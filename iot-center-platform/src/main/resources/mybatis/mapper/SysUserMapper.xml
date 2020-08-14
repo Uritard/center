@@ -240,6 +240,7 @@
         <result property="invalidTime" column="invalid_time"/>
         <result property="lastLogin" column="last_login"/>
     </resultMap>
+
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysUser" resultMap="userInfoPageMap">
         select
         a.user_id,
@@ -260,20 +261,16 @@
         a.appkey,
         a.image_url,
         a.role_id,
-        c.role_name,
         a.org_id,
-        b.org_name,
         a.user_status,
-        DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%S') AS create_time,
-        DATE_FORMAT(a.update_time, '%Y-%m-%d %H:%i:%S') AS update_time,
-        DATE_FORMAT(a.invalid_time, '%Y-%m-%d %H:%i:%S') AS invalid_time,
-        DATE_FORMAT(a.last_login, '%Y-%m-%d %H:%i:%S') AS last_login
+        a.create_time,
+        a.update_time,
+        a.invalid_time,
+        a.last_login
         from sys_user a
-        LEFT JOIN sys_org b ON a.org_id = b.org_id
-        LEFT JOIN sys_role c ON a.role_id = c.role_id
         where 1 = 1 AND a.state != 0
         <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
-        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="userName != null and userName != ''"> and a.user_name like concat('%',#{userName, jdbcType=VARCHAR},'%') </if>
         <if test="password != null and password != ''"> and a.PASSWORD = #{password, jdbcType=VARCHAR}</if>
         <if test="trueName != null and trueName != ''"> and a.true_name = #{trueName, jdbcType=VARCHAR}</if>
         <if test="userType != null and userType != ''"> and a.user_type = #{userType, jdbcType=INTEGER}</if>

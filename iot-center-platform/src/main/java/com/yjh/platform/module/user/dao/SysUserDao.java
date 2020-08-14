@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TCameraPreset;
@@ -16,8 +17,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface SysUserDao {
-
-
     int insert(SysUser sysUser);
     int deleteByPrimaryId(@Param(value = "userId") Long userId);
     int update(SysUser sysUser);
