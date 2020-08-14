@@ -1,0 +1,12 @@
+.idea
+/*.iml
+*.iml
+/web/*.iml
+/server/*.iml
+/.idea
+/api/*.iml
+/interface/*.iml
+**/target
+/logs/*.log
+**/test
+**/logs

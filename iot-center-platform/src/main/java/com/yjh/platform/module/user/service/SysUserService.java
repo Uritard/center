@@ -24,12 +24,7 @@ public class SysUserService{
     @Autowired
     private SysUserDao sysUserDao;
 
-<<<<<<< Updated upstream
     @Logs(title = "插入新用户", code = "sysUser")
-=======
-
-    @Logs(title = "插入", code = "module")
->>>>>>> Stashed changes
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysUser sysUser) {
         Date date = new Date();
