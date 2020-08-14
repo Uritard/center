@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TDictBusinessDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TDictBusiness">
+        <id column="dict_id" jdbcType="INTEGER" property="dictId" />
+        <result column="dict_code" jdbcType="VARCHAR" property="dictCode" />
+        <result column="col_name" jdbcType="VARCHAR" property="colName" />
+        <result column="dict_note" jdbcType="VARCHAR" property="dictNote" />
+        <result column="up_dict" jdbcType="INTEGER" property="upDict" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="sort" jdbcType="BIGINT" property="sort" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        dict_id, dict_code, col_name, dict_note, up_dict, remark, sort
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="dictId" parameterType="com.yjh.platform.module.user.entity.TDictBusiness">
+        insert into t_dict_business(
+            dict_id,
+            dict_code,
+            col_name,
+            dict_note,
+            up_dict,
+            remark,
+            sort
+        )values(
+                #{dictId, jdbcType=INTEGER},
+                #{dictCode, jdbcType=VARCHAR},
+                #{colName, jdbcType=VARCHAR},
+                #{dictNote, jdbcType=VARCHAR},
+                #{upDict, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR},
+                #{sort, jdbcType=BIGINT}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Integer">
+        delete from t_dict_business
+                where dict_id = #{dictId, jdbcType=INTEGER}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TDictBusiness">
+        update t_dict_business a <set>
+        <if test="dictId != null and dictId != ''">a.dict_id = #{dictId, jdbcType=INTEGER},</if>
+        <if test="dictCode != null and dictCode != ''">a.dict_code = #{dictCode, jdbcType=VARCHAR},</if>
+        <if test="colName != null and colName != ''">a.col_name = #{colName, jdbcType=VARCHAR},</if>
+        <if test="dictNote != null and dictNote != ''">a.dict_note = #{dictNote, jdbcType=VARCHAR},</if>
+        <if test="upDict != null and upDict != ''">a.up_dict = #{upDict, jdbcType=INTEGER},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=BIGINT},</if>
+    </set>
+            where a.dict_id = #{dictId, jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select
+        a.dict_id,
+        a.dict_code,
+        a.col_name,
+        a.dict_note,
+        a.up_dict,
+        a.remark,
+        a.sort
+        from t_dict_business a
+        where 1 = 1
+            and a.dict_id = #{dictId, jdbcType=INTEGER}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TDictBusiness" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select
+        a.dict_id,
+        a.dict_code,
+        a.col_name,
+        a.dict_note,
+        a.up_dict,
+        a.remark,
+        a.sort
+        from t_dict_business a
+        where 1 = 1
+        <if test="dictId != null and dictId != ''"> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
+        <if test="dictCode != null and dictCode != ''"> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
+        <if test="colName != null and colName != ''"> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+        <if test="dictNote != null and dictNote != ''"> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
+        <if test="upDict != null and upDict != ''"> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=BIGINT}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TDictBusiness" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select
+        a.dict_id,
+        a.dict_code,
+        a.col_name,
+        a.dict_note,
+        a.up_dict,
+        a.remark,
+        a.sort
+        from t_dict_business a
+        where 1 = 1
+        <if test="dictId != null and dictId != ''"> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
+        <if test="dictCode != null and dictCode != ''"> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
+        <if test="colName != null and colName != ''"> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+        <if test="dictNote != null and dictNote != ''"> AND a.dict_note LIKE CONCAT('%',#{dictNote, jdbcType=VARCHAR},'%')</if>
+        <if test="upDict != null and upDict != ''"> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=BIGINT}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_dict_business(
+            dict_code,
+            col_name,
+            dict_note,
+            up_dict,
+            remark,
+            sort
+        )values
+        <foreach collection="list" item="TDictBusiness" separator=",">
+            (
+                #{TDictBusiness.dictCode, jdbcType=VARCHAR},
+                #{TDictBusiness.colName, jdbcType=VARCHAR},
+                #{TDictBusiness.dictNote, jdbcType=VARCHAR},
+                #{TDictBusiness.upDict, jdbcType=INTEGER},
+                #{TDictBusiness.remark, jdbcType=VARCHAR},
+                #{TDictBusiness.sort, jdbcType=BIGINT}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

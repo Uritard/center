@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.SysRoleRegionDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.SysRoleRegion">
+        <id column="role_id" jdbcType="BIGINT" property="roleId" />
+        <result column="region_id" jdbcType="BIGINT" property="regionId" />
+        <result column="is_checked" jdbcType="VARCHAR" property="isChecked" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        role_id, region_id, is_checked
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="roleId" parameterType="com.yjh.platform.module.user.entity.SysRoleRegion">
+        insert into sys_role_region(
+            role_id,
+            region_id,
+            is_checked
+        )values(
+                #{roleId, jdbcType=BIGINT},
+                #{regionId, jdbcType=BIGINT},
+                #{isChecked, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from sys_role_region
+                where role_id = #{roleId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleRegion">
+        update sys_role_region a <set>
+        <if test="roleId != null and roleId != ''">a.role_id = #{roleId, jdbcType=BIGINT},</if>
+        <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=BIGINT},</if>
+        <if test="isChecked != null and isChecked != ''">a.is_checked = #{isChecked, jdbcType=VARCHAR},</if>
+    </set>
+            where a.role_id = #{roleId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysRoleRegion">
+        select
+        a.role_id,
+        a.region_id,
+        a.is_checked
+        from sys_role_region a
+        where 1 = 1
+            and a.role_id = #{roleId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.SysRoleRegion" resultType="com.yjh.platform.module.user.entity.SysRoleRegion">
+        select
+        a.role_id,
+        a.region_id,
+        a.is_checked
+        from sys_role_region a
+        where 1 = 1
+        <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=BIGINT}</if>
+        <if test="isChecked != null and isChecked != ''"> and a.is_checked = #{isChecked, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysRoleRegion" resultType="com.yjh.platform.module.user.entity.SysRoleRegion">
+        select
+        a.role_id,
+        a.region_id,
+        a.is_checked
+        from sys_role_region a
+        where 1 = 1
+        <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=BIGINT}</if>
+        <if test="isChecked != null and isChecked != ''"> and a.is_checked = #{isChecked, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into sys_role_region(
+            role_id,
+            region_id,
+            is_checked
+        )values
+        <foreach collection="list" item="SysRoleRegion" separator=",">
+            (
+                #{SysRoleRegion.roleId, jdbcType=BIGINT},
+                #{SysRoleRegion.regionId, jdbcType=BIGINT},
+                #{SysRoleRegion.isChecked, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

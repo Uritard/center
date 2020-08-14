@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TStdMetemodelDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdMeteModel">
+        <id column="model_id" jdbcType="BIGINT" property="modelId" />
+        <result column="model_name" jdbcType="VARCHAR" property="modelName" />
+        <result column="device_type" jdbcType="INTEGER" property="deviceType" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        model_id, model_name, device_type, remark
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="modelId" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel">
+        insert into t_std_metemodel(
+            model_id,
+            model_name,
+            device_type,
+            remark
+        )values(
+                #{modelId, jdbcType=BIGINT},
+                #{modelName, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_std_metemodel
+                where model_id = #{modelId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel">
+        update t_std_metemodel a <set>
+        <if test="modelId != null and modelId != ''">a.model_id = #{modelId, jdbcType=BIGINT},</if>
+        <if test="modelName != null and modelName != ''">a.model_name = #{modelName, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+            where a.model_id = #{modelId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdMeteModel">
+        select
+        a.model_id,
+        a.model_name,
+        a.device_type,
+        a.remark
+        from t_std_metemodel a
+        where 1 = 1
+            and a.model_id = #{modelId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel" resultType="com.yjh.platform.module.device.entity.TStdMeteModel">
+        select
+        a.model_id,
+        a.model_name,
+        a.device_type,
+        a.remark
+        from t_std_metemodel a
+        where 1 = 1
+        <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
+        <if test="modelName != null and modelName != ''"> and a.model_name = #{modelName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel" resultType="com.yjh.platform.module.device.entity.TStdMeteModel">
+        select
+        a.model_id,
+        a.model_name,
+        a.device_type,
+        a.remark
+        from t_std_metemodel a
+        where 1 = 1
+        <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
+        <if test="modelName != null and modelName != ''"> and a.model_name = #{modelName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_std_metemodel(
+            model_id,
+            model_name,
+            device_type,
+            remark
+        ) values
+        <foreach collection="list" item="TStdMeteModel" separator=",">
+            (
+                #{TStdMeteModel.modelId, jdbcType=BIGINT},
+                #{TStdMeteModel.modelName, jdbcType=VARCHAR},
+                #{TStdMeteModel.deviceType, jdbcType=INTEGER},
+                #{TStdMeteModel.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectMeteByDeviceType" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
+        select
+        a.model_id,
+        b.std_mete_id AS mete_id,
+        "本体" AS custom_type,
+        b.mete_code,
+        b.mete_type,
+        b.mete_name,
+        b.unit,
+        b.alarm_note,
+        b.alarm_explain,
+        b.alarm_type,
+        b.up_effect,
+        b.low_effect,
+        b.alarm_level,
+        b.alarm_limit AS high_limit1,
+        b.alarm_limit AS low_limit1,
+        b.alarm_limit AS high_limit2,
+        b.alarm_limit AS low_limit2,
+        b.alarm_delay,
+        b.alarm_cnt,
+        b.threshold_abs,
+        b.threshold_per,
+        b.modulus
+        from t_std_metemodel a
+        LEFT JOIN t_std_mete b ON a.device_type = b.device_type
+        where 1 = 1
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,34 @@
+package com.yjh.platform.module.device.dao;
+
+import java.util.List;
+import java.util.Date;
+
+import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
+import com.yjh.platform.module.device.entity.TStdRegion;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+/**
+ * @author tt
+ * @since 2020-07-27
+ */
+@Repository
+public interface TStdRegionDao {
+
+    int insert(TStdRegion tStdRegion);
+    int deleteByPrimaryId(@Param(value = "regionId") Long regionId);
+    int update(TStdRegion tStdRegion);
+    TStdRegion selectByPrimaryId(@Param(value = "regionId") Long regionId);
+    List<TStdRegion> select(@Param(value = "regionId") Long regionId,
+                                @Param(value = "regionName") String regionName,
+                                @Param(value = "sort") Integer sort,
+                                @Param(value = "upRegionId") Long upRegionId,
+                                @Param(value = "upRegionIds") String upRegionIds,
+                                @Param(value = "regionCode") Integer regionCode,
+                                @Param(value = "stationId") String stationId,
+                                @Param(value = "state") Integer state,
+                                @Param(value = "createTime") Date createTime);
+    List<TStdRegion> selectByPage(TStdRegion tStdRegion);
+    List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
+}

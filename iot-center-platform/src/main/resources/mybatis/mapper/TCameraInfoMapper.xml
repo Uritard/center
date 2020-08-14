@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TCameraInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraInfo">
+        <id column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <result column="camera_name" jdbcType="VARCHAR" property="cameraName" />
+        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
+        <result column="record_id" jdbcType="VARCHAR" property="recordId" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="channel_num" jdbcType="INTEGER" property="channelNum" />
+        <result column="sms_id" jdbcType="INTEGER" property="smsId" />
+        <result column="rms_id" jdbcType="INTEGER" property="rmsId" />
+        <result column="factory_name" jdbcType="VARCHAR" property="factoryName" />
+        <result column="stream_type" jdbcType="INTEGER" property="streamType" />
+        <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
+        <result column="is_control" jdbcType="INTEGER" property="isControl" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        camera_id, camera_name, alias_name, record_id, up_region_id, channel_num, sms_id, rms_id, factory_name, stream_type, protocol_type, url, port, camera_type, is_control
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
+        insert into t_camera_info(
+            camera_name,
+            alias_name,
+            record_id,
+            up_region_id,
+            channel_num,
+            sms_id,
+            rms_id,
+            factory_name,
+            stream_type,
+            protocol_type,
+            url,
+            port,
+            camera_type,
+            is_control
+        )values(
+                #{cameraName, jdbcType=VARCHAR},
+                #{aliasName, jdbcType=VARCHAR},
+                #{recordId, jdbcType=VARCHAR},
+                #{upRegionId, jdbcType=BIGINT},
+                #{channelNum, jdbcType=INTEGER},
+                #{smsId, jdbcType=INTEGER},
+                #{rmsId, jdbcType=INTEGER},
+                #{factoryName, jdbcType=VARCHAR},
+                #{streamType, jdbcType=INTEGER},
+                #{protocolType, jdbcType=INTEGER},
+                #{url, jdbcType=VARCHAR},
+                #{port, jdbcType=INTEGER},
+                #{cameraType, jdbcType=INTEGER},
+                #{isControl, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_camera_info
+                where camera_id = #{cameraId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
+        update t_camera_info a <set>
+        <if test="cameraName != null and cameraName != ''">a.camera_name = #{cameraName, jdbcType=VARCHAR},</if>
+        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
+        <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=VARCHAR},</if>
+        <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+        <if test="channelNum != null and channelNum != ''">a.channel_num = #{channelNum, jdbcType=INTEGER},</if>
+        <if test="smsId != null and smsId != ''">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
+        <if test="rmsId != null and rmsId != ''">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
+        <if test="factoryName != null and factoryName != ''">a.factory_name = #{factoryName, jdbcType=VARCHAR},</if>
+        <if test="streamType != null and streamType != ''">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
+        <if test="protocolType != null and protocolType != ''">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
+        <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
+        <if test="port != null and port != ''">a.port = #{port, jdbcType=INTEGER},</if>
+        <if test="cameraType != null and cameraType != ''">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
+        <if test="isControl != null and isControl != ''">a.is_control = #{isControl, jdbcType=INTEGER},</if>
+    </set>
+        where a.camera_id = #{cameraId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+        select
+        a.camera_id,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.up_region_id,
+        a.channel_num,
+        a.sms_id,
+        a.rms_id,
+        a.factory_name,
+        a.stream_type,
+        a.protocol_type,
+        a.url,
+        a.port,
+        a.camera_type,
+        a.is_control
+        from t_camera_info a
+        where 1 = 1
+            and a.camera_id = #{cameraId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+        select
+        a.camera_id,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.up_region_id,
+        a.channel_num,
+        a.sms_id,
+        a.rms_id,
+        a.factory_name,
+        a.stream_type,
+        a.protocol_type,
+        a.url,
+        a.port,
+        a.camera_type,
+        a.is_control
+        from t_camera_info a
+        where 1 = 1
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="channelNum != null and channelNum != ''"> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
+        <if test="smsId != null and smsId != ''"> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
+        <if test="rmsId != null and rmsId != ''"> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
+        <if test="factoryName != null and factoryName != ''"> and a.factory_name = #{factoryName, jdbcType=VARCHAR}</if>
+        <if test="streamType != null and streamType != ''"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
+        <if test="protocolType != null and protocolType != ''"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
+        <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
+        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
+        <if test="cameraType != null and cameraType != ''"> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
+        <if test="isControl != null and isControl != ''"> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+        select
+        a.camera_id,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.up_region_id,
+        a.channel_num,
+        a.sms_id,
+        a.rms_id,
+        a.factory_name,
+        a.stream_type,
+        a.protocol_type,
+        a.url,
+        a.port,
+        a.camera_type,
+        a.is_control
+        from t_camera_info a
+        where 1 = 1
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="channelNum != null and channelNum != ''"> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
+        <if test="smsId != null and smsId != ''"> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
+        <if test="rmsId != null and rmsId != ''"> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
+        <if test="factoryName != null and factoryName != ''"> and a.factory_name = #{factoryName, jdbcType=VARCHAR}</if>
+        <if test="streamType != null and streamType != ''"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
+        <if test="protocolType != null and protocolType != ''"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
+        <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
+        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
+        <if test="cameraType != null and cameraType != ''"> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
+        <if test="isControl != null and isControl != ''"> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="selectCameraTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
+                FROM t_camera_info d
+                LEFT JOIN t_std_region b ON d.up_region_id = b.region_id);
+    </select>
+
+</mapper>

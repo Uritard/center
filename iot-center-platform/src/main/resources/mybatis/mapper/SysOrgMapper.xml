@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.SysOrgDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.SysOrg">
+        <id column="org_id" jdbcType="BIGINT" property="orgId" />
+        <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+        <result column="org_code" jdbcType="VARCHAR" property="orgCode" />
+        <result column="up_id" jdbcType="BIGINT" property="upId" />
+        <result column="sort" jdbcType="INTEGER" property="sort" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="creator_id" jdbcType="BIGINT" property="creatorId" />
+        <result column="org_level" jdbcType="INTEGER" property="orgLevel" />
+        <result column="org_path" jdbcType="VARCHAR" property="orgPath" />
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        org_id, org_name, org_code, up_id, sort, create_time, creator_id, org_level, org_path, dept_name
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="orgId" parameterType="com.yjh.platform.module.user.entity.SysOrg">
+        insert into sys_org(
+            org_id,
+            org_name,
+            org_code,
+            up_id,
+            sort,
+            create_time,
+            creator_id,
+            org_level,
+            org_path,
+            dept_name
+        )values(
+                #{orgId, jdbcType=BIGINT},
+                #{orgName, jdbcType=VARCHAR},
+                #{orgCode, jdbcType=VARCHAR},
+                #{upId, jdbcType=BIGINT},
+                #{sort, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{creatorId, jdbcType=BIGINT},
+                #{orgLevel, jdbcType=INTEGER},
+                #{orgPath, jdbcType=VARCHAR},
+                #{deptName, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from sys_org
+                where org_id = #{orgId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.SysOrg">
+        update sys_org a <set>
+        <if test="orgId != null and orgId != ''">a.org_id = #{orgId, jdbcType=BIGINT},</if>
+        <if test="orgName != null and orgName != ''">a.org_name = #{orgName, jdbcType=VARCHAR},</if>
+        <if test="orgCode != null and orgCode != ''">a.org_code = #{orgCode, jdbcType=VARCHAR},</if>
+        <if test="upId != null and upId != ''">a.up_id = #{upId, jdbcType=BIGINT},</if>
+        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=INTEGER},</if>
+        <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="creatorId != null and creatorId != ''">a.creator_id = #{creatorId, jdbcType=BIGINT},</if>
+        <if test="orgLevel != null and orgLevel != ''">a.org_level = #{orgLevel, jdbcType=INTEGER},</if>
+        <if test="orgPath != null and orgPath != ''">a.org_path = #{orgPath, jdbcType=VARCHAR},</if>
+        <if test="deptName != null and deptName != ''">a.dept_name = #{deptName, jdbcType=VARCHAR},</if>
+    </set>
+            where a.org_id = #{orgId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysOrg">
+        select
+        a.org_id,
+        a.org_name,
+        a.org_code,
+        a.up_id,
+        a.sort,
+        a.create_time,
+        a.creator_id,
+        a.org_level,
+        a.org_path,
+        a.dept_name
+        from sys_org a
+        where 1 = 1
+            and a.org_id = #{orgId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.SysOrg" resultType="com.yjh.platform.module.user.entity.SysOrg">
+        select
+        a.org_id,
+        a.org_name,
+        a.org_code,
+        a.up_id,
+        a.sort,
+        a.create_time,
+        a.creator_id,
+        a.org_level,
+        a.org_path,
+        a.dept_name
+        from sys_org a
+        where 1 = 1
+        <if test="orgId != null and orgId != ''"> and a.org_id = #{orgId, jdbcType=BIGINT}</if>
+        <if test="orgName != null and orgName != ''"> and a.org_name = #{orgName, jdbcType=VARCHAR}</if>
+        <if test="orgCode != null and orgCode != ''"> and a.org_code = #{orgCode, jdbcType=VARCHAR}</if>
+        <if test="upId != null and upId != ''"> and a.up_id = #{upId, jdbcType=BIGINT}</if>
+        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
+        <if test="orgLevel != null and orgLevel != ''"> and a.org_level = #{orgLevel, jdbcType=INTEGER}</if>
+        <if test="orgPath != null and orgPath != ''"> and a.org_path = #{orgPath, jdbcType=VARCHAR}</if>
+        <if test="deptName != null and deptName != ''"> and a.dept_name = #{deptName, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysOrg" resultType="com.yjh.platform.module.user.entity.SysOrg">
+        select
+        a.org_id,
+        a.org_name,
+        a.org_code,
+        a.up_id,
+        a.sort,
+        a.create_time,
+        a.creator_id,
+        a.org_level,
+        a.org_path,
+        a.dept_name
+        from sys_org a
+        where 1 = 1
+        <if test="orgId != null and orgId != ''"> and a.org_id = #{orgId, jdbcType=BIGINT}</if>
+        <if test="orgName != null and orgName != ''"> and a.org_name = #{orgName, jdbcType=VARCHAR}</if>
+        <if test="orgCode != null and orgCode != ''"> and a.org_code = #{orgCode, jdbcType=VARCHAR}</if>
+        <if test="upId != null and upId != ''"> and a.upId = #{parentId, jdbcType=BIGINT}</if>
+        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
+        <if test="orgLevel != null and orgLevel != ''"> and a.org_level = #{orgLevel, jdbcType=INTEGER}</if>
+        <if test="orgPath != null and orgPath != ''"> and a.org_path = #{orgPath, jdbcType=VARCHAR}</if>
+        <if test="deptName != null and deptName != ''"> and a.dept_name = #{deptName, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectOrgTree" resultType="com.yjh.platform.module.user.entity.OrgInfo">
+        SELECT a.org_id AS Id, a.org_name AS label, a.up_id AS upId, b.org_name AS upName, a.org_code AS orgCode
+          FROM sys_org a
+          LEFT JOIN sys_org b ON a.up_id = b.org_id;
+    </select>
+
+    <select id="selectOrgTreeByOrgName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.OrgInfo">
+        SELECT a.org_id AS Id, a.org_name AS label, a.up_id AS upId, b.org_name AS upName, a.org_code AS orgCode
+          FROM sys_org a
+          LEFT JOIN sys_org b ON a.up_id = b.org_id
+          WHERE 1=1
+                <if test="orgName != null and orgName != ''"> AND a.org_name LIKE CONCAT('%',#{orgName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+</mapper>

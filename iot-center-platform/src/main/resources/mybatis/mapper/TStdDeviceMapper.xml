@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDevice">
+        <id column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
+        <result column="device_type" jdbcType="INTEGER" property="deviceType" />
+        <result column="position_type" jdbcType="VARCHAR" property="positionType" />
+        <result column="model_id" jdbcType="BIGINT" property="modelId" />
+        <result column="region_path" jdbcType="VARCHAR" property="regionPath" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="up_region_name" jdbcType="VARCHAR" property="upRegionName" />
+        <result column="custom_name" jdbcType="VARCHAR" property="customName" />
+        <result column="custom_type" jdbcType="INTEGER" property="customType" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_id, custom_id, device_code, device_name, alias_name, device_type, position_type, model_id, region_path, up_region_id, up_region_name, custom_name, custom_type, status, update_time, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDevice">
+        insert into t_std_device(
+            device_id,
+            custom_id,
+            device_code,
+            device_name,
+            alias_name,
+            device_type,
+            position_type,
+            model_id,
+            region_path,
+            up_region_id,
+            up_region_name,
+            custom_name,
+            custom_type,
+            status,
+            update_time,
+            create_time
+        )values(
+                #{deviceId, jdbcType=BIGINT},
+                #{customId, jdbcType=VARCHAR},
+                #{deviceCode, jdbcType=VARCHAR},
+                #{deviceName, jdbcType=VARCHAR},
+                #{aliasName, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=INTEGER},
+                #{positionType, jdbcType=VARCHAR},
+                #{modelId, jdbcType=BIGINT},
+                #{regionPath, jdbcType=VARCHAR},
+                #{upRegionId, jdbcType=BIGINT},
+                #{upRegionName, jdbcType=VARCHAR},
+                #{customName, jdbcType=VARCHAR},
+                #{customType, jdbcType=INTEGER},
+                #{status, jdbcType=INTEGER},
+                #{updateTime, jdbcType=TIMESTAMP},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_std_device
+                where device_id = #{deviceId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDevice">
+        update t_std_device a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
+        <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
+        <if test="deviceName != null and deviceName != ''">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
+        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+        <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
+        <if test="modelId != null and modelId != ''">a.model_id = #{modelId, jdbcType=BIGINT},</if>
+        <if test="regionPath != null and regionPath != ''">a.region_path = #{regionPath, jdbcType=VARCHAR},</if>
+        <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+        <if test="upRegionName != null and upRegionName != ''">a.up_region_name = #{upRegionName, jdbcType=VARCHAR},</if>
+        <if test="customName != null and customName != ''">a.custom_name = #{customName, jdbcType=VARCHAR},</if>
+        <if test="customType != null and customType != ''">a.custom_type = #{customType, jdbcType=INTEGER},</if>
+        <if test="status != null and status != ''">a.status = #{status, jdbcType=INTEGER},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDevice">
+        select
+        a.device_id,
+        a.custom_id,
+        a.device_code,
+        a.device_name,
+        a.alias_name,
+        a.device_type,
+        a.position_type,
+        a.model_id,
+        a.region_path,
+        a.up_region_id,
+        a.up_region_name,
+        a.custom_name,
+        a.custom_type,
+        a.status,
+        a.update_time,
+        a.create_time
+        from t_std_device a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
+        select
+        a.device_id,
+        a.custom_id,
+        a.device_code,
+        a.device_name,
+        a.alias_name,
+        a.device_type,
+        a.position_type,
+        a.model_id,
+        a.region_path,
+        a.up_region_id,
+        a.up_region_name,
+        a.custom_name,
+        a.custom_type,
+        a.status,
+        a.update_time,
+        a.create_time
+        from t_std_device a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
+        <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
+        <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
+        <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
+        <if test="customType != null and customType != ''"> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
+        <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
+        select
+        a.device_id,
+        a.custom_id,
+        a.device_code,
+        a.device_name,
+        a.alias_name,
+        a.device_type,
+        a.position_type,
+        a.model_id,
+        a.region_path,
+        a.up_region_id,
+        a.up_region_name,
+        a.custom_name,
+        a.custom_type,
+        a.status,
+        a.update_time,
+        a.create_time
+        from t_std_device a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
+        <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
+        <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
+        <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
+        <if test="customType != null and customType != ''"> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
+        <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectRegionById" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        select
+        DISTINCT a.device_id,
+        b.region_id,
+        b.region_name,
+        b.sort,
+        b.up_region_id,
+        b.up_region_ids,
+        b.region_code,
+        b.station_id,
+        b.state,
+        b.create_time
+        from t_std_device a
+        LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        where 1 = 1
+        and a.device_id = #{deviceId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectDevTreeCustom" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_device c
+                LEFT JOIN t_std_device e ON c.device_id = e.device_id);
+    </select>
+
+    <select id="selectDevTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id);
+    </select>
+
+    <select id="selectDevTreeRegion" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id;
+    </select>
+
+    <select id="selectAllTreeCustom" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_device c
+                LEFT JOIN t_std_device e ON c.device_id = e.device_id)
+        UNION ALL (
+            SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
+                FROM t_camera_info d
+                LEFT JOIN t_std_region b ON d.up_region_id = b.region_id);
+    </select>
+
+    <select id="selectAllTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
+                FROM t_camera_info d
+                LEFT JOIN t_std_region b ON d.up_region_id = b.region_id);
+    </select>
+
+    <select id="selectByModelId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select
+        a.device_id
+        from t_std_device a
+        where 1 = 1
+        <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
+    </select>
+
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TAlgorithmInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        <id column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
+        <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
+        <result column="algorithm_type" jdbcType="VARCHAR" property="algorithmType" />
+        <result column="describel" jdbcType="VARCHAR" property="describel" />
+        <result column="algorithm_code" jdbcType="INTEGER" property="algorithmCode" />
+        <result column="analys_type" jdbcType="VARCHAR" property="analysType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        algorithm_id, algorithm_name, algorithm_type, describel, algorithm_code, analys_type
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="algorithmId" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        insert into t_algorithm_info(
+            algorithm_name,
+            algorithm_type,
+            describel,
+            algorithm_code,
+            analys_type
+        )values(
+                #{algorithmName, jdbcType=VARCHAR},
+                #{algorithmType, jdbcType=VARCHAR},
+                #{describel, jdbcType=VARCHAR},
+                #{algorithmCode, jdbcType=INTEGER},
+                #{analysType, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_algorithm_info
+                where algorithm_id = #{algorithmId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        update t_algorithm_info a <set>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
+        <if test="algorithmName != null and algorithmName != ''">a.algorithm_name = #{algorithmName, jdbcType=VARCHAR},</if>
+        <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
+        <if test="describel != null and describel != ''">a.describel = #{describel, jdbcType=VARCHAR},</if>
+        <if test="algorithmCode != null and algorithmCode != ''">a.algorithm_code = #{algorithmCode, jdbcType=INTEGER},</if>
+        <if test="analysType != null and analysType != ''">a.analys_type = #{analysType, jdbcType=VARCHAR},</if>
+    </set>
+            where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        select
+        a.algorithm_id,
+        a.algorithm_name,
+        a.algorithm_type,
+        a.describel,
+        a.algorithm_code,
+        a.analys_type
+        from t_algorithm_info a
+        where 1 = 1
+            and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        select
+        a.algorithm_id,
+        a.algorithm_name,
+        a.algorithm_type,
+        a.describel,
+        a.algorithm_code,
+        a.analys_type
+        from t_algorithm_info a
+        where 1 = 1
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
+        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="algorithmType != null and algorithmType != ''"> and a.algorithm_type = #{algorithmType, jdbcType=VARCHAR}</if>
+        <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
+        <if test="algorithmCode != null and algorithmCode != ''"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
+        <if test="analysType != null and analysType != ''"> and a.analys_type = #{analysType, jdbcType=VARCHAR}</if>
+    </select>
+
+    <resultMap id="algorithmInfoMap" type="java.util.HashMap">
+        <result property="algorithmId" column="algorithm_id"/>
+        <result property="algorithmName" column="algorithm_name"/>
+        <result property="algorithmType" column="algorithm_type"/>
+        <result property="describel" column="describel"/>
+        <result property="algorithmCode" column="algorithm_code"/>
+        <result property="analysType" column="analys_type"/>
+        <result property="analysTypeName" column="dict_note"/>
+    </resultMap>
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultMap="algorithmInfoMap">
+        select
+        a.algorithm_id,
+        a.algorithm_name,
+        a.algorithm_type,
+        a.describel,
+        a.algorithm_code,
+        a.analys_type,
+        b.dict_note
+        from t_algorithm_info a
+        LEFT JOIN t_dict_business b ON b.dict_code = a.analys_type
+        where 1 = 1
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
+        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="algorithmType != null and algorithmType != ''"> and a.algorithm_type = #{algorithmType, jdbcType=VARCHAR}</if>
+        <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
+        <if test="algorithmCode != null and algorithmCode != ''"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
+        <if test="analysType != null and analysType != ''"> and a.analys_type = #{analysType, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_algorithm_info(
+            algorithm_id,
+            algorithm_name,
+            algorithm_type,
+            describel,
+            algorithm_code,
+            analys_type
+        )values
+        <foreach collection="list" item="TAlgorithmInfo" separator=",">
+            (
+                #{TAlgorithmInfo.algorithmId, jdbcType=BIGINT},
+                #{TAlgorithmInfo.algorithmName, jdbcType=VARCHAR},
+                #{TAlgorithmInfo.algorithmType, jdbcType=VARCHAR},
+                #{TAlgorithmInfo.describel, jdbcType=VARCHAR},
+                #{TAlgorithmInfo.algorithmCode, jdbcType=INTEGER},
+                #{TAlgorithmInfo.analysType, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

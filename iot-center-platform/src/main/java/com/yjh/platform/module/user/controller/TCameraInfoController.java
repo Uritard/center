@@ -1,0 +1,150 @@
+package com.yjh.platform.module.user.controller;
+
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.user.service.TCameraInfoService;
+import com.yjh.platform.module.user.entity.TCameraInfo;
+import java.util.HashMap;
+import java.util.List;
+
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yjh.platform.common.result.Result;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.Page;
+import java.util.Map;
+
+import com.yjh.platform.common.result.ResultCodeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.mysql.jdbc.StringUtils;
+
+
+/**
+ * @author tt
+ * @since 2020-07-23
+ */
+@RestController
+@RequestMapping("/tCameraInfo/v1")
+@Api(value = "/tCameraInfo", description = "摄像头信息表操作接口")
+public class TCameraInfoController {
+
+    @Autowired
+    private final TCameraInfoService tCameraInfoService;
+
+    private Logger log = LoggerFactory.getLogger(TCameraInfoController.class);
+
+    public TCameraInfoController(TCameraInfoService tCameraInfoService) {
+        this.tCameraInfoService = tCameraInfoService;
+    }
+
+    @ApiOperation(value = "插入")
+    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    public Result insert(@RequestBody TCameraInfo tCameraInfo) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraInfoService.insert(tCameraInfo));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("新增相机错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除")
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public Result delete(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraInfoService.deleteByPrimaryId(cameraId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除相机异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除相机错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "更新")
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    public Result update(@RequestBody TCameraInfo tCameraInfo) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraInfoService.update(tCameraInfo));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新相机异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新相机错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "主键查询")
+    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    public Result selectByPrimaryId(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+        Result result = new Result();
+        try {
+            TCameraInfo tCameraInfo = tCameraInfoService.selectByPrimaryId(cameraId);
+            result.setData(tCameraInfo);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询")
+    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    public Result select(@RequestParam(value = "cameraId", required = false) Long cameraId,
+                         @RequestParam(value = "cameraName", required = false) String cameraName,
+                         @RequestParam(value = "aliasName", required = false) String aliasName,
+                         @RequestParam(value = "recordId", required = false) String recordId,
+                         @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                         @RequestParam(value = "channelNum", required = false) Integer channelNum,
+                         @RequestParam(value = "smsId", required = false) Integer smsId,
+                         @RequestParam(value = "rmsId", required = false) Integer rmsId,
+                         @RequestParam(value = "factoryName", required = false) String factoryName,
+                         @RequestParam(value = "streamType", required = false) Integer streamType,
+                         @RequestParam(value = "protocolType", required = false) Integer protocolType,
+                         @RequestParam(value = "url", required = false) String url,
+                         @RequestParam(value = "port", required = false) Integer port,
+                         @RequestParam(value = "cameraType", required = false) Integer cameraType,
+                         @RequestParam(value = "isControl", required = false) Integer isControl) {
+        Result result = new Result();
+        try {
+            List<TCameraInfo> list = tCameraInfoService.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, factoryName, streamType, protocolType, url, port, cameraType, isControl);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "分页查询")
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    public Result selectByPage(@RequestBody TCameraInfo tCameraInfo,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCameraInfo> list = tCameraInfoService.selectByPage(tCameraInfo);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+}

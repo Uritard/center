@@ -1,0 +1,45 @@
+package com.yjh.platform.module.user.dao;
+
+import java.util.List;
+import java.util.Date;
+import com.yjh.platform.module.user.entity.TRobotInfo;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+/**
+ * @author tt
+ * @since 2020-08-05
+ */
+@Repository
+public interface TRobotInfoDao {
+
+    int insert(TRobotInfo tRobotInfo);
+    int deleteByPrimaryId(@Param(value = "robotId") Long robotId);
+    int update(TRobotInfo tRobotInfo);
+    TRobotInfo selectByPrimaryId(@Param(value = "robotId") Long robotId);
+    List<TRobotInfo> select(@Param(value = "robotId") Long robotId,
+                                @Param(value = "robotName") String robotName,
+                                @Param(value = "robotStatus") String robotStatus,
+                                @Param(value = "robotType") Integer robotType,
+                                @Param(value = "robotIp") String robotIp,
+                                @Param(value = "robotPort") Integer robotPort,
+                                @Param(value = "upRegionId") Long upRegionId,
+                                @Param(value = "upRegionName") String upRegionName,
+                                @Param(value = "lightIp") String lightIp,
+                                @Param(value = "lightPort") String lightPort,
+                                @Param(value = "lightUsername") String lightUsername,
+                                @Param(value = "lightPassword") String lightPassword,
+                                @Param(value = "lnferadIp") String lnferadIp,
+                                @Param(value = "inferadPort") Integer inferadPort,
+                                @Param(value = "inferadUsername") String inferadUsername,
+                                @Param(value = "inferadPassword") String inferadPassword,
+                                @Param(value = "photePath") String photePath,
+                                @Param(value = "createBy") String createBy,
+                                @Param(value = "createDate") Date createDate,
+                                @Param(value = "updateBy") String updateBy,
+                                @Param(value = "updateDate") Date updateDate,
+                                @Param(value = "remarks") String remarks);
+    List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
+
+    int batchInsert(@Param("list") List<TRobotInfo> list);
+}

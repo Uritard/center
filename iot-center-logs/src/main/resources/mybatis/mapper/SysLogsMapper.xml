@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.logs.module.log.dao.SysLogsDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.logs.module.log.entity.SysLogs">
+        <id column="log_id" jdbcType="VARCHAR" property="logId" />
+        <result column="log_type" jdbcType="VARCHAR" property="logType" />
+        <result column="ip" jdbcType="VARCHAR" property="ip" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id, log_type, ip, title, state, content, user_id, user_name, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="logId" parameterType="com.yjh.logs.module.log.entity.SysLogs">
+        insert into sys_logs(
+            log_id,
+            log_type,
+            ip,
+            title,
+            state,
+            content,
+            user_id,
+            user_name,
+            create_time
+        )values(
+                #{logId, jdbcType=VARCHAR},
+                #{logType, jdbcType=VARCHAR},
+                #{ip, jdbcType=VARCHAR},
+                #{title, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{content, jdbcType=VARCHAR},
+                #{userId, jdbcType=BIGINT},
+                #{userName, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from sys_logs
+                where log_id = #{logId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.logs.module.log.entity.SysLogs">
+        update sys_logs a <set>
+        <if test="logId != null and logId != ''">a.log_id = #{logId, jdbcType=VARCHAR},</if>
+        <if test="logType != null and logType != ''">a.log_type = #{logType, jdbcType=VARCHAR},</if>
+        <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
+        <if test="title != null and title != ''">a.title = #{title, jdbcType=VARCHAR},</if>
+        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="content != null and content != ''">a.content = #{content, jdbcType=VARCHAR},</if>
+        <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
+        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.log_id = #{logId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.logs.module.log.entity.SysLogs">
+        select
+        a.log_id,
+        a.log_type,
+        a.ip,
+        a.title,
+        a.state,
+        a.content,
+        a.user_id,
+        a.user_name,
+        a.create_time
+        from sys_logs a
+        where 1 = 1
+            and a.log_id = #{logId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">
+        select
+        a.log_id,
+        a.log_type,
+        a.ip,
+        a.title,
+        a.state,
+        a.content,
+        a.user_id,
+        a.user_name,
+        a.create_time
+        from sys_logs a
+        where 1 = 1
+        <if test="logId != null and logId != ''"> and a.log_id = #{logId, jdbcType=VARCHAR}</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title = #{title, jdbcType=VARCHAR}</if>
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">
+        select
+        a.log_id,
+        a.log_type,
+        a.ip,
+        a.title,
+        a.state,
+        a.content,
+        a.user_id,
+        a.user_name,
+        a.create_time
+        from sys_logs a
+        where 1 = 1
+        <if test="logId != null and logId != ''"> and a.log_id = #{logId, jdbcType=VARCHAR}</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title = #{title, jdbcType=VARCHAR}</if>
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into sys_logs(
+            log_id,
+            log_type,
+            ip,
+            title,
+            state,
+            content,
+            user_id,
+            user_name
+        )values
+        <foreach collection="list" item="SysLogs" separator=",">
+            (
+                #{SysLogs.logId, jdbcType=VARCHAR},
+                #{SysLogs.logType, jdbcType=VARCHAR},
+                #{SysLogs.ip, jdbcType=VARCHAR},
+                #{SysLogs.title, jdbcType=VARCHAR},
+                #{SysLogs.state, jdbcType=INTEGER},
+                #{SysLogs.content, jdbcType=VARCHAR},
+                #{SysLogs.userId, jdbcType=BIGINT},
+                #{SysLogs.userName, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

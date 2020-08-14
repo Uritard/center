@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TSysParamDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TSysParam">
+        <id column="param_id" jdbcType="INTEGER" property="paramId" />
+        <result column="param_type" jdbcType="VARCHAR" property="paramType" />
+        <result column="param_name" jdbcType="VARCHAR" property="paramName" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        param_id, param_type, param_name, content, remark
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="paramId" parameterType="com.yjh.platform.module.user.entity.TSysParam">
+        insert into t_sys_param(
+            param_id,
+            param_type,
+            param_name,
+            content,
+            remark
+        )values(
+                #{paramId, jdbcType=INTEGER},
+                #{paramType, jdbcType=VARCHAR},
+                #{paramName, jdbcType=VARCHAR},
+                #{content, jdbcType=VARCHAR},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Integer">
+        delete from t_sys_param
+                where param_id = #{paramId, jdbcType=INTEGER}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TSysParam">
+        update t_sys_param a <set>
+        <if test="paramId != null and paramId != ''">a.param_id = #{paramId, jdbcType=INTEGER},</if>
+        <if test="paramType != null and paramType != ''">a.param_type = #{paramType, jdbcType=VARCHAR},</if>
+        <if test="paramName != null and paramName != ''">a.param_name = #{paramName, jdbcType=VARCHAR},</if>
+        <if test="content != null and content != ''">a.content = #{content, jdbcType=VARCHAR},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+            where a.param_id = #{paramId, jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.TSysParam">
+        select
+        a.param_id,
+        a.param_type,
+        a.param_name,
+        a.content,
+        a.remark
+        from t_sys_param a
+        where 1 = 1
+            and a.param_id = #{paramId, jdbcType=INTEGER}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TSysParam" resultType="com.yjh.platform.module.user.entity.TSysParam">
+        select
+        a.param_id,
+        a.param_type,
+        a.param_name,
+        a.content,
+        a.remark
+        from t_sys_param a
+        where 1 = 1
+        <if test="paramId != null and paramId != ''"> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
+        <if test="paramType != null and paramType != ''"> and a.param_type = #{paramType, jdbcType=VARCHAR}</if>
+        <if test="paramName != null and paramName != ''"> and a.param_name = #{paramName, jdbcType=VARCHAR}</if>
+        <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TSysParam" resultType="com.yjh.platform.module.user.entity.TSysParam">
+        select
+        a.param_id,
+        a.param_type,
+        a.param_name,
+        a.content,
+        a.remark
+        from t_sys_param a
+        where 1 = 1
+        <if test="paramId != null and paramId != ''"> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
+        <if test="paramType != null and paramType != ''"> and a.param_type = #{paramType, jdbcType=VARCHAR}</if>
+        <if test="paramName != null and paramName != ''"> and a.param_name = #{paramName, jdbcType=VARCHAR}</if>
+        <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_sys_param(
+            param_id,
+            param_type,
+            param_name,
+            content,
+            remark
+        )values
+        <foreach collection="list" item="TSysParam" separator=",">
+            (
+                #{TSysParam.paramId, jdbcType=INTEGER},
+                #{TSysParam.paramType, jdbcType=VARCHAR},
+                #{TSysParam.paramName, jdbcType=VARCHAR},
+                #{TSysParam.content, jdbcType=VARCHAR},
+                #{TSysParam.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

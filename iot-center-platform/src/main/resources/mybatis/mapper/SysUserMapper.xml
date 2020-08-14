@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.SysUserDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.SysUser">
+        <id column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+        <result column="true_name" jdbcType="VARCHAR" property="trueName" />
+        <result column="user_type" jdbcType="INTEGER" property="userType" />
+        <result column="sex" jdbcType="INTEGER" property="sex" />
+        <result column="e_mail" jdbcType="VARCHAR" property="eMail" />
+        <result column="mobile_phone" jdbcType="VARCHAR" property="mobilePhone" />
+        <result column="work_no" jdbcType="VARCHAR" property="workNo" />
+        <result column="face_id" jdbcType="VARCHAR" property="faceId" />
+        <result column="finger_id" jdbcType="VARCHAR" property="fingerId" />
+        <result column="voice_id" jdbcType="VARCHAR" property="voiceId" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="user_title" jdbcType="VARCHAR" property="userTitle" />
+        <result column="creator_id" jdbcType="BIGINT" property="creatorId" />
+        <result column="appkey" jdbcType="VARCHAR" property="appkey" />
+        <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+        <result column="role_id" jdbcType="BIGINT" property="roleId" />
+        <result column="org_id" jdbcType="BIGINT" property="orgId" />
+        <result column="user_status" jdbcType="INTEGER" property="userStatus" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
+        <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, user_name, PASSWORD, true_name, user_type, sex, e_mail, mobile_phone, work_no, face_id, finger_id, voice_id, state, user_title, creator_id, appkey, image_url, role_id, org_id, user_status, create_time, update_time, invalid_time, last_login
+    </sql>
+
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId" parameterType="com.yjh.platform.module.user.entity.SysUser">
+        insert into sys_user(
+            user_id,
+            user_name,
+            PASSWORD,
+            true_name,
+            user_type,
+            sex,
+            e_mail,
+            mobile_phone,
+            work_no,
+            face_id,
+            finger_id,
+            voice_id,
+            state,
+            user_title,
+            creator_id,
+            appkey,
+            image_url,
+            role_id,
+            org_id,
+            user_status,
+            create_time,
+            update_time,
+            invalid_time,
+            last_login
+        )values(
+                #{userId, jdbcType=BIGINT},
+                #{userName, jdbcType=VARCHAR},
+                #{password, jdbcType=VARCHAR},
+                #{trueName, jdbcType=VARCHAR},
+                #{userType, jdbcType=INTEGER},
+                #{sex, jdbcType=INTEGER},
+                #{eMail, jdbcType=VARCHAR},
+                #{mobilePhone, jdbcType=VARCHAR},
+                #{workNo, jdbcType=VARCHAR},
+                #{faceId, jdbcType=VARCHAR},
+                #{fingerId, jdbcType=VARCHAR},
+                #{voiceId, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{userTitle, jdbcType=VARCHAR},
+                #{creatorId, jdbcType=BIGINT},
+                #{appkey, jdbcType=VARCHAR},
+                #{imageUrl, jdbcType=VARCHAR},
+                #{roleId, jdbcType=BIGINT},
+                #{orgId, jdbcType=BIGINT},
+                #{userStatus, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{updateTime, jdbcType=TIMESTAMP},
+                #{invalidTime, jdbcType=TIMESTAMP},
+                #{lastLogin, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from sys_user
+                where user_id = #{userId, jdbcType=BIGINT}
+    </delete>
+
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.SysUser">
+        update sys_user a <set>
+        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
+        <if test="password != null and password != ''">a.PASSWORD = #{password, jdbcType=VARCHAR},</if>
+        <if test="trueName != null and trueName != ''">a.true_name = #{trueName, jdbcType=VARCHAR},</if>
+        <if test="userType != null and userType != ''">a.user_type = #{userType, jdbcType=INTEGER},</if>
+        <if test="sex != null and sex != ''">a.sex = #{sex, jdbcType=INTEGER},</if>
+        <if test="eMail != null and eMail != ''">a.e_mail = #{eMail, jdbcType=VARCHAR},</if>
+        <if test="mobilePhone != null and mobilePhone != ''">a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR},</if>
+        <if test="workNo != null and workNo != ''">a.work_no = #{workNo, jdbcType=VARCHAR},</if>
+        <if test="faceId != null and faceId != ''">a.face_id = #{faceId, jdbcType=VARCHAR},</if>
+        <if test="fingerId != null and fingerId != ''">a.finger_id = #{fingerId, jdbcType=VARCHAR},</if>
+        <if test="voiceId != null and voiceId != ''">a.voice_id = #{voiceId, jdbcType=VARCHAR},</if>
+        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="userTitle != null and userTitle != ''">a.user_title = #{userTitle, jdbcType=VARCHAR},</if>
+        <if test="creatorId != null and creatorId != ''">a.creator_id = #{creatorId, jdbcType=BIGINT},</if>
+        <if test="appkey != null and appkey != ''">a.appkey = #{appkey, jdbcType=VARCHAR},</if>
+        <if test="imageUrl != null and imageUrl != ''">a.image_url = #{imageUrl, jdbcType=VARCHAR},</if>
+        <if test="roleId != null and roleId != ''">a.role_id = #{roleId, jdbcType=BIGINT},</if>
+        <if test="orgId != null and orgId != ''">a.org_id = #{orgId, jdbcType=BIGINT},</if>
+        <if test="userStatus != null and userStatus != ''">a.user_status = #{userStatus, jdbcType=INTEGER},</if>
+        <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP},</if>
+        <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
+    </set>
+        where a.user_id = #{userId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysUser">
+        select
+        a.user_id,
+        a.user_name,
+        a.PASSWORD,
+        a.true_name,
+        a.user_type,
+        a.sex,
+        a.e_mail,
+        a.mobile_phone,
+        a.work_no,
+        a.face_id,
+        a.finger_id,
+        a.voice_id,
+        a.state,
+        a.user_title,
+        a.creator_id,
+        a.appkey,
+        a.image_url,
+        a.role_id,
+        a.org_id,
+        a.user_status,
+        a.create_time,
+        a.update_time,
+        a.invalid_time,
+        a.last_login
+        from sys_user a
+        where 1 = 1
+            and a.user_id = #{userId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.SysUser" resultType="com.yjh.platform.module.user.entity.SysUser">
+        select
+        a.user_id,
+        a.user_name,
+        a.PASSWORD,
+        a.true_name,
+        a.user_type,
+        a.sex,
+        a.e_mail,
+        a.mobile_phone,
+        a.work_no,
+        a.face_id,
+        a.finger_id,
+        a.voice_id,
+        a.state,
+        a.user_title,
+        a.creator_id,
+        a.appkey,
+        a.image_url,
+        a.role_id,
+        a.org_id,
+        a.user_status,
+        a.create_time,
+        a.update_time,
+        a.invalid_time,
+        a.last_login
+        from sys_user a
+        where 1 = 1
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="password != null and password != ''"> and a.PASSWORD = #{password, jdbcType=VARCHAR}</if>
+        <if test="trueName != null and trueName != ''"> and a.true_name = #{trueName, jdbcType=VARCHAR}</if>
+        <if test="userType != null and userType != ''"> and a.user_type = #{userType, jdbcType=INTEGER}</if>
+        <if test="sex != null and sex != ''"> and a.sex = #{sex, jdbcType=INTEGER}</if>
+        <if test="eMail != null and eMail != ''"> and a.e_mail = #{eMail, jdbcType=VARCHAR}</if>
+        <if test="mobilePhone != null and mobilePhone != ''"> and a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR}</if>
+        <if test="workNo != null and workNo != ''"> and a.work_no = #{workNo, jdbcType=VARCHAR}</if>
+        <if test="faceId != null and faceId != ''"> and a.face_id = #{faceId, jdbcType=VARCHAR}</if>
+        <if test="fingerId != null and fingerId != ''"> and a.finger_id = #{fingerId, jdbcType=VARCHAR}</if>
+        <if test="voiceId != null and voiceId != ''"> and a.voice_id = #{voiceId, jdbcType=VARCHAR}</if>
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="userTitle != null and userTitle != ''"> and a.user_title = #{userTitle, jdbcType=VARCHAR}</if>
+        <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
+        <if test="appkey != null and appkey != ''"> and a.appkey = #{appkey, jdbcType=VARCHAR}</if>
+        <if test="imageUrl != null and imageUrl != ''"> and a.image_url = #{imageUrl, jdbcType=VARCHAR}</if>
+        <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        <if test="orgId != null and orgId != ''"> and a.org_id = #{orgId, jdbcType=BIGINT}</if>
+        <if test="userStatus != null and userStatus != ''"> and a.user_status = #{userStatus, jdbcType=INTEGER}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="invalidTime != null"> and a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP}</if>
+        <if test="lastLogin != null"> and a.last_login = #{lastLogin, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <resultMap id="userInfoPageMap" type="java.util.HashMap">
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="trueName" column="true_name"/>
+        <result property="userType" column="user_type"/>
+        <result property="sex" column="sex"/>
+        <result property="eMail" column="e_mail"/>
+        <result property="mobilePhone" column="mobile_phone"/>
+        <result property="workNo" column="work_no"/>
+        <result property="faceId" column="face_id"/>
+        <result property="fingerId" column="finger_id"/>
+        <result property="voiceId" column="voice_id"/>
+        <result property="state" column="state"/>
+        <result property="userTitle" column="user_title"/>
+        <result property="creatorId" column="creator_id"/>
+        <result property="appkey" column="appkey"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="userStatus" column="user_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="invalidTime" column="invalid_time"/>
+        <result property="lastLogin" column="last_login"/>
+    </resultMap>
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysUser" resultMap="userInfoPageMap">
+        select
+        a.user_id,
+        a.user_name,
+        a.PASSWORD,
+        a.true_name,
+        a.user_type,
+        a.sex,
+        a.e_mail,
+        a.mobile_phone,
+        a.work_no,
+        a.face_id,
+        a.finger_id,
+        a.voice_id,
+        a.state,
+        a.user_title,
+        a.creator_id,
+        a.appkey,
+        a.image_url,
+        a.role_id,
+        c.role_name,
+        a.org_id,
+        b.org_name,
+        a.user_status,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%S') AS create_time,
+        DATE_FORMAT(a.update_time, '%Y-%m-%d %H:%i:%S') AS update_time,
+        DATE_FORMAT(a.invalid_time, '%Y-%m-%d %H:%i:%S') AS invalid_time,
+        DATE_FORMAT(a.last_login, '%Y-%m-%d %H:%i:%S') AS last_login
+        from sys_user a
+        LEFT JOIN sys_org b ON a.org_id = b.org_id
+        LEFT JOIN sys_role c ON a.role_id = c.role_id
+        where 1 = 1 AND a.state != 0
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="password != null and password != ''"> and a.PASSWORD = #{password, jdbcType=VARCHAR}</if>
+        <if test="trueName != null and trueName != ''"> and a.true_name = #{trueName, jdbcType=VARCHAR}</if>
+        <if test="userType != null and userType != ''"> and a.user_type = #{userType, jdbcType=INTEGER}</if>
+        <if test="sex != null and sex != ''"> and a.sex = #{sex, jdbcType=INTEGER}</if>
+        <if test="eMail != null and eMail != ''"> and a.e_mail = #{eMail, jdbcType=VARCHAR}</if>
+        <if test="mobilePhone != null and mobilePhone != ''"> and a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR}</if>
+        <if test="workNo != null and workNo != ''"> and a.work_no = #{workNo, jdbcType=VARCHAR}</if>
+        <if test="faceId != null and faceId != ''"> and a.face_id = #{faceId, jdbcType=VARCHAR}</if>
+        <if test="fingerId != null and fingerId != ''"> and a.finger_id = #{fingerId, jdbcType=VARCHAR}</if>
+        <if test="voiceId != null and voiceId != ''"> and a.voice_id = #{voiceId, jdbcType=VARCHAR}</if>
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="userTitle != null and userTitle != ''"> and a.user_title = #{userTitle, jdbcType=VARCHAR}</if>
+        <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
+        <if test="appkey != null and appkey != ''"> and a.appkey = #{appkey, jdbcType=VARCHAR}</if>
+        <if test="imageUrl != null and imageUrl != ''"> and a.image_url = #{imageUrl, jdbcType=VARCHAR}</if>
+        <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        <if test="orgId != null and orgId != ''"> and a.org_id = #{orgId, jdbcType=BIGINT}</if>
+        <if test="userStatus != null"> and a.user_status = #{userStatus, jdbcType=INTEGER}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="invalidTime != null"> and a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP}</if>
+        <if test="lastLogin != null"> and a.last_login = #{lastLogin, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectRelationOrg" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysOrg">
+        SELECT
+        b.user_id,
+        a.org_name,
+        a.org_code,
+        a.up_id,
+        a.sort,
+        a.create_time,
+        a.creator_id,
+        a.org_level,
+        a.org_path,
+        a.dept_name
+        FROM sys_org a
+        LEFT JOIN sys_user b ON a.org_id = b.org_id
+        WHERE 1 = 1
+        AND b.user_id = #{userId, jdbcType=BIGINT}
+    </select>
+
+    <resultMap id="relationMenuMap" type="java.util.HashMap">
+        <result property="userId" column="user_id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="menuName" column="menu_name"/>
+    </resultMap>
+    <!--resultType="java.util.Map"-->
+    <select id="selectRelationMenu" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT c.menu_code AS menuCode
+	    FROM sys_user a
+	      LEFT JOIN sys_role b ON a.role_id = b.role_id
+	      LEFT JOIN sys_role_menu c ON c.role_id = b.role_id
+	      LEFT JOIN sys_menu d ON c.menu_code = d.menu_code
+	    WHERE user_id = #{userId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectRelationAuthor" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT c.region_id AS Id,d.region_name AS label,d.up_region_id AS upId,"region" AS infoType FROM sys_user a
+	        LEFT JOIN sys_role b ON a.role_id = b.role_id
+	        LEFT JOIN sys_role_region c ON b.role_id = c.role_id
+	        LEFT JOIN t_std_region d ON c.region_id = d.region_id
+	        WHERE user_id = #{userId, jdbcType=BIGINT}
+        UNION ALL (SELECT DISTINCT c.device_id AS Id,d.device_name AS label,d.up_region_id AS upId,"device" AS infoType FROM sys_user a
+                	  LEFT JOIN sys_role b ON a.role_id = b.role_id
+                	    LEFT JOIN sys_role_device c ON b.role_id = c.role_id
+                	    LEFT JOIN t_std_device d ON c.device_id = d.device_id
+                	    WHERE user_id = #{userId, jdbcType=BIGINT})
+        UNION ALL (SELECT d.custom_id AS Id,d.custom_name AS label,d.device_id AS upId,"custom" AS infoType FROM sys_user a
+	                  LEFT JOIN sys_role b ON a.role_id = b.role_id
+	                    LEFT JOIN sys_role_device c ON b.role_id = c.role_id
+	                    LEFT JOIN t_std_device d ON c.device_id = d.device_id
+	                    WHERE user_id = #{userId, jdbcType=BIGINT})
+        UNION ALL (SELECT DISTINCT c.camera_id AS Id,d.camera_name AS label,d.up_region_id AS upId,"camera" AS infoType FROM sys_user a
+	                  LEFT JOIN sys_role b ON a.role_id = b.role_id
+	                    LEFT JOIN sys_role_camera c ON b.role_id = c.role_id
+	                    LEFT JOIN t_camera_info d ON c.camera_id = d.camera_id
+	                    WHERE user_id = #{userId, jdbcType=BIGINT})
+    </select>
+
+    <select id="selectByUserName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUser">
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,
+          a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,a.org_id,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login
+        from sys_user a
+        where 1 = 1
+        and a.user_name = #{userName, jdbcType=VARCHAR}
+    </select>
+
+</mapper>

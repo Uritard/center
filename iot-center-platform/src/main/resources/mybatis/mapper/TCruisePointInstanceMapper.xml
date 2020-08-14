@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCruisePointInstanceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        <id column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="station_id" jdbcType="VARCHAR" property="stationId" />
+        <result column="station_name" jdbcType="VARCHAR" property="stationName" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="data_format" jdbcType="VARCHAR" property="dataFormat" />
+        <result column="identify_type" jdbcType="INTEGER" property="identifyType" />
+        <result column="identify_son_type" jdbcType="INTEGER" property="identifySonType" />
+        <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
+        <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+        <result column="cruise_name" jdbcType="VARCHAR" property="cruiseName" />
+        <result column="cruise_content" jdbcType="VARCHAR" property="cruiseContent" />
+        <result column="fluctuating_value" jdbcType="VARCHAR" property="fluctuatingValue" />
+        <result column="unit_val" jdbcType="VARCHAR" property="unitVal" />
+        <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+        <result column="if_sy" jdbcType="INTEGER" property="ifSy" />
+        <result column="sy_type" jdbcType="INTEGER" property="syType" />
+        <result column="if_videotape" jdbcType="INTEGER" property="ifVideotape" />
+        <result column="videotape_time" jdbcType="VARCHAR" property="videotapeTime" />
+        <result column="text_desc" jdbcType="VARCHAR" property="textDesc" />
+        <result column="sort" jdbcType="VARCHAR" property="sort" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        instance_id, device_mete_id, station_id, station_name, device_id, custom_id, data_format, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, cruise_content, fluctuating_value, unit_val, unit_name, if_sy, sy_type, if_videotape, videotape_time, text_desc, sort
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="instanceId" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        insert into t_cruise_point_instance(
+            instance_id,
+            device_mete_id,
+            station_id,
+            station_name,
+            device_id,
+            custom_id,
+            data_format,
+            identify_type,
+            identify_son_type,
+            cruise_type,
+            cruise_id,
+            cruise_name,
+            cruise_content,
+            fluctuating_value,
+            unit_val,
+            unit_name,
+            if_sy,
+            sy_type,
+            if_videotape,
+            videotape_time,
+            text_desc,
+            sort
+        )values(
+                #{instanceId, jdbcType=BIGINT},
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{stationId, jdbcType=VARCHAR},
+                #{stationName, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{customId, jdbcType=VARCHAR},
+                #{dataFormat, jdbcType=VARCHAR},
+                #{identifyType, jdbcType=INTEGER},
+                #{identifySonType, jdbcType=INTEGER},
+                #{cruiseType, jdbcType=INTEGER},
+                #{cruiseId, jdbcType=BIGINT},
+                #{cruiseName, jdbcType=VARCHAR},
+                #{cruiseContent, jdbcType=VARCHAR},
+                #{fluctuatingValue, jdbcType=VARCHAR},
+                #{unitVal, jdbcType=VARCHAR},
+                #{unitName, jdbcType=VARCHAR},
+                #{ifSy, jdbcType=INTEGER},
+                #{syType, jdbcType=INTEGER},
+                #{ifVideotape, jdbcType=INTEGER},
+                #{videotapeTime, jdbcType=VARCHAR},
+                #{textDesc, jdbcType=VARCHAR},
+                #{sort, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cruise_point_instance
+                where instance_id = #{instanceId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        update t_cruise_point_instance a <set>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
+        <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
+        <if test="stationName != null and stationName != ''">a.station_name = #{stationName, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
+        <if test="dataFormat != null and dataFormat != ''">a.data_format = #{dataFormat, jdbcType=VARCHAR},</if>
+        <if test="identifyType != null and identifyType != ''">a.identify_type = #{identifyType, jdbcType=INTEGER},</if>
+        <if test="identifySonType != null and identifySonType != ''">a.identify_son_type = #{identifySonType, jdbcType=INTEGER},</if>
+        <if test="cruiseType != null and cruiseType != ''">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="cruiseName != null and cruiseName != ''">a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
+        <if test="cruiseContent != null and cruiseContent != ''">a.cruise_content = #{cruiseContent, jdbcType=VARCHAR},</if>
+        <if test="fluctuatingValue != null and fluctuatingValue != ''">a.fluctuating_value = #{fluctuatingValue, jdbcType=VARCHAR},</if>
+        <if test="unitVal != null and unitVal != ''">a.unit_val = #{unitVal, jdbcType=VARCHAR},</if>
+        <if test="unitName != null and unitName != ''">a.unit_name = #{unitName, jdbcType=VARCHAR},</if>
+        <if test="ifSy != null and ifSy != ''">a.if_sy = #{ifSy, jdbcType=INTEGER},</if>
+        <if test="syType != null and syType != ''">a.sy_type = #{syType, jdbcType=INTEGER},</if>
+        <if test="ifVideotape != null and ifVideotape != ''">a.if_videotape = #{ifVideotape, jdbcType=INTEGER},</if>
+        <if test="videotapeTime != null and videotapeTime != ''">a.videotape_time = #{videotapeTime, jdbcType=VARCHAR},</if>
+        <if test="textDesc != null and textDesc != ''">a.text_desc = #{textDesc, jdbcType=VARCHAR},</if>
+        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=VARCHAR},</if>
+    </set>
+            where a.instance_id = #{instanceId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        select
+        a.instance_id,
+        a.device_mete_id,
+        a.station_id,
+        a.station_name,
+        a.device_id,
+        a.custom_id,
+        a.data_format,
+        a.identify_type,
+        a.identify_son_type,
+        a.cruise_type,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_content,
+        a.fluctuating_value,
+        a.unit_val,
+        a.unit_name,
+        a.if_sy,
+        a.sy_type,
+        a.if_videotape,
+        a.videotape_time,
+        a.text_desc,
+        a.sort
+        from t_cruise_point_instance a
+        where 1 = 1
+            and a.instance_id = #{instanceId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        select
+        a.instance_id,
+        a.device_mete_id,
+        a.station_id,
+        a.station_name,
+        a.device_id,
+        a.custom_id,
+        a.data_format,
+        a.identify_type,
+        a.identify_son_type,
+        a.cruise_type,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_content,
+        a.fluctuating_value,
+        a.unit_val,
+        a.unit_name,
+        a.if_sy,
+        a.sy_type,
+        a.if_videotape,
+        a.videotape_time,
+        a.text_desc,
+        a.sort
+        from t_cruise_point_instance a
+        where 1 = 1
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
+        <if test="stationName != null and stationName != ''"> and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="dataFormat != null and dataFormat != ''"> and a.data_format = #{dataFormat, jdbcType=VARCHAR}</if>
+        <if test="identifyType != null and identifyType != ''"> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
+        <if test="identifySonType != null and identifySonType != ''"> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
+        <if test="fluctuatingValue != null and fluctuatingValue != ''"> and a.fluctuating_value = #{fluctuatingValue, jdbcType=VARCHAR}</if>
+        <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
+        <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
+        <if test="ifSy != null and ifSy != ''"> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
+        <if test="syType != null and syType != ''"> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
+        <if test="ifVideotape != null and ifVideotape != ''"> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
+        <if test="videotapeTime != null and videotapeTime != ''"> and a.videotape_time = #{videotapeTime, jdbcType=VARCHAR}</if>
+        <if test="textDesc != null and textDesc != ''"> and a.text_desc = #{textDesc, jdbcType=VARCHAR}</if>
+        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        select
+        a.instance_id,
+        a.device_mete_id,
+        a.station_id,
+        a.station_name,
+        a.device_id,
+        a.custom_id,
+        a.data_format,
+        a.identify_type,
+        a.identify_son_type,
+        a.cruise_type,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_content,
+        a.fluctuating_value,
+        a.unit_val,
+        a.unit_name,
+        a.if_sy,
+        a.sy_type,
+        a.if_videotape,
+        a.videotape_time,
+        a.text_desc,
+        a.sort
+        from t_cruise_point_instance a
+        where 1 = 1
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
+        <if test="stationName != null and stationName != ''"> and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="dataFormat != null and dataFormat != ''"> and a.data_format = #{dataFormat, jdbcType=VARCHAR}</if>
+        <if test="identifyType != null and identifyType != ''"> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
+        <if test="identifySonType != null and identifySonType != ''"> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
+        <if test="fluctuatingValue != null and fluctuatingValue != ''"> and a.fluctuating_value = #{fluctuatingValue, jdbcType=VARCHAR}</if>
+        <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
+        <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
+        <if test="ifSy != null and ifSy != ''"> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
+        <if test="syType != null and syType != ''"> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
+        <if test="ifVideotape != null and ifVideotape != ''"> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
+        <if test="videotapeTime != null and videotapeTime != ''"> and a.videotape_time = #{videotapeTime, jdbcType=VARCHAR}</if>
+        <if test="textDesc != null and textDesc != ''"> and a.text_desc = #{textDesc, jdbcType=VARCHAR}</if>
+        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cruise_point_instance(
+            instance_id,
+            device_mete_id,
+            station_id,
+            station_name,
+            device_id,
+            custom_id,
+            data_format,
+            identify_type,
+            identify_son_type,
+            cruise_type,
+            cruise_id,
+            cruise_name,
+            cruise_content,
+            fluctuating_value,
+            unit_val,
+            unit_name,
+            if_sy,
+            sy_type,
+            if_videotape,
+            videotape_time,
+            text_desc,
+            sort
+        )values
+        <foreach collection="list" item="TCruisePointInstance" separator=",">
+            (
+                #{TCruisePointInstance.instanceId, jdbcType=BIGINT},
+                #{TCruisePointInstance.deviceMeteId, jdbcType=BIGINT},
+                #{TCruisePointInstance.stationId, jdbcType=VARCHAR},
+                #{TCruisePointInstance.stationName, jdbcType=VARCHAR},
+                #{TCruisePointInstance.deviceId, jdbcType=BIGINT},
+                #{TCruisePointInstance.customId, jdbcType=VARCHAR},
+                #{TCruisePointInstance.dataFormat, jdbcType=VARCHAR},
+                #{TCruisePointInstance.identifyType, jdbcType=INTEGER},
+                #{TCruisePointInstance.identifySonType, jdbcType=INTEGER},
+                #{TCruisePointInstance.cruiseType, jdbcType=INTEGER},
+                #{TCruisePointInstance.cruiseId, jdbcType=BIGINT},
+                #{TCruisePointInstance.cruiseName, jdbcType=VARCHAR},
+                #{TCruisePointInstance.cruiseContent, jdbcType=VARCHAR},
+                #{TCruisePointInstance.fluctuatingValue, jdbcType=VARCHAR},
+                #{TCruisePointInstance.unitVal, jdbcType=VARCHAR},
+                #{TCruisePointInstance.unitName, jdbcType=VARCHAR},
+                #{TCruisePointInstance.ifSy, jdbcType=INTEGER},
+                #{TCruisePointInstance.syType, jdbcType=INTEGER},
+                #{TCruisePointInstance.ifVideotape, jdbcType=INTEGER},
+                #{TCruisePointInstance.videotapeTime, jdbcType=VARCHAR},
+                #{TCruisePointInstance.textDesc, jdbcType=VARCHAR},
+                #{TCruisePointInstance.sort, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <select id="StdMeteUnionInspectionId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        select
+        a.instance_id,
+        a.device_mete_id,
+        a.station_id,
+        a.station_name,
+        a.device_id,
+        a.custom_id,
+        a.data_format,
+        a.identify_type,
+        a.identify_son_type,
+        a.cruise_type,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_content,
+        a.fluctuating_value,
+        a.unit_val,
+        a.unit_name,
+        a.if_sy,
+        a.sy_type,
+        a.if_videotape,
+        a.videotape_time,
+        a.text_desc,
+        a.sort
+        from t_std_devicemete a
+        LEFT JOIN t_robot_inspection b ON a.device_id = b.device_id
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+    </select>
+
+
+
+</mapper>

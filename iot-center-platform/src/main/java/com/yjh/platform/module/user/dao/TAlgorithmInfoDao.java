@@ -1,0 +1,29 @@
+package com.yjh.platform.module.user.dao;
+
+import java.util.List;
+
+import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+/**
+ * @author tt
+ * @since 2020-08-06
+ */
+@Repository
+public interface TAlgorithmInfoDao {
+
+    int insert(TAlgorithmInfo tAlgorithmInfo);
+    int deleteByPrimaryId(@Param(value = "algorithmId") Long algorithmId);
+    int update(TAlgorithmInfo tAlgorithmInfo);
+    TAlgorithmInfo selectByPrimaryId(@Param(value = "algorithmId") Long algorithmId);
+    List<TAlgorithmInfo> select(@Param(value = "algorithmId") Long algorithmId,
+                                @Param(value = "algorithmName") String algorithmName,
+                                @Param(value = "algorithmType") String algorithmType,
+                                @Param(value = "describel") String describel,
+                                @Param(value = "algorithmCode") Integer algorithmCode,
+                                @Param(value = "analysType") String analysType);
+    List<TAlgorithmInfo> selectByPage(TAlgorithmInfo tAlgorithmInfo);
+
+    int batchInsert(List<TAlgorithmInfo> list);
+}
