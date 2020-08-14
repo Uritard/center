@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="iot-center-access" />
+        <module name="iot-center-device" />
+        <module name="iot-center-etl" />
+        <module name="iot-center-logs" />
+        <module name="iot-center-manager" />
+        <module name="iot-center-platform" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="iot-center-access" target="1.8" />
+      <module name="iot-center-device" target="1.8" />
+      <module name="iot-center-etl" target="1.8" />
+      <module name="iot-center-logs" target="1.8" />
+      <module name="iot-center-manager" target="1.8" />
+      <module name="iot-center-platform" target="1.8" />
+      <module name="IotCenter" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
