@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TCameraRecorderDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraRecorder">
+        <id column="record_id" jdbcType="BIGINT" property="recordId" />
+        <result column="record_name" jdbcType="VARCHAR" property="recordName" />
+        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
+        <result column="record_ip" jdbcType="VARCHAR" property="recordIp" />
+        <result column="protocal" jdbcType="VARCHAR" property="protocal" />
+        <result column="http_port" jdbcType="INTEGER" property="httpPort" />
+        <result column="trans_port" jdbcType="INTEGER" property="transPort" />
+        <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="pwd" jdbcType="VARCHAR" property="pwd" />
+        <result column="root" jdbcType="VARCHAR" property="root" />
+        <result column="max_channel" jdbcType="INTEGER" property="maxChannel" />
+        <result column="hdd_size" jdbcType="INTEGER" property="hddSize" />
+        <result column="buffer_day" jdbcType="INTEGER" property="bufferDay" />
+        <result column="time_long" jdbcType="INTEGER" property="timeLong" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        record_id, record_name, alias_name, record_ip, protocal, http_port, trans_port, rtsp_port, user_name, pwd,root, max_channel, hdd_size, buffer_day, time_long
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="recordId" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
+        insert into t_camera_recorder (
+            record_name,
+            alias_name,
+            record_ip,
+            protocal,
+            http_port,
+            trans_port,
+            rtsp_port,
+            user_name,
+            pwd,
+            root,
+            max_channel,
+            hdd_size,
+            buffer_day,
+            time_long
+        )values(
+                #{recordName, jdbcType=VARCHAR},
+                #{aliasName, jdbcType=VARCHAR},
+                #{recordIp, jdbcType=VARCHAR},
+                #{protocal, jdbcType=VARCHAR},
+                #{httpPort, jdbcType=INTEGER},
+                #{transPort, jdbcType=INTEGER},
+                #{rtspPort, jdbcType=INTEGER},
+                #{userName, jdbcType=VARCHAR},
+                #{pwd, jdbcType=VARCHAR},
+                #{root, jdbcType=VARCHAR},
+                #{maxChannel, jdbcType=INTEGER},
+                #{hddSize, jdbcType=INTEGER},
+                #{bufferDay, jdbcType=INTEGER},
+                #{timeLong, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_camera_recorder
+                where record_id = #{recordId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
+        update t_camera_recorder a <set>
+        <if test="recordName != null and recordName != ''">a.record_name = #{recordName, jdbcType=VARCHAR},</if>
+        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
+        <if test="recordIp != null and recordIp != ''">a.record_ip = #{recordIp, jdbcType=VARCHAR},</if>
+        <if test="protocal != null and protocal != ''">a.protocal = #{protocal, jdbcType=VARCHAR},</if>
+        <if test="httpPort != null and httpPort != ''">a.http_port = #{httpPort, jdbcType=INTEGER},</if>
+        <if test="transPort != null and transPort != ''">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
+        <if test="rtspPort != null and rtspPort!= ''">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
+        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
+        <if test="pwd != null and pwd != ''">a.pwd = #{pwd, jdbcType=VARCHAR},</if>
+        <if test="root != null and root != ''">a.root = #{root, jdbcType=VARCHAR},</if>
+        <if test="maxChannel != null and maxChannel != ''">a.max_channel = #{maxChannel, jdbcType=INTEGER},</if>
+        <if test="hddSize != null and hddSize != ''">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>
+        <if test="bufferDay != null and bufferDay != ''">a.buffer_day = #{bufferDay, jdbcType=INTEGER},</if>
+        <if test="timeLong != null and timeLong != ''">a.time_long = #{timeLong, jdbcType=INTEGER},</if>
+    </set>
+        where a.record_id = #{recordId, jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraRecorder">
+         select
+        a.record_id,
+        a.record_name,
+        a.alias_name,
+        a.record_ip,
+        a.protocal,
+        a.http_port,
+        a.trans_port,
+        a.rtsp_port,
+        a.user_name,
+        a.pwd,
+        a.root,
+        a.max_channel,
+        a.hdd_size,
+        a.buffer_day,
+        a.time_long
+        from t_camera_recorder a
+        where 1 = 1
+            and a.record_id = #{recordId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder" resultType="com.yjh.platform.module.user.entity.TCameraRecorder">
+        select
+        a.record_id,
+        a.record_name,
+        a.alias_name,
+        a.record_ip,
+        a.protocal,
+        a.http_port,
+        a.trans_port,
+        a.rtsp_port,
+        a.user_name,
+        a.pwd,
+        a.root,
+        a.max_channel,
+        a.hdd_size,
+        a.buffer_day,
+        a.time_long
+        from t_camera_recorder a
+        where 1 = 1
+        <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
+        <if test="recordName != null and recordName != ''"> and a.record_name = #{recordName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="recordIp != null and recordIp != ''"> and a.record_ip = #{recordIp, jdbcType=VARCHAR}</if>
+        <if test="protocal != null and protocal != ''"> and a.protocal = #{protocal, jdbcType=VARCHAR}</if>
+        <if test="httpPort != null and httpPort != ''"> and a.http_port = #{httpPort, jdbcType=INTEGER}</if>
+        <if test="transPort != null and transPort != ''"> and a.trans_port = #{transPort, jdbcType=INTEGER}</if>
+        <if test="rtspPort != null and rtspPort != ''"> and a.rtsp_port = #{rtspPort, jdbcType=INTEGER}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="pwd != null and pwd != ''"> and a.pwd = #{pwd, jdbcType=VARCHAR}</if>
+        <if test="root != null and root != ''"> and a.root = #{root, jdbcType=VARCHAR}</if>
+        <if test="maxChannel != null and maxChannel != ''"> and a.max_channel = #{maxChannel, jdbcType=INTEGER}</if>
+        <if test="hddSize != null and hddSize != ''"> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
+        <if test="bufferDay != null and bufferDay != ''"> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
+        <if test="timeLong != null and timeLong != ''"> and a.time_long = #{timeLong, jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder" resultType="com.yjh.platform.module.user.entity.TCameraRecorder">
+        select
+        a.record_id,
+        a.record_name,
+        a.alias_name,
+        a.record_ip,
+        a.protocal,
+        a.http_port,
+        a.trans_port,
+        a.rtsp_port,
+        a.user_name,
+        a.pwd,
+        a.root,
+        a.max_channel,
+        a.hdd_size,
+        a.buffer_day,
+        a.time_long
+        from t_camera_recorder a
+        where 1 = 1
+        <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
+        <if test="recordName != null and recordName != ''"> and a.record_name = #{recordName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="recordIp != null and recordIp != ''"> and a.record_ip = #{recordIp, jdbcType=VARCHAR}</if>
+        <if test="protocal != null and protocal != ''"> and a.protocal = #{protocal, jdbcType=VARCHAR}</if>
+        <if test="httpPort != null and httpPort != ''"> and a.http_port = #{httpPort, jdbcType=INTEGER}</if>
+        <if test="transPort != null and transPort != ''"> and a.trans_port = #{transPort, jdbcType=INTEGER}</if>
+        <if test="rtspPort != null and rtspPort != ''"> and a.rtsp_port = #{rtspPort, jdbcType=INTEGER}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="pwd != null and pwd != ''"> and a.pwd = #{pwd, jdbcType=VARCHAR}</if>
+        <if test="root != null and root != ''"> and a.root = #{root, jdbcType=VARCHAR}</if>
+        <if test="maxChannel != null and maxChannel != ''"> and a.max_channel = #{maxChannel, jdbcType=INTEGER}</if>
+        <if test="hddSize != null and hddSize != ''"> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
+        <if test="bufferDay != null and bufferDay != ''"> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
+        <if test="timeLong != null and timeLong != ''"> and a.time_long = #{timeLong, jdbcType=INTEGER}</if>
+    </select>
+
+
+
+</mapper>
