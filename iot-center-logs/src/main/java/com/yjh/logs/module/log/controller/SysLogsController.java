@@ -63,7 +63,7 @@ public class SysLogsController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加日志错误:", e);
+            log.error("添加错误:", e);
         }
         return result;
     }
