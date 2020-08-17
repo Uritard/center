@@ -27,6 +27,15 @@ public class SysOrgService{
         return this.sysOrgDao.insert(sysOrg);
     }
 
+    public boolean judgeOrgCode (String orgCode) {
+        boolean flag = false;
+        List<SysOrg> sysOrgList = this.sysOrgDao.select(null, null, orgCode, null, null, null, null, null, null, null);
+        if (sysOrgList.size()>0) {
+            flag=true;
+        }
+        return flag;
+    }
+
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long orgId) {

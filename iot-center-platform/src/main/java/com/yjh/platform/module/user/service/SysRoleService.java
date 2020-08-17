@@ -272,14 +272,16 @@ public class SysRoleService{
         Long roleId = Long.valueOf(String.valueOf(req.get("roleId")));
         sysRoleMenuDao.deleteByRoleId(roleId);
         List<String> listString = (List<String>) req.get("checked");
-        List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
-        for (String menuCode:listString) {
-            SysRoleMenu sysRoleMenu = new SysRoleMenu();
-            sysRoleMenu.setMenuCode(menuCode);
-            sysRoleMenu.setRoleId(roleId);
-            sysRoleMenuList.add(sysRoleMenu);
-        }
-        return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
+        if (listString.size()>0) {
+            List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
+            for (String menuCode:listString) {
+                SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                sysRoleMenu.setMenuCode(menuCode);
+                sysRoleMenu.setRoleId(roleId);
+                sysRoleMenuList.add(sysRoleMenu);
+            }
+            return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
+        } else {return 0;}
     }
 
 //    @Logs(title = "根据角色ID查询关联的菜单信息", code = "module")
