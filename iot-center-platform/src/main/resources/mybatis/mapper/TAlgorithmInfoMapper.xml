@@ -76,7 +76,7 @@
         from t_algorithm_info a
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
-        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
         <if test="algorithmType != null and algorithmType != ''"> and a.algorithm_type = #{algorithmType, jdbcType=VARCHAR}</if>
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null and algorithmCode != ''"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
@@ -105,7 +105,7 @@
         LEFT JOIN t_dict_business b ON b.dict_code = a.analys_type
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
-        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
         <if test="algorithmType != null and algorithmType != ''"> and a.algorithm_type = #{algorithmType, jdbcType=VARCHAR}</if>
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null and algorithmCode != ''"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>

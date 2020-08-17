@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
-@EnableFeignClients
+@EnableFeignClients 
 public class PlatformApplication {
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
