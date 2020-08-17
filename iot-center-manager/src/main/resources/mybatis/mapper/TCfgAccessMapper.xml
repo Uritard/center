@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mabatis.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mabatis.mapper.dtd">
+<mabatis.mapper namespace="com.yjh.Manager.module.dao.TCfgAccessDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.Manager.module.entity.TCfgAccess">
+        <id column="access_id" jdbcType="BIGINT" property="accessId" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="project_id" jdbcType="BIGINT" property="projectId" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="port" jdbcType="VARCHAR" property="port" />
+        <result column="app_id" jdbcType="VARCHAR" property="appId" />
+        <result column="secret" jdbcType="VARCHAR" property="secret" />
+        <result column="access_code" jdbcType="VARCHAR" property="accessCode" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="VARCHAR" property="state" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        access_id, name, project_id, url, port, app_id, secret, access_code, user_id, user_name, create_time, update_time, remark, state
+    </sql>
+
+    <select id="select" parameterType="com.yjh.Manager.module.entity.TCfgAccess" resultType="com.yjh.Manager.module.entity.TCfgAccess">
+        select
+        a.access_id,
+        a.name,
+        a.project_id,
+        a.url,
+        a.port,
+        a.app_id,
+        a.secret,
+        a.access_code,
+        a.user_id,
+        a.user_name,
+        a.create_time,
+        a.update_time,
+        a.remark,
+        a.state
+        from t_cfg_access a
+        where 1 = 1
+        <if test="accessId != null and accessId != ''"> and a.access_id = #{accessId, jdbcType=BIGINT}</if>
+        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
+        <if test="projectId != null and projectId != ''"> and a.project_id = #{projectId, jdbcType=BIGINT}</if>
+        <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
+        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=VARCHAR}</if>
+        <if test="appId != null and appId != ''"> and a.app_id = #{appId, jdbcType=VARCHAR}</if>
+        <if test="secret != null and secret != ''"> and a.secret = #{secret, jdbcType=VARCHAR}</if>
+        <if test="accessCode != null and accessCode != ''"> and a.access_code = #{accessCode, jdbcType=VARCHAR}</if>
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=VARCHAR}</if>
+    </select>
+
+
+
+</mabatis.mapper>

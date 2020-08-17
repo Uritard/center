@@ -1,6 +1,8 @@
 package com.yjh.platform.configuration;
 
+import com.alibaba.druid.filter.config.ConfigTools;
 import com.yjh.platform.configuration.TripleDESEncrypt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,12 @@ public class RedisConn {
 
     private String password;
     private int database;
+
+    @Value("${spring.datasource.platform.publicKey}")
+    private String publicKey;
+
+    @Value("${spring.redis.password}")
+    private String passwordSec;
 
     public String getHost() {
         return host;
@@ -35,12 +43,12 @@ public class RedisConn {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        try {
+            this.password = ConfigTools.decrypt(publicKey, passwordSec);
+        } catch (Exception e) {
+            e.getMessage();
+        }
     }
-
-//    public void setPassword(String password) {
-//        this.password = TripleDESEncrypt.decrypt(password);
-//    }
 
     public int getDatabase() {
         return database;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.user.dao.SysUserDao">
+<!DOCTYPE mabatis.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mabatis.mapper.dtd">
+<mabatis.mapper namespace="com.yjh.platform.module.user.dao.SysUserDao">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.SysUser">
@@ -361,4 +361,4 @@
         and a.user_name = #{userName, jdbcType=VARCHAR}
     </select>
 
-</mapper>
+</mabatis.mapper>

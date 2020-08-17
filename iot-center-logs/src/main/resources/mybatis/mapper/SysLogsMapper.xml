@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.logs.module.log.dao.SysLogsDao">
+<!DOCTYPE mabatis.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mabatis.mapper.dtd">
+<mabatis.mapper namespace="com.yjh.logs.module.log.dao.SysLogsDao">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.logs.module.log.entity.SysLogs">
@@ -157,4 +157,4 @@
 
 
 
-</mapper>
+</mabatis.mapper>

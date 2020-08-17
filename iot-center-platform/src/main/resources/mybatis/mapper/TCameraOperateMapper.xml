@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.user.dao.TCameraOperateDao">
+<!DOCTYPE mabatis.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mabatis.mapper.dtd">
+<mabatis.mapper namespace="com.yjh.platform.module.user.dao.TCameraOperateDao">
 
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraPreset">
         <id column="preset_id" jdbcType="BIGINT" property="presetId" />
@@ -86,4 +86,4 @@
     </set>
         where  preset_id= #{presetId, jdbcType=BIGINT}
     </update>
-</mapper>
+</mabatis.mapper>

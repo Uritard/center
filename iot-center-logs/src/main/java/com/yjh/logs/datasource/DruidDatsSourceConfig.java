@@ -333,7 +333,7 @@
 //        bean.setPlugins(new Interceptor[]{pageHelper});
 //
 //
-//        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mybatis/mapper/*/*.xml"));
+//        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mybatis/mabatis.mapper/*/*.xml"));
 //        return bean.getObject();
 //    }
 //
