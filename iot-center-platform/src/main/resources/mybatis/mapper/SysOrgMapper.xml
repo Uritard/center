@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mabatis.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mabatis.mapper.dtd">
-<mabatis.mapper namespace="com.yjh.platform.module.user.dao.SysOrgDao">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.SysOrgDao">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.SysOrg">
@@ -153,4 +153,4 @@
                 <if test="orgName != null and orgName != ''"> AND a.org_name LIKE CONCAT('%',#{orgName, jdbcType=VARCHAR},'%')</if>
     </select>
 
-</mabatis.mapper>
+</mapper>

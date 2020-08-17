@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mabatis.mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mabatis.mapper.dtd">
-<mabatis.mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceDao">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceDao">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDevice">
@@ -281,4 +281,4 @@
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
     </select>
 
-</mabatis.mapper>
+</mapper>
