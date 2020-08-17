@@ -53,6 +53,18 @@ public class SysUserService{
         return this.sysUserDao.selectByPrimaryId(userId);
     }
 
+    @Logs(title = "用户状态查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<SysUser> selectByUserState(Integer state) {
+        return this.sysUserDao.selectByUserState(state);
+    }
+
+    @Logs(title = "用户名查询", code ="module")
+    @Transactional(rollbackFor =Exception.class )
+    public  List<SysUser> selectByUserName(String userName){
+        return this.sysUserDao.selectByUserName(userName);
+    }
+
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Date invalidTime, Date lastLogin) {
@@ -103,7 +115,7 @@ public class SysUserService{
     @Logs(title = "用户登录", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public SysUser userLogin(String userName, String password) {
-        SysUser sysUser = this.sysUserDao.selectByUserName(userName);
+        SysUser sysUser = this.sysUserDao. selectByUserNameL(userName);
         if (!sysUser.getPassword().equals(password)) {
             throw new BusinessException("用户密码错误");
         } else {
@@ -114,7 +126,7 @@ public class SysUserService{
         return sysUser;
     }
 
-    @Logs(title = "用户登录", code = "module")
+    @Logs(title = "用户登出", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int userLogout(String userId) {
         SysUser sysUserParams = new SysUser();

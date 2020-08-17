@@ -109,6 +109,35 @@ public class SysUserController {
         return result;
     }
 
+    @ApiOperation(value = "用户状态查询")
+    @RequestMapping(value = "/selectByUserState", method = RequestMethod.GET)
+    public Result selectByUserState(@RequestParam(value ="state",required = true)Integer state){
+        Result result =new Result();
+        try{
+            List<SysUser> sysUser =sysUserService.selectByUserState(state);
+            result.setData(sysUser);
+        }catch(Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "用户名查询")
+    @RequestMapping(value = "/selectByUserName", method = RequestMethod.GET)
+    public Result selectByUserName(@RequestParam(value = "userName",required = true)String userName){
+        Result result=new Result();
+        try{
+            List<SysUser> sysUsers =sysUserService.selectByUserName(userName);
+            result.setData(sysUsers);
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+
     @ApiOperation(value = "系统用户表查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "userId", required = false) Long userId,
