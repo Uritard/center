@@ -21,6 +21,13 @@ public interface SysUserDao {
     int deleteByPrimaryId(@Param(value = "userId") Long userId);
     int update(SysUser sysUser);
     SysUser selectByPrimaryId(@Param(value = "userId") Long userId);
+
+    List<SysUser> selectByUserState(@Param(value= "state") Integer state);
+
+    List<SysUser> selectByUserName(@Param(value = "userName")String userName);
+
+    SysUser selectByUserNameL(@Param(value = "userName") String userName);
+
     List<SysUser> select(@Param(value = "userId") Long userId,
                          @Param(value = "userName") String userName,
                          @Param(value = "password") String password,
@@ -50,5 +57,4 @@ public interface SysUserDao {
     SysOrg selectRelationOrg(@Param(value = "userId") Long userId);
     List<String> selectRelationMenu(@Param(value = "userId") Long userId);
     List<Map<String, String>> selectRelationAuthor(@Param(value = "userId") Long userId);
-    SysUser selectByUserName(@Param(value = "userName") String userName);
 }
