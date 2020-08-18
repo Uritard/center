@@ -265,10 +265,10 @@
         a.org_id,
         b.org_name,
         a.user_status,
-        a.create_time,
-        a.update_time,
-        a.invalid_time,
-        a.last_login
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time,
+        DATE_FORMAT(a.update_time ,'%Y-%m-%d %H:%i:%s') AS update_time,
+        DATE_FORMAT(a.invalid_time ,'%Y-%m-%d %H:%i:%s') AS invalid_time,
+        DATE_FORMAT(a.last_login ,'%Y-%m-%d %H:%i:%s') AS last_login
         from sys_user a
         LEFT JOIN sys_org b ON a.org_id = b.org_id
         LEFT JOIN sys_role c ON a.role_id = c.role_id
