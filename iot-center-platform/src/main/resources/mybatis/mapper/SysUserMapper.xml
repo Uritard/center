@@ -261,13 +261,17 @@
         a.appkey,
         a.image_url,
         a.role_id,
+        c.role_name,
         a.org_id,
+        b.org_name,
         a.user_status,
         a.create_time,
         a.update_time,
         a.invalid_time,
         a.last_login
         from sys_user a
+        LEFT JOIN sys_org b ON a.org_id = b.org_id
+        LEFT JOIN sys_role c ON a.role_id = c.role_id
         where 1 = 1 AND a.state != 0
         <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
         <if test="userName != null and userName != ''"> and a.user_name like concat('%',#{userName, jdbcType=VARCHAR},'%') </if>
