@@ -1,7 +1,5 @@
 package com.yjh.platform.module.user.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,49 +10,47 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author yc
- * @since 2020-08-18
+ * @author YC
+ * @date 2020/8/12 - 21:39
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TCameraPreset对象", description = "摄像机预位置表")
+@ApiModel(value = "TCameraPreset对象", description = "摄像机预置位表")
 public class TCameraPreset implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @ApiModelProperty(value = "预置位id")
-    @TableId(value = "preset_id", type = IdType.AUTO)
     private Long presetId;
 
     @ApiModelProperty(value = "摄像头id")
-    private Long cameraId;
+    private Long cameraId ;
 
     @ApiModelProperty(value = "预置位号")
-    private Integer presetNum;
+    private int presetNum ;
 
     @ApiModelProperty(value = "预置位名称")
-    private String presetName;
+    private String presetName ;
 
-    private String creatorUser;
+    @ApiModelProperty(value = "啥也不是")
+    private String creatorUser ;
 
     @ApiModelProperty(value = "创建时间")
-    private Date creatorTime;
+    private Date creatorTime ;
 
     @ApiModelProperty(value = "是否使用")
-    private Integer isUse;
+    private int isUse ;
 
-    private String presetImg;
+    @ApiModelProperty(value = "啥也不是啊")
+    private String presetImg ;
 
     @ApiModelProperty(value = "检测点位置，0-室外 1-室内")
-    private Integer inspectionPostion;
+    private int inspectionPostion ;
 
     @ApiModelProperty(value = "采集状态，0-未采集 1-已采集")
-    private Integer collectStatus;
+    private int collectStatus ;
 
     @ApiModelProperty(value = "标定状态，0-未标定 1-已标定")
-    private Integer calibrationStatus;
-
-
+    private int calibrationStatus ;
 }

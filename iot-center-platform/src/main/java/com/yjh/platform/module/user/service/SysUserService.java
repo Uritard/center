@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author tt
- * @since 2020-07-23
- */
+* @author tt
+* @since 2020-07-23
+*/
 @Service
 public class SysUserService{
 
@@ -78,8 +78,8 @@ public class SysUserService{
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, String>> selectByPage(SysUser sysUser) {
-        if (sysUser.getState() != null && sysUser.getState()==-1) {
-            sysUser.setState(null);
+        if (sysUser.getUserStatus() != null && sysUser.getUserStatus()==-1) {
+            sysUser.setUserStatus(null);
         }
         return sysUserDao.selectByPage(sysUser);
     }
@@ -118,6 +118,7 @@ public class SysUserService{
 
     @Logs(title = "用户登录", code = "module")
     @Transactional(rollbackFor = Exception.class)
+<<<<<<< Updated upstream
     public SysUserLogin userLogin(String userName, String password) {
         SysUserLogin sysUserLogin = this.sysUserDao.selectByUserNameL(userName);
         if(sysUserLogin==null) {
@@ -130,6 +131,16 @@ public class SysUserService{
                 String appKey = String.valueOf(DateTimeUtil.getSecondTimestamp(date));
                 sysUserLogin.setAppkey(appKey);
             }
+=======
+    public SysUser userLogin(String userName, String password) {
+        SysUser sysUser = this.sysUserDao. selectByUserNameL(userName);
+        if (!sysUser.getPassword().equals(password)) {
+            throw new BusinessException("用户密码错误");
+        } else {
+            Date date = new Date();
+            String appKey = String.valueOf(DateTimeUtil.getSecondTimestamp(date));
+            sysUser.setAppkey(appKey);
+>>>>>>> Stashed changes
         }
         return sysUserLogin;
     }

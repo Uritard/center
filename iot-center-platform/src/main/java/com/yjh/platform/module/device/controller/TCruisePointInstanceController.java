@@ -1,9 +1,13 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.service.TCruisePointInstanceService;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -178,6 +182,36 @@ public class TCruisePointInstanceController {
             log.error("标准测点关联机器人巡检点查询失败描述：", e);
         }
         return result;
+    }
+
+    @ApiOperation(value = "创建机器人巡检实例")
+    @RequestMapping(value = "/STDMateUnionTRInspection", method = RequestMethod.POST)
+    public Result STDMateUnionTRInspection(@RequestBody List<Map<String,Object> > list){
+        //数据顺序 tR TS
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.STDMateUnionTRInspection(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("创建机器人巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "创建摄像头预置位巡检实例")
+    @RequestMapping(value = "/STDMateUnionTCPreset", method = RequestMethod.POST)
+    public Result STDMateUnionTCPreset(@RequestBody List<Map<String,Object> > list){
+        //数据顺序 TCP TS
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.STDMateUnionTCPreset(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("创建摄像头预置位巡检实例失败描述：", e);
+        }
+        return result;
+
     }
 
 }

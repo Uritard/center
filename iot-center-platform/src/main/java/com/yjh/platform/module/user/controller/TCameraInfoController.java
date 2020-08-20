@@ -1,11 +1,10 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
@@ -69,22 +69,6 @@ public class TCameraInfoController {
         return result;
     }
 
-    @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/deleteSelectedCamera", method = RequestMethod.DELETE)
-    public Result deleteSelectedCamera(@RequestParam(value = "cameraIds[]", required = true) String[] cameraIds) {
-        Result result = new Result();
-        try {
-            result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
-        } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("删除异常:", e);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("删除错误:", e);
-        }
-        return result;
-    }
-
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public Result update(@RequestBody TCameraInfo tCameraInfo) {
@@ -111,45 +95,6 @@ public class TCameraInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
-        }
-        return result;
-    }
-    @ApiOperation(value = "根据间隔id查询所有摄像机信息")
-    @RequestMapping(value = "/selectByRegionId", method = RequestMethod.GET)
-    public Result selectByRegionId(@RequestParam(value = "regionId", required = false) Long regionId,
-                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-        Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCameraInfo> list = tCameraInfoService.selectByRegionId(regionId);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("查询失败描述：", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "根据摄像机名称查询信息")
-    @RequestMapping(value = "/selectByCameraName", method = RequestMethod.GET)
-    public Result selectByCameraName(@RequestParam(value = "cameraName", required = false) String cameraName,
-                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-        Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCameraInfo> list = tCameraInfoService.selectByCameraName(cameraName);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("查询失败描述：", e);
         }
         return result;
     }

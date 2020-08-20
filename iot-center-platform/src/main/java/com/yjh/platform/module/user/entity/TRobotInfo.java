@@ -36,12 +36,6 @@ public class TRobotInfo implements Serializable {
 
     private Integer robotPort;
 
-    @ApiModelProperty(value = "上级区域ID")
-    private Long upRegionId;
-
-    @ApiModelProperty(value = "上级区域名称")
-    private String upRegionName;
-
     private String lightIp;
 
     private String lightPort;

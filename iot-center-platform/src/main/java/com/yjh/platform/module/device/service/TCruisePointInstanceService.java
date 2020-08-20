@@ -4,7 +4,13 @@ import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.user.entity.TCameraPreset;
+import org.apache.poi.poifs.filesystem.Entry;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -71,5 +77,56 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceList;
     }
 
+    @Logs(title = "创建机器人巡检实例",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int STDMateUnionTRInspection(List<Map<String,Object> > list){
+        Map<String,Object> map1 = list.get(0);//TRobotInspection的数据
+        Map<String,Object> map2 = list.get(1);//TStdDeviceMete的数据
+        TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
+        TRobotInspection tRobotInspection = new TRobotInspection();
+        //获取TStdDeviceMete的数据
+        tStdDeviceMete.setDeviceMeteId(Long.valueOf(map2.get("deviceMeteId").toString()));
+        tStdDeviceMete.setDeviceId(Long.valueOf(map2.get("deviceId").toString()));
+        tStdDeviceMete.setCustomId((String)map2.get("CustomId"));
+        //获取TRobotInspection的数据
+        tRobotInspection.setInspectionId(Long.valueOf(map1.get("presetId").toString()));
+        tRobotInspection.setInspectionName((String) map1.get("inspectionName"));
+        //构造TCruisePointInstance数据
+        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
+        tCruisePointInstance.setDeviceMeteId(tStdDeviceMete.getDeviceMeteId());
+        tCruisePointInstance.setDeviceId(tStdDeviceMete.getDeviceId());
+        tCruisePointInstance.setCustomId(tStdDeviceMete.getCustomId());
+
+        tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
+        tCruisePointInstance.setCruiseId(tRobotInspection.getInspectionId());
+        tCruisePointInstance.setCruiseType(4002);
+        return tCruisePointInstanceDao.sTDMateUnionTRInspection(tCruisePointInstance);
+    }
+
+    @Logs(title = "创建摄像头预置位巡检实例",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int STDMateUnionTCPreset(List<Map<String,Object> > list){
+        Map<String,Object> map1 = list.get(0);//TCameraPreset的数据
+        Map<String,Object> map2 = list.get(1);//TStdDeviceMete的数据
+        TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
+        TCameraPreset tCameraPreset = new TCameraPreset();
+        //获取TStdDeviceMete的数据
+        tStdDeviceMete.setDeviceMeteId(Long.valueOf(map2.get("deviceMeteId").toString()));
+        tStdDeviceMete.setDeviceId(Long.valueOf(map2.get("deviceId").toString()));
+        tStdDeviceMete.setCustomId((String)map2.get("CustomId"));
+        //取得TCameraPreset的数据
+        tCameraPreset.setPresetId(Long.valueOf(map1.get("presetId").toString()));
+        tCameraPreset.setPresetName(map1.get("presetName").toString());
+        //构造TCruisePointInstance数据
+        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
+        tCruisePointInstance.setDeviceMeteId(tStdDeviceMete.getDeviceMeteId());
+        tCruisePointInstance.setDeviceId(tStdDeviceMete.getDeviceId());
+        tCruisePointInstance.setCustomId(tStdDeviceMete.getCustomId());
+        
+        tCruisePointInstance.setCruiseId(tCameraPreset.getPresetId());
+        tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+        tCruisePointInstance.setCruiseType(4001);
+        return tCruisePointInstanceDao.STDMateUnionTCPreset(tCruisePointInstance);
+    }
 }
 

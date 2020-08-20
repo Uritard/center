@@ -43,4 +43,9 @@ public interface TCruisePointInstanceDao {
 
     int batchInsert(List<TCruisePointInstance> list);
     List<TCruisePointInstance> StdMeteUnionInspectionId(@Param(value = "deviceId") Long deviceId);
+
+    //创建机器人巡检实例
+    int sTDMateUnionTRInspection(TCruisePointInstance tCruisePointInstance);
+    //创建摄像头预置位巡检实例
+    int STDMateUnionTCPreset(TCruisePointInstance tCruisePointInstance);
 }

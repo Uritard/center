@@ -10,8 +10,6 @@
         <result column="robot_type" jdbcType="INTEGER" property="robotType" />
         <result column="robot_ip" jdbcType="VARCHAR" property="robotIp" />
         <result column="robot_port" jdbcType="INTEGER" property="robotPort" />
-        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
-        <result column="up_region_name" jdbcType="VARCHAR" property="upRegionName" />
         <result column="light_ip" jdbcType="VARCHAR" property="lightIp" />
         <result column="light_port" jdbcType="VARCHAR" property="lightPort" />
         <result column="light_username" jdbcType="VARCHAR" property="lightUsername" />
@@ -30,7 +28,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_name, robot_status, robot_type, robot_ip, robot_port, up_region_id, up_region_name, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, remarks
+        robot_id, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, remarks
     </sql>
 
 
@@ -41,8 +39,6 @@
             robot_type,
             robot_ip,
             robot_port,
-            up_region_id,
-            up_region_name,
             light_ip,
             light_port,
             light_username,
@@ -63,8 +59,6 @@
                 #{robotType, jdbcType=INTEGER},
                 #{robotIp, jdbcType=VARCHAR},
                 #{robotPort, jdbcType=INTEGER},
-                #{upRegionId, jdbcType=BIGINT},
-                #{upRegionName, jdbcType=VARCHAR},
                 #{lightIp, jdbcType=VARCHAR},
                 #{lightPort, jdbcType=VARCHAR},
                 #{lightUsername, jdbcType=VARCHAR},
@@ -82,9 +76,27 @@
         )
     </insert>
 
+<!--    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">-->
+<!--        delete from t_robot_info-->
+<!--                where robot_id = #{robotId, jdbcType=BIGINT}-->
+<!--    </delete>-->
+
+    <!--多表的根据robot_id的删除-->
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from t_robot_info
-                where robot_id = #{robotId, jdbcType=BIGINT}
+                DELETE  a,
+                        b,
+                        e,
+                        d
+                FROM
+                    t_robot_info AS a,
+                    t_robot_inspection AS b,
+                    t_cruise_point_instance AS e,
+                    t_cruise_plan AS d
+                WHERE
+                    a.robot_id = b.robot_id
+                AND b.inspection_id = e.cruise_id
+                AND a.robot_id = d.robot_id
+                AND a.robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
@@ -95,8 +107,6 @@
         <if test="robotType != null and robotType != ''">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
         <if test="robotIp != null and robotIp != ''">a.robot_ip = #{robotIp, jdbcType=VARCHAR},</if>
         <if test="robotPort != null and robotPort != ''">a.robot_port = #{robotPort, jdbcType=INTEGER},</if>
-        <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
-        <if test="upRegionName != null and upRegionName != ''">a.up_region_name = #{upRegionName, jdbcType=VARCHAR},</if>
         <if test="lightIp != null and lightIp != ''">a.light_ip = #{lightIp, jdbcType=VARCHAR},</if>
         <if test="lightPort != null and lightPort != ''">a.light_port = #{lightPort, jdbcType=VARCHAR},</if>
         <if test="lightUsername != null and lightUsername != ''">a.light_username = #{lightUsername, jdbcType=VARCHAR},</if>
@@ -123,8 +133,6 @@
         a.robot_type,
         a.robot_ip,
         a.robot_port,
-        a.up_region_id,
-        a.up_region_name,
         a.light_ip,
         a.light_port,
         a.light_username,
@@ -153,8 +161,6 @@
         a.robot_type,
         a.robot_ip,
         a.robot_port,
-        a.up_region_id,
-        a.up_region_name,
         a.light_ip,
         a.light_port,
         a.light_username,
@@ -177,8 +183,6 @@
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
         <if test="robotIp != null and robotIp != ''"> and a.robot_ip = #{robotIp, jdbcType=VARCHAR}</if>
         <if test="robotPort != null and robotPort != ''"> and a.robot_port = #{robotPort, jdbcType=INTEGER}</if>
-        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
-        <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
         <if test="lightIp != null and lightIp != ''"> and a.light_ip = #{lightIp, jdbcType=VARCHAR}</if>
         <if test="lightPort != null and lightPort != ''"> and a.light_port = #{lightPort, jdbcType=VARCHAR}</if>
         <if test="lightUsername != null and lightUsername != ''"> and a.light_username = #{lightUsername, jdbcType=VARCHAR}</if>
@@ -203,8 +207,6 @@
         a.robot_type,
         a.robot_ip,
         a.robot_port,
-        a.up_region_id,
-        a.up_region_name,
         a.light_ip,
         a.light_port,
         a.light_username,
@@ -227,8 +229,6 @@
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
         <if test="robotIp != null and robotIp != ''"> and a.robot_ip = #{robotIp, jdbcType=VARCHAR}</if>
         <if test="robotPort != null and robotPort != ''"> and a.robot_port = #{robotPort, jdbcType=INTEGER}</if>
-        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
-        <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
         <if test="lightIp != null and lightIp != ''"> and a.light_ip = #{lightIp, jdbcType=VARCHAR}</if>
         <if test="lightPort != null and lightPort != ''"> and a.light_port = #{lightPort, jdbcType=VARCHAR}</if>
         <if test="lightUsername != null and lightUsername != ''"> and a.light_username = #{lightUsername, jdbcType=VARCHAR}</if>
@@ -252,8 +252,6 @@
             robot_type,
             robot_ip,
             robot_port,
-            up_region_id,
-            up_region_name,
             light_ip,
             light_port,
             light_username,
@@ -276,8 +274,6 @@
                 #{TRobotInfo.robotType, jdbcType=INTEGER},
                 #{TRobotInfo.robotIp, jdbcType=VARCHAR},
                 #{TRobotInfo.robotPort, jdbcType=INTEGER},
-                #{TRobotInfo.upRegionId, jdbcType=BIGINT},
-                #{TRobotInfo.upRegionName, jdbcType=VARCHAR},
                 #{TRobotInfo.lightIp, jdbcType=VARCHAR},
                 #{TRobotInfo.lightPort, jdbcType=VARCHAR},
                 #{TRobotInfo.lightUsername, jdbcType=VARCHAR},

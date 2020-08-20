@@ -330,6 +330,43 @@
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
     </select>
 
+    <!--创建机器人的巡检实例，根据参数所做的插入-->
+    <insert id="sTDMateUnionTRInspection"  parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        insert into t_cruise_point_instance(
+            device_mete_id,
+            device_id,
+            custom_id,
+            cruise_type,
+            cruise_id,
+            cruise_name
+        )values(
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{customId, jdbcType=VARCHAR},
+                #{cruiseType, jdbcType=INTEGER},
+                #{cruiseId, jdbcType=BIGINT},
+                #{cruiseName, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!--创建摄像头预置位的巡检实例，根据参数所做的插入-->
+    <insert id="STDMateUnionTCPreset"  parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        insert into t_cruise_point_instance(
+            device_mete_id,
+            device_id,
+            custom_id,
+            cruise_type,
+            cruise_id,
+            cruise_name
+        )values(
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{customId, jdbcType=VARCHAR},
+                #{cruiseType, jdbcType=INTEGER},
+                #{cruiseId, jdbcType=BIGINT},
+                #{cruiseName, jdbcType=VARCHAR}
+        )
+    </insert>
 
 
 </mapper>

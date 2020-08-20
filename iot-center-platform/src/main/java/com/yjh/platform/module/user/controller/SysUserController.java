@@ -4,6 +4,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
+import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.entity.SysUser;
 
@@ -247,7 +248,7 @@ public class SysUserController {
                 result.setData(this.sysUserService.userLogin(userName, password));
             } else {result.setData("用户名或者密码为空！");}
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("根据密码登录失败:", e);
         }
         return result;

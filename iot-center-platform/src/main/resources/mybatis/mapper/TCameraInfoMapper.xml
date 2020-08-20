@@ -62,20 +62,8 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete t_camera_info,t_camera_preset from t_camera_info left join t_camera_preset
-        on t_camera_info.camera_id=t_camera_preset.camera_id
-        where t_camera_info.camera_id = #{cameraId, jdbcType=BIGINT}
-    </delete>
-
-    <!--批量删除-->
-    <delete id="deleteSelectedCamera"  parameterType="java.lang.String">
-        delete t_camera_info,t_camera_preset from
-        t_camera_info left join t_camera_preset
-        on t_camera_info.camera_id=t_camera_preset.camera_id
-        where  t_camera_info.camera_id in
-            <foreach collection="cameraIds" item="cameraId" open="(" separator="," close=")">
-                #{cameraId, jdbcType=BIGINT}
-            </foreach>
+        delete from t_camera_info
+                where camera_id = #{cameraId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
@@ -120,51 +108,6 @@
             and a.camera_id = #{cameraId, jdbcType=BIGINT}
         limit 1
     </select>
-    <!--根据摄像机名称查询信息-->
-    <select id="selectByCameraName" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
-        select
-        a.camera_id,
-        a.camera_name,
-        a.alias_name,
-        a.record_id,
-        a.up_region_id,
-        a.channel_num,
-        a.sms_id,
-        a.rms_id,
-        a.factory_name,
-        a.stream_type,
-        a.protocol_type,
-        a.url,
-        a.port,
-        a.camera_type,
-        a.is_control
-        from t_camera_info a
-        where 1 = 1
-        <if test="cameraName != null and cameraName != ''"> and a.camera_name  like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
-    </select>
-    <!--根据间隔id查询所有摄像机信息-->
-    <select id="selectByRegionId" parameterType="com.yjh.platform.module.device.entity.TStdRegion" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
-        select
-        a.camera_id,
-        a.camera_name,
-        a.alias_name,
-        a.record_id,
-        a.up_region_id,
-        a.channel_num,
-        a.sms_id,
-        a.rms_id,
-        a.factory_name,
-        a.stream_type,
-        a.protocol_type,
-        a.url,
-        a.port,
-        a.camera_type,
-        a.is_control
-        from t_camera_info a
-        where 1 = 1
-        and a.up_region_id = #{regionId, jdbcType=BIGINT}
-
-    </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
         select
@@ -186,7 +129,7 @@
         from t_camera_info a
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
-        <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
@@ -222,7 +165,7 @@
         from t_camera_info a
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
-        <if test="cameraName != null and cameraName != ''"> and a.camera_name  like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
