@@ -7,11 +7,8 @@ import java.util.Map;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysUser;
-<<<<<<< Updated upstream
 import com.yjh.platform.module.user.entity.SysUserLogin;
-=======
 import com.yjh.platform.module.user.entity.TCameraPreset;
->>>>>>> Stashed changes
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

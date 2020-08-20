@@ -4,6 +4,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
+import com.yjh.platform.module.user.entity.SysUserLogin;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -178,8 +179,8 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody SysUser sysUser,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -245,10 +246,19 @@ public class SysUserController {
             if (userMap.size()>0) {
                 String userName = userMap.get("userName");
                 String password = userMap.get("password");
-                result.setData(this.sysUserService.userLogin(userName, password));
+                SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
+                if (sysUserLogin.getUserId() != null) {
+                    if (sysUserLogin.getState()==2) {result.setData("账号锁定！");}
+                    if (sysUserLogin.getState()==0) {result.setData("账号删除！");}
+                    if (sysUserLogin.getState()==1) {result.setData(sysUserLogin);}
+                } else {
+                    Map<String, Integer> map = new HashMap<>();
+                    map.put("code", ResultCodeEnum.CODE10101.getCode());
+                    result.setData(map);
+                }
             } else {result.setData("用户名或者密码为空！");}
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
             log.error("根据密码登录失败:", e);
         }
         return result;
