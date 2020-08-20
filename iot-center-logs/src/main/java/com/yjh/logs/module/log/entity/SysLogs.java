@@ -2,6 +2,8 @@ package com.yjh.logs.module.log.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -45,7 +47,8 @@ public class SysLogs implements Serializable {
     @ApiModelProperty(value = "操作者名称")
     private String userName;
 
-    @ApiModelProperty(value = "更新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "更新时间",example = "2018-10-01 12:18:48")
     private Date createTime;
 
 

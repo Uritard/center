@@ -30,10 +30,10 @@
             <scope>provided</scope>
         </dependency>
         <!-- spring cloud eureka 注册中心客户端 暂时不需要-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.cloud</groupId>-->
-            <!--<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <!-- spring cloud zuul 网关 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -233,7 +233,7 @@
                             <!-- 生成的manifest中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前 缀是lib/ -->
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- 应用的main class -->
-                            <mainClass>com.yjh.logs.DeviceApplication</mainClass>
+                            <mainClass>com.yjh.logs.LogsApplication</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>config/</Class-Path>

@@ -15,9 +15,9 @@ import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
-* @author tt
-* @since 2020-07-23
-*/
+ * @author tt
+ * @since 2020-07-23
+ */
 @Service
 public class SysUserService{
 
@@ -74,8 +74,8 @@ public class SysUserService{
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, String>> selectByPage(SysUser sysUser) {
-        if (sysUser.getUserStatus() != null && sysUser.getUserStatus()==-1) {
-            sysUser.setUserStatus(null);
+        if (sysUser.getState() != null && sysUser.getState()==-1) {
+            sysUser.setState(null);
         }
         return sysUserDao.selectByPage(sysUser);
     }
