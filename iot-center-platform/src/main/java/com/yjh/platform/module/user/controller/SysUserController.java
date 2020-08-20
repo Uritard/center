@@ -255,13 +255,11 @@ public class SysUserController {
 
     @ApiOperation(value = "用户登出")
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public Result userLogout(HttpServletRequest request, @RequestBody Map<String, String> userMap) {
+    public Result userLogout(HttpServletRequest request) {
         Result result = new Result();
         try {
-            if (userMap.size()>0) {
-                String userId = userMap.get("userId");
-                result.setData(this.sysUserService.userLogout(userId));
-            }
+            String userId = request.getHeader("userId");
+            result.setData(this.sysUserService.userLogout(userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("登出失败:", e);
