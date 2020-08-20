@@ -102,7 +102,7 @@
         from sys_org a
         where 1 = 1
         <if test="orgId != null and orgId != ''"> and a.org_id = #{orgId, jdbcType=BIGINT}</if>
-        <if test="orgName != null and orgName != ''"> and a.org_name = #{orgName, jdbcType=VARCHAR}</if>
+        <if test="orgName != null and orgName != ''"> and a.org_name like concat('%',#{orgName,jdbcType=VARCHAR},'%')</if>
         <if test="orgCode != null and orgCode != ''"> and a.org_code = #{orgCode, jdbcType=VARCHAR}</if>
         <if test="upId != null and upId != ''"> and a.up_id = #{upId, jdbcType=BIGINT}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
@@ -128,7 +128,7 @@
         from sys_org a
         where 1 = 1
         <if test="orgId != null and orgId != ''"> and a.org_id = #{orgId, jdbcType=BIGINT}</if>
-        <if test="orgName != null and orgName != ''"> and a.org_name = #{orgName, jdbcType=VARCHAR}</if>
+        <if test="orgName != null and orgName != ''"> and a.org_name like concat('%',#{orgName,jdbcType=VARCHAR},'%')</if>
         <if test="orgCode != null and orgCode != ''"> and a.org_code = #{orgCode, jdbcType=VARCHAR}</if>
         <if test="upId != null and upId != ''"> and a.upId = #{parentId, jdbcType=BIGINT}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>

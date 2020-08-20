@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TCameraPresetDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraPreset">
+        <id column="preset_id" jdbcType="BIGINT" property="presetId" />
+        <result column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <result column="preset_num" jdbcType="INTEGER" property="presetNum" />
+        <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
+        <result column="creator_user" jdbcType="VARCHAR" property="creatorUser" />
+        <result column="creator_time" jdbcType="TIMESTAMP" property="creatorTime" />
+        <result column="is_use" jdbcType="INTEGER" property="isUse" />
+        <result column="preset_img" jdbcType="VARCHAR" property="presetImg" />
+        <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
+        <result column="collect_status" jdbcType="INTEGER" property="collectStatus" />
+        <result column="calibration_status" jdbcType="INTEGER" property="calibrationStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        preset_id, camera_id, preset_num, preset_name, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
+        insert into t_camera_preset(
+            preset_id,
+            camera_id,
+            preset_num,
+            preset_name,
+            creator_user,
+            creator_time,
+            is_use,
+            preset_img,
+            inspection_postion,
+            collect_status,
+            calibration_status
+        )values(
+                #{presetId, jdbcType=BIGINT},
+                #{cameraId, jdbcType=BIGINT},
+                #{presetNum, jdbcType=INTEGER},
+                #{presetName, jdbcType=VARCHAR},
+                #{creatorUser, jdbcType=VARCHAR},
+                #{creatorTime, jdbcType=TIMESTAMP},
+                #{isUse, jdbcType=INTEGER},
+                #{presetImg, jdbcType=VARCHAR},
+                #{inspectionPostion, jdbcType=INTEGER},
+                #{collectStatus, jdbcType=INTEGER},
+                #{calibrationStatus, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_camera_preset
+                where preset_id = #{presetId, jdbcType=BIGINT}
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteSelectedPreset"  parameterType="java.lang.Long">
+        delete from t_camera_preset
+        where 1=1
+        and preset_id in
+           <foreach collection="presetIds" item="presetIds" open="(" separator="," close=")">
+               #{presetIds, jdbcType=BIGINT}
+            </foreach>
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
+        update t_camera_preset a <set>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        <if test="cameraId != null and cameraId != ''">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
+        <if test="presetNum != null and presetNum != ''">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
+        <if test="presetName != null and presetName != ''">a.preset_name = #{presetName, jdbcType=VARCHAR},</if>
+        <if test="creatorUser != null and creatorUser != ''">a.creator_user = #{creatorUser, jdbcType=VARCHAR},</if>
+        <if test="creatorTime != null and creatorTime != ''">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
+        <if test="isUse != null and isUse != ''">a.is_use = #{isUse, jdbcType=INTEGER},</if>
+        <if test="presetImg != null and presetImg != ''">a.preset_img = #{presetImg, jdbcType=VARCHAR},</if>
+        <if test="inspectionPostion != null and inspectionPostion != ''">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
+        <if test="collectStatus != null and collectStatus != ''">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
+        <if test="calibrationStatus != null and calibrationStatus != ''">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
+    </set>
+            where a.preset_id = #{presetId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        a.preset_id,
+        a.camera_id,
+        a.preset_num,
+        a.preset_name,
+        a.creator_user,
+        a.creator_time,
+        a.is_use,
+        a.preset_img,
+        a.inspection_postion,
+        a.collect_status,
+        a.calibration_status
+        from t_camera_preset a
+        where 1 = 1
+            and a.preset_id = #{presetId, jdbcType=BIGINT}
+        limit 1
+    </select>
+    <!--根据预置位名称查询信息-->
+    <select id="selectByPresetName" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        a.preset_id,
+        a.camera_id,
+        a.preset_num,
+        a.preset_name,
+        a.creator_user,
+        a.creator_time,
+        a.is_use,
+        a.preset_img,
+        a.inspection_postion,
+        a.collect_status,
+        a.calibration_status
+        from t_camera_preset a
+        where 1=1
+        <if test="presetName != null and presetName != ''"> and a.preset_name like concat('%',#{presetName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+    <!--根据摄像机id查询所有预置位信息-->
+    <select id="selectByCameraId" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        a.preset_id,
+        a.camera_id,
+        a.preset_num,
+        a.preset_name,
+        a.creator_user,
+        a.creator_time,
+        a.is_use,
+        a.preset_img,
+        a.inspection_postion,
+        a.collect_status,
+        a.calibration_status
+        from t_camera_preset a
+        where 1 = 1
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        a.preset_id,
+        a.camera_id,
+        a.preset_num,
+        a.preset_name,
+        a.creator_user,
+        a.creator_time,
+        a.is_use,
+        a.preset_img,
+        a.inspection_postion,
+        a.collect_status,
+        a.calibration_status
+        from t_camera_preset a
+        where 1 = 1
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="presetNum != null and presetNum != ''"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="presetName != null and presetName != ''"> and a.preset_name like concat('%',#{presetName, jdbcType=VARCHAR},'%')</if>
+        <if test="creatorUser != null and creatorUser != ''"> and a.creator_user = #{creatorUser, jdbcType=VARCHAR}</if>
+        <if test="creatorTime != null and creatorTime != ''"> and a.creator_time = #{creatorTime, jdbcType=TIMESTAMP}</if>
+        <if test="isUse != null and isUse != ''"> and a.is_use = #{isUse, jdbcType=INTEGER}</if>
+        <if test="presetImg != null and presetImg != ''"> and a.preset_img = #{presetImg, jdbcType=VARCHAR}</if>
+        <if test="inspectionPostion != null and inspectionPostion != ''"> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
+        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
+        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        a.preset_id,
+        a.camera_id,
+        a.preset_num,
+        a.preset_name,
+        a.creator_user,
+        a.creator_time,
+        a.is_use,
+        a.preset_img,
+        a.inspection_postion,
+        a.collect_status,
+        a.calibration_status
+        from t_camera_preset a
+        where 1 = 1
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="presetNum != null and presetNum != ''"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="presetName != null and presetName != ''"> and a.preset_name like concat('%',#{presetName, jdbcType=VARCHAR},'%')</if>
+        <if test="creatorUser != null and creatorUser != ''"> and a.creator_user = #{creatorUser, jdbcType=VARCHAR}</if>
+        <if test="creatorTime != null and creatorTime != ''"> and a.creator_time = #{creatorTime, jdbcType=TIMESTAMP}</if>
+        <if test="isUse != null and isUse != ''"> and a.is_use = #{isUse, jdbcType=INTEGER}</if>
+        <if test="presetImg != null and presetImg != ''"> and a.preset_img = #{presetImg, jdbcType=VARCHAR}</if>
+        <if test="inspectionPostion != null and inspectionPostion != ''"> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
+        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
+        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_camera_preset(
+            preset_id,
+            camera_id,
+            preset_num,
+            preset_name,
+            creator_user,
+            creator_time,
+            is_use,
+            preset_img,
+            inspection_postion,
+            collect_status,
+            calibration_status
+        )values
+        <foreach collection="list" item="TCameraPreset" separator=",">
+            (
+                #{TCameraPreset.presetId, jdbcType=BIGINT},
+                #{TCameraPreset.cameraId, jdbcType=BIGINT},
+                #{TCameraPreset.presetNum, jdbcType=INTEGER},
+                #{TCameraPreset.presetName, jdbcType=VARCHAR},
+                #{TCameraPreset.creatorUser, jdbcType=VARCHAR},
+                #{TCameraPreset.creatorTime, jdbcType=TIMESTAMP},
+                #{TCameraPreset.isUse, jdbcType=INTEGER},
+                #{TCameraPreset.presetImg, jdbcType=VARCHAR},
+                #{TCameraPreset.inspectionPostion, jdbcType=INTEGER},
+                #{TCameraPreset.collectStatus, jdbcType=INTEGER},
+                #{TCameraPreset.calibrationStatus, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -17,8 +18,11 @@ public interface TCameraInfoDao {
 
     int insert(TCameraInfo tCameraInfo);
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
+    int deleteSelectedCamera(@Param(value = "cameraIds") String[] cameraIds);
     int update(TCameraInfo tCameraInfo);
     TCameraInfo selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
+    List<TCameraInfo> selectByRegionId(@Param(value = "regionId") Long regionId);
+    List<TCameraInfo> selectByCameraName(@Param(value = "cameraName") String cameraName);
     List<TCameraInfo> select(@Param(value = "cameraId") Long cameraId,
                              @Param(value = "cameraName") String cameraName,
                              @Param(value = "aliasName") String aliasName,

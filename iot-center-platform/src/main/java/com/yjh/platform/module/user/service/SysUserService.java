@@ -116,12 +116,16 @@ public class SysUserService{
     @Transactional(rollbackFor = Exception.class)
     public SysUser userLogin(String userName, String password) {
         SysUser sysUser = this.sysUserDao. selectByUserNameL(userName);
-        if (!sysUser.getPassword().equals(password)) {
-            throw new BusinessException("用户密码错误");
-        } else {
-            Date date = new Date();
-            String appKey = String.valueOf(DateTimeUtil.getSecondTimestamp(date));
-            sysUser.setAppkey(appKey);
+        if(sysUser==null) {
+            throw new BusinessException("用户名不存在");
+        }else {
+            if (!sysUser.getPassword().equals(password)) {
+                throw new BusinessException("用户密码错误");
+            } else {
+                Date date = new Date();
+                String appKey = String.valueOf(DateTimeUtil.getSecondTimestamp(date));
+                sysUser.setAppkey(appKey);
+            }
         }
         return sysUser;
     }
