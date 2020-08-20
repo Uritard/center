@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
@@ -9,10 +10,13 @@ import com.yjh.platform.module.user.dao.SysUserDao;
 
 import java.util.*;
 
+import com.yjh.platform.module.user.entity.SysUserLogin;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author tt
@@ -114,20 +118,20 @@ public class SysUserService{
 
     @Logs(title = "用户登录", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public SysUser userLogin(String userName, String password) {
-        SysUser sysUser = this.sysUserDao. selectByUserNameL(userName);
-        if(sysUser==null) {
+    public SysUserLogin userLogin(String userName, String password) {
+        SysUserLogin sysUserLogin = this.sysUserDao.selectByUserNameL(userName);
+        if(sysUserLogin==null) {
             throw new BusinessException("用户名不存在");
         }else {
-            if (!sysUser.getPassword().equals(password)) {
+            if (!sysUserLogin.getPassword().equals(password)) {
                 throw new BusinessException("用户密码错误");
             } else {
                 Date date = new Date();
                 String appKey = String.valueOf(DateTimeUtil.getSecondTimestamp(date));
-                sysUser.setAppkey(appKey);
+                sysUserLogin.setAppkey(appKey);
             }
         }
-        return sysUser;
+        return sysUserLogin;
     }
 
     @Logs(title = "用户登出", code = "module")
@@ -138,6 +142,28 @@ public class SysUserService{
         long userIdLong = Long.valueOf(userId);
         sysUserParams.setUserId(userIdLong);
         return this.sysUserDao.update(sysUserParams);
+    }
+
+    @Logs(title = "用户帐号解锁", code = "unlockUserAccount")
+    @Transactional(rollbackFor = Exception.class)
+    public int unlockUserAccount(Map<String, String> map) {
+        SysUser sysUserLocked = new SysUser();
+        sysUserLocked.setState(1);
+        sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
+        Date date = new Date();
+        sysUserLocked.setUpdateTime(date);
+        return this.sysUserDao.update(sysUserLocked);
+    }
+
+    @Logs(title = "更新密码", code = "changePassword")
+    @Transactional(rollbackFor = Exception.class)
+    public int changePassword(Long userId, Map<String, String> map) {
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(userId);
+        sysUser.setPassword(map.get("newPassword"));
+        Date date = new Date();
+        sysUser.setUpdateTime(date);
+        return this.sysUserDao.update(sysUser);
     }
 
     private void diGui(List<AreaInfo> areaInfoList, List<Map<String, String>> listTree) {

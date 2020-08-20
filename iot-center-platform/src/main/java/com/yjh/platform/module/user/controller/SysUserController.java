@@ -290,4 +290,45 @@ public class SysUserController {
         return result;
     }
 
+    @ApiOperation(value = "用户帐号解锁")
+    @RequestMapping(value = "/unlockUserAccount", method = RequestMethod.PUT)
+    public Result unlockUserAccount(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
+        Result result = new Result();
+        try {
+            Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+            SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
+            if (sysUserCurrent.getRoleId() == 1234) {
+                result.setData(this.sysUserService.unlockUserAccount(map));
+            } else { result.setData(ResultCodeEnum.CODE10008); }
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("用户帐号解锁异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("用户帐号解锁错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "用户修改密码")
+    @RequestMapping(value = "/changePassword", method = RequestMethod.PUT)
+    public Result changePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
+        Result result = new Result();
+        try {
+            Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+            SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
+            String oldPassword = map.get("oldPassword");
+            if (sysUserCurrent.getPassword().equals(oldPassword)) {
+                result.setData(sysUserService.changePassword(userId, map));
+            } else {result.setData("旧密码输入错误！");}
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("用户修改密码异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("用户修改密码错误:", e);
+        }
+        return result;
+    }
+
 }

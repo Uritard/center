@@ -7,6 +7,7 @@ import java.util.Map;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.module.user.entity.SysUserLogin;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +26,7 @@ public interface SysUserDao {
 
     List<SysUser> selectByUserName(@Param(value = "userName")String userName);
 
-    SysUser selectByUserNameL(@Param(value = "userName") String userName);
+    SysUserLogin selectByUserNameL(@Param(value = "userName") String userName);
 
     List<SysUser> select(@Param(value = "userId") Long userId,
                          @Param(value = "userName") String userName,
