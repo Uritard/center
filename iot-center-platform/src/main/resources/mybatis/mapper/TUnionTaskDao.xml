@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TUnionTaskDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TUnionTask">
+        <id column="union_id" jdbcType="VARCHAR" property="UnionId" />
+        <result column="plan_id" jdbcType="BIGINT" property="PlanId" />
+        <result column="area_id" jdbcType="VARCHAR" property="AreaId" />
+        <result column="name" jdbcType="VARCHAR" property="Name" />
+        <result column="type" jdbcType="INTEGER" property="Type" />
+        <result column="if_run" jdbcType="INTEGER" property="IfRun" />
+        <result column="robot_id" jdbcType="BIGINT" property="RobotId" />
+        <result column="date_type" jdbcType="INTEGER" property="Datetype" />
+        <result column="remark1" jdbcType="INTEGER" property="Remark1" />
+        <result column="remark2" jdbcType="INTEGER" property="Remark2" />
+        <result column="remark3" jdbcType="INTEGER" property="Remark3" />
+        <result column="task_type" jdbcType="INTEGER" property="TaskType" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="StartTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="CreateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+      union_id,plan_id,area_id,name,type,if_run,robot_id,date_type,remark1,remark2,remark3,task_type,start_time,create_time
+       </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="UnionId" parameterType="com.yjh.platform.module.task.entity.TUnionTask">
+        insert into t_union_task(
+        union_id,
+        plan_id,
+        area_id,
+        name,
+        type,
+        if_run,
+        robot_id,
+        date_type,
+        remark1,
+        remark2,
+        remark3,
+        task_type,
+        start_time,
+        create_time
+        )values(
+		        #{UnionId, jdbcType=VARCHAR},
+                #{PlanId, jdbcType=BIGINT},
+                #{AreaId, jdbcType=VARCHAR},
+                #{Name, jdbcType=VARCHAR},
+                #{Type, jdbcType=INTEGER},
+                #{IfRun, jdbcType=INTEGER},
+                #{RobotId, jdbcType=BIGINT},
+                #{Datetype, jdbcType=INTEGER},
+                #{Remark1, jdbcType=INTEGER},
+                #{Remark2, jdbcType=INTEGER},
+                #{Remark3, jdbcType=INTEGER},
+                #{TaskType, jdbcType=INTEGER},
+                #{StartTime, jdbcType=TIMESTAMP},
+                #{CreateTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String" >
+        delete from t_union_task
+        where
+            union_id = #{UnionId, jdbcType=VARCHAR}
+    </delete>
+
+    <!--修改-->
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TUnionTask">
+        update t_union_task a
+        <set>
+            <if test="TaskId != null and TaskId != ''">
+                and task_id = #{TaskId, jdbcType=VARCHAR}
+            </if>
+            <if test="PlanId != null and PlanId != ''">
+                and plan_id = #{PlanId, jdbcType=BIGINT}
+            </if>
+            <if test="AreaId != null and AreaId != ''">
+                and area_id = #{AreaId, jdbcType=VARCHAR}
+            </if>
+            <if test="Name != null and Name != ''">
+                and name = #{Name, jdbcType=VARCHAR}
+            </if>
+            <if test="Type != null and Type != ''">
+                and type = #{Type, jdbcType=INTEGER}
+            </if>
+            <if test="IfRun != null and IfRun != ''">
+                and if_run = #{IfRun, jdbcType=INTEGER}
+            </if>
+            <if test="RobotId != null and RobotId != ''">
+                and robot_id = #{RobotId, jdbcType=BIGINT}
+            </if>
+            <if test="Datetype != null and Datetype != ''">
+                and date_type = #{Datetype, jdbcType=INTEGER}
+            </if>
+            <if test="Remark1 != null and Remark1 != ''">
+                and remark1 = #{Remark1, jdbcType=INTEGER}
+            </if>
+            <if test="TaskType != null and TaskType != ''">
+                and task_type = #{TaskType, jdbcType=INTEGER}
+            </if>
+            <if test="StartTime != null and StartTime != ''">
+                and start_time = #{StartTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="CreateTime != null and CreateTime != ''">
+                and create_time = #{CreateTime, jdbcType=TIMESTAMP}
+            </if>
+    </set>
+        where and task_id = #{TaskId, jdbcType=VARCHAR}
+    </update>
+
+    <!--根据主键查询-->
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TUnionTask">
+        select
+        <include refid="Base_Column_List"/>
+        from t_union_task
+        where 1 = 1
+        and
+        union_id = #{UnionId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTask">
+        select
+        task_id,
+        plan_id,
+        area_id,
+        name,
+        type,
+        if_run,
+        robot_id,
+        date_type,
+        remark1,
+        remark2,
+        remark3,
+        task_type,
+        start_time,
+        create_time
+        from t_union_task
+        where 1 = 1
+        <if test="UnionId != null and UnionId != ''">
+            and union_id = #{UnionId, jdbcType=VARCHAR}
+        </if>
+        <if test="PlanId != null and PlanId != ''">
+            and plan_id = #{PlanId, jdbcType=BIGINT}
+        </if>
+        <if test="AreaId != null and AreaId != ''">
+            and area_id = #{AreaId, jdbcType=VARCHAR}
+        </if>
+        <if test="Name != null and Name != ''">
+            and name = #{Name, jdbcType=VARCHAR}
+        </if>
+        <if test="Type != null and Type != ''">
+            and type = #{Type, jdbcType=INTEGER}
+        </if>
+        <if test="IfRun != null and IfRun != ''">
+            and if_run = #{IfRun, jdbcType=INTEGER}
+        </if>
+        <if test="RobotId != null and RobotId != ''">
+            and robot_id = #{RobotId, jdbcType=BIGINT}
+        </if>
+        <if test="Datetype != null and Datetype != ''">
+            and date_type = #{Datetype, jdbcType=INTEGER}
+        </if>
+        <if test="Remark1 != null and Remark1 != ''">
+            and remark1 = #{Remark1, jdbcType=INTEGER}
+        </if>
+        <if test="Remark2 != null and Remark2 != ''">
+            and remark2 = #{Remark2, jdbcType=INTEGER}
+        </if>
+        <if test="Remark3 != null and Remark3 != ''">
+            and remark3 = #{Remark3, jdbcType=INTEGER}
+        </if>
+        <if test="TaskType != null and TaskType != ''">
+            and task_type = #{TaskType, jdbcType=INTEGER}
+        </if>
+        <if test="StartTime != null and StartTime != ''">
+            and start_time = #{StartTime, jdbcType=TIMESTAMP}
+        </if>
+        <if test="CreateTime != null and CreateTime != ''">
+            and create_time = #{CreateTime, jdbcType=TIMESTAMP}
+        </if>
+    </select>
+
+</mapper>

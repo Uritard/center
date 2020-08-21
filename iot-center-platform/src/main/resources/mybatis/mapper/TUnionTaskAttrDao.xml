@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TUnionTaskAttrDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TUnionTaskAttr">
+        <id column="union_id" jdbcType="VARCHAR" property="UnionId" />
+        <result column="instance_id" jdbcType="BIGINT" property="InstanceId" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="DeviceMeteId" />
+        <result column="device_custom_id" jdbcType="VARCHAR" property="DeviceCustomId" />
+        <result column="point_task_id" jdbcType="BIGINT" property="PointTaskId" />
+        <result column="if_robot" jdbcType="INTEGER" property="IfRobot" />
+        <result column="if_video" jdbcType="INTEGER" property="IfVideo" />
+        <result column="if_inferad" jdbcType="INTEGER" property="IfInferad" />
+        <result column="if_artificial" jdbcType="INTEGER" property="IfArtificial" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+      union_id,instance_id,device_mete_id,device_custom_id,point_task_id,if_robot,if_video,if_inferad,if_artificial
+       </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="UnionId" parameterType="com.yjh.platform.module.task.entity.TUnionTaskAttr">
+        insert into t_union_task_attr(
+        union_id,
+        instance_id,
+        device_mete_id,
+        device_custom_id,
+        point_task_id,
+        if_robot,
+        if_video,
+        if_inferad,
+        if_artificial
+        )values(
+		        #{TaskId, jdbcType=VARCHAR},
+                #{InstanceId, jdbcType=BIGINT},
+                #{DeviceMeteId, jdbcType=BIGINT},
+                #{DeviceCustomId, jdbcType=VARCHAR},
+                #{PointTaskId, jdbcType=VARCHAR},
+                #{IfRobot, jdbcType=INTEGER},
+                #{IfVideo, jdbcType=INTEGER},
+                #{IfInferad, jdbcType=INTEGER},
+                #{IfArtificial, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.util.map" >
+        delete from t_union_task_attr
+        where
+        <if test="UnionId != null">
+            union_id = #{UnionId, jdbcType=VARCHAR}
+        </if>
+        AND
+        <if test="InstanceId != null">
+            instance_id = #{InstanceId, jdbcType=BIGINT}
+        </if>
+    </delete>
+
+    <!--修改-->
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TUnionTaskAttr">
+        update t_union_task_attr
+        <set>
+            <if test="UnionId != null and UnionId != ''">
+                and union_id = #{UnionId, jdbcType=VARCHAR}
+            </if>
+            <if test="InstanceId != null and InstanceId != ''">
+                and instance_id = #{InstanceId, jdbcType=BIGINT}
+            </if>
+            <if test="DeviceMeteId != null and DeviceMeteId != ''">
+                and device_mete_id = #{DeviceMeteId, jdbcType=BIGINT}
+            </if>
+            <if test="DeviceCustomId != null and DeviceCustomId != ''">
+                and device_custom_id = #{DeviceCustomId, jdbcType=VARCHAR}
+            </if>
+            <if test="PointTaskId != null and PointTaskId != ''">
+                and point_task_id = #{PointTaskId, jdbcType=BIGINT}
+            </if>
+            <if test="IfRobot != null and IfRobot != ''">
+                and if_robot = #{IfRobot, jdbcType=INTEGER}
+            </if>
+            <if test="IfVideo != null and IfVideo != ''">
+                and if_video = #{IfVideo, jdbcType=INTEGER}
+            </if>
+            <if test="IfInferad != null and IfInferad != ''">
+                and if_inferad = #{IfInferad, jdbcType=INTEGER}
+            </if>
+            <if test="IfArtificial != null and IfArtificial != ''">
+                and if_artificial = #{IfArtificial, jdbcType=INTEGER}
+            </if>
+    </set>
+        where and union_id = #{UnionId, jdbcType=VARCHAR}
+    </update>
+
+    <!--根据主键查询-->
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TUnionTaskAttr">
+        select
+        <include refid="Base_Column_List"/>
+        from t_union_task_attr
+        where 1 = 1
+        and
+        union_id = #{UnionId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TUnionTaskAttr" resultType="com.yjh.platform.module.task.entity.TUnionTaskAttr">
+        select
+        union_id,
+        instance_id,
+        device_mete_id,
+        device_custom_id,
+        point_task_id,
+        if_robot,
+        if_video,
+        if_inferad,
+        if_artificial
+        from t_union_task_attr
+        where 1 = 1
+        <if test="UnionId != null and UnionId != ''">
+            and union_id = #{UnionId, jdbcType=VARCHAR}
+        </if>
+        <if test="InstanceId != null and InstanceId != ''">
+            and instance_id = #{InstanceId, jdbcType=BIGINT}
+        </if>
+        <if test="DeviceMeteId != null and DeviceMeteId != ''">
+            and device_mete_id = #{DeviceMeteId, jdbcType=BIGINT}
+        </if>
+        <if test="DeviceCustomId != null and DeviceCustomId != ''">
+            and device_custom_id = #{DeviceCustomId, jdbcType=VARCHAR}
+        </if>
+        <if test="PointTaskId != null and PointTaskId != ''">
+            and point_task_id = #{PointTaskId, jdbcType=VARCHAR}
+        </if>
+        <if test="IfRobot != null and IfRobot != ''">
+            and if_robot = #{IfRobot, jdbcType=INTEGER}
+        </if>
+        <if test="IfVideo != null and IfVideo != ''">
+            and if_video = #{IfVideo, jdbcType=INTEGER}
+        </if>
+        <if test="IfInferad != null and IfInferad != ''">
+            and if_inferad = #{IfInferad, jdbcType=INTEGER}
+        </if>
+        <if test="IfArtificial != null and IfArtificial != ''">
+            and if_artificial = #{IfArtificial, jdbcType=INTEGER}
+        </if>
+    </select>
+
+</mapper>
