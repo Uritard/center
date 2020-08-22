@@ -2,24 +2,18 @@ package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.yjh.platform.module.device.entity.TRobotInspection;
-import com.yjh.platform.module.device.entity.TStdDeviceMete;
-import com.yjh.platform.module.user.entity.TCameraPreset;
-import org.apache.poi.poifs.filesystem.Entry;
+import java.util.*;
+import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
-* @author tt
-* @since 2020-08-08
-*/
+ * @author tt
+ * @since 2020-08-08
+ */
 @Service
 public class TCruisePointInstanceService{
 
@@ -52,8 +46,8 @@ public class TCruisePointInstanceService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruisePointInstance> select(Long instanceId, Long deviceMeteId, String stationId, String stationName, Long deviceId, String customId, String dataFormat, Integer identifyType, Integer identifySonType, Integer cruiseType, Long cruiseId, String cruiseName, String cruiseContent, String fluctuatingValue, String unitVal, String unitName, Integer ifSy, Integer syType, Integer ifVideotape, String videotapeTime, String textDesc, String sort) {
-        List<TCruisePointInstance> tCruisePointInstanceList = tCruisePointInstanceDao.select(instanceId, deviceMeteId, stationId, stationName, deviceId, customId, dataFormat, identifyType, identifySonType, cruiseType, cruiseId, cruiseName, cruiseContent, fluctuatingValue, unitVal, unitName, ifSy, syType, ifVideotape, videotapeTime, textDesc, sort);
+    public List<TCruisePointInstance> select(Long instanceId, Long deviceMeteId, String stationId, String stationName, Long deviceId, String customId, String dataFormat, Integer identifyType, Integer identifySonType, Integer cruiseType, Long cruiseId, String cruiseName, String cruiseContent, String positionType, String unitVal, String unitName, Integer ifSy, Integer syType, Integer ifVideotape, String videotapeTime, String textDesc, String sort) {
+        List<TCruisePointInstance> tCruisePointInstanceList = tCruisePointInstanceDao.select(instanceId, deviceMeteId, stationId, stationName, deviceId, customId, dataFormat, identifyType, identifySonType, cruiseType, cruiseId, cruiseName, cruiseContent, positionType, unitVal, unitName, ifSy, syType, ifVideotape, videotapeTime, textDesc, sort);
         return tCruisePointInstanceList;
     }
 
@@ -79,54 +73,71 @@ public class TCruisePointInstanceService{
 
     @Logs(title = "创建机器人巡检实例",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int STDMateUnionTRInspection(List<Map<String,Object> > list){
-        Map<String,Object> map1 = list.get(0);//TRobotInspection的数据
-        Map<String,Object> map2 = list.get(1);//TStdDeviceMete的数据
-        TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
-        TRobotInspection tRobotInspection = new TRobotInspection();
-        //获取TStdDeviceMete的数据
-        tStdDeviceMete.setDeviceMeteId(Long.valueOf(map2.get("deviceMeteId").toString()));
-        tStdDeviceMete.setDeviceId(Long.valueOf(map2.get("deviceId").toString()));
-        tStdDeviceMete.setCustomId((String)map2.get("CustomId"));
-        //获取TRobotInspection的数据
-        tRobotInspection.setInspectionId(Long.valueOf(map1.get("presetId").toString()));
-        tRobotInspection.setInspectionName((String) map1.get("inspectionName"));
-        //构造TCruisePointInstance数据
+    public int STDMateUnionTRInspection(List<Map<String,String> > list){
+        Map<String,String> mapAll = new HashMap<>();
+        for (Map map:list) {
+            mapAll.putAll(map);
+        }
+        //传入的数据
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(tStdDeviceMete.getDeviceMeteId());
-        tCruisePointInstance.setDeviceId(tStdDeviceMete.getDeviceId());
-        tCruisePointInstance.setCustomId(tStdDeviceMete.getCustomId());
-
-        tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
-        tCruisePointInstance.setCruiseId(tRobotInspection.getInspectionId());
+        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("deviceMeteId")));
+        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
+        tCruisePointInstance.setCustomId(mapAll.get("customId"));
+        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
+        tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
         tCruisePointInstance.setCruiseType(4002);
-        return tCruisePointInstanceDao.sTDMateUnionTRInspection(tCruisePointInstance);
+        tCruisePointInstance.setIfSy(1);
+        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
+        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
+        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
+        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
+        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
+        tCruisePointInstance.setUnitVal(mapAll.get("unit"));
+        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
+        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
+        //间接的数据
+        //station_id station_name unit_name
+        TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
+        String str = mapAll.get("unit");
+        TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("unit"));
+        tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
+        tCruisePointInstance.setStationId(tStdRegion.getStationId());
+        tCruisePointInstance.setStationName(tStdRegion.getStationName());
+        return tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
+
 
     @Logs(title = "创建摄像头预置位巡检实例",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int STDMateUnionTCPreset(List<Map<String,Object> > list){
-        Map<String,Object> map1 = list.get(0);//TCameraPreset的数据
-        Map<String,Object> map2 = list.get(1);//TStdDeviceMete的数据
-        TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
-        TCameraPreset tCameraPreset = new TCameraPreset();
-        //获取TStdDeviceMete的数据
-        tStdDeviceMete.setDeviceMeteId(Long.valueOf(map2.get("deviceMeteId").toString()));
-        tStdDeviceMete.setDeviceId(Long.valueOf(map2.get("deviceId").toString()));
-        tStdDeviceMete.setCustomId((String)map2.get("CustomId"));
-        //取得TCameraPreset的数据
-        tCameraPreset.setPresetId(Long.valueOf(map1.get("presetId").toString()));
-        tCameraPreset.setPresetName(map1.get("presetName").toString());
-        //构造TCruisePointInstance数据
+    public int STDMateUnionTCPreset(List<Map<String,String> > list){
+        Map<String,String> mapAll = new HashMap<>();
+        for (Map map:list) {
+            mapAll.putAll(map);
+        }
+        //传入的数据
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(tStdDeviceMete.getDeviceMeteId());
-        tCruisePointInstance.setDeviceId(tStdDeviceMete.getDeviceId());
-        tCruisePointInstance.setCustomId(tStdDeviceMete.getCustomId());
-        
-        tCruisePointInstance.setCruiseId(tCameraPreset.getPresetId());
-        tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("deviceMeteId")));
+        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
+        tCruisePointInstance.setCustomId(mapAll.get("customId"));
+        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
+        tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
         tCruisePointInstance.setCruiseType(4001);
-        return tCruisePointInstanceDao.STDMateUnionTCPreset(tCruisePointInstance);
+        tCruisePointInstance.setIfSy(1);
+        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
+        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
+        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
+        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
+        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
+        //tCruisePointInstance.setUnitVal(mapAll.get("unit"));
+        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
+        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
+        //间接的数据
+        //station_id station_name
+        TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
+//        TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("uint"));
+//        tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
+        tCruisePointInstance.setStationId(tStdRegion.getStationId());
+        tCruisePointInstance.setStationName(tStdRegion.getStationName());
+        return tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
 }
-

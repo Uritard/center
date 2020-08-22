@@ -63,7 +63,7 @@ public class TCruisePointInstance implements Serializable {
     private String cruiseContent;
 
     @ApiModelProperty(value = "波动值")
-    private String fluctuatingValue;
+    private String positionType;
 
     @ApiModelProperty(value = "单位字典值")
     private String unitVal;

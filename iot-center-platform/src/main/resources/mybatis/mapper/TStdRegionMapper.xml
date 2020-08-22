@@ -13,11 +13,12 @@
         <result column="station_id" jdbcType="VARCHAR" property="stationId" />
         <result column="state" jdbcType="INTEGER" property="state" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="station_name" jdbcType="VARCHAR" property="stationName" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        region_id, region_name, sort, up_region_id, up_region_ids, region_code, station_id, state, create_time
+        region_id, region_name, sort, up_region_id, up_region_ids, region_code, station_id, state, create_time,station_name
     </sql>
 
 
@@ -31,7 +32,8 @@
             region_code,
             station_id,
             state,
-            create_time
+            create_time,
+            station_name
         )values(
                 #{regionId, jdbcType=BIGINT},
                 #{regionName, jdbcType=VARCHAR},
@@ -41,7 +43,8 @@
                 #{regionCode, jdbcType=INTEGER},
                 #{stationId, jdbcType=VARCHAR},
                 #{state, jdbcType=INTEGER},
-                #{createTime, jdbcType=TIMESTAMP}
+                #{createTime, jdbcType=TIMESTAMP},
+                #{stationName, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -61,8 +64,9 @@
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
         <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="stationName != null">a.station_name = #{stationName, jdbcType=VARCHAR},</if>
     </set>
-            where a.region_id = #{regionId, jdbcType=BIGINT}
+        where a.region_id = #{regionId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdRegion">
@@ -75,7 +79,8 @@
         a.region_code,
         a.station_id,
         a.state,
-        a.create_time
+        a.create_time,
+        a.station_name
         from t_std_region a
         where 1 = 1
             and a.region_id = #{regionId, jdbcType=BIGINT}
@@ -92,7 +97,8 @@
         a.region_code,
         a.station_id,
         a.state,
-        a.create_time
+        a.create_time,
+        a.station_name
         from t_std_region a
         where 1 = 1
         <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=BIGINT}</if>
@@ -104,6 +110,7 @@
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="stationName != null">and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdRegion" resultType="com.yjh.platform.module.device.entity.TStdRegion">
@@ -116,7 +123,8 @@
         a.region_code,
         a.station_id,
         a.state,
-        a.create_time
+        a.create_time,
+        a.station_name
         from t_std_region a
         where 1 = 1
         <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=BIGINT}</if>
@@ -128,14 +136,15 @@
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="stationName != null">and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectRegTreeByRegName" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.AreaInfoRegionCode">
         SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, a.region_code AS regionCode, "region" AS infoType
-            FROM t_std_region a
-            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
-            WHERE 1=1
-                <if test="regionName != null and regionName != ''"> AND a.region_name LIKE CONCAT('%',#{regionName, jdbcType=VARCHAR},'%')</if>
+        FROM t_std_region a
+        LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        WHERE 1=1
+        <if test="regionName != null and regionName != ''"> AND a.region_name LIKE CONCAT('%',#{regionName, jdbcType=VARCHAR},'%')</if>
     </select>
 
 </mapper>
