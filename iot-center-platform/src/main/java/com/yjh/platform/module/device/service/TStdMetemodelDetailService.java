@@ -23,8 +23,8 @@ public class TStdMetemodelDetailService{
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TStdMeteModelDetail tStdMeteModelDetail) {
-        return this.tStdMetemodelDetailDao.insert(tStdMeteModelDetail);
+    public int add(TStdMeteModelDetail tStdMeteModelDetail) {
+        return this.tStdMetemodelDetailDao.add(tStdMeteModelDetail);
     }
 
     @Logs(title = "删除", code = "module")
@@ -61,8 +61,8 @@ public class TStdMetemodelDetailService{
 
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<TStdMeteModelDetail> list) {
-        return this.tStdMetemodelDetailDao.batchInsert(list);
+    public int batchAdd(List<TStdMeteModelDetail> list) {
+        return this.tStdMetemodelDetailDao.batchAdd(list);
     }
 
 }

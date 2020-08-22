@@ -41,10 +41,10 @@ public class TStdMetemodelDetailController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TStdMeteModelDetail tStdMeteModelDetail) {
+    public Result add(@RequestBody TStdMeteModelDetail tStdMeteModelDetail) {
         Result result = new Result();
         try {
-            result.setData(tStdMetemodelDetailService.insert(tStdMeteModelDetail));
+            result.setData(tStdMetemodelDetailService.add(tStdMeteModelDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -156,16 +156,18 @@ public class TStdMetemodelDetailController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TStdMeteModelDetail> list) {
+    @RequestMapping(value = "/batchadd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TStdMeteModelDetail> list) {
         Result result = new Result();
         try {
-        result.setData(tStdMetemodelDetailService.batchInsert(list));
+        result.setData(tStdMetemodelDetailService.batchAdd(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);
         }
         return result;
     }
+
+
 
 }

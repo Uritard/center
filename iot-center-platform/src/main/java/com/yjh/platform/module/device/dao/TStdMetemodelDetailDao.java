@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdMetemodelDetailDao {
 
-    int insert(TStdMeteModelDetail tStdMeteModelDetail);
+    int add(TStdMeteModelDetail tStdMeteModelDetail);
     int deleteByPrimaryId(@Param(value = "modelId") Long modelId);
     int update(TStdMeteModelDetail tStdMeteModelDetail);
     TStdMeteModelDetail selectByPrimaryId(@Param(value = "modelId") Long modelId);
@@ -42,5 +42,5 @@ public interface TStdMetemodelDetailDao {
                                      @Param(value = "modulus") Integer modulus);
     List<TStdMeteModelDetail> selectByPage(TStdMeteModelDetail tStdMeteModelDetail);
 
-    int batchInsert(List<TStdMeteModelDetail> list);
+    int batchAdd(List<TStdMeteModelDetail> list);
 }

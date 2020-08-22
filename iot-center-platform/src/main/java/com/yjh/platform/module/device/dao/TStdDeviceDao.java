@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdDeviceDao {
 
-    int insert(TStdDevice tStdDevice);
+    int add(TStdDevice tStdDevice);
     int deleteByPrimaryId(@Param(value = "deviceId") Long deviceId);
     int update(TStdDevice tStdDevice);
     TStdDevice selectByPrimaryId(@Param(value = "deviceId") Long deviceId);
@@ -46,4 +46,10 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectAllTreeCustom();
     List<AreaInfo> selectAllTreeDevice();
     List<String> selectByModelId(@Param(value = "modelId") Long modelId);
+
+    int updateModelIdByDevCus(@Param(value = "deviceId")Long deviceId,
+                              @Param(value = "customId")Long customId,
+                              @Param(value = "modelId")Long modelId);
+
+    int batchDelete(@Param(value = "list")List<String> list);
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdDevicemeteDao {
 
-    int insert(TStdDeviceMete tStdDeviceMete);
+    int add(TStdDeviceMete tStdDeviceMete);
     int deleteByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     int update(TStdDeviceMete tStdDeviceMete);
     TStdDeviceMete selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
@@ -45,8 +45,15 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "remark") String remark);
     List<TStdDeviceMete> selectByPage(TStdDeviceMete tStdDeviceMete);
 
-    int batchInsert(List<TStdDeviceMete> list);
+    int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);
     int deleteByDevId(@Param(value = "deviceId") Long deviceId);
+    List<TStdDeviceMete>selectByDevCus(@Param(value="deviceId")Long deviceId,@Param(value="customId")Long customId);
+
+    List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customId")Long customId);
+
+    int batchDelete(@Param(value = "list") List<String> list);
+
+
 
 }

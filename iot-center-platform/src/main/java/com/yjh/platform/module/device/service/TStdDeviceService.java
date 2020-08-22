@@ -1,11 +1,13 @@
 package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 
 import java.util.*;
+
 
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -24,13 +26,14 @@ public class TStdDeviceService{
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
 
+
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TStdDevice tStdDevice) {
-        return this.tStdDeviceDao.insert(tStdDevice);
+    public int add(TStdDevice tStdDevice) {
+        return this.tStdDeviceDao.add(tStdDevice);
     }
 
     @Logs(title = "删除", code = "module")
@@ -159,6 +162,18 @@ public class TStdDeviceService{
     public List<String> selectByModelId(Long modelId) {
         List<String> tStdDeviceList = tStdDeviceDao.selectByModelId(modelId);
         return tStdDeviceList;
+    }
+
+    @Logs(title = "根据设备ID和部位ID修改设备的模板ID")
+    @Transactional(rollbackFor = Exception.class)
+    public int updateModelIdByDevCus(Long deviceId,Long customId,Long modelId){
+        return this.tStdDeviceDao.updateModelIdByDevCus(deviceId, customId, modelId);
+    }
+
+    @Logs(title = "批量删除",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int batchDelete(List<String> list){
+        return this.tStdDeviceDao.batchDelete(list);
     }
 
 }

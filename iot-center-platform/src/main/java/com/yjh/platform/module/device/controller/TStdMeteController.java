@@ -41,10 +41,10 @@ public class TStdMeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TStdMete tStdMete) {
+    public Result add(@RequestBody TStdMete tStdMete) {
         Result result = new Result();
         try {
-            result.setData(tStdMeteService.insert(tStdMete));
+            result.setData(tStdMeteService.add(tStdMete));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -153,15 +153,30 @@ public class TStdMeteController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TStdMete> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TStdMete> list) {
         Result result = new Result();
         try {
-        result.setData(tStdMeteService.batchInsert(list));
+        result.setData(tStdMeteService.batchAdd(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("系统测点批量插入失败：" + e);
         }
+        return result;
+    }
+
+    @ApiOperation(value = "根据设备类型查询mete")
+    @RequestMapping(value = "/selectByDeviceType",method = RequestMethod.GET)
+    public Result selectByDeviceType(@RequestParam (value = "deviceType",required = true) Integer deviceType){
+        Result result =new Result();
+        try{
+            List<TStdMete> mete=tStdMeteService.selectByDeviceType(deviceType);
+            result.setData(mete);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("系统测点失败描述：", e);
+        }
+
         return result;
     }
 

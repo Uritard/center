@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdMetemodelDao {
 
-    int insert(TStdMeteModel tStdMeteModel);
+    int add(TStdMeteModel tStdMeteModel);
     int deleteByPrimaryId(@Param(value = "modelId") Long modelId);
     int update(TStdMeteModel tStdMeteModel);
     TStdMeteModel selectByPrimaryId(@Param(value = "modelId") Long modelId);
@@ -24,6 +24,8 @@ public interface TStdMetemodelDao {
                                @Param(value = "remark") String remark);
     List<TStdMeteModel> selectByPage(TStdMeteModel tStdMeteModel);
 
-    int batchInsert(List<TStdMeteModel> list);
+    int batchAdd(List<TStdMeteModel> list);
     List<TStdMeteModelDetail> selectMeteByDeviceType(@Param(value = "deviceType") Integer deviceType);
+
+    int batchDelete(@Param(value = "list")List<String> list);
 }

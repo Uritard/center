@@ -23,8 +23,8 @@ public class TStdMeteService{
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TStdMete tStdMete) {
-        return this.tStdMeteDao.insert(tStdMete);
+    public int add(TStdMete tStdMete) {
+        return this.tStdMeteDao.add(tStdMete);
     }
 
     @Logs(title = "删除", code = "module")
@@ -61,9 +61,15 @@ public class TStdMeteService{
 
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<TStdMete> list) {
-        return this.tStdMeteDao.batchInsert(list);
+    public int batchAdd(List<TStdMete> list) {
+        return this.tStdMeteDao.batchAdd(list);
     }
 
+
+    @Logs(title = "根据设备ID查找")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TStdMete> selectByDeviceType(Integer deviceType){
+        return this.tStdMeteDao.selectByDeviceType(deviceType);
+    }
 }
 

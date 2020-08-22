@@ -42,11 +42,11 @@ public class TStdDeviceController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
-    public Result insert(@RequestBody TStdDevice tStdDevice) {
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public Result add(@RequestBody TStdDevice tStdDevice) {
         Result result = new Result();
         try {
-            result.setData(tStdDeviceService.insert(tStdDevice));
+            result.setData(tStdDeviceService.add(tStdDevice));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -193,5 +193,49 @@ public class TStdDeviceController {
         }
         return result;
     }
+
+    @ApiOperation(value = "根据设备ID和部位ID修改设备的模板ID")
+    @RequestMapping(value = "/updateModelIdByDevCus",method = RequestMethod.PUT)
+    public Result updateModelIdByDevCus(@RequestParam(value = "deviceId")Long deviceId,
+                                        @RequestParam(value = "customId")Long customId,
+                                        @RequestParam(value = "modelId")Long modelId){
+        Result result=new Result();
+        try{
+            result.setData(tStdDeviceService.updateModelIdByDevCus(deviceId, customId, modelId));
+        }catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新模板ID异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新模板ID错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value="查询详细设备信息")
+    @RequestMapping(value = "/selectDeviceDetail",method = RequestMethod.GET)
+    public Result selectDeviceDetail(@RequestParam(value = "deviceId")Long deviceId){
+        Result result=new Result();
+
+        return  result;
+    }
+
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
+    public Result batchDelete(@RequestParam(value="list")List<String> list){
+        Result result=new Result();
+        try{
+            result.setData(tStdDeviceService.batchDelete(list));
+        }catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除设备异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除设备错误:", e);
+        }
+        return result;
+    }
+
 
 }

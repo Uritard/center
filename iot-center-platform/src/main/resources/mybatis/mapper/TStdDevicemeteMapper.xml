@@ -37,7 +37,7 @@
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+    <insert id="add" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         insert into t_std_devicemete(
             device_mete_id,
             device_id,
@@ -274,7 +274,7 @@
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
-    <insert id="batchInsert">
+    <insert id="batchAdd">
         insert into t_std_devicemete(
             device_mete_id,
             device_id,
@@ -373,5 +373,53 @@
         where device_id = #{deviceId, jdbcType=BIGINT}
     </delete>
 
+    <select id="selectByDevCus" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+       select * from t_std_devicemete
+       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customId,jdbcType=BIGINT}
+
+    </select>
+
+    <select id="selectPreDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+       SELECT
+	    a.device_id,
+        a.custom_id,
+        b.mete_id,
+        b.mete_type,
+        b.mete_name,
+        a.device_type,
+        a.custom_type,
+        a.position_type,
+        b.unit,
+        b.alarm_note,
+        b.alarm_type,
+        b.up_effect,
+        b.low_effect,
+        b.alarm_level,
+        b.high_limit1,
+        b.low_limit1,
+        b.high_limit2,
+        b.low_limit2,
+        b.alarm_delay,
+        b.alarm_cnt,
+        b.threshold_abs,
+        b.threshold_per,
+        b.modulus
+       FROM
+	   t_std_device a
+       LEFT JOIN t_std_metemodel_detail b ON a.model_id = b.model_id
+       WHERE
+	   a.model_id = #{modelId,jdbcType=BIGINT}
+       AND a.device_id = #{deviceId,jdbcType=BIGINT}
+       AND a.custom_id = #{customId,jdbcType=BIGINT}
+
+    </select>
+
+
+    <delete id="batchDelete" >
+             delete from t_std_devicemete where device_mete_id in
+        <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")" >
+        #{deviceMeteId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
 
 </mapper>

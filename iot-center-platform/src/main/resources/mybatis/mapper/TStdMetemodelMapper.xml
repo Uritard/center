@@ -16,7 +16,7 @@
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="modelId" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel">
+    <insert id="add" useGeneratedKeys="true" keyProperty="modelId" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel">
         insert into t_std_metemodel(
             model_id,
             model_name,
@@ -31,8 +31,12 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from t_std_metemodel
-                where model_id = #{modelId, jdbcType=BIGINT}
+        DELETE
+             a,b
+        FROM
+	        t_std_metemodel a
+        LEFT JOIN t_std_metemodel_detail b ON a.model_id = b.model_id
+        WHERE a.model_id = #{modelId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdMeteModel">
@@ -85,7 +89,7 @@
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
-    <insert id="batchInsert">
+    <insert id="batchAdd">
         insert into t_std_metemodel(
             model_id,
             model_name,
@@ -132,6 +136,13 @@
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
     </select>
 
-
+    <delete id="batchDelete" >
+        delete a,b from t_std_metemodel a left join t_std_metemodel_detail b
+        on a.model_id=b.model_id
+        where a.model_id in
+        <foreach collection="list" item="modelId"  separator="," open="(" close=")" >
+            #{modelId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
 
 </mapper>

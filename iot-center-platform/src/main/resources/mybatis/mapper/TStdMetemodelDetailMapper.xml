@@ -34,7 +34,7 @@
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="modelId" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
+    <insert id="add" useGeneratedKeys="true" keyProperty="modelId" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
         insert into t_std_metemodel_detail(
             model_id,
             mete_id,
@@ -247,7 +247,7 @@
         <if test="modulus != null and modulus != ''"> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
     </select>
 
-    <insert id="batchInsert">
+    <insert id="batchAdd">
         insert into t_std_metemodel_detail(
             model_id,
             mete_id,

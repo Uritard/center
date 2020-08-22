@@ -31,8 +31,8 @@ public class TStdMetemodelService{
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TStdMeteModel tStdMeteModel) {
-        return this.tStdMetemodelDao.insert(tStdMeteModel);
+    public int add(TStdMeteModel tStdMeteModel) {
+        return this.tStdMetemodelDao.add(tStdMeteModel);
     }
 
     @Logs(title = "删除", code = "module")
@@ -63,8 +63,8 @@ public class TStdMetemodelService{
 
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<TStdMeteModel> list) {
-        return this.tStdMetemodelDao.batchInsert(list);
+    public int batchAdd(List<TStdMeteModel> list) {
+        return this.tStdMetemodelDao.batchAdd(list);
     }
 
     @Logs(title = "根据模版的设备类型查询对应的初始测点信息", code = "module")
@@ -73,13 +73,19 @@ public class TStdMetemodelService{
 
     @Logs(title = "批量插入模版测点", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertModelMete(List<TStdMeteModelDetail> list) {
+    public int batchAddModelMete(List<TStdMeteModelDetail> list) {
         Long modelId = list.get(0).getModelId();
         List<String> deviceList = tStdDeviceDao.selectByModelId(modelId);
         if (deviceList.size()>0) {return 206;} else {
             tStdMetemodelDetailDao.deleteByPrimaryId(modelId);
-            return this.tStdMetemodelDetailDao.batchInsert(list);
+            return this.tStdMetemodelDetailDao.batchAdd(list);
         }
+    }
+
+    @Logs(title = "批量删除",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int batchDelete(List<String> list){
+        return this.tStdMetemodelDao.batchDelete(list);
     }
 
 }

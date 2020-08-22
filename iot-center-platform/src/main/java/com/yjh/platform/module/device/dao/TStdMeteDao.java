@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdMeteDao {
 
-    int insert(TStdMete tStdMete);
+    int add(TStdMete tStdMete);
     int deleteByPrimaryId(@Param(value = "stdMeteId") Long stdMeteId);
     int update(TStdMete tStdMete);
     TStdMete selectByPrimaryId(@Param(value = "stdMeteId") Long stdMeteId);
@@ -38,6 +38,7 @@ public interface TStdMeteDao {
                                 @Param(value = "modulus") Integer modulus,
                                 @Param(value = "remark") String remark);
     List<TStdMete> selectByPage(TStdMete tStdMete);
+    int batchAdd(List<TStdMete> list);
 
-    int batchInsert(List<TStdMete> list);
+    List<TStdMete> selectByDeviceType(Integer deviceType);
 }

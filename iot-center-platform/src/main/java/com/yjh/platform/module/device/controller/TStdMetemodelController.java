@@ -40,10 +40,10 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TStdMeteModel tStdMeteModel) {
+    public Result add(@RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
         try {
-            result.setData(tStdMetemodelService.insert(tStdMeteModel));
+            result.setData(tStdMetemodelService.add(tStdMeteModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -137,11 +137,11 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TStdMeteModel> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TStdMeteModel> list) {
         Result result = new Result();
         try {
-        result.setData(tStdMetemodelService.batchInsert(list));
+        result.setData(tStdMetemodelService.batchAdd(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("系统测点模版批量插入失败：" + e);
@@ -164,16 +164,36 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "批量插入模版测点")
-    @RequestMapping(value = "/batchInsertModelMete", method = RequestMethod.POST)
-    public Result batchInsertModelMete(@RequestBody List<TStdMeteModelDetail> list) {
+    @RequestMapping(value = "/batchAddModelMete", method = RequestMethod.POST)
+    public Result batchAddModelMete(@RequestBody List<TStdMeteModelDetail> list) {
         Result result = new Result();
         try {
-            result.setData(tStdMetemodelService.batchInsertModelMete(list));
+            result.setData(tStdMetemodelService.batchAddModelMete(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("批量插入模版测点失败：" + e);
         }
         return result;
     }
+
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
+    public Result batchDetele(@RequestParam(value = "list")List<String> list){
+        Result result=new Result();
+        try{
+            result.setData(tStdMetemodelService.batchDelete(list));
+        }catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("系统测点模版删除异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("系统测点模版删除错误:", e);
+        }
+        return result;
+    }
+
+
+
+
 
 }
