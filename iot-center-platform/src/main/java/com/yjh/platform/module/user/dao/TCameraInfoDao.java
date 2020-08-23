@@ -5,6 +5,10 @@ import java.util.Map;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
+<<<<<<< Updated upstream
+=======
+import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+>>>>>>> Stashed changes
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -18,8 +22,15 @@ public interface TCameraInfoDao {
     int insert(TCameraInfo tCameraInfo);
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
     int update(TCameraInfo tCameraInfo);
+<<<<<<< Updated upstream
     TCameraInfo selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
     List<TCameraInfo> select(@Param(value = "cameraId") Long cameraId,
+=======
+    TCameraInfoByDict selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
+    List<TCameraInfoByDict> selectByRegionId(@Param(value = "regionId") Long regionId);
+    List<TCameraInfoByDict> selectByCameraName(@Param(value = "cameraName") String cameraName);
+    List<TCameraInfoByDict> select(@Param(value = "cameraId") Long cameraId,
+>>>>>>> Stashed changes
                              @Param(value = "cameraName") String cameraName,
                              @Param(value = "aliasName") String aliasName,
                              @Param(value = "recordId") String recordId,
@@ -27,14 +38,14 @@ public interface TCameraInfoDao {
                              @Param(value = "channelNum") Integer channelNum,
                              @Param(value = "smsId") Integer smsId,
                              @Param(value = "rmsId") Integer rmsId,
-                             @Param(value = "factoryName") String factoryName,
+                             @Param(value = "vendorId") Integer vendorId,
                              @Param(value = "streamType") Integer streamType,
                              @Param(value = "protocolType") Integer protocolType,
                              @Param(value = "url") String url,
                              @Param(value = "port") Integer port,
                              @Param(value = "cameraType") Integer cameraType,
                              @Param(value = "isControl") Integer isControl);
-    List<TCameraInfo> selectByPage(TCameraInfo tCameraInfo);
+    List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
 
     List<AreaInfo> selectCameraTreeDevice();
 }

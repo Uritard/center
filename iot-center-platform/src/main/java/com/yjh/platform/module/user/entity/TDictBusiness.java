@@ -21,7 +21,6 @@ public class TDictBusiness implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @ApiModelProperty(value = "字典ID")
     @TableId(value = "dict_id", type = IdType.AUTO)
     private Integer dictId;

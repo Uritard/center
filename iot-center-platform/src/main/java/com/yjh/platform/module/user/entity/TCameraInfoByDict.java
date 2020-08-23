@@ -1,25 +1,26 @@
 package com.yjh.platform.module.user.entity;
 
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 /**
- * @author tt
- * @since 2020-07-23
+ * @author YC
+ * @date 2020/8/22 - 12:24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TCameraInfo对象", description = "摄像头信息表")
-public class TCameraInfo implements Serializable {
+@ApiModel(value = "TCameraInfoByDict对象", description = "摄像头信息表新增")
+public class TCameraInfoByDict implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "主键")
+    @ApiModelProperty(value = "摄像机id")
     private Long cameraId;
 
     @ApiModelProperty(value = "摄像机名称")
@@ -43,8 +44,8 @@ public class TCameraInfo implements Serializable {
     @ApiModelProperty(value = "主录像媒体服务器")
     private Integer rmsId;
 
-    @ApiModelProperty(value = "厂家名称")
-    private Integer vendorId;
+    @ApiModelProperty(value = "字典描述")
+    private String dictNote;
 
     @ApiModelProperty(value = "码流类型")
     private Integer streamType;
@@ -63,6 +64,4 @@ public class TCameraInfo implements Serializable {
 
     @ApiModelProperty(value = "是否可控(0-可控球机，1-不可控枪机)")
     private Integer isControl;
-
-
 }

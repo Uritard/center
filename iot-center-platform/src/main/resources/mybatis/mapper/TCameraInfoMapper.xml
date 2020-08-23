@@ -12,13 +12,41 @@
         <result column="channel_num" jdbcType="INTEGER" property="channelNum" />
         <result column="sms_id" jdbcType="INTEGER" property="smsId" />
         <result column="rms_id" jdbcType="INTEGER" property="rmsId" />
-        <result column="factory_name" jdbcType="VARCHAR" property="factoryName" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
         <result column="stream_type" jdbcType="INTEGER" property="streamType" />
         <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
         <result column="url" jdbcType="VARCHAR" property="url" />
         <result column="port" jdbcType="INTEGER" property="port" />
         <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
         <result column="is_control" jdbcType="INTEGER" property="isControl" />
+    </resultMap>
+    <!--新的map-->
+    <resultMap id="NewMap" type="com.yjh.platform.module.user.entity.TCameraInfo">
+        <id column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <result column="camera_name" jdbcType="VARCHAR" property="cameraName" />
+        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
+        <result column="record_id" jdbcType="VARCHAR" property="recordId" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="channel_num" jdbcType="INTEGER" property="channelNum" />
+        <result column="sms_id" jdbcType="INTEGER" property="smsId" />
+        <result column="rms_id" jdbcType="INTEGER" property="rmsId" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+        <result column="stream_type" jdbcType="INTEGER" property="streamType" />
+        <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
+        <result column="is_control" jdbcType="INTEGER" property="isControl" />
+
+        <association property="tDictBusiness" javaType="com.yjh.platform.module.user.entity.TDictBusiness">
+            <id column="dict_id" property="dictId"></id>
+            <result column="dict_code" property="dictCode"></result>
+            <result column="dict_note" property="dictNote"></result>
+            <result column="col_name" property="colName"></result>
+            <result column="upDict" property="upDict"></result>
+            <result column="remark" property="remark"></result>
+            <result column="sort" property="sort"></result>
+        </association>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -86,9 +114,8 @@
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
-        select
-        a.camera_id,
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
+        select a.camera_id,
         a.camera_name,
         a.alias_name,
         a.record_id,
@@ -96,20 +123,22 @@
         a.channel_num,
         a.sms_id,
         a.rms_id,
-        a.factory_name,
+        b.dict_note,
         a.stream_type,
         a.protocol_type,
         a.url,
         a.port,
         a.camera_type,
         a.is_control
-        from t_camera_info a
+        from t_camera_info a,t_dict_business b
         where 1 = 1
-            and a.camera_id = #{cameraId, jdbcType=BIGINT}
-        limit 1
+        and a.camera_id = #{cameraId} and b.dict_note in
+        (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
     </select>
-
-    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+<<<<<<< Updated upstream
+=======
+    <!--根据摄像机名称查询信息-->
+    <select id="selectByCameraName" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select
         a.camera_id,
         a.camera_name,
@@ -119,14 +148,65 @@
         a.channel_num,
         a.sms_id,
         a.rms_id,
-        a.factory_name,
+        b.dict_note,
         a.stream_type,
         a.protocol_type,
         a.url,
         a.port,
         a.camera_type,
         a.is_control
-        from t_camera_info a
+        from t_camera_info a,t_dict_business b
+        where 1 = 1 and
+        a.camera_name  like concat('%',#{cameraName, jdbcType=VARCHAR},'%')
+        and b.dict_note in
+        (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
+
+    </select>
+    <!--根据间隔id查询所有摄像机信息-->
+    <select id="selectByRegionId" parameterType="com.yjh.platform.module.device.entity.TStdRegion" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
+        select
+        a.camera_id,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.up_region_id,
+        a.channel_num,
+        a.sms_id,
+        a.rms_id,
+        b.dict_note,
+        a.stream_type,
+        a.protocol_type,
+        a.url,
+        a.port,
+        a.camera_type,
+        a.is_control
+        from t_camera_info a,t_dict_business b
+        where 1 = 1
+        and a.up_region_id = #{regionId, jdbcType=BIGINT}
+        and b.dict_note in
+        (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
+
+    </select>
+>>>>>>> Stashed changes
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
+        select
+        a.camera_id,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.up_region_id,
+        a.channel_num,
+        a.sms_id,
+        a.rms_id,
+        b.dict_note,
+        a.stream_type,
+        a.protocol_type,
+        a.url,
+        a.port,
+        a.camera_type,
+        a.is_control
+        from t_camera_info a,t_dict_business b
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
@@ -136,16 +216,18 @@
         <if test="channelNum != null and channelNum != ''"> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
         <if test="smsId != null and smsId != ''"> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
         <if test="rmsId != null and rmsId != ''"> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
-        <if test="factoryName != null and factoryName != ''"> and a.factory_name = #{factoryName, jdbcType=VARCHAR}</if>
+        <if test="vendorId != null and vendorId != ''"> and a.vendor_id = #{vendorId, jdbcType=VARCHAR}</if>
         <if test="streamType != null and streamType != ''"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
         <if test="protocolType != null and protocolType != ''"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
         <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="cameraType != null and cameraType != ''"> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
         <if test="isControl != null and isControl != ''"> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
+        and b.dict_note in
+        (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select
         a.camera_id,
         a.camera_name,
@@ -155,30 +237,36 @@
         a.channel_num,
         a.sms_id,
         a.rms_id,
-        a.factory_name,
+        b.dict_note,
         a.stream_type,
         a.protocol_type,
         a.url,
         a.port,
         a.camera_type,
         a.is_control
-        from t_camera_info a
+        from t_camera_info a,t_dict_business b
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+<<<<<<< Updated upstream
         <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
+=======
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
+>>>>>>> Stashed changes
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="channelNum != null and channelNum != ''"> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
         <if test="smsId != null and smsId != ''"> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
         <if test="rmsId != null and rmsId != ''"> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
-        <if test="factoryName != null and factoryName != ''"> and a.factory_name = #{factoryName, jdbcType=VARCHAR}</if>
+        <if test="vendorId != null and vendorId != ''"> and a.vendor_id = #{vendorId, jdbcType=VARCHAR}</if>
         <if test="streamType != null and streamType != ''"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
         <if test="protocolType != null and protocolType != ''"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
         <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="cameraType != null and cameraType != ''"> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
         <if test="isControl != null and isControl != ''"> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
+        and b.dict_note in
+        (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
     </select>
 
     <select id="selectCameraTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">

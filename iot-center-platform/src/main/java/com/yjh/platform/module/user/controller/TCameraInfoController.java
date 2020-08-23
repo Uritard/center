@@ -1,12 +1,21 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.result.BusinessException;
+<<<<<<< Updated upstream
+=======
+import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+import com.yjh.platform.module.user.entity.TCameraPreset;
+>>>>>>> Stashed changes
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -18,6 +27,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mysql.jdbc.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -90,14 +100,56 @@ public class TCameraInfoController {
     public Result selectByPrimaryId(@RequestParam(value = "cameraId", required = true) Long cameraId) {
         Result result = new Result();
         try {
-            TCameraInfo tCameraInfo = tCameraInfoService.selectByPrimaryId(cameraId);
-            result.setData(tCameraInfo);
+            TCameraInfoByDict tCameraInfoByDict = tCameraInfoService.selectByPrimaryId(cameraId);
+            result.setData(tCameraInfoByDict);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
+<<<<<<< Updated upstream
+=======
+    @ApiOperation(value = "根据间隔id查询所有摄像机信息")
+    @RequestMapping(value = "/selectByRegionId", method = RequestMethod.GET)
+    public Result selectByRegionId(@RequestParam(value = "regionId", required = false) Long regionId,
+                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCameraInfoByDict> list = tCameraInfoService.selectByRegionId(regionId);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "根据摄像机名称查询信息")
+    @RequestMapping(value = "/selectByCameraName", method = RequestMethod.GET)
+    public Result selectByCameraName(@RequestParam(value = "cameraName", required = false) String cameraName,
+                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCameraInfoByDict> list = tCameraInfoService.selectByCameraName(cameraName);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询失败描述：", e);
+        }
+        return result;
+    }
+>>>>>>> Stashed changes
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
@@ -109,7 +161,7 @@ public class TCameraInfoController {
                          @RequestParam(value = "channelNum", required = false) Integer channelNum,
                          @RequestParam(value = "smsId", required = false) Integer smsId,
                          @RequestParam(value = "rmsId", required = false) Integer rmsId,
-                         @RequestParam(value = "factoryName", required = false) String factoryName,
+                         @RequestParam(value = "vendorId", required = false) Integer vendorId,
                          @RequestParam(value = "streamType", required = false) Integer streamType,
                          @RequestParam(value = "protocolType", required = false) Integer protocolType,
                          @RequestParam(value = "url", required = false) String url,
@@ -118,7 +170,7 @@ public class TCameraInfoController {
                          @RequestParam(value = "isControl", required = false) Integer isControl) {
         Result result = new Result();
         try {
-            List<TCameraInfo> list = tCameraInfoService.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, factoryName, streamType, protocolType, url, port, cameraType, isControl);
+            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType, url, port, cameraType, isControl);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -136,7 +188,7 @@ public class TCameraInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCameraInfo> list = tCameraInfoService.selectByPage(tCameraInfo);
+            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(tCameraInfo);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -146,5 +198,6 @@ public class TCameraInfoController {
         }
         return result;
     }
+
 
 }
