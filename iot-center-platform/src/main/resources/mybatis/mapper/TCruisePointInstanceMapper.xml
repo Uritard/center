@@ -17,7 +17,7 @@
         <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
         <result column="cruise_name" jdbcType="VARCHAR" property="cruiseName" />
         <result column="cruise_content" jdbcType="VARCHAR" property="cruiseContent" />
-        <result column="fluctuating_value" jdbcType="VARCHAR" property="fluctuatingValue" />
+        <result column="position_type" jdbcType="VARCHAR" property="positionType" />
         <result column="unit_val" jdbcType="VARCHAR" property="unitVal" />
         <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
         <result column="if_sy" jdbcType="INTEGER" property="ifSy" />
@@ -30,7 +30,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        instance_id, device_mete_id, station_id, station_name, device_id, custom_id, data_format, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, cruise_content, fluctuating_value, unit_val, unit_name, if_sy, sy_type, if_videotape, videotape_time, text_desc, sort
+        instance_id, device_mete_id, station_id, station_name, device_id, custom_id, data_format, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, cruise_content, position_type, unit_val, unit_name, if_sy, sy_type, if_videotape, videotape_time, text_desc, sort
     </sql>
 
 
@@ -49,7 +49,7 @@
             cruise_id,
             cruise_name,
             cruise_content,
-            fluctuating_value,
+            position_type,
             unit_val,
             unit_name,
             if_sy,
@@ -72,7 +72,7 @@
                 #{cruiseId, jdbcType=BIGINT},
                 #{cruiseName, jdbcType=VARCHAR},
                 #{cruiseContent, jdbcType=VARCHAR},
-                #{fluctuatingValue, jdbcType=VARCHAR},
+                #{positionType, jdbcType=VARCHAR},
                 #{unitVal, jdbcType=VARCHAR},
                 #{unitName, jdbcType=VARCHAR},
                 #{ifSy, jdbcType=INTEGER},
@@ -104,7 +104,7 @@
         <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
         <if test="cruiseName != null and cruiseName != ''">a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
         <if test="cruiseContent != null and cruiseContent != ''">a.cruise_content = #{cruiseContent, jdbcType=VARCHAR},</if>
-        <if test="fluctuatingValue != null and fluctuatingValue != ''">a.fluctuating_value = #{fluctuatingValue, jdbcType=VARCHAR},</if>
+        <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
         <if test="unitVal != null and unitVal != ''">a.unit_val = #{unitVal, jdbcType=VARCHAR},</if>
         <if test="unitName != null and unitName != ''">a.unit_name = #{unitName, jdbcType=VARCHAR},</if>
         <if test="ifSy != null and ifSy != ''">a.if_sy = #{ifSy, jdbcType=INTEGER},</if>
@@ -114,7 +114,7 @@
         <if test="textDesc != null and textDesc != ''">a.text_desc = #{textDesc, jdbcType=VARCHAR},</if>
         <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=VARCHAR},</if>
     </set>
-            where a.instance_id = #{instanceId, jdbcType=BIGINT}
+        where a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
@@ -132,7 +132,7 @@
         a.cruise_id,
         a.cruise_name,
         a.cruise_content,
-        a.fluctuating_value,
+        a.position_type,
         a.unit_val,
         a.unit_name,
         a.if_sy,
@@ -162,7 +162,7 @@
         a.cruise_id,
         a.cruise_name,
         a.cruise_content,
-        a.fluctuating_value,
+        a.position_type,
         a.unit_val,
         a.unit_name,
         a.if_sy,
@@ -186,7 +186,7 @@
         <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
         <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
-        <if test="fluctuatingValue != null and fluctuatingValue != ''"> and a.fluctuating_value = #{fluctuatingValue, jdbcType=VARCHAR}</if>
+        <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
         <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
         <if test="ifSy != null and ifSy != ''"> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
@@ -212,7 +212,7 @@
         a.cruise_id,
         a.cruise_name,
         a.cruise_content,
-        a.fluctuating_value,
+        a.position_type,
         a.unit_val,
         a.unit_name,
         a.if_sy,
@@ -236,7 +236,7 @@
         <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
         <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
-        <if test="fluctuatingValue != null and fluctuatingValue != ''"> and a.fluctuating_value = #{fluctuatingValue, jdbcType=VARCHAR}</if>
+        <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
         <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
         <if test="ifSy != null and ifSy != ''"> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
@@ -249,53 +249,53 @@
 
     <insert id="batchInsert">
         insert into t_cruise_point_instance(
-            instance_id,
-            device_mete_id,
-            station_id,
-            station_name,
-            device_id,
-            custom_id,
-            data_format,
-            identify_type,
-            identify_son_type,
-            cruise_type,
-            cruise_id,
-            cruise_name,
-            cruise_content,
-            fluctuating_value,
-            unit_val,
-            unit_name,
-            if_sy,
-            sy_type,
-            if_videotape,
-            videotape_time,
-            text_desc,
-            sort
+        instance_id,
+        device_mete_id,
+        station_id,
+        station_name,
+        device_id,
+        custom_id,
+        data_format,
+        identify_type,
+        identify_son_type,
+        cruise_type,
+        cruise_id,
+        cruise_name,
+        cruise_content,
+        position_type,
+        unit_val,
+        unit_name,
+        if_sy,
+        sy_type,
+        if_videotape,
+        videotape_time,
+        text_desc,
+        sort
         )values
         <foreach collection="list" item="TCruisePointInstance" separator=",">
             (
-                #{TCruisePointInstance.instanceId, jdbcType=BIGINT},
-                #{TCruisePointInstance.deviceMeteId, jdbcType=BIGINT},
-                #{TCruisePointInstance.stationId, jdbcType=VARCHAR},
-                #{TCruisePointInstance.stationName, jdbcType=VARCHAR},
-                #{TCruisePointInstance.deviceId, jdbcType=BIGINT},
-                #{TCruisePointInstance.customId, jdbcType=VARCHAR},
-                #{TCruisePointInstance.dataFormat, jdbcType=VARCHAR},
-                #{TCruisePointInstance.identifyType, jdbcType=INTEGER},
-                #{TCruisePointInstance.identifySonType, jdbcType=INTEGER},
-                #{TCruisePointInstance.cruiseType, jdbcType=INTEGER},
-                #{TCruisePointInstance.cruiseId, jdbcType=BIGINT},
-                #{TCruisePointInstance.cruiseName, jdbcType=VARCHAR},
-                #{TCruisePointInstance.cruiseContent, jdbcType=VARCHAR},
-                #{TCruisePointInstance.fluctuatingValue, jdbcType=VARCHAR},
-                #{TCruisePointInstance.unitVal, jdbcType=VARCHAR},
-                #{TCruisePointInstance.unitName, jdbcType=VARCHAR},
-                #{TCruisePointInstance.ifSy, jdbcType=INTEGER},
-                #{TCruisePointInstance.syType, jdbcType=INTEGER},
-                #{TCruisePointInstance.ifVideotape, jdbcType=INTEGER},
-                #{TCruisePointInstance.videotapeTime, jdbcType=VARCHAR},
-                #{TCruisePointInstance.textDesc, jdbcType=VARCHAR},
-                #{TCruisePointInstance.sort, jdbcType=VARCHAR}
+            #{TCruisePointInstance.instanceId, jdbcType=BIGINT},
+            #{TCruisePointInstance.deviceMeteId, jdbcType=BIGINT},
+            #{TCruisePointInstance.stationId, jdbcType=VARCHAR},
+            #{TCruisePointInstance.stationName, jdbcType=VARCHAR},
+            #{TCruisePointInstance.deviceId, jdbcType=BIGINT},
+            #{TCruisePointInstance.customId, jdbcType=VARCHAR},
+            #{TCruisePointInstance.dataFormat, jdbcType=VARCHAR},
+            #{TCruisePointInstance.identifyType, jdbcType=INTEGER},
+            #{TCruisePointInstance.identifySonType, jdbcType=INTEGER},
+            #{TCruisePointInstance.cruiseType, jdbcType=INTEGER},
+            #{TCruisePointInstance.cruiseId, jdbcType=BIGINT},
+            #{TCruisePointInstance.cruiseName, jdbcType=VARCHAR},
+            #{TCruisePointInstance.cruiseContent, jdbcType=VARCHAR},
+            #{TCruisePointInstance.positionType, jdbcType=VARCHAR},
+            #{TCruisePointInstance.unitVal, jdbcType=VARCHAR},
+            #{TCruisePointInstance.unitName, jdbcType=VARCHAR},
+            #{TCruisePointInstance.ifSy, jdbcType=INTEGER},
+            #{TCruisePointInstance.syType, jdbcType=INTEGER},
+            #{TCruisePointInstance.ifVideotape, jdbcType=INTEGER},
+            #{TCruisePointInstance.videotapeTime, jdbcType=VARCHAR},
+            #{TCruisePointInstance.textDesc, jdbcType=VARCHAR},
+            #{TCruisePointInstance.sort, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -315,7 +315,7 @@
         a.cruise_id,
         a.cruise_name,
         a.cruise_content,
-        a.fluctuating_value,
+        a.position_type,
         a.unit_val,
         a.unit_name,
         a.if_sy,
@@ -330,43 +330,22 @@
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
     </select>
 
-    <!--创建机器人的巡检实例，根据参数所做的插入-->
-    <insert id="sTDMateUnionTRInspection"  parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
-        insert into t_cruise_point_instance(
-            device_mete_id,
-            device_id,
-            custom_id,
-            cruise_type,
-            cruise_id,
-            cruise_name
-        )values(
-                #{deviceMeteId, jdbcType=BIGINT},
-                #{deviceId, jdbcType=BIGINT},
-                #{customId, jdbcType=VARCHAR},
-                #{cruiseType, jdbcType=INTEGER},
-                #{cruiseId, jdbcType=BIGINT},
-                #{cruiseName, jdbcType=VARCHAR}
-        )
-    </insert>
+    <select id="selectTSRegionForStation" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        select
+        *
+        from
+        t_std_region a
+        where
+        a.up_region_id is null
+    </select>
 
-    <!--创建摄像头预置位的巡检实例，根据参数所做的插入-->
-    <insert id="STDMateUnionTCPreset"  parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
-        insert into t_cruise_point_instance(
-            device_mete_id,
-            device_id,
-            custom_id,
-            cruise_type,
-            cruise_id,
-            cruise_name
-        )values(
-                #{deviceMeteId, jdbcType=BIGINT},
-                #{deviceId, jdbcType=BIGINT},
-                #{customId, jdbcType=VARCHAR},
-                #{cruiseType, jdbcType=INTEGER},
-                #{cruiseId, jdbcType=BIGINT},
-                #{cruiseName, jdbcType=VARCHAR}
-        )
-    </insert>
-
+    <select id="selectTDBusinessForUnitName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select
+        *
+        from
+        t_dict_business a
+        where
+        a.col_name =  #{colName, jdbcType=VARCHAR}
+    </select>
 
 </mapper>

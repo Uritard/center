@@ -47,5 +47,7 @@ public class TStdRegion implements Serializable {
 
     private Date createTime;
 
+    private  String stationName;
+
 
 }

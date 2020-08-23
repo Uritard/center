@@ -3,6 +3,8 @@ package com.yjh.platform.module.device.dao;
 import java.util.List;
 
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -18,34 +20,34 @@ public interface TCruisePointInstanceDao {
     int update(TCruisePointInstance tCruisePointInstance);
     TCruisePointInstance selectByPrimaryId(@Param(value = "instanceId") Long instanceId);
     List<TCruisePointInstance> select(@Param(value = "instanceId") Long instanceId,
-                                @Param(value = "deviceMeteId") Long deviceMeteId,
-                                @Param(value = "stationId") String stationId,
-                                @Param(value = "stationName") String stationName,
-                                @Param(value = "deviceId") Long deviceId,
-                                @Param(value = "customId") String customId,
-                                @Param(value = "dataFormat") String dataFormat,
-                                @Param(value = "identifyType") Integer identifyType,
-                                @Param(value = "identifySonType") Integer identifySonType,
-                                @Param(value = "cruiseType") Integer cruiseType,
-                                @Param(value = "cruiseId") Long cruiseId,
-                                @Param(value = "cruiseName") String cruiseName,
-                                @Param(value = "cruiseContent") String cruiseContent,
-                                @Param(value = "fluctuatingValue") String fluctuatingValue,
-                                @Param(value = "unitVal") String unitVal,
-                                @Param(value = "unitName") String unitName,
-                                @Param(value = "ifSy") Integer ifSy,
-                                @Param(value = "syType") Integer syType,
-                                @Param(value = "ifVideotape") Integer ifVideotape,
-                                @Param(value = "videotapeTime") String videotapeTime,
-                                @Param(value = "textDesc") String textDesc,
-                                @Param(value = "sort") String sort);
+                                      @Param(value = "deviceMeteId") Long deviceMeteId,
+                                      @Param(value = "stationId") String stationId,
+                                      @Param(value = "stationName") String stationName,
+                                      @Param(value = "deviceId") Long deviceId,
+                                      @Param(value = "customId") String customId,
+                                      @Param(value = "dataFormat") String dataFormat,
+                                      @Param(value = "identifyType") Integer identifyType,
+                                      @Param(value = "identifySonType") Integer identifySonType,
+                                      @Param(value = "cruiseType") Integer cruiseType,
+                                      @Param(value = "cruiseId") Long cruiseId,
+                                      @Param(value = "cruiseName") String cruiseName,
+                                      @Param(value = "cruiseContent") String cruiseContent,
+                                      @Param(value = "positionType") String positionType,
+                                      @Param(value = "unitVal") String unitVal,
+                                      @Param(value = "unitName") String unitName,
+                                      @Param(value = "ifSy") Integer ifSy,
+                                      @Param(value = "syType") Integer syType,
+                                      @Param(value = "ifVideotape") Integer ifVideotape,
+                                      @Param(value = "videotapeTime") String videotapeTime,
+                                      @Param(value = "textDesc") String textDesc,
+                                      @Param(value = "sort") String sort);
     List<TCruisePointInstance> selectByPage(TCruisePointInstance tCruisePointInstance);
 
     int batchInsert(List<TCruisePointInstance> list);
     List<TCruisePointInstance> StdMeteUnionInspectionId(@Param(value = "deviceId") Long deviceId);
 
-    //创建机器人巡检实例
-    int sTDMateUnionTRInspection(TCruisePointInstance tCruisePointInstance);
-    //创建摄像头预置位巡检实例
-    int STDMateUnionTCPreset(TCruisePointInstance tCruisePointInstance);
+    //为创建实例服务
+    TStdRegion selectTSRegionForStation();
+    TDictBusiness selectTDBusinessForUnitName(String colName);
+
 }

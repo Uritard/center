@@ -105,27 +105,27 @@ public class TCruisePointInstanceController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "instanceId", required = false) Long instanceId,
-                            @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
-                            @RequestParam(value = "stationId", required = false) String stationId,
-                            @RequestParam(value = "stationName", required = false) String stationName,
-                            @RequestParam(value = "deviceId", required = false) Long deviceId,
-                            @RequestParam(value = "customId", required = false) String customId,
-                            @RequestParam(value = "dataFormat", required = false) String dataFormat,
-                            @RequestParam(value = "identifyType", required = false) Integer identifyType,
-                            @RequestParam(value = "identifySonType", required = false) Integer identifySonType,
-                            @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
-                            @RequestParam(value = "cruiseId", required = false) Long cruiseId,
-                            @RequestParam(value = "cruiseName", required = false) String cruiseName,
-                            @RequestParam(value = "cruiseContent", required = false) String cruiseContent,
-                            @RequestParam(value = "fluctuatingValue", required = false) String fluctuatingValue,
-                            @RequestParam(value = "unitVal", required = false) String unitVal,
-                            @RequestParam(value = "unitName", required = false) String unitName,
-                            @RequestParam(value = "ifSy", required = false) Integer ifSy,
-                            @RequestParam(value = "syType", required = false) Integer syType,
-                            @RequestParam(value = "ifVideotape", required = false) Integer ifVideotape,
-                            @RequestParam(value = "videotapeTime", required = false) String videotapeTime,
-                            @RequestParam(value = "textDesc", required = false) String textDesc,
-                            @RequestParam(value = "sort", required = false) String sort) {
+                         @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
+                         @RequestParam(value = "stationId", required = false) String stationId,
+                         @RequestParam(value = "stationName", required = false) String stationName,
+                         @RequestParam(value = "deviceId", required = false) Long deviceId,
+                         @RequestParam(value = "customId", required = false) String customId,
+                         @RequestParam(value = "dataFormat", required = false) String dataFormat,
+                         @RequestParam(value = "identifyType", required = false) Integer identifyType,
+                         @RequestParam(value = "identifySonType", required = false) Integer identifySonType,
+                         @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+                         @RequestParam(value = "cruiseId", required = false) Long cruiseId,
+                         @RequestParam(value = "cruiseName", required = false) String cruiseName,
+                         @RequestParam(value = "cruiseContent", required = false) String cruiseContent,
+                         @RequestParam(value = "fluctuatingValue", required = false) String fluctuatingValue,
+                         @RequestParam(value = "unitVal", required = false) String unitVal,
+                         @RequestParam(value = "unitName", required = false) String unitName,
+                         @RequestParam(value = "ifSy", required = false) Integer ifSy,
+                         @RequestParam(value = "syType", required = false) Integer syType,
+                         @RequestParam(value = "ifVideotape", required = false) Integer ifVideotape,
+                         @RequestParam(value = "videotapeTime", required = false) String videotapeTime,
+                         @RequestParam(value = "textDesc", required = false) String textDesc,
+                         @RequestParam(value = "sort", required = false) String sort) {
         Result result = new Result();
         try {
             List<TCruisePointInstance> list = tCruisePointInstanceService.select(instanceId, deviceMeteId, stationId, stationName, deviceId, customId, dataFormat, identifyType, identifySonType, cruiseType, cruiseId, cruiseName, cruiseContent, fluctuatingValue, unitVal, unitName, ifSy, syType, ifVideotape, videotapeTime, textDesc, sort);
@@ -140,8 +140,8 @@ public class TCruisePointInstanceController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -162,10 +162,10 @@ public class TCruisePointInstanceController {
     public Result batchInsert(@RequestBody List<TCruisePointInstance> list) {
         Result result = new Result();
         try {
-        result.setData(tCruisePointInstanceService.batchInsert(list));
+            result.setData(tCruisePointInstanceService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("巡检点实例批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("巡检点实例批量插入失败：" + e);
         }
         return result;
     }
@@ -186,7 +186,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "创建机器人巡检实例")
     @RequestMapping(value = "/STDMateUnionTRInspection", method = RequestMethod.POST)
-    public Result STDMateUnionTRInspection(@RequestBody List<Map<String,Object> > list){
+    public Result STDMateUnionTRInspection(@RequestBody List<Map<String,String> > list){
         //数据顺序 tR TS
         Result result = new Result();
         try{
@@ -201,7 +201,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "创建摄像头预置位巡检实例")
     @RequestMapping(value = "/STDMateUnionTCPreset", method = RequestMethod.POST)
-    public Result STDMateUnionTCPreset(@RequestBody List<Map<String,Object> > list){
+    public Result STDMateUnionTCPreset(@RequestBody List<Map<String,String> > list){
         //数据顺序 TCP TS
         Result result = new Result();
         try{
