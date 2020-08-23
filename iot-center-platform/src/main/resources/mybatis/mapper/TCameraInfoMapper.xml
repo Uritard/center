@@ -135,8 +135,6 @@
         and a.camera_id = #{cameraId} and b.dict_note in
         (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
     </select>
-<<<<<<< Updated upstream
-=======
     <!--根据摄像机名称查询信息-->
     <select id="selectByCameraName" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select
@@ -187,7 +185,6 @@
         (SELECT b.dict_note from t_dict_business where b.dict_code=a.vendor_id)
 
     </select>
->>>>>>> Stashed changes
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select
@@ -247,11 +244,7 @@
         from t_camera_info a,t_dict_business b
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
-<<<<<<< Updated upstream
-        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
-=======
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
->>>>>>> Stashed changes
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>

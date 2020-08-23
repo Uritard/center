@@ -5,11 +5,8 @@ import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
 import java.util.List;
 
-<<<<<<< Updated upstream
-=======
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCameraPreset;
->>>>>>> Stashed changes
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -52,8 +49,6 @@ public class TCameraInfoService{
 //        return this.tCameraInfoDao.selectByPrimaryId(cameraId);
     }
 
-<<<<<<< Updated upstream
-=======
     @Logs(title = "根据间隔id查询所有摄像机信息", code = "TStdRegion")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> selectByRegionId(Long regionId) {
@@ -68,7 +63,6 @@ public class TCameraInfoService{
         return tCameraInfoByDictList;
     }
 
->>>>>>> Stashed changes
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId, Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId, Integer vendorId, Integer streamType, Integer protocolType, String url, Integer port, Integer cameraType, Integer isControl) {

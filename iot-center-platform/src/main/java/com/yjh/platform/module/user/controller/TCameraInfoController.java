@@ -1,11 +1,8 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.result.BusinessException;
-<<<<<<< Updated upstream
-=======
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCameraPreset;
->>>>>>> Stashed changes
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import java.util.HashMap;
@@ -49,7 +46,7 @@ public class TCameraInfoController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCameraInfo tCameraInfo) {
         Result result = new Result();
         try {
@@ -108,8 +105,6 @@ public class TCameraInfoController {
         }
         return result;
     }
-<<<<<<< Updated upstream
-=======
     @ApiOperation(value = "根据间隔id查询所有摄像机信息")
     @RequestMapping(value = "/selectByRegionId", method = RequestMethod.GET)
     public Result selectByRegionId(@RequestParam(value = "regionId", required = false) Long regionId,
@@ -149,7 +144,6 @@ public class TCameraInfoController {
         }
         return result;
     }
->>>>>>> Stashed changes
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)

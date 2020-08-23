@@ -49,7 +49,7 @@ public class SysUserController {
     }
 
     @ApiOperation(value = "系统用户表插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {

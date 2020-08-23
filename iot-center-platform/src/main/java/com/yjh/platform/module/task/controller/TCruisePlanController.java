@@ -41,7 +41,7 @@ public class TCruisePlanController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCruisePlan tCruisePlan) {
         Result result = new Result();
         try {

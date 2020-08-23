@@ -35,7 +35,7 @@ import java.util.Arrays;
 public class LogsAspect {
     private static final Logger logger = LoggerFactory.getLogger(IPUtil.class);
 
-    private static final String LOG_URL = "http://energy-platform-logs/log/insert";
+    private static final String LOG_URL = "http://energy-platform-logs/log/add";
     @Autowired
     private LogsConfig logsConfig;
 

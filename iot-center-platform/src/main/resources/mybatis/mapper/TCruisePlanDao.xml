@@ -59,7 +59,7 @@
         )
     </insert>
 
-    <delete id="delete" parameterType="java.util.map" >
+    <delete id="delete" parameterType="java.lang.String" >
         delete from t_cruise_plan
         where
         <if test="PlanId != null">

@@ -39,7 +39,7 @@ public class TUnionTaskController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TUnionTask tUnionTask) {
         Result result = new Result();
 

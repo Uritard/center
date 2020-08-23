@@ -38,7 +38,7 @@ public class TCruiseTaskAttrController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCruiseTaskAttr tCruiseTaskAttr) {
         Result result = new Result();
 

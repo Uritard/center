@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CommonLogs {
     @Autowired
     private LogsConfig logsConfig;
-    private static final String LOG_URL = "http://energy-platform-logs/log/insert";
+    private static final String LOG_URL = "http://energy-platform-logs/log/add";
 
     /**
      * 常规日志

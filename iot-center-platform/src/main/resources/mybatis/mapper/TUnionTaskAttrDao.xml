@@ -44,7 +44,7 @@
         )
     </insert>
 
-    <delete id="deleteByPrimaryId" parameterType="java.util.map" >
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String" >
         delete from t_union_task_attr
         where
         <if test="UnionId != null">

@@ -68,7 +68,7 @@ public class TCameraOperateController {
             return result;
         }
     @ApiOperation(value = "摄像机预置位插入")
-    @RequestMapping(value = "/insertTCP", method = RequestMethod.POST)
+    @RequestMapping(value = "/addTCP", method = RequestMethod.POST)
     public Result insertTCP(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
