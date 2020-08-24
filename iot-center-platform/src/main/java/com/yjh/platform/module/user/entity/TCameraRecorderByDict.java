@@ -8,20 +8,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-
 /**
- * @author yc
- * @since 2020-08-24
+ * @author YC
+ * @date 2020/8/24 - 11:28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TCameraRecorder对象", description = "录像服务器表")
-public class TCameraRecorder implements Serializable {
-
+@ApiModel(value = "TCameraRecorderByDict", description = "录像服务器表新增")
+public class TCameraRecorderByDict {
     private static final long serialVersionUID = 1L;
-
 
     @ApiModelProperty(value = "录像机ID")
     @TableId(value = "record_id", type = IdType.AUTO)
@@ -30,8 +26,8 @@ public class TCameraRecorder implements Serializable {
     @ApiModelProperty(value = "服务器名称")
     private String recordName;
 
-    @ApiModelProperty(value = "录像机类型")
-    private String recorderType;
+    @ApiModelProperty(value = "字典描述")
+    private String dictNote;
 
     @ApiModelProperty(value = "备用名称")
     private String aliasName;
@@ -71,6 +67,5 @@ public class TCameraRecorder implements Serializable {
 
     @ApiModelProperty(value = "录制文件时长 单位秒")
     private Integer timeLong;
-
 
 }

@@ -4,13 +4,7 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
 import java.util.List;
-<<<<<<< Updated upstream
-
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
-import com.yjh.platform.module.user.entity.TCameraPreset;
-=======
-import com.yjh.platform.module.user.entity.TCameraInfoByDict;
->>>>>>> Stashed changes
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -36,6 +30,12 @@ public class TCameraInfoService{
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long cameraId) {
         return this.tCameraInfoDao.deleteByPrimaryId(cameraId);
+    }
+
+    @Logs(title = "批量删除", code = "TCameraPreset")
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteSelectedCamera(String[] cameraIds) {
+        return this.tCameraInfoDao.deleteSelectedCamera(cameraIds);
     }
 
     @Logs(title = "更新", code = "module")

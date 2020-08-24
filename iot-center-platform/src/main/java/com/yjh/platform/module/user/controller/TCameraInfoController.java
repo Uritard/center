@@ -2,16 +2,19 @@ package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
-<<<<<<< Updated upstream
-import com.yjh.platform.module.user.entity.TCameraPreset;
-=======
->>>>>>> Stashed changes
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -75,6 +78,21 @@ public class TCameraInfoController {
         return result;
     }
 
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/deleteSelectedCamera", method = RequestMethod.DELETE)
+    public Result deleteSelectedCamera(@RequestParam(value = "cameraIds[]", required = true) String[] cameraIds) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public Result update(@RequestBody TCameraInfo tCameraInfo) {
@@ -191,6 +209,55 @@ public class TCameraInfoController {
         }
         return result;
     }
+
+    /*@ApiOperation(value = "导入", notes = "导入")
+    @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+    public Result importExcel(@RequestParam("excelFile") MultipartFile excelFile) {
+        Result result = new Result();
+        try {
+            XSSFWorkbook wb = new XSSFWorkbook(excelFile.getInputStream());//创建工作簿
+            Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
+            int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
+            String deviceId = null;
+            List<TCameraInfo> metes = new ArrayList<>();
+            StringBuffer errMsg = new StringBuffer();
+            for (int i = 1; i <= total; i++) {
+                Row row = sheet.getRow(i);//获取第i+1行
+                *//*以字符串的方式获取第i+1行的第二列的值*//*
+                deviceId = (row.getCell(1).getStringCellValue() == null || "".equals(row.getCell(1).getStringCellValue())) ? deviceId : row.getCell(1).getStringCellValue();
+                TCameraInfo devicemete = new TCameraInfo();
+                devicemete.setMeteId(row.getCell(4).getStringCellValue());
+                devicemete.setDeviceId(deviceId);
+                if (row.getCell(6) == null || row.getCell(6).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(6).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(6).getStringCellValue()))) {
+                    errMsg.append("第" + (i + 1) + "行," + "G列,点号不能为空<br>");
+                    continue;
+                }
+                if (row.getCell(6) != null && row.getCell(6).getCellTypeEnum().equals(CellType.NUMERIC)) {
+                    devicemete.setRawMeteType(ExcelPoiUtil.getValue(row.getCell(6)));
+                } else {
+                    errMsg.append("第" + (i + 1) + "行," + "G列,点号不是数值类型<br>");
+                    continue;
+                }
+                if (row.getCell(7) == null || row.getCell(7).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(7).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(7).getStringCellValue()))) {
+                    errMsg.append("第" + (i + 1) + "行," + "H列,系数不能为空<br>");
+                    continue;
+                }
+                if (row.getCell(7) != null && row.getCell(7).getCellTypeEnum().equals(CellType.NUMERIC)) {
+                    devicemete.setRemark(ExcelPoiUtil.getValue(row.getCell(7)));
+                } else {
+                    errMsg.append("第" + (i + 1) + "行," + "H列,系数不是数值类型<br>");
+                    continue;
+                }
+                metes.add(devicemete);
+            }
+            deviceService.batchUpdateMete(metes);
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            logger.error("导入失败：" + e);
+        }
+        return result;
+    }*/
+
 
 
 }
