@@ -5,21 +5,22 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         <id column="device_id" jdbcType="BIGINT" property="deviceId" />
-        <result column="device_subtype" jdbcType="INTEGER" property="deviceSubtype" />
-        <result column="serial" jdbcType="VARCHAR" property="serial" />
+        <result column="device_model" jdbcType="INTEGER" property="deviceModel" />
+        <result column="pms_type" jdbcType="VARCHAR" property="pmsType" />
+        <result column="pms_id" jdbcType="VARCHAR" property="pmsId" />
         <result column="manufacturer" jdbcType="VARCHAR" property="manufacturer" />
-        <result column="supplier" jdbcType="VARCHAR" property="supplier" />
         <result column="production_date" jdbcType="TIMESTAMP" property="productionDate" />
         <result column="opening_date" jdbcType="TIMESTAMP" property="openingDate" />
         <result column="disable_date" jdbcType="TIMESTAMP" property="disableDate" />
         <result column="last_maintenance" jdbcType="TIMESTAMP" property="lastMaintenance" />
-        <result column="maintenance_cycle" jdbcType="VARCHAR" property="maintenanceCycle" />
+        <result column="maintenance_count" jdbcType="VARCHAR" property="maintenanceCount" />
         <result column="organization" jdbcType="VARCHAR" property="organization" />
         <result column="department" jdbcType="VARCHAR" property="department" />
         <result column="responsible_person" jdbcType="VARCHAR" property="responsiblePerson" />
         <result column="latitude" jdbcType="VARCHAR" property="latitude" />
         <result column="longitude" jdbcType="VARCHAR" property="longitude" />
-        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="ip" jdbcType="VARCHAR" property="ip" />
+        <result column="port" jdbcType="INTEGER" property="port" />
         <result column="para_1" jdbcType="VARCHAR" property="para1" />
         <result column="para_2" jdbcType="VARCHAR" property="para2" />
         <result column="para_3" jdbcType="VARCHAR" property="para3" />
@@ -27,48 +28,50 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_id, device_subtype, serial, manufacturer, supplier, production_date, opening_date, disable_date, last_maintenance, maintenance_cycle, organization, department, responsible_person, latitude, longitude, remark, para_1, para_2, para_3
+        device_id, device_model, pms_type, pms_id, manufacturer, production_date, opening_date, disable_date, last_maintenance, maintenance_count, organization, department, responsible_person, latitude, longitude, ip, port, para_1, para_2, para_3
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         insert into t_std_device_attr(
             device_id,
-            device_subtype,
-            serial,
+            device_model,
+            pms_type,
+            pms_id,
             manufacturer,
-            supplier,
             production_date,
             opening_date,
             disable_date,
             last_maintenance,
-            maintenance_cycle,
+            maintenance_count,
             organization,
             department,
             responsible_person,
             latitude,
             longitude,
-            remark,
+            ip,
+            port,
             para_1,
             para_2,
             para_3
         )values(
                 #{deviceId, jdbcType=BIGINT},
-                #{deviceSubtype, jdbcType=INTEGER},
-                #{serial, jdbcType=VARCHAR},
+                #{deviceModel, jdbcType=INTEGER},
+                #{pmsType, jdbcType=VARCHAR},
+                #{pmsId, jdbcType=VARCHAR},
                 #{manufacturer, jdbcType=VARCHAR},
-                #{supplier, jdbcType=VARCHAR},
                 #{productionDate, jdbcType=TIMESTAMP},
                 #{openingDate, jdbcType=TIMESTAMP},
                 #{disableDate, jdbcType=TIMESTAMP},
                 #{lastMaintenance, jdbcType=TIMESTAMP},
-                #{maintenanceCycle, jdbcType=VARCHAR},
+                #{maintenanceCount, jdbcType=VARCHAR},
                 #{organization, jdbcType=VARCHAR},
                 #{department, jdbcType=VARCHAR},
                 #{responsiblePerson, jdbcType=VARCHAR},
                 #{latitude, jdbcType=VARCHAR},
                 #{longitude, jdbcType=VARCHAR},
-                #{remark, jdbcType=VARCHAR},
+                #{ip, jdbcType=VARCHAR},
+                #{port, jdbcType=INTEGER},
                 #{para1, jdbcType=VARCHAR},
                 #{para2, jdbcType=VARCHAR},
                 #{para3, jdbcType=VARCHAR}
@@ -83,46 +86,48 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         update t_std_device_attr a <set>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="deviceSubtype != null and deviceSubtype != ''">a.device_subtype = #{deviceSubtype, jdbcType=INTEGER},</if>
-        <if test="serial != null and serial != ''">a.serial = #{serial, jdbcType=VARCHAR},</if>
+        <if test="deviceModel != null and deviceModel != ''">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
+        <if test="pmsType != null and pmsType != ''">a.pms_type = #{pmsType, jdbcType=VARCHAR},</if>
+        <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
         <if test="manufacturer != null and manufacturer != ''">a.manufacturer = #{manufacturer, jdbcType=VARCHAR},</if>
-        <if test="supplier != null and supplier != ''">a.supplier = #{supplier, jdbcType=VARCHAR},</if>
         <if test="productionDate != null and productionDate != ''">a.production_date = #{productionDate, jdbcType=TIMESTAMP},</if>
         <if test="openingDate != null and openingDate != ''">a.opening_date = #{openingDate, jdbcType=TIMESTAMP},</if>
         <if test="disableDate != null and disableDate != ''">a.disable_date = #{disableDate, jdbcType=TIMESTAMP},</if>
         <if test="lastMaintenance != null and lastMaintenance != ''">a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP},</if>
-        <if test="maintenanceCycle != null and maintenanceCycle != ''">a.maintenance_cycle = #{maintenanceCycle, jdbcType=VARCHAR},</if>
+        <if test="maintenanceCount != null and maintenanceCount != ''">a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR},</if>
         <if test="organization != null and organization != ''">a.organization = #{organization, jdbcType=VARCHAR},</if>
         <if test="department != null and department != ''">a.department = #{department, jdbcType=VARCHAR},</if>
         <if test="responsiblePerson != null and responsiblePerson != ''">a.responsible_person = #{responsiblePerson, jdbcType=VARCHAR},</if>
         <if test="latitude != null and latitude != ''">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null and longitude != ''">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
+        <if test="port != null and port != ''">a.port = #{port, jdbcType=INTEGER},</if>
         <if test="para1 != null and para1 != ''">a.para_1 = #{para1, jdbcType=VARCHAR},</if>
         <if test="para2 != null and para2 != ''">a.para_2 = #{para2, jdbcType=VARCHAR},</if>
         <if test="para3 != null and para3 != ''">a.para_3 = #{para3, jdbcType=VARCHAR},</if>
     </set>
-        where a.device_id = #{deviceId, jdbcType=BIGINT}
+            where a.device_id = #{deviceId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         select
         a.device_id,
-        a.device_subtype,
-        a.serial,
+        a.device_model,
+        a.pms_type,
+        a.pms_id,
         a.manufacturer,
-        a.supplier,
         a.production_date,
         a.opening_date,
         a.disable_date,
         a.last_maintenance,
-        a.maintenance_cycle,
+        a.maintenance_count,
         a.organization,
         a.department,
         a.responsible_person,
         a.latitude,
         a.longitude,
-        a.remark,
+        a.ip,
+        a.port,
         a.para_1,
         a.para_2,
         a.para_3
@@ -135,42 +140,44 @@
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr" resultType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         select
         a.device_id,
-        a.device_subtype,
-        a.serial,
+        a.device_model,
+        a.pms_type,
+        a.pms_id,
         a.manufacturer,
-        a.supplier,
         a.production_date,
         a.opening_date,
         a.disable_date,
         a.last_maintenance,
-        a.maintenance_cycle,
+        a.maintenance_count,
         a.organization,
         a.department,
         a.responsible_person,
         a.latitude,
         a.longitude,
-        a.remark,
+        a.ip,
+        a.port,
         a.para_1,
         a.para_2,
         a.para_3
         from t_std_device_attr a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="deviceSubtype != null and deviceSubtype != ''"> and a.device_subtype = #{deviceSubtype, jdbcType=INTEGER}</if>
-        <if test="serial != null and serial != ''"> and a.serial = #{serial, jdbcType=VARCHAR}</if>
+        <if test="deviceModel != null and deviceModel != ''"> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
+        <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
+        <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
-        <if test="supplier != null and supplier != ''"> and a.supplier = #{supplier, jdbcType=VARCHAR}</if>
         <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
         <if test="openingDate != null and openingDate != ''"> and a.opening_date = #{openingDate, jdbcType=TIMESTAMP}</if>
         <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
         <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
-        <if test="maintenanceCycle != null and maintenanceCycle != ''"> and a.maintenance_cycle = #{maintenanceCycle, jdbcType=VARCHAR}</if>
+        <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
         <if test="organization != null and organization != ''"> and a.organization = #{organization, jdbcType=VARCHAR}</if>
         <if test="department != null and department != ''"> and a.department = #{department, jdbcType=VARCHAR}</if>
         <if test="responsiblePerson != null and responsiblePerson != ''"> and a.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
         <if test="latitude != null and latitude != ''"> and a.latitude = #{latitude, jdbcType=VARCHAR}</if>
         <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
         <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
         <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
@@ -179,42 +186,44 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr" resultType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         select
         a.device_id,
-        a.device_subtype,
-        a.serial,
+        a.device_model,
+        a.pms_type,
+        a.pms_id,
         a.manufacturer,
-        a.supplier,
         a.production_date,
         a.opening_date,
         a.disable_date,
         a.last_maintenance,
-        a.maintenance_cycle,
+        a.maintenance_count,
         a.organization,
         a.department,
         a.responsible_person,
         a.latitude,
         a.longitude,
-        a.remark,
+        a.ip,
+        a.port,
         a.para_1,
         a.para_2,
         a.para_3
         from t_std_device_attr a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="deviceSubtype != null and deviceSubtype != ''"> and a.device_subtype = #{deviceSubtype, jdbcType=INTEGER}</if>
-        <if test="serial != null and serial != ''"> and a.serial = #{serial, jdbcType=VARCHAR}</if>
+        <if test="deviceModel != null and deviceModel != ''"> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
+        <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
+        <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
-        <if test="supplier != null and supplier != ''"> and a.supplier = #{supplier, jdbcType=VARCHAR}</if>
         <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
         <if test="openingDate != null and openingDate != ''"> and a.opening_date = #{openingDate, jdbcType=TIMESTAMP}</if>
         <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
         <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
-        <if test="maintenanceCycle != null and maintenanceCycle != ''"> and a.maintenance_cycle = #{maintenanceCycle, jdbcType=VARCHAR}</if>
+        <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
         <if test="organization != null and organization != ''"> and a.organization = #{organization, jdbcType=VARCHAR}</if>
         <if test="department != null and department != ''"> and a.department = #{department, jdbcType=VARCHAR}</if>
         <if test="responsiblePerson != null and responsiblePerson != ''"> and a.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
         <if test="latitude != null and latitude != ''"> and a.latitude = #{latitude, jdbcType=VARCHAR}</if>
         <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
         <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
         <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
@@ -222,47 +231,49 @@
 
     <insert id="batchInsert">
         insert into t_std_device_attr(
-        device_id,
-        device_subtype,
-        serial,
-        manufacturer,
-        supplier,
-        production_date,
-        opening_date,
-        disable_date,
-        last_maintenance,
-        maintenance_cycle,
-        organization,
-        department,
-        responsible_person,
-        latitude,
-        longitude,
-        remark,
-        para_1,
-        para_2,
-        para_3
+            device_id,
+            device_model,
+            pms_type,
+            pms_id,
+            manufacturer,
+            production_date,
+            opening_date,
+            disable_date,
+            last_maintenance,
+            maintenance_count,
+            organization,
+            department,
+            responsible_person,
+            latitude,
+            longitude,
+            ip,
+            port,
+            para_1,
+            para_2,
+            para_3
         )values
         <foreach collection="list" item="TStdDeviceAttr" separator=",">
             (
-            #{TStdDeviceAttr.deviceId, jdbcType=BIGINT},
-            #{TStdDeviceAttr.deviceSubtype, jdbcType=INTEGER},
-            #{TStdDeviceAttr.serial, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.manufacturer, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.supplier, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.productionDate, jdbcType=TIMESTAMP},
-            #{TStdDeviceAttr.openingDate, jdbcType=TIMESTAMP},
-            #{TStdDeviceAttr.disableDate, jdbcType=TIMESTAMP},
-            #{TStdDeviceAttr.lastMaintenance, jdbcType=TIMESTAMP},
-            #{TStdDeviceAttr.maintenanceCycle, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.organization, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.department, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.responsiblePerson, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.latitude, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.longitude, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.remark, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.para1, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.para2, jdbcType=VARCHAR},
-            #{TStdDeviceAttr.para3, jdbcType=VARCHAR}
+                #{TStdDeviceAttr.deviceId, jdbcType=BIGINT},
+                #{TStdDeviceAttr.deviceModel, jdbcType=INTEGER},
+                #{TStdDeviceAttr.pmsType, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.pmsId, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.manufacturer, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.productionDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.openingDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.disableDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.lastMaintenance, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.maintenanceCount, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.organization, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.department, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.responsiblePerson, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.latitude, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.longitude, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.ip, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.port, jdbcType=INTEGER},
+                #{TStdDeviceAttr.para1, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.para2, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.para3, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

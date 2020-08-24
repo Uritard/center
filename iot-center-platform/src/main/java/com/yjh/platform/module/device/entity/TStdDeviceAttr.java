@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 /**
  * @author lqh
- * @since 2020-08-19
+ * @since 2020-08-24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -23,14 +23,17 @@ public class TStdDeviceAttr implements Serializable {
 
     private Long deviceId;
 
-    private Integer deviceSubtype;
+    @ApiModelProperty(value = "设备型号")
+    private Integer deviceModel;
 
-    private String serial;
+    @ApiModelProperty(value = "PMS类型")
+    private String pmsType;
+
+    @ApiModelProperty(value = "PMS ID")
+    private String pmsId;
 
     @ApiModelProperty(value = "生产厂家")
     private String manufacturer;
-
-    private String supplier;
 
     private Date productionDate;
 
@@ -41,7 +44,8 @@ public class TStdDeviceAttr implements Serializable {
 
     private Date lastMaintenance;
 
-    private String maintenanceCycle;
+    @ApiModelProperty(value = "维修次数")
+    private String maintenanceCount;
 
     @ApiModelProperty(value = "所属单位")
     private String organization;
@@ -52,12 +56,17 @@ public class TStdDeviceAttr implements Serializable {
     @ApiModelProperty(value = "责任人")
     private String responsiblePerson;
 
+    @ApiModelProperty(value = "纬度")
     private String latitude;
 
+    @ApiModelProperty(value = "经度")
     private String longitude;
 
-    @ApiModelProperty(value = "备注")
-    private String remark;
+    @ApiModelProperty(value = "设备IP地址")
+    private String ip;
+
+    @ApiModelProperty(value = "端口")
+    private Integer port;
 
     @ApiModelProperty(value = "电压等级")
     private String para1;
