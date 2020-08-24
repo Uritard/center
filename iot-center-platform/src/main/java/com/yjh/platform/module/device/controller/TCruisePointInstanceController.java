@@ -184,34 +184,145 @@ public class TCruisePointInstanceController {
         return result;
     }
 
-    @ApiOperation(value = "创建机器人巡检实例")
+    @ApiOperation(value = "标准设备测点关联机器人巡检实例")
     @RequestMapping(value = "/STDMateUnionTRInspection", method = RequestMethod.POST)
     public Result STDMateUnionTRInspection(@RequestBody List<Map<String,String> > list){
-        //数据顺序 tR TS
         Result result = new Result();
         try{
             result.setData(tCruisePointInstanceService.STDMateUnionTRInspection(list));
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("创建机器人巡检实例失败描述：", e);
+            log.error("标准设备测点关联机器人巡检实例失败描述：", e);
         }
         return result;
 
     }
 
-    @ApiOperation(value = "创建摄像头预置位巡检实例")
+    @ApiOperation(value = "遥测量测点关联机器人巡检实例")
+    @RequestMapping(value = "/telemeterUnionTRInspection", method = RequestMethod.POST)
+    public Result telemeterUnionTRInspection(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.telemeterUnionTRInspection(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥测量测点关联机器人巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "遥控量测点关联机器人巡检实例")
+    @RequestMapping(value = "/telecontrolUnionTRInspection", method = RequestMethod.POST)
+    public Result telecontrolUnionTRInspection(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.telecontrolUnionTRInspection(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥控量测点关联机器人巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "遥调量测点关联机器人巡检实例")
+    @RequestMapping(value = "/teleadjustUnionTRInspection", method = RequestMethod.POST)
+    public Result teleadjustUnionTRInspection(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.teleadjustUnionTRInspection(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥调量测点关联机器人巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "遥信量测点关联机器人巡检实例")
+    @RequestMapping(value = "/telesignalUnionTRInspection", method = RequestMethod.POST)
+    public Result telesignalUnionTRInspection(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.telesignalUnionTRInspection(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥信量测点关联机器人巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "标准设备测点关联摄像头预置位巡检实例")
     @RequestMapping(value = "/STDMateUnionTCPreset", method = RequestMethod.POST)
     public Result STDMateUnionTCPreset(@RequestBody List<Map<String,String> > list){
-        //数据顺序 TCP TS
         Result result = new Result();
         try{
             result.setData(tCruisePointInstanceService.STDMateUnionTCPreset(list));
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("创建摄像头预置位巡检实例失败描述：", e);
+            log.error("标准设备测点关联摄像头预置位巡检实例失败描述：", e);
         }
         return result;
 
     }
+
+    @ApiOperation(value = "遥测量测点关联摄像头预置位巡检实例")
+    @RequestMapping(value = "/telemeterUnionTCPreset", method = RequestMethod.POST)
+    public Result telemeterUnionTCPreset(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.telemeterUnionTCPreset(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥测量测点关联摄像头预置位巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "遥控量测点关联摄像头预置位巡检实例")
+    @RequestMapping(value = "/telecontrolUnionTCPreset", method = RequestMethod.POST)
+    public Result telecontrolUnionTCPreset(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.telecontrolUnionTCPreset(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥控量测点关联摄像头预置位巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "遥调量测点关联摄像头预置位巡检实例")
+    @RequestMapping(value = "/teleadjuslUnionTCPreset", method = RequestMethod.POST)
+    public Result teleadjuslUnionTCPreset(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.teleadjuslUnionTCPreset(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥调量测点关联摄像头预置位巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "遥信量测点关联摄像头预置位巡检实例")
+    @RequestMapping(value = "/telesignalUnionTCPreset", method = RequestMethod.POST)
+    public Result telesignalUnionTCPreset(@RequestBody List<Map<String,String> > list){
+        Result result = new Result();
+        try{
+            result.setData(tCruisePointInstanceService.telesignalUnionTCPreset(list));
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("遥信量测点关联摄像头预置位巡检实例失败描述：", e);
+        }
+        return result;
+
+    }
+
 
 }

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author lqh
- * @since 2020-08-19
+ * @since 2020-08-24
  */
 @RestController
 @RequestMapping("/tStdDeviceAttr/v1")
@@ -47,7 +47,7 @@ public class TStdDeviceAttrController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("标准化设备参数添加错误:", e);
+            log.error("添加错误:", e);
         }
         return result;
     }
@@ -60,10 +60,10 @@ public class TStdDeviceAttrController {
             result.setData(tStdDeviceAttrService.deleteByPrimaryId(deviceId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("标准化设备参数删除异常:", e);
+            log.error("删除异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("标准化设备参数删除错误:", e);
+            log.error("删除错误:", e);
         }
         return result;
     }
@@ -76,10 +76,10 @@ public class TStdDeviceAttrController {
             result.setData(tStdDeviceAttrService.update(tStdDeviceAttr));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("标准化设备参数更新异常:", e);
+            log.error("更新异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("标准化设备参数更新错误:", e);
+            log.error("更新错误:", e);
         }
         return result;
     }
@@ -93,7 +93,7 @@ public class TStdDeviceAttrController {
             result.setData(tStdDeviceAttr);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("标准化设备参数失败描述：", e);
+            log.error("失败描述：", e);
         }
         return result;
     }
@@ -101,31 +101,32 @@ public class TStdDeviceAttrController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "deviceId", required = false) Long deviceId,
-                         @RequestParam(value = "deviceSubtype", required = false) Integer deviceSubtype,
-                         @RequestParam(value = "serial", required = false) String serial,
-                         @RequestParam(value = "manufacturer", required = false) String manufacturer,
-                         @RequestParam(value = "supplier", required = false) String supplier,
-                         @RequestParam(value = "productionDate", required = false) Date productionDate,
-                         @RequestParam(value = "openingDate", required = false) Date openingDate,
-                         @RequestParam(value = "disableDate", required = false) Date disableDate,
-                         @RequestParam(value = "lastMaintenance", required = false) Date lastMaintenance,
-                         @RequestParam(value = "maintenanceCycle", required = false) String maintenanceCycle,
-                         @RequestParam(value = "organization", required = false) String organization,
-                         @RequestParam(value = "department", required = false) String department,
-                         @RequestParam(value = "responsiblePerson", required = false) String responsiblePerson,
-                         @RequestParam(value = "latitude", required = false) String latitude,
-                         @RequestParam(value = "longitude", required = false) String longitude,
-                         @RequestParam(value = "remark", required = false) String remark,
-                         @RequestParam(value = "para1", required = false) String para1,
-                         @RequestParam(value = "para2", required = false) String para2,
-                         @RequestParam(value = "para3", required = false) String para3) {
+                            @RequestParam(value = "deviceModel", required = false) Integer deviceModel,
+                            @RequestParam(value = "pmsType", required = false) String pmsType,
+                            @RequestParam(value = "pmsId", required = false) String pmsId,
+                            @RequestParam(value = "manufacturer", required = false) String manufacturer,
+                            @RequestParam(value = "productionDate", required = false) Date productionDate,
+                            @RequestParam(value = "openingDate", required = false) Date openingDate,
+                            @RequestParam(value = "disableDate", required = false) Date disableDate,
+                            @RequestParam(value = "lastMaintenance", required = false) Date lastMaintenance,
+                            @RequestParam(value = "maintenanceCount", required = false) String maintenanceCount,
+                            @RequestParam(value = "organization", required = false) String organization,
+                            @RequestParam(value = "department", required = false) String department,
+                            @RequestParam(value = "responsiblePerson", required = false) String responsiblePerson,
+                            @RequestParam(value = "latitude", required = false) String latitude,
+                            @RequestParam(value = "longitude", required = false) String longitude,
+                            @RequestParam(value = "ip", required = false) String ip,
+                            @RequestParam(value = "port", required = false) Integer port,
+                            @RequestParam(value = "para1", required = false) String para1,
+                            @RequestParam(value = "para2", required = false) String para2,
+                            @RequestParam(value = "para3", required = false) String para3) {
         Result result = new Result();
         try {
-            List<TStdDeviceAttr> list = tStdDeviceAttrService.select(deviceId, deviceSubtype, serial, manufacturer, supplier, productionDate, openingDate, disableDate, lastMaintenance, maintenanceCycle, organization, department, responsiblePerson, latitude, longitude, remark, para1, para2, para3);
+            List<TStdDeviceAttr> list = tStdDeviceAttrService.select(deviceId, deviceModel, pmsType, pmsId, manufacturer, productionDate, openingDate, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, para1, para2, para3);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("标准化设备参数失败描述：", e);
+            log.error("失败描述：", e);
         }
         return result;
     }
@@ -133,8 +134,8 @@ public class TStdDeviceAttrController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TStdDeviceAttr tStdDeviceAttr,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -145,7 +146,7 @@ public class TStdDeviceAttrController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("标准化设备参数失败描述：", e);
+            log.error("失败描述：", e);
         }
         return result;
     }
@@ -155,10 +156,10 @@ public class TStdDeviceAttrController {
     public Result batchInsert(@RequestBody List<TStdDeviceAttr> list) {
         Result result = new Result();
         try {
-            result.setData(tStdDeviceAttrService.batchInsert(list));
+        result.setData(tStdDeviceAttrService.batchInsert(list));
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("标准化设备参数批量插入失败：" + e);
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
         }
         return result;
     }
