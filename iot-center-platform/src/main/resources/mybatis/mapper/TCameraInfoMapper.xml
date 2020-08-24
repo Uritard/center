@@ -20,34 +20,6 @@
         <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
         <result column="is_control" jdbcType="INTEGER" property="isControl" />
     </resultMap>
-    <!--新的map-->
-    <resultMap id="NewMap" type="com.yjh.platform.module.user.entity.TCameraInfo">
-        <id column="camera_id" jdbcType="BIGINT" property="cameraId" />
-        <result column="camera_name" jdbcType="VARCHAR" property="cameraName" />
-        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
-        <result column="record_id" jdbcType="VARCHAR" property="recordId" />
-        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
-        <result column="channel_num" jdbcType="INTEGER" property="channelNum" />
-        <result column="sms_id" jdbcType="INTEGER" property="smsId" />
-        <result column="rms_id" jdbcType="INTEGER" property="rmsId" />
-        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
-        <result column="stream_type" jdbcType="INTEGER" property="streamType" />
-        <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
-        <result column="url" jdbcType="VARCHAR" property="url" />
-        <result column="port" jdbcType="INTEGER" property="port" />
-        <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
-        <result column="is_control" jdbcType="INTEGER" property="isControl" />
-
-        <association property="tDictBusiness" javaType="com.yjh.platform.module.user.entity.TDictBusiness">
-            <id column="dict_id" property="dictId"></id>
-            <result column="dict_code" property="dictCode"></result>
-            <result column="dict_note" property="dictNote"></result>
-            <result column="col_name" property="colName"></result>
-            <result column="upDict" property="upDict"></result>
-            <result column="remark" property="remark"></result>
-            <result column="sort" property="sort"></result>
-        </association>
-    </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
@@ -206,7 +178,7 @@
         from t_camera_info a,t_dict_business b
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
-        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType=VARCHAR}</if>
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>

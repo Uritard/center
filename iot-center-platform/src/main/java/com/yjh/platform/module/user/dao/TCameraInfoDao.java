@@ -1,8 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
-import java.util.Map;
-
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
@@ -19,6 +17,10 @@ public interface TCameraInfoDao {
     int insert(TCameraInfo tCameraInfo);
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
     int update(TCameraInfo tCameraInfo);
+<<<<<<< Updated upstream
+=======
+    List<TCameraInfo> select(@Param(value = "cameraId") Long cameraId);
+>>>>>>> Stashed changes
     TCameraInfoByDict selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
     List<TCameraInfoByDict> selectByRegionId(@Param(value = "regionId") Long regionId);
     List<TCameraInfoByDict> selectByCameraName(@Param(value = "cameraName") String cameraName);
@@ -40,4 +42,5 @@ public interface TCameraInfoDao {
     List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
 
     List<AreaInfo> selectCameraTreeDevice();
+
 }

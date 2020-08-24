@@ -4,9 +4,13 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
 import java.util.List;
+<<<<<<< Updated upstream
 
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+=======
+import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+>>>>>>> Stashed changes
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -43,10 +47,9 @@ public class TCameraInfoService{
     @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public TCameraInfoByDict selectByPrimaryId(Long cameraId) {
-        TCameraInfoByDict tCameraInfoByDict = this.tCameraInfoDao.selectByPrimaryId(cameraId);
-        System.out.println("结果是："+tCameraInfoByDict);
-        return tCameraInfoByDict;
-//        return this.tCameraInfoDao.selectByPrimaryId(cameraId);
+//        TCameraInfoByDict tCameraInfoByDict = this.tCameraInfoDao.selectByPrimaryId(cameraId);
+        return this.tCameraInfoDao.selectByPrimaryId(cameraId);
+//        return tCameraInfoByDict;
     }
 
     @Logs(title = "根据间隔id查询所有摄像机信息", code = "TStdRegion")
