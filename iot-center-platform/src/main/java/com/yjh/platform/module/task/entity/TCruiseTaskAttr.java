@@ -29,7 +29,7 @@ public class TCruiseTaskAttr implements Serializable {
 
     @ApiModelProperty(value = "巡检点实例ID")
     @TableId(value = "instance_id", type = IdType.AUTO)
-    private Long InstanceId;
+    private Long instanceId;
 
     @ApiModelProperty(value = "测点实例ID")
     private Long DeviceMeteId;

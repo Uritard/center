@@ -25,7 +25,8 @@ public interface TCruisePlanDao {
     TCruisePlan selectByPrimaryId(@Param(value = "PlanId") Long PlanId);
 
     List<TCruisePlan> select(@Param(value = "PlanId") Long PlanId,
-                             @Param(value = "InstanceId") Long InstanceId,
+                             @Param(value = "instanceId") Long instanceId,
+                             @Param(value = "PlanName") String PlanName,
                              @Param(value = "PointType") Integer PointType,
                              @Param(value = "AreaId") String AreaId,
                              @Param(value = "CruiseRegionIds") String CruiseRegionIds,
@@ -40,7 +41,9 @@ public interface TCruisePlanDao {
                              @Param(value = "UpdateTime") Date UpdateTime);
 
     //分页查询
-    List<TCruisePlan> select(TCruisePlan tCruisePlan);
+    List<TCruisePlan> selectTCruisePlanResult(Map<String ,Object> map);
 
-    List<TCruisePlan> SelectPlanQuery(JSONObject jsonObject);
+    List<Map<String, Object>> TaskByName( Map<String ,Object> taskNameMap);
+
+    int insertTCruisePlan(TCruisePlan tCruisePlan);
 }

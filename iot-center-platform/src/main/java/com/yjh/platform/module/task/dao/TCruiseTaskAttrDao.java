@@ -23,7 +23,7 @@ public interface TCruiseTaskAttrDao {
     TCruiseTaskAttr selectByPrimaryId(@Param(value = "TaskId") String TaskId);
 
     List<TCruiseTaskAttr> select(@Param(value = "TaskId") String TaskId,
-                                 @Param(value = "InstanceId") Long InstanceId,
+                                 @Param(value = "instanceId") Long instanceId,
                                  @Param(value = "DeviceMeteId") Long DeviceMeteId,
                                  @Param(value = "DeviceId") Long DeviceId,
                                  @Param(value = "CustomId") String CustomId,

@@ -6,16 +6,20 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.service.TCruisePlanService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +45,7 @@ public class TCruisePlanController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/insert", method = RequestMethod.POST)
     public Result insert(@RequestBody TCruisePlan tCruisePlan) {
         Result result = new Result();
         try {
@@ -52,6 +56,14 @@ public class TCruisePlanController {
             result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
             log.error("添加巡检预案错误:", e);
         }
+        return result;
+    }
+
+    @ApiOperation(value = "插入计划")
+    @RequestMapping(value = "/addplan", method = RequestMethod.POST)
+    public Result insertTCruisePlan(@RequestBody TCruisePlan tCruisePlan) {
+        Result result = new Result();
+        result.setData(tCruisePlanService.insertTCruisePlan(tCruisePlan));
         return result;
     }
 
@@ -113,6 +125,7 @@ public class TCruisePlanController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "PlanId", required = false) Long PlanId,
                          @RequestParam(value = "InstanceId", required = false) Long InstanceId,
+                         @RequestParam(value = "PlanName", required = false) String PlanName,
                          @RequestParam(value = "PointType", required = false) Integer PointType,
                          @RequestParam(value = "AreaId", required = false) String AreaId,
                          @RequestParam(value = "CruiseRegionIds", required = false) String CruiseRegionIds,
@@ -128,7 +141,7 @@ public class TCruisePlanController {
     ){
         Result result = new Result();
         try {
-            List<TCruisePlan> list = this.tCruisePlanService.select(PlanId,InstanceId,PointType,AreaId,CruiseRegionIds,
+            List<TCruisePlan> list = this.tCruisePlanService.select(PlanId,InstanceId,PlanName,PointType,AreaId,CruiseRegionIds,
                     ExceptionType,RobotId,Position,AlgorithmId,AlgorithmName,InferadAnalyze,IrTempBox,CreateTime,UpdateTime);
             result.setData(list);
         }catch (Exception e) {
@@ -139,16 +152,16 @@ public class TCruisePlanController {
     }
 
     //分页查询
-    @ApiOperation(value = "分页查询")
+    @ApiOperation(value = "分页查询智能巡检预案")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCruisePlan tCruisePlan,
+    public Result selectByPage(@RequestBody JSONObject obj,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCruisePlan> list = tCruisePlanService.selectByPage(tCruisePlan);
+            List<TCruisePlan> list = tCruisePlanService.selectByPage(obj);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -159,20 +172,14 @@ public class TCruisePlanController {
         return result;
     }
 
-    @ApiOperation(value = "任务管理查询")
-    @RequestMapping(value = "/SelectPlanQuery", method = RequestMethod.POST)
-    public void SelectPlanQuery(HttpServletResponse response, @RequestBody JSONObject obj) throws Exception {
-        Result result = new Result();
-        try{
-            JSONObject jsonObject = new JSONObject(obj);
-            if (null == jsonObject) {
-                result.setCode(ResultCodeEnum.CODE20006.getCode(),ResultCodeEnum.CODE20006.getName());
-            }
-            List<TCruisePlan> list = tCruisePlanService.SelectPlanQuery(jsonObject);
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
-            log.error("失败描述：", e);
-        }
+    @RequestMapping(value = "/TaskList")
+    @ResponseBody
+    public Map<String, Object> TaskList(String year, String month, String date) {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("year", year);
+        param.put("month", month);
+        param.put("date", date);
+        Map<String, Object> result = tCruisePlanService.TaskListByPage(param);
+        return result;
     }
-
 }

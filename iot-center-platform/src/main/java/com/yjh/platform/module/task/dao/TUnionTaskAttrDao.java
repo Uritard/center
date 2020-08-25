@@ -24,7 +24,7 @@ public interface TUnionTaskAttrDao {
     TUnionTaskAttr selectByPrimaryId(@Param(value = "UnionId") String UnionId);
 
     List<TUnionTaskAttr> select(@Param(value = "UnionId") String UnionId,
-                                @Param(value = "InstanceId") Long InstanceId,
+                                @Param(value = "instanceId") Long instanceId,
                                 @Param(value = "DeviceMeteId") Long DeviceMeteId,
                                 @Param(value = "DeviceCustomId") String DeviceCustomId,
                                 @Param(value = "PointTaskId") String PointTaskId,

@@ -52,9 +52,9 @@ public class TUnionTaskAttrService {
     //查询
     @Logs(title = "查询",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TUnionTaskAttr> select(String TaskId,Long InstanceId,Long DeviceMeteId,String DeviceCustomId,
+    public List<TUnionTaskAttr> select(String TaskId,Long instanceId,Long DeviceMeteId,String DeviceCustomId,
                                        String PointTaskId,Integer IfRobot,Integer IfVideo,Integer IfInferad,Integer IfArtificial){
-        List<TUnionTaskAttr> list = this.tUnionTaskAttrDao.select(TaskId,InstanceId,DeviceMeteId,DeviceCustomId,
+        List<TUnionTaskAttr> list = this.tUnionTaskAttrDao.select(TaskId,instanceId,DeviceMeteId,DeviceCustomId,
                 PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
         return list;
     }

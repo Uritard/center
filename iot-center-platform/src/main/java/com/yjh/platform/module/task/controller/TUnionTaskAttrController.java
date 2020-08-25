@@ -57,11 +57,11 @@ public class TUnionTaskAttrController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public Result delete(@RequestParam(value = "UnionId", required = true) String UnionId,
-                         @RequestParam(value = "InstanceId", required = true) Long InstanceId) {
+                         @RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
         Map<String, Object> map = new HashMap<>();
         map.put("UnionId", UnionId);
-        map.put("InstanceId", InstanceId);
+        map.put("instanceId", instanceId);
 
         try {
             result.setData(tUnionTaskAttrService.deleteByPrimaryId(map));
@@ -111,7 +111,7 @@ public class TUnionTaskAttrController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "UnionId", required = false) String UnionId,
-                         @RequestParam(value = "InstanceId", required = false) Long InstanceId,
+                         @RequestParam(value = "instanceId", required = false) Long instanceId,
                          @RequestParam(value = "DeviceMeteId", required = false) Long DeviceMeteId,
                          @RequestParam(value = "DeviceCustomIId", required = false) String DeviceCustomIId,
                          @RequestParam(value = "PointTaskId", required = false) String PointTaskId,
@@ -122,7 +122,7 @@ public class TUnionTaskAttrController {
     ){
         Result result = new Result();
         try {
-            List<TUnionTaskAttr> list = this.tUnionTaskAttrService.select(UnionId,InstanceId,DeviceMeteId,DeviceCustomIId,
+            List<TUnionTaskAttr> list = this.tUnionTaskAttrService.select(UnionId,instanceId,DeviceMeteId,DeviceCustomIId,
                     PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
             result.setData(list);
         }catch (Exception e) {
