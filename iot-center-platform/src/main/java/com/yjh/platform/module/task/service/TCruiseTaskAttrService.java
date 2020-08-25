@@ -49,9 +49,9 @@ public class TCruiseTaskAttrService {
     //查询
     @Logs(title = "查询",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTaskAttr> select(String TaskId,Long InstanceId,Long DeviceMeteId,Long DeviceId,String CustomId,
+    public List<TCruiseTaskAttr> select(String TaskId,Long instanceId,Long DeviceMeteId,Long DeviceId,String CustomId,
                                     String PointTaskId,Integer IfRobot,Integer IfVideo,Integer IfInferad,Integer IfArtificial){
-        List<TCruiseTaskAttr> list = this.tCruiseTaskAttrDao.select(TaskId,InstanceId,DeviceMeteId,DeviceId,CustomId,
+        List<TCruiseTaskAttr> list = this.tCruiseTaskAttrDao.select(TaskId,instanceId,DeviceMeteId,DeviceId,CustomId,
                 PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
         return list;
     }

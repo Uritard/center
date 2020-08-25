@@ -56,11 +56,11 @@ public class TCruiseTaskAttrController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public Result delete(@RequestParam(value = "TaskId", required = true) String TaskId,
-                         @RequestParam(value = "InstanceId", required = true) Long InstanceId) {
+                         @RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
         Map<String, Object> map = new HashMap<>();
         map.put("TaskId", TaskId);
-        map.put("InstanceId", InstanceId);
+        map.put("instanceId", instanceId);
 
         try {
             result.setData(tCruiseTaskAttrService.deleteByPrimaryId(map));
@@ -110,7 +110,7 @@ public class TCruiseTaskAttrController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "TaskId", required = false) String TaskId,
-                         @RequestParam(value = "InstanceId", required = false) Long InstanceId,
+                         @RequestParam(value = "instanceId", required = false) Long instanceId,
                          @RequestParam(value = "DeviceMeteId", required = false) Long DeviceMeteId,
                          @RequestParam(value = "DeviceId", required = false) Long DeviceId,
                          @RequestParam(value = "CustomId", required = false) String CustomId,
@@ -122,7 +122,7 @@ public class TCruiseTaskAttrController {
     ){
         Result result = new Result();
         try {
-            List<TCruiseTaskAttr> list = this.tCruiseTaskAttrService.select(TaskId,InstanceId,DeviceMeteId,DeviceId,CustomId,
+            List<TCruiseTaskAttr> list = this.tCruiseTaskAttrService.select(TaskId,instanceId,DeviceMeteId,DeviceId,CustomId,
                     PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
             result.setData(list);
         }catch (Exception e) {

@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author wf
@@ -23,16 +25,21 @@ public class TCruisePlan implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @ApiModelProperty(value = "预案ID")
     @TableId(value = "plan_id", type = IdType.AUTO)
     private Long PlanId;
 
     @ApiModelProperty(value = "关联巡检点定义实例表id")
-    private Long InstanceId;
+    private Long instanceId;
+
+    @ApiModelProperty(value = "巡检预案名")
+    private String PlanName;
 
     @ApiModelProperty(value = "巡检方式 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹")
     private Integer PointType;
+
+    @ApiModelProperty(value = "所属场站")
+    private Integer AreaId;
 
     @ApiModelProperty(value = "巡检区域id")
     private String CruiseRegionIds;
@@ -63,4 +70,6 @@ public class TCruisePlan implements Serializable {
 
     @ApiModelProperty(value = "更新时间")
     private Date UpdateTime;
+
+    private List<TCruisePointInstance> instanceIdList;
 }

@@ -25,7 +25,7 @@ public class TCruiseTaskService {
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TCruiseTask tCruiseTask) {
+    public int insertTCruiseTask(TCruiseTask tCruiseTask) {
         return this.tCruiseTaskDao.insert(tCruiseTask);
     }
 

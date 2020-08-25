@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTaskAttr">
         <id column="task_id" jdbcType="VARCHAR" property="TaskId" />
-        <result column="instance_id" jdbcType="BIGINT" property="InstanceId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
         <result column="device_mete_id" jdbcType="BIGINT" property="DeviceMeteId" />
         <result column="device_id" jdbcType="BIGINT" property="DeviceId" />
         <result column="custom_id" jdbcType="VARCHAR" property="CustomId" />
@@ -35,7 +35,7 @@
         if_artificial
         )values(
 		        #{TaskId, jdbcType=VARCHAR},
-                #{InstanceId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
                 #{DeviceMeteId, jdbcType=BIGINT},
                 #{DeviceId, jdbcType=BIGINT},
                 #{CustomId, jdbcType=VARCHAR},
@@ -54,8 +54,8 @@
             task_id = #{TaskId, jdbcType=VARCHAR}
         </if>
         AND
-        <if test="InstanceId != null">
-            instance_id = #{InstanceId, jdbcType=BIGINT}
+        <if test="instanceId != null">
+            instance_id = #{instanceId, jdbcType=BIGINT}
         </if>
     </delete>
 
@@ -66,8 +66,8 @@
             <if test="TaskId != null and TaskId != ''">
                 and task_id = #{TaskId, jdbcType=VARCHAR}
             </if>
-            <if test="InstanceId != null and InstanceId != ''">
-                and instance_id = #{InstanceId, jdbcType=BIGINT}
+            <if test="instanceId != null and instanceId != ''">
+                and instance_id = #{instanceId, jdbcType=BIGINT}
             </if>
             <if test="DeviceMeteId != null and DeviceMeteId != ''">
                 and device_mete_id = #{DeviceMeteId, jdbcType=BIGINT}
@@ -125,8 +125,8 @@
         <if test="TaskId != null and TaskId != ''">
             and task_id = #{TaskId, jdbcType=VARCHAR}
         </if>
-        <if test="InstanceId != null and InstanceId != ''">
-            and instance_id = #{InstanceId, jdbcType=BIGINT}
+        <if test="instanceId != null and instanceId != ''">
+            and instance_id = #{instanceId, jdbcType=BIGINT}
         </if>
         <if test="DeviceMeteId != null and DeviceMeteId != ''">
             and device_mete_id = #{DeviceMeteId, jdbcType=BIGINT}

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +41,11 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruiseTask tCruiseTask) {
+    public Result insertTCruiseTask(@RequestBody TCruiseTask tCruiseTask) {
         Result result = new Result();
 
         try {
-            result.setData(tCruiseTaskService.insert(tCruiseTask));
+            result.setData(tCruiseTaskService.insertTCruiseTask(tCruiseTask));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), b.getMessage());
         } catch (Exception e) {

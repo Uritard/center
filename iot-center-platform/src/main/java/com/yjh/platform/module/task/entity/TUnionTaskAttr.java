@@ -30,7 +30,7 @@ public class TUnionTaskAttr implements Serializable {
 
     @ApiModelProperty(value = "关联巡检点定义实例表id")
     @TableId(value = "instance_id", type = IdType.AUTO)
-    private Long InstanceId;
+    private Long instanceId;
 
     @ApiModelProperty(value = "测点实例ID")
     private Long DeviceMeteId;

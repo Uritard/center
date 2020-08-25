@@ -5,7 +5,8 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruisePlan">
         <id column="plan_id" jdbcType="BIGINT" property="PlanId" />
-        <result column="instance_id" jdbcType="BIGINT" property="InstanceId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="plan_name" jdbcType="VARCHAR" property="PlanName" />
         <result column="point_type" jdbcType="INTEGER" property="PointType" />
         <result column="area_id" jdbcType="VARCHAR" property="AreaId" />
         <result column="cruise_region_ids" jdbcType="VARCHAR" property="CruiseRegionIds" />
@@ -22,7 +23,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        plan_id, instance_id, point_type, area_id, cruise_region_ids, exception_type, robot_id, position, algorithm_id, algorithm_name, inferad_analyze, ir_temp_box, create_time, update_time
+        plan_id, instance_id, plan_name,point_type, area_id, cruise_region_ids, exception_type, robot_id, position, algorithm_id, algorithm_name, inferad_analyze, ir_temp_box, create_time, update_time
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="PlanId" parameterType="com.yjh.platform.module.task.entity.TCruisePlan">
@@ -43,7 +44,43 @@
             update_time
         )values(
                 #{PlanId, jdbcType=BIGINT},
-                #{InstanceId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
+                #{PointType, jdbcType=INTEGER},
+                #{AreaId, jdbcType=VARCHAR},
+                #{CruiseRegionIds, jdbcType=VARCHAR},
+                #{ExceptionType, jdbcType=INTEGER},
+                #{RobotId, jdbcType=BIGINT},
+                #{Position, jdbcType=VARCHAR},
+                #{AlgorithmId, jdbcType=INTEGER},
+                #{AlgorithmName, jdbcType=VARCHAR},
+                #{InferadAnalyze, jdbcType=VARCHAR},
+                #{IrTempBox, jdbcType=VARCHAR},
+                #{CreateTime, jdbcType=TIMESTAMP},
+                #{UpdateTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <insert id="insertTCruisePlan" parameterType="HashMap">
+        insert into t_cruise_plan(
+            plan_id,
+            instance_id,
+            plan_name,
+            point_type,
+            area_id,
+            cruise_region_ids,
+            exception_type,
+            robot_id,
+            position,
+            algorithm_id,
+            algorithm_name,
+            inferad_analyze,
+            ir_temp_box,
+            create_time,
+            update_time
+        )values(
+                #{PlanId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
+                #{PlanName, jdbcType=VARCHAR},
                 #{PointType, jdbcType=INTEGER},
                 #{AreaId, jdbcType=VARCHAR},
                 #{CruiseRegionIds, jdbcType=VARCHAR},
@@ -66,8 +103,8 @@
             plan_id = #{PlanId, jdbcType=BIGINT}
         </if>
         AND
-        <if test="InstanceId != null">
-            instance_id = #{InstanceId, jdbcType=BIGINT}
+        <if test="instanceId != null">
+            instance_id = #{instanceId, jdbcType=BIGINT}
         </if>
     </delete>
 
@@ -78,8 +115,11 @@
         <if test="PlanId != null and PlanId != ''">
         a.plan_id = #{PlanId, jdbcType=BIGINT}
         </if>
-        <if test="InstanceId != null and InstanceId != ''">
-        a.instance_id = #{InstanceId, jdbcType=BIGINT}
+        <if test="instanceId != null and instanceId != ''">
+        a.instance_id = #{instanceId, jdbcType=BIGINT}
+        </if>
+        <if test="PlanName != null and PlanName != ''">
+        a.plan_name = #{PlanName, jdbcType=VARCHAR}
         </if>
         <if test="PointType != null and PointType != ''">
         a.point_type = #{PointType, jdbcType=INTEGER}
@@ -132,10 +172,58 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
+    <resultMap id="TCruisePlanMap" type="com.yjh.platform.module.task.entity.TCruisePlan">
+        <result column="plan_id" jdbcType="BIGINT" property="PlanId" />
+        <result column="plan_name" jdbcType="VARCHAR" property="PlanName" />
+        <result column="point_type" jdbcType="INTEGER" property="PointType" />
+        <result column="area_id" jdbcType="VARCHAR" property="AreaId" />
+        <result column="cruise_region_ids" jdbcType="VARCHAR" property="CruiseRegionIds" />
+        <result column="robot_id" jdbcType="BIGINT" property="RobotId" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="CreateTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="UpdateTime" />
+        <collection property="instanceIdList" ofType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+            <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+            <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+            <result column="station_id" jdbcType="VARCHAR" property="stationId" />
+            <result column="station_name" jdbcType="VARCHAR" property="stationName" />
+            <result column="device_id" jdbcType="VARCHAR" property="deviceId" />
+            <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+            <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
+            <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+            <result column="cruise_name" jdbcType="VARCHAR" property="cruiseName" />
+        </collection>
+    </resultMap>
+
+    <select id="selectTCruisePlanResult" parameterType="java.util.Map" resultMap="TCruisePlanMap">
+         SELECT
+        tc.plan_id as PlanId,
+        tc.instance_id as instanceId,
+        tc.plan_name as PlanName,
+        tc.point_type as PointType,
+        tc.area_id as AreaId,
+        tc.cruise_region_ids as CruiseRegionIds,
+        tc.robot_id as RobotId,
+        tc.create_time as CreateTime,
+        tc.update_time as UpdateTime,
+        tci.device_mete_id as deviceMeteId,
+        tci.station_id as stationId,
+        tci.station_name as stationName,
+        tci.device_id as deviceId,
+        tci.custom_id as customId,
+        tci.cruise_type as cruiseType,
+        tci.cruise_id as cruiseId,
+        tci.cruise_name as cruiseName
+        from t_cruise_point_instance tci
+        left join t_cruise_plan tc on tc.instance_id = tci.instance_id
+        order by tc.create_time desc
+    </select>
+
+
+    <select id="select" parameterType="java.util.Map" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
         select
         plan_id,
         instance_id,
+        plan_name,
         point_type,
         area_id,
         cruise_region_ids,
@@ -151,46 +239,57 @@
         from t_cruise_plan
         where 1 = 1
         <if test="PlanId != null and PlanId != ''">
-        and a.plan_id = #{PlanId, jdbcType=BIGINT}
+        and plan_id = #{PlanId, jdbcType=BIGINT}
         </if>
-        <if test="InstanceId != null and InstanceId != ''">
-        and a.instance_id = #{InstanceId, jdbcType=BIGINT}
+        <if test="instanceId != null and instanceId != ''">
+        and instance_id = #{instanceId, jdbcType=BIGINT}
+        </if>
+        <if test="PlanName != null and PlanName != ''">
+        and plan_name = #{PlanName, jdbcType=VARCHAR}
         </if>
         <if test="PointType != null and PointType != ''">
-        and a.point_type = #{PointType, jdbcType=INTEGER}
+        and point_type = #{PointType, jdbcType=INTEGER}
         </if>
         <if test="AreaId != null and AreaId != ''">
-        and a.area_id = #{AreaId, jdbcType=VARCHAR}
+        and area_id = #{AreaId, jdbcType=VARCHAR}
         </if>
         <if test="CruiseRegionIds != null and CruiseRegionIds != ''">
-        and a.cruise_region_ids = #{CruiseRegionIds, jdbcType=VARCHAR}
+        and cruise_region_ids = #{CruiseRegionIds, jdbcType=VARCHAR}
         </if>
         <if test="ExceptionType != null and ExceptionType != ''">
-        and a.exception_type = #{ExceptionType, jdbcType=INTEGER}
+        and exception_type = #{ExceptionType, jdbcType=INTEGER}
         </if>
         <if test="RobotId != null and RobotId != ''">
-        and a.robot_id = #{RobotId, jdbcType=BIGINT}
+        and robot_id = #{RobotId, jdbcType=BIGINT}
         </if>
         <if test="Position != null and Position != ''">
-        and a.position = #{Position, jdbcType=VARCHAR}
+        and position = #{Position, jdbcType=VARCHAR}
         </if>
         <if test="AlgorithmId != null and AlgorithmId != ''">
-        and a.algorithm_id = #{AlgorithmId, jdbcType=INTEGER}
+        and algorithm_id = #{AlgorithmId, jdbcType=INTEGER}
         </if>
         <if test="AlgorithmName != null and AlgorithmName != ''">
-        and a.algorithm_name = #{AlgorithmName, jdbcType=VARCHAR}
+        and algorithm_name = #{AlgorithmName, jdbcType=VARCHAR}
         </if>
         <if test="InferadAnalyze != null and InferadAnalyze != ''">
-        and a.inferad_analyze = #{InferadAnalyze, jdbcType=VARCHAR}
+        and inferad_analyze = #{InferadAnalyze, jdbcType=VARCHAR}
         </if>
         <if test="IrTempBox != null and IrTempBox != ''">
-        and a.ir_temp_box = #{IrTempBox, jdbcType=VARCHAR}
+        and ir_temp_box = #{IrTempBox, jdbcType=VARCHAR}
         </if>
         <if test="CreateTime != null and CreateTime != ''">
-        and a.create_time = #{CreateTime, jdbcType=TIMESTAMP}
+        and create_time = #{CreateTime, jdbcType=TIMESTAMP}
         </if>
         <if test="UpdateTime != null and UpdateTime != ''">
-        and a.update_time = #{UpdateTime, jdbcType=TIMESTAMP}
+        and update_time = #{UpdateTime, jdbcType=TIMESTAMP}
+        </if>
+    </select>
+
+    <select id="TaskByName" parameterType="HashMap" resultType="HashMap">
+        SELECT t.plan_id,t.instance_id,t.plan_name,t.create_time from t_cruise_plan t
+        where
+        <if test="PlanName !=null and PlanName !=''">
+            t.plan_name = #{PlanName}
         </if>
     </select>
 
