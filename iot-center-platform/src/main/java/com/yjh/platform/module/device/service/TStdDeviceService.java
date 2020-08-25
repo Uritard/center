@@ -145,7 +145,21 @@ public class TStdDeviceService{
     public List<AreaInfo> selectRegionTreeByName(String regionName) {
         List<AreaInfo> listTree = new ArrayList<>();
         List<AreaInfo> listTreeAll = this.tStdDeviceDao.selectDevTreeRegion();
-
+        if (Objects.equals(null, regionName) || regionName.equals("")) {
+            List<AreaInfo> areaInfoCountryList = new ArrayList<>();
+            for(Iterator<AreaInfo> it = listTreeAll.iterator();it.hasNext();){
+                AreaInfo areaInfoMap = it.next();
+                if (Objects.equals(areaInfoMap.getUpId(), null)) {
+                    AreaInfo areaInfoCountry = new AreaInfo();
+                    areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                    areaInfoCountry.setId(areaInfoMap.getId());
+                    areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoCountryList.add(areaInfoCountry);
+                }
+            }
+            diGui(areaInfoCountryList, listTreeAll);
+            return areaInfoCountryList;
+        }
         List<AreaInfoRegionCode> listTreeByName = new ArrayList<>();
         listTreeByName = tStdRegionDao.selectRegTreeByRegName(regionName);
         if (listTreeByName.size()>0) {
@@ -159,6 +173,7 @@ public class TStdDeviceService{
                 listTree.add(areaInfo);
                 if (areaInfoRegionCode.getUpId() != null) {
                     Long areaInfoRegionCodeUpId = areaInfoRegionCode.getUpId();
+                    System.out.println("areaInfoRegionCodeUpId: "+areaInfoRegionCodeUpId);
                     for (AreaInfo areaInfoAll : listTreeAll) {
                         if (Objects.equals(areaInfoAll.getId(), areaInfoRegionCodeUpId)) {
                             listTree.add(areaInfoAll);

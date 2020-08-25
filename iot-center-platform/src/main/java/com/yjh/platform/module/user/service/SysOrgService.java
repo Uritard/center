@@ -5,6 +5,7 @@ import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.dao.SysOrgDao;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,8 +87,41 @@ public class SysOrgService{
 
     @Logs(title = "根据组织机构名称模糊查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<OrgInfo> selectOrgTreeByOrgName(String orgName) {
-        List<OrgInfo> listTree = this.sysOrgDao.selectOrgTreeByOrgName(orgName);
+    public List<OrgInfo> selectOrgTreeByName(String orgName) {
+        List<OrgInfo> listTree = new ArrayList<>();
+        List<OrgInfo> listTreeAll = this.sysOrgDao.selectOrgTree();
+        if (Objects.equals(null, orgName) || orgName.equals("")) {
+            List<OrgInfo> orgInfoStartList = new ArrayList<>();
+            Integer level = 1;
+            for (OrgInfo orgInfo:listTreeAll) {
+                if (Objects.equals(orgInfo.getUpId(), null) || Objects.equals(orgInfo.getUpId(), "")) {
+                    orgInfo.setLevel(level);
+                    orgInfoStartList.add(orgInfo);
+                }
+            }
+            diGui(orgInfoStartList, listTreeAll, level);
+            return orgInfoStartList;
+        }
+
+        List<OrgInfo> listTreeByName = new ArrayList<>();
+        listTreeByName = this.sysOrgDao.selectOrgTreeByOrgName(orgName);
+        if (listTreeByName.size()>0) {
+            for (OrgInfo orgInfo : listTreeByName) {
+                listTree.add(orgInfo);
+                if (orgInfo.getUpId() != null) {
+                    Long orgInfoUpId = orgInfo.getUpId();
+                    System.out.println("orgInfoUpId: "+orgInfoUpId);
+                    for (OrgInfo orgInfoAll : listTreeAll) {
+                        if (Objects.equals(orgInfoUpId, orgInfoAll.getId())) {
+                            listTree.add(orgInfoAll);
+                            diGuiMoHu(orgInfoAll, listTreeAll, listTree);
+                        }
+                    }
+                }
+            }
+        }
+        listTree = listTree.stream().distinct().collect(Collectors.toList());
+        System.out.println("listTree: "+listTree);
         List<OrgInfo> orgInfoStartList = new ArrayList<>();
         Integer level = 1;
         for (OrgInfo orgInfo:listTree) {
@@ -98,6 +132,18 @@ public class SysOrgService{
         }
         diGui(orgInfoStartList, listTree, level);
         return orgInfoStartList;
+    }
+
+    private void diGuiMoHu(OrgInfo orgInfoAll, List<OrgInfo> listTreeAll, List<OrgInfo> listTree) {
+        if (orgInfoAll.getUpId() != null) {
+            Long orgInfoUpId = orgInfoAll.getUpId();
+            for (OrgInfo orgInfo : listTreeAll) {
+                if (Objects.equals(orgInfoUpId, orgInfo.getId())) {
+                    listTree.add(orgInfo);
+                    diGuiMoHu(orgInfo, listTreeAll, listTree);
+                }
+            }
+        }
     }
 
     private void diGui(List<OrgInfo> areaInfoList, List<OrgInfo> listTree, Integer level) {

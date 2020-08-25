@@ -59,7 +59,7 @@ public class TStdRegionService{
         return tStdRegionList;
     }
 
-    @Logs(title = "根据区域名称模糊查询区域树", code = "module")
+    @Logs(title = "根据区域名称模糊查询区域，非树形", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfoRegionCode> selectRegTreeByRegName(String regionName) {
         List<AreaInfoRegionCode> listTree = this.tStdRegionDao.selectRegTreeByRegName(regionName);

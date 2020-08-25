@@ -4,16 +4,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.service.SysOrgService;
 import com.yjh.platform.module.user.entity.SysOrg;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
+
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
@@ -161,11 +160,11 @@ public class SysOrgController {
     }
 
     @ApiOperation(value = "根据组织机构名称模糊查询")
-    @RequestMapping(value = "/selectOrgTreeByOrgName", method = RequestMethod.GET)
-    public Result selectOrgTreeByOrgName(@RequestParam(value = "orgName", required = false) String orgName) {
+    @RequestMapping(value = "/selectOrgTreeByName", method = RequestMethod.GET)
+    public Result selectOrgTreeByName(@RequestParam(value = "orgName", required = false) String orgName) {
         Result result = new Result();
         try {
-            result.setData(sysOrgService.selectOrgTreeByOrgName(orgName));
+            result.setData(sysOrgService.selectOrgTreeByName(orgName));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
