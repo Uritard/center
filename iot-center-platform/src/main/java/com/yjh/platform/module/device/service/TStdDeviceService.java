@@ -2,11 +2,14 @@ package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -25,6 +28,8 @@ public class TStdDeviceService{
 
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
 
     @Autowired
@@ -133,6 +138,63 @@ public class TStdDeviceService{
         diGui(areaInfoCountryList, listTree);
         return areaInfoCountryList;
 
+    }
+
+    @Logs(title = "区域树模糊查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfo> selectRegionTreeByName(String regionName) {
+        List<AreaInfo> listTree = new ArrayList<>();
+        List<AreaInfo> listTreeAll = this.tStdDeviceDao.selectDevTreeRegion();
+
+        List<AreaInfoRegionCode> listTreeByName = new ArrayList<>();
+        listTreeByName = tStdRegionDao.selectRegTreeByRegName(regionName);
+        if (listTreeByName.size()>0) {
+            for (AreaInfoRegionCode areaInfoRegionCode : listTreeByName) {
+                AreaInfo areaInfo = new AreaInfo();
+                areaInfo.setId(areaInfoRegionCode.getId());
+                areaInfo.setLabel(areaInfoRegionCode.getLabel());
+                areaInfo.setUpName(areaInfoRegionCode.getUpName());
+                areaInfo.setUpId(areaInfoRegionCode.getUpId());
+                areaInfo.setInfoType(areaInfoRegionCode.getInfoType());
+                listTree.add(areaInfo);
+                if (areaInfoRegionCode.getUpId() != null) {
+                    Long areaInfoRegionCodeUpId = areaInfoRegionCode.getUpId();
+                    for (AreaInfo areaInfoAll : listTreeAll) {
+                        if (Objects.equals(areaInfoAll.getId(), areaInfoRegionCodeUpId)) {
+                            listTree.add(areaInfoAll);
+                            diGuiMoHu(areaInfoAll, listTreeAll, listTree);
+                        }
+                    }
+                }
+            }
+            listTree = listTree.stream().distinct().collect(Collectors.toList());
+            System.out.println("listTree: "+listTree);
+            List<AreaInfo> areaInfoCountryList = new ArrayList<>();
+            for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
+                AreaInfo areaInfoMap = it.next();
+                if (Objects.equals(areaInfoMap.getUpId(), null)) {
+                    AreaInfo areaInfoCountry = new AreaInfo();
+                    areaInfoCountry.setId(areaInfoMap.getId());
+                    areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                    areaInfoCountryList.add(areaInfoCountry);
+                }
+            }
+            diGui(areaInfoCountryList, listTree);
+            return areaInfoCountryList;
+        } else {return listTree;}
+    }
+
+    private void diGuiMoHu(AreaInfo areaInfoAll, List<AreaInfo> listTreeAll, List<AreaInfo> listTree) {
+        if (areaInfoAll.getUpId() != null) {
+            Long areaInfoRegionCodeUpId = areaInfoAll.getUpId();
+            for (AreaInfo areaInfo : listTreeAll) {
+                if (Objects.equals(areaInfo.getId(), areaInfoRegionCodeUpId)) {
+                    listTree.add(areaInfo);
+                    diGuiMoHu(areaInfo, listTreeAll, listTree);
+                }
+            }
+        }
     }
 
     private void diGui(List<AreaInfo> areaInfoList, List<AreaInfo> listTree) {

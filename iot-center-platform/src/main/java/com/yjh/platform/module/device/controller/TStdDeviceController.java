@@ -180,6 +180,20 @@ public class TStdDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "区域树模糊查询")
+    @RequestMapping(value = "/selectRegionTreeByName", method = RequestMethod.GET)
+    public Result selectRegionTreeByName(@RequestParam(value = "regionName", required = false) String regionName) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = tStdDeviceService.selectRegionTreeByName(regionName);
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "根据ModelId查询")
     @RequestMapping(value = "/selectByModelId", method = RequestMethod.GET)
     public Result selectByModelId(@RequestParam(value = "modelId", required = false) Long modelId) {
