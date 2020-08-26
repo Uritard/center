@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.TStdMeteModel;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -43,4 +44,5 @@ public interface TStdMetemodelDetailDao {
     List<TStdMeteModelDetail> selectByPage(TStdMeteModelDetail tStdMeteModelDetail);
 
     int batchAdd(List<TStdMeteModelDetail> list);
+
 }

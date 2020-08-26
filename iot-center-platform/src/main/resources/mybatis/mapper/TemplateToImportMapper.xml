@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TemplateToImportDao">
+
+    <!--测点模板导入-->
+        <insert id="batchUpdateTStdMeteModel">
+            insert  into t_std_metemodel(
+                model_id,
+                model_name,
+                device_type,
+                remark
+            ) values
+            <foreach collection="tStdMeteModelList" item="TStdMeteModel" separator=",">
+                (
+                null,
+                #{TStdMeteModel.modelName, jdbcType=VARCHAR},
+                #{TStdMeteModel.deviceType, jdbcType=INTEGER},
+                #{TStdMeteModel.remark, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--测点模板详细导入-->
+        <insert id="batchUpdateTStdMeteModelDetail">
+        insert into t_std_metemodel_detail(
+            model_id,
+            mete_id,
+            custom_type,
+            mete_code,
+            mete_name,
+            mete_type,
+            unit,
+            alarm_note,
+            alarm_explain,
+            alarm_type,
+            up_effect,
+            low_effect,
+            alarm_level,
+            high_limit1,
+            low_limit1,
+            high_limit2,
+            low_limit2,
+            alarm_delay,
+            alarm_cnt,
+            threshold_abs,
+            threshold_per,
+            modulus
+        ) values
+        <foreach collection="tStdMeteModelDetailList" item="TStdMeteModelDetail" separator=",">
+            (
+            #{TStdMeteModelDetail.modelId, jdbcType=BIGINT},
+            #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
+            #{TStdMeteModelDetail.customType, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.meteCode, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.unit, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmNote, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmExplain, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.upEffect, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowEffect, jdbcType=REAL},
+            #{TStdMeteModelDetail.alarmLevel, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.highLimit1, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.alarmDelay, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.alarmCnt, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
+            #{TStdMeteModelDetail.thresholdPer, jdbcType=NUMERIC},
+            #{TStdMeteModelDetail.modulus, jdbcType=INTEGER}
+            )
+        </foreach>
+        </insert>
+
+        <!--获取最后一条数据的modelid-->
+        <select id="selectLastModelId" resultType="java.lang.Long">
+            select model_id from t_std_metemodel order by model_id DESC limit 1;
+        </select>
+
+</mapper>
