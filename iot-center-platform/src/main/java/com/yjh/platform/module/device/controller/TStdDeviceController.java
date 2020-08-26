@@ -165,7 +165,7 @@ public class TStdDeviceController {
         return result;
     }
 
-    @ApiOperation(value = "设备树查询(区域-间隔5-设备6-部位7,所有设备all-设备dev-摄像头camera)")
+    @ApiOperation(value = "设备树查询(区域-间隔5-设备6-部位7,所有设备all-设备dev-摄像头camera-机器人-robot)")
     @RequestMapping(value = "/selectDevTree", method = RequestMethod.GET)
     public Result selectDevTree(@RequestParam(value = "level", required = true) String level,
                                     @RequestParam(value = "deviceShow", required = true) String deviceShow) {

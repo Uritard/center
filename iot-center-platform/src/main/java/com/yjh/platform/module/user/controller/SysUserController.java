@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import io.swagger.annotations.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -43,6 +44,8 @@ public class SysUserController {
     private UserManager userManager;
 
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public SysUserController(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
@@ -250,7 +253,15 @@ public class SysUserController {
                 if (sysUserLogin.getUserId() != null) {
                     if (sysUserLogin.getState()==2) {result.setData("账号锁定！");}
                     if (sysUserLogin.getState()==0) {result.setData("账号删除！");}
-                    if (sysUserLogin.getState()==1) {result.setData(sysUserLogin);}
+                    if (sysUserLogin.getState()==1) {
+                        result.setData(sysUserLogin);
+                        String userId = String.valueOf(sysUserLogin.getUserId());
+                        Map<String, String> map = new HashMap<>();
+                        map.put(userId, "0");
+//                        redisTemplate.opsForSet().add("accout_lock_times", map);
+                        redisTemplate.opsForHash().put("redisHash","class","6");
+//                        redisTemplate.opsForHash().putAll("accout_lock_times", map);
+                    }
                 } else {
                     Map<String, Integer> map = new HashMap<>();
                     map.put("code", ResultCodeEnum.CODE10101.getCode());
@@ -260,6 +271,14 @@ public class SysUserController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
             log.error("根据密码登录失败:", e);
+            SysUser sysUser = this.sysUserService.selectByUserName(userMap.get("userName")).get(0);
+            String accout_lock_times = String.valueOf(redisTemplate.opsForHash().get("accout_lock_times", sysUser.getUserId()));
+            accout_lock_times +=1;
+            redisTemplate.opsForHash().put("accout_lock_times", sysUser.getUserId(), accout_lock_times);
+            if (Integer.parseInt(accout_lock_times)>=3) {
+                sysUser.setState(2);
+                this.sysUserService.update(sysUser);
+            }
         }
         return result;
     }

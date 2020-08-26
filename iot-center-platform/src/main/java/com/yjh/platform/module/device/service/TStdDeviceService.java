@@ -79,7 +79,7 @@ public class TStdDeviceService{
         return this.tStdDeviceDao.selectRegionById(deviceId);
     }
 
-    @Logs(title = "设备树查询(区域-间隔5-设备6-部位7,所有设备all-设备dev-摄像头camera)", code = "module")
+    @Logs(title = "设备树查询(区域-间隔5-设备6-部位7,所有设备all-设备dev-摄像头camera-机器人-robot)", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectDevTree(String level, String deviceShow) {
         List<AreaInfo> listTree = new ArrayList<>();
@@ -107,6 +107,14 @@ public class TStdDeviceService{
                     break;
                 default:
                     throw new BusinessException("设备类型输入有误！");
+            }
+        } else if (Objects.equals(deviceShow, "robot")) {
+            switch (level) {
+                case "6":
+                    listTree = this.tStdDeviceDao.selectRobotTree();
+                    break;
+                default:
+                    throw new BusinessException("类型输入有误！");
             }
         } else if (Objects.equals(deviceShow, "all")) {
             switch (level) {
