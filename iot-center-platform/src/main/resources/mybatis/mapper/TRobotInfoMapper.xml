@@ -5,6 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TRobotInfo">
         <id column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
         <result column="robot_name" jdbcType="VARCHAR" property="robotName" />
         <result column="robot_status" jdbcType="VARCHAR" property="robotStatus" />
         <result column="robot_type" jdbcType="INTEGER" property="robotType" />
@@ -23,17 +24,25 @@
         <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
         <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
         <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="robot_factory" jdbcType="VARCHAR" property="robotFactory" />
+        <result column="is_use" jdbcType="VARCHAR" property="isUse" />
+        <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
+        <result column="upregionId" jdbcType="BIGINT" property="upregionId" />
+        <result column="robotPosition" jdbcType="VARCHAR" property="robotPosition" />
         <result column="remarks" jdbcType="VARCHAR" property="remarks" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, remarks
+        robot_id, robot_code, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password,
+        lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date,
+        robot_factory, is_use, commission_date, up_region_id, robot_position, remarks
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="robotId" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
         insert into t_robot_info(
+            robot_code,
             robot_name,
             robot_status,
             robot_type,
@@ -52,8 +61,14 @@
             create_date,
             update_by,
             update_date,
+            robot_factory,
+            is_use,
+            commission_date,
+            up_region_id,
+            robot_position,
             remarks
         )values(
+                #{robotCode, jdbcType=VARCHAR},
                 #{robotName, jdbcType=VARCHAR},
                 #{robotStatus, jdbcType=VARCHAR},
                 #{robotType, jdbcType=INTEGER},
@@ -69,9 +84,14 @@
                 #{inferadPassword, jdbcType=VARCHAR},
                 #{photePath, jdbcType=VARCHAR},
                 #{createBy, jdbcType=VARCHAR},
-                #{createDate, jdbcType=TIMESTAMP},
+                NOW(),
                 #{updateBy, jdbcType=VARCHAR},
                 #{updateDate, jdbcType=TIMESTAMP},
+                #{robotFactory, jdbcType=VARCHAR},
+                #{isUse, jdbcType=VARCHAR},
+                #{commissionDate, jdbcType=TIMESTAMP},
+                #{upregionId, jdbcType=BIGINT},
+                #{robotPosition, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR}
         )
     </insert>
@@ -102,6 +122,7 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
         update t_robot_info a <set>
         <if test="robotId != null and robotId != ''"> a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="robotCode != null and robotCode != ''"> a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
         <if test="robotName != null and robotName != ''">a.robot_name = #{robotName, jdbcType=VARCHAR},</if>
         <if test="robotStatus != null and robotStatus != ''">a.robot_status = #{robotStatus, jdbcType=VARCHAR},</if>
         <if test="robotType != null and robotType != ''">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
@@ -119,7 +140,12 @@
         <if test="createBy != null and createBy != ''">a.create_by = #{createBy, jdbcType=VARCHAR},</if>
         <if test="createDate != null">a.create_date = #{createDate, jdbcType=TIMESTAMP},</if>
         <if test="updateBy != null and updateBy != ''">a.update_by = #{updateBy, jdbcType=VARCHAR},</if>
-        <if test="updateDate != null">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
+        a.update_date = NOW(),
+        <if test="robotFactory != null and robotFactory !=''">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
+        <if test="isUse != null and isUse !=''">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
+        <if test="commissionDate != null and commissionDate !=''">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
+        <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
@@ -128,6 +154,7 @@
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
         a.robot_id,
+        a.robot_code,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -146,6 +173,11 @@
         a.create_date,
         a.update_by,
         a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
         a.remarks
         from t_robot_info a
         where 1 = 1
@@ -156,6 +188,7 @@
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
         a.robot_id,
+        a.robot_code,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -174,10 +207,16 @@
         a.create_date,
         a.update_by,
         a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
         a.remarks
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
@@ -196,12 +235,18 @@
         <if test="createDate != null"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
+        <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
+        <if test="isRse != null">a.is_use = #{isRse, jdbcType=VARCHAR},</if>
+        <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
+        <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
         a.robot_id,
+        a.robot_code,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -220,10 +265,16 @@
         a.create_date,
         a.update_by,
         a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
         a.remarks
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
@@ -242,11 +293,17 @@
         <if test="createDate != null"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
+        <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
+        <if test="isRse != null">a.is_use = #{isRse, jdbcType=VARCHAR},</if>
+        <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
+        <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
         insert into t_robot_info(
+        robot_code,
             robot_name,
             robot_status,
             robot_type,
@@ -265,10 +322,16 @@
             create_date,
             update_by,
             update_date,
+            robot_factory,
+            is_use,
+            commission_date,
+            up_region_id,
+            robot_position,
             remarks
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
             (
+            #{TRobotInfo.robotCode, jdbcType=VARCHAR},
                 #{TRobotInfo.robotName, jdbcType=VARCHAR},
                 #{TRobotInfo.robotStatus, jdbcType=VARCHAR},
                 #{TRobotInfo.robotType, jdbcType=INTEGER},
@@ -284,9 +347,14 @@
                 #{TRobotInfo.inferadPassword, jdbcType=VARCHAR},
                 #{TRobotInfo.photePath, jdbcType=VARCHAR},
                 #{TRobotInfo.createBy, jdbcType=VARCHAR},
-                #{TRobotInfo.createDate, jdbcType=TIMESTAMP},
+                NOW(),
                 #{TRobotInfo.updateBy, jdbcType=VARCHAR},
                 #{TRobotInfo.updateDate, jdbcType=TIMESTAMP},
+                #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
+                #{TRobotInfo.isRse, jdbcType=VARCHAR},
+                #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
+                #{TRobotInfo.upregionId, jdbcType=BIGINT},
+                #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
                 #{TRobotInfo.remarks, jdbcType=VARCHAR}
             )
         </foreach>
