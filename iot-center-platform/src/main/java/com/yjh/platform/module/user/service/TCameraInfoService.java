@@ -4,7 +4,13 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
 import java.util.List;
+<<<<<<< Updated upstream
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+=======
+
+import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+
+>>>>>>> Stashed changes
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;

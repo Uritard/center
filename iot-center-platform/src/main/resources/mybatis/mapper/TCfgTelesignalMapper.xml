@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCfgTelesignalDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        <id column="device_id" jdbcType="VARCHAR" property="deviceId" />
+        <result column="mete_id" jdbcType="VARCHAR" property="meteId" />
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
+        <result column="up_effect" jdbcType="INTEGER" property="upEffect" />
+        <result column="low_effect" jdbcType="INTEGER" property="lowEffect" />
+        <result column="mete_index" jdbcType="INTEGER" property="meteIndex" />
+        <result column="mete_cid" jdbcType="INTEGER" property="meteCid" />
+        <result column="signal_kind" jdbcType="INTEGER" property="signalKind" />
+        <result column="last_value" jdbcType="INTEGER" property="lastValue" />
+        <result column="last_time" jdbcType="TIMESTAMP" property="lastTime" />
+        <result column="explain_type" jdbcType="INTEGER" property="explainType" />
+        <result column="report_type" jdbcType="INTEGER" property="reportType" />
+        <result column="report_level" jdbcType="INTEGER" property="reportLevel" />
+        <result column="mask_type" jdbcType="INTEGER" property="maskType" />
+        <result column="mask_mid" jdbcType="VARCHAR" property="maskMid" />
+        <result column="mask_string" jdbcType="VARCHAR" property="maskString" />
+        <result column="mask_value" jdbcType="INTEGER" property="maskValue" />
+        <result column="delay_time" jdbcType="INTEGER" property="delayTime" />
+        <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="isshield" jdbcType="INTEGER" property="isshield" />
+        <result column="storageperiod" jdbcType="BIGINT" property="storageperiod" />
+        <result column="describer" jdbcType="VARCHAR" property="describer" />
+        <result column="alarmthresbhold" jdbcType="INTEGER" property="alarmthresbhold" />
+        <result column="alarmlevel" jdbcType="INTEGER" property="alarmlevel" />
+        <result column="link_mete_id" jdbcType="VARCHAR" property="linkMeteId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_id, mete_id, mete_name, up_effect, low_effect, mete_index, mete_cid, signal_kind, last_value, last_time, explain_type, report_type, report_level, mask_type, mask_mid, mask_string, mask_value, delay_time, mete_code, device_type, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, link_mete_id
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        insert into t_cfg_telesignal(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_index,
+            mete_cid,
+            signal_kind,
+            last_value,
+            last_time,
+            explain_type,
+            report_type,
+            report_level,
+            mask_type,
+            mask_mid,
+            mask_string,
+            mask_value,
+            delay_time,
+            mete_code,
+            device_type,
+            description,
+            isshield,
+            storageperiod,
+            describer,
+            alarmthresbhold,
+            alarmlevel,
+            link_mete_id
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=INTEGER},
+                #{lowEffect, jdbcType=INTEGER},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{signalKind, jdbcType=INTEGER},
+                #{lastValue, jdbcType=INTEGER},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{explainType, jdbcType=INTEGER},
+                #{reportType, jdbcType=INTEGER},
+                #{reportLevel, jdbcType=INTEGER},
+                #{maskType, jdbcType=INTEGER},
+                #{maskMid, jdbcType=VARCHAR},
+                #{maskString, jdbcType=VARCHAR},
+                #{maskValue, jdbcType=INTEGER},
+                #{delayTime, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{isshield, jdbcType=INTEGER},
+                #{storageperiod, jdbcType=BIGINT},
+                #{describer, jdbcType=VARCHAR},
+                #{alarmthresbhold, jdbcType=INTEGER},
+                #{alarmlevel, jdbcType=INTEGER},
+                #{linkMeteId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cfg_telesignal
+                where device_id = #{deviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        update t_cfg_telesignal a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
+        <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=INTEGER},</if>
+        <if test="meteIndex != null and meteIndex != ''">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null and meteCid != ''">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="signalKind != null and signalKind != ''">a.signal_kind = #{signalKind, jdbcType=INTEGER},</if>
+        <if test="lastValue != null and lastValue != ''">a.last_value = #{lastValue, jdbcType=INTEGER},</if>
+        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
+        <if test="explainType != null and explainType != ''">a.explain_type = #{explainType, jdbcType=INTEGER},</if>
+        <if test="reportType != null and reportType != ''">a.report_type = #{reportType, jdbcType=INTEGER},</if>
+        <if test="reportLevel != null and reportLevel != ''">a.report_level = #{reportLevel, jdbcType=INTEGER},</if>
+        <if test="maskType != null and maskType != ''">a.mask_type = #{maskType, jdbcType=INTEGER},</if>
+        <if test="maskMid != null and maskMid != ''">a.mask_mid = #{maskMid, jdbcType=VARCHAR},</if>
+        <if test="maskString != null and maskString != ''">a.mask_string = #{maskString, jdbcType=VARCHAR},</if>
+        <if test="maskValue != null and maskValue != ''">a.mask_value = #{maskValue, jdbcType=INTEGER},</if>
+        <if test="delayTime != null and delayTime != ''">a.delay_time = #{delayTime, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="isshield != null and isshield != ''">a.isshield = #{isshield, jdbcType=INTEGER},</if>
+        <if test="storageperiod != null and storageperiod != ''">a.storageperiod = #{storageperiod, jdbcType=BIGINT},</if>
+        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+        <if test="alarmthresbhold != null and alarmthresbhold != ''">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
+        <if test="alarmlevel != null and alarmlevel != ''">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
+        <if test="linkMeteId != null and linkMeteId != ''">a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR},</if>
+    </set>
+            where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_index,
+        a.mete_cid,
+        a.signal_kind,
+        a.last_value,
+        a.last_time,
+        a.explain_type,
+        a.report_type,
+        a.report_level,
+        a.mask_type,
+        a.mask_mid,
+        a.mask_string,
+        a.mask_value,
+        a.delay_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.isshield,
+        a.storageperiod,
+        a.describer,
+        a.alarmthresbhold,
+        a.alarmlevel,
+        a.link_mete_id
+        from t_cfg_telesignal a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCfgTelesignal" resultType="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_index,
+        a.mete_cid,
+        a.signal_kind,
+        a.last_value,
+        a.last_time,
+        a.explain_type,
+        a.report_type,
+        a.report_level,
+        a.mask_type,
+        a.mask_mid,
+        a.mask_string,
+        a.mask_value,
+        a.delay_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.isshield,
+        a.storageperiod,
+        a.describer,
+        a.alarmthresbhold,
+        a.alarmlevel,
+        a.link_mete_id
+        from t_cfg_telesignal a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
+        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="signalKind != null and signalKind != ''"> and a.signal_kind = #{signalKind, jdbcType=INTEGER}</if>
+        <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=INTEGER}</if>
+        <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
+        <if test="explainType != null and explainType != ''"> and a.explain_type = #{explainType, jdbcType=INTEGER}</if>
+        <if test="reportType != null and reportType != ''"> and a.report_type = #{reportType, jdbcType=INTEGER}</if>
+        <if test="reportLevel != null and reportLevel != ''"> and a.report_level = #{reportLevel, jdbcType=INTEGER}</if>
+        <if test="maskType != null and maskType != ''"> and a.mask_type = #{maskType, jdbcType=INTEGER}</if>
+        <if test="maskMid != null and maskMid != ''"> and a.mask_mid = #{maskMid, jdbcType=VARCHAR}</if>
+        <if test="maskString != null and maskString != ''"> and a.mask_string = #{maskString, jdbcType=VARCHAR}</if>
+        <if test="maskValue != null and maskValue != ''"> and a.mask_value = #{maskValue, jdbcType=INTEGER}</if>
+        <if test="delayTime != null and delayTime != ''"> and a.delay_time = #{delayTime, jdbcType=INTEGER}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="isshield != null and isshield != ''"> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
+        <if test="storageperiod != null and storageperiod != ''"> and a.storageperiod = #{storageperiod, jdbcType=BIGINT}</if>
+        <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
+        <if test="alarmthresbhold != null and alarmthresbhold != ''"> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
+        <if test="alarmlevel != null and alarmlevel != ''"> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
+        <if test="linkMeteId != null and linkMeteId != ''"> and a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgTelesignal" resultType="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_index,
+        a.mete_cid,
+        a.signal_kind,
+        a.last_value,
+        a.last_time,
+        a.explain_type,
+        a.report_type,
+        a.report_level,
+        a.mask_type,
+        a.mask_mid,
+        a.mask_string,
+        a.mask_value,
+        a.delay_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.isshield,
+        a.storageperiod,
+        a.describer,
+        a.alarmthresbhold,
+        a.alarmlevel,
+        a.link_mete_id
+        from t_cfg_telesignal a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
+        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="signalKind != null and signalKind != ''"> and a.signal_kind = #{signalKind, jdbcType=INTEGER}</if>
+        <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=INTEGER}</if>
+        <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
+        <if test="explainType != null and explainType != ''"> and a.explain_type = #{explainType, jdbcType=INTEGER}</if>
+        <if test="reportType != null and reportType != ''"> and a.report_type = #{reportType, jdbcType=INTEGER}</if>
+        <if test="reportLevel != null and reportLevel != ''"> and a.report_level = #{reportLevel, jdbcType=INTEGER}</if>
+        <if test="maskType != null and maskType != ''"> and a.mask_type = #{maskType, jdbcType=INTEGER}</if>
+        <if test="maskMid != null and maskMid != ''"> and a.mask_mid = #{maskMid, jdbcType=VARCHAR}</if>
+        <if test="maskString != null and maskString != ''"> and a.mask_string = #{maskString, jdbcType=VARCHAR}</if>
+        <if test="maskValue != null and maskValue != ''"> and a.mask_value = #{maskValue, jdbcType=INTEGER}</if>
+        <if test="delayTime != null and delayTime != ''"> and a.delay_time = #{delayTime, jdbcType=INTEGER}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="isshield != null and isshield != ''"> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
+        <if test="storageperiod != null and storageperiod != ''"> and a.storageperiod = #{storageperiod, jdbcType=BIGINT}</if>
+        <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
+        <if test="alarmthresbhold != null and alarmthresbhold != ''"> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
+        <if test="alarmlevel != null and alarmlevel != ''"> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
+        <if test="linkMeteId != null and linkMeteId != ''"> and a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_telesignal(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_index,
+            mete_cid,
+            signal_kind,
+            last_value,
+            last_time,
+            explain_type,
+            report_type,
+            report_level,
+            mask_type,
+            mask_mid,
+            mask_string,
+            mask_value,
+            delay_time,
+            mete_code,
+            device_type,
+            description,
+            isshield,
+            storageperiod,
+            describer,
+            alarmthresbhold,
+            alarmlevel,
+            link_mete_id
+        )values
+        <foreach collection="list" item="TCfgTelesignal" separator=",">
+            (
+                #{TCfgTelesignal.deviceId, jdbcType=VARCHAR},
+                #{TCfgTelesignal.meteId, jdbcType=VARCHAR},
+                #{TCfgTelesignal.meteName, jdbcType=VARCHAR},
+                #{TCfgTelesignal.upEffect, jdbcType=INTEGER},
+                #{TCfgTelesignal.lowEffect, jdbcType=INTEGER},
+                #{TCfgTelesignal.meteIndex, jdbcType=INTEGER},
+                #{TCfgTelesignal.meteCid, jdbcType=INTEGER},
+                #{TCfgTelesignal.signalKind, jdbcType=INTEGER},
+                #{TCfgTelesignal.lastValue, jdbcType=INTEGER},
+                #{TCfgTelesignal.lastTime, jdbcType=TIMESTAMP},
+                #{TCfgTelesignal.explainType, jdbcType=INTEGER},
+                #{TCfgTelesignal.reportType, jdbcType=INTEGER},
+                #{TCfgTelesignal.reportLevel, jdbcType=INTEGER},
+                #{TCfgTelesignal.maskType, jdbcType=INTEGER},
+                #{TCfgTelesignal.maskMid, jdbcType=VARCHAR},
+                #{TCfgTelesignal.maskString, jdbcType=VARCHAR},
+                #{TCfgTelesignal.maskValue, jdbcType=INTEGER},
+                #{TCfgTelesignal.delayTime, jdbcType=INTEGER},
+                #{TCfgTelesignal.meteCode, jdbcType=VARCHAR},
+                #{TCfgTelesignal.deviceType, jdbcType=VARCHAR},
+                #{TCfgTelesignal.description, jdbcType=VARCHAR},
+                #{TCfgTelesignal.isshield, jdbcType=INTEGER},
+                #{TCfgTelesignal.storageperiod, jdbcType=BIGINT},
+                #{TCfgTelesignal.describer, jdbcType=VARCHAR},
+                #{TCfgTelesignal.alarmthresbhold, jdbcType=INTEGER},
+                #{TCfgTelesignal.alarmlevel, jdbcType=INTEGER},
+                #{TCfgTelesignal.linkMeteId, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

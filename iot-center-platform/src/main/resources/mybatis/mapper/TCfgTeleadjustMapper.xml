@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCfgTeleadjustDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        <id column="device_id" jdbcType="VARCHAR" property="deviceId" />
+        <result column="mete_id" jdbcType="VARCHAR" property="meteId" />
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
+        <result column="up_effect" jdbcType="REAL" property="upEffect" />
+        <result column="low_effect" jdbcType="REAL" property="lowEffect" />
+        <result column="mete_precision" jdbcType="INTEGER" property="metePrecision" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+        <result column="mete_index" jdbcType="INTEGER" property="meteIndex" />
+        <result column="mete_cid" jdbcType="INTEGER" property="meteCid" />
+        <result column="adjust_kind" jdbcType="INTEGER" property="adjustKind" />
+        <result column="last_value" jdbcType="REAL" property="lastValue" />
+        <result column="last_time" jdbcType="TIMESTAMP" property="lastTime" />
+        <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="stander" jdbcType="REAL" property="stander" />
+        <result column="controlenable" jdbcType="INTEGER" property="controlenable" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_id, mete_id, mete_name, up_effect, low_effect, mete_precision, unit, mete_index, mete_cid, adjust_kind, last_value, last_time, mete_code, device_type, description, stander, controlenable
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        insert into t_cfg_teleadjust(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            adjust_kind,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            stander,
+            controlenable
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=REAL},
+                #{lowEffect, jdbcType=REAL},
+                #{metePrecision, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{adjustKind, jdbcType=INTEGER},
+                #{lastValue, jdbcType=REAL},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{stander, jdbcType=REAL},
+                #{controlenable, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cfg_teleadjust
+                where device_id = #{deviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        update t_cfg_teleadjust a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
+        <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=REAL},</if>
+        <if test="metePrecision != null and metePrecision != ''">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="meteIndex != null and meteIndex != ''">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null and meteCid != ''">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="adjustKind != null and adjustKind != ''">a.adjust_kind = #{adjustKind, jdbcType=INTEGER},</if>
+        <if test="lastValue != null and lastValue != ''">a.last_value = #{lastValue, jdbcType=REAL},</if>
+        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
+        <if test="controlenable != null and controlenable != ''">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
+    </set>
+            where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_precision,
+        a.unit,
+        a.mete_index,
+        a.mete_cid,
+        a.adjust_kind,
+        a.last_value,
+        a.last_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.stander,
+        a.controlenable
+        from t_cfg_teleadjust a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCfgTeleadjust" resultType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_precision,
+        a.unit,
+        a.mete_index,
+        a.mete_cid,
+        a.adjust_kind,
+        a.last_value,
+        a.last_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.stander,
+        a.controlenable
+        from t_cfg_teleadjust a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
+        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
+        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="adjustKind != null and adjustKind != ''"> and a.adjust_kind = #{adjustKind, jdbcType=INTEGER}</if>
+        <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=REAL}</if>
+        <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
+        <if test="controlenable != null and controlenable != ''"> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgTeleadjust" resultType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_precision,
+        a.unit,
+        a.mete_index,
+        a.mete_cid,
+        a.adjust_kind,
+        a.last_value,
+        a.last_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.stander,
+        a.controlenable
+        from t_cfg_teleadjust a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
+        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
+        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="adjustKind != null and adjustKind != ''"> and a.adjust_kind = #{adjustKind, jdbcType=INTEGER}</if>
+        <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=REAL}</if>
+        <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
+        <if test="controlenable != null and controlenable != ''"> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_teleadjust(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            adjust_kind,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            stander,
+            controlenable
+        )values
+        <foreach collection="list" item="TCfgTeleadjust" separator=",">
+            (
+                #{TCfgTeleadjust.deviceId, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.meteId, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.meteName, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.upEffect, jdbcType=REAL},
+                #{TCfgTeleadjust.lowEffect, jdbcType=REAL},
+                #{TCfgTeleadjust.metePrecision, jdbcType=INTEGER},
+                #{TCfgTeleadjust.unit, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.meteIndex, jdbcType=INTEGER},
+                #{TCfgTeleadjust.meteCid, jdbcType=INTEGER},
+                #{TCfgTeleadjust.adjustKind, jdbcType=INTEGER},
+                #{TCfgTeleadjust.lastValue, jdbcType=REAL},
+                #{TCfgTeleadjust.lastTime, jdbcType=TIMESTAMP},
+                #{TCfgTeleadjust.meteCode, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.deviceType, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.description, jdbcType=VARCHAR},
+                #{TCfgTeleadjust.stander, jdbcType=REAL},
+                #{TCfgTeleadjust.controlenable, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

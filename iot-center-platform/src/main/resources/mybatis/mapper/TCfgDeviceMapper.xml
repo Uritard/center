@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCfgDeviceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCfgDevice">
+        <id column="device_id" jdbcType="VARCHAR" property="deviceId" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+        <result column="logical_type" jdbcType="VARCHAR" property="logicalType" />
+        <result column="project_id" jdbcType="BIGINT" property="projectId" />
+        <result column="relation_code" jdbcType="VARCHAR" property="relationCode" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_id, device_name, device_type, device_code, logical_type, project_id, relation_code, create_time, update_time, remark
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgDevice">
+        insert into t_cfg_device(
+            device_id,
+            device_name,
+            device_type,
+            device_code,
+            logical_type,
+            project_id,
+            relation_code,
+            create_time,
+            update_time,
+            remark
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{deviceName, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{deviceCode, jdbcType=VARCHAR},
+                #{logicalType, jdbcType=VARCHAR},
+                #{projectId, jdbcType=BIGINT},
+                #{relationCode, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{updateTime, jdbcType=TIMESTAMP},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cfg_device
+                where device_id = #{deviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgDevice">
+        update t_cfg_device a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="deviceName != null and deviceName != ''">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
+        <if test="logicalType != null and logicalType != ''">a.logical_type = #{logicalType, jdbcType=VARCHAR},</if>
+        <if test="projectId != null and projectId != ''">a.project_id = #{projectId, jdbcType=BIGINT},</if>
+        <if test="relationCode != null and relationCode != ''">a.relation_code = #{relationCode, jdbcType=VARCHAR},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+            where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgDevice">
+        select
+        a.device_id,
+        a.device_name,
+        a.device_type,
+        a.device_code,
+        a.logical_type,
+        a.project_id,
+        a.relation_code,
+        a.create_time,
+        a.update_time,
+        a.remark
+        from t_cfg_device a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCfgDevice" resultType="com.yjh.platform.module.device.entity.TCfgDevice">
+        select
+        a.device_id,
+        a.device_name,
+        a.device_type,
+        a.device_code,
+        a.logical_type,
+        a.project_id,
+        a.relation_code,
+        a.create_time,
+        a.update_time,
+        a.remark
+        from t_cfg_device a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="logicalType != null and logicalType != ''"> and a.logical_type = #{logicalType, jdbcType=VARCHAR}</if>
+        <if test="projectId != null and projectId != ''"> and a.project_id = #{projectId, jdbcType=BIGINT}</if>
+        <if test="relationCode != null and relationCode != ''"> and a.relation_code = #{relationCode, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgDevice" resultType="com.yjh.platform.module.device.entity.TCfgDevice">
+        select
+        a.device_id,
+        a.device_name,
+        a.device_type,
+        a.device_code,
+        a.logical_type,
+        a.project_id,
+        a.relation_code,
+        a.create_time,
+        a.update_time,
+        a.remark
+        from t_cfg_device a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="logicalType != null and logicalType != ''"> and a.logical_type = #{logicalType, jdbcType=VARCHAR}</if>
+        <if test="projectId != null and projectId != ''"> and a.project_id = #{projectId, jdbcType=BIGINT}</if>
+        <if test="relationCode != null and relationCode != ''"> and a.relation_code = #{relationCode, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_device(
+            device_id,
+            device_name,
+            device_type,
+            device_code,
+            logical_type,
+            project_id,
+            relation_code,
+            create_time,
+            update_time,
+            remark
+        )values
+        <foreach collection="list" item="TCfgDevice" separator=",">
+            (
+                #{TCfgDevice.deviceId, jdbcType=VARCHAR},
+                #{TCfgDevice.deviceName, jdbcType=VARCHAR},
+                #{TCfgDevice.deviceType, jdbcType=VARCHAR},
+                #{TCfgDevice.deviceCode, jdbcType=VARCHAR},
+                #{TCfgDevice.logicalType, jdbcType=VARCHAR},
+                #{TCfgDevice.projectId, jdbcType=BIGINT},
+                #{TCfgDevice.relationCode, jdbcType=VARCHAR},
+                #{TCfgDevice.createTime, jdbcType=TIMESTAMP},
+                #{TCfgDevice.updateTime, jdbcType=TIMESTAMP},
+                #{TCfgDevice.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertIntoTeleadjust" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
+        insert into t_cfg_teleadjust(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            adjust_kind,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            stander,
+            controlenable
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=REAL},
+                #{lowEffect, jdbcType=REAL},
+                #{metePrecision, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{adjustKind, jdbcType=INTEGER},
+                #{lastValue, jdbcType=REAL},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{stander, jdbcType=REAL},
+                #{controlenable, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <insert id="insertIntoTelecontrol" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        insert into t_cfg_telecontrol(
+            device_id,
+            mete_id,
+            mete_name,
+            mete_index,
+            mete_cid,
+            control_status,
+            enable_string,
+            succeed_string,
+            trigger_string,
+            control_value,
+            mete_code,
+            device_type,
+            description,
+            describer
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{controlStatus, jdbcType=INTEGER},
+                #{enableString, jdbcType=VARCHAR},
+                #{succeedString, jdbcType=VARCHAR},
+                #{triggerString, jdbcType=VARCHAR},
+                #{controlValue, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{describer, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="insertIntoTelemeter" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        insert into t_cfg_telemeter(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            limit_band,
+            change_limit,
+            valid_mid,
+            valid_string,
+            invalid_value,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            hilimit1,
+            lolimit1,
+            hilimit2,
+            lolimit2,
+            hilimit3,
+            lolimit3,
+            hilimit4,
+            lolimit4,
+            stander,
+            isshield,
+            storageperiod,
+            link_mete_id
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=REAL},
+                #{lowEffect, jdbcType=REAL},
+                #{metePrecision, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{limitBand, jdbcType=REAL},
+                #{changeLimit, jdbcType=REAL},
+                #{validMid, jdbcType=VARCHAR},
+                #{validString, jdbcType=VARCHAR},
+                #{invalidValue, jdbcType=REAL},
+                #{lastValue, jdbcType=REAL},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{hilimit1, jdbcType=REAL},
+                #{lolimit1, jdbcType=REAL},
+                #{hilimit2, jdbcType=REAL},
+                #{lolimit2, jdbcType=REAL},
+                #{hilimit3, jdbcType=REAL},
+                #{lolimit3, jdbcType=REAL},
+                #{hilimit4, jdbcType=REAL},
+                #{lolimit4, jdbcType=REAL},
+                #{stander, jdbcType=REAL},
+                #{isshield, jdbcType=INTEGER},
+                #{storageperiod, jdbcType=BIGINT},
+                #{linkMeteId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="insertIntoTelesignal" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTelesignal">
+        insert into t_cfg_telesignal(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_index,
+            mete_cid,
+            signal_kind,
+            last_value,
+            last_time,
+            explain_type,
+            report_type,
+            report_level,
+            mask_type,
+            mask_mid,
+            mask_string,
+            mask_value,
+            delay_time,
+            mete_code,
+            device_type,
+            description,
+            isshield,
+            storageperiod,
+            describer,
+            alarmthresbhold,
+            alarmlevel,
+            link_mete_id
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=INTEGER},
+                #{lowEffect, jdbcType=INTEGER},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{signalKind, jdbcType=INTEGER},
+                #{lastValue, jdbcType=INTEGER},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{explainType, jdbcType=INTEGER},
+                #{reportType, jdbcType=INTEGER},
+                #{reportLevel, jdbcType=INTEGER},
+                #{maskType, jdbcType=INTEGER},
+                #{maskMid, jdbcType=VARCHAR},
+                #{maskString, jdbcType=VARCHAR},
+                #{maskValue, jdbcType=INTEGER},
+                #{delayTime, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{isshield, jdbcType=INTEGER},
+                #{storageperiod, jdbcType=BIGINT},
+                #{describer, jdbcType=VARCHAR},
+                #{alarmthresbhold, jdbcType=INTEGER},
+                #{alarmlevel, jdbcType=INTEGER},
+                #{linkMeteId, jdbcType=VARCHAR}
+        )
+    </insert>
+</mapper>

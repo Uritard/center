@@ -272,7 +272,7 @@ public class TCruisePointInstanceService{
 
     @Logs(title = "遥调量测点关联摄像头预置位巡检实例",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int teleadjuslUnionTCPreset(List<Map<String,String> > list){
+    public int teleadjustUnionTCPreset(List<Map<String,String> > list){
         Map<String,String> mapAll = new HashMap<>();
         for (Map map:list) {
             mapAll.putAll(map);

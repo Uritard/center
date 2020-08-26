@@ -297,11 +297,11 @@ public class TCruisePointInstanceController {
     }
 
     @ApiOperation(value = "遥调量测点关联摄像头预置位巡检实例")
-    @RequestMapping(value = "/teleadjuslUnionTCPreset", method = RequestMethod.POST)
-    public Result teleadjuslUnionTCPreset(@RequestBody List<Map<String,String> > list){
+    @RequestMapping(value = "/teleadjustUnionTCPreset", method = RequestMethod.POST)
+    public Result teleadjustUnionTCPreset(@RequestBody List<Map<String,String> > list){
         Result result = new Result();
         try{
-            result.setData(tCruisePointInstanceService.teleadjuslUnionTCPreset(list));
+            result.setData(tCruisePointInstanceService.teleadjustUnionTCPreset(list));
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("遥调量测点关联摄像头预置位巡检实例失败描述：", e);

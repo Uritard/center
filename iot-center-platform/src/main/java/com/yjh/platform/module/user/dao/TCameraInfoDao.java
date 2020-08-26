@@ -17,8 +17,11 @@ public interface TCameraInfoDao {
     int insert(TCameraInfo tCameraInfo);
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
     int update(TCameraInfo tCameraInfo);
+<<<<<<< Updated upstream
     int deleteSelectedCamera(@Param(value = "cameraIds") String[] cameraIds);
     List<TCameraInfo> select(@Param(value = "cameraId") Long cameraId);
+=======
+>>>>>>> Stashed changes
     TCameraInfoByDict selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
     List<TCameraInfoByDict> selectByRegionId(@Param(value = "regionId") Long regionId);
     List<TCameraInfoByDict> selectByCameraName(@Param(value = "cameraName") String cameraName);

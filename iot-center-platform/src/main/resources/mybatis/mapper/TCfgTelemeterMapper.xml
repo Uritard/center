@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCfgTelemeterDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        <id column="device_id" jdbcType="VARCHAR" property="deviceId" />
+        <result column="mete_id" jdbcType="VARCHAR" property="meteId" />
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
+        <result column="up_effect" jdbcType="REAL" property="upEffect" />
+        <result column="low_effect" jdbcType="REAL" property="lowEffect" />
+        <result column="mete_precision" jdbcType="INTEGER" property="metePrecision" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+        <result column="mete_index" jdbcType="INTEGER" property="meteIndex" />
+        <result column="mete_cid" jdbcType="INTEGER" property="meteCid" />
+        <result column="limit_band" jdbcType="REAL" property="limitBand" />
+        <result column="change_limit" jdbcType="REAL" property="changeLimit" />
+        <result column="valid_mid" jdbcType="VARCHAR" property="validMid" />
+        <result column="valid_string" jdbcType="VARCHAR" property="validString" />
+        <result column="invalid_value" jdbcType="REAL" property="invalidValue" />
+        <result column="last_value" jdbcType="REAL" property="lastValue" />
+        <result column="last_time" jdbcType="TIMESTAMP" property="lastTime" />
+        <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="hilimit1" jdbcType="REAL" property="hilimit1" />
+        <result column="lolimit1" jdbcType="REAL" property="lolimit1" />
+        <result column="hilimit2" jdbcType="REAL" property="hilimit2" />
+        <result column="lolimit2" jdbcType="REAL" property="lolimit2" />
+        <result column="hilimit3" jdbcType="REAL" property="hilimit3" />
+        <result column="lolimit3" jdbcType="REAL" property="lolimit3" />
+        <result column="hilimit4" jdbcType="REAL" property="hilimit4" />
+        <result column="lolimit4" jdbcType="REAL" property="lolimit4" />
+        <result column="stander" jdbcType="REAL" property="stander" />
+        <result column="isshield" jdbcType="INTEGER" property="isshield" />
+        <result column="storageperiod" jdbcType="BIGINT" property="storageperiod" />
+        <result column="link_mete_id" jdbcType="VARCHAR" property="linkMeteId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_id, mete_id, mete_name, up_effect, low_effect, mete_precision, unit, mete_index, mete_cid, limit_band, change_limit, valid_mid, valid_string, invalid_value, last_value, last_time, mete_code, device_type, description, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, lolimit4, stander, isshield, storageperiod, link_mete_id
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        insert into t_cfg_telemeter(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            limit_band,
+            change_limit,
+            valid_mid,
+            valid_string,
+            invalid_value,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            hilimit1,
+            lolimit1,
+            hilimit2,
+            lolimit2,
+            hilimit3,
+            lolimit3,
+            hilimit4,
+            lolimit4,
+            stander,
+            isshield,
+            storageperiod,
+            link_mete_id
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=REAL},
+                #{lowEffect, jdbcType=REAL},
+                #{metePrecision, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{limitBand, jdbcType=REAL},
+                #{changeLimit, jdbcType=REAL},
+                #{validMid, jdbcType=VARCHAR},
+                #{validString, jdbcType=VARCHAR},
+                #{invalidValue, jdbcType=REAL},
+                #{lastValue, jdbcType=REAL},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{hilimit1, jdbcType=REAL},
+                #{lolimit1, jdbcType=REAL},
+                #{hilimit2, jdbcType=REAL},
+                #{lolimit2, jdbcType=REAL},
+                #{hilimit3, jdbcType=REAL},
+                #{lolimit3, jdbcType=REAL},
+                #{hilimit4, jdbcType=REAL},
+                #{lolimit4, jdbcType=REAL},
+                #{stander, jdbcType=REAL},
+                #{isshield, jdbcType=INTEGER},
+                #{storageperiod, jdbcType=BIGINT},
+                #{linkMeteId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cfg_telemeter
+                where device_id = #{deviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        update t_cfg_telemeter a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
+        <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=REAL},</if>
+        <if test="metePrecision != null and metePrecision != ''">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="meteIndex != null and meteIndex != ''">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null and meteCid != ''">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="limitBand != null and limitBand != ''">a.limit_band = #{limitBand, jdbcType=REAL},</if>
+        <if test="changeLimit != null and changeLimit != ''">a.change_limit = #{changeLimit, jdbcType=REAL},</if>
+        <if test="validMid != null and validMid != ''">a.valid_mid = #{validMid, jdbcType=VARCHAR},</if>
+        <if test="validString != null and validString != ''">a.valid_string = #{validString, jdbcType=VARCHAR},</if>
+        <if test="invalidValue != null and invalidValue != ''">a.invalid_value = #{invalidValue, jdbcType=REAL},</if>
+        <if test="lastValue != null and lastValue != ''">a.last_value = #{lastValue, jdbcType=REAL},</if>
+        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="hilimit1 != null and hilimit1 != ''">a.hilimit1 = #{hilimit1, jdbcType=REAL},</if>
+        <if test="lolimit1 != null and lolimit1 != ''">a.lolimit1 = #{lolimit1, jdbcType=REAL},</if>
+        <if test="hilimit2 != null and hilimit2 != ''">a.hilimit2 = #{hilimit2, jdbcType=REAL},</if>
+        <if test="lolimit2 != null and lolimit2 != ''">a.lolimit2 = #{lolimit2, jdbcType=REAL},</if>
+        <if test="hilimit3 != null and hilimit3 != ''">a.hilimit3 = #{hilimit3, jdbcType=REAL},</if>
+        <if test="lolimit3 != null and lolimit3 != ''">a.lolimit3 = #{lolimit3, jdbcType=REAL},</if>
+        <if test="hilimit4 != null and hilimit4 != ''">a.hilimit4 = #{hilimit4, jdbcType=REAL},</if>
+        <if test="lolimit4 != null and lolimit4 != ''">a.lolimit4 = #{lolimit4, jdbcType=REAL},</if>
+        <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
+        <if test="isshield != null and isshield != ''">a.isshield = #{isshield, jdbcType=INTEGER},</if>
+        <if test="storageperiod != null and storageperiod != ''">a.storageperiod = #{storageperiod, jdbcType=BIGINT},</if>
+        <if test="linkMeteId != null and linkMeteId != ''">a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR},</if>
+    </set>
+            where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_precision,
+        a.unit,
+        a.mete_index,
+        a.mete_cid,
+        a.limit_band,
+        a.change_limit,
+        a.valid_mid,
+        a.valid_string,
+        a.invalid_value,
+        a.last_value,
+        a.last_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.hilimit1,
+        a.lolimit1,
+        a.hilimit2,
+        a.lolimit2,
+        a.hilimit3,
+        a.lolimit3,
+        a.hilimit4,
+        a.lolimit4,
+        a.stander,
+        a.isshield,
+        a.storageperiod,
+        a.link_mete_id
+        from t_cfg_telemeter a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCfgTelemeter" resultType="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_precision,
+        a.unit,
+        a.mete_index,
+        a.mete_cid,
+        a.limit_band,
+        a.change_limit,
+        a.valid_mid,
+        a.valid_string,
+        a.invalid_value,
+        a.last_value,
+        a.last_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.hilimit1,
+        a.lolimit1,
+        a.hilimit2,
+        a.lolimit2,
+        a.hilimit3,
+        a.lolimit3,
+        a.hilimit4,
+        a.lolimit4,
+        a.stander,
+        a.isshield,
+        a.storageperiod,
+        a.link_mete_id
+        from t_cfg_telemeter a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
+        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
+        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="limitBand != null and limitBand != ''"> and a.limit_band = #{limitBand, jdbcType=REAL}</if>
+        <if test="changeLimit != null and changeLimit != ''"> and a.change_limit = #{changeLimit, jdbcType=REAL}</if>
+        <if test="validMid != null and validMid != ''"> and a.valid_mid = #{validMid, jdbcType=VARCHAR}</if>
+        <if test="validString != null and validString != ''"> and a.valid_string = #{validString, jdbcType=VARCHAR}</if>
+        <if test="invalidValue != null and invalidValue != ''"> and a.invalid_value = #{invalidValue, jdbcType=REAL}</if>
+        <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=REAL}</if>
+        <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="hilimit1 != null and hilimit1 != ''"> and a.hilimit1 = #{hilimit1, jdbcType=REAL}</if>
+        <if test="lolimit1 != null and lolimit1 != ''"> and a.lolimit1 = #{lolimit1, jdbcType=REAL}</if>
+        <if test="hilimit2 != null and hilimit2 != ''"> and a.hilimit2 = #{hilimit2, jdbcType=REAL}</if>
+        <if test="lolimit2 != null and lolimit2 != ''"> and a.lolimit2 = #{lolimit2, jdbcType=REAL}</if>
+        <if test="hilimit3 != null and hilimit3 != ''"> and a.hilimit3 = #{hilimit3, jdbcType=REAL}</if>
+        <if test="lolimit3 != null and lolimit3 != ''"> and a.lolimit3 = #{lolimit3, jdbcType=REAL}</if>
+        <if test="hilimit4 != null and hilimit4 != ''"> and a.hilimit4 = #{hilimit4, jdbcType=REAL}</if>
+        <if test="lolimit4 != null and lolimit4 != ''"> and a.lolimit4 = #{lolimit4, jdbcType=REAL}</if>
+        <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
+        <if test="isshield != null and isshield != ''"> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
+        <if test="storageperiod != null and storageperiod != ''"> and a.storageperiod = #{storageperiod, jdbcType=BIGINT}</if>
+        <if test="linkMeteId != null and linkMeteId != ''"> and a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgTelemeter" resultType="com.yjh.platform.module.device.entity.TCfgTelemeter">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.up_effect,
+        a.low_effect,
+        a.mete_precision,
+        a.unit,
+        a.mete_index,
+        a.mete_cid,
+        a.limit_band,
+        a.change_limit,
+        a.valid_mid,
+        a.valid_string,
+        a.invalid_value,
+        a.last_value,
+        a.last_time,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.hilimit1,
+        a.lolimit1,
+        a.hilimit2,
+        a.lolimit2,
+        a.hilimit3,
+        a.lolimit3,
+        a.hilimit4,
+        a.lolimit4,
+        a.stander,
+        a.isshield,
+        a.storageperiod,
+        a.link_mete_id
+        from t_cfg_telemeter a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
+        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
+        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="limitBand != null and limitBand != ''"> and a.limit_band = #{limitBand, jdbcType=REAL}</if>
+        <if test="changeLimit != null and changeLimit != ''"> and a.change_limit = #{changeLimit, jdbcType=REAL}</if>
+        <if test="validMid != null and validMid != ''"> and a.valid_mid = #{validMid, jdbcType=VARCHAR}</if>
+        <if test="validString != null and validString != ''"> and a.valid_string = #{validString, jdbcType=VARCHAR}</if>
+        <if test="invalidValue != null and invalidValue != ''"> and a.invalid_value = #{invalidValue, jdbcType=REAL}</if>
+        <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=REAL}</if>
+        <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="hilimit1 != null and hilimit1 != ''"> and a.hilimit1 = #{hilimit1, jdbcType=REAL}</if>
+        <if test="lolimit1 != null and lolimit1 != ''"> and a.lolimit1 = #{lolimit1, jdbcType=REAL}</if>
+        <if test="hilimit2 != null and hilimit2 != ''"> and a.hilimit2 = #{hilimit2, jdbcType=REAL}</if>
+        <if test="lolimit2 != null and lolimit2 != ''"> and a.lolimit2 = #{lolimit2, jdbcType=REAL}</if>
+        <if test="hilimit3 != null and hilimit3 != ''"> and a.hilimit3 = #{hilimit3, jdbcType=REAL}</if>
+        <if test="lolimit3 != null and lolimit3 != ''"> and a.lolimit3 = #{lolimit3, jdbcType=REAL}</if>
+        <if test="hilimit4 != null and hilimit4 != ''"> and a.hilimit4 = #{hilimit4, jdbcType=REAL}</if>
+        <if test="lolimit4 != null and lolimit4 != ''"> and a.lolimit4 = #{lolimit4, jdbcType=REAL}</if>
+        <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
+        <if test="isshield != null and isshield != ''"> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
+        <if test="storageperiod != null and storageperiod != ''"> and a.storageperiod = #{storageperiod, jdbcType=BIGINT}</if>
+        <if test="linkMeteId != null and linkMeteId != ''"> and a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_telemeter(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            limit_band,
+            change_limit,
+            valid_mid,
+            valid_string,
+            invalid_value,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            hilimit1,
+            lolimit1,
+            hilimit2,
+            lolimit2,
+            hilimit3,
+            lolimit3,
+            hilimit4,
+            lolimit4,
+            stander,
+            isshield,
+            storageperiod,
+            link_mete_id
+        )values
+        <foreach collection="list" item="TCfgTelemeter" separator=",">
+            (
+                #{TCfgTelemeter.deviceId, jdbcType=VARCHAR},
+                #{TCfgTelemeter.meteId, jdbcType=VARCHAR},
+                #{TCfgTelemeter.meteName, jdbcType=VARCHAR},
+                #{TCfgTelemeter.upEffect, jdbcType=REAL},
+                #{TCfgTelemeter.lowEffect, jdbcType=REAL},
+                #{TCfgTelemeter.metePrecision, jdbcType=INTEGER},
+                #{TCfgTelemeter.unit, jdbcType=VARCHAR},
+                #{TCfgTelemeter.meteIndex, jdbcType=INTEGER},
+                #{TCfgTelemeter.meteCid, jdbcType=INTEGER},
+                #{TCfgTelemeter.limitBand, jdbcType=REAL},
+                #{TCfgTelemeter.changeLimit, jdbcType=REAL},
+                #{TCfgTelemeter.validMid, jdbcType=VARCHAR},
+                #{TCfgTelemeter.validString, jdbcType=VARCHAR},
+                #{TCfgTelemeter.invalidValue, jdbcType=REAL},
+                #{TCfgTelemeter.lastValue, jdbcType=REAL},
+                #{TCfgTelemeter.lastTime, jdbcType=TIMESTAMP},
+                #{TCfgTelemeter.meteCode, jdbcType=VARCHAR},
+                #{TCfgTelemeter.deviceType, jdbcType=VARCHAR},
+                #{TCfgTelemeter.description, jdbcType=VARCHAR},
+                #{TCfgTelemeter.hilimit1, jdbcType=REAL},
+                #{TCfgTelemeter.lolimit1, jdbcType=REAL},
+                #{TCfgTelemeter.hilimit2, jdbcType=REAL},
+                #{TCfgTelemeter.lolimit2, jdbcType=REAL},
+                #{TCfgTelemeter.hilimit3, jdbcType=REAL},
+                #{TCfgTelemeter.lolimit3, jdbcType=REAL},
+                #{TCfgTelemeter.hilimit4, jdbcType=REAL},
+                #{TCfgTelemeter.lolimit4, jdbcType=REAL},
+                #{TCfgTelemeter.stander, jdbcType=REAL},
+                #{TCfgTelemeter.isshield, jdbcType=INTEGER},
+                #{TCfgTelemeter.storageperiod, jdbcType=BIGINT},
+                #{TCfgTelemeter.linkMeteId, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

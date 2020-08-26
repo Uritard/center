@@ -47,7 +47,7 @@ public class TStdDeviceAttrController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
+            log.error("标准化设备参数表添加错误:", e);
         }
         return result;
     }
@@ -63,7 +63,7 @@ public class TStdDeviceAttrController {
             log.error("删除异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("删除错误:", e);
+            log.error("标准化设备参数表删除错误:", e);
         }
         return result;
     }
@@ -76,10 +76,10 @@ public class TStdDeviceAttrController {
             result.setData(tStdDeviceAttrService.update(tStdDeviceAttr));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新异常:", e);
+            log.error("标准化设备参数表更新异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("更新错误:", e);
+            log.error("标准化设备参数表更新错误:", e);
         }
         return result;
     }
@@ -93,7 +93,7 @@ public class TStdDeviceAttrController {
             result.setData(tStdDeviceAttr);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("标准化设备参数表失败描述：", e);
         }
         return result;
     }
@@ -126,7 +126,7 @@ public class TStdDeviceAttrController {
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("标准化设备参数表失败描述：", e);
         }
         return result;
     }
@@ -146,7 +146,7 @@ public class TStdDeviceAttrController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("标准化设备参数表失败描述：", e);
         }
         return result;
     }
@@ -159,7 +159,7 @@ public class TStdDeviceAttrController {
         result.setData(tStdDeviceAttrService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+        log.error("标准化设备参数表批量插入失败：" + e);
         }
         return result;
     }

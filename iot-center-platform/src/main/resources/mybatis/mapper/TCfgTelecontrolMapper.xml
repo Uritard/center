@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCfgTelecontrolDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        <id column="device_id" jdbcType="VARCHAR" property="deviceId" />
+        <result column="mete_id" jdbcType="VARCHAR" property="meteId" />
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
+        <result column="mete_index" jdbcType="INTEGER" property="meteIndex" />
+        <result column="mete_cid" jdbcType="INTEGER" property="meteCid" />
+        <result column="control_status" jdbcType="INTEGER" property="controlStatus" />
+        <result column="enable_string" jdbcType="VARCHAR" property="enableString" />
+        <result column="succeed_string" jdbcType="VARCHAR" property="succeedString" />
+        <result column="trigger_string" jdbcType="VARCHAR" property="triggerString" />
+        <result column="control_value" jdbcType="INTEGER" property="controlValue" />
+        <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="describer" jdbcType="VARCHAR" property="describer" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_id, mete_id, mete_name, mete_index, mete_cid, control_status, enable_string, succeed_string, trigger_string, control_value, mete_code, device_type, description, describer
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        insert into t_cfg_telecontrol(
+            device_id,
+            mete_id,
+            mete_name,
+            mete_index,
+            mete_cid,
+            control_status,
+            enable_string,
+            succeed_string,
+            trigger_string,
+            control_value,
+            mete_code,
+            device_type,
+            description,
+            describer
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{controlStatus, jdbcType=INTEGER},
+                #{enableString, jdbcType=VARCHAR},
+                #{succeedString, jdbcType=VARCHAR},
+                #{triggerString, jdbcType=VARCHAR},
+                #{controlValue, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{describer, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cfg_telecontrol
+                where device_id = #{deviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        update t_cfg_telecontrol a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="meteIndex != null and meteIndex != ''">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null and meteCid != ''">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="controlStatus != null and controlStatus != ''">a.control_status = #{controlStatus, jdbcType=INTEGER},</if>
+        <if test="enableString != null and enableString != ''">a.enable_string = #{enableString, jdbcType=VARCHAR},</if>
+        <if test="succeedString != null and succeedString != ''">a.succeed_string = #{succeedString, jdbcType=VARCHAR},</if>
+        <if test="triggerString != null and triggerString != ''">a.trigger_string = #{triggerString, jdbcType=VARCHAR},</if>
+        <if test="controlValue != null and controlValue != ''">a.control_value = #{controlValue, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+    </set>
+            where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.mete_index,
+        a.mete_cid,
+        a.control_status,
+        a.enable_string,
+        a.succeed_string,
+        a.trigger_string,
+        a.control_value,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.describer
+        from t_cfg_telecontrol a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCfgTelecontrol" resultType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.mete_index,
+        a.mete_cid,
+        a.control_status,
+        a.enable_string,
+        a.succeed_string,
+        a.trigger_string,
+        a.control_value,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.describer
+        from t_cfg_telecontrol a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="controlStatus != null and controlStatus != ''"> and a.control_status = #{controlStatus, jdbcType=INTEGER}</if>
+        <if test="enableString != null and enableString != ''"> and a.enable_string = #{enableString, jdbcType=VARCHAR}</if>
+        <if test="succeedString != null and succeedString != ''"> and a.succeed_string = #{succeedString, jdbcType=VARCHAR}</if>
+        <if test="triggerString != null and triggerString != ''"> and a.trigger_string = #{triggerString, jdbcType=VARCHAR}</if>
+        <if test="controlValue != null and controlValue != ''"> and a.control_value = #{controlValue, jdbcType=INTEGER}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgTelecontrol" resultType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
+        select
+        a.device_id,
+        a.mete_id,
+        a.mete_name,
+        a.mete_index,
+        a.mete_cid,
+        a.control_status,
+        a.enable_string,
+        a.succeed_string,
+        a.trigger_string,
+        a.control_value,
+        a.mete_code,
+        a.device_type,
+        a.description,
+        a.describer
+        from t_cfg_telecontrol a
+        where 1 = 1
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
+        <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="controlStatus != null and controlStatus != ''"> and a.control_status = #{controlStatus, jdbcType=INTEGER}</if>
+        <if test="enableString != null and enableString != ''"> and a.enable_string = #{enableString, jdbcType=VARCHAR}</if>
+        <if test="succeedString != null and succeedString != ''"> and a.succeed_string = #{succeedString, jdbcType=VARCHAR}</if>
+        <if test="triggerString != null and triggerString != ''"> and a.trigger_string = #{triggerString, jdbcType=VARCHAR}</if>
+        <if test="controlValue != null and controlValue != ''"> and a.control_value = #{controlValue, jdbcType=INTEGER}</if>
+        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_telecontrol(
+            device_id,
+            mete_id,
+            mete_name,
+            mete_index,
+            mete_cid,
+            control_status,
+            enable_string,
+            succeed_string,
+            trigger_string,
+            control_value,
+            mete_code,
+            device_type,
+            description,
+            describer
+        )values
+        <foreach collection="list" item="TCfgTelecontrol" separator=",">
+            (
+                #{TCfgTelecontrol.deviceId, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.meteId, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.meteName, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.meteIndex, jdbcType=INTEGER},
+                #{TCfgTelecontrol.meteCid, jdbcType=INTEGER},
+                #{TCfgTelecontrol.controlStatus, jdbcType=INTEGER},
+                #{TCfgTelecontrol.enableString, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.succeedString, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.triggerString, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.controlValue, jdbcType=INTEGER},
+                #{TCfgTelecontrol.meteCode, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.deviceType, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.description, jdbcType=VARCHAR},
+                #{TCfgTelecontrol.describer, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>
