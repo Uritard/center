@@ -2,10 +2,12 @@ package com.yjh.logs.module.log.controller;
 
 import com.yjh.logs.module.log.service.SysLogsService;
 import com.yjh.logs.module.log.entity.SysLogs;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.github.pagehelper.PageHelper;
@@ -131,20 +133,23 @@ public class SysLogsController {
         return result;
     }
 
+
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "logId", required = false) String logId,
-                            @RequestParam(value = "logType", required = false) String logType,
-                            @RequestParam(value = "ip", required = false) String ip,
-                            @RequestParam(value = "title", required = false) String title,
-                            @RequestParam(value = "state", required = false) Integer state,
-                            @RequestParam(value = "content", required = false) String content,
-                            @RequestParam(value = "userId", required = false) Long userId,
-                            @RequestParam(value = "userName", required = false) String userName,
-                            @RequestParam(value = "createTime", required = false) Date createTime) {
+                         @RequestParam(value = "logType", required = false) String logType,
+                         @RequestParam(value = "ip", required = false) String ip,
+                         @RequestParam(value = "title", required = false) String title,
+                         @RequestParam(value = "state", required = false) Integer state,
+                         @RequestParam(value = "content", required = false) String content,
+                         @RequestParam(value = "userId", required = false) Long userId,
+                         @RequestParam(value = "userName", required = false) String userName,
+                         @RequestParam(value = "createTime", required = false) Date createTime,
+                         @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
+                         @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date endTime) {
         Result result = new Result();
         try {
-            List<SysLogs> list = sysLogsService.select(logId, logType, ip, title, state, content, userId, userName, createTime);
+            List<SysLogs> list = sysLogsService.select(logId, logType, ip, title, state, content, userId, userName, createTime,startTime,endTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -156,8 +161,8 @@ public class SysLogsController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody SysLogs sysLogs,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -178,10 +183,10 @@ public class SysLogsController {
     public Result batchInsert(@RequestBody List<SysLogs> list) {
         Result result = new Result();
         try {
-        result.setData(sysLogsService.batchInsert(list));
+            result.setData(sysLogsService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入日志失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入日志失败：" + e);
         }
         return result;
     }

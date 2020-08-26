@@ -92,7 +92,7 @@ public class TCfgDeviceService{
 
 
 
-    @Logs(title = "摇调", code = "module")
+    @Logs(title = "遥调", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTeleadjust(Map<String,String> mapAll){
 
@@ -113,7 +113,7 @@ public class TCfgDeviceService{
         return tCfgDeviceDao.insertIntoTeleadjust(tCfgTeleadjust);
     }
 
-    @Logs(title = "摇信", code = "module")
+    @Logs(title = "遥信", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTelesignal(Map<String,String> mapAll){
 
@@ -132,7 +132,7 @@ public class TCfgDeviceService{
         return tCfgDeviceDao.insertIntoTelesignal(tCfgTelesignal);
     }
 
-    @Logs(title = "摇测", code = "module")
+    @Logs(title = "遥测", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTelemeter(Map<String,String> mapAll){
 
@@ -159,7 +159,7 @@ public class TCfgDeviceService{
         return tCfgDeviceDao.insertIntoTelemeter(tCfgTelemeter);
     }
 
-    @Logs(title = "摇控", code = "module")
+    @Logs(title = "遥控", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTelecontrol(Map<String,String> mapAll){
 

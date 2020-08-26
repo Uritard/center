@@ -155,7 +155,7 @@ public class TCfgDeviceController {
         return result;
     }
 
-    @ApiOperation(value = "生成四摇测点")
+    @ApiOperation(value = "生成四遥测点")
     @RequestMapping(value = "/createSYPoint", method = RequestMethod.POST)
     public Result createSYPoint(@RequestBody List<Map<String,String>> list) {
         Result result = new Result();
@@ -163,7 +163,7 @@ public class TCfgDeviceController {
             result.setData(tCfgDeviceService.createSYPoint(list));
         }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("生成四摇测点失败：" + e);
+            log.error("生成四遥测点失败：" + e);
         }
         return result;
     }

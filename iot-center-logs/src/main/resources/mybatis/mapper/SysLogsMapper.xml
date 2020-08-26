@@ -62,7 +62,7 @@
         <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
     </set>
-            where a.log_id = #{logId, jdbcType=VARCHAR}
+        where a.log_id = #{logId, jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.logs.module.log.entity.SysLogs">
@@ -82,7 +82,7 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">
+    <select id="select" parameterType="java.util.HashMap" resultType="com.yjh.logs.module.log.entity.SysLogs">
         select
         a.log_id,
         a.log_type,
@@ -104,6 +104,10 @@
         <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
         <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="startTime != null and endTime == null"> and a.create_time &gt;= #{startTime, jdbcType=TIMESTAMP} </if>
+        <if test="startTime == null and endTime != null"> and a.create_time &lt;= #{endTime, jdbcType=TIMESTAMP} </if>
+
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">
@@ -132,25 +136,25 @@
 
     <insert id="batchInsert">
         insert into sys_logs(
-            log_id,
-            log_type,
-            ip,
-            title,
-            state,
-            content,
-            user_id,
-            user_name
+        log_id,
+        log_type,
+        ip,
+        title,
+        state,
+        content,
+        user_id,
+        user_name
         )values
         <foreach collection="list" item="SysLogs" separator=",">
             (
-                #{SysLogs.logId, jdbcType=VARCHAR},
-                #{SysLogs.logType, jdbcType=VARCHAR},
-                #{SysLogs.ip, jdbcType=VARCHAR},
-                #{SysLogs.title, jdbcType=VARCHAR},
-                #{SysLogs.state, jdbcType=INTEGER},
-                #{SysLogs.content, jdbcType=VARCHAR},
-                #{SysLogs.userId, jdbcType=BIGINT},
-                #{SysLogs.userName, jdbcType=VARCHAR}
+            #{SysLogs.logId, jdbcType=VARCHAR},
+            #{SysLogs.logType, jdbcType=VARCHAR},
+            #{SysLogs.ip, jdbcType=VARCHAR},
+            #{SysLogs.title, jdbcType=VARCHAR},
+            #{SysLogs.state, jdbcType=INTEGER},
+            #{SysLogs.content, jdbcType=VARCHAR},
+            #{SysLogs.userId, jdbcType=BIGINT},
+            #{SysLogs.userName, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
