@@ -101,6 +101,7 @@ public class TRobotInfoController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "robotId", required = false) Long robotId,
+                         @RequestParam(value = "robotCode", required = false) String robotCode,
                             @RequestParam(value = "robotName", required = false) String robotName,
                             @RequestParam(value = "robotStatus", required = false) String robotStatus,
                             @RequestParam(value = "robotType", required = false) Integer robotType,
@@ -121,10 +122,17 @@ public class TRobotInfoController {
                             @RequestParam(value = "createDate", required = false) Date createDate,
                             @RequestParam(value = "updateBy", required = false) String updateBy,
                             @RequestParam(value = "updateDate", required = false) Date updateDate,
+                            @RequestParam(value = "robotFactory", required = false) String robotFactory,
+                            @RequestParam(value = "isUse", required = false) String isUse,
+                            @RequestParam(value = "commissionDate", required = false) Date commissionDate,
+                            @RequestParam(value = "upregionId", required = false) Long upregionId,
+                            @RequestParam(value = "robotPosition", required = false) String robotPosition,
                             @RequestParam(value = "remarks", required = false) String remarks) {
         Result result = new Result();
         try {
-            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotName, robotStatus, robotType, robotIp, robotPort, upRegionId, upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword, photePath, createBy, createDate, updateBy, updateDate, remarks);
+            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort, upRegionId,
+                    upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
+                    photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDate, upregionId, robotPosition, remarks);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
