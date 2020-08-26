@@ -118,21 +118,7 @@ public class SysUserService{
 
     @Logs(title = "用户登录", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public SysUserLogin userLogin(String userName, String password) {
-        SysUserLogin sysUserLogin = this.sysUserDao.selectByUserNameL(userName);
-        if(sysUserLogin==null) {
-            throw new BusinessException("用户名不存在");
-        }else {
-            if (!sysUserLogin.getPassword().equals(password)) {
-                throw new BusinessException("用户密码错误");
-            } else {
-                Date date = new Date();
-                String appKey = String.valueOf(DateTimeUtil.getSecondTimestamp(date));
-                sysUserLogin.setAppkey(appKey);
-            }
-        }
-        return sysUserLogin;
-    }
+    public SysUserLogin userLogin(String userName, String password) { return this.sysUserDao.selectByUserNameL(userName, password); }
 
     @Logs(title = "用户登出", code = "module")
     @Transactional(rollbackFor = Exception.class)

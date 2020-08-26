@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -9,9 +10,8 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.entity.SysUser;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import io.swagger.annotations.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
@@ -246,39 +245,70 @@ public class SysUserController {
     public Result userLogin(HttpServletRequest request, @RequestBody Map<String, String> userMap) {
         Result result = new Result();
         try {
-            if (userMap.size()>0) {
+            if (userMap.size()>0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
                 String userName = userMap.get("userName");
                 String password = userMap.get("password");
                 SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
-                if (sysUserLogin.getUserId() != null) {
-                    if (sysUserLogin.getState()==2) {result.setData("账号锁定！");}
-                    if (sysUserLogin.getState()==0) {result.setData("账号删除！");}
+                if (!Objects.equals(null, sysUserLogin)) {
+                    if (sysUserLogin.getState()==2) {
+                        Map<String, Object> mapResult = new HashMap<>();
+                        mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                        result.setData(mapResult);
+                        return result;
+                    }
+                    if (sysUserLogin.getState()==0) {
+                        Map<String, Object> mapResult = new HashMap<>();
+                        mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                        result.setData(mapResult);
+                        return result;
+                    }
                     if (sysUserLogin.getState()==1) {
                         result.setData(sysUserLogin);
                         String userId = String.valueOf(sysUserLogin.getUserId());
-                        Map<String, String> map = new HashMap<>();
-                        map.put(userId, "0");
-//                        redisTemplate.opsForSet().add("accout_lock_times", map);
-                        redisTemplate.opsForHash().put("redisHash","class","6");
-//                        redisTemplate.opsForHash().putAll("accout_lock_times", map);
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("userId", userId);
+                        map.put("userName", userName);
+                        map.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                        map.put("errorInputTimes", "0");
+                        String key = Constant.account_lock_times.replace("userAccountID", userId);
+                        redisTemplate.opsForHash().putAll(key, map);
                     }
                 } else {
-                    Map<String, Integer> map = new HashMap<>();
-                    map.put("code", ResultCodeEnum.CODE10101.getCode());
-                    result.setData(map);
+                    SysUser sysUser = this.sysUserService.selectByUserName(userMap.get("userName")).get(0);
+                    String userId = String.valueOf(sysUser.getUserId());
+                    String key = Constant.account_lock_times.replace("userAccountID", userId);
+                    Integer errorInputTimes = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "errorInputTimes")));
+                    Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "expireTime")));
+                    errorInputTimes +=1;
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("userId", userId);
+                    map.put("userName", userName);
+                    map.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                    map.put("errorInputTimes", String.valueOf(errorInputTimes));
+                    redisTemplate.opsForHash().putAll(key, map);
+                    if (errorInputTimes>=3 && System.currentTimeMillis()-expireTime<=1800000) {
+                        sysUser.setState(2);
+                        this.sysUserService.update(sysUser);
+                    }
+                    Map<String, Object> mapResult = new HashMap<>();
+                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                    mapResult.put("errorCount", "已输入错误"+String.valueOf(errorInputTimes)+"次！");
+                    result.setData(mapResult);
+                    return result;
                 }
-            } else {result.setData("用户名或者密码为空！");}
+            } else {
+                Map<String, Object> mapResult = new HashMap<>();
+                mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10103.getName());
+                result.setData(mapResult);
+                return result;
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
-            log.error("根据密码登录失败:", e);
-            SysUser sysUser = this.sysUserService.selectByUserName(userMap.get("userName")).get(0);
-            String accout_lock_times = String.valueOf(redisTemplate.opsForHash().get("accout_lock_times", sysUser.getUserId()));
-            accout_lock_times +=1;
-            redisTemplate.opsForHash().put("accout_lock_times", sysUser.getUserId(), accout_lock_times);
-            if (Integer.parseInt(accout_lock_times)>=3) {
-                sysUser.setState(2);
-                this.sysUserService.update(sysUser);
-            }
+            log.error("登录失败:", e);
         }
         return result;
     }
@@ -327,7 +357,13 @@ public class SysUserController {
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             if (sysUserCurrent.getRoleId() == 1234) {
                 result.setData(this.sysUserService.unlockUserAccount(map));
-            } else { result.setData(ResultCodeEnum.CODE10008); }
+                Map<String, Object> mapCache = new HashMap<>();
+                mapCache.put("userId", map.get("lockedUserId"));
+                mapCache.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                mapCache.put("errorInputTimes", "0");
+                String key = Constant.account_lock_times.replace("userAccountID", map.get("lockedUserId"));
+                redisTemplate.opsForHash().putAll(key, mapCache);
+            } else { result.setData(ResultCodeEnum.CODE10008.getCode()); }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("用户帐号解锁异常:", e);

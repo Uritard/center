@@ -365,6 +365,7 @@
         LEFT JOIN sys_org c ON c.org_id = a.org_id
         where 1 = 1
         and a.user_name = #{userName, jdbcType=VARCHAR}
+        and a.PASSWORD = #{password, jdbcType=VARCHAR}
     </select>
 
     <select id="selectByUserState" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.SysUser">

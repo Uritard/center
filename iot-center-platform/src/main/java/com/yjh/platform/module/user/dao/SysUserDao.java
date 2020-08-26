@@ -27,7 +27,7 @@ public interface SysUserDao {
 
     List<SysUser> selectByUserName(@Param(value = "userName")String userName);
 
-    SysUserLogin selectByUserNameL(@Param(value = "userName") String userName);
+    SysUserLogin selectByUserNameL(@Param(value = "userName") String userName, @Param(value = "password") String password);
 
     List<SysUser> select(@Param(value = "userId") Long userId,
                          @Param(value = "userName") String userName,
