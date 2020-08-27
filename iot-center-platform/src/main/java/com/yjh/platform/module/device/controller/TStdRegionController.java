@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import java.util.HashMap;
@@ -31,6 +32,9 @@ public class TStdRegionController {
 
     @Autowired
     private final TStdRegionService tStdRegionService;
+
+    @Autowired
+    private TStdDeviceService tStdDeviceService;
 
     private Logger log = LoggerFactory.getLogger(TStdRegionController.class);
 
@@ -142,11 +146,11 @@ public class TStdRegionController {
     }
 
     @ApiOperation(value = "根据区域名称模糊查询区域树")
-    @RequestMapping(value = "/selectRegTreeByRegName", method = RequestMethod.GET)
+    @RequestMapping(value = "/selectRegionTreeByName", method = RequestMethod.GET)
     public Result selectRegTreeByRegName(@RequestParam(value = "regionName", required = false) String regionName) {
         Result result = new Result();
         try {
-            result.setData(tStdRegionService.selectRegTreeByRegName(regionName));
+            result.setData(tStdDeviceService.selectRegionTreeByName(regionName));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("区域树模糊查询失败：", e);

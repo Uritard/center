@@ -153,4 +153,19 @@ public class TCruiseTaskController {
         return result;
     }
 
+    //查询
+    @ApiOperation(value = "任务统计")
+    @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
+    public Result taskCount(){
+        Result result = new Result();
+        try {
+//            List<TCruiseTask> list = this.tCruiseTaskService.taskCount();
+//            result.setData(list);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }
