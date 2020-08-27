@@ -43,7 +43,7 @@
         update t_std_metemodel a <set>
         <if test="modelId != null and modelId != ''">a.model_id = #{modelId, jdbcType=BIGINT},</if>
         <if test="modelName != null and modelName != ''">a.model_name = #{modelName, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.model_id = #{modelId, jdbcType=BIGINT}
@@ -71,7 +71,7 @@
         where 1 = 1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="modelName != null and modelName != ''"> and a.model_name = #{modelName, jdbcType=VARCHAR}</if>
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
@@ -85,7 +85,7 @@
         where 1 = 1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="modelName != null and modelName != ''"> and a.model_name = #{modelName, jdbcType=VARCHAR}</if>
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
@@ -133,7 +133,7 @@
         from t_std_metemodel a
         LEFT JOIN t_std_mete b ON a.device_type = b.device_type
         where 1 = 1
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
     </select>
 
     <delete id="batchDelete" >

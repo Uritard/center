@@ -86,7 +86,7 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         update t_std_device_attr a <set>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="deviceModel != null and deviceModel != ''">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
+        <if test="deviceModel != null ">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
         <if test="pmsType != null and pmsType != ''">a.pms_type = #{pmsType, jdbcType=VARCHAR},</if>
         <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
         <if test="manufacturer != null and manufacturer != ''">a.manufacturer = #{manufacturer, jdbcType=VARCHAR},</if>
@@ -101,7 +101,7 @@
         <if test="latitude != null and latitude != ''">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null and longitude != ''">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
         <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
-        <if test="port != null and port != ''">a.port = #{port, jdbcType=INTEGER},</if>
+        <if test="port != null ">a.port = #{port, jdbcType=INTEGER},</if>
         <if test="para1 != null and para1 != ''">a.para_1 = #{para1, jdbcType=VARCHAR},</if>
         <if test="para2 != null and para2 != ''">a.para_2 = #{para2, jdbcType=VARCHAR},</if>
         <if test="para3 != null and para3 != ''">a.para_3 = #{para3, jdbcType=VARCHAR},</if>
@@ -162,7 +162,7 @@
         from t_std_device_attr a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="deviceModel != null and deviceModel != ''"> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
+        <if test="deviceModel != null "> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
         <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
         <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
@@ -177,7 +177,7 @@
         <if test="latitude != null and latitude != ''"> and a.latitude = #{latitude, jdbcType=VARCHAR}</if>
         <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
         <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
-        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
+        <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
         <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
         <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
@@ -208,7 +208,7 @@
         from t_std_device_attr a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="deviceModel != null and deviceModel != ''"> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
+        <if test="deviceModel != null "> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
         <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
         <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
@@ -223,7 +223,7 @@
         <if test="latitude != null and latitude != ''"> and a.latitude = #{latitude, jdbcType=VARCHAR}</if>
         <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
         <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
-        <if test="port != null and port != ''"> and a.port = #{port, jdbcType=INTEGER}</if>
+        <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
         <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
         <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>

@@ -57,12 +57,12 @@
         update t_std_region a <set>
         <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=BIGINT},</if>
         <if test="regionName != null and regionName != ''">a.region_name = #{regionName, jdbcType=VARCHAR},</if>
-        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=INTEGER},</if>
+        <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="upRegionIds != null and upRegionIds != ''">a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR},</if>
-        <if test="regionCode != null and regionCode != ''">a.region_code = #{regionCode, jdbcType=INTEGER},</if>
+        <if test="regionCode != null ">a.region_code = #{regionCode, jdbcType=INTEGER},</if>
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
-        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="stationName != null">a.station_name = #{stationName, jdbcType=VARCHAR},</if>
     </set>
@@ -103,12 +103,12 @@
         where 1 = 1
         <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=BIGINT}</if>
         <if test="regionName != null and regionName != ''"> and a.region_name = #{regionName, jdbcType=VARCHAR}</if>
-        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="upRegionIds != null and upRegionIds != ''"> and a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR}</if>
-        <if test="regionCode != null and regionCode != ''"> and a.region_code = #{regionCode, jdbcType=INTEGER}</if>
+        <if test="regionCode != null "> and a.region_code = #{regionCode, jdbcType=INTEGER}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
-        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="stationName != null">and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
     </select>
@@ -129,12 +129,12 @@
         where 1 = 1
         <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=BIGINT}</if>
         <if test="regionName != null and regionName != ''"> and a.region_name = #{regionName, jdbcType=VARCHAR}</if>
-        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="upRegionIds != null and upRegionIds != ''"> and a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR}</if>
-        <if test="regionCode != null and regionCode != ''"> and a.region_code = #{regionCode, jdbcType=INTEGER}</if>
+        <if test="regionCode != null "> and a.region_code = #{regionCode, jdbcType=INTEGER}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
-        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="stationName != null">and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
     </select>

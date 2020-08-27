@@ -47,7 +47,7 @@
         update sys_role_menu a <set>
         <if test="rpId != null and rpId != ''">a.rp_id = #{rpId, jdbcType=BIGINT},</if>
         <if test="menuCode != null and menuCode != ''">a.menu_code = #{menuCode, jdbcType=VARCHAR},</if>
-        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=INTEGER},</if>
+        <if test="sort != null">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="elementCode != null and elementCode != ''">a.element_code = #{elementCode, jdbcType=VARCHAR},</if>
         <if test="roleId != null and roleId != ''">a.role_id = #{roleId, jdbcType=BIGINT},</if>
     </set>
@@ -78,7 +78,7 @@
         where 1 = 1
         <if test="rpId != null and rpId != ''"> and a.rp_id = #{rpId, jdbcType=BIGINT}</if>
         <if test="menuCode != null and menuCode != ''"> and a.menu_code = #{menuCode, jdbcType=VARCHAR}</if>
-        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="sort != null"> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="elementCode != null and elementCode != ''"> and a.element_code = #{elementCode, jdbcType=VARCHAR}</if>
         <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
     </select>
@@ -94,7 +94,7 @@
         where 1 = 1
         <if test="rpId != null and rpId != ''"> and a.rp_id = #{rpId, jdbcType=BIGINT}</if>
         <if test="menuCode != null and menuCode != ''"> and a.menu_code = #{menuCode, jdbcType=VARCHAR}</if>
-        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="sort != null"> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="elementCode != null and elementCode != ''"> and a.element_code = #{elementCode, jdbcType=VARCHAR}</if>
         <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
     </select>

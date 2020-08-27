@@ -81,16 +81,16 @@
             <if test="PointTaskId != null and PointTaskId != ''">
                 and point_task_id = #{PointTaskId, jdbcType=VARCHAR}
             </if>
-            <if test="IfRobot != null and IfRobot != ''">
+            <if test="IfRobot != null ">
                 and if_robot = #{IfRobot, jdbcType=INTEGER}
             </if>
-            <if test="IfVideo != null and IfVideo != ''">
+            <if test="IfVideo != null ">
                 and if_video = #{IfVideo, jdbcType=INTEGER}
             </if>
-            <if test="IfInferad != null and IfInferad != ''">
+            <if test="IfInferad != null ">
                 and if_inferad = #{IfInferad, jdbcType=INTEGER}
             </if>
-            <if test="IfArtificial != null and IfArtificial != ''">
+            <if test="IfArtificial != null ">
                 and if_artificial = #{IfArtificial, jdbcType=INTEGER}
             </if>
     </set>
@@ -140,16 +140,16 @@
         <if test="PointTaskId != null and PointTaskId != ''">
             and point_task_id = #{PointTaskId, jdbcType=VARCHAR}
         </if>
-        <if test="IfRobot != null and IfRobot != ''">
+        <if test="IfRobot != null ">
             and if_robot = #{IfRobot, jdbcType=INTEGER}
         </if>
-        <if test="IfVideo != null and IfVideo != ''">
+        <if test="IfVideo != null ">
             and if_video = #{IfVideo, jdbcType=INTEGER}
         </if>
-        <if test="IfInferad != null and IfInferad != ''">
+        <if test="IfInferad != null ">
             and if_inferad = #{IfInferad, jdbcType=INTEGER}
         </if>
-        <if test="IfArtificial != null and IfArtificial != ''">
+        <if test="IfArtificial != null ">
             and if_artificial = #{IfArtificial, jdbcType=INTEGER}
         </if>
     </select>

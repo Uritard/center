@@ -123,10 +123,10 @@
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=REAL},</if>
-        <if test="metePrecision != null and metePrecision != ''">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="metePrecision != null ">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
-        <if test="meteIndex != null and meteIndex != ''">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
-        <if test="meteCid != null and meteCid != ''">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
         <if test="limitBand != null and limitBand != ''">a.limit_band = #{limitBand, jdbcType=REAL},</if>
         <if test="changeLimit != null and changeLimit != ''">a.change_limit = #{changeLimit, jdbcType=REAL},</if>
         <if test="validMid != null and validMid != ''">a.valid_mid = #{validMid, jdbcType=VARCHAR},</if>
@@ -146,7 +146,7 @@
         <if test="hilimit4 != null and hilimit4 != ''">a.hilimit4 = #{hilimit4, jdbcType=REAL},</if>
         <if test="lolimit4 != null and lolimit4 != ''">a.lolimit4 = #{lolimit4, jdbcType=REAL},</if>
         <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
-        <if test="isshield != null and isshield != ''">a.isshield = #{isshield, jdbcType=INTEGER},</if>
+        <if test="isshield != null ">a.isshield = #{isshield, jdbcType=INTEGER},</if>
         <if test="storageperiod != null and storageperiod != ''">a.storageperiod = #{storageperiod, jdbcType=BIGINT},</if>
         <if test="linkMeteId != null and linkMeteId != ''">a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR},</if>
     </set>
@@ -232,10 +232,10 @@
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
-        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="metePrecision != null "> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
-        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="meteIndex != null "> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null "> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
         <if test="limitBand != null and limitBand != ''"> and a.limit_band = #{limitBand, jdbcType=REAL}</if>
         <if test="changeLimit != null and changeLimit != ''"> and a.change_limit = #{changeLimit, jdbcType=REAL}</if>
         <if test="validMid != null and validMid != ''"> and a.valid_mid = #{validMid, jdbcType=VARCHAR}</if>
@@ -255,7 +255,7 @@
         <if test="hilimit4 != null and hilimit4 != ''"> and a.hilimit4 = #{hilimit4, jdbcType=REAL}</if>
         <if test="lolimit4 != null and lolimit4 != ''"> and a.lolimit4 = #{lolimit4, jdbcType=REAL}</if>
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
-        <if test="isshield != null and isshield != ''"> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
+        <if test="isshield != null "> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
         <if test="storageperiod != null and storageperiod != ''"> and a.storageperiod = #{storageperiod, jdbcType=BIGINT}</if>
         <if test="linkMeteId != null and linkMeteId != ''"> and a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR}</if>
     </select>
@@ -300,10 +300,10 @@
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
-        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="metePrecision != null "> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
-        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="meteIndex != null "> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null "> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
         <if test="limitBand != null and limitBand != ''"> and a.limit_band = #{limitBand, jdbcType=REAL}</if>
         <if test="changeLimit != null and changeLimit != ''"> and a.change_limit = #{changeLimit, jdbcType=REAL}</if>
         <if test="validMid != null and validMid != ''"> and a.valid_mid = #{validMid, jdbcType=VARCHAR}</if>
@@ -323,7 +323,7 @@
         <if test="hilimit4 != null and hilimit4 != ''"> and a.hilimit4 = #{hilimit4, jdbcType=REAL}</if>
         <if test="lolimit4 != null and lolimit4 != ''"> and a.lolimit4 = #{lolimit4, jdbcType=REAL}</if>
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
-        <if test="isshield != null and isshield != ''"> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
+        <if test="isshield != null "> and a.isshield = #{isshield, jdbcType=INTEGER}</if>
         <if test="storageperiod != null and storageperiod != ''"> and a.storageperiod = #{storageperiod, jdbcType=BIGINT}</if>
         <if test="linkMeteId != null and linkMeteId != ''"> and a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR}</if>
     </select>

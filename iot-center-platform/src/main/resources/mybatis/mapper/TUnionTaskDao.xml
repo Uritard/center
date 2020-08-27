@@ -81,22 +81,22 @@
             <if test="Name != null and Name != ''">
                 and name = #{Name, jdbcType=VARCHAR}
             </if>
-            <if test="Type != null and Type != ''">
+            <if test="Type != null ">
                 and type = #{Type, jdbcType=INTEGER}
             </if>
-            <if test="IfRun != null and IfRun != ''">
+            <if test="IfRun != null ">
                 and if_run = #{IfRun, jdbcType=INTEGER}
             </if>
             <if test="RobotId != null and RobotId != ''">
                 and robot_id = #{RobotId, jdbcType=BIGINT}
             </if>
-            <if test="Datetype != null and Datetype != ''">
+            <if test="Datetype != null ">
                 and date_type = #{Datetype, jdbcType=INTEGER}
             </if>
-            <if test="Remark1 != null and Remark1 != ''">
+            <if test="Remark1 != null ">
                 and remark1 = #{Remark1, jdbcType=INTEGER}
             </if>
-            <if test="TaskType != null and TaskType != ''">
+            <if test="TaskType != null ">
                 and task_type = #{TaskType, jdbcType=INTEGER}
             </if>
             <if test="StartTime != null and StartTime != ''">
@@ -150,28 +150,28 @@
         <if test="Name != null and Name != ''">
             and name = #{Name, jdbcType=VARCHAR}
         </if>
-        <if test="Type != null and Type != ''">
+        <if test="Type != null ">
             and type = #{Type, jdbcType=INTEGER}
         </if>
-        <if test="IfRun != null and IfRun != ''">
+        <if test="IfRun != null ">
             and if_run = #{IfRun, jdbcType=INTEGER}
         </if>
         <if test="RobotId != null and RobotId != ''">
             and robot_id = #{RobotId, jdbcType=BIGINT}
         </if>
-        <if test="Datetype != null and Datetype != ''">
+        <if test="Datetype != null ">
             and date_type = #{Datetype, jdbcType=INTEGER}
         </if>
-        <if test="Remark1 != null and Remark1 != ''">
+        <if test="Remark1 != null ">
             and remark1 = #{Remark1, jdbcType=INTEGER}
         </if>
-        <if test="Remark2 != null and Remark2 != ''">
+        <if test="Remark2 != null ">
             and remark2 = #{Remark2, jdbcType=INTEGER}
         </if>
-        <if test="Remark3 != null and Remark3 != ''">
+        <if test="Remark3 != null ">
             and remark3 = #{Remark3, jdbcType=INTEGER}
         </if>
-        <if test="TaskType != null and TaskType != ''">
+        <if test="TaskType != null ">
             and task_type = #{TaskType, jdbcType=INTEGER}
         </if>
         <if test="StartTime != null and StartTime != ''">

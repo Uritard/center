@@ -46,11 +46,11 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TDictBusiness">
         update t_dict_business a <set>
-        <if test="dictId != null and dictId != ''">a.dict_id = #{dictId, jdbcType=INTEGER},</if>
+        <if test="dictId != null ">a.dict_id = #{dictId, jdbcType=INTEGER},</if>
         <if test="dictCode != null and dictCode != ''">a.dict_code = #{dictCode, jdbcType=VARCHAR},</if>
         <if test="colName != null and colName != ''">a.col_name = #{colName, jdbcType=VARCHAR},</if>
         <if test="dictNote != null and dictNote != ''">a.dict_note = #{dictNote, jdbcType=VARCHAR},</if>
-        <if test="upDict != null and upDict != ''">a.up_dict = #{upDict, jdbcType=INTEGER},</if>
+        <if test="upDict != null ">a.up_dict = #{upDict, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
         <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=BIGINT},</if>
     </set>
@@ -83,11 +83,11 @@
         a.sort
         from t_dict_business a
         where 1 = 1
-        <if test="dictId != null and dictId != ''"> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
+        <if test="dictId != null "> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
         <if test="dictCode != null and dictCode != ''"> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
         <if test="colName != null and colName != ''"> and a.col_name LIKE CONCAT('%',#{colName, jdbcType=VARCHAR},'%')</if>
         <if test="dictNote != null and dictNote != ''"> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
-        <if test="upDict != null and upDict != ''"> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
+        <if test="upDict != null "> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=BIGINT}</if>
     </select>
@@ -103,11 +103,11 @@
         a.sort
         from t_dict_business a
         where 1 = 1
-        <if test="dictId != null and dictId != ''"> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
+        <if test="dictId != null "> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
         <if test="dictCode != null and dictCode != ''"> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
         <if test="colName != null and colName != ''"> and a.col_name LIKE CONCAT('%',#{colName, jdbcType=VARCHAR},'%')</if>
         <if test="dictNote != null and dictNote != ''"> AND a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
-        <if test="upDict != null and upDict != ''"> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
+        <if test="upDict != null "> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=BIGINT}</if>
     </select>

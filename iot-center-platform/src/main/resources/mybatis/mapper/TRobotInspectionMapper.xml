@@ -61,13 +61,13 @@
         <if test="inspectionId != null and inspectionId != ''">a.inspection_id = #{inspectionId, jdbcType=BIGINT},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
-        <if test="inspectionType != null and inspectionType != ''">a.inspection_type = #{inspectionType, jdbcType=INTEGER},</if>
+        <if test="inspectionType != null ">a.inspection_type = #{inspectionType, jdbcType=INTEGER},</if>
         <if test="alarmTop != null and alarmTop != ''">a.alarm_top = #{alarmTop, jdbcType=VARCHAR},</if>
         <if test="alarmBottom != null and alarmBottom != ''">a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR},</if>
         <if test="defaultValue != null and defaultValue != ''">a.default_value = #{defaultValue, jdbcType=VARCHAR},</if>
-        <if test="inspectionPostion != null and inspectionPostion != ''">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
-        <if test="collectStatus != null and collectStatus != ''">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
-        <if test="calibrationStatus != null and calibrationStatus != ''">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
+        <if test="inspectionPostion != null ">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
+        <if test="collectStatus != null ">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
+        <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
     </set>
             where a.inspection_id = #{inspectionId, jdbcType=BIGINT}
@@ -110,13 +110,13 @@
         <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="inspectionType != null and inspectionType != ''"> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
+        <if test="inspectionType != null "> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
         <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
         <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
         <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
-        <if test="inspectionPostion != null and inspectionPostion != ''"> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
-        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
-        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+        <if test="inspectionPostion != null "> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
+        <if test="collectStatus != null "> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
+        <if test="calibrationStatus != null"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
     </select>
 
@@ -138,13 +138,13 @@
         <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="inspectionType != null and inspectionType != ''"> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
+        <if test="inspectionType != null "> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
         <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
         <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
         <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
-        <if test="inspectionPostion != null and inspectionPostion != ''"> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
-        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
-        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+        <if test="inspectionPostion != null "> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
+        <if test="collectStatus != null "> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
+        <if test="calibrationStatus != null "> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
     </select>
 

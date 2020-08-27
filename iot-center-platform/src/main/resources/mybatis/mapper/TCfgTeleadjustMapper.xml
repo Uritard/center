@@ -81,18 +81,18 @@
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=REAL},</if>
-        <if test="metePrecision != null and metePrecision != ''">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="metePrecision != null ">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
-        <if test="meteIndex != null and meteIndex != ''">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
-        <if test="meteCid != null and meteCid != ''">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
-        <if test="adjustKind != null and adjustKind != ''">a.adjust_kind = #{adjustKind, jdbcType=INTEGER},</if>
+        <if test="meteIndex != null">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="adjustKind != null ">a.adjust_kind = #{adjustKind, jdbcType=INTEGER},</if>
         <if test="lastValue != null and lastValue != ''">a.last_value = #{lastValue, jdbcType=REAL},</if>
         <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
         <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
         <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
-        <if test="controlenable != null and controlenable != ''">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
+        <if test="controlenable != null ">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
@@ -148,18 +148,18 @@
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
-        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="metePrecision != null "> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
-        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
-        <if test="adjustKind != null and adjustKind != ''"> and a.adjust_kind = #{adjustKind, jdbcType=INTEGER}</if>
+        <if test="meteIndex != null "> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null "> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="adjustKind != null "> and a.adjust_kind = #{adjustKind, jdbcType=INTEGER}</if>
         <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=REAL}</if>
         <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
-        <if test="controlenable != null and controlenable != ''"> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
+        <if test="controlenable != null "> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgTeleadjust" resultType="com.yjh.platform.module.device.entity.TCfgTeleadjust">
@@ -188,18 +188,18 @@
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
-        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="metePrecision != null "> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="meteIndex != null and meteIndex != ''"> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
-        <if test="meteCid != null and meteCid != ''"> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
-        <if test="adjustKind != null and adjustKind != ''"> and a.adjust_kind = #{adjustKind, jdbcType=INTEGER}</if>
+        <if test="meteIndex != null "> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
+        <if test="meteCid != null "> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
+        <if test="adjustKind != null "> and a.adjust_kind = #{adjustKind, jdbcType=INTEGER}</if>
         <if test="lastValue != null and lastValue != ''"> and a.last_value = #{lastValue, jdbcType=REAL}</if>
         <if test="lastTime != null and lastTime != ''"> and a.last_time = #{lastTime, jdbcType=TIMESTAMP}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
-        <if test="controlenable != null and controlenable != ''"> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
+        <if test="controlenable != null "> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">

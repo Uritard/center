@@ -44,7 +44,7 @@
         <if test="roleName != null and roleName != ''">a.role_name = #{roleName, jdbcType=VARCHAR}, </if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP}, </if>
         <if test="creatorId != null and creatorId != ''">a.creator_id = #{creatorId, jdbcType=BIGINT}, </if>
-        <if test="sysState != null and sysState != ''">a.sys_state = #{sysState, jdbcType=INTEGER}, </if>
+        <if test="sysState != null">a.sys_state = #{sysState, jdbcType=INTEGER}, </if>
     </set>
             where a.role_id = #{roleId, jdbcType=BIGINT}
     </update>
@@ -75,7 +75,7 @@
         <if test="roleName != null and roleName != ''"> and a.role_name = #{roleName, jdbcType=VARCHAR}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
-        <if test="sysState != null and sysState != ''"> and a.sys_state = #{sysState, jdbcType=INTEGER}</if>
+        <if test="sysState != null"> and a.sys_state = #{sysState, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysRole" resultType="com.yjh.platform.module.user.entity.SysRole">
@@ -91,7 +91,7 @@
         <if test="roleName != null and roleName != ''"> and a.role_name = #{roleName, jdbcType=VARCHAR}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
-        <if test="sysState != null and sysState != ''"> and a.sys_state = #{sysState, jdbcType=INTEGER}</if>
+        <if test="sysState != null"> and a.sys_state = #{sysState, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectRelationMenu" parameterType="java.lang.Long" resultType="java.lang.String">
@@ -167,7 +167,7 @@
         <if test="roleName != null and roleName != ''">, a.role_name = #{roleName, jdbcType=VARCHAR}</if>
         <if test="createTime != null">, a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="creatorId != null and creatorId != ''">, a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
-        <if test="sysState != null and sysState != ''">, a.sys_state = #{sysState, jdbcType=INTEGER}</if>
+        <if test="sysState != null">, a.sys_state = #{sysState, jdbcType=INTEGER}</if>
         where a.role_id = #{roleId, jdbcType=BIGINT}
     </update>
 

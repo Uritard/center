@@ -98,18 +98,18 @@
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
         <if test="dataFormat != null and dataFormat != ''">a.data_format = #{dataFormat, jdbcType=VARCHAR},</if>
-        <if test="identifyType != null and identifyType != ''">a.identify_type = #{identifyType, jdbcType=INTEGER},</if>
-        <if test="identifySonType != null and identifySonType != ''">a.identify_son_type = #{identifySonType, jdbcType=INTEGER},</if>
-        <if test="cruiseType != null and cruiseType != ''">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        <if test="identifyType != null ">a.identify_type = #{identifyType, jdbcType=INTEGER},</if>
+        <if test="identifySonType != null ">a.identify_son_type = #{identifySonType, jdbcType=INTEGER},</if>
+        <if test="cruiseType != null ">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
         <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
         <if test="cruiseName != null and cruiseName != ''">a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
         <if test="cruiseContent != null and cruiseContent != ''">a.cruise_content = #{cruiseContent, jdbcType=VARCHAR},</if>
         <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
         <if test="unitVal != null and unitVal != ''">a.unit_val = #{unitVal, jdbcType=VARCHAR},</if>
         <if test="unitName != null and unitName != ''">a.unit_name = #{unitName, jdbcType=VARCHAR},</if>
-        <if test="ifSy != null and ifSy != ''">a.if_sy = #{ifSy, jdbcType=INTEGER},</if>
-        <if test="syType != null and syType != ''">a.sy_type = #{syType, jdbcType=INTEGER},</if>
-        <if test="ifVideotape != null and ifVideotape != ''">a.if_videotape = #{ifVideotape, jdbcType=INTEGER},</if>
+        <if test="ifSy != null ">a.if_sy = #{ifSy, jdbcType=INTEGER},</if>
+        <if test="syType != null ">a.sy_type = #{syType, jdbcType=INTEGER},</if>
+        <if test="ifVideotape != null ">a.if_videotape = #{ifVideotape, jdbcType=INTEGER},</if>
         <if test="videotapeTime != null and videotapeTime != ''">a.videotape_time = #{videotapeTime, jdbcType=VARCHAR},</if>
         <if test="textDesc != null and textDesc != ''">a.text_desc = #{textDesc, jdbcType=VARCHAR},</if>
         <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=VARCHAR},</if>
@@ -180,18 +180,18 @@
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="dataFormat != null and dataFormat != ''"> and a.data_format = #{dataFormat, jdbcType=VARCHAR}</if>
-        <if test="identifyType != null and identifyType != ''"> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
-        <if test="identifySonType != null and identifySonType != ''"> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
-        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="identifyType != null "> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
+        <if test="identifySonType != null "> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
         <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
         <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
-        <if test="ifSy != null and ifSy != ''"> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
-        <if test="syType != null and syType != ''"> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
-        <if test="ifVideotape != null and ifVideotape != ''"> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
+        <if test="ifSy != null "> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
+        <if test="syType != null "> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
+        <if test="ifVideotape != null "> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
         <if test="videotapeTime != null and videotapeTime != ''"> and a.videotape_time = #{videotapeTime, jdbcType=VARCHAR}</if>
         <if test="textDesc != null and textDesc != ''"> and a.text_desc = #{textDesc, jdbcType=VARCHAR}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
@@ -230,18 +230,18 @@
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="dataFormat != null and dataFormat != ''"> and a.data_format = #{dataFormat, jdbcType=VARCHAR}</if>
-        <if test="identifyType != null and identifyType != ''"> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
-        <if test="identifySonType != null and identifySonType != ''"> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
-        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="identifyType != null "> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
+        <if test="identifySonType != null "> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
         <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
         <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
-        <if test="ifSy != null and ifSy != ''"> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
-        <if test="syType != null and syType != ''"> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
-        <if test="ifVideotape != null and ifVideotape != ''"> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
+        <if test="ifSy != null "> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
+        <if test="syType != null "> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
+        <if test="ifVideotape != null "> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
         <if test="videotapeTime != null and videotapeTime != ''"> and a.videotape_time = #{videotapeTime, jdbcType=VARCHAR}</if>
         <if test="textDesc != null and textDesc != ''"> and a.text_desc = #{textDesc, jdbcType=VARCHAR}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>

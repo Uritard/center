@@ -83,7 +83,7 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdMete">
         update t_std_mete a <set>
         <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
@@ -93,13 +93,13 @@
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=REAL},</if>
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
-        <if test="alarmLimit != null and alarmLimit != ''">a.alarm_limit = #{alarmLimit, jdbcType=INTEGER},</if>
-        <if test="alarmDelay != null and alarmDelay != ''">a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},</if>
-        <if test="alarmCnt != null and alarmCnt != ''">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmLimit != null ">a.alarm_limit = #{alarmLimit, jdbcType=INTEGER},</if>
+        <if test="alarmDelay != null ">a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},</if>
+        <if test="alarmCnt != null ">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
         <if test="thresholdAbs != null and thresholdAbs != ''">a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},</if>
         <if test="thresholdPer != null and thresholdPer != ''">a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},</if>
-        <if test="modulus != null and modulus != ''">a.modulus = #{modulus, jdbcType=INTEGER},</if>
+        <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}
@@ -156,7 +156,7 @@
         from t_std_mete a
         where 1 = 1
         <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
@@ -166,13 +166,13 @@
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
-        <if test="alarmLevel != null and alarmLevel != ''"> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
-        <if test="alarmLimit != null and alarmLimit != ''"> and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
-        <if test="alarmDelay != null and alarmDelay != ''"> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
-        <if test="alarmCnt != null and alarmCnt != ''"> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
+        <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        <if test="alarmLimit != null "> and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
+        <if test="alarmDelay != null "> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
+        <if test="alarmCnt != null "> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
-        <if test="modulus != null and modulus != ''"> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
@@ -200,7 +200,7 @@
         from t_std_mete a
         where 1 = 1
         <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
@@ -210,13 +210,13 @@
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
-        <if test="alarmLevel != null and alarmLevel != ''"> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
-        <if test="alarmLimit != null and alarmLimit != ''"> and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
-        <if test="alarmDelay != null and alarmDelay != ''"> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
-        <if test="alarmCnt != null and alarmCnt != ''"> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
+        <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        <if test="alarmLimit != null "> and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
+        <if test="alarmDelay != null "> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
+        <if test="alarmCnt != null "> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
-        <if test="modulus != null and modulus != ''"> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 

@@ -176,8 +176,8 @@
         <if test="menuType != null "> and a.menu_type = #{menuType, jdbcType=INTEGER}</if>
         <if test="menuLevel != null "> and a.menu_level = #{menuLevel, jdbcType=INTEGER}</if>
         <if test="elementCode != null and elementCode != ''"> and a.element_code = #{elementCode, jdbcType=VARCHAR}</if>
-        <if test="state != null and "> and a.state = #{state, jdbcType=INTEGER}</if>
-        <if test="sort != null and "> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="sort != null  "> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="linkType != null "> and a.link_type = #{linkType, jdbcType=INTEGER}</if>
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
         <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>

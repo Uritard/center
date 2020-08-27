@@ -111,22 +111,22 @@
         update t_cfg_mete a <set>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
-        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteKind != null ">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="meteExplainType != null and meteExplainType != ''">a.mete_explain_type = #{meteExplainType, jdbcType=VARCHAR},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        <if test="modulus != null and modulus != ''">a.modulus = #{modulus, jdbcType=INTEGER},</if>
+        <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
         <if test="stationName != null and stationName != ''">a.station_name = #{stationName, jdbcType=VARCHAR},</if>
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
-        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
-        <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=INTEGER},</if>
-        <if test="alarmlevel != null and alarmlevel != ''">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
-        <if test="alarmthresbhold != null and alarmthresbhold != ''">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
+        <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
+        <if test="lowEffect != null ">a.low_effect = #{lowEffect, jdbcType=INTEGER},</if>
+        <if test="alarmlevel != null ">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
+        <if test="alarmthresbhold != null ">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
         <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
-        <if test="metePrecision != null and metePrecision != ''">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="metePrecision != null">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
         <if test="changeLimit != null and changeLimit != ''">a.change_limit = #{changeLimit, jdbcType=REAL},</if>
         <if test="hilimit1 != null and hilimit1 != ''">a.hilimit1 = #{hilimit1, jdbcType=REAL},</if>
         <if test="lolimit1 != null and lolimit1 != ''">a.lolimit1 = #{lolimit1, jdbcType=REAL},</if>
@@ -136,7 +136,7 @@
         <if test="lolimit3 != null and lolimit3 != ''">a.lolimit3 = #{lolimit3, jdbcType=REAL},</if>
         <if test="hilimit4 != null and hilimit4 != ''">a.hilimit4 = #{hilimit4, jdbcType=REAL},</if>
         <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
-        <if test="controlenable != null and controlenable != ''">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
+        <if test="controlenable != null ">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
     </set>
             where a.mete_id = #{meteId, jdbcType=VARCHAR}
     </update>
@@ -211,22 +211,22 @@
         where 1 = 1
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteKind != null "> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="meteExplainType != null and meteExplainType != ''"> and a.mete_explain_type = #{meteExplainType, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
-        <if test="modulus != null and modulus != ''"> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
         <if test="stationName != null and stationName != ''"> and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
-        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
-        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
-        <if test="alarmlevel != null and alarmlevel != ''"> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
-        <if test="alarmthresbhold != null and alarmthresbhold != ''"> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
+        <if test="upEffect != null "> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
+        <if test="lowEffect != null "> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="alarmlevel != null "> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
+        <if test="alarmthresbhold != null "> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
         <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
-        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="metePrecision != null "> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
         <if test="changeLimit != null and changeLimit != ''"> and a.change_limit = #{changeLimit, jdbcType=REAL}</if>
         <if test="hilimit1 != null and hilimit1 != ''"> and a.hilimit1 = #{hilimit1, jdbcType=REAL}</if>
         <if test="lolimit1 != null and lolimit1 != ''"> and a.lolimit1 = #{lolimit1, jdbcType=REAL}</if>
@@ -236,7 +236,7 @@
         <if test="lolimit3 != null and lolimit3 != ''"> and a.lolimit3 = #{lolimit3, jdbcType=REAL}</if>
         <if test="hilimit4 != null and hilimit4 != ''"> and a.hilimit4 = #{hilimit4, jdbcType=REAL}</if>
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
-        <if test="controlenable != null and controlenable != ''"> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
+        <if test="controlenable != null "> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMete" resultType="com.yjh.platform.module.device.entity.TCfgMete">
@@ -273,22 +273,22 @@
         where 1 = 1
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteKind != null "> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="meteExplainType != null and meteExplainType != ''"> and a.mete_explain_type = #{meteExplainType, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
-        <if test="modulus != null and modulus != ''"> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
         <if test="stationName != null and stationName != ''"> and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
-        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
-        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
-        <if test="alarmlevel != null and alarmlevel != ''"> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
-        <if test="alarmthresbhold != null and alarmthresbhold != ''"> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
+        <if test="upEffect != null "> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
+        <if test="lowEffect != null "> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="alarmlevel != null "> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
+        <if test="alarmthresbhold != null "> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
         <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
-        <if test="metePrecision != null and metePrecision != ''"> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
+        <if test="metePrecision != null "> and a.mete_precision = #{metePrecision, jdbcType=INTEGER}</if>
         <if test="changeLimit != null and changeLimit != ''"> and a.change_limit = #{changeLimit, jdbcType=REAL}</if>
         <if test="hilimit1 != null and hilimit1 != ''"> and a.hilimit1 = #{hilimit1, jdbcType=REAL}</if>
         <if test="lolimit1 != null and lolimit1 != ''"> and a.lolimit1 = #{lolimit1, jdbcType=REAL}</if>
@@ -298,7 +298,7 @@
         <if test="lolimit3 != null and lolimit3 != ''"> and a.lolimit3 = #{lolimit3, jdbcType=REAL}</if>
         <if test="hilimit4 != null and hilimit4 != ''"> and a.hilimit4 = #{hilimit4, jdbcType=REAL}</if>
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
-        <if test="controlenable != null and controlenable != ''"> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
+        <if test="controlenable != null "> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">
