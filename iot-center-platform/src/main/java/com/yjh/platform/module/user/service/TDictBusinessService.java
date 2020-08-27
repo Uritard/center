@@ -69,29 +69,8 @@ public class TDictBusinessService{
 
     @Logs(title = "多类型查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> selectQuery() {
-        Map<String,Object> result = new HashMap<>();
-        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null,null,null,null,null,null,null);
-        List<TDictBusiness> robotPosition = new ArrayList<>();
-        List<TDictBusiness> robotType = new ArrayList<>();
-        List<TDictBusiness> robotFactory = new ArrayList<>();
-        List<TDictBusiness> robotUse = new ArrayList<>();
-        for(TDictBusiness tDictBusiness : tDictBusinessList){
-            if(tDictBusiness.getColName().equalsIgnoreCase("robot_position")){
-                robotPosition.add(tDictBusiness);
-            }else if (tDictBusiness.getColName().equalsIgnoreCase("robot_type")){
-                robotType.add(tDictBusiness);
-            }else if (tDictBusiness.getColName().equalsIgnoreCase("robot_factory")){
-                robotFactory.add(tDictBusiness);
-            }else if (tDictBusiness.getColName().equalsIgnoreCase("robot_use")){
-                robotUse.add(tDictBusiness);
-            }
-        }
-        result.put("robotPosition",robotPosition);
-        result.put("robotType",robotType);
-        result.put("robotFactory",robotFactory);
-        result.put("robotUse",robotUse);
-        return result;
+    public  List<TDictBusiness> selectQuery(List<String> colNames) {
+        return tDictBusinessDao.selectQuery(colNames);
     }
 
 }

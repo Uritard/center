@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
@@ -27,5 +28,7 @@ public interface TDictBusinessDao {
     List<TDictBusiness> selectByPage(TDictBusiness tDictBusiness);
 
     int batchInsert(@Param("list") List<TDictBusiness> list);
+
+    List<TDictBusiness> selectQuery(@Param("colNames") List<String> colNames);
 
 }

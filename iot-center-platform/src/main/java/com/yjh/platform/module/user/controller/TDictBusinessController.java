@@ -1,7 +1,10 @@
 package com.yjh.platform.module.user.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.module.user.service.TDictBusinessService;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -153,18 +156,23 @@ public class TDictBusinessController {
         return result;
     }
 
+
     @ApiOperation(value = "多类型查询")
     @RequestMapping(value = "/selectQuery", method = RequestMethod.POST)
-    public Result selectQuery() {
+    public Result selectQuery( @RequestParam(value = "colNames", required = false) String colName) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
         try {
-            resultMap = tDictBusinessService.selectQuery();
-            result.setData(resultMap);
+        String [] splitColNames=colName.split("'|,");
+        List<String> colNames = new ArrayList<>();
+        for(String ColName : splitColNames) {
+            colNames.add(ColName);
+        }
+        result.setData(tDictBusinessService.selectQuery(colNames));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("业务字典分页失败描述：", e);
+            log.error("业务字典查询失败描述：", e);
         }
         return result;
     }
+
 }
