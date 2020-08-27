@@ -57,14 +57,14 @@ public class TCameraRecorderService {
         return tCameraRecorderByDictList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "TCameraRecorder")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraRecorderByDict> selectByPage(TCameraRecorder tCameraRecorder) {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(tCameraRecorder);
         return tCameraRecorderByDictList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "TCameraRecorder")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCameraRecorder> list) {
         return this.tCameraRecorderDao.batchInsert(list);

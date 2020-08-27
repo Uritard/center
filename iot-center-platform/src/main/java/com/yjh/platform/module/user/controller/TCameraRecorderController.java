@@ -25,8 +25,8 @@ import java.util.Map;
  * @since 2020-08-24
  */
 @RestController
-@RequestMapping("/t-camera-recorder/v1")
-@Api(value = "/t-camera-recorder", description = "录像服务器表操作接口")
+@RequestMapping("/tCameraRecorder/v1")
+@Api(value = "/tCameraRecorder", description = "录像服务器表操作接口")
 public class TCameraRecorderController {
 
     @Autowired
@@ -39,7 +39,7 @@ public class TCameraRecorderController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCameraRecorder tCameraRecorder) {
         Result result = new Result();
         try {

@@ -73,9 +73,104 @@
         </foreach>
         </insert>
 
-        <!--获取最后一条数据的modelid-->
+        <!--获取最后一条数据的modelId-->
         <select id="selectLastModelId" resultType="java.lang.Long">
-            select model_id from t_std_metemodel order by model_id DESC limit 1;
+             select model_id from t_std_metemodel order by model_id DESC limit 1;
+        </select>
+
+        <!--标准化设备导入-->
+    <insert id="batchUpdateTStdDevice">
+        insert  into t_std_device(
+        device_id,
+        custom_id,
+        device_code,
+        device_name,
+        alias_name,
+        device_type,
+        position_type,
+        model_id,
+        region_path,
+        up_region_id,
+        up_region_name,
+        custom_name,
+        custom_type,
+        status,
+        update_time,
+        create_time
+        ) values
+        <foreach collection="tStdDeviceList" item="TStdDevice" separator=",">
+            (
+            null,
+            #{TStdDevice.customId, jdbcType=VARCHAR},
+            #{TStdDevice.deviceCode, jdbcType=VARCHAR},
+            #{TStdDevice.deviceName, jdbcType=VARCHAR},
+            #{TStdDevice.aliasName, jdbcType=VARCHAR},
+            #{TStdDevice.deviceType, jdbcType=INTEGER},
+            #{TStdDevice.positionType, jdbcType=VARCHAR},
+            #{TStdDevice.modelId, jdbcType=BIGINT},
+            #{TStdDevice.regionPath, jdbcType=VARCHAR},
+            #{TStdDevice.upRegionId, jdbcType=BIGINT},
+            #{TStdDevice.upRegionName, jdbcType=VARCHAR},
+            #{TStdDevice.customName, jdbcType=VARCHAR},
+            #{TStdDevice.customType, jdbcType=INTEGER},
+            #{TStdDevice.status, jdbcType=INTEGER},
+            #{TStdDevice.updateTime, jdbcType=TIMESTAMP},
+            #{TStdDevice.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+        <!--标准化设备参数导入-->
+        <insert id="batchUpdateTStdDeviceAttr">
+            insert  into t_std_device_attr(
+            device_id,
+            device_model,
+            pms_type,
+            pms_id,
+            manufacturer,
+            production_date,
+            opening_date,
+            disable_date,
+            last_maintenance,
+            maintenance_count,
+            organization,
+            department,
+            responsible_person,
+            latitude,
+            longitude,
+            ip,
+            port,
+            para_1,
+            para_2,
+            para_3
+            ) values
+            <foreach collection="tStdDeviceAttrList" item="TStdDeviceAttr" separator=",">
+                (
+                #{TStdDeviceAttr.deviceId, jdbcType=BIGINT},
+                #{TStdDeviceAttr.deviceModel, jdbcType=INTEGER},
+                #{TStdDeviceAttr.pmsType, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.pmsId, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.manufacturer, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.productionDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.openingDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.disableDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.lastMaintenance, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.maintenanceCount, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.organization, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.department, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.responsiblePerson, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.latitude, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.longitude, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.ip, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.port, jdbcType=INTEGER},
+                #{TStdDeviceAttr.para1, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.para2, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.para3, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--获取最后一条数据的modelId-->
+        <select id="selectLastDeviceId" resultType="java.lang.Long">
+            select device_id from t_std_device order by device_id DESC limit 1;
         </select>
 
 </mapper>
