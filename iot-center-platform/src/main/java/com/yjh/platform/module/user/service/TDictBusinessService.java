@@ -3,7 +3,10 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +65,33 @@ public class TDictBusinessService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TDictBusiness> list) {
         return this.tDictBusinessDao.batchInsert(list);
+    }
+
+    @Logs(title = "多类型查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectQuery() {
+        Map<String,Object> result = new HashMap<>();
+        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null,null,null,null,null,null,null);
+        List<TDictBusiness> robotPosition = new ArrayList<>();
+        List<TDictBusiness> robotType = new ArrayList<>();
+        List<TDictBusiness> robotFactory = new ArrayList<>();
+        List<TDictBusiness> robotUse = new ArrayList<>();
+        for(TDictBusiness tDictBusiness : tDictBusinessList){
+            if(tDictBusiness.getColName().equalsIgnoreCase("robot_position")){
+                robotPosition.add(tDictBusiness);
+            }else if (tDictBusiness.getColName().equalsIgnoreCase("robot_type")){
+                robotType.add(tDictBusiness);
+            }else if (tDictBusiness.getColName().equalsIgnoreCase("robot_factory")){
+                robotFactory.add(tDictBusiness);
+            }else if (tDictBusiness.getColName().equalsIgnoreCase("robot_use")){
+                robotUse.add(tDictBusiness);
+            }
+        }
+        result.put("robotPosition",robotPosition);
+        result.put("robotType",robotType);
+        result.put("robotFactory",robotFactory);
+        result.put("robotUse",robotUse);
+        return result;
     }
 
 }

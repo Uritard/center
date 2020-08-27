@@ -18,6 +18,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
+
 
 /**
  * @author tt
@@ -151,4 +153,18 @@ public class TDictBusinessController {
         return result;
     }
 
+    @ApiOperation(value = "多类型查询")
+    @RequestMapping(value = "/selectQuery", method = RequestMethod.POST)
+    public Result selectQuery() {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            resultMap = tDictBusinessService.selectQuery();
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("业务字典分页失败描述：", e);
+        }
+        return result;
+    }
 }

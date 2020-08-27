@@ -27,4 +27,5 @@ public interface TDictBusinessDao {
     List<TDictBusiness> selectByPage(TDictBusiness tDictBusiness);
 
     int batchInsert(@Param("list") List<TDictBusiness> list);
+
 }
