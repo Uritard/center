@@ -82,7 +82,7 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="java.util.HashMap" resultType="com.yjh.logs.module.log.entity.SysLogs">
+    <select id="selectByPage" parameterType="java.util.HashMap" resultType="com.yjh.logs.module.log.entity.SysLogs">
         select
         a.log_id,
         a.log_type,
@@ -110,7 +110,7 @@
 
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">
+    <select id="select" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">
         select
         a.log_id,
         a.log_type,

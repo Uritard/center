@@ -43,7 +43,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruisePointInstance tCruisePointInstance) {
+    public Result add(@RequestBody TCruisePointInstance tCruisePointInstance) {
         Result result = new Result();
         try {
             result.setData(tCruisePointInstanceService.insert(tCruisePointInstance));
@@ -159,7 +159,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCruisePointInstance> list) {
+    public Result batchAdd(@RequestBody List<TCruisePointInstance> list) {
         Result result = new Result();
         try {
             result.setData(tCruisePointInstanceService.batchInsert(list));

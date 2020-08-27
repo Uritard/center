@@ -39,7 +39,7 @@ public class TCfgTelesignalController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCfgTelesignal tCfgTelesignal) {
+    public Result add(@RequestBody TCfgTelesignal tCfgTelesignal) {
         Result result = new Result();
         try {
             result.setData(tCfgTelesignalService.insert(tCfgTelesignal));
@@ -159,8 +159,8 @@ public class TCfgTelesignalController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCfgTelesignal> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TCfgTelesignal> list) {
         Result result = new Result();
         try {
         result.setData(tCfgTelesignalService.batchInsert(list));

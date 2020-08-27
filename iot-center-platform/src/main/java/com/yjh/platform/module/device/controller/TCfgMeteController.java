@@ -39,7 +39,7 @@ public class TCfgMeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCfgMete tCfgMete) {
+    public Result add(@RequestBody TCfgMete tCfgMete) {
         Result result = new Result();
         try {
             result.setData(tCfgMeteService.insert(tCfgMete));
@@ -160,8 +160,8 @@ public class TCfgMeteController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCfgMete> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TCfgMete> list) {
         Result result = new Result();
         try {
         result.setData(tCfgMeteService.batchInsert(list));

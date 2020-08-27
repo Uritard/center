@@ -59,10 +59,10 @@
         <if test="orgName != null and orgName != ''">a.org_name = #{orgName, jdbcType=VARCHAR},</if>
         <if test="orgCode != null and orgCode != ''">a.org_code = #{orgCode, jdbcType=VARCHAR},</if>
         <if test="upId != null and upId != ''">a.up_id = #{upId, jdbcType=BIGINT},</if>
-        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=INTEGER},</if>
+        <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="creatorId != null and creatorId != ''">a.creator_id = #{creatorId, jdbcType=BIGINT},</if>
-        <if test="orgLevel != null and orgLevel != ''">a.org_level = #{orgLevel, jdbcType=INTEGER},</if>
+        <if test="orgLevel != null ">a.org_level = #{orgLevel, jdbcType=INTEGER},</if>
         <if test="orgPath != null and orgPath != ''">a.org_path = #{orgPath, jdbcType=VARCHAR},</if>
         <if test="deptName != null and deptName != ''">a.dept_name = #{deptName, jdbcType=VARCHAR},</if>
     </set>
@@ -105,10 +105,10 @@
         <if test="orgName != null and orgName != ''"> and a.org_name = #{orgName, jdbcType=VARCHAR}</if>
         <if test="orgCode != null and orgCode != ''"> and a.org_code = #{orgCode, jdbcType=VARCHAR}</if>
         <if test="upId != null and upId != ''"> and a.up_id = #{upId, jdbcType=BIGINT}</if>
-        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
-        <if test="orgLevel != null and orgLevel != ''"> and a.org_level = #{orgLevel, jdbcType=INTEGER}</if>
+        <if test="orgLevel != null "> and a.org_level = #{orgLevel, jdbcType=INTEGER}</if>
         <if test="orgPath != null and orgPath != ''"> and a.org_path = #{orgPath, jdbcType=VARCHAR}</if>
         <if test="deptName != null and deptName != ''"> and a.dept_name = #{deptName, jdbcType=VARCHAR}</if>
     </select>
@@ -131,10 +131,10 @@
         <if test="orgName != null and orgName != ''"> and a.org_name = #{orgName, jdbcType=VARCHAR}</if>
         <if test="orgCode != null and orgCode != ''"> and a.org_code = #{orgCode, jdbcType=VARCHAR}</if>
         <if test="upId != null and upId != ''"> and a.upId = #{parentId, jdbcType=BIGINT}</if>
-        <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="creatorId != null and creatorId != ''"> and a.creator_id = #{creatorId, jdbcType=BIGINT}</if>
-        <if test="orgLevel != null and orgLevel != ''"> and a.org_level = #{orgLevel, jdbcType=INTEGER}</if>
+        <if test="orgLevel != null "> and a.org_level = #{orgLevel, jdbcType=INTEGER}</if>
         <if test="orgPath != null and orgPath != ''"> and a.org_path = #{orgPath, jdbcType=VARCHAR}</if>
         <if test="deptName != null and deptName != ''"> and a.dept_name = #{deptName, jdbcType=VARCHAR}</if>
     </select>

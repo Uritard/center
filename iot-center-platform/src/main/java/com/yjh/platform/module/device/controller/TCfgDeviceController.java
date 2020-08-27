@@ -39,7 +39,7 @@ public class TCfgDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCfgDevice tCfgDevice) {
+    public Result add(@RequestBody TCfgDevice tCfgDevice) {
         Result result = new Result();
         try {
             result.setData(tCfgDeviceService.insert(tCfgDevice));
@@ -142,8 +142,8 @@ public class TCfgDeviceController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCfgDevice> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TCfgDevice> list) {
         Result result = new Result();
         try {
         result.setData(tCfgDeviceService.batchInsert(list));

@@ -43,27 +43,26 @@ public class SysLogsService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLogs> select(String logId, String logType, String ip, String title, Integer state, String content, Long userId, String userName, Date createTime,Date startTime, Date endTime) {
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("logId",logId);
-        map.put("logType",logType);
-        map.put("ip",ip);
-        map.put("title",title);
-        map.put("state",state);
-        map.put("content",content);
-        map.put("userId",userId);
-        map.put("userName",userName);
-        map.put("createTime",createTime);
-        map.put("startTime",startTime);
-        map.put("endTime",endTime);
-
-        List<SysLogs> sysLogsList = sysLogsDao.select(map);
+    public List<SysLogs> select(String logId, String logType, String ip, String title, Integer state, String content, Long userId, String userName, Date createTime) {
+        List<SysLogs> sysLogsList = sysLogsDao.select(logId,logType,ip,title,state,content,userId,userName,createTime);
         return sysLogsList;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLogs> selectByPage(SysLogs sysLogs) {
-        List<SysLogs> sysLogsList = sysLogsDao.selectByPage(sysLogs);
+    public List<SysLogs> selectByPage(SysLogs sysLogs,Date startTime,Date endTime) {
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("logId",sysLogs.getLogId());
+        map.put("logType",sysLogs.getLogType());
+        map.put("ip",sysLogs.getIp());
+        map.put("title",sysLogs.getTitle());
+        map.put("state",sysLogs.getState());
+        map.put("content",sysLogs.getContent());
+        map.put("userId",sysLogs.getUserId());
+        map.put("userName",sysLogs.getUserName());
+        map.put("createTime",sysLogs.getCreateTime());
+        map.put("startTime",startTime);
+        map.put("endTime",endTime);
+        List<SysLogs> sysLogsList = sysLogsDao.selectByPage(map);
         return sysLogsList;
     }
 

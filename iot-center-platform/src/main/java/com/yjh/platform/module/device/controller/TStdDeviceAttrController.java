@@ -39,7 +39,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TStdDeviceAttr tStdDeviceAttr) {
+    public Result add(@RequestBody TStdDeviceAttr tStdDeviceAttr) {
         Result result = new Result();
         try {
             result.setData(tStdDeviceAttrService.insert(tStdDeviceAttr));
@@ -153,7 +153,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TStdDeviceAttr> list) {
+    public Result batchAdd(@RequestBody List<TStdDeviceAttr> list) {
         Result result = new Result();
         try {
         result.setData(tStdDeviceAttrService.batchInsert(list));

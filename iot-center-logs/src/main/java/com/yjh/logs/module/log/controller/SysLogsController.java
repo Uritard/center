@@ -144,12 +144,10 @@ public class SysLogsController {
                          @RequestParam(value = "content", required = false) String content,
                          @RequestParam(value = "userId", required = false) Long userId,
                          @RequestParam(value = "userName", required = false) String userName,
-                         @RequestParam(value = "createTime", required = false) Date createTime,
-                         @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
-                         @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date endTime) {
+                         @RequestParam(value = "createTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date createTime) {
         Result result = new Result();
         try {
-            List<SysLogs> list = sysLogsService.select(logId, logType, ip, title, state, content, userId, userName, createTime,startTime,endTime);
+            List<SysLogs> list = sysLogsService.select(logId, logType, ip, title, state, content, userId, userName, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -162,12 +160,14 @@ public class SysLogsController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody SysLogs sysLogs,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize,
+                               @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
+                               @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date endTime) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<SysLogs> list = sysLogsService.selectByPage(sysLogs);
+            List<SysLogs> list = sysLogsService.selectByPage(sysLogs,startTime,endTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

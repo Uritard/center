@@ -96,7 +96,7 @@ public class TCfgDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTeleadjust(Map<String,String> mapAll){
 
-        //做判断 四摇类型是否对应
+
         TCfgTeleadjust tCfgTeleadjust = new TCfgTeleadjust();
         tCfgTeleadjust.setDeviceId(mapAll.get("deviceId"));
         tCfgTeleadjust.setMeteId(mapAll.get("meteId"));

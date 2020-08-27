@@ -39,7 +39,7 @@ public class TCfgTelemeterController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCfgTelemeter tCfgTelemeter) {
+    public Result add(@RequestBody TCfgTelemeter tCfgTelemeter) {
         Result result = new Result();
         try {
             result.setData(tCfgTelemeterService.insert(tCfgTelemeter));
@@ -163,8 +163,8 @@ public class TCfgTelemeterController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCfgTelemeter> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TCfgTelemeter> list) {
         Result result = new Result();
         try {
         result.setData(tCfgTelemeterService.batchInsert(list));
