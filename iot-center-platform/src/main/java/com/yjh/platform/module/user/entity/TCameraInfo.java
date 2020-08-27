@@ -64,5 +64,9 @@ public class TCameraInfo implements Serializable {
     @ApiModelProperty(value = "是否可控(0-可控球机，1-不可控枪机)")
     private Integer isControl;
 
+    @ApiModelProperty(value = "摄像机ip")
+    private String cameraIp;
+
+
 
 }

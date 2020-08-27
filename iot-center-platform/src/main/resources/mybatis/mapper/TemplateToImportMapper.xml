@@ -39,6 +39,10 @@
             low_limit1,
             high_limit2,
             low_limit2,
+            high_limit3,
+            low_limit3,
+            high_limit4,
+            low_limit4,
             alarm_delay,
             alarm_cnt,
             threshold_abs,
@@ -64,6 +68,10 @@
             #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},
             #{TStdMeteModelDetail.highLimit2, jdbcType=REAL},
             #{TStdMeteModelDetail.lowLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit3, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit3, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit4, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit4, jdbcType=REAL},
             #{TStdMeteModelDetail.alarmDelay, jdbcType=INTEGER},
             #{TStdMeteModelDetail.alarmCnt, jdbcType=INTEGER},
             #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
@@ -79,46 +87,46 @@
         </select>
 
         <!--标准化设备导入-->
-    <insert id="batchUpdateTStdDevice">
-        insert  into t_std_device(
-        device_id,
-        custom_id,
-        device_code,
-        device_name,
-        alias_name,
-        device_type,
-        position_type,
-        model_id,
-        region_path,
-        up_region_id,
-        up_region_name,
-        custom_name,
-        custom_type,
-        status,
-        update_time,
-        create_time
-        ) values
-        <foreach collection="tStdDeviceList" item="TStdDevice" separator=",">
-            (
-            null,
-            #{TStdDevice.customId, jdbcType=VARCHAR},
-            #{TStdDevice.deviceCode, jdbcType=VARCHAR},
-            #{TStdDevice.deviceName, jdbcType=VARCHAR},
-            #{TStdDevice.aliasName, jdbcType=VARCHAR},
-            #{TStdDevice.deviceType, jdbcType=INTEGER},
-            #{TStdDevice.positionType, jdbcType=VARCHAR},
-            #{TStdDevice.modelId, jdbcType=BIGINT},
-            #{TStdDevice.regionPath, jdbcType=VARCHAR},
-            #{TStdDevice.upRegionId, jdbcType=BIGINT},
-            #{TStdDevice.upRegionName, jdbcType=VARCHAR},
-            #{TStdDevice.customName, jdbcType=VARCHAR},
-            #{TStdDevice.customType, jdbcType=INTEGER},
-            #{TStdDevice.status, jdbcType=INTEGER},
-            #{TStdDevice.updateTime, jdbcType=TIMESTAMP},
-            #{TStdDevice.createTime, jdbcType=TIMESTAMP}
-            )
-        </foreach>
-    </insert>
+        <insert id="batchUpdateTStdDevice">
+            insert  into t_std_device(
+            device_id,
+            custom_id,
+            device_code,
+            device_name,
+            alias_name,
+            device_type,
+            position_type,
+            model_id,
+            region_path,
+            up_region_id,
+            up_region_name,
+            custom_name,
+            custom_type,
+            status,
+            update_time,
+            create_time
+            ) values
+            <foreach collection="tStdDeviceList" item="TStdDevice" separator=",">
+                (
+                null,
+                #{TStdDevice.customId, jdbcType=VARCHAR},
+                #{TStdDevice.deviceCode, jdbcType=VARCHAR},
+                #{TStdDevice.deviceName, jdbcType=VARCHAR},
+                #{TStdDevice.aliasName, jdbcType=VARCHAR},
+                #{TStdDevice.deviceType, jdbcType=INTEGER},
+                #{TStdDevice.positionType, jdbcType=VARCHAR},
+                #{TStdDevice.modelId, jdbcType=BIGINT},
+                #{TStdDevice.regionPath, jdbcType=VARCHAR},
+                #{TStdDevice.upRegionId, jdbcType=BIGINT},
+                #{TStdDevice.upRegionName, jdbcType=VARCHAR},
+                #{TStdDevice.customName, jdbcType=VARCHAR},
+                #{TStdDevice.customType, jdbcType=INTEGER},
+                #{TStdDevice.status, jdbcType=INTEGER},
+                #{TStdDevice.updateTime, jdbcType=TIMESTAMP},
+                #{TStdDevice.createTime, jdbcType=TIMESTAMP}
+                )
+            </foreach>
+        </insert>
         <!--标准化设备参数导入-->
         <insert id="batchUpdateTStdDeviceAttr">
             insert  into t_std_device_attr(
@@ -172,5 +180,72 @@
         <select id="selectLastDeviceId" resultType="java.lang.Long">
             select device_id from t_std_device order by device_id DESC limit 1;
         </select>
+        <!--标准化设备测点导入-->
+        <insert id="batchUpdateTStdDeviceMete">
+            insert  into t_std_devicemete(
+            device_mete_id,
+            device_id,
+            custom_id,
+            mete_id,
+            mete_type,
+            mete_name,
+            device_type,
+            custom_type,
+            position_type,
+            unit,
+            alarm_note,
+            alarm_type,
+            up_effect,
+            low_effect,
+            alarm_level,
+            high_limit1,
+            low_limit1,
+            high_limit2,
+            low_limit2,
+            high_limit3,
+            low_limit3,
+            high_limit4,
+            low_limit4,
+            alarm_delay,
+            alarm_cnt,
+            threshold_abs,
+            threshold_per,
+            modulus,
+            remark
+            ) values
+            <foreach collection="tStdDeviceMeteList" item="TStdDeviceMete" separator=",">
+                (
+                null,
+                #{TStdDeviceMete.deviceId, jdbcType=BIGINT},
+                #{TStdDeviceMete.customId, jdbcType=VARCHAR},
+                #{TStdDeviceMete.meteId, jdbcType=BIGINT},
+                #{TStdDeviceMete.meteType, jdbcType=VARCHAR},
+                #{TStdDeviceMete.meteName, jdbcType=VARCHAR},
+                #{TStdDeviceMete.deviceType, jdbcType=INTEGER},
+                #{TStdDeviceMete.customType, jdbcType=INTEGER},
+                #{TStdDeviceMete.positionType, jdbcType=VARCHAR},
+                #{TStdDeviceMete.unit, jdbcType=VARCHAR},
+                #{TStdDeviceMete.alarmNote, jdbcType=VARCHAR},
+                #{TStdDeviceMete.alarmType, jdbcType=VARCHAR},
+                #{TStdDeviceMete.upEffect, jdbcType=REAL},
+                #{TStdDeviceMete.lowEffect, jdbcType=REAL},
+                #{TStdDeviceMete.alarmLevel, jdbcType=INTEGER},
+                #{TStdDeviceMete.highLimit1, jdbcType=REAL},
+                #{TStdDeviceMete.lowLimit1, jdbcType=REAL},
+                #{TStdDeviceMete.highLimit2, jdbcType=REAL},
+                #{TStdDeviceMete.lowLimit2, jdbcType=REAL},
+                #{TStdDeviceMete.highLimit3, jdbcType=REAL},
+                #{TStdDeviceMete.lowLimit3, jdbcType=REAL},
+                #{TStdDeviceMete.highLimit4, jdbcType=REAL},
+                #{TStdDeviceMete.lowLimit4, jdbcType=REAL},
+                #{TStdDeviceMete.alarmDelay, jdbcType=INTEGER},
+                #{TStdDeviceMete.alarmCnt, jdbcType=INTEGER},
+                #{TStdDeviceMete.thresholdAbs, jdbcType=NUMERIC},
+                #{TStdDeviceMete.thresholdPer, jdbcType=NUMERIC},
+                #{TStdDeviceMete.modulus, jdbcType=INTEGER},
+                #{TStdDeviceMete.remark, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
 
 </mapper>

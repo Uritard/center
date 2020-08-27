@@ -33,6 +33,7 @@ public interface TCameraInfoDao {
                              @Param(value = "vendorId") Integer vendorId,
                              @Param(value = "streamType") Integer streamType,
                              @Param(value = "protocolType") Integer protocolType,
+                             @Param(value = "cameraIp") String cameraIp,
                              @Param(value = "url") String url,
                              @Param(value = "port") Integer port,
                              @Param(value = "cameraType") Integer cameraType,

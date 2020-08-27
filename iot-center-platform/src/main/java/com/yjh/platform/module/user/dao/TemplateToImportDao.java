@@ -1,9 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
-import com.yjh.platform.module.device.entity.TStdDevice;
-import com.yjh.platform.module.device.entity.TStdDeviceAttr;
-import com.yjh.platform.module.device.entity.TStdMeteModel;
-import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
+import com.yjh.platform.module.device.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +24,6 @@ public interface TemplateToImportDao {
     int batchUpdateTStdDeviceAttr(@Param(value = "tStdDeviceAttrList")List<TStdDeviceAttr> tStdDeviceAttrList);
     //获取标准化设备表的最后一条DeviceId
     Long selectLastDeviceId();
+    //标准化设备测点导入
+    int batchUpdateTStdDeviceMete(@Param(value = "tStdDeviceMeteList")List<TStdDeviceMete> tStdDeviceMeteList);
 }

@@ -47,9 +47,7 @@ public class TCameraInfoService{
     @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public TCameraInfoByDict selectByPrimaryId(Long cameraId) {
-//        TCameraInfoByDict tCameraInfoByDict = this.tCameraInfoDao.selectByPrimaryId(cameraId);
         return this.tCameraInfoDao.selectByPrimaryId(cameraId);
-//        return tCameraInfoByDict;
     }
 
     @Logs(title = "根据间隔id查询所有摄像机信息", code = "TStdRegion")
@@ -68,8 +66,8 @@ public class TCameraInfoService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId, Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId, Integer vendorId, Integer streamType, Integer protocolType, String url, Integer port, Integer cameraType, Integer isControl) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType, url, port, cameraType, isControl);
+    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId, Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId, Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,String url, Integer port, Integer cameraType, Integer isControl) {
+        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,cameraIp, url, port, cameraType, isControl);
         return tCameraInfoByDictList;
     }
 

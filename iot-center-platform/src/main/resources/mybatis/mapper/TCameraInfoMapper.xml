@@ -15,6 +15,7 @@
         <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
         <result column="stream_type" jdbcType="INTEGER" property="streamType" />
         <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
+        <result column="camera_ip" jdbcType="VARCHAR" property="cameraIp"/>
         <result column="url" jdbcType="VARCHAR" property="url" />
         <result column="port" jdbcType="INTEGER" property="port" />
         <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
@@ -23,7 +24,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        camera_id, camera_name, alias_name, record_id, up_region_id, channel_num, sms_id, rms_id, factory_name, stream_type, protocol_type, url, port, camera_type, is_control
+        camera_id, camera_name, alias_name, record_id, up_region_id, channel_num, sms_id, rms_id, vendor_id, stream_type, protocol_type, camera_ip,url, port, camera_type, is_control
     </sql>
 
 
@@ -36,9 +37,10 @@
             channel_num,
             sms_id,
             rms_id,
-            factory_name,
+            vendor_id,
             stream_type,
             protocol_type,
+            camera_ip,
             url,
             port,
             camera_type,
@@ -51,9 +53,10 @@
                 #{channelNum, jdbcType=INTEGER},
                 #{smsId, jdbcType=INTEGER},
                 #{rmsId, jdbcType=INTEGER},
-                #{factoryName, jdbcType=VARCHAR},
+                #{vendor_id, jdbcType=INTEGER},
                 #{streamType, jdbcType=INTEGER},
                 #{protocolType, jdbcType=INTEGER},
+                #{camera_ip,jdbcType=VARCHAR},
                 #{url, jdbcType=VARCHAR},
                 #{port, jdbcType=INTEGER},
                 #{cameraType, jdbcType=INTEGER},
@@ -86,12 +89,22 @@
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=VARCHAR},</if>
         <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+<<<<<<< Updated upstream
         <if test="channelNum != null">a.channel_num = #{channelNum, jdbcType=INTEGER},</if>
         <if test="smsId != null">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
         <if test="rmsId != null">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
         <if test="factoryName != null and factoryName != ''">a.factory_name = #{factoryName, jdbcType=VARCHAR},</if>
         <if test="streamType != null">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
+=======
+        <if test="channelNum != null and channelNum != ''">a.channel_num = #{channelNum, jdbcType=INTEGER},</if>
+        <if test="smsId != null and smsId != ''">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
+        <if test="rmsId != null and rmsId != ''">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
+        <if test="vendorId != null and vendorId != ''">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
+        <if test="streamType != null and streamType != ''">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
+        <if test="protocolType != null and protocolType != ''">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
+        <if test="cameraIp != null and cameraIp != ''">a.camera_ip = #{cameraIp, jdbcType=VARCHAR},</if>
+>>>>>>> Stashed changes
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
         <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
@@ -112,6 +125,7 @@
         b.dict_note,
         a.stream_type,
         a.protocol_type,
+        a.camera_ip,
         a.url,
         a.port,
         a.camera_type,
@@ -135,6 +149,7 @@
         b.dict_note,
         a.stream_type,
         a.protocol_type,
+        a.camera_ip,
         a.url,
         a.port,
         a.camera_type,
@@ -160,6 +175,7 @@
         b.dict_note,
         a.stream_type,
         a.protocol_type,
+        a.camera_ip,
         a.url,
         a.port,
         a.camera_type,
@@ -185,6 +201,7 @@
         b.dict_note,
         a.stream_type,
         a.protocol_type,
+        a.camera_ip,
         a.url,
         a.port,
         a.camera_type,
@@ -193,15 +210,21 @@
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
-        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="channelNum != null"> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
         <if test="smsId != null"> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
         <if test="rmsId != null"> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
         <if test="vendorId != null and vendorId != ''"> and a.vendor_id = #{vendorId, jdbcType=VARCHAR}</if>
+<<<<<<< Updated upstream
         <if test="streamType != null"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
         <if test="protocolType != null"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
+=======
+        <if test="streamType != null and streamType != ''"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
+        <if test="protocolType != null and protocolType != ''"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
+        <if test="cameraIp != null and cameraIp != ''"> and a.camera_ip like concat('%',#{cameraIp, jdbcType=VARCHAR},'%')</if>
+>>>>>>> Stashed changes
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
         <if test="port != null"> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="cameraType != null "> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
@@ -223,6 +246,7 @@
         b.dict_note,
         a.stream_type,
         a.protocol_type,
+        a.camera_ip,
         a.url,
         a.port,
         a.camera_type,
@@ -231,15 +255,21 @@
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
-        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="channelNum != null "> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
         <if test="smsId != null "> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
         <if test="rmsId != null "> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
         <if test="vendorId != null and vendorId != ''"> and a.vendor_id = #{vendorId, jdbcType=VARCHAR}</if>
+<<<<<<< Updated upstream
         <if test="streamType != null "> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
         <if test="protocolType != null "> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
+=======
+        <if test="streamType != null and streamType != ''"> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
+        <if test="protocolType != null and protocolType != ''"> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
+        <if test="cameraIp != null and cameraIp != ''"> and a.camera_ip like concat('%',#{cameraIp, jdbcType=VARCHAR},'%')</if>
+>>>>>>> Stashed changes
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
         <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
         <if test="cameraType != null "> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
