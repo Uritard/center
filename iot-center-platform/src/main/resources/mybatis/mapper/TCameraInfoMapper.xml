@@ -92,10 +92,9 @@
         <if test="channelNum != null">a.channel_num = #{channelNum, jdbcType=INTEGER},</if>
         <if test="smsId != null">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
         <if test="rmsId != null">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
-        <if test="vendorId != null and vendorId != ''">a.vendorId = #{vendorId, jdbcType=VARCHAR},</if>
+        <if test="vendorId != null ">a.vendorId = #{vendorId, jdbcType=VARCHAR},</if>
         <if test="streamType != null">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
-        <if test="vendorId != null and ">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
         <if test="cameraIp != null and cameraIp != ''">a.camera_ip = #{cameraIp, jdbcType=VARCHAR},</if>
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
@@ -210,7 +209,6 @@
         <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=VARCHAR},</if>
         <if test="streamType != null">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
-        <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
         <if test="cameraIp != null and cameraIp != ''">a.camera_ip = #{cameraIp, jdbcType=VARCHAR},</if>
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
@@ -250,7 +248,6 @@
         <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=VARCHAR},</if>
         <if test="streamType != null">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
-        <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
         <if test="cameraIp != null and cameraIp != ''">a.camera_ip = #{cameraIp, jdbcType=VARCHAR},</if>
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
