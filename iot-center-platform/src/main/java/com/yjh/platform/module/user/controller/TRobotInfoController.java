@@ -18,6 +18,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author tt
@@ -39,9 +41,11 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TRobotInfo tRobotInfo) {
+    public Result insert(HttpServletRequest request,TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
+            String userId = request.getHeader("userId");
+            tRobotInfo.setCreateBy(userId);
             result.setData(tRobotInfoService.insert(tRobotInfo));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -107,7 +111,6 @@ public class TRobotInfoController {
                             @RequestParam(value = "robotType", required = false) Integer robotType,
                             @RequestParam(value = "robotIp", required = false) String robotIp,
                             @RequestParam(value = "robotPort", required = false) Integer robotPort,
-                            @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                             @RequestParam(value = "upRegionName", required = false) String upRegionName,
                             @RequestParam(value = "lightIp", required = false) String lightIp,
                             @RequestParam(value = "lightPort", required = false) String lightPort,
@@ -125,14 +128,14 @@ public class TRobotInfoController {
                             @RequestParam(value = "robotFactory", required = false) String robotFactory,
                             @RequestParam(value = "isUse", required = false) String isUse,
                             @RequestParam(value = "commissionDate", required = false) Date commissionDate,
-                            @RequestParam(value = "upregionId", required = false) Long upregionId,
+                            @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                             @RequestParam(value = "robotPosition", required = false) String robotPosition,
                             @RequestParam(value = "remarks", required = false) String remarks) {
         Result result = new Result();
         try {
-            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort, upRegionId,
+            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
                     upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
-                    photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDate, upregionId, robotPosition, remarks);
+                    photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDate, upRegionId, robotPosition, remarks);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

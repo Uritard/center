@@ -27,7 +27,7 @@
         <result column="robot_factory" jdbcType="VARCHAR" property="robotFactory" />
         <result column="is_use" jdbcType="VARCHAR" property="isUse" />
         <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
-        <result column="upregionId" jdbcType="BIGINT" property="upregionId" />
+        <result column="upRegionId" jdbcType="BIGINT" property="upRegionId" />
         <result column="robotPosition" jdbcType="VARCHAR" property="robotPosition" />
         <result column="remarks" jdbcType="VARCHAR" property="remarks" />
     </resultMap>
@@ -90,7 +90,7 @@
                 #{robotFactory, jdbcType=VARCHAR},
                 #{isUse, jdbcType=VARCHAR},
                 #{commissionDate, jdbcType=TIMESTAMP},
-                #{upregionId, jdbcType=BIGINT},
+                #{upRegionId, jdbcType=BIGINT},
                 #{robotPosition, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR}
         )
@@ -144,7 +144,7 @@
         <if test="robotFactory != null and robotFactory !=''">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
         <if test="isUse != null and isUse !=''">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
         <if test="commissionDate != null and commissionDate !=''">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
+        <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
     </set>
@@ -238,7 +238,7 @@
         <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
         <if test="isUse != null">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
+        <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
@@ -296,7 +296,7 @@
         <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
         <if test="isUse != null">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
+        <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
@@ -353,7 +353,7 @@
                 #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
                 #{TRobotInfo.isUse, jdbcType=VARCHAR},
                 #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
-                #{TRobotInfo.upregionId, jdbcType=BIGINT},
+                #{TRobotInfo.upRegionId, jdbcType=BIGINT},
                 #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
                 #{TRobotInfo.remarks, jdbcType=VARCHAR}
             )

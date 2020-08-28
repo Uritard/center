@@ -48,13 +48,13 @@ public class TRobotInfoService{
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> select(Long robotId, String robotCode, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
-                                   Long upRegionId, String upRegionName, String lightIp, String lightPort, String lightUsername, String lightPassword,
+                                    String upRegionName, String lightIp, String lightPort, String lightUsername, String lightPassword,
                                    String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
                                    String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
-                                   Date commissionDateString, Long upregionId, String robotPosition, String remarks) {
-        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort, upRegionId,
+                                   Date commissionDateString, Long upRegionId, String robotPosition, String remarks) {
+        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
                 upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
-                photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upregionId, robotPosition, remarks);
+                photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition, remarks);
         return tRobotInfoList;
     }
 

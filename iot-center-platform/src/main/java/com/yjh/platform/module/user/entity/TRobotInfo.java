@@ -99,7 +99,7 @@ public class TRobotInfo implements Serializable {
     private Date commissionDate;
 
     @ApiModelProperty(value = "区域ID")
-    private Long upregionId;
+    private Long upRegionId;
 
     @ApiModelProperty(value = "机器人类型")
     private String robotPosition;

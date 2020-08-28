@@ -24,7 +24,6 @@ public interface TRobotInfoDao {
                                 @Param(value = "robotType") Integer robotType,
                                 @Param(value = "robotIp") String robotIp,
                                 @Param(value = "robotPort") Integer robotPort,
-                                @Param(value = "upupregionId") Long upupregionId,
                                 @Param(value = "upRegionName") String upRegionName,
                                 @Param(value = "lightIp") String lightIp,
                                 @Param(value = "lightPort") String lightPort,
@@ -42,7 +41,7 @@ public interface TRobotInfoDao {
                                 @Param(value = "robotFactory") String robotFactory,
                                 @Param(value = "isUse") String isUse,
                                 @Param(value = "commissionDate") Date commissionDate,
-                                @Param(value = "upregionId") Long upregionId,
+                                @Param(value = "upRegionId") Long upRegionId,
                                 @Param(value = "robotPosition") String robotPosition,
                                 @Param(value = "remarks") String remarks);
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
