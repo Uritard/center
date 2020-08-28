@@ -41,7 +41,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(HttpServletRequest request,TRobotInfo tRobotInfo) {
+    public Result insert(HttpServletRequest request,@RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");

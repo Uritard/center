@@ -27,7 +27,7 @@
         <result column="robot_factory" jdbcType="VARCHAR" property="robotFactory" />
         <result column="is_use" jdbcType="VARCHAR" property="isUse" />
         <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
-        <result column="upRegionId" jdbcType="BIGINT" property="upRegionId" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
         <result column="robotPosition" jdbcType="VARCHAR" property="robotPosition" />
         <result column="remarks" jdbcType="VARCHAR" property="remarks" />
     </resultMap>
