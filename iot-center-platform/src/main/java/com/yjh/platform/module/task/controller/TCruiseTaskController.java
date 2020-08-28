@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,11 +40,11 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insertTCruiseTask(@RequestBody TCruiseTask tCruiseTask) {
+    public Result insert(@RequestBody TCruiseTask tCruiseTask) {
         Result result = new Result();
 
         try {
-            result.setData(tCruiseTaskService.insertTCruiseTask(tCruiseTask));
+            result.setData(tCruiseTaskService.insert(tCruiseTask));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -147,21 +146,6 @@ public class TCruiseTaskController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
-            log.error("失败描述：", e);
-        }
-        return result;
-    }
-
-    //查询
-    @ApiOperation(value = "任务统计")
-    @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
-    public Result taskCount(){
-        Result result = new Result();
-        try {
-//            List<TCruiseTask> list = this.tCruiseTaskService.taskCount();
-//            result.setData(list);
-        }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
         }

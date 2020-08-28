@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMete;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -31,6 +32,14 @@ public interface TStdMeteDao {
                                 @Param(value = "lowEffect") Float lowEffect,
                                 @Param(value = "alarmLevel") Integer alarmLevel,
                                 @Param(value = "alarmLimit") Integer alarmLimit,
+                                @Param(value = "highLimit1") Float highLimit1,
+                                @Param(value = "lowLimit1") Float lowLimit1,
+                                @Param(value = "highLimit2") Float highLimit2,
+                                @Param(value = "lowLimit2") Float lowLimit2,
+                                @Param(value = "highLimit3") Float highLimit3,
+                                @Param(value = "lowLimit3") Float lowLimit3,
+                                @Param(value = "highLimit4") Float highLimit4,
+                                @Param(value = "lowLimit4") Float lowLimit4,
                                 @Param(value = "alarmDelay") Integer alarmDelay,
                                 @Param(value = "alarmCnt") Integer alarmCnt,
                                 @Param(value = "thresholdAbs") BigDecimal thresholdAbs,
@@ -41,4 +50,6 @@ public interface TStdMeteDao {
     int batchAdd(List<TStdMete> list);
 
     List<TStdMete> selectByDeviceType(Integer deviceType);
+
+
 }

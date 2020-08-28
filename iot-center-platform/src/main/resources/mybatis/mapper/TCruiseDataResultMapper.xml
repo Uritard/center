@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCruiseDataResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        <id column="cruise_data_id" jdbcType="BIGINT" property="cruiseDataId" />
+        <result column="cruise_result_id" jdbcType="VARCHAR" property="cruiseResultId" />
+        <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+        <result column="point_type" jdbcType="INTEGER" property="pointType" />
+        <result column="result_desc" jdbcType="VARCHAR" property="resultDesc" />
+        <result column="result_num" jdbcType="VARCHAR" property="resultNum" />
+        <result column="modify_num" jdbcType="VARCHAR" property="modifyNum" />
+        <result column="picpath" jdbcType="VARCHAR" property="picpath" />
+        <result column="personcheck" jdbcType="VARCHAR" property="personcheck" />
+        <result column="origpic" jdbcType="VARCHAR" property="origpic" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="evaluation_state" jdbcType="VARCHAR" property="evaluationState" />
+        <result column="identify_state" jdbcType="INTEGER" property="identifyState" />
+        <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cruise_data_id, cruise_result_id, cruise_id, point_type, result_desc, result_num, modify_num, picpath, personcheck, origpic, state, evaluation_state, identify_state, identify_result, createtime, remark
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="cruiseDataId" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        insert into t_cruise_data_result(
+            cruise_data_id,
+            cruise_result_id,
+            cruise_id,
+            point_type,
+            result_desc,
+            result_num,
+            modify_num,
+            picpath,
+            personcheck,
+            origpic,
+            state,
+            evaluation_state,
+            identify_state,
+            identify_result,
+            createtime,
+            remark
+        )values(
+                #{cruiseDataId, jdbcType=BIGINT},
+                #{cruiseResultId, jdbcType=VARCHAR},
+                #{cruiseId, jdbcType=BIGINT},
+                #{pointType, jdbcType=INTEGER},
+                #{resultDesc, jdbcType=VARCHAR},
+                #{resultNum, jdbcType=VARCHAR},
+                #{modifyNum, jdbcType=VARCHAR},
+                #{picpath, jdbcType=VARCHAR},
+                #{personcheck, jdbcType=VARCHAR},
+                #{origpic, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{evaluationState, jdbcType=VARCHAR},
+                #{identifyState, jdbcType=INTEGER},
+                #{identifyResult, jdbcType=INTEGER},
+                #{createtime, jdbcType=TIMESTAMP},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cruise_data_result
+                where cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        update t_cruise_data_result a <set>
+        <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
+        <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
+        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="pointType != null and pointType != ''">a.point_type = #{pointType, jdbcType=INTEGER},</if>
+        <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
+        <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
+        <if test="modifyNum != null and modifyNum != ''">a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
+        <if test="personcheck != null and personcheck != ''">a.personcheck = #{personcheck, jdbcType=VARCHAR},</if>
+        <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
+        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=VARCHAR},</if>
+        <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
+        <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        a.createtime = #{createtime, jdbcType=TIMESTAMP},
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+            where a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        select
+        a.cruise_data_id,
+        a.cruise_result_id,
+        a.cruise_id,
+        a.point_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.picpath,
+        a.personcheck,
+        a.origpic,
+        a.state,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark
+        from t_cruise_data_result a
+        where 1 = 1
+            and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        select
+        a.cruise_data_id,
+        a.cruise_result_id,
+        a.cruise_id,
+        a.point_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.picpath,
+        a.personcheck,
+        a.origpic,
+        a.state,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark
+        from t_cruise_data_result a
+        where 1 = 1
+        <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
+        <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
+        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="pointType != null and pointType != ''">a.point_type = #{pointType, jdbcType=INTEGER},</if>
+        <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
+        <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
+        <if test="modifyNum != null and modifyNum != ''">a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
+        <if test="personcheck != null and personcheck != ''">a.personcheck = #{personcheck, jdbcType=VARCHAR},</if>
+        <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
+        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=VARCHAR},</if>
+        <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
+        <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        select
+        a.cruise_data_id,
+        a.cruise_result_id,
+        a.cruise_id,
+        a.point_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.picpath,
+        a.personcheck,
+        a.origpic,
+        a.state,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark
+        from t_cruise_data_result a
+        where 1 = 1
+        <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
+        <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
+        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="pointType != null and pointType != ''">a.point_type = #{pointType, jdbcType=INTEGER},</if>
+        <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
+        <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
+        <if test="modifyNum != null and modifyNum != ''">a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
+        <if test="personcheck != null and personcheck != ''">a.personcheck = #{personcheck, jdbcType=VARCHAR},</if>
+        <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
+        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=VARCHAR},</if>
+        <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
+        <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cruise_data_result(
+            cruise_data_id,
+            cruise_result_id,
+            cruise_id,
+            point_type,
+            result_desc,
+            result_num,
+            modify_num,
+            picpath,
+            personcheck,
+            origpic,
+            state,
+            evaluation_state,
+            identify_state,
+            identify_result,
+            createtime,
+            remark
+        )values
+        <foreach collection="list" item="TCruiseDataResult" separator=",">
+            (
+                #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
+                #{TCruiseDataResult.cruiseResultId, jdbcType=VARCHAR},
+                #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
+                #{TCruiseDataResult.pointType, jdbcType=INTEGER},
+                #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
+                #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
+                #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
+                #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
+                #{TCruiseDataResult.personcheck, jdbcType=VARCHAR},
+                #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
+                #{TCruiseDataResult.state, jdbcType=INTEGER},
+                #{TCruiseDataResult.evaluationState, jdbcType=VARCHAR},
+                #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
+                #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
+                #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
+                #{TCruiseDataResult.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

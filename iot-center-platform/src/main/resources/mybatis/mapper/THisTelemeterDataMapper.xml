@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.THisTelemeterDataDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.THisTelemeterData">
+    <result column="id" jdbcType="BIGINT" property="id" />
+        <result column="mete_id" jdbcType="BIGINT" property="meteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+        <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
+        <result column="mete_value" jdbcType="VARCHAR" property="meteValue" />
+        <result column="last_mete_value" jdbcType="VARCHAR" property="lastMeteValue" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        mete_id, device_id, record_time, mete_kind, mete_value, last_mete_value
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.task.entity.THisTelemeterData">
+        insert into t_his_telemeter_data(
+            id,
+            mete_id,
+            device_id,
+            record_time,
+            mete_kind,
+            mete_value,
+            last_mete_value
+        )values(
+                #{id,jdbcType=BIGINT},
+                #{meteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{recordTime, jdbcType=TIMESTAMP},
+                #{meteKind, jdbcType=INTEGER},
+                #{meteValue, jdbcType=VARCHAR},
+                #{lastMeteValue, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_his_telemeter_data where id=#{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.THisTelemeterData">
+        update t_his_telemeter_data a <set>
+        <if test="id !=null and id != ''">a.id=#{id,jdbcType=BIGINT},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        a.record_time = #{recordTime, jdbcType=TIMESTAMP},
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+    </set>
+       where a.id=#{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.THisTelemeterData">
+        select
+        a.mete_id,
+        a.device_id,
+        a.record_time,
+        a.mete_kind,
+        a.mete_value,
+        a.last_mete_value
+        from t_his_telemeter_data a
+        where 1 = 1
+        and a.id=#{id,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.THisTelemeterData" resultType="com.yjh.platform.module.task.entity.THisTelemeterData">
+        select
+        a.id,
+        a.mete_id,
+        a.device_id,
+        a.record_time,
+        a.mete_kind,
+        a.mete_value,
+        a.last_mete_value
+        from t_his_telemeter_data a
+        where 1 = 1
+        <if test="id !=null and id != ''">a.id = #{id,jdbcType=BIGINT},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.THisTelemeterData" resultType="com.yjh.platform.module.task.entity.THisTelemeterData">
+        select
+        a.id,
+        a.mete_id,
+        a.device_id,
+        a.record_time,
+        a.mete_kind,
+        a.mete_value,
+        a.last_mete_value
+        from t_his_telemeter_data a
+        where 1 = 1
+        <if test="id !=null and id != ''">a.id=#{id,jdbcType=BIGINT},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_his_telemeter_data(
+            id,
+            mete_id,
+            device_id,
+            record_time,
+            mete_kind,
+            mete_value,
+            last_mete_value
+        )values
+        <foreach collection="list" item="THisTelemeterData" separator=",">
+            (
+                #{THisTelemeterData.id, jdbcType=BIGINT},
+                #{THisTelemeterData.meteId, jdbcType=BIGINT},
+                #{THisTelemeterData.deviceId, jdbcType=BIGINT},
+                #{THisTelemeterData.recordTime, jdbcType=TIMESTAMP},
+                #{THisTelemeterData.meteKind, jdbcType=INTEGER},
+                #{THisTelemeterData.meteValue, jdbcType=VARCHAR},
+                #{THisTelemeterData.lastMeteValue, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

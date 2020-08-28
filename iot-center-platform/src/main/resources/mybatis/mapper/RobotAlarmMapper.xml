@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.RobotAlarmDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.RobotAlarm">
+        <id column="robot_alarm_id" jdbcType="BIGINT" property="robotAlarmId" />
+        <result column="station_id" jdbcType="VARCHAR" property="stationId" />
+        <result column="alarm_type" jdbcType="INTEGER" property="alarmType" />
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
+        <result column="alarm_info" jdbcType="VARCHAR" property="alarmInfo" />
+        <result column="alarm_time" jdbcType="TIMESTAMP" property="alarmTime" />
+        <result column="deal_type" jdbcType="INTEGER" property="dealType" />
+        <result column="deal_info" jdbcType="VARCHAR" property="dealInfo" />
+        <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId" />
+        <result column="deal_person_name" jdbcType="VARCHAR" property="dealPersonName" />
+        <result column="position_station_num" jdbcType="VARCHAR" property="positionStationNum" />
+        <result column="position_offset" jdbcType="VARCHAR" property="positionOffset" />
+        <result column="alarm_state" jdbcType="INTEGER" property="alarmState" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        robot_alarm_id, station_id, alarm_type, alarm_level, alarm_info, alarm_time, deal_type, deal_info, deal_person_id, deal_person_name, position_station_num, position_offset, alarm_state, create_time, end_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="robotAlarmId" parameterType="com.yjh.platform.module.task.entity.RobotAlarm">
+        insert into robot_alarm(
+            robot_alarm_id,
+            station_id,
+            alarm_type,
+            alarm_level,
+            alarm_info,
+            alarm_time,
+            deal_type,
+            deal_info,
+            deal_person_id,
+            deal_person_name,
+            position_station_num,
+            position_offset,
+            alarm_state,
+            create_time,
+            end_time
+        )values(
+                #{robotAlarmId, jdbcType=BIGINT},
+                #{stationId, jdbcType=VARCHAR},
+                #{alarmType, jdbcType=INTEGER},
+                #{alarmLevel, jdbcType=INTEGER},
+                #{alarmInfo, jdbcType=VARCHAR},
+                #{alarmTime, jdbcType=TIMESTAMP},
+                #{dealType, jdbcType=INTEGER},
+                #{dealInfo, jdbcType=VARCHAR},
+                #{dealPersonId, jdbcType=VARCHAR},
+                #{dealPersonName, jdbcType=VARCHAR},
+                #{positionStationNum, jdbcType=VARCHAR},
+                #{positionOffset, jdbcType=VARCHAR},
+                #{alarmState, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from robot_alarm
+                where robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.RobotAlarm">
+        update robot_alarm a <set>
+        <if test="robotAlarmId != null and robotAlarmId != ''">a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT},</if>
+        <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
+        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmInfo != null and alarmInfo != ''">a.alarm_info = #{alarmInfo, jdbcType=VARCHAR},</if>
+        a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
+        <if test="dealType != null and dealType != ''">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
+        <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        <if test="dealPersonName != null and dealPersonName != ''">a.deal_person_name = #{dealPersonName, jdbcType=VARCHAR},</if>
+        <if test="positionStationNum != null and positionStationNum != ''">a.position_station_num = #{positionStationNum, jdbcType=VARCHAR},</if>
+        <if test="positionOffset != null and positionOffset != ''">a.position_offset = #{positionOffset, jdbcType=VARCHAR},</if>
+        <if test="alarmState != null and alarmState != ''">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        a.create_time = #{createTime, jdbcType=TIMESTAMP},
+        a.end_time = #{endTime, jdbcType=TIMESTAMP},
+    </set>
+            where a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.RobotAlarm">
+        select
+        a.robot_alarm_id,
+        a.station_id,
+        a.alarm_type,
+        a.alarm_level,
+        a.alarm_info,
+        a.alarm_time,
+        a.deal_type,
+        a.deal_info,
+        a.deal_person_id,
+        a.deal_person_name,
+        a.position_station_num,
+        a.position_offset,
+        a.alarm_state,
+        a.create_time,
+        a.end_time
+        from robot_alarm a
+        where 1 = 1
+            and a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.RobotAlarm" resultType="com.yjh.platform.module.task.entity.RobotAlarm">
+        select
+        a.robot_alarm_id,
+        a.station_id,
+        a.alarm_type,
+        a.alarm_level,
+        a.alarm_info,
+        a.alarm_time,
+        a.deal_type,
+        a.deal_info,
+        a.deal_person_id,
+        a.deal_person_name,
+        a.position_station_num,
+        a.position_offset,
+        a.alarm_state,
+        a.create_time,
+        a.end_time
+        from robot_alarm a
+        where 1 = 1
+        <if test="robotAlarmId != null and robotAlarmId != ''">a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT},</if>
+        <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
+        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmInfo != null and alarmInfo != ''">a.alarm_info = #{alarmInfo, jdbcType=VARCHAR},</if>
+        <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
+        <if test="dealType != null and dealType != ''">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
+        <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        <if test="dealPersonName != null and dealPersonName != ''">a.deal_person_name = #{dealPersonName, jdbcType=VARCHAR},</if>
+        <if test="positionStationNum != null and positionStationNum != ''">a.position_station_num = #{positionStationNum, jdbcType=VARCHAR},</if>
+        <if test="positionOffset != null and positionOffset != ''">a.position_offset = #{positionOffset, jdbcType=VARCHAR},</if>
+        <if test="alarmState != null and alarmState != ''">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.RobotAlarm" resultType="com.yjh.platform.module.task.entity.RobotAlarm">
+        select
+        a.robot_alarm_id,
+        a.station_id,
+        a.alarm_type,
+        a.alarm_level,
+        a.alarm_info,
+        a.alarm_time,
+        a.deal_type,
+        a.deal_info,
+        a.deal_person_id,
+        a.deal_person_name,
+        a.position_station_num,
+        a.position_offset,
+        a.alarm_state,
+        a.create_time,
+        a.end_time
+        from robot_alarm a
+        where 1 = 1
+        <if test="robotAlarmId != null and robotAlarmId != ''">a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT},</if>
+        <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
+        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmInfo != null and alarmInfo != ''">a.alarm_info = #{alarmInfo, jdbcType=VARCHAR},</if>
+        <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
+        <if test="dealType != null and dealType != ''">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
+        <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        <if test="dealPersonName != null and dealPersonName != ''">a.deal_person_name = #{dealPersonName, jdbcType=VARCHAR},</if>
+        <if test="positionStationNum != null and positionStationNum != ''">a.position_station_num = #{positionStationNum, jdbcType=VARCHAR},</if>
+        <if test="positionOffset != null and positionOffset != ''">a.position_offset = #{positionOffset, jdbcType=VARCHAR},</if>
+        <if test="alarmState != null and alarmState != ''">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into robot_alarm(
+            robot_alarm_id,
+            station_id,
+            alarm_type,
+            alarm_level,
+            alarm_info,
+            alarm_time,
+            deal_type,
+            deal_info,
+            deal_person_id,
+            deal_person_name,
+            position_station_num,
+            position_offset,
+            alarm_state,
+            create_time,
+            end_time
+        )values
+        <foreach collection="list" item="RobotAlarm" separator=",">
+            (
+                #{RobotAlarm.robotAlarmId, jdbcType=BIGINT},
+                #{RobotAlarm.stationId, jdbcType=VARCHAR},
+                #{RobotAlarm.alarmType, jdbcType=INTEGER},
+                #{RobotAlarm.alarmLevel, jdbcType=INTEGER},
+                #{RobotAlarm.alarmInfo, jdbcType=VARCHAR},
+                #{RobotAlarm.alarmTime, jdbcType=TIMESTAMP},
+                #{RobotAlarm.dealType, jdbcType=INTEGER},
+                #{RobotAlarm.dealInfo, jdbcType=VARCHAR},
+                #{RobotAlarm.dealPersonId, jdbcType=VARCHAR},
+                #{RobotAlarm.dealPersonName, jdbcType=VARCHAR},
+                #{RobotAlarm.positionStationNum, jdbcType=VARCHAR},
+                #{RobotAlarm.positionOffset, jdbcType=VARCHAR},
+                #{RobotAlarm.alarmState, jdbcType=INTEGER},
+                #{RobotAlarm.createTime, jdbcType=TIMESTAMP},
+                #{RobotAlarm.endTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

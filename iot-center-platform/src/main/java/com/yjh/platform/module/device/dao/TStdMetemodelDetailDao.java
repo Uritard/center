@@ -3,7 +3,7 @@ package com.yjh.platform.module.device.dao;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.yjh.platform.module.device.entity.TStdMeteModel;
+import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -36,6 +36,10 @@ public interface TStdMetemodelDetailDao {
                                      @Param(value = "lowLimit1") Float lowLimit1,
                                      @Param(value = "highLimit2") Float highLimit2,
                                      @Param(value = "lowLimit2") Float lowLimit2,
+                                     @Param(value = "highLimit3") Float highLimit3,
+                                     @Param(value = "lowLimit3") Float lowLimit3,
+                                     @Param(value = "highLimit4") Float highLimit4,
+                                     @Param(value = "lowLimit4") Float lowLimit4,
                                      @Param(value = "alarmDelay") Integer alarmDelay,
                                      @Param(value = "alarmCnt") Integer alarmCnt,
                                      @Param(value = "thresholdAbs") BigDecimal thresholdAbs,
@@ -45,4 +49,6 @@ public interface TStdMetemodelDetailDao {
 
     int batchAdd(List<TStdMeteModelDetail> list);
 
+    List<MeteInfo> selectMeteBlindModel(@Param(value = "modelId")Long modelId);
+    int deleteByMeteId(@Param(value ="meteId")Long meteId);
 }

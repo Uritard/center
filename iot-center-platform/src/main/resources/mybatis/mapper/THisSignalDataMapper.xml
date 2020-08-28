@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.THisSignalDataDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.THisSignalData">
+        <result column="id" jdbcType="BIGINT" property="Id" />
+        <result column="mete_id" jdbcType="BIGINT" property="meteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+        <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
+        <result column="mete_value" jdbcType="VARCHAR" property="meteValue" />
+        <result column="last_mete_value" jdbcType="VARCHAR" property="lastMeteValue" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, mete_id, device_id, record_time, mete_kind, mete_value, last_mete_value
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="Id" parameterType="com.yjh.platform.module.task.entity.THisSignalData">
+        insert into t_his_signal_data(
+            id,
+            mete_id,
+            device_id,
+            record_time,
+            mete_kind,
+            mete_value,
+            last_mete_value
+        )values(
+                #{Id, jdbcType=BIGINT},
+                #{meteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{recordTime, jdbcType=TIMESTAMP},
+                #{meteKind, jdbcType=INTEGER},
+                #{meteValue, jdbcType=VARCHAR},
+                #{lastMeteValue, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_his_signal_data where id=#{Id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.THisSignalData">
+        update t_his_signal_data a <set>
+        <if test="Id != null and Id != ''">a.id = #{Id, jdbcType=BIGINT},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        a.record_time = #{recordTime, jdbcType=TIMESTAMP},
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+    </set>
+         where id=#{Id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.THisSignalData">
+        select
+        a.id,
+        a.mete_id,
+        a.device_id,
+        a.record_time,
+        a.mete_kind,
+        a.mete_value,
+        a.last_mete_value
+        from t_his_signal_data a
+        where 1 = 1
+        and a.id=#{Id,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.THisSignalData" resultType="com.yjh.platform.module.task.entity.THisSignalData">
+        select
+        a.id,
+        a.mete_id,
+        a.device_id,
+        a.record_time,
+        a.mete_kind,
+        a.mete_value,
+        a.last_mete_value
+        from t_his_signal_data a
+        where 1 = 1
+        <if test="Id != null and Id != ''">a.id = #{Id,jdbcType=BIGINT},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.THisSignalData" resultType="com.yjh.platform.module.task.entity.THisSignalData">
+        select
+        a.mete_id,
+        a.device_id,
+        a.record_time,
+        a.mete_kind,
+        a.mete_value,
+        a.last_mete_value
+        from t_his_signal_data a
+        where 1 = 1
+        <if test="Id != null and Id != ''">a.id = #{Id, jdbcType=BIGINT},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_his_signal_data(
+            id,
+            mete_id,
+            device_id,
+            record_time,
+            mete_kind,
+            mete_value,
+            last_mete_value
+        )values
+        <foreach collection="list" item="THisSignalData" separator=",">
+            (
+                #{THisSignalData.Id, jdbcType=BIGINT},
+                #{THisSignalData.meteId, jdbcType=BIGINT},
+                #{THisSignalData.deviceId, jdbcType=BIGINT},
+                #{THisSignalData.recordTime, jdbcType=TIMESTAMP},
+                #{THisSignalData.meteKind, jdbcType=INTEGER},
+                #{THisSignalData.meteValue, jdbcType=VARCHAR},
+                #{THisSignalData.lastMeteValue, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

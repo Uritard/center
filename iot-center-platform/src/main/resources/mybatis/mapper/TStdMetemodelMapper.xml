@@ -146,4 +146,29 @@
     </delete>
 
 
+
+    <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.DeviceTypeTree">
+        SELECT DISTINCT
+	       a.device_type,
+	       b.dict_note as deviceTypeName
+        FROM
+	       t_std_mete a
+        LEFT JOIN t_dict_business b ON a.device_type = b.dict_code
+        WHERE
+	       b.remark = '设备类型' ORDER BY a.device_type ASC
+
+    </select>
+
+    <select id="selectModel" resultType="com.yjh.platform.module.device.entity.MeteModel">
+       SELECT
+	     a.device_type,
+	     a.model_id,
+	     a.model_name
+       FROM
+	     t_std_metemodel a
+    </select>
+
+
+
+
 </mapper>

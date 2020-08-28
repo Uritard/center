@@ -35,5 +35,8 @@ public class TStdMeteModel implements Serializable {
     @ApiModelProperty(value = "模板备注")
     private String remark;
 
+    @ApiModelProperty(value = "层级标志")
+    private int level=2;
+
 
 }

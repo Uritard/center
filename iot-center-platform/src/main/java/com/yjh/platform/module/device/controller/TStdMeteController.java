@@ -115,6 +115,14 @@ public class TStdMeteController {
                             @RequestParam(value = "lowEffect", required = false) Float lowEffect,
                             @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
                             @RequestParam(value = "alarmLimit", required = false) Integer alarmLimit,
+                            @RequestParam(value = "highLimit1", required = false) Float highLimit1,
+                            @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
+                            @RequestParam(value = "highLimit2", required = false) Float highLimit2,
+                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit2,
+                            @RequestParam(value = "highLimit2", required = false) Float highLimit3,
+                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit3,
+                            @RequestParam(value = "highLimit2", required = false) Float highLimit4,
+                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit4,
                             @RequestParam(value = "alarmDelay", required = false) Integer alarmDelay,
                             @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
                             @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
@@ -123,7 +131,7 @@ public class TStdMeteController {
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteCode, meteType, meteName, alarmNote, alarmExplain, alarmType, unit, upEffect, lowEffect, alarmLevel, alarmLimit, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
+            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteCode, meteType, meteName, alarmNote, alarmExplain, alarmType, unit, upEffect, lowEffect, alarmLevel, alarmLimit,highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
