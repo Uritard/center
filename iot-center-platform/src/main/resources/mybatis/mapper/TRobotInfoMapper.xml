@@ -96,27 +96,22 @@
         )
     </insert>
 
-<!--    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">-->
-<!--        delete from t_robot_info-->
-<!--                where robot_id = #{robotId, jdbcType=BIGINT}-->
-<!--    </delete>-->
-
-    <!--多表的根据robot_id的删除-->
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-                DELETE  a,
-                        b,
-                        e,
-                        d
-                FROM
-                    t_robot_info AS a,
-                    t_robot_inspection AS b,
-                    t_cruise_point_instance AS e,
-                    t_cruise_plan AS d
-                WHERE
-                    a.robot_id = b.robot_id
-                AND b.inspection_id = e.cruise_id
-                AND a.robot_id = d.robot_id
-                AND a.robot_id = #{robotId, jdbcType=BIGINT}
+        delete from t_robot_info
+                where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+    <delete id="deletePlan" parameterType="java.lang.Long">
+        delete from t_cruise_plan
+                where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteInstance" parameterType="java.lang.Long">
+        delete a from t_cruise_point_instance AS a,t_robot_inspection AS b
+                where b.inspection_id = a.cruise_id
+                AND b.robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteInspection" parameterType="java.lang.Long">
+        delete from t_robot_inspection
+                where robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">

@@ -30,7 +30,7 @@ public class TRobotInfoService{
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long robotId) {
-        return this.tRobotInfoDao.deleteByPrimaryId(robotId);
+        return this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deletePlan(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
     }
 
     @Logs(title = "更新", code = "module")
