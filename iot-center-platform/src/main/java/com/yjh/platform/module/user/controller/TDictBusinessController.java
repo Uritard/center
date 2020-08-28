@@ -158,7 +158,7 @@ public class TDictBusinessController {
 
 
     @ApiOperation(value = "多类型查询")
-    @RequestMapping(value = "/selectQuery", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectQuery", method = RequestMethod.GET)
     public Result selectQuery( @RequestParam(value = "colNames", required = false) String colName) {
         Result result = new Result();
         try {
