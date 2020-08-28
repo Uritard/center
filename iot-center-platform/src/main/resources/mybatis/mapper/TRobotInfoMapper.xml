@@ -236,7 +236,7 @@
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
         <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
-        <if test="isRse != null">a.is_use = #{isRse, jdbcType=VARCHAR},</if>
+        <if test="isUse != null">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
@@ -294,7 +294,7 @@
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
         <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
-        <if test="isRse != null">a.is_use = #{isRse, jdbcType=VARCHAR},</if>
+        <if test="isUse != null">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upregionId != null and upregionId !=''">a.up_region_id = #{upregionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
@@ -351,7 +351,7 @@
                 #{TRobotInfo.updateBy, jdbcType=VARCHAR},
                 #{TRobotInfo.updateDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
-                #{TRobotInfo.isRse, jdbcType=VARCHAR},
+                #{TRobotInfo.isUse, jdbcType=VARCHAR},
                 #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.upregionId, jdbcType=BIGINT},
                 #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
