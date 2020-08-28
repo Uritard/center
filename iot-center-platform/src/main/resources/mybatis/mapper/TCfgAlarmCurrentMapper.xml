@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCfgAlarmCurrentDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCfgAlarmCurrent">
+        <id column="alarm_no" jdbcType="BIGINT" property="alarmNo" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId" />
+        <result column="mete_id" jdbcType="BIGINT" property="meteId" />
+        <result column="alarm_time" jdbcType="TIMESTAMP" property="alarmTime" />
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
+        <result column="alarm_value" jdbcType="VARCHAR" property="alarmValue" />
+        <result column="alarm_desc" jdbcType="VARCHAR" property="alarmDesc" />
+        <result column="confirm_state" jdbcType="INTEGER" property="confirmState" />
+        <result column="confirm_people" jdbcType="VARCHAR" property="confirmPeople" />
+        <result column="confirm_time" jdbcType="TIMESTAMP" property="confirmTime" />
+        <result column="confirm_remark" jdbcType="VARCHAR" property="confirmRemark" />
+        <result column="defect" jdbcType="INTEGER" property="defect" />
+        <result column="defect_level" jdbcType="INTEGER" property="defectLevel" />
+        <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
+        <result column="is_clear" jdbcType="VARCHAR" property="isClear" />
+        <result column="show_type" jdbcType="VARCHAR" property="showType" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        alarm_no, device_id, cunstom_id, mete_id, alarm_time, alarm_level, alarm_value, alarm_desc, confirm_state, confirm_people, confirm_time, confirm_remark, defect, defect_level, mete_code, is_clear, show_type, update_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="alarmNo" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent">
+        insert into t_cfg_alarm_current(
+            alarm_no,
+            device_id,
+            cunstom_id,
+            mete_id,
+            alarm_time,
+            alarm_level,
+            alarm_value,
+            alarm_desc,
+            confirm_state,
+            confirm_people,
+            confirm_time,
+            confirm_remark,
+            defect,
+            defect_level,
+            mete_code,
+            is_clear,
+            show_type,
+            update_time
+        )values(
+                #{alarmNo, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{cunstomId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=BIGINT},
+                #{alarmTime, jdbcType=TIMESTAMP},
+                #{alarmLevel, jdbcType=INTEGER},
+                #{alarmValue, jdbcType=VARCHAR},
+                #{alarmDesc, jdbcType=VARCHAR},
+                #{confirmState, jdbcType=INTEGER},
+                #{confirmPeople, jdbcType=VARCHAR},
+                #{confirmTime, jdbcType=TIMESTAMP},
+                #{confirmRemark, jdbcType=VARCHAR},
+                #{defect, jdbcType=INTEGER},
+                #{defectLevel, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{isClear, jdbcType=VARCHAR},
+                #{showType, jdbcType=VARCHAR},
+                #{updateTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cfg_alarm_current
+                where alarm_no = #{alarmNo, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent">
+        update t_cfg_alarm_current a <set>
+        <if test="alarmNo != null and alarmNo != ''">a.alarm_no = #{alarmNo, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
+        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmValue != null and alarmValue != ''">a.alarm_value = #{alarmValue, jdbcType=VARCHAR},</if>
+        <if test="alarmDesc != null and alarmDesc != ''">a.alarm_desc = #{alarmDesc, jdbcType=VARCHAR},</if>
+        <if test="confirmState != null and confirmState != ''">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        <if test="confirmPeople != null and confirmPeople != ''">a.confirm_people = #{confirmPeople, jdbcType=VARCHAR},</if>
+        a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},
+        <if test="confirmRemark != null and confirmRemark != ''">a.confirm_remark = #{confirmRemark, jdbcType=VARCHAR},</if>
+        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="isClear != null and isClear != ''">a.is_clear = #{isClear, jdbcType=VARCHAR},</if>
+        <if test="showType != null and showType != ''">a.show_type = #{showType, jdbcType=VARCHAR},</if>
+        a.update_time = #{updateTime, jdbcType=TIMESTAMP},
+    </set>
+            where a.alarm_no = #{alarmNo, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent">
+        select
+        a.alarm_no,
+        a.device_id,
+        a.cunstom_id,
+        a.mete_id,
+        a.alarm_time,
+        a.alarm_level,
+        a.alarm_value,
+        a.alarm_desc,
+        a.confirm_state,
+        a.confirm_people,
+        a.confirm_time,
+        a.confirm_remark,
+        a.defect,
+        a.defect_level,
+        a.mete_code,
+        a.is_clear,
+        a.show_type,
+        a.update_time
+        from t_cfg_alarm_current a
+        where 1 = 1
+            and a.alarm_no = #{alarmNo, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent" resultType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent">
+        select
+        a.alarm_no,
+        a.device_id,
+        a.cunstom_id,
+        a.mete_id,
+        a.alarm_time,
+        a.alarm_level,
+        a.alarm_value,
+        a.alarm_desc,
+        a.confirm_state,
+        a.confirm_people,
+        a.confirm_time,
+        a.confirm_remark,
+        a.defect,
+        a.defect_level,
+        a.mete_code,
+        a.is_clear,
+        a.show_type,
+        a.update_time
+        from t_cfg_alarm_current a
+        where 1 = 1
+        <if test="alarmNo != null and alarmNo != ''">a.alarm_no = #{alarmNo, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
+        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmValue != null and alarmValue != ''">a.alarm_value = #{alarmValue, jdbcType=VARCHAR},</if>
+        <if test="alarmDesc != null and alarmDesc != ''">a.alarm_desc = #{alarmDesc, jdbcType=VARCHAR},</if>
+        <if test="confirmState != null and confirmState != ''">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        <if test="confirmPeople != null and confirmPeople != ''">a.confirm_people = #{confirmPeople, jdbcType=VARCHAR},</if>
+        <if test="confirmTime != null and confirmTime != ''">a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},</if>
+        <if test="confirmRemark != null and confirmRemark != ''">a.confirm_remark = #{confirmRemark, jdbcType=VARCHAR},</if>
+        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="isClear != null and isClear != ''">a.is_clear = #{isClear, jdbcType=VARCHAR},</if>
+        <if test="showType != null and showType != ''">a.show_type = #{showType, jdbcType=VARCHAR},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent" resultType="com.yjh.platform.module.task.entity.TCfgAlarmCurrent">
+        select
+        a.alarm_no,
+        a.device_id,
+        a.cunstom_id,
+        a.mete_id,
+        a.alarm_time,
+        a.alarm_level,
+        a.alarm_value,
+        a.alarm_desc,
+        a.confirm_state,
+        a.confirm_people,
+        a.confirm_time,
+        a.confirm_remark,
+        a.defect,
+        a.defect_level,
+        a.mete_code,
+        a.is_clear,
+        a.show_type,
+        a.update_time
+        from t_cfg_alarm_current a
+        where 1 = 1
+        <if test="alarmNo != null and alarmNo != ''">a.alarm_no = #{alarmNo, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
+        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmValue != null and alarmValue != ''">a.alarm_value = #{alarmValue, jdbcType=VARCHAR},</if>
+        <if test="alarmDesc != null and alarmDesc != ''">a.alarm_desc = #{alarmDesc, jdbcType=VARCHAR},</if>
+        <if test="confirmState != null and confirmState != ''">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        <if test="confirmPeople != null and confirmPeople != ''">a.confirm_people = #{confirmPeople, jdbcType=VARCHAR},</if>
+        <if test="confirmTime != null and confirmTime != ''">a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},</if>
+        <if test="confirmRemark != null and confirmRemark != ''">a.confirm_remark = #{confirmRemark, jdbcType=VARCHAR},</if>
+        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="isClear != null and isClear != ''">a.is_clear = #{isClear, jdbcType=VARCHAR},</if>
+        <if test="showType != null and showType != ''">a.show_type = #{showType, jdbcType=VARCHAR},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_alarm_current(
+            alarm_no,
+            device_id,
+            cunstom_id,
+            mete_id,
+            alarm_time,
+            alarm_level,
+            alarm_value,
+            alarm_desc,
+            confirm_state,
+            confirm_people,
+            confirm_time,
+            confirm_remark,
+            defect,
+            defect_level,
+            mete_code,
+            is_clear,
+            show_type,
+            update_time
+        )values
+        <foreach collection="list" item="TCfgAlarmCurrent" separator=",">
+            (
+                #{TCfgAlarmCurrent.alarmNo, jdbcType=BIGINT},
+                #{TCfgAlarmCurrent.deviceId, jdbcType=BIGINT},
+                #{TCfgAlarmCurrent.cunstomId, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.meteId, jdbcType=BIGINT},
+                #{TCfgAlarmCurrent.alarmTime, jdbcType=TIMESTAMP},
+                #{TCfgAlarmCurrent.alarmLevel, jdbcType=INTEGER},
+                #{TCfgAlarmCurrent.alarmValue, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.alarmDesc, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.confirmState, jdbcType=INTEGER},
+                #{TCfgAlarmCurrent.confirmPeople, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.confirmTime, jdbcType=TIMESTAMP},
+                #{TCfgAlarmCurrent.confirmRemark, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.defect, jdbcType=INTEGER},
+                #{TCfgAlarmCurrent.defectLevel, jdbcType=INTEGER},
+                #{TCfgAlarmCurrent.meteCode, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.isClear, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.showType, jdbcType=VARCHAR},
+                #{TCfgAlarmCurrent.updateTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

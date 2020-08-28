@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCfgDataCurrentDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        <id column="mete_id" jdbcType="BIGINT" property="meteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId" />
+        <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+        <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
+        <result column="region_id" jdbcType="VARCHAR" property="regionId" />
+        <result column="mete_value" jdbcType="VARCHAR" property="meteValue" />
+        <result column="last_mete_value" jdbcType="VARCHAR" property="lastMeteValue" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        mete_id, device_id, cunstom_id, record_time, mete_kind, region_id, mete_value, last_mete_value
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="meteId" parameterType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        insert into t_cfg_data_current(
+            mete_id,
+            device_id,
+            cunstom_id,
+            record_time,
+            mete_kind,
+            region_id,
+            mete_value,
+            last_mete_value
+        )values(
+                #{meteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{cunstomId, jdbcType=VARCHAR},
+                #{recordTime, jdbcType=TIMESTAMP},
+                #{meteKind, jdbcType=INTEGER},
+                #{regionId, jdbcType=VARCHAR},
+                #{meteValue, jdbcType=VARCHAR},
+                #{lastMeteValue, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cfg_data_current
+                where mete_id = #{meteId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        update t_cfg_data_current a <set>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        a.record_time = #{recordTime, jdbcType=TIMESTAMP},
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=VARCHAR},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+    </set>
+            where a.mete_id = #{meteId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        select
+        a.mete_id,
+        a.device_id,
+        a.cunstom_id,
+        a.record_time,
+        a.mete_kind,
+        a.region_id,
+        a.mete_value,
+        a.last_mete_value
+        from t_cfg_data_current a
+        where 1 = 1
+            and a.mete_id = #{meteId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCfgDataCurrent" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        select
+        a.mete_id,
+        a.device_id,
+        a.cunstom_id,
+        a.record_time,
+        a.mete_kind,
+        a.region_id,
+        a.mete_value,
+        a.last_mete_value
+        from t_cfg_data_current a
+        where 1 = 1
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=VARCHAR},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCfgDataCurrent" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        select
+        a.mete_id,
+        a.device_id,
+        a.cunstom_id,
+        a.record_time,
+        a.mete_kind,
+        a.region_id,
+        a.mete_value,
+        a.last_mete_value
+        from t_cfg_data_current a
+        where 1 = 1
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=VARCHAR},</if>
+        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
+        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cfg_data_current(
+            mete_id,
+            device_id,
+            cunstom_id,
+            record_time,
+            mete_kind,
+            region_id,
+            mete_value,
+            last_mete_value
+        )values
+        <foreach collection="list" item="TCfgDataCurrent" separator=",">
+            (
+                #{TCfgDataCurrent.meteId, jdbcType=BIGINT},
+                #{TCfgDataCurrent.deviceId, jdbcType=BIGINT},
+                #{TCfgDataCurrent.cunstomId, jdbcType=VARCHAR},
+                #{TCfgDataCurrent.recordTime, jdbcType=TIMESTAMP},
+                #{TCfgDataCurrent.meteKind, jdbcType=INTEGER},
+                #{TCfgDataCurrent.regionId, jdbcType=VARCHAR},
+                #{TCfgDataCurrent.meteValue, jdbcType=VARCHAR},
+                #{TCfgDataCurrent.lastMeteValue, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

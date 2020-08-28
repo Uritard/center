@@ -119,6 +119,10 @@ public class TStdMetemodelDetailController {
                             @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
                             @RequestParam(value = "highLimit2", required = false) Float highLimit2,
                             @RequestParam(value = "lowLimit2", required = false) Float lowLimit2,
+                           @RequestParam(value = "highLimit2", required = false) Float highLimit3,
+                           @RequestParam(value = "lowLimit2", required = false) Float lowLimit3,
+                           @RequestParam(value = "highLimit2", required = false) Float highLimit4,
+                           @RequestParam(value = "lowLimit2", required = false) Float lowLimit4,
                             @RequestParam(value = "alarmDelay", required = false) Integer alarmDelay,
                             @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
                             @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
@@ -126,7 +130,7 @@ public class TStdMetemodelDetailController {
                             @RequestParam(value = "modulus", required = false) Integer modulus) {
         Result result = new Result();
         try {
-            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType, meteCode, meteName, meteType, unit, alarmNote, alarmExplain, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
+            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType, meteCode, meteName, meteType, unit, alarmNote, alarmExplain, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

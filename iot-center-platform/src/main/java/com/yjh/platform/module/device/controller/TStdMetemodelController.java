@@ -1,22 +1,13 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.ModelInfo;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import com.yjh.platform.module.device.service.TStdMetemodelService;
 import com.yjh.platform.module.device.entity.TStdMeteModel;
-
-import java.io.FileInputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.yjh.platform.module.user.entity.TCameraInfo;
 import io.swagger.annotations.*;
-import io.swagger.models.auth.In;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -201,6 +192,78 @@ public class TStdMetemodelController {
         }
         return result;
     }
+
+
+
+
+    @ApiOperation(value = "查询设备类型-模板树")
+    @RequestMapping(value = "/selectDeviceTypeModelTree",method = RequestMethod.GET)
+    public Result selectDeviceTypeModelTree(){
+        Result result=new Result();
+        try{
+            result.setData(tStdMetemodelService.selectDeviceTypeModelTree());
+
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询失败失败描述：", e);
+        }
+
+        return  result;
+    }
+
+
+
+    @ApiOperation(value = "新建模板")
+    @RequestMapping(value = "/addModel",method = RequestMethod.POST)
+    public Result addModel(@RequestParam(value = "deviceType")Integer deviceType,
+                           @RequestParam(value = "modelName")String modelName,
+                           @RequestParam(value = "meteIds")List<Long> meteIds){
+        Result result =new Result();
+        try {
+            result.setData(tStdMetemodelService.addModel(deviceType, modelName, meteIds));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("系统测点模版新建失败：" + e);
+        }
+
+        return result;
+    }
+
+
+
+
+   @ApiOperation(value = "查看当前模板信息")
+   @RequestMapping(value = "/selectModel",method = RequestMethod.GET)
+    public Result selectModel(@RequestParam(value = "modelId")Long modelId){
+        Result result=new Result();
+       try{
+           result.setData(tStdMetemodelService.selectModel(modelId));
+
+       }catch (Exception e) {
+           result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+           log.error("查询失败描述：", e);
+       }
+        return  result;
+
+   }
+
+
+    @ApiOperation(value = "修改当前模板信息")
+    @RequestMapping(value = "updateModel",method = RequestMethod.POST)
+    public Result updateModel (@RequestBody ModelInfo modelInfo){
+        Result result =new Result();
+        try {
+            result.setData(tStdMetemodelService.updateModel(modelInfo));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("模板信息更新成功失败：" + e);
+        }
+
+        return  result;
+
+    }
+
+
 
 
 }

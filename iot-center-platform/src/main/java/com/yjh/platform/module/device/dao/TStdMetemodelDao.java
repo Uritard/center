@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.DeviceTypeTree;
+import com.yjh.platform.module.device.entity.MeteModel;
 import com.yjh.platform.module.device.entity.TStdMeteModel;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import org.apache.ibatis.annotations.Param;
@@ -29,5 +31,6 @@ public interface TStdMetemodelDao {
 
     int batchDelete(@Param(value = "list")List<String> list);
 
-
+    List<DeviceTypeTree> selectDevice();
+    List<MeteModel> selectModel();
 }

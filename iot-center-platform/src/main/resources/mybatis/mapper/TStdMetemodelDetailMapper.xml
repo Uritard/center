@@ -21,6 +21,10 @@
         <result column="low_limit1" jdbcType="REAL" property="lowLimit1" />
         <result column="high_limit2" jdbcType="REAL" property="highLimit2" />
         <result column="low_limit2" jdbcType="REAL" property="lowLimit2" />
+        <result column="high_limit3" jdbcType="REAL" property="highLimit3" />
+        <result column="low_limit3" jdbcType="REAL" property="lowLimit3" />
+        <result column="high_limit4" jdbcType="REAL" property="highLimit4" />
+        <result column="low_limit4" jdbcType="REAL" property="lowLimit4" />
         <result column="alarm_delay" jdbcType="INTEGER" property="alarmDelay" />
         <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt" />
         <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs" />
@@ -30,7 +34,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        model_id, mete_id, custom_type, mete_code, mete_name, mete_type, unit, alarm_note, alarm_explain, alarm_type, up_effect, low_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
+        model_id, mete_id, custom_type, mete_code, mete_name, mete_type, unit, alarm_note, alarm_explain, alarm_type, up_effect, low_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
     </sql>
 
 
@@ -53,6 +57,10 @@
             low_limit1,
             high_limit2,
             low_limit2,
+            high_limit3,
+            low_limit3,
+            high_limit4,
+            low_limit4,
             alarm_delay,
             alarm_cnt,
             threshold_abs,
@@ -76,6 +84,10 @@
                 #{lowLimit1, jdbcType=REAL},
                 #{highLimit2, jdbcType=REAL},
                 #{lowLimit2, jdbcType=REAL},
+                #{highLimit3, jdbcType=REAL},
+                #{lowLimit3, jdbcType=REAL},
+                #{highLimit4, jdbcType=REAL},
+                #{lowLimit4, jdbcType=REAL},
                 #{alarmDelay, jdbcType=INTEGER},
                 #{alarmCnt, jdbcType=INTEGER},
                 #{thresholdAbs, jdbcType=NUMERIC},
@@ -108,6 +120,10 @@
         <if test="lowLimit1 != null and lowLimit1 != ''">a.low_limit1 = #{lowLimit1, jdbcType=REAL},</if>
         <if test="highLimit2 != null and highLimit2 != ''">a.high_limit2 = #{highLimit2, jdbcType=REAL},</if>
         <if test="lowLimit2 != null and lowLimit2 != ''">a.low_limit2 = #{lowLimit2, jdbcType=REAL},</if>
+        <if test="highLimit3 != null and highLimit2 != ''">a.high_limit3 = #{highLimit3, jdbcType=REAL},</if>
+        <if test="lowLimit3 != null and lowLimit2 != ''">a.low_limit3 = #{lowLimit3, jdbcType=REAL},</if>
+        <if test="highLimit4 != null and highLimit2 != ''">a.high_limit4 = #{highLimit4, jdbcType=REAL},</if>
+        <if test="lowLimit4 != null and lowLimit2 != ''">a.low_limit4 = #{lowLimit4, jdbcType=REAL},</if>
         <if test="alarmDelay != null ">a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},</if>
         <if test="alarmCnt != null ">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
         <if test="thresholdAbs != null and thresholdAbs != ''">a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},</if>
@@ -136,6 +152,10 @@
         a.low_limit1,
         a.high_limit2,
         a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
         a.alarm_delay,
         a.alarm_cnt,
         a.threshold_abs,
@@ -166,6 +186,10 @@
         a.low_limit1,
         a.high_limit2,
         a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
         a.alarm_delay,
         a.alarm_cnt,
         a.threshold_abs,
@@ -190,6 +214,10 @@
         <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
         <if test="highLimit2 != null and highLimit2 != ''"> and a.high_limit2 = #{highLimit2, jdbcType=REAL}</if>
         <if test="lowLimit2 != null and lowLimit2 != ''"> and a.low_limit2 = #{lowLimit2, jdbcType=REAL}</if>
+        <if test="highLimit3 != null and highLimit3 != ''"> and a.high_limit3 = #{highLimit3, jdbcType=REAL}</if>
+        <if test="lowLimit3 != null and lowLimit3 != ''"> and a.low_limit3 = #{lowLimit3, jdbcType=REAL}</if>
+        <if test="highLimit4 != null and highLimit4 != ''"> and a.high_limit4 = #{highLimit4, jdbcType=REAL}</if>
+        <if test="lowLimit4 != null and lowLimit4 != ''"> and a.low_limit4 = #{lowLimit4, jdbcType=REAL}</if>
         <if test="alarmDelay != null "> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
         <if test="alarmCnt != null "> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
@@ -216,6 +244,10 @@
         a.low_limit1,
         a.high_limit2,
         a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
         a.alarm_delay,
         a.alarm_cnt,
         a.threshold_abs,
@@ -240,6 +272,10 @@
         <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
         <if test="highLimit2 != null and highLimit2 != ''"> and a.high_limit2 = #{highLimit2, jdbcType=REAL}</if>
         <if test="lowLimit2 != null and lowLimit2 != ''"> and a.low_limit2 = #{lowLimit2, jdbcType=REAL}</if>
+        <if test="highLimit3 != null and highLimit3 != ''"> and a.high_limit3 = #{highLimit3, jdbcType=REAL}</if>
+        <if test="lowLimit3 != null and lowLimit3 != ''"> and a.low_limit3 = #{lowLimit3, jdbcType=REAL}</if>
+        <if test="highLimit4 != null and highLimit4 != ''"> and a.high_limit4 = #{highLimit4, jdbcType=REAL}</if>
+        <if test="lowLimit4 != null and lowLimit4 != ''"> and a.low_limit4 = #{lowLimit4, jdbcType=REAL}</if>
         <if test="alarmDelay != null "> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
         <if test="alarmCnt != null "> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
@@ -266,6 +302,10 @@
             low_limit1,
             high_limit2,
             low_limit2,
+            high_limit3,
+            low_limit3,
+            high_limit4,
+            low_limit4,
             alarm_delay,
             alarm_cnt,
             threshold_abs,
@@ -291,6 +331,10 @@
                 #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},
                 #{TStdMeteModelDetail.highLimit2, jdbcType=REAL},
                 #{TStdMeteModelDetail.lowLimit2, jdbcType=REAL},
+                #{TStdMeteModelDetail.highLimit3, jdbcType=REAL},
+                #{TStdMeteModelDetail.lowLimit3, jdbcType=REAL},
+                #{TStdMeteModelDetail.highLimit4, jdbcType=REAL},
+                #{TStdMeteModelDetail.lowLimit4, jdbcType=REAL},
                 #{TStdMeteModelDetail.alarmDelay, jdbcType=INTEGER},
                 #{TStdMeteModelDetail.alarmCnt, jdbcType=INTEGER},
                 #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
@@ -300,6 +344,11 @@
         </foreach>
     </insert>
 
+    <select id="selectMeteBlindModel"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.MeteInfo">
+       select mete_id,mete_name FROM t_std_metemodel_detail WHERE model_id=#{modelId,jdbcType=BIGINT}
+    </select>
 
-
+    <delete id="deleteByMeteId" parameterType="java.lang.Long">
+        DELETE FROM t_std_metemodel_detail WHERE mete_id=#{meteId,jdbcType=BIGINT}
+    </delete>
 </mapper>

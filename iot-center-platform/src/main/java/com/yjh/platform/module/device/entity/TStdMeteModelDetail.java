@@ -72,6 +72,7 @@ public class TStdMeteModelDetail implements Serializable {
     @ApiModelProperty(value = "告警下限2")
     private Float lowLimit2;
 
+
     @ApiModelProperty(value = "告警上限3")
     private Float highLimit3;
 

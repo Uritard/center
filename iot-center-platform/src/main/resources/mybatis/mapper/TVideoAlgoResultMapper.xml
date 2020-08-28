@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TVideoAlgoResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TVideoAlgoResult">
+    <result column="id" jdbcType="BIGINT" property="id" />
+        <result column="point_id" jdbcType="BIGINT" property="pointId" />
+        <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="preset_id" jdbcType="BIGINT" property="presetId" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="pic_url" jdbcType="VARCHAR" property="picUrl" />
+        <result column="cus_id" jdbcType="VARCHAR" property="cusId" />
+        <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="analyse_result" jdbcType="VARCHAR" property="analyseResult" />
+        <result column="pic_orignal" jdbcType="VARCHAR" property="picOrignal" />
+        <result column="evaluation_state" jdbcType="INTEGER" property="evaluationState" />
+        <result column="signpic" jdbcType="VARCHAR" property="signpic" />
+        <result column="algorithm_type" jdbcType="VARCHAR" property="algorithmType" />
+        <result column="algorithm_son_type" jdbcType="VARCHAR" property="algorithmSonType" />
+        <result column="execute_time" jdbcType="TIMESTAMP" property="executeTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        point_id, task_id, plan_id, device_id, preset_id, device_mete_id, pic_url, cus_id, algorithm_id, status, analyse_result, pic_orignal, evaluation_state, signpic, algorithm_type, algorithm_son_type, execute_time, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
+        insert into t_video_algo_result(
+            id,
+            point_id,
+            task_id,
+            plan_id,
+            device_id,
+            preset_id,
+            device_mete_id,
+            pic_url,
+            cus_id,
+            algorithm_id,
+            status,
+            analyse_result,
+            pic_orignal,
+            evaluation_state,
+            signpic,
+            algorithm_type,
+            algorithm_son_type,
+            execute_time,
+            create_time
+        )values(
+                #{id, jdbcType=BIGINT},
+                #{pointId, jdbcType=BIGINT},
+                #{taskId, jdbcType=VARCHAR},
+                #{planId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{presetId, jdbcType=BIGINT},
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{picUrl, jdbcType=VARCHAR},
+                #{cusId, jdbcType=VARCHAR},
+                #{algorithmId, jdbcType=BIGINT},
+                #{status, jdbcType=VARCHAR},
+                #{analyseResult, jdbcType=VARCHAR},
+                #{picOrignal, jdbcType=VARCHAR},
+                #{evaluationState, jdbcType=INTEGER},
+                #{signpic, jdbcType=VARCHAR},
+                #{algorithmType, jdbcType=VARCHAR},
+                #{algorithmSonType, jdbcType=VARCHAR},
+                #{executeTime, jdbcType=TIMESTAMP},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_video_algo_result where id=#{id,jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
+        update t_video_algo_result a <set>
+        <if test="id!= null and id != ''">a.id = #{id, jdbcType=BIGINT},</if>
+        <if test="pointId != null and pointId != ''">a.point_id = #{pointId, jdbcType=BIGINT},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=BIGINT},</if>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
+        <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
+        <if test="cusId != null and cusId != ''">a.cus_id = #{cusId, jdbcType=VARCHAR},</if>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
+        <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
+        <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
+        <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
+        <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
+        <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>
+        a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
+        a.create_time = #{createTime, jdbcType=TIMESTAMP},
+    </set>
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
+        select
+        a.id,
+        a.point_id,
+        a.task_id,
+        a.plan_id,
+        a.device_id,
+        a.preset_id,
+        a.device_mete_id,
+        a.pic_url,
+        a.cus_id,
+        a.algorithm_id,
+        a.status,
+        a.analyse_result,
+        a.pic_orignal,
+        a.evaluation_state,
+        a.signpic,
+        a.algorithm_type,
+        a.algorithm_son_type,
+        a.execute_time,
+        a.create_time
+        from t_video_algo_result a
+        where 1 = 1
+        AND id=#{id,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TVideoAlgoResult" resultType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
+        select
+        a.id,
+        a.point_id,
+        a.task_id,
+        a.plan_id,
+        a.device_id,
+        a.preset_id,
+        a.device_mete_id,
+        a.pic_url,
+        a.cus_id,
+        a.algorithm_id,
+        a.status,
+        a.analyse_result,
+        a.pic_orignal,
+        a.evaluation_state,
+        a.signpic,
+        a.algorithm_type,
+        a.algorithm_son_type,
+        a.execute_time,
+        a.create_time
+        from t_video_algo_result a
+        where 1 = 1
+        <if test="id!= null and id != ''">a.id = #{id, jdbcType=BIGINT},</if>
+        <if test="pointId != null and pointId != ''">a.point_id = #{pointId, jdbcType=BIGINT},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=BIGINT},</if>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
+        <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
+        <if test="cusId != null and cusId != ''">a.cus_id = #{cusId, jdbcType=VARCHAR},</if>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
+        <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
+        <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
+        <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
+        <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
+        <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>
+        <if test="executeTime != null and executeTime != ''">a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TVideoAlgoResult" resultType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
+        select
+        a.id,
+        a.point_id,
+        a.task_id,
+        a.plan_id,
+        a.device_id,
+        a.preset_id,
+        a.device_mete_id,
+        a.pic_url,
+        a.cus_id,
+        a.algorithm_id,
+        a.status,
+        a.analyse_result,
+        a.pic_orignal,
+        a.evaluation_state,
+        a.signpic,
+        a.algorithm_type,
+        a.algorithm_son_type,
+        a.execute_time,
+        a.create_time
+        from t_video_algo_result a
+        where 1 = 1
+        <if test="id != null and id != ''">a.id = #{id, jdbcType=BIGINT},</if>
+        <if test="pointId != null and pointId != ''">a.point_id = #{pointId, jdbcType=BIGINT},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=BIGINT},</if>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
+        <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
+        <if test="cusId != null and cusId != ''">a.cus_id = #{cusId, jdbcType=VARCHAR},</if>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
+        <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
+        <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
+        <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
+        <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
+        <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>
+        <if test="executeTime != null and executeTime != ''">a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_video_algo_result(
+            id,
+            point_id,
+            task_id,
+            plan_id,
+            device_id,
+            preset_id,
+            device_mete_id,
+            pic_url,
+            cus_id,
+            algorithm_id,
+            status,
+            analyse_result,
+            pic_orignal,
+            evaluation_state,
+            signpic,
+            algorithm_type,
+            algorithm_son_type,
+            execute_time,
+            create_time
+        )values
+        <foreach collection="list" item="TVideoAlgoResult" separator=",">
+            (
+                #{TVideoAlgoResult.id, jdbcType=BIGINT},
+                #{TVideoAlgoResult.pointId, jdbcType=BIGINT},
+                #{TVideoAlgoResult.taskId, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.planId, jdbcType=BIGINT},
+                #{TVideoAlgoResult.deviceId, jdbcType=BIGINT},
+                #{TVideoAlgoResult.presetId, jdbcType=BIGINT},
+                #{TVideoAlgoResult.deviceMeteId, jdbcType=BIGINT},
+                #{TVideoAlgoResult.picUrl, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.cusId, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.algorithmId, jdbcType=BIGINT},
+                #{TVideoAlgoResult.status, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.analyseResult, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.picOrignal, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.evaluationState, jdbcType=INTEGER},
+                #{TVideoAlgoResult.signpic, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.algorithmType, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.algorithmSonType, jdbcType=VARCHAR},
+                #{TVideoAlgoResult.executeTime, jdbcType=TIMESTAMP},
+                #{TVideoAlgoResult.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>
