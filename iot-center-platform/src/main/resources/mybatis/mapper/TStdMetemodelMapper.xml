@@ -149,13 +149,12 @@
 
     <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.DeviceTypeTree">
         SELECT DISTINCT
-	       a.device_type,
-	       b.dict_note as deviceTypeName
+	      dict_code as deviceType,
+	      dict_note as deviceTypeName
         FROM
-	       t_std_mete a
-        LEFT JOIN t_dict_business b ON a.device_type = b.dict_code
+	        t_dict_business
         WHERE
-	       b.remark = '设备类型' ORDER BY a.device_type ASC
+	       remark = '设备类型'
 
     </select>
 
