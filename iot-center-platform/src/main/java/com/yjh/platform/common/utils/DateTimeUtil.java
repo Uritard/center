@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils;
 
 import com.mysql.jdbc.StringUtils;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -883,5 +884,106 @@ public class DateTimeUtil {
         c.set(Calendar.MINUTE, 59);
         c.set(Calendar.SECOND, 59);
         return c.getTime();
+    }
+
+    /**
+     * @Author tt
+     * @CreateTime 2020/8/27 18:15
+     */
+    public static List<Date> cornTransTime(String cronExpression, Date dayAfterOneWeek) {
+        List<Date> validTimeList = new ArrayList<Date>();
+        if (cronExpression == null || cronExpression.length() < 1) {
+            return validTimeList;
+        } else {
+            CronExpression exp = null;
+            try {
+                exp = new CronExpression(cronExpression);
+            } catch (Exception e) {
+                e.getMessage();
+                return validTimeList;
+            }
+//            Calendar calendar = Calendar.getInstance();
+//            String cronDate = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.DATE);
+//            String sStart = cronDate + " 00:00:00";
+//            Date dStart = null;
+//            Date dEnd = null;
+//            try {
+//                dStart = sdf.parse(sStart);
+//                calendar.setTime(dStart);
+//                calendar.add(Calendar.DATE, 1);
+//                dEnd = calendar.getTime();
+//            } catch (Exception e) { e.getMessage(); }
+            Date date = new Date();
+            Date dd = exp.getNextValidTimeAfter(date);
+//            validTimeList.add(sdf.format(dd));
+            while (dd.getTime() < dayAfterOneWeek.getTime()) {
+                validTimeList.add(dd);
+                dd = exp.getNextValidTimeAfter(dd);
+            }
+            exp = null;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<String> validTimeList2 = new ArrayList<String>();
+        for (Date aValidTimeList:validTimeList) {
+            validTimeList2.add(sdf.format(aValidTimeList));
+        }
+        System.out.println("validTimeList2: "+validTimeList2);
+        return validTimeList;
+    }
+
+    public static String createCronExpression(String min, String hour, String Day, String week, String month, String season, String year){
+        StringBuffer croExp=new StringBuffer();
+
+        //按日执行：每天15时执行：0 0 15 * * ？ *  小时数可以根据自己需求更改
+        if(!Day.equals("")){
+            croExp.append("0 ");//分钟
+            croExp.append("15 ");//小时
+            croExp.append("* * ? *");
+        }
+        //按月执行：每月15号三点执行：0 0 3 15 * ？ *
+        if(!month.equals("")){
+            croExp.append("0 ");//分钟
+            croExp.append("3 ");//小时
+            croExp.append("15 * ? *");
+        }
+        //按年执行：每年6月1号5点执行：0 0 5 1 6 ？ *
+        if(!year.equals("")){
+            croExp.append("0 ");//分钟
+            croExp.append("5 ");//小时
+            croExp.append("1 6 ? *");
+        }
+        //按季度执行：7月18号开始每三个月执行一次：0 0 2 18 7,10,1,4 ？ *
+        if(!season.equals("")){
+            //指定月份执行
+            int month1=7;
+            int month2=(month1+3)%12==0?12:(month1+3)%12;
+            int month3=(month2+3)%12==0?12:(month2+3)%12;
+            int month4=(month3+3)%12==0?12:(month3+3)%12;
+            croExp.append("0 ");//分钟
+            croExp.append("15 ");//小时
+            croExp.append("18 month1,month2,month3,month4 ? *");
+        }
+        //按周执行：每周三四点执行：0 0 4 * * 2 *
+        if(!week.equals("")){
+            croExp.append("0 ");//分钟
+            croExp.append("4 ");//小时
+            croExp.append("* * 2 *");
+        }
+        //按半年执行：七月一月18号执行一次：0 0 2 18 1,7 ？ *
+        if(!min.equals("")){
+            int month1=7;
+            int month2=(month1+6)%12==0?12:(month1+6)%12;
+            croExp.append("0 ");//分钟
+            croExp.append("2 ");//小时
+            croExp.append("18 month1,month2 ? *");
+        }
+        //按时间执行：每五分钟执行：0 */5 * * * ？ *
+        if(!Day.equals("")){
+            croExp.append("0 ");//分钟
+            croExp.append("*/5 ");//小时
+            croExp.append("* * ? *");
+        }
+        return croExp.toString();
     }
 }

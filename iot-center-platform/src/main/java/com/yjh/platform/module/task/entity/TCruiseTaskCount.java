@@ -18,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "TCruiseTask对象", description = "巡检任务表")
-public class TCruiseTask implements Serializable {
+public class TCruiseTaskCount implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,7 +39,7 @@ public class TCruiseTask implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
-    private Integer type;
+    private String dictNote;
 
     @ApiModelProperty(value = "是否立即执行（172.周期，173.立即，174.定期）")
     private Integer ifRun;

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCruiseTaskDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTask">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="task_name" jdbcType="VARCHAR" property="taskName" />
+        <result column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="if_run" jdbcType="INTEGER" property="ifRun" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="date_type" jdbcType="VARCHAR" property="dateType" />
+        <result column="task_type" jdbcType="INTEGER" property="taskType" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id, task_name, plan_id, area_id, name, type, if_run, robot_id, date_type, task_type, start_time, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="taskId" parameterType="com.yjh.platform.module.task.entity.TCruiseTask">
+        insert into t_cruise_task(
+            task_id,
+            task_name,
+            plan_id,
+            area_id,
+            name,
+            type,
+            if_run,
+            robot_id,
+            date_type,
+            task_type,
+            start_time,
+            create_time
+        )values(
+                #{taskId, jdbcType=VARCHAR},
+                #{taskName, jdbcType=VARCHAR},
+                #{planId, jdbcType=BIGINT},
+                #{areaId, jdbcType=VARCHAR},
+                #{name, jdbcType=VARCHAR},
+                #{type, jdbcType=INTEGER},
+                #{ifRun, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
+                #{dateType, jdbcType=VARCHAR},
+                #{taskType, jdbcType=INTEGER},
+                #{startTime, jdbcType=TIMESTAMP},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cruise_task
+                where task_id = #{taskId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTask">
+        update t_cruise_task a <set>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="name != null and name != ''">a.name = #{name, jdbcType=VARCHAR},</if>
+        <if test="type != null and type != ''">a.type = #{type, jdbcType=INTEGER},</if>
+        <if test="ifRun != null and ifRun != ''">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="dateType != null and dateType != ''">a.date_type = #{dateType, jdbcType=VARCHAR},</if>
+        <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="startTime != null and startTime != ''">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
+        select
+        a.task_id,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        a.type,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.task_type,
+        a.start_time,
+        a.create_time
+        from t_cruise_task a
+        where 1 = 1
+            and a.task_id = #{taskId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseTask" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
+        select
+        a.task_id,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        a.type,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.task_type,
+        a.start_time,
+        a.create_time
+        from t_cruise_task a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseTask" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
+        select
+        a.task_id,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        a.type,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.task_type,
+        a.start_time,
+        a.create_time
+        from t_cruise_task a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cruise_task(
+            task_id,
+            task_name,
+            plan_id,
+            area_id,
+            name,
+            type,
+            if_run,
+            robot_id,
+            date_type,
+            task_type,
+            start_time,
+            create_time
+        )values
+        <foreach collection="list" item="TCruiseTask" separator=",">
+            (
+                #{TCruiseTask.taskId, jdbcType=VARCHAR},
+                #{TCruiseTask.taskName, jdbcType=VARCHAR},
+                #{TCruiseTask.planId, jdbcType=BIGINT},
+                #{TCruiseTask.areaId, jdbcType=VARCHAR},
+                #{TCruiseTask.name, jdbcType=VARCHAR},
+                #{TCruiseTask.type, jdbcType=INTEGER},
+                #{TCruiseTask.ifRun, jdbcType=INTEGER},
+                #{TCruiseTask.robotId, jdbcType=BIGINT},
+                #{TCruiseTask.dateType, jdbcType=VARCHAR},
+                #{TCruiseTask.taskType, jdbcType=INTEGER},
+                #{TCruiseTask.startTime, jdbcType=TIMESTAMP},
+                #{TCruiseTask.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <select id="taskCount" parameterType="java.util.Date" resultType="com.yjh.platform.module.task.entity.TCruiseTaskCount">
+        select
+        a.task_id,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        b.dict_note,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.task_type,
+        DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        from t_cruise_task a
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "task_kind"
+        where a.if_run = 173 AND a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
+        UNION ALL (
+        select
+        a.task_id,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        b.dict_note,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.task_type,
+        DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        from t_cruise_task a
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "task_kind"
+        where a.if_run = 174 AND a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
+        )
+        UNION ALL (
+        select
+        a.task_id,
+        a.task_name,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        b.dict_note,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.task_type,
+        DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        from t_cruise_task a
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "task_kind"
+        where a.if_run = 172 AND a.start_time = "2000-01-01 00:00:00"
+        );
+    </select>
+
+</mapper>

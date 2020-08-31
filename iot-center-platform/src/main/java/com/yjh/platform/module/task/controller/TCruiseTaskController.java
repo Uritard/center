@@ -21,8 +21,8 @@ import java.util.Map;
 
 
 /**
- * @author wf
- * @since 2020-08-19
+ * @author tt
+ * @since 2020-08-27
  */
 @RestController
 @RequestMapping("/tCruiseTask/v1")
@@ -42,36 +42,33 @@ public class TCruiseTaskController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCruiseTask tCruiseTask) {
         Result result = new Result();
-
         try {
             result.setData(tCruiseTaskService.insert(tCruiseTask));
         } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), b.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
-            log.error("添加巡检任务错误:", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加任务错误:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "TaskId", required = true) String TaskId) {
+    public Result delete(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
-
         try {
-            result.setData(tCruiseTaskService.deleteByPrimaryId(TaskId));
+            result.setData(tCruiseTaskService.deleteByPrimaryId(taskId));
         } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.DELETEERROR.getCode(), e.getMessage());
-            log.error("巡检任务删除异常:", e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除任务异常:", e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.DELETEERROR.getCode(), ResultCodeEnum.DELETEERROR.getName());
-            log.error("巡检任务删除错误:", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
         }
         return result;
     }
 
-    //更新
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public Result update(@RequestBody TCruiseTask tCruiseTask) {
@@ -80,63 +77,58 @@ public class TCruiseTaskController {
             result.setData(tCruiseTaskService.update(tCruiseTask));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新巡检任务参数异常:", e);
+            log.error("更新任务异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("更新巡检任务参数错误:", e);
+            log.error("更新错误:", e);
         }
         return result;
     }
 
-    //查询 根据主键ID查询
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "TaskId", required = true) String TaskId){
+    public Result selectByPrimaryId(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
-
         try {
-            result.setData(tCruiseTaskService.selectByPrimaryId(TaskId));
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            TCruiseTask tCruiseTask = tCruiseTaskService.selectByPrimaryId(taskId);
+            result.setData(tCruiseTask);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
 
-    //查询
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "TaskId", required = false) String TaskId,
-                         @RequestParam(value = "PlanId", required = false) Long PlanId,
-                         @RequestParam(value = "AreaId", required = false) String AreaId,
-                         @RequestParam(value = "Name", required = false) String Name,
-                         @RequestParam(value = "Type", required = false) Integer Type,
-                         @RequestParam(value = "IfRun", required = false) Integer IfRun,
-                         @RequestParam(value = "RobotId", required = false) Long RobotId,
-                         @RequestParam(value = "Datetype", required = false) Integer Datetype,
-                         @RequestParam(value = "Remark1", required = false) Integer Remark1,
-                         @RequestParam(value = "TaskType", required = false) Integer TaskType,
-                         @RequestParam(value = "StartTime", required = false) Date StartTime,
-                         @RequestParam(value = "CreateTime", required = false) Date CreateTime
-    ){
+    public Result select(@RequestParam(value = "taskId", required = false) String taskId,
+                         @RequestParam(value = "taskName", required = false) String taskName,
+                         @RequestParam(value = "planId", required = false) Long planId,
+                         @RequestParam(value = "areaId", required = false) String areaId,
+                         @RequestParam(value = "name", required = false) String name,
+                         @RequestParam(value = "type", required = false) Integer type,
+                         @RequestParam(value = "ifRun", required = false) Integer ifRun,
+                         @RequestParam(value = "robotId", required = false) Long robotId,
+                         @RequestParam(value = "dateType", required = false) String dateType,
+                         @RequestParam(value = "taskType", required = false) Integer taskType,
+                         @RequestParam(value = "startTime", required = false) Date startTime,
+                         @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TCruiseTask> list = this.tCruiseTaskService.select(TaskId,PlanId,AreaId,Name,Type,IfRun,RobotId,
-                                                 Datetype,Remark1,TaskType,StartTime,CreateTime);
+            List<TCruiseTask> list = tCruiseTaskService.select(taskId, taskName, planId, areaId, name, type, ifRun, robotId, dateType, taskType, startTime, createTime);
             result.setData(list);
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
 
-    //分页查询
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruiseTask tCruiseTask,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -146,6 +138,34 @@ public class TCruiseTaskController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "批量插入")
+    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    public Result batchInsert(@RequestBody List<TCruiseTask> list) {
+        Result result = new Result();
+        try {
+        result.setData(tCruiseTaskService.batchInsert(list));
+        } catch (Exception e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
+    //任务统计
+    @ApiOperation(value = "任务统计")
+    @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
+    public Result taskCount(){
+        Result result = new Result();
+        try {
+            List<Map<String, Object>> list = this.tCruiseTaskService.taskCount();
+            result.setData(list);
+        }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
         }
