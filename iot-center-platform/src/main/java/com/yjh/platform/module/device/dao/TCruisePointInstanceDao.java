@@ -50,4 +50,6 @@ public interface TCruisePointInstanceDao {
     TStdRegion selectTSRegionForStation();
     TDictBusiness selectTDBusinessForUnitName(String colName);
 
+    //根据巡检点类型查询巡检点数量
+    int selectCruiseCountByType(@Param(value = "cruiseType")Integer cruiseType);
 }

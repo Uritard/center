@@ -154,7 +154,7 @@
         FROM
 	        t_dict_business
         WHERE
-	       remark = '设备类型'
+	      col_name="device_type"
 
     </select>
 

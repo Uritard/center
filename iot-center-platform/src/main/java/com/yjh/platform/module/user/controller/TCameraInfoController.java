@@ -214,4 +214,12 @@ public class TCameraInfoController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询当前巡检点摄像头URL")
+    @RequestMapping(value = "/selectUrlByCruise",method = RequestMethod.GET)
+    public Result selectUrlByCruise(){
+        Result result=new Result();
+
+        return result;
+    }
 }

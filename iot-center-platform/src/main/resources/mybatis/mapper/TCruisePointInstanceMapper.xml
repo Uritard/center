@@ -348,4 +348,8 @@
         a.col_name =  #{colName, jdbcType=VARCHAR}
     </select>
 
+
+    <select id="selectCruiseCountByType" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) from t_cruise_point_instance WHERE cruise_type=#{cruiseType,jdbcType=INTEGER}
+    </select>
 </mapper>

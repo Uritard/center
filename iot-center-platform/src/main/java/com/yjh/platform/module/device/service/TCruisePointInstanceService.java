@@ -311,4 +311,10 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setStationName(mapAll.get("stationName"));
         return tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
+
+    @Logs(title = "查询各种巡检类型下的巡检点数量",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int selectCruiseCountByType(Integer cruiseType){
+        return this.tCruisePointInstanceDao.selectCruiseCountByType(cruiseType);
+    }
 }
