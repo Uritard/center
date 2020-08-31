@@ -125,13 +125,13 @@ public class TStdMetemodelService {
 
   @Logs(title = "新建模板联合新增",code = "module")
   @Transactional(rollbackFor = Exception.class)
-  public int addModel(Integer deviceType,String modelName,List<Long> meteIds ){
+  public int addModel(ModelCreator modelCreator){
         TStdMeteModel m=new TStdMeteModel();
-        m.setDeviceType(deviceType);
-        m.setModelName(modelName);
+        m.setDeviceType(modelCreator.getDeviceType());
+        m.setModelName(modelCreator.getModel_name());
         tStdMetemodelDao.add(m);
         Long modelId=m.getModelId();
-      for (Long id:meteIds) {
+      for (Long id:modelCreator.getMeteIds()) {
 
           TStdMete mete=tStdMeteDao.selectByPrimaryId(id);
           TStdMeteModelDetail detail=new TStdMeteModelDetail();
@@ -182,24 +182,27 @@ public class TStdMetemodelService {
 
     @Logs(title = "修改当前模板信息",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int updateModel(ModelInfo modelInfo){
-         tStdMetemodelDao.update(modelInfo.getModel());
+    public int updateModel(ModelCreator modelCreator){
 
-         List<MeteInfo> mete1=tStdMetemodelDetailDao.selectMeteBlindModel(modelInfo.getModel().getModelId());//当前模板绑定的测点信息
-         List<MeteInfo> mete2=modelInfo.getMeteInfo();//采集的测点信息
+        //修改模板名
+        TStdMeteModel meteModel=tStdMetemodelDao.selectByPrimaryId(modelCreator.getModelId());
+        meteModel.setModelName(modelCreator.getModel_name());
+         tStdMetemodelDao.update(meteModel);
+
+
+         //修改细节模板表
+         List<MeteInfo> mete1=tStdMetemodelDetailDao.selectMeteBlindModel(modelCreator.getModelId());//当前模板绑定的测点信息
 
 
          List<Long> m1=new ArrayList<>();
-         List<Long> m2=new ArrayList<>();
+         List<Long> m2=modelCreator.getMeteIds();
          List<Long> m3=new ArrayList<>();
 
 
          for(MeteInfo meteInfo1:mete1){
              m1.add(meteInfo1.getMeteId());
          }
-         for(MeteInfo meteInfo2:mete2){
-             m2.add(meteInfo2.getMeteId());
-         }
+
         for(MeteInfo meteInfo1:mete1){
             m3.add(meteInfo1.getMeteId());
         }
@@ -214,7 +217,7 @@ public class TStdMetemodelService {
                 for(Long id:m2){
                     TStdMete mete=tStdMeteDao.selectByPrimaryId(id);
                     TStdMeteModelDetail detail=new TStdMeteModelDetail();
-                    detail.setModelId(modelInfo.getModel().getModelId());
+                    detail.setModelId(modelCreator.getModelId());
                     detail.setMeteId(mete.getStdMeteId());
                     detail.setMeteCode(mete.getMeteCode());
                     detail.setMeteName(mete.getMeteName());

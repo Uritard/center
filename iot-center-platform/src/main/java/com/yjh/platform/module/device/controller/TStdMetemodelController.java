@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.ModelCreator;
 import com.yjh.platform.module.device.entity.ModelInfo;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import com.yjh.platform.module.device.service.TStdMetemodelService;
@@ -215,12 +216,10 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "新建模板")
     @RequestMapping(value = "/addModel",method = RequestMethod.POST)
-    public Result addModel(@RequestParam(value = "deviceType")Integer deviceType,
-                           @RequestParam(value = "modelName")String modelName,
-                           @RequestParam(value = "meteIds")List<Long> meteIds){
+    public Result addModel(@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
-            result.setData(tStdMetemodelService.addModel(deviceType, modelName, meteIds));
+            result.setData(tStdMetemodelService.addModel(modelCreator));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("系统测点模版新建失败：" + e);
@@ -250,10 +249,10 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "修改当前模板信息")
     @RequestMapping(value = "updateModel",method = RequestMethod.POST)
-    public Result updateModel (@RequestBody ModelInfo modelInfo){
+    public Result updateModel (@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
-            result.setData(tStdMetemodelService.updateModel(modelInfo));
+            result.setData(tStdMetemodelService.updateModel(modelCreator));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("模板信息更新成功失败：" + e);
