@@ -30,6 +30,11 @@
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
         <result column="robotPosition" jdbcType="VARCHAR" property="robotPosition" />
         <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <result column="robot_type_name" jdbcType="VARCHAR" property="dictNote" />
+        <result column="robot_factory_name" jdbcType="VARCHAR" property="robotFactoryName" />
+        <result column="is_use_name" jdbcType="VARCHAR" property="isUseName" />
+        <result column="robot_position_name" jdbcType="VARCHAR" property="robotPositionName" />
+        <result column="region_name" jdbcType="VARCHAR" property="regionName" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -138,7 +143,7 @@
         a.update_date = NOW(),
         <if test="robotFactory != null and robotFactory !=''">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
         <if test="isUse != null and isUse !=''">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
-        <if test="commissionDate != null and commissionDate !=''">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
@@ -230,11 +235,11 @@
         <if test="createDate != null"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
-        <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
-        <if test="isUse != null">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
-        <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
-        <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
+        <if test="robotFactory != null">and a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
+        <if test="isUse != null">and a.is_use = #{isUse, jdbcType=VARCHAR},</if>
+        <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+        <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
@@ -245,6 +250,7 @@
         a.robot_name,
         a.robot_status,
         a.robot_type,
+        d.dict_note as robot_type_name,
         a.robot_ip,
         a.robot_port,
         a.light_ip,
@@ -260,17 +266,26 @@
         a.create_date,
         a.update_by,
         a.update_date,
+        b.dict_note as robot_factory_name,
         a.robot_factory,
+        c.dict_note as is_use_name,
         a.is_use,
         a.commission_date,
+        f.region_name,
         a.up_region_id,
-        a.robot_position,
+        e.dict_note as robot_position_name,
+        a.robot_position ,
         a.remarks
         from t_robot_info a
+        LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code
+        LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code
+        LEFT JOIN t_dict_business c ON a.is_use=c.dict_code
+        LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code
+        LEFT JOIN t_std_region f on a.up_region_id=f.region_id
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
-        <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
+        <if test="robotName != null and robotName != ''"> and a.robot_name like '%${robotName, jdbcType=VARCHAR}%'</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null "> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
         <if test="robotIp != null and robotIp != ''"> and a.robot_ip = #{robotIp, jdbcType=VARCHAR}</if>
@@ -288,11 +303,11 @@
         <if test="createDate != null"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
         <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
         <if test="updateDate != null"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
-        <if test="robotFactory != null">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
-        <if test="isUse != null">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
-        <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
-        <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
+        <if test="robotFactory != null and robotFactory !=''">and a.robot_factory = #{robotFactory, jdbcType=VARCHAR}</if>
+        <if test="isUse != null and isUse != ''">and a.is_use = #{isUse, jdbcType=VARCHAR}</if>
+        <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP}</if>
+        <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 

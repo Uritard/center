@@ -38,6 +38,8 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "机器人型号")
     private Integer robotType;
 
+    private String robotTypeName;
+
     @ApiModelProperty(value = "机器人IP")
     private String robotIp;
 
@@ -92,17 +94,26 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "机器人厂家 ")
     private String robotFactory;
 
+    private String robotFactoryName;
+
     @ApiModelProperty(value = "使用状态 ")
     private String isUse;
 
+    private String isUseName;
+
     @ApiModelProperty(value = "投运时间",example = "2020-08-01")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date commissionDate;
 
     @ApiModelProperty(value = "区域ID")
     private Long upRegionId;
 
+    private String regionName;
+
     @ApiModelProperty(value = "机器人类型")
     private String robotPosition;
+
+    private String robotPositionName;
 
     private String remarks;
 
