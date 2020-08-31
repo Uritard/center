@@ -55,4 +55,5 @@ public interface TRobotInfoDao {
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
 
     int batchInsert(@Param("list") List<TRobotInfo> list);
+
 }

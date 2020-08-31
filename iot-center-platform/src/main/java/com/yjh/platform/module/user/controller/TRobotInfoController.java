@@ -154,7 +154,7 @@ public class TRobotInfoController {
         return result;
     }
 
-    @ApiOperation(value = "分页查询，名称模糊查询")
+    @ApiOperation(value = "分页查询查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage( @RequestBody TRobotInfo tRobotInfo,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
