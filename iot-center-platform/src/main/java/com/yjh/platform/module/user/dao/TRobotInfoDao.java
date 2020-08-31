@@ -14,7 +14,15 @@ import org.springframework.stereotype.Repository;
 public interface TRobotInfoDao {
 
     int insert(TRobotInfo tRobotInfo);
-    int deleteByPrimaryId(@Param(value = "robotId") Long robotId);
+    //多表删除 t_robot_info
+    int deleteByPrimaryId(Long robotId);
+    //多表删除 t_cruise_plan
+    int deletePlan(Long robotId);
+    //多表删除 t_robot_inspection
+    int deleteInspection(Long robotId);
+    //多表删除 t_cruise_point_instance
+    int deleteInstance(Long robotId);
+
     int update(TRobotInfo tRobotInfo);
     TRobotInfo selectByPrimaryId(@Param(value = "robotId") Long robotId);
     List<TRobotInfo> select(@Param(value = "robotId") Long robotId,
