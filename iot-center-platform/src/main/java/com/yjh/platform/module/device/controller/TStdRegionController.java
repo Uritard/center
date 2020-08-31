@@ -142,7 +142,7 @@ public class TStdRegionController {
     }
 
     @ApiOperation(value = "根据区域名称模糊查询区域树")
-    @RequestMapping(value = "/selectRegTreeByRegName", method = RequestMethod.GET)
+    @RequestMapping(value = "/selectRegTreeByName", method = RequestMethod.GET)
     public Result selectRegTreeByRegName(@RequestParam(value = "regionName", required = false) String regionName) {
         Result result = new Result();
         try {
