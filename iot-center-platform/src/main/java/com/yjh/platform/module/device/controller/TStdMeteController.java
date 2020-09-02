@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.service.TStdMeteService;
 import com.yjh.platform.module.device.entity.TStdMete;
 
@@ -178,7 +179,7 @@ public class TStdMeteController {
     public Result selectByDeviceType(@RequestParam (value = "deviceType",required = true) Integer deviceType){
         Result result =new Result();
         try{
-            List<TStdMete> mete=tStdMeteService.selectByDeviceType(deviceType);
+            List<MeteInfo> mete=tStdMeteService.selectByDeviceType(deviceType);
             result.setData(mete);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

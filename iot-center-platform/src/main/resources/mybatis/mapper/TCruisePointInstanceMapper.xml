@@ -348,8 +348,29 @@
         a.col_name =  #{colName, jdbcType=VARCHAR}
     </select>
 
+    <select id="selectCruiseCount" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT
+          COUNT(*)
+        FROM
+          t_cruise_point_instance c
+        LEFT JOIN (
+          t_cruise_task a
+        LEFT JOIN t_cruise_plan b ON a.plan_id = b.plan_id
+         ) ON c.instance_id = b.instance_id
+        WHERE a.task_id = #{taskId,jdbcType=BIGINT}
+    </select>
 
-    <select id="selectCruiseCountByType" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        SELECT COUNT(*) from t_cruise_point_instance WHERE cruise_type=#{cruiseType,jdbcType=INTEGER}
+    <select id="selectCruiseCountByType" resultType="java.lang.Integer">
+        SELECT
+	       COUNT(*)
+        FROM
+	      t_cruise_point_instance c
+        LEFT JOIN (
+	      t_cruise_task a
+	    LEFT JOIN t_cruise_plan b ON a.plan_id = b.plan_id
+        ) ON c.instance_id = b.instance_id
+       WHERE
+	      c.cruise_type = #{cruiseType,jdbcType=INTEGER}
+       AND a.task_id = #{taskId,jdbcType=BIGINT}
     </select>
 </mapper>

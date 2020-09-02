@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMete;
 import com.yjh.platform.module.device.dao.TStdMeteDao;
 
@@ -68,7 +69,7 @@ public class TStdMeteService{
 
     @Logs(title = "根据设备ID查找")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdMete> selectByDeviceType(Integer deviceType){
+    public List<MeteInfo> selectByDeviceType(Integer deviceType){
         return this.tStdMeteDao.selectByDeviceType(deviceType);
     }
 }

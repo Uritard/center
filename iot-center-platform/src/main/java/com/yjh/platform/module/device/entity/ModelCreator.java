@@ -26,7 +26,10 @@ public class ModelCreator implements Serializable {
     private Integer deviceType;
 
     @ApiModelProperty(value = "模板名")
-    private String model_name;
+    private String modelName;
+
+    @ApiModelProperty(value = "备注")
+    private String Remark;
 
     @ApiModelProperty(value = "测点ID")
     List<Long> meteIds;

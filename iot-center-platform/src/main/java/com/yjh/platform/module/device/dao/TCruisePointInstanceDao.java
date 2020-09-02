@@ -49,7 +49,10 @@ public interface TCruisePointInstanceDao {
     //为创建实例服务
     TStdRegion selectTSRegionForStation();
     TDictBusiness selectTDBusinessForUnitName(String colName);
+    //统计当前任务下的巡检点数量
+    int selectCruiseCount(@Param(value = "taskId")Long taskId);
 
     //根据巡检点类型查询巡检点数量
-    int selectCruiseCountByType(@Param(value = "cruiseType")Integer cruiseType);
+    int selectCruiseCountByType(@Param(value = "taskId")Long taskId,
+            @Param(value = "cruiseType")Integer cruiseType);
 }

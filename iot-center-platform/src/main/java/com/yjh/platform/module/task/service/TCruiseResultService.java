@@ -6,6 +6,7 @@ import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.TCruiseTask;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -63,6 +64,12 @@ public class TCruiseResultService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseResult> list) {
         return this.tCruiseResultDao.batchInsert(list);
+    }
+
+    @Logs(title = "查询正在执行中的任务",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruiseTask> selectTaskIsRunning(){
+        return this.tCruiseResultDao.selectTaskIsRunning();
     }
 
 }

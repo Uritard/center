@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.dao;
 
 import java.util.List;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import org.apache.ibatis.annotations.Param;
@@ -41,5 +42,7 @@ public interface TCameraInfoDao {
     List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
 
     List<AreaInfo> selectCameraTreeDevice();
+
+    List<CameraInfo> selectCameraByTaskId(@Param(value = "taskId")Long taskId);
 
 }

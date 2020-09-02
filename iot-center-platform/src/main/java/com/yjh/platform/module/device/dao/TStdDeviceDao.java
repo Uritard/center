@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Map;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.CustomInfo;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -92,4 +93,6 @@ public interface TStdDeviceDao {
                               @Param(value = "modelId")Long modelId);
 
     int batchDelete(@Param(value = "list")List<String> list);
+    Integer selectCustomTypeByDict();
+    List<CustomInfo> selectCustomInfoByDict();
 }

@@ -56,10 +56,11 @@ public class TStdMetemodelDetailController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "modelId", required = true) Long modelId) {
+    public Result delete(@RequestParam(value = "modelId", required = true) Long modelId,
+                         @RequestParam(value = "meteId",required = true) Long meteId) {
         Result result = new Result();
         try {
-            result.setData(tStdMetemodelDetailService.deleteByPrimaryId(modelId));
+            result.setData(tStdMetemodelDetailService.deleteByPrimaryId(modelId,meteId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -91,7 +92,7 @@ public class TStdMetemodelDetailController {
     public Result selectByPrimaryId(@RequestParam(value = "modelId", required = true) Long modelId) {
         Result result = new Result();
         try {
-            TStdMeteModelDetail tStdMeteModelDetail = tStdMetemodelDetailService.selectByPrimaryId(modelId);
+            List<TStdMeteModelDetail> tStdMeteModelDetail = tStdMetemodelDetailService.selectByPrimaryId(modelId);
             result.setData(tStdMeteModelDetail);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -105,6 +106,7 @@ public class TStdMetemodelDetailController {
     public Result select(@RequestParam(value = "modelId", required = false) Long modelId,
                             @RequestParam(value = "meteId", required = false) Long meteId,
                             @RequestParam(value = "customType", required = false) Integer customType,
+                            @RequestParam(value = "customTypeName",required = false)String customTypeName,
                             @RequestParam(value = "meteCode", required = false) String meteCode,
                             @RequestParam(value = "meteName", required = false) String meteName,
                             @RequestParam(value = "meteType", required = false) String meteType,
@@ -130,7 +132,7 @@ public class TStdMetemodelDetailController {
                             @RequestParam(value = "modulus", required = false) Integer modulus) {
         Result result = new Result();
         try {
-            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType, meteCode, meteName, meteType, unit, alarmNote, alarmExplain, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
+            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType,customTypeName, meteCode, meteName, meteType, unit, alarmNote, alarmExplain, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -171,7 +173,6 @@ public class TStdMetemodelDetailController {
         }
         return result;
     }
-
 
 
 }

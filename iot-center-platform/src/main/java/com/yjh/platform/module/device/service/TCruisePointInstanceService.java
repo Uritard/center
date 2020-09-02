@@ -5,6 +5,7 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import java.util.*;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -312,9 +313,15 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
 
+    @Logs(title="统计当前任务下的巡检点数量",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int selectCruiseCount(Long taskId){
+        return this.tCruisePointInstanceDao.selectCruiseCount(taskId);
+    }
+
     @Logs(title = "查询各种巡检类型下的巡检点数量",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int selectCruiseCountByType(Integer cruiseType){
-        return this.tCruisePointInstanceDao.selectCruiseCountByType(cruiseType);
+    public int selectCruiseCountByType(Long taskId,Integer cruiseType){
+        return this.tCruisePointInstanceDao.selectCruiseCountByType(taskId,cruiseType);
     }
 }

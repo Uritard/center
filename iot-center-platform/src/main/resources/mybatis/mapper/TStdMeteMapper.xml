@@ -355,8 +355,8 @@
         </foreach>
     </insert>
 
-    <select id="selectByDeviceType" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.device.entity.TStdMete">
-       SELECT * FROM t_std_mete
+    <select id="selectByDeviceType" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.device.entity.MeteInfo">
+       SELECT std_mete_id as meteId,mete_name as meteName FROM t_std_mete
         WHERE device_type=#{deviceType,jdbcType=INTEGER}
     </select>
 

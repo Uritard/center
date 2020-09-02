@@ -381,7 +381,9 @@
         and a.user_name LIKE concat('%',#{userName, jdbcType=VARCHAR},'%')
     </select>
 
-
+   <select id="selectUser" resultType="com.yjh.platform.module.user.entity.SysUser">
+       select * from sys_user
+   </select>
 
 
 </mapper>

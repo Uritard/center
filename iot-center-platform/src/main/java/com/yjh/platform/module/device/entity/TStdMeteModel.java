@@ -32,6 +32,9 @@ public class TStdMeteModel implements Serializable {
     @ApiModelProperty(value = "所属设备类型")
     private Integer deviceType;
 
+    @ApiModelProperty(value = "设备类型名")
+    private String deviceTypeName;
+
     @ApiModelProperty(value = "模板备注")
     private String remark;
 

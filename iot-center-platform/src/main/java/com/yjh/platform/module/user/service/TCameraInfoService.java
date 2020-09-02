@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
@@ -78,5 +79,10 @@ public class TCameraInfoService{
         return tCameraInfoByDict;
     }
 
+    @Logs(title = "查询当前任务下的摄像头信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<CameraInfo> selectCameraByTaskId(Long taskId){
+        return this.tCameraInfoDao.selectCameraByTaskId(taskId);
+    }
 }
 

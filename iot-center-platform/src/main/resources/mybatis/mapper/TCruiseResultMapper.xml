@@ -223,6 +223,14 @@
         </foreach>
     </insert>
 
-
+<select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
+  SELECT
+	a.*
+  FROM
+	t_cruise_task a
+  LEFT JOIN t_cruise_result b ON a.task_id = b.task_id
+  WHERE
+	b.c_state = 0
+</select>
 
 </mapper>

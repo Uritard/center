@@ -24,6 +24,7 @@ public interface SysUserDao {
     SysUser selectByPrimaryId(@Param(value = "userId") Long userId);
 
     List<SysUser> selectByUserState(@Param(value= "state") Integer state);
+    List<SysUser> selectUser();
 
     List<SysUser> selectByUserName(@Param(value = "userName")String userName);
 

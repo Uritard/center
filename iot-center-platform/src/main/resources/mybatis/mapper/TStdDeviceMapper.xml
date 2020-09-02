@@ -516,4 +516,23 @@
         </foreach>
     </delete>
 
+    <select id="selectCustomTypeByDict" resultType="java.lang.Integer">
+         SELECT
+	        dict_code AS customType
+         FROM
+	        t_dict_business
+         WHERE
+	        col_name = "custom_type"
+         AND dict_note = "本体"
+    </select>
+
+    <select id="selectCustomInfoByDict" resultType="com.yjh.platform.module.device.entity.CustomInfo">
+        SELECT
+	       dict_code AS customType,
+	       dict_note AS customTypeName
+        FROM
+	       t_dict_business
+        WHERE
+	       col_name = "custom_type"
+    </select>
 </mapper>

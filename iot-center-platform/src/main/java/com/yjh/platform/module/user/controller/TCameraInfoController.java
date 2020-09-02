@@ -12,6 +12,8 @@ import java.util.List;
 
 import io.swagger.annotations.*;
 
+
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -216,4 +218,17 @@ public class TCameraInfoController {
     }
 
 
+
+    @ApiOperation(value = "B-查询一个任务下的摄像头信息")
+    @RequestMapping(value = "/selectCameraByTaskId",method =RequestMethod.GET)
+    public Result selectCameraByTaskId(@RequestParam(value = "taskId")Long taskId){
+        Result result=new Result();
+     try{
+         result.setData(tCameraInfoService.selectCameraByTaskId(taskId));
+     }catch (Exception e){
+         result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+         log.error("失败描述",e);
+     }
+        return  result;
+    }
 }

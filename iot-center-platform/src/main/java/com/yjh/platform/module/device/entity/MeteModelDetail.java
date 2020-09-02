@@ -1,22 +1,19 @@
 package com.yjh.platform.module.device.entity;
 
-import java.math.BigDecimal;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-/**
- * @author tt
- * @since 2020-08-07
- */
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "TStdMetemodelDetail对象", description = "系统测点模版详细表")
-public class TStdMeteModelDetail implements Serializable {
+public class MeteModelDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +27,7 @@ public class TStdMeteModelDetail implements Serializable {
     @ApiModelProperty(value = "部位类型，默认为0-本体，")
     private Integer customType;
 
-    @ApiModelProperty(value = "部位类型名称")
+    @ApiModelProperty(value = "部位名称")
     private String customTypeName;
 
     @ApiModelProperty(value = "信号标准化编码")
@@ -41,15 +38,6 @@ public class TStdMeteModelDetail implements Serializable {
 
     @ApiModelProperty(value = "测点类型")
     private String meteType;
-
-    @ApiModelProperty(value = "测点类型名称")
-    private String meteTypeName;
-
-    @ApiModelProperty(value = "设备类型")
-    private Integer deviceType;
-
-    @ApiModelProperty(value = "设备类型名称")
-    private String deviceTypeName;
 
     @ApiModelProperty(value = "单位")
     private String unit;

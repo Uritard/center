@@ -159,4 +159,18 @@ public class TCruiseResultController {
         return result;
     }
 
+
+    @ApiOperation(value = "A-查询正在执行的任务")
+    @RequestMapping(value = "/selectTaskIsRunning",method = RequestMethod.GET)
+    public Result selectTaskIsRunning(){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseResultService.selectTaskIsRunning());
+        }catch(Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+
+        return result;
+    }
 }

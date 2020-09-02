@@ -60,6 +60,9 @@ public class SysUserService{
     @Logs(title = "用户状态查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> selectByUserState(Integer state) {
+        if(state.equals(-1)){
+            return this.sysUserDao.selectUser();
+        }
         return this.sysUserDao.selectByUserState(state);
     }
 

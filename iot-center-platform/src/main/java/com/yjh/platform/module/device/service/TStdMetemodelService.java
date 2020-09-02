@@ -85,11 +85,12 @@ public class TStdMetemodelService {
     @Transactional(rollbackFor = Exception.class)
     public int batchAddModelMete(List<TStdMeteModelDetail> list) {
         Long modelId = list.get(0).getModelId();
+        Long meteId=list.get(0).getMeteId();
         List<String> deviceList = tStdDeviceDao.selectByModelId(modelId);
         if (deviceList.size() > 0) {
             return 206;
         } else {
-            tStdMetemodelDetailDao.deleteByPrimaryId(modelId);
+            tStdMetemodelDetailDao.deleteByPrimaryId(modelId,meteId);
             return this.tStdMetemodelDetailDao.batchAdd(list);
         }
     }
@@ -110,7 +111,7 @@ public class TStdMetemodelService {
             List<MeteModel> list=new ArrayList<>();
             for (int j = 0; j < list1.size(); j++) {
 
-                if (list2.get(i).getDeviceType()==list1.get(j).getDeviceType()){
+                if (list2.get(i).getID().equals(list1.get(j).getDeviceType())){
 
                    list.add(list1.get(j));
                    list2.get(i).setChildren(list);
@@ -128,7 +129,8 @@ public class TStdMetemodelService {
   public int addModel(ModelCreator modelCreator){
         TStdMeteModel m=new TStdMeteModel();
         m.setDeviceType(modelCreator.getDeviceType());
-        m.setModelName(modelCreator.getModel_name());
+        m.setModelName(modelCreator.getModelName());
+        m.setRemark(modelCreator.getRemark());
         tStdMetemodelDao.add(m);
         Long modelId=m.getModelId();
       for (Long id:modelCreator.getMeteIds()) {
@@ -137,6 +139,8 @@ public class TStdMetemodelService {
           TStdMeteModelDetail detail=new TStdMeteModelDetail();
           detail.setModelId(modelId);
           detail.setMeteId(mete.getStdMeteId());
+          detail.setCustomTypeName("本体");
+          detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
           detail.setMeteCode(mete.getMeteCode());
           detail.setMeteName(mete.getMeteName());
           detail.setMeteType(mete.getMeteType());
@@ -172,9 +176,13 @@ public class TStdMetemodelService {
     public ModelInfo selectModel(Long modelId){
         ModelInfo mInfo=new ModelInfo();
         TStdMeteModel model=tStdMetemodelDao.selectByPrimaryId(modelId);
-        mInfo.setModel(model);
+
+       mInfo.setModel(model);
+
+
         List<MeteInfo> mete=tStdMetemodelDetailDao.selectMeteBlindModel(modelId);
         mInfo.setMeteInfo(mete);
+
 
         return  mInfo;
 
@@ -186,7 +194,8 @@ public class TStdMetemodelService {
 
         //修改模板名
         TStdMeteModel meteModel=tStdMetemodelDao.selectByPrimaryId(modelCreator.getModelId());
-        meteModel.setModelName(modelCreator.getModel_name());
+        meteModel.setModelName(modelCreator.getModelName());
+        meteModel.setRemark(modelCreator.getRemark());
          tStdMetemodelDao.update(meteModel);
 
 
@@ -211,7 +220,43 @@ public class TStdMetemodelService {
             for(Long id:m3){
                 tStdMetemodelDetailDao.deleteByMeteId(id);
             }
-        }else {
+        }
+         else if (m1.isEmpty()){
+            for(Long id:m2){
+                TStdMete mete=tStdMeteDao.selectByPrimaryId(id);
+                TStdMeteModelDetail detail=new TStdMeteModelDetail();
+                detail.setModelId(modelCreator.getModelId());
+                detail.setMeteId(mete.getStdMeteId());
+                detail.setCustomTypeName("本体");
+                detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
+                detail.setMeteCode(mete.getMeteCode());
+                detail.setMeteName(mete.getMeteName());
+                detail.setMeteType(mete.getMeteType());
+                detail.setUnit(mete.getUnit());
+                detail.setAlarmNote(mete.getAlarmNote());
+                detail.setAlarmExplain(mete.getAlarmExplain());
+                detail.setAlarmType(mete.getAlarmType());
+                detail.setUpEffect(mete.getUpEffect());
+                detail.setLowEffect(mete.getLowEffect());
+                detail.setAlarmLevel(mete.getAlarmLevel());
+                detail.setHighLimit1(mete.getHighLimit1());
+                detail.setLowLimit1(mete.getLowLimit1());
+                detail.setHighLimit2(mete.getHighLimit2());
+                detail.setLowLimit2(mete.getLowLimit2());
+                detail.setHighLimit3(mete.getHighLimit3());
+                detail.setLowLimit3(mete.getLowLimit3());
+                detail.setHighLimit4(mete.getHighLimit4());
+                detail.setLowLimit4(mete.getLowLimit4());
+                detail.setAlarmDelay(mete.getAlarmDelay());
+                detail.setAlarmCnt(mete.getAlarmCnt());
+                detail.setThresholdAbs(mete.getThresholdAbs());
+                detail.setThresholdPer(mete.getThresholdPer());
+                detail.setModulus(mete.getModulus());
+
+                tStdMetemodelDetailDao.add(detail);
+            }
+        }
+        else {
             m1.retainAll(m2); //不变
             if(m2.removeAll(m3) && !m2.isEmpty() ){ //增加
                 for(Long id:m2){
@@ -219,6 +264,8 @@ public class TStdMetemodelService {
                     TStdMeteModelDetail detail=new TStdMeteModelDetail();
                     detail.setModelId(modelCreator.getModelId());
                     detail.setMeteId(mete.getStdMeteId());
+                    detail.setCustomTypeName("本体");
+                    detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
                     detail.setMeteCode(mete.getMeteCode());
                     detail.setMeteName(mete.getMeteName());
                     detail.setMeteType(mete.getMeteType());

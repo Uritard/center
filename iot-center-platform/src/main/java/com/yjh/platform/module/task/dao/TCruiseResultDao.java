@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.task.entity.TCruiseResult;
+import com.yjh.platform.module.task.entity.TCruiseTask;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -35,4 +36,6 @@ public interface TCruiseResultDao {
     List<TCruiseResult> selectByPage(TCruiseResult tCruiseResult);
 
     int batchInsert(List<TCruiseResult> list);
+
+    List<TCruiseTask> selectTaskIsRunning();
 }

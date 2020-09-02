@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.yjh.platform.module.device.entity.MeteInfo;
+import com.yjh.platform.module.device.entity.MeteModelDetail;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -16,12 +17,14 @@ import org.springframework.stereotype.Repository;
 public interface TStdMetemodelDetailDao {
 
     int add(TStdMeteModelDetail tStdMeteModelDetail);
-    int deleteByPrimaryId(@Param(value = "modelId") Long modelId);
+    int deleteByPrimaryId(@Param(value = "modelId") Long modelId,
+                          @Param(value = "meteId") Long meteId);
     int update(TStdMeteModelDetail tStdMeteModelDetail);
-    TStdMeteModelDetail selectByPrimaryId(@Param(value = "modelId") Long modelId);
+    List<TStdMeteModelDetail> selectByPrimaryId(@Param(value = "modelId") Long modelId);
     List<TStdMeteModelDetail> select(@Param(value = "modelId") Long modelId,
                                      @Param(value = "meteId") Long meteId,
                                      @Param(value = "customType") Integer customType,
+                                     @Param(value = "customTypeName")String customTypeName,
                                      @Param(value = "meteCode") String meteCode,
                                      @Param(value = "meteName") String meteName,
                                      @Param(value = "meteType") String meteType,
@@ -51,4 +54,7 @@ public interface TStdMetemodelDetailDao {
 
     List<MeteInfo> selectMeteBlindModel(@Param(value = "modelId")Long modelId);
     int deleteByMeteId(@Param(value ="meteId")Long meteId);
+
+
+
 }

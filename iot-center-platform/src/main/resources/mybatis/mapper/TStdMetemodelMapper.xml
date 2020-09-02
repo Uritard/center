@@ -54,10 +54,14 @@
         a.model_id,
         a.model_name,
         a.device_type,
+        b.dict_note as deviceTypeName,
         a.remark
         from t_std_metemodel a
+        LEFT JOIN t_dict_business b
+        ON a.device_type=b.dict_code
         where 1 = 1
-            and a.model_id = #{modelId, jdbcType=BIGINT}
+            and a.model_id =#{modelId,jdbcType=BIGINT}
+            and b.col_name="device_type"
         limit 1
     </select>
 
@@ -110,7 +114,6 @@
         select
         a.model_id,
         b.std_mete_id AS mete_id,
-        "本体" AS custom_type,
         b.mete_code,
         b.mete_type,
         b.mete_name,
@@ -149,8 +152,8 @@
 
     <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.DeviceTypeTree">
         SELECT DISTINCT
-	      dict_code as deviceType,
-	      dict_note as deviceTypeName
+	      dict_code as ID,
+	      dict_note as Label
         FROM
 	        t_dict_business
         WHERE
@@ -161,8 +164,8 @@
     <select id="selectModel" resultType="com.yjh.platform.module.device.entity.MeteModel">
        SELECT
 	     a.device_type,
-	     a.model_id,
-	     a.model_name
+	     a.model_id as ID,
+	     a.model_name as Label
        FROM
 	     t_std_metemodel a
     </select>

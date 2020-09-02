@@ -248,14 +248,17 @@ public class TStdMetemodelController {
 
 
     @ApiOperation(value = "修改当前模板信息")
-    @RequestMapping(value = "updateModel",method = RequestMethod.POST)
+    @RequestMapping(value = "updateModel",method = RequestMethod.PUT)
     public Result updateModel (@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
             result.setData(tStdMetemodelService.updateModel(modelCreator));
+        }  catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("系统测点模版更新异常:", e);
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("模板信息更新成功失败：" + e);
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("系统测点模版更新错误:", e);
         }
 
         return  result;

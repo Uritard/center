@@ -49,7 +49,7 @@ public interface TStdMeteDao {
     List<TStdMete> selectByPage(TStdMete tStdMete);
     int batchAdd(List<TStdMete> list);
 
-    List<TStdMete> selectByDeviceType(Integer deviceType);
+    List<MeteInfo> selectByDeviceType(Integer deviceType);
 
 
 }
