@@ -276,7 +276,15 @@ public class SysUserController {
                         redisTemplate.opsForHash().putAll(key, map);
                     }
                 } else {
-                    SysUser sysUser = this.sysUserService.selectByUserName(userMap.get("userName")).get(0);
+                    List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
+                    if (sysUserList.size()==0) {
+                        Map<String, Object> mapResult = new HashMap<>();
+                        mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                        mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                        result.setData(mapResult);
+                        return result;
+                    }
+                    SysUser sysUser = sysUserList.get(0);
                     String userId = String.valueOf(sysUser.getUserId());
                     String key = Constant.account_lock_times.replace("userAccountID", userId);
                     Integer errorInputTimes = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "errorInputTimes")));
@@ -355,7 +363,8 @@ public class SysUserController {
         try {
             Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
-            if (sysUserCurrent.getRoleId() == 1234) {
+            String password = map.get("password");
+            if (sysUserCurrent.getRoleId() == 1234 && password.equals(sysUserCurrent.getPassword())) {
                 result.setData(this.sysUserService.unlockUserAccount(map));
                 Map<String, Object> mapCache = new HashMap<>();
                 mapCache.put("userId", map.get("lockedUserId"));

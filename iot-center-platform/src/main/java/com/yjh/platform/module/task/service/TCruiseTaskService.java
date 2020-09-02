@@ -1,22 +1,26 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.entity.TCruiseTaskCount;
+import com.yjh.platform.module.task.entity.TCruiseTaskCron;
+import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
-* @author tt
-* @since 2020-08-27
-*/
+ * @author tt
+ * @since 2020-08-27
+ */
 @Service
 public class TCruiseTaskService {
 
@@ -26,6 +30,13 @@ public class TCruiseTaskService {
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTask tCruiseTask) {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date startTime = null;
+        try {
+            startTime = format.parse("2000-01-01 00:00:00");
+        } catch (Exception e) { e.getMessage(); }
+        tCruiseTask.setStartTime(startTime);
+        tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()));
         return this.tCruiseTaskDao.insert(tCruiseTask);
     }
 

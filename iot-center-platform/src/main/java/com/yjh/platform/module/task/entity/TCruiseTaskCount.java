@@ -17,7 +17,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TCruiseTask对象", description = "巡检任务表")
+@ApiModel(value = "TCruiseTaskCount对象", description = "巡检任务表")
 public class TCruiseTaskCount implements Serializable {
 
     private static final long serialVersionUID = 1L;

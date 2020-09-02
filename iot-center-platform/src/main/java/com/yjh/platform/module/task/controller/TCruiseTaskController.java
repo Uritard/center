@@ -5,19 +5,18 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -40,10 +39,34 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruiseTask tCruiseTask) {
+    public Result insert(@RequestParam(value = "min", required = false) String min,
+                         @RequestParam(value = "hour", required = false) String hour,
+                         @RequestParam(value = "dayOfMonth", required = false) String dayOfMonth,
+                         @RequestParam(value = "month", required = false) String month,
+                         @RequestParam(value = "dayOfWeek", required = false) String dayOfWeek,
+                         @RequestParam(value = "year", required = false) String year,
+                         @RequestBody TCruiseTask tCruiseTask) {
         Result result = new Result();
         try {
-            result.setData(tCruiseTaskService.insert(tCruiseTask));
+            if (tCruiseTask.getIfRun() == 172) {
+                // 秒  分  时  天  月  星期  年
+                Map<String, String> mapTime = new HashMap<>();
+                if (Objects.isNull(min)) {mapTime.put("min", "");} else {mapTime.put("min", min);}
+                if (Objects.isNull(hour)) {mapTime.put("hour", "");} else {mapTime.put("hour", hour);}
+                if (Objects.isNull(dayOfMonth)) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", dayOfMonth);}
+                if (Objects.isNull(month)) {mapTime.put("month", "");} else {mapTime.put("month", month);}
+                if (Objects.isNull(dayOfWeek)) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", dayOfWeek);}
+                if (Objects.isNull(year)) {mapTime.put("year", "");} else {mapTime.put("year", year);}
+                String cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
+                System.out.println("cronExpressionDate: "+cronExpressionDate);
+                if (CronExpression.isValidExpression(cronExpressionDate)) {
+                    tCruiseTask.setDateType(cronExpressionDate);
+                    result.setData(tCruiseTaskService.insert(tCruiseTask));
+                } else {
+                    result.setData(ResultCodeEnum.CODE10005.getName());
+                    return result;
+                }
+            } else { result.setData(tCruiseTaskService.insert(tCruiseTask)); }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -149,10 +172,10 @@ public class TCruiseTaskController {
     public Result batchInsert(@RequestBody List<TCruiseTask> list) {
         Result result = new Result();
         try {
-        result.setData(tCruiseTaskService.batchInsert(list));
+            result.setData(tCruiseTaskService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }

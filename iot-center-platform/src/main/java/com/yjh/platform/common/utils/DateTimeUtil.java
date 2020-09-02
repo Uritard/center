@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils;
 
 import com.mysql.jdbc.StringUtils;
+import com.yjh.platform.module.task.entity.TCruiseTaskCron;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -932,58 +933,176 @@ public class DateTimeUtil {
         return validTimeList;
     }
 
-    public static String createCronExpression(String min, String hour, String Day, String week, String month, String season, String year){
-        StringBuffer croExp=new StringBuffer();
+    public static String createCronExpression(Map<String, String> mapTime){
 
-        //按日执行：每天15时执行：0 0 15 * * ？ *  小时数可以根据自己需求更改
-        if(!Day.equals("")){
-            croExp.append("0 ");//分钟
-            croExp.append("15 ");//小时
-            croExp.append("* * ? *");
-        }
+        StringBuffer croExp=new StringBuffer();
+        String min = mapTime.get("min");
+        String hour = mapTime.get("hour");
+        String dayOfMonth = mapTime.get("dayOfMonth");
+        String dayOfWeek = mapTime.get("dayOfWeek");
+        String month = mapTime.get("month");
+        String year = mapTime.get("year");
+
+        //按日执行：每天上午10:15触发：0 15 10 ? * *
+        if (!hour.equals("") && dayOfMonth.equals("") && dayOfWeek.equals("")) {croExp.append("0 ").append(min).append(" ").append(hour).append(" ? * *");}
+        //按周执行：每周三四点执行：0 0 4 ? * 3
+        if (dayOfMonth.equals("") && !dayOfWeek.equals("")) {croExp.append("0 ").append(min).append(" ").append(hour).append(" ? * ").append(dayOfWeek);}
+        //按月执行：每月15日上午10:15触发：0 15 10 15 * ?
+        if (!dayOfMonth.equals("") && dayOfWeek.equals("")) {croExp.append("0 ").append(min).append(" ").append(hour).append(" ? * ").append(dayOfMonth);}
+
+
+//        if(!day.equals("")){
+//            croExp.append("0 ");//分钟
+//            croExp.append("15 ");//小时
+//            croExp.append("* * ? *");
+//        }
         //按月执行：每月15号三点执行：0 0 3 15 * ？ *
-        if(!month.equals("")){
-            croExp.append("0 ");//分钟
-            croExp.append("3 ");//小时
-            croExp.append("15 * ? *");
-        }
+//        if(!month.equals("")){
+//            croExp.append("0 ");//分钟
+//            croExp.append("3 ");//小时
+//            croExp.append("15 * ? *");
+//        }
         //按年执行：每年6月1号5点执行：0 0 5 1 6 ？ *
-        if(!year.equals("")){
-            croExp.append("0 ");//分钟
-            croExp.append("5 ");//小时
-            croExp.append("1 6 ? *");
-        }
+//        if(!year.equals("")){
+//            croExp.append("0 ");//分钟
+//            croExp.append("5 ");//小时
+//            croExp.append("1 6 ? *");
+//        }
         //按季度执行：7月18号开始每三个月执行一次：0 0 2 18 7,10,1,4 ？ *
-        if(!season.equals("")){
-            //指定月份执行
-            int month1=7;
-            int month2=(month1+3)%12==0?12:(month1+3)%12;
-            int month3=(month2+3)%12==0?12:(month2+3)%12;
-            int month4=(month3+3)%12==0?12:(month3+3)%12;
-            croExp.append("0 ");//分钟
-            croExp.append("15 ");//小时
-            croExp.append("18 month1,month2,month3,month4 ? *");
-        }
+//        if(!season.equals("")){
+//            //指定月份执行
+//            int month1=7;
+//            int month2=(month1+3)%12==0?12:(month1+3)%12;
+//            int month3=(month2+3)%12==0?12:(month2+3)%12;
+//            int month4=(month3+3)%12==0?12:(month3+3)%12;
+//            croExp.append("0 ");//分钟
+//            croExp.append("15 ");//小时
+//            croExp.append("18 month1,month2,month3,month4 ? *");
+//        }
         //按周执行：每周三四点执行：0 0 4 * * 2 *
-        if(!week.equals("")){
-            croExp.append("0 ");//分钟
-            croExp.append("4 ");//小时
-            croExp.append("* * 2 *");
-        }
+//        if(!week.equals("")){
+//            croExp.append("0 ");//分钟
+//            croExp.append("4 ");//小时
+//            croExp.append("* * 2 *");
+//        }
         //按半年执行：七月一月18号执行一次：0 0 2 18 1,7 ？ *
-        if(!min.equals("")){
-            int month1=7;
-            int month2=(month1+6)%12==0?12:(month1+6)%12;
-            croExp.append("0 ");//分钟
-            croExp.append("2 ");//小时
-            croExp.append("18 month1,month2 ? *");
-        }
+//        if(!min.equals("")){
+//            int month1=7;
+//            int month2=(month1+6)%12==0?12:(month1+6)%12;
+//            croExp.append("0 ");//分钟
+//            croExp.append("2 ");//小时
+//            croExp.append("18 month1,month2 ? *");
+//        }
         //按时间执行：每五分钟执行：0 */5 * * * ？ *
-        if(!Day.equals("")){
-            croExp.append("0 ");//分钟
-            croExp.append("*/5 ");//小时
-            croExp.append("* * ? *");
-        }
+//        if(!day.equals("")){
+//            croExp.append("0 ");//分钟
+//            croExp.append("*/5 ");//小时
+//            croExp.append("* * ? *");
+//        }
         return croExp.toString();
+    }
+
+    /**
+     *
+     *方法摘要：构建Cron表达式
+     *@param  tCruiseTaskCron
+     *@return String
+     */
+    public static String createCronExpression2(TCruiseTaskCron tCruiseTaskCron){
+        StringBuffer cronExp = new StringBuffer("");
+
+        if(null == tCruiseTaskCron.getJobType()) {
+            System.out.println("执行周期未配置" );//执行周期未配置
+        }
+
+        if (null != tCruiseTaskCron.getSecond()
+                && null == tCruiseTaskCron.getMinute()
+                && null == tCruiseTaskCron.getHour()){
+            //每隔几秒
+            if (tCruiseTaskCron.getJobType().equals("0")) {
+                cronExp.append("0/").append(tCruiseTaskCron.getSecond());
+                cronExp.append(" ");
+                cronExp.append("* ");
+                cronExp.append("* ");
+                cronExp.append("* ");
+                cronExp.append("* ");
+                cronExp.append("?");
+            }
+
+        }
+
+        if (null != tCruiseTaskCron.getSecond()
+                && null != tCruiseTaskCron.getMinute()
+                && null == tCruiseTaskCron.getHour()){
+            //每隔几分钟
+            if (tCruiseTaskCron.getJobType().equals("4")) {
+                cronExp.append("* ");
+                cronExp.append("0/").append(tCruiseTaskCron.getMinute());
+                cronExp.append(" ");
+                cronExp.append("* ");
+                cronExp.append("* ");
+                cronExp.append("* ");
+                cronExp.append("?");
+            }
+
+        }
+
+        if (null != tCruiseTaskCron.getSecond()
+                && null != tCruiseTaskCron.getMinute()
+                && null != tCruiseTaskCron.getHour()) {
+            //秒
+            cronExp.append(tCruiseTaskCron.getSecond()).append(" ");
+            //分
+            cronExp.append(tCruiseTaskCron.getMinute()).append(" ");
+            //小时
+            cronExp.append(tCruiseTaskCron.getHour()).append(" ");
+
+            //每天
+            if(tCruiseTaskCron.getJobType().equals("1")){
+                cronExp.append("* ");//日
+                cronExp.append("* ");//月
+                cronExp.append("?");//周
+            }
+
+            //按每周
+            else if(tCruiseTaskCron.getJobType().equals("3")){
+                //一个月中第几天
+                cronExp.append("? ");
+                //月份
+                cronExp.append("* ");
+                //周
+                String[] weeks = tCruiseTaskCron.getDayOfWeeks();
+                for(int i = 0; i < weeks.length; i++){
+                    if(i == 0){
+                        cronExp.append(weeks[i]);
+                    } else{
+                        cronExp.append(",").append(weeks[i]);
+                    }
+                }
+
+            }
+
+            //按每月
+            else if(tCruiseTaskCron.getJobType().equals("2")){
+                //一个月中的哪几天
+                String[] days = tCruiseTaskCron.getDayOfMonths();
+                for(int i = 0; i < days.length; i++){
+                    if(i == 0){
+                        cronExp.append(days[i]);
+                    } else{
+                        cronExp.append(",").append(days[i]);
+                    }
+                }
+                //月份
+                cronExp.append(" * ");
+                //周
+                cronExp.append("?");
+            }
+
+        }
+        else {
+            System.out.println("时或分或秒参数未配置" );//时或分或秒参数未配置
+        }
+        return cronExp.toString();
     }
 }
