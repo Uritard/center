@@ -24,7 +24,7 @@ public class TStdDeviceAttrService{
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdDeviceAttr tStdDeviceAttr) {
-        return this.tStdDeviceAttrDao.insert(tStdDeviceAttr);
+        return this.tStdDeviceAttrDao.add(tStdDeviceAttr);
     }
 
     @Logs(title = "删除", code = "module")

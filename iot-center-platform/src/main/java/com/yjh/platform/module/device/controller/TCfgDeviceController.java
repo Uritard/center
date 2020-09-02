@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.TCfgDeviceDetail;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
 import com.yjh.platform.module.device.entity.TCfgDevice;
 import java.util.HashMap;
@@ -123,14 +124,14 @@ public class TCfgDeviceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCfgDevice tCfgDevice,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+    public Result selectByPage(@RequestBody TCfgDeviceDetail tCfgDeviceDetail,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCfgDevice> list = tCfgDeviceService.selectByPage(tCfgDevice);
+            List<HashMap<String,Object>> list = tCfgDeviceService.selectByPage(tCfgDeviceDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

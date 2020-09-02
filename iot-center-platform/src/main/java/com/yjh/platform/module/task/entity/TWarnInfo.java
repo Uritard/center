@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,6 +32,7 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "告警等级")
     private Integer warnLevel;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "告警时间")
     private Date warnTime;
 
@@ -49,6 +52,7 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "告警状态：1未处理 2已处理 3已确认 4已忽略")
     private Integer confMode;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "确认时间")
     private Date confTime;
 

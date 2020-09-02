@@ -1,7 +1,10 @@
 package com.yjh.platform.module.task.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.task.entity.RobotAlarm;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -43,4 +46,14 @@ public interface TWarnInfoDao {
     List<TWarnInfo> selectByPage(TWarnInfo tWarnInfo);
 
     int batchInsert(List<TWarnInfo> list);
+    List<HashMap<String,Object>> selectAllWarn(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countSixDay(HashMap<String,Object> map);
+    List<HashMap<String,Object>> selectByType(HashMap<String,Object> map);
+    List<RobotAlarm> selectByRobot(HashMap<String,Object> map);
+    List<HashMap<String,Object>> selectOthers(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countByType(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countOthers(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countByRobot(HashMap<String,Object> map);
+
+
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdDeviceAttrDao {
 
-    int insert(TStdDeviceAttr tStdDeviceAttr);
+    int add(TStdDeviceAttr tStdDeviceAttr);
     int deleteByPrimaryId(@Param(value = "deviceId") Long deviceId);
     int update(TStdDeviceAttr tStdDeviceAttr);
     TStdDeviceAttr selectByPrimaryId(@Param(value = "deviceId") Long deviceId);

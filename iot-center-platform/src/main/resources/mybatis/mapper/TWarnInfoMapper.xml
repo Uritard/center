@@ -311,6 +311,193 @@
         </foreach>
     </insert>
 
+    <select id="selectAllWarn" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+        a.warn_id,
+        a.warn_time,
+        a.value,
+        b.device_name,
+        a.alarm_source,
+         a.warn_level,
+         a.conf_mode
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        union all(
+        select
+        robot_alarm_id,
+        alarm_time,
+        alarm_info,
+        "检测机器人" as deviceName,
+        "机器人本体" as alarmSource,
+        alarm_level,
+        alarm_state
+        from robot_alarm c
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        )
+    </select>
 
+    <select id="countSixDay" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (select
+        a.warn_time
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        union all(
+        select
+        b.alarm_time
+        from robot_alarm b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and b.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        )) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        GROUP BY
+        day1;
+    </select>
 
+    <select id="selectByType" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+        a.warn_id,
+        a.warn_time,
+        a.value,
+        b.device_name,
+        a.alarm_source,
+        a.warn_level,
+        a.conf_mode
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="countByType" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (select
+        a.warn_time
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        GROUP BY
+        day1;
+    </select>
+
+    <select id="selectByRobot" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.RobotAlarm">
+        select
+        robot_alarm_id,
+        alarm_time,
+        alarm_info,
+        "检测机器人" as deviceName,
+        "机器人本体" as alarmSource,
+        alarm_level,
+        alarm_state
+        from robot_alarm c
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="countByRobot" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( alarm_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (
+        select
+        alarm_time
+        from robot_alarm b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and b.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        ) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(alarm_time,'%y%m'))=0  ) as robot
+        GROUP BY
+        day1;
+    </select>
+
+    <select id="selectOthers" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+        a.warn_id,
+        a.warn_time,
+        a.value,
+        b.device_name,
+        a.alarm_source,
+        a.warn_level,
+        a.conf_mode
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != ''">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="countOthers" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (select
+        a.warn_time
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        GROUP BY
+        day1;
+    </select>
 </mapper>

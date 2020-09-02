@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.dao;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
@@ -22,7 +23,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "deviceId") Long deviceId,
                                 @Param(value = "customId") String customId,
                                 @Param(value = "meteId") Long meteId,
-                                @Param(value = "meteType") Integer meteType,
+                                @Param(value = "meteType") String meteType,
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "deviceType") Integer deviceType,
                                 @Param(value = "customType") Integer customType,
@@ -43,7 +44,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "thresholdPer") BigDecimal thresholdPer,
                                 @Param(value = "modulus") Integer modulus,
                                 @Param(value = "remark") String remark);
-    List<TStdDeviceMete> selectByPage(TStdDeviceMete tStdDeviceMete);
+    List<HashMap<String,Object>> selectByPage(TStdDeviceMete tStdDeviceMete);
 
     int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);

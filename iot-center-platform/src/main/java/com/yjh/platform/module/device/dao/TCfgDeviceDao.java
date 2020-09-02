@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 
@@ -28,7 +29,7 @@ public interface TCfgDeviceDao {
                                 @Param(value = "createTime") Date createTime,
                                 @Param(value = "updateTime") Date updateTime,
                                 @Param(value = "remark") String remark);
-    List<TCfgDevice> selectByPage(TCfgDevice tCfgDevice);
+    List<HashMap<String,Object>> selectByPage(TCfgDeviceDetail tCfgDeviceDetail);
 
     int batchInsert(List<TCfgDevice> list);
 

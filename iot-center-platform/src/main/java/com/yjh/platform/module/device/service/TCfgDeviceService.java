@@ -56,9 +56,9 @@ public class TCfgDeviceService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgDevice> selectByPage(TCfgDevice tCfgDevice) {
-        List<TCfgDevice> tCfgDeviceList = tCfgDeviceDao.selectByPage(tCfgDevice);
-        return tCfgDeviceList;
+    public List<HashMap<String,Object>> selectByPage(TCfgDeviceDetail tCfgDeviceDetail) {
+        List<HashMap<String,Object>> list= tCfgDeviceDao.selectByPage(tCfgDeviceDetail);
+        return list;
     }
 
 

@@ -107,7 +107,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "deviceId", required = false) Long deviceId,
                          @RequestParam(value = "customId", required = false) String customId,
                          @RequestParam(value = "meteId", required = false) Long meteId,
-                         @RequestParam(value = "meteType", required = false) Integer meteType,
+                         @RequestParam(value = "meteType", required = false) String meteType,
                          @RequestParam(value = "meteName", required = false) String meteName,
                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                          @RequestParam(value = "customType", required = false) Integer customType,
@@ -148,7 +148,7 @@ public class TStdDevicemeteController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TStdDeviceMete> list = tStdDevicemeteService.selectByPage(tStdDeviceMete);
+            List<HashMap<String,Object>> list = tStdDevicemeteService.selectByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

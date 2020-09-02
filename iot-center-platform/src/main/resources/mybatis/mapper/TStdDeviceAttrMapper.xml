@@ -32,7 +32,7 @@
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
+    <insert id="add" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         insert into t_std_device_attr(
             device_id,
             device_model,

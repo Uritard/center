@@ -113,30 +113,40 @@
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgDevice" resultType="com.yjh.platform.module.device.entity.TCfgDevice">
-        select
-        a.device_id,
-        a.device_name,
-        a.device_type,
-        a.device_code,
-        a.logical_type,
-        a.project_id,
-        a.relation_code,
-        a.create_time,
-        a.update_time,
-        a.remark
-        from t_cfg_device a
-        where 1 = 1
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
-        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCfgDevice" resultType="java.util.HashMap">
+       SELECT a.device_id,b.mete_name,b.mete_kind,b.mete_code,b.mete_explain_type,d.isshield
+	   FROM t_cfg_device a,t_cfg_mete b,t_cfg_telemeter d
+	   WHERE
+        a.device_id = d.device_id and  b.mete_id = d.mete_id
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
-        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
-        <if test="logicalType != null and logicalType != ''"> and a.logical_type = #{logicalType, jdbcType=VARCHAR}</if>
-        <if test="projectId != null and projectId != ''"> and a.project_id = #{projectId, jdbcType=BIGINT}</if>
-        <if test="relationCode != null and relationCode != ''"> and a.relation_code = #{relationCode, jdbcType=VARCHAR}</if>
-        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
-        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''"> and 1 = #{meteKind, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and b.met_name = #{meteName, jdbcType=VARCHAR}</if>
+        UNION all(
+        SELECT a.device_id,b.mete_name,b.mete_kind,b.mete_code,b.mete_explain_type,e.isshield
+        FROM t_cfg_device a,t_cfg_mete b,t_cfg_telesignal e
+        WHERE
+        a.device_id = e.device_id and  b.mete_id = e.mete_id
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''"> and 0 = #{meteKind, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and b.met_name = #{meteName, jdbcType=VARCHAR}</if>
+        )
+        UNION all(
+        SELECT a.device_id,b.mete_name,b.mete_kind,b.mete_code,b.mete_explain_type,'null' as isshield
+        FROM t_cfg_device a,t_cfg_mete b,t_cfg_teleadjust f
+        WHERE
+        a.device_id = f.device_id and  b.mete_id = f.mete_id
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''"> and 3= #{meteKind, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and b.met_name = #{meteName, jdbcType=VARCHAR}</if>
+        )UNION all(
+        SELECT a.device_id,b.mete_name,b.mete_kind,b.mete_code,b.mete_explain_type,'null' as isshield
+        FROM t_cfg_device a,t_cfg_mete b,t_cfg_telecontrol g
+        WHERE
+        a.device_id = g.device_id and  b.mete_id = g.mete_id
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''"> and 2 = #{meteKind, jdbcType=VARCHAR}</if>
+        <if test="meteName != null and meteName != ''"> and b.met_name = #{meteName, jdbcType=VARCHAR}</if>
+        )
     </select>
 
     <insert id="batchInsert">

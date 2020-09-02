@@ -4,6 +4,7 @@ import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 import lombok.extern.java.Log;
@@ -48,14 +49,14 @@ public class TStdDevicemeteService{
 
     @Logs(title = "查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId, String customId, Long meteId, Integer meteType, String meteName, Integer deviceType, Integer customType, String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float lowEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark) {
+    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId, String customId, Long meteId, String meteType, String meteName, Integer deviceType, Integer customType, String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float lowEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark) {
         List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId, customId, meteId, meteType, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
         return tStdDeviceMeteList;
     }
 
     @Logs(title = "分页查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> selectByPage(TStdDeviceMete tStdDeviceMete) {
+    public List<HashMap<String,Object>> selectByPage(TStdDeviceMete tStdDeviceMete) {
         return tStdDevicemeteDao.selectByPage(tStdDeviceMete);
     }
 
