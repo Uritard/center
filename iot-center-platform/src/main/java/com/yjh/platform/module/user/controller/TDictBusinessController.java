@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mysql.jdbc.StringUtils;
 import com.yjh.platform.module.user.service.TDictBusinessService;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 
@@ -51,8 +52,12 @@ public class TDictBusinessController {
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("业务字典添加错误:", e);
+            if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_dictcode") != -1) {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "字典表编码重复");
+            } else {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                log.error("业务字典添加错误:", e);
+            }
         }
         return result;
     }

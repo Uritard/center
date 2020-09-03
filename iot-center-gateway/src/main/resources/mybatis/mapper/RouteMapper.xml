@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.gateway.module.gateway.dao.RouteDao">
+    <resultMap id="BaseResultMap" type="com.yjh.gateway.module.gateway.entity.Route">
+        <id column="route_id" jdbcType="BIGINT" property="routeId"/>
+        <result column="service_id" jdbcType="VARCHAR" property="serviceId"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="strip_prefix" jdbcType="VARCHAR" property="stripPrefix"/>
+        <result column="retry_able" jdbcType="INTEGER" property="retryAble"/>
+        <result column="api_name" jdbcType="VARCHAR" property="apiName"/>
+        <result column="enabled" jdbcType="INTEGER" property="enabled"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap1" type="java.util.HashMap">
+        <id column="route_id" jdbcType="BIGINT" property="routeId"/>
+        <result column="service_id" jdbcType="VARCHAR" property="serviceId"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="strip_prefix" jdbcType="VARCHAR" property="stripPrefix"/>
+        <result column="retry_able" jdbcType="INTEGER" property="retryAble"/>
+        <result column="api_name" jdbcType="VARCHAR" property="apiName"/>
+        <result column="enabled" jdbcType="INTEGER" property="enabled"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from sys_route
+        where route_id = #{routeId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.yjh.gateway.module.gateway.entity.Route" useGeneratedKeys="true"
+            keyProperty="routeId" keyColumn="route_id">
+        insert into sys_route (route_id, service_id, url,
+        strip_prefix, retry_able, api_name,
+        enabled, path,remark)
+        values (#{routeId,jdbcType=BIGINT}, #{serviceId,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+        #{stripPrefix,jdbcType=VARCHAR}, #{retryAble,jdbcType=INTEGER}, #{apiName,jdbcType=VARCHAR},
+        #{enabled,jdbcType=INTEGER}, #{path,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.yjh.gateway.module.gateway.entity.Route">
+        update sys_route
+        set service_id = #{serviceId,jdbcType=VARCHAR},
+        url = #{url,jdbcType=VARCHAR},
+        strip_prefix = #{stripPrefix,jdbcType=VARCHAR},
+        retry_able = #{retryAble,jdbcType=INTEGER},
+        api_name = #{apiName,jdbcType=VARCHAR},
+        enabled = #{enabled,jdbcType=INTEGER},
+        path = #{path,jdbcType=VARCHAR},
+        remark = #{remark,jdbcType=VARCHAR}
+        where route_id = #{routeId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateStatus" parameterType="com.yjh.gateway.module.gateway.entity.Route">
+        update sys_route
+        set enabled = #{enabled,jdbcType=INTEGER}
+        where route_id = #{routeId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select route_id, service_id, url, strip_prefix, retry_able, api_name, enabled, path,remark
+        from sys_route
+        where route_id = #{routeId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByParams" parameterType="java.util.HashMap" resultMap="BaseResultMap1">
+        select route_id, service_id, url, strip_prefix, retry_able, api_name, enabled, path,remark
+        from sys_route
+        where 1=1
+        <if test="routeId !=null and routeId !=''">
+            and route_id = #{routeId,jdbcType=BIGINT}
+        </if>
+        <if test="apiName !=null and apiName !=''">
+            and (api_name like CONCAT('%',#{apiName,jdbcType=VARCHAR}, '%')
+                   or service_id like CONCAT('%',#{apiName,jdbcType=VARCHAR}, '%')
+                   or path like CONCAT('%',#{apiName,jdbcType=VARCHAR}, '%'))
+        </if>
+        order by route_id desc
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select route_id, service_id, url, strip_prefix, retry_able, api_name, enabled, path
+        from sys_route
+    </select>
+
+</mapper>

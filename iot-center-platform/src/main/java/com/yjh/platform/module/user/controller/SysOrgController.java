@@ -43,6 +43,10 @@ public class SysOrgController {
     public Result insert(@RequestBody SysOrg sysOrg) {
         Result result = new Result();
         try {
+            if (sysOrg.getOrgCode().equals("")) {
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "组织机构编码为空");
+                return result;
+            }
             if (sysOrgService.judgeOrgCode(sysOrg.getOrgCode())) {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "组织机构编码重复");
                 return result;
