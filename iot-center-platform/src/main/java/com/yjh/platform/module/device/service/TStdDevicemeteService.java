@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +55,10 @@ public class TStdDevicemeteService{
         return tStdDeviceMeteList;
     }
 
+    //告警规则未定
     @Logs(title = "分页查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<HashMap<String,Object>> selectByPage(TStdDeviceMete tStdDeviceMete) {
+    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMete tStdDeviceMete) {
         return tStdDevicemeteDao.selectByPage(tStdDeviceMete);
     }
 

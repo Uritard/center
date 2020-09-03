@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.service.TCruisePointInstanceService;
@@ -139,14 +140,14 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance,
+    public Result selectByPage(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCruisePointInstance> list = tCruisePointInstanceService.selectByPage(tCruisePointInstance);
+            List<TCruisePointInstanceDetail> list = tCruisePointInstanceService.selectByPage(tCruisePointInstanceDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

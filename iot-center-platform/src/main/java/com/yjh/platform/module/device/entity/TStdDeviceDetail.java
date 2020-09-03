@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -45,6 +46,8 @@ public class TStdDeviceDetail {
     @ApiModelProperty(value = "模版ID")
     private Long modelId;
 
+    private String modelName;
+
     @ApiModelProperty(value = "路径")
     private String regionPath;
 
@@ -62,15 +65,17 @@ public class TStdDeviceDetail {
 
     @ApiModelProperty(value = "设备状态(0：新建，1：在线，2：离线)")
     private Integer status;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     @ApiModelProperty(value = "设备型号")
     private Integer deviceModel;
+
+    private String devideModelName;
 
     @ApiModelProperty(value = "PMS类型")
     private String pmsType;
@@ -79,15 +84,15 @@ public class TStdDeviceDetail {
     private String pmsId;
 
     @ApiModelProperty(value = "生产厂家")
-    private String manufacturer;
-
+    private String deviceVendor;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date productionDate;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "投运时间")
-    private Date openingDate;
-
+    private Date usedTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date disableDate;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastMaintenance;
 
     @ApiModelProperty(value = "维修次数")
@@ -115,12 +120,15 @@ public class TStdDeviceDetail {
     private Integer port;
 
     @ApiModelProperty(value = "电压等级")
-    private String para1;
+    private String voltageLevel;
 
     @ApiModelProperty(value = "顺控点号")
-    private String para2;
+    private String sequencePoint;
 
     @ApiModelProperty(value = "实物编码")
-    private String para3;
+    private String realCode;
+
+    @ApiModelProperty(value = "安装地址")
+    private String address;
 
 }

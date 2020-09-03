@@ -47,8 +47,8 @@ public class TStdDeviceAttrService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceAttr> select(Long deviceId, Integer deviceModel, String pmsType, String pmsId, String manufacturer, Date productionDate, Date openingDate, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String para1, String para2, String para3) {
-        List<TStdDeviceAttr> tStdDeviceAttrList = tStdDeviceAttrDao.select(deviceId, deviceModel, pmsType, pmsId, manufacturer, productionDate, openingDate, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, para1, para2, para3);
+    public List<TStdDeviceAttr> select(Long deviceId, Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {
+        List<TStdDeviceAttr> tStdDeviceAttrList = tStdDeviceAttrDao.select(deviceId, deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
         return tStdDeviceAttrList;
     }
 

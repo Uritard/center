@@ -177,12 +177,17 @@ public class TWarnInfoController {
                             @RequestParam(value = "value", required = false) String value,
                             @RequestParam(value = "startTime", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                             @RequestParam(value = "edTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
-                            @RequestParam(value = "deviceName", required = false) String deviceName) {
-        //@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+                            @RequestParam(value = "deviceName", required = false) String deviceName,
+                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                            @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
             List<HashMap<String,Object>> list = tWarnInfoService.selectAll(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName);
-            result.setData(list);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询所有告警失败描述：", e);
@@ -219,11 +224,17 @@ public class TWarnInfoController {
                                @RequestParam(value = "startTime", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                @RequestParam(value = "edTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                @RequestParam(value = "deviceName", required = false) String deviceName,
-                               @RequestParam(value = "warnType", required = false) Integer warnType){
+                               @RequestParam(value = "warnType", required = false) Integer warnType,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
+        Map<String, Object> resultMap = new HashMap<>();
         Result result = new Result();
         try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
             List<HashMap<String,Object>> list = tWarnInfoService.selectByType(warnLevel,confMode,alarmSource,value,startTime,endTime,deviceName,warnType);
-            result.setData(list);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("根据设备类型来查失败描述：", e);
@@ -261,11 +272,17 @@ public class TWarnInfoController {
                                @RequestParam(value = "startTime", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                @RequestParam(value = "edTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                @RequestParam(value = "deviceName", required = false) String deviceName,
-                               @RequestParam(value = "warnType", required = false) Integer warnType){
+                               @RequestParam(value = "warnType", required = false) Integer warnType,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
         Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
             List<RobotAlarm> list = tWarnInfoService.selectByRobot(warnLevel,confMode,alarmSource,value,startTime,endTime,deviceName,warnType);
-            result.setData(list);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("根据机器人来查失败描述：", e);

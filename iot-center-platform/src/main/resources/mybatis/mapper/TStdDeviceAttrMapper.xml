@@ -8,9 +8,9 @@
         <result column="device_model" jdbcType="INTEGER" property="deviceModel" />
         <result column="pms_type" jdbcType="VARCHAR" property="pmsType" />
         <result column="pms_id" jdbcType="VARCHAR" property="pmsId" />
-        <result column="manufacturer" jdbcType="VARCHAR" property="manufacturer" />
+        <result column="device_vendor" jdbcType="VARCHAR" property="deviceVendor" />
         <result column="production_date" jdbcType="TIMESTAMP" property="productionDate" />
-        <result column="opening_date" jdbcType="TIMESTAMP" property="openingDate" />
+        <result column="used_time" jdbcType="TIMESTAMP" property="usedTime" />
         <result column="disable_date" jdbcType="TIMESTAMP" property="disableDate" />
         <result column="last_maintenance" jdbcType="TIMESTAMP" property="lastMaintenance" />
         <result column="maintenance_count" jdbcType="VARCHAR" property="maintenanceCount" />
@@ -21,26 +21,27 @@
         <result column="longitude" jdbcType="VARCHAR" property="longitude" />
         <result column="ip" jdbcType="VARCHAR" property="ip" />
         <result column="port" jdbcType="INTEGER" property="port" />
-        <result column="para_1" jdbcType="VARCHAR" property="para1" />
-        <result column="para_2" jdbcType="VARCHAR" property="para2" />
-        <result column="para_3" jdbcType="VARCHAR" property="para3" />
+        <result column="voltage_level" jdbcType="VARCHAR" property="voltageLevel" />
+        <result column="sequence_point" jdbcType="VARCHAR" property="sequencePoint" />
+        <result column="real_code" jdbcType="VARCHAR" property="realCode" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_id, device_model, pms_type, pms_id, manufacturer, production_date, opening_date, disable_date, last_maintenance, maintenance_count, organization, department, responsible_person, latitude, longitude, ip, port, para_1, para_2, para_3
+        device_id, device_model, pms_type, pms_id, device_vendor, production_date, used_time, disable_date, last_maintenance, maintenance_count, organization, department, responsible_person, latitude, longitude, ip, port, voltage_level, sequence_point, real_code,address
     </sql>
 
 
-    <insert id="add" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
+    <insert id="add" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         insert into t_std_device_attr(
             device_id,
             device_model,
             pms_type,
             pms_id,
-            manufacturer,
+            device_vendor,
             production_date,
-            opening_date,
+            used_time,
             disable_date,
             last_maintenance,
             maintenance_count,
@@ -51,17 +52,18 @@
             longitude,
             ip,
             port,
-            para_1,
-            para_2,
-            para_3
+            voltage_level,
+            sequence_point,
+            real_code,
+            address
         )values(
                 #{deviceId, jdbcType=BIGINT},
                 #{deviceModel, jdbcType=INTEGER},
                 #{pmsType, jdbcType=VARCHAR},
                 #{pmsId, jdbcType=VARCHAR},
-                #{manufacturer, jdbcType=VARCHAR},
+                #{deviceVendor, jdbcType=VARCHAR},
                 #{productionDate, jdbcType=TIMESTAMP},
-                #{openingDate, jdbcType=TIMESTAMP},
+                #{usedTime, jdbcType=TIMESTAMP},
                 #{disableDate, jdbcType=TIMESTAMP},
                 #{lastMaintenance, jdbcType=TIMESTAMP},
                 #{maintenanceCount, jdbcType=VARCHAR},
@@ -72,9 +74,10 @@
                 #{longitude, jdbcType=VARCHAR},
                 #{ip, jdbcType=VARCHAR},
                 #{port, jdbcType=INTEGER},
-                #{para1, jdbcType=VARCHAR},
-                #{para2, jdbcType=VARCHAR},
-                #{para3, jdbcType=VARCHAR}
+                #{voltageLevel, jdbcType=VARCHAR},
+                #{sequencePoint, jdbcType=VARCHAR},
+                #{realCode, jdbcType=VARCHAR},
+                #{address, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -89,9 +92,9 @@
         <if test="deviceModel != null ">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
         <if test="pmsType != null and pmsType != ''">a.pms_type = #{pmsType, jdbcType=VARCHAR},</if>
         <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
-        <if test="manufacturer != null and manufacturer != ''">a.manufacturer = #{manufacturer, jdbcType=VARCHAR},</if>
+        <if test="deviceVendor != null and deviceVendor != ''">a.device_vendor = #{deviceVendor, jdbcType=VARCHAR},</if>
         <if test="productionDate != null and productionDate != ''">a.production_date = #{productionDate, jdbcType=TIMESTAMP},</if>
-        <if test="openingDate != null and openingDate != ''">a.opening_date = #{openingDate, jdbcType=TIMESTAMP},</if>
+        <if test="usedTime != null and usedTime != ''">a.used_time = #{usedTime, jdbcType=TIMESTAMP},</if>
         <if test="disableDate != null and disableDate != ''">a.disable_date = #{disableDate, jdbcType=TIMESTAMP},</if>
         <if test="lastMaintenance != null and lastMaintenance != ''">a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP},</if>
         <if test="maintenanceCount != null and maintenanceCount != ''">a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR},</if>
@@ -102,9 +105,10 @@
         <if test="longitude != null and longitude != ''">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
         <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
         <if test="port != null ">a.port = #{port, jdbcType=INTEGER},</if>
-        <if test="para1 != null and para1 != ''">a.para_1 = #{para1, jdbcType=VARCHAR},</if>
-        <if test="para2 != null and para2 != ''">a.para_2 = #{para2, jdbcType=VARCHAR},</if>
-        <if test="para3 != null and para3 != ''">a.para_3 = #{para3, jdbcType=VARCHAR},</if>
+        <if test="voltageLevel != null and voltageLevel != ''">a.voltage_level = #{voltageLevel, jdbcType=VARCHAR},</if>
+        <if test="sequencePoint != null and sequencePoint != ''">a.sequence_point = #{sequencePoint, jdbcType=VARCHAR},</if>
+        <if test="realCode != null and realCode != ''">a.real_code = #{realCode, jdbcType=VARCHAR},</if>
+        <if test="address != null and address != ''">a.address = #{address, jdbcType=VARCHAR},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=BIGINT}
     </update>
@@ -115,9 +119,9 @@
         a.device_model,
         a.pms_type,
         a.pms_id,
-        a.manufacturer,
+        a.device_vendor,
         a.production_date,
-        a.opening_date,
+        a.used_time,
         a.disable_date,
         a.last_maintenance,
         a.maintenance_count,
@@ -128,9 +132,10 @@
         a.longitude,
         a.ip,
         a.port,
-        a.para_1,
-        a.para_2,
-        a.para_3
+        a.voltage_level,
+        a.sequence_point,
+        a.real_code,
+        a.address
         from t_std_device_attr a
         where 1 = 1
             and a.device_id = #{deviceId, jdbcType=BIGINT}
@@ -143,9 +148,9 @@
         a.device_model,
         a.pms_type,
         a.pms_id,
-        a.manufacturer,
+        a.device_vendor,
         a.production_date,
-        a.opening_date,
+        a.used_time,
         a.disable_date,
         a.last_maintenance,
         a.maintenance_count,
@@ -156,18 +161,19 @@
         a.longitude,
         a.ip,
         a.port,
-        a.para_1,
-        a.para_2,
-        a.para_3
+        a.voltage_level,
+        a.sequence_point,
+        a.real_code,
+        a.address
         from t_std_device_attr a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="deviceModel != null "> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
         <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
         <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
-        <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
+        <if test="deviceVendor != null and deviceVendor != ''"> and a.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
         <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="openingDate != null and openingDate != ''"> and a.opening_date = #{openingDate, jdbcType=TIMESTAMP}</if>
+        <if test="usedTime != null and usedTime != ''"> and a.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
         <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
         <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
         <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
@@ -178,9 +184,10 @@
         <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
         <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
         <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
-        <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
-        <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
-        <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
+        <if test="voltageLevel != null and voltageLevel != ''"> and a.voltage_level = #{voltageLevel, jdbcType=VARCHAR}</if>
+        <if test="sequencePoint != null and sequencePoint != ''"> and a.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
+        <if test="realCode != null and realCode != ''"> and a.real_code = #{realCode, jdbcType=VARCHAR}</if>
+        <if test="address != null and address != ''"> and a.address = #{address, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr" resultType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
@@ -189,9 +196,9 @@
         a.device_model,
         a.pms_type,
         a.pms_id,
-        a.manufacturer,
+        a.device_vendor,
         a.production_date,
-        a.opening_date,
+        a.used_time,
         a.disable_date,
         a.last_maintenance,
         a.maintenance_count,
@@ -202,18 +209,19 @@
         a.longitude,
         a.ip,
         a.port,
-        a.para_1,
-        a.para_2,
-        a.para_3
+        a.voltage_level,
+        a.sequence_point,
+        a.real_code,
+        a.address
         from t_std_device_attr a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="deviceModel != null "> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
         <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
         <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
-        <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
+        <if test="deviceVendor != null and deviceVendor != ''"> and a.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
         <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="openingDate != null and openingDate != ''"> and a.opening_date = #{openingDate, jdbcType=TIMESTAMP}</if>
+        <if test="usedTime != null and usedTime != ''"> and a.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
         <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
         <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
         <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
@@ -224,9 +232,10 @@
         <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
         <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
         <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
-        <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
-        <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
-        <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
+        <if test="voltageLevel != null and voltageLevel != ''"> and a.voltage_level = #{voltageLevel, jdbcType=VARCHAR}</if>
+        <if test="sequencePoint != null and sequencePoint != ''"> and a.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
+        <if test="realCode != null and realCode != ''"> and a.real_code = #{realCode, jdbcType=VARCHAR}</if>
+        <if test="address != null and address != ''"> and a.address = #{address, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
@@ -235,9 +244,9 @@
             device_model,
             pms_type,
             pms_id,
-            manufacturer,
+            device_vendor,
             production_date,
-            opening_date,
+            used_time,
             disable_date,
             last_maintenance,
             maintenance_count,
@@ -248,9 +257,10 @@
             longitude,
             ip,
             port,
-            para_1,
-            para_2,
-            para_3
+            voltage_level,
+            sequence_point,
+            real_code,
+            address
         )values
         <foreach collection="list" item="TStdDeviceAttr" separator=",">
             (
@@ -258,9 +268,9 @@
                 #{TStdDeviceAttr.deviceModel, jdbcType=INTEGER},
                 #{TStdDeviceAttr.pmsType, jdbcType=VARCHAR},
                 #{TStdDeviceAttr.pmsId, jdbcType=VARCHAR},
-                #{TStdDeviceAttr.manufacturer, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.deviceVendor, jdbcType=VARCHAR},
                 #{TStdDeviceAttr.productionDate, jdbcType=TIMESTAMP},
-                #{TStdDeviceAttr.openingDate, jdbcType=TIMESTAMP},
+                #{TStdDeviceAttr.usedTime, jdbcType=TIMESTAMP},
                 #{TStdDeviceAttr.disableDate, jdbcType=TIMESTAMP},
                 #{TStdDeviceAttr.lastMaintenance, jdbcType=TIMESTAMP},
                 #{TStdDeviceAttr.maintenanceCount, jdbcType=VARCHAR},
@@ -271,9 +281,10 @@
                 #{TStdDeviceAttr.longitude, jdbcType=VARCHAR},
                 #{TStdDeviceAttr.ip, jdbcType=VARCHAR},
                 #{TStdDeviceAttr.port, jdbcType=INTEGER},
-                #{TStdDeviceAttr.para1, jdbcType=VARCHAR},
-                #{TStdDeviceAttr.para2, jdbcType=VARCHAR},
-                #{TStdDeviceAttr.para3, jdbcType=VARCHAR}
+                #{TStdDeviceAttr.voltageLevel, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.sequencePoint, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.realCode, jdbcType=VARCHAR},
+                #{TStdDeviceAttr.address, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

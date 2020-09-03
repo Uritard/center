@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -63,9 +65,11 @@ public class TStdDevice implements Serializable {
     @ApiModelProperty(value = "设备状态(0：新建，1：在线，2：离线)")
     private Integer status;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 

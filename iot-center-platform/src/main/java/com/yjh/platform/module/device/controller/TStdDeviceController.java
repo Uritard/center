@@ -58,7 +58,7 @@ public class TStdDeviceController {
     }
 
     @ApiOperation(value = "插入设备及属性")
-    @RequestMapping(value = "/addALL", method = RequestMethod.POST)
+    @RequestMapping(value = "/addAll", method = RequestMethod.POST)
     public Result addALL(@RequestBody TStdDeviceDetail tStdDeviceDetail) {
         Result result = new Result();
         try {
@@ -215,9 +215,9 @@ public class TStdDeviceController {
                             @RequestParam(value = "deviceModel", required = false) Integer deviceModel,
                             @RequestParam(value = "pmsType", required = false) String pmsType,
                             @RequestParam(value = "pmsId", required = false) String pmsId,
-                            @RequestParam(value = "manufacturer", required = false) String manufacturer,
+                            @RequestParam(value = "deviceVendor", required = false) String deviceVendor,
                             @RequestParam(value = "productionDate", required = false) Date productionDate,
-                            @RequestParam(value = "openingDate", required = false) Date openingDate,
+                            @RequestParam(value = "usedTime", required = false) Date usedTime,
                             @RequestParam(value = "disableDate", required = false) Date disableDate,
                             @RequestParam(value = "lastMaintenance", required = false) Date lastMaintenance,
                             @RequestParam(value = "maintenanceCount", required = false) String maintenanceCount,
@@ -228,12 +228,13 @@ public class TStdDeviceController {
                             @RequestParam(value = "longitude", required = false) String longitude,
                             @RequestParam(value = "ip", required = false) String ip,
                             @RequestParam(value = "port", required = false) Integer port,
-                            @RequestParam(value = "para1", required = false) String para1,
-                            @RequestParam(value = "para2", required = false) String para2,
-                            @RequestParam(value = "para3", required = false) String para3) {
+                            @RequestParam(value = "voltageLevel", required = false) String voltageLevel,
+                            @RequestParam(value = "sequencePoint", required = false) String sequencePoint,
+                            @RequestParam(value = "realCode", required = false) String realCode,
+                            @RequestParam(value = "address", required = false) String address) {
         Result result = new Result();
         try {
-            List<TStdDeviceDetail> list = tStdDeviceService.selectAll(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime,deviceModel, pmsType, pmsId, manufacturer, productionDate, openingDate, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, para1, para2, para3);
+            List<TStdDeviceDetail> list = tStdDeviceService.selectAll(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime,deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -369,7 +370,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
-    public Result batchDelete(@RequestParam(value="list")List<String> list){
+    public Result batchDelete(@RequestParam(value="list")String list){
         Result result=new Result();
         try{
             result.setData(tStdDeviceService.batchDelete(list));

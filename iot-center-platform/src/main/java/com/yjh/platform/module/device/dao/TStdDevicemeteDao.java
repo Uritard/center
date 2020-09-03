@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -44,7 +45,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "thresholdPer") BigDecimal thresholdPer,
                                 @Param(value = "modulus") Integer modulus,
                                 @Param(value = "remark") String remark);
-    List<HashMap<String,Object>> selectByPage(TStdDeviceMete tStdDeviceMete);
+    List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMete tStdDeviceMete);
 
     int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);

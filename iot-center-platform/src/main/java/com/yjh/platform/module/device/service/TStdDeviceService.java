@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.github.pagehelper.parser.impl.HsqldbParser;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 
 
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -30,6 +33,9 @@ public class TStdDeviceService{
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private TStdDeviceAttrDao tStdDeviceAttrDao;
+    @Autowired
+    private TDictBusinessDao tDictBusinessDao;
+
 
 
     @Autowired
@@ -38,6 +44,11 @@ public class TStdDeviceService{
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDevice tStdDevice) {
+        if(tStdDevice.getCustomId() == null){
+            tStdDevice.setCustomId("101");
+            List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
+            tStdDevice.setCustomName(list.get(0).getDictNote());
+        }
         return this.tStdDeviceDao.add(tStdDevice);
     }
 
@@ -46,9 +57,17 @@ public class TStdDeviceService{
     public int addALL(TStdDeviceDetail tStdDeviceDetail) {
         TStdDevice tStdDevice = new TStdDevice();
         tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
-        tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
+        //tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
         tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
-        tStdDevice.setCustomName(tStdDeviceDetail.getCustomName());
+        if(tStdDevice.getCustomId() == null){
+            tStdDevice.setCustomId("101");
+            List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
+            tStdDevice.setCustomName(list.get(0).getDictNote());
+        }else{
+            tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceDetail.getCustomId(),null,null,null,null,null);
+            tStdDevice.setCustomName(list.get(0).getDictNote());
+        }
         tStdDevice.setCustomType(tStdDeviceDetail.getCustomType());
         tStdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
         tStdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
@@ -62,9 +81,10 @@ public class TStdDeviceService{
         tStdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
         tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
 
+        int i = this.tStdDeviceDao.add(tStdDevice);
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
-        tStdDeviceAttr.setDeviceId(tStdDeviceDetail.getDeviceId());
+        tStdDeviceAttr.setDeviceId(Long.valueOf(tStdDevice.getDeviceId()));
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
         tStdDeviceAttr.setDisableDate(tStdDeviceDetail.getDisableDate());
         tStdDeviceAttr.setIp(tStdDeviceDetail.getIp());
@@ -72,20 +92,21 @@ public class TStdDeviceService{
         tStdDeviceAttr.setLatitude(tStdDeviceDetail.getLatitude());
         tStdDeviceAttr.setLongitude(tStdDeviceDetail.getLongitude());
         tStdDeviceAttr.setMaintenanceCount(tStdDeviceDetail.getMaintenanceCount());
-        tStdDeviceAttr.setManufacturer(tStdDeviceDetail.getManufacturer());
-        tStdDeviceAttr.setOpeningDate(tStdDeviceDetail.getOpeningDate());
+        tStdDeviceAttr.setDeviceVendor(tStdDeviceDetail.getDeviceVendor());
+        tStdDeviceAttr.setUsedTime(tStdDeviceDetail.getUsedTime());
         tStdDeviceAttr.setOrganization(tStdDeviceDetail.getOrganization());
-        tStdDeviceAttr.setPara1(tStdDeviceDetail.getPara1());
-        tStdDeviceAttr.setPara2(tStdDeviceDetail.getPara2());
-        tStdDeviceAttr.setPara3(tStdDeviceDetail.getPara3());
+        tStdDeviceAttr.setVoltageLevel(tStdDeviceDetail.getVoltageLevel());
+        tStdDeviceAttr.setSequencePoint(tStdDeviceDetail.getSequencePoint());
+        tStdDeviceAttr.setResponsiblePerson(tStdDeviceDetail.getResponsiblePerson());
         tStdDeviceAttr.setPmsId(tStdDeviceDetail.getPmsId());
         tStdDeviceAttr.setPmsType(tStdDeviceDetail.getPmsType());
         tStdDeviceAttr.setPort(tStdDeviceDetail.getPort());
         tStdDeviceAttr.setProductionDate(tStdDeviceDetail.getProductionDate());
         tStdDeviceAttr.setResponsiblePerson(tStdDeviceDetail.getResponsiblePerson());
+        tStdDeviceAttr.setAddress(tStdDeviceDetail.getAddress());
 
 
-        return this.tStdDeviceDao.add(tStdDevice)+tStdDeviceAttrDao.add(tStdDeviceAttr);
+        return tStdDeviceAttrDao.add(tStdDeviceAttr);
     }
 
     @Logs(title = "删除", code = "module")
@@ -129,7 +150,7 @@ public class TStdDeviceService{
 
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
-        tStdDeviceAttr.setDeviceId(tStdDeviceDetail.getDeviceId());
+        tStdDeviceAttr.setDeviceId(Long.valueOf(tStdDevice.getDeviceId()));
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
         tStdDeviceAttr.setDisableDate(tStdDeviceDetail.getDisableDate());
         tStdDeviceAttr.setIp(tStdDeviceDetail.getIp());
@@ -137,17 +158,18 @@ public class TStdDeviceService{
         tStdDeviceAttr.setLatitude(tStdDeviceDetail.getLatitude());
         tStdDeviceAttr.setLongitude(tStdDeviceDetail.getLongitude());
         tStdDeviceAttr.setMaintenanceCount(tStdDeviceDetail.getMaintenanceCount());
-        tStdDeviceAttr.setManufacturer(tStdDeviceDetail.getManufacturer());
-        tStdDeviceAttr.setOpeningDate(tStdDeviceDetail.getOpeningDate());
+        tStdDeviceAttr.setDeviceVendor(tStdDeviceDetail.getDeviceVendor());
+        tStdDeviceAttr.setUsedTime(tStdDeviceDetail.getUsedTime());
         tStdDeviceAttr.setOrganization(tStdDeviceDetail.getOrganization());
-        tStdDeviceAttr.setPara1(tStdDeviceDetail.getPara1());
-        tStdDeviceAttr.setPara2(tStdDeviceDetail.getPara2());
-        tStdDeviceAttr.setPara3(tStdDeviceDetail.getPara3());
+        tStdDeviceAttr.setVoltageLevel(tStdDeviceDetail.getVoltageLevel());
+        tStdDeviceAttr.setSequencePoint(tStdDeviceDetail.getSequencePoint());
+        tStdDeviceAttr.setResponsiblePerson(tStdDeviceDetail.getResponsiblePerson());
         tStdDeviceAttr.setPmsId(tStdDeviceDetail.getPmsId());
         tStdDeviceAttr.setPmsType(tStdDeviceDetail.getPmsType());
         tStdDeviceAttr.setPort(tStdDeviceDetail.getPort());
         tStdDeviceAttr.setProductionDate(tStdDeviceDetail.getProductionDate());
         tStdDeviceAttr.setResponsiblePerson(tStdDeviceDetail.getResponsiblePerson());
+        tStdDeviceAttr.setAddress(tStdDeviceDetail.getAddress());
         return this.tStdDeviceDao.update(tStdDevice)+tStdDeviceAttrDao.update(tStdDeviceAttr);
     }
 
@@ -172,9 +194,9 @@ public class TStdDeviceService{
 
     @Logs(title = "查询设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceDetail> selectAll(Long deviceId, String customId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, String customName, Integer customType, Integer status, Date updateTime, Date createTime,Integer deviceModel, String pmsType, String pmsId, String manufacturer, Date productionDate, Date openingDate, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String para1, String para2, String para3) {
+    public List<TStdDeviceDetail> selectAll(Long deviceId, String customId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, String customName, Integer customType, Integer status, Date updateTime, Date createTime,Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {
         return this.tStdDeviceDao.selectAll(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime,
-                deviceModel, pmsType, pmsId, manufacturer, productionDate, openingDate, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, para1, para2, para3);
+                deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
     }
 
     @Logs(title = "分页查询", code = "module")
@@ -374,8 +396,9 @@ public class TStdDeviceService{
 
     @Logs(title = "批量删除",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchDelete(List<String> list){
-        return this.tStdDeviceDao.batchDelete(list);
+    public int batchDelete(String list){
+        List<String> list1= Arrays.asList(list.split(","));
+        return this.tStdDeviceDao.batchDelete(list1);
     }
 
 }

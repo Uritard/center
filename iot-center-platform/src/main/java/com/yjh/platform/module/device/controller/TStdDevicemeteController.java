@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 
@@ -148,7 +149,7 @@ public class TStdDevicemeteController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<HashMap<String,Object>> list = tStdDevicemeteService.selectByPage(tStdDeviceMete);
+            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

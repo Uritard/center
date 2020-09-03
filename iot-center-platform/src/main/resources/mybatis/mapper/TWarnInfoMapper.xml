@@ -328,7 +328,7 @@
         <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
         union all(
         select
         robot_alarm_id,
@@ -362,7 +362,7 @@
         <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
         union all(
         select
         b.alarm_time
@@ -395,7 +395,7 @@
         <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
         <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
     </select>
 
@@ -414,7 +414,7 @@
         <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
         <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
         WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
         GROUP BY
@@ -475,7 +475,7 @@
         <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
         <if test="warnType!= null and warnType != ''">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
     </select>
 

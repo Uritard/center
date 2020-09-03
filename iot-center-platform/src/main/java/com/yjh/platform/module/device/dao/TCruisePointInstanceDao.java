@@ -1,8 +1,11 @@
 package com.yjh.platform.module.device.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Handler;
 
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
@@ -41,7 +44,7 @@ public interface TCruisePointInstanceDao {
                                       @Param(value = "videotapeTime") String videotapeTime,
                                       @Param(value = "textDesc") String textDesc,
                                       @Param(value = "sort") String sort);
-    List<TCruisePointInstance> selectByPage(TCruisePointInstance tCruisePointInstance);
+    List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail);
 
     int batchInsert(List<TCruisePointInstance> list);
     List<TCruisePointInstance> StdMeteUnionInspectionId(@Param(value = "deviceId") Long deviceId);

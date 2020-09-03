@@ -21,9 +21,9 @@ public interface TStdDeviceAttrDao {
                                 @Param(value = "deviceModel") Integer deviceModel,
                                 @Param(value = "pmsType") String pmsType,
                                 @Param(value = "pmsId") String pmsId,
-                                @Param(value = "manufacturer") String manufacturer,
+                                @Param(value = "deviceVendor") String deviceVendor,
                                 @Param(value = "productionDate") Date productionDate,
-                                @Param(value = "openingDate") Date openingDate,
+                                @Param(value = "usedTime") Date usedTime,
                                 @Param(value = "disableDate") Date disableDate,
                                 @Param(value = "lastMaintenance") Date lastMaintenance,
                                 @Param(value = "maintenanceCount") String maintenanceCount,
@@ -34,9 +34,10 @@ public interface TStdDeviceAttrDao {
                                 @Param(value = "longitude") String longitude,
                                 @Param(value = "ip") String ip,
                                 @Param(value = "port") Integer port,
-                                @Param(value = "para1") String para1,
-                                @Param(value = "para2") String para2,
-                                @Param(value = "para3") String para3);
+                                @Param(value = "voltageLevel") String voltageLevel,
+                                @Param(value = "sequencePoint") String sequencePoint,
+                                @Param(value = "realCode") String realCode,
+                                @Param(value = "address") String address);
     List<TStdDeviceAttr> selectByPage(TStdDeviceAttr tStdDeviceAttr);
 
     int batchInsert(List<TStdDeviceAttr> list);

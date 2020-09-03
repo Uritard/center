@@ -595,14 +595,14 @@ public class TemplateToImportController {
                     tStdDeviceAttr.setPmsType(pmsType);//第18列
                 }
 
-                String manufacturer = null;
+                String deviceVendor = null;
                 if (row.getCell(18) != null && row.getCell(18).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     errMsg.append("第" + (i + 1) + "行," + "S列,点号不是字符串类型<br>");
                     log.error("模板有误:" + errMsg);
                     break;
                 } else {
-                    manufacturer = (row.getCell(18).getStringCellValue() == null || "".equals(row.getCell(18).getStringCellValue())) ? manufacturer : row.getCell(18).getStringCellValue();
-                    tStdDeviceAttr.setManufacturer(manufacturer);//第19列
+                    deviceVendor = (row.getCell(18).getStringCellValue() == null || "".equals(row.getCell(18).getStringCellValue())) ? deviceVendor : row.getCell(18).getStringCellValue();
+                    tStdDeviceAttr.setDeviceVendor(deviceVendor);//第19列
                 }
                 Date productionDate = null;
                 if (row.getCell(19) != null && row.getCell(19).getCellTypeEnum().equals(CellType.STRING)) {
@@ -613,14 +613,14 @@ public class TemplateToImportController {
                     productionDate = (row.getCell(19).getDateCellValue() == null || "".equals(row.getCell(19).getDateCellValue())) ? productionDate : row.getCell(19).getDateCellValue();
                     tStdDeviceAttr.setProductionDate(productionDate);//第20列
                 }
-                Date openingDate = null;
+                Date usedTime = null;
                 if (row.getCell(20) != null && row.getCell(20).getCellTypeEnum().equals(CellType.STRING)) {
                     errMsg.append("第" + (i + 1) + "行," + "U列,点号不是日期类型<br>");
                     log.error("模板有误:" + errMsg);
                     break;
                 } else {
-                    openingDate = (row.getCell(20).getDateCellValue() == null || "".equals(row.getCell(20).getDateCellValue())) ? openingDate : row.getCell(20).getDateCellValue();
-                    tStdDeviceAttr.setOpeningDate(openingDate);//第21列
+                    usedTime = (row.getCell(20).getDateCellValue() == null || "".equals(row.getCell(20).getDateCellValue())) ? usedTime : row.getCell(20).getDateCellValue();
+                    tStdDeviceAttr.setUsedTime(usedTime);//第21列
                 }
                 Date disableDate = null;
                 if (row.getCell(21) != null && row.getCell(21).getCellTypeEnum().equals(CellType.STRING)) {
@@ -712,32 +712,32 @@ public class TemplateToImportController {
                     port = new Double(row.getCell(30).getNumericCellValue()).intValue();
                     tStdDeviceAttr.setPort(port);//第30列
                 }
-                String para1 = null;
+                String voltageLevel = null;
                 if (row.getCell(31) != null && row.getCell(31).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     errMsg.append("第" + (i + 1) + "行," + "AF列,点号不是字符串类型<br>");
                     log.error("模板有误:" + errMsg);
                     break;
                 } else {
-                    para1 = (row.getCell(31).getStringCellValue() == null || "".equals(row.getCell(31).getStringCellValue())) ? para1 : row.getCell(31).getStringCellValue();
-                    tStdDeviceAttr.setPara1(para1);//第32列
+                    voltageLevel = (row.getCell(31).getStringCellValue() == null || "".equals(row.getCell(31).getStringCellValue())) ? voltageLevel : row.getCell(31).getStringCellValue();
+                    tStdDeviceAttr.setVoltageLevel(voltageLevel);//第32列
                 }
-                String para2 = null;
+                String sequencePoint = null;
                 if (row.getCell(32) != null && row.getCell(32).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     errMsg.append("第" + (i + 1) + "行," + "AG列,点号不是字符串类型<br>");
                     log.error("模板有误:" + errMsg);
                     break;
                 } else {
-                    para2 = (row.getCell(32).getStringCellValue() == null || "".equals(row.getCell(32).getStringCellValue())) ? para2 : row.getCell(32).getStringCellValue();
-                    tStdDeviceAttr.setPara2(para2);//第33列
+                    sequencePoint = (row.getCell(32).getStringCellValue() == null || "".equals(row.getCell(32).getStringCellValue())) ? sequencePoint : row.getCell(32).getStringCellValue();
+                    tStdDeviceAttr.setSequencePoint(sequencePoint);//第33列
                 }
-                String para3 = null;
+                String realCode = null;
                 if (row.getCell(33) != null && row.getCell(33).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     errMsg.append("第" + (i + 1) + "行," + "AH列,点号不是字符串类型<br>");
                     log.error("模板有误:" + errMsg);
                     break;
                 } else {
-                    para3 = (row.getCell(33).getStringCellValue() == null || "".equals(row.getCell(33).getStringCellValue())) ? para3 : row.getCell(33).getStringCellValue();
-                    tStdDeviceAttr.setPara3(para3);//第34列
+                    realCode = (row.getCell(33).getStringCellValue() == null || "".equals(row.getCell(33).getStringCellValue())) ? realCode : row.getCell(33).getStringCellValue();
+                    tStdDeviceAttr.setRealCode(realCode);//第34列
                 }
                 tStdDeviceAttrList.add(tStdDeviceAttr);
             }

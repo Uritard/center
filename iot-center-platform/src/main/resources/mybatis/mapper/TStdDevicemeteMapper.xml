@@ -219,38 +219,40 @@
     </select>
 
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="java.util.HashMap">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
-        a.device_mete_id deviceMeteId,
-        a.device_id deviceId,
-        a.custom_id customId,
-        a.mete_id meteId,
-        a.mete_type meteType,
-        d.dict_note meteTypeName,
-        a.mete_name meteName,
-        a.device_type deviceType,
-        b.dict_note deviceTypeName,
-        a.custom_type customType,
-        a.position_type positionType,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_type,
+        d.dict_note as meteTypeName,
+        a.mete_name,
+        a.device_type,
+        a.custom_type,
+        a.position_type,
         a.unit unit,
-        a.alarm_note alarmNote,
-        a.alarm_type alarmType,
-        a.up_effect upEffect,
-        a.low_effect lowEffect,
-        a.alarm_level alarmLevel,
-        a.high_limit1 highLimit1,
-        a.low_limit1 lowLimit1,
-        a.high_limit2 highLimit2,
-        a.low_limit2 lowLimit2,
-        a.alarm_delay alarmDelay,
-        a.alarm_cnt alarmCnt,
-        a.threshold_abs thresholdAbs,
-        a.threshold_per thresholdPer,
-        a.modulus modulus,
-        a.remark remark
-        from t_std_devicemete a, t_dict_business b,t_dict_business d
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.low_effect ,
+        a.alarm_level ,
+        a.high_limit1 ,
+        a.low_limit1 ,
+        a.high_limit2 ,
+        a.low_limit2 ,
+        a.alarm_delay ,
+        a.alarm_cnt ,
+        a.threshold_abs ,
+        a.threshold_per ,
+        a.modulus ,
+        a.remark ,
+        d.dict_note as alarmTypeName,
+        e.device_name as deviceName,
+        e.custom_name as customName
+        from t_std_devicemete a, t_dict_business b,t_dict_business d,t_std_device e
         where 1 = 1
-        and b.dict_code = a.device_type and d.dict_code = a.mete_type
+        and b.dict_code = a.mete_type and a.alarm_type=d.dict_code and a.device_id = e.deviceId
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>

@@ -197,7 +197,7 @@
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail">
         select
         a.instance_id,
         a.device_mete_id,
@@ -220,9 +220,13 @@
         a.if_videotape,
         a.videotape_time,
         a.text_desc,
-        a.sort
-        from t_cruise_point_instance a
-        where 1 = 1
+        a.sort,
+        b.device_name as deviceName,
+        b.custom_name as customName,
+        e.real_code as realId,
+        f.dict_note as deviceTypeNmae
+        from t_cruise_point_instance a,t_std_device b,t_std_device_attr e,t_dict_business f
+        where 1 = 1 and a.device_id = b.device_id and a.custom_id= b.custom_id and a.device_id = e.device_id and b.device_type = f.dict_code
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
@@ -245,6 +249,11 @@
         <if test="videotapeTime != null and videotapeTime != ''"> and a.videotape_time = #{videotapeTime, jdbcType=VARCHAR}</if>
         <if test="textDesc != null and textDesc != ''"> and a.text_desc = #{textDesc, jdbcType=VARCHAR}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and b.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="realId != null and realId != ''"> and e.real_code like concat('%',#{realId, jdbcType=VARCHAR},'%') </if>
+        <if test="deviceType != null and deviceType != ''"> and f.dict_code = #{deviceType, jdbcType=VARCHAR}</if>
+
+
     </select>
 
     <insert id="batchInsert">

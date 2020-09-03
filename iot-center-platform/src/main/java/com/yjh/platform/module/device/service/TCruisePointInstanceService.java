@@ -3,6 +3,8 @@ package com.yjh.platform.module.device.service;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import java.util.*;
+
+import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.java.Log;
@@ -54,9 +56,9 @@ public class TCruisePointInstanceService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruisePointInstance> selectByPage(TCruisePointInstance tCruisePointInstance) {
-        List<TCruisePointInstance> tCruisePointInstanceList = tCruisePointInstanceDao.selectByPage(tCruisePointInstance);
-        return tCruisePointInstanceList;
+    public List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail) {
+        List<TCruisePointInstanceDetail> list = tCruisePointInstanceDao.selectByPage(tCruisePointInstanceDetail);
+        return list;
     }
 
     @Logs(title = "批量插入", code = "module")

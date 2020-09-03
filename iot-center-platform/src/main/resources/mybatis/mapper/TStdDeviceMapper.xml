@@ -18,8 +18,8 @@
         <result column="custom_name" jdbcType="VARCHAR" property="customName" />
         <result column="custom_type" jdbcType="INTEGER" property="customType" />
         <result column="status" jdbcType="INTEGER" property="status" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -43,9 +43,7 @@
             up_region_name,
             custom_name,
             custom_type,
-            status,
-            update_time,
-            create_time
+            status
         )values(
                 #{deviceId, jdbcType=BIGINT},
                 #{customId, jdbcType=VARCHAR},
@@ -60,9 +58,7 @@
                 #{upRegionName, jdbcType=VARCHAR},
                 #{customName, jdbcType=VARCHAR},
                 #{customType, jdbcType=INTEGER},
-                #{status, jdbcType=INTEGER},
-                #{updateTime, jdbcType=TIMESTAMP},
-                #{createTime, jdbcType=TIMESTAMP}
+                #{status, jdbcType=INTEGER}
         )
     </insert>
 
@@ -95,8 +91,6 @@
         <if test="customName != null and customName != ''">a.custom_name = #{customName, jdbcType=VARCHAR},</if>
         <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
-        <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
@@ -127,43 +121,46 @@
 
     <select id="selectByPrimaryIdAll" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
-        a.device_id,
-        a.custom_id,
-        a.device_code,
-        a.device_name,
-        a.alias_name,
-        a.device_type,
-        a.position_type,
-        a.model_id,
-        a.region_path,
-        a.up_region_id,
-        a.up_region_name,
-        a.custom_name,
-        a.custom_type,
-        a.status,
-        a.update_time,
-        a.create_time,
-        b.device_model,
-        b.pms_type,
-        b.pms_id,
-        b.manufacturer,
-        b.production_date,
-        b.opening_date,
-        b.disable_date,
-        b.last_maintenance,
-        b.maintenance_count,
-        b.organization,
-        b.department,
-        b.responsible_person,
-        b.latitude,
+        a.device_id as deviceId,
+        a.custom_id as customId,
+        a.device_code as deviceCode,
+        a.device_name as deviceName,
+        a.alias_name as aliasName,
+        a.device_type as deviceType,
+        a.position_type as positionType,
+        a.model_id as modelId,
+        a.region_path as regionPath,
+        a.up_region_id as upRegionId,
+        a.up_region_name as upRegionName,
+        a.custom_name as customName,
+        a.custom_type as customType,
+        a.status as status,
+        a.update_time as updateTime,
+        a.create_time as createTime,
+        e.dict_note as devideModelName,
+        b.pms_type as pmsType,
+        b.pms_id as pmsId,
+        f.dict_note as deviceVendor,
+        b.production_date as productionDate,
+        b.used_time usedTime,
+        b.disable_date disableDate,
+        b.last_maintenance as lastMaintenance,
+        b.maintenance_count as maintenanceCount,
+        b.organization as organization,
+        b.department as department,
+        b.responsible_person as responsiblePerson,
+        b.latitude as latitude,
         b.longitude,
         b.ip,
         b.port,
-        b.para_1,
-        b.para_2,
-        b.para_3
-        from t_std_device a,t_std_device_attr b
-        where  1 = 1 and a.device_id = b.device_id and a.device_id = #{deviceId, jdbcType=BIGINT}
+        g.dict_note as voltageLevel,
+        b.sequence_point as sequencePoint,
+        b.real_code realCode,
+        b.address,
+        d.model_name as modelName
+        from t_std_device a,t_std_device_attr b,t_std_metemodel d,t_dict_business e,t_dict_business f,t_dict_business g
+         where 1 = 1 and a.device_id = b.device_id and d.model_id=a.model_id and b.device_model = e.dict_code and b.device_vendor=f.dict_code and b.voltage_level=g.dict_code
+        and a.device_id = #{deviceId, jdbcType=BIGINT}
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
@@ -206,43 +203,45 @@
 
     <select id="selectAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
-        a.device_id,
-        a.custom_id,
-        a.device_code,
-        a.device_name,
-        a.alias_name,
-        a.device_type,
-        a.position_type,
-        a.model_id,
-        a.region_path,
-        a.up_region_id,
-        a.up_region_name,
-        a.custom_name,
-        a.custom_type,
-        a.status,
-        a.update_time,
-        a.create_time,
-        b.device_model,
-        b.pms_type,
-        b.pms_id,
-        b.manufacturer,
-        b.production_date,
-        b.opening_date,
-        b.disable_date,
-        b.last_maintenance,
-        b.maintenance_count,
-        b.organization,
-        b.department,
-        b.responsible_person,
-        b.latitude,
+        a.device_id as deviceId,
+        a.custom_id as customId,
+        a.device_code as deviceCode,
+        a.device_name as deviceName,
+        a.alias_name as aliasName,
+        a.device_type as deviceType,
+        a.position_type as positionType,
+        a.model_id as modelId,
+        a.region_path as regionPath,
+        a.up_region_id as upRegionId,
+        a.up_region_name as upRegionName,
+        a.custom_name as customName,
+        a.custom_type as customType,
+        a.status as status,
+        a.update_time as updateTime,
+        a.create_time as createTime,
+        e.dict_note as devideModelName,
+        b.pms_type as pmsType,
+        b.pms_id as pmsId,
+        f.dict_note as deviceVendor,
+        b.production_date as productionDate,
+        b.used_time usedTime,
+        b.disable_date disableDate,
+        b.last_maintenance as lastMaintenance,
+        b.maintenance_count as maintenanceCount,
+        b.organization as organization,
+        b.department as department,
+        b.responsible_person as responsiblePerson,
+        b.latitude as latitude,
         b.longitude,
         b.ip,
         b.port,
-        b.para_1,
-        b.para_2,
-        b.para_3
-        from t_std_device a,t_std_device_attr b
-        where 1 = 1 and a.device_id = b.device_id
+        g.dict_note as voltageLevel,
+        b.sequence_point as sequencePoint,
+        b.real_code realCode,
+        b.address,
+        d.model_name as modelName
+        from t_std_device a,t_std_device_attr b,t_std_metemodel d,t_dict_business e,t_dict_business f,t_dict_business g
+        where 1 = 1 and a.device_id = b.device_id and d.model_id=a.model_id and b.device_model = e.dict_code and b.device_vendor=f.dict_code and b.voltage_level=g.dict_code
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
@@ -259,25 +258,26 @@
         <if test="status != null "> and a.status = #{status, jdbcType=INTEGER}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceModel != null "> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
-        <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
-        <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
-        <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
-        <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="openingDate != null and openingDate != ''"> and a.opening_date = #{openingDate, jdbcType=TIMESTAMP}</if>
-        <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
-        <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
-        <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
-        <if test="organization != null and organization != ''"> and a.organization = #{organization, jdbcType=VARCHAR}</if>
-        <if test="department != null and department != ''"> and a.department = #{department, jdbcType=VARCHAR}</if>
-        <if test="responsiblePerson != null and responsiblePerson != ''"> and a.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
-        <if test="latitude != null and latitude != ''"> and a.latitude = #{latitude, jdbcType=VARCHAR}</if>
-        <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
-        <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
-        <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
-        <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
-        <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
+        <if test="deviceModel != null "> and b.device_model = #{deviceModel, jdbcType=INTEGER}</if>
+        <if test="pmsType != null and pmsType != ''"> and b.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
+        <if test="pmsId != null and pmsId != ''"> and b.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
+        <if test="deviceVendor != null and deviceVendor != ''"> and b.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
+        <if test="productionDate != null and productionDate != ''"> and b.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
+        <if test="usedTime != null and usedTime != ''"> and b.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
+        <if test="disableDate != null and disableDate != ''"> and b.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
+        <if test="lastMaintenance != null and lastMaintenance != ''"> and b.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
+        <if test="maintenanceCount != null and maintenanceCount != ''"> and b.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
+        <if test="organization != null and organization != ''"> and b.organization = #{organization, jdbcType=VARCHAR}</if>
+        <if test="department != null and department != ''"> and b.department = #{department, jdbcType=VARCHAR}</if>
+        <if test="responsiblePerson != null and responsiblePerson != ''"> and b.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
+        <if test="latitude != null and latitude != ''"> and b.latitude = #{latitude, jdbcType=VARCHAR}</if>
+        <if test="longitude != null and longitude != ''"> and b.longitude = #{longitude, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and b.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="port != null "> and b.port = #{port, jdbcType=INTEGER}</if>
+        <if test="voltageLevel != null and voltageLevel != ''"> and b.voltage_level = #{voltageLevel, jdbcType=VARCHAR}</if>
+        <if test="sequencePoint != null and sequencePoint != ''"> and b.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
+        <if test="realCode != null and realCode != ''"> and b.real_code = #{realCode, jdbcType=VARCHAR}</if>
+        <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
@@ -320,43 +320,45 @@
 
     <select id="selectByPageAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
-        a.device_id,
-        a.custom_id,
-        a.device_code,
-        a.device_name,
-        a.alias_name,
-        a.device_type,
-        a.position_type,
-        a.model_id,
-        a.region_path,
-        a.up_region_id,
-        a.up_region_name,
-        a.custom_name,
-        a.custom_type,
-        a.status,
-        a.update_time,
-        a.create_time,
-        b.device_model,
-        b.pms_type,
-        b.pms_id,
-        b.manufacturer,
-        b.production_date,
-        b.opening_date,
-        b.disable_date,
-        b.last_maintenance,
-        b.maintenance_count,
-        b.organization,
-        b.department,
-        b.responsible_person,
-        b.latitude,
+        a.device_id as deviceId,
+        a.custom_id as customId,
+        a.device_code as deviceCode,
+        a.device_name as deviceName,
+        a.alias_name as aliasName,
+        a.device_type as deviceType,
+        a.position_type as positionType,
+        a.model_id as modelId,
+        a.region_path as regionPath,
+        a.up_region_id as upRegionId,
+        a.up_region_name as upRegionName,
+        a.custom_name as customName,
+        a.custom_type as customType,
+        a.status as status,
+        a.update_time as updateTime,
+        a.create_time as createTime,
+        e.dict_note as devideModelName,
+        b.pms_type as pmsType,
+        b.pms_id as pmsId,
+        f.dict_note as deviceVendor,
+        b.production_date as productionDate,
+        b.used_time usedTime,
+        b.disable_date disableDate,
+        b.last_maintenance as lastMaintenance,
+        b.maintenance_count as maintenanceCount,
+        b.organization as organization,
+        b.department as department,
+        b.responsible_person as responsiblePerson,
+        b.latitude as latitude,
         b.longitude,
         b.ip,
         b.port,
-        b.para_1,
-        b.para_2,
-        b.para_3
-        from t_std_device a,t_std_device_attr b
-        where 1 = 1 and a.device_id = b.device_id
+        g.dict_note as voltageLevel,
+        b.sequence_point as sequencePoint,
+        b.real_code realCode,
+        b.address,
+        d.model_name as modelName
+        from t_std_device a,t_std_device_attr b,t_std_metemodel d,t_dict_business e,t_dict_business f,t_dict_business g
+        where 1 = 1 and a.device_id = b.device_id and d.model_id=a.model_id and b.device_model = e.dict_code and b.device_vendor=f.dict_code and b.voltage_level=g.dict_code
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
@@ -373,25 +375,26 @@
         <if test="status != null "> and a.status = #{status, jdbcType=INTEGER}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceModel != null "> and a.device_model = #{deviceModel, jdbcType=INTEGER}</if>
-        <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
-        <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
-        <if test="manufacturer != null and manufacturer != ''"> and a.manufacturer = #{manufacturer, jdbcType=VARCHAR}</if>
-        <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="openingDate != null and openingDate != ''"> and a.opening_date = #{openingDate, jdbcType=TIMESTAMP}</if>
-        <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
-        <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
-        <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
-        <if test="organization != null and organization != ''"> and a.organization = #{organization, jdbcType=VARCHAR}</if>
-        <if test="department != null and department != ''"> and a.department = #{department, jdbcType=VARCHAR}</if>
-        <if test="responsiblePerson != null and responsiblePerson != ''"> and a.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
-        <if test="latitude != null and latitude != ''"> and a.latitude = #{latitude, jdbcType=VARCHAR}</if>
-        <if test="longitude != null and longitude != ''"> and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
-        <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
-        <if test="para1 != null and para1 != ''"> and a.para_1 = #{para1, jdbcType=VARCHAR}</if>
-        <if test="para2 != null and para2 != ''"> and a.para_2 = #{para2, jdbcType=VARCHAR}</if>
-        <if test="para3 != null and para3 != ''"> and a.para_3 = #{para3, jdbcType=VARCHAR}</if>
+        <if test="deviceModel != null "> and b.device_model = #{deviceModel, jdbcType=INTEGER}</if>
+        <if test="pmsType != null and pmsType != ''"> and b.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
+        <if test="pmsId != null and pmsId != ''"> and b.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
+        <if test="deviceVendor != null and deviceVendor != ''"> and b.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
+        <if test="productionDate != null and productionDate != ''"> and b.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
+        <if test="usedTime != null and usedTime != ''"> and b.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
+        <if test="disableDate != null and disableDate != ''"> and b.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
+        <if test="lastMaintenance != null and lastMaintenance != ''"> and b.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
+        <if test="maintenanceCount != null and maintenanceCount != ''"> and b.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
+        <if test="organization != null and organization != ''"> and b.organization = #{organization, jdbcType=VARCHAR}</if>
+        <if test="department != null and department != ''"> and b.department = #{department, jdbcType=VARCHAR}</if>
+        <if test="responsiblePerson != null and responsiblePerson != ''"> and b.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
+        <if test="latitude != null and latitude != ''"> and b.latitude = #{latitude, jdbcType=VARCHAR}</if>
+        <if test="longitude != null and longitude != ''"> and b.longitude = #{longitude, jdbcType=VARCHAR}</if>
+        <if test="ip != null and ip != ''"> and b.ip = #{ip, jdbcType=VARCHAR}</if>
+        <if test="port != null "> and b.port = #{port, jdbcType=INTEGER}</if>
+        <if test="voltageLevel != null and voltageLevel != ''"> and b.voltage_level = #{voltageLevel, jdbcType=VARCHAR}</if>
+        <if test="sequencePoint != null and sequencePoint != ''"> and b.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
+        <if test="realCode != null and realCode != ''"> and b.real_code = #{realCode, jdbcType=VARCHAR}</if>
+        <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectRegionById" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdRegion">
