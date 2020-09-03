@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.platform.module.user.dao.TemplateToImportDao">
 
-    <!--测点模板导入-->
+        <!--测点模板导入-->
         <insert id="batchUpdateTStdMeteModel">
             insert  into t_std_metemodel(
                 model_id,
@@ -80,12 +80,10 @@
             )
         </foreach>
         </insert>
-
         <!--获取最后一条数据的modelId-->
         <select id="selectLastModelId" resultType="java.lang.Long">
              select model_id from t_std_metemodel order by model_id DESC limit 1;
         </select>
-
         <!--标准化设备导入-->
         <insert id="batchUpdateTStdDevice">
             insert  into t_std_device(
@@ -247,5 +245,406 @@
                 )
             </foreach>
         </insert>
-
+        <!--组织数据导入-->
+        <insert id="batchUpdateSysOrg">
+            insert  into sys_org(
+            org_id,
+            org_name,
+            org_code,
+            up_id,
+            sort,
+            create_time,
+            creator_id,
+            org_level,
+            org_path,
+            dept_name
+            ) values
+            <foreach collection="sysOrgList" item="SysOrg" separator=",">
+                (
+                null,
+                #{SysOrg.orgName, jdbcType=VARCHAR},
+                #{SysOrg.orgCode, jdbcType=VARCHAR},
+                #{SysOrg.upId, jdbcType=BIGINT},
+                #{SysOrg.sort, jdbcType=INTEGER},
+                #{SysOrg.createTime, jdbcType=TIMESTAMP},
+                #{SysOrg.creatorId, jdbcType=BIGINT},
+                #{SysOrg.orgLevel, jdbcType=INTEGER},
+                #{SysOrg.orgPath, jdbcType=VARCHAR},
+                #{SysOrg.deptName, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--系统用户数据导入-->
+        <insert id="batchUpdateSysUser">
+            insert  into sys_user(
+            user_id,
+            user_name,
+            password,
+            true_name,
+            user_type,
+            sex,
+            e_mail,
+            mobile_phone,
+            work_no,
+            face_id,
+            finger_id,
+            voice_id,
+            state,
+            user_title,
+            creator_id,
+            appkey,
+            image_url,
+            role_id,
+            org_id,
+            user_status,
+            create_time,
+            update_time,
+            invalid_time,
+            last_login
+            ) values
+            <foreach collection="sysUserList" item="SysUser" separator=",">
+                (
+                null,
+                #{SysUser.userName, jdbcType=VARCHAR},
+                #{SysUser.password, jdbcType=VARCHAR},
+                #{SysUser.trueName, jdbcType=VARCHAR},
+                #{SysUser.userType, jdbcType=INTEGER},
+                #{SysUser.sex, jdbcType=INTEGER},
+                #{SysUser.eMail, jdbcType=VARCHAR},
+                #{SysUser.mobilePhone, jdbcType=VARCHAR},
+                #{SysUser.workNo, jdbcType=VARCHAR},
+                #{SysUser.faceId, jdbcType=VARCHAR},
+                #{SysUser.fingerId, jdbcType=VARCHAR},
+                #{SysUser.voiceId, jdbcType=VARCHAR},
+                #{SysUser.state, jdbcType=INTEGER},
+                #{SysUser.userTitle, jdbcType=VARCHAR},
+                #{SysUser.creatorId, jdbcType=BIGINT},
+                #{SysUser.appkey, jdbcType=VARCHAR},
+                #{SysUser.imageUrl, jdbcType=VARCHAR},
+                #{SysUser.roleId, jdbcType=BIGINT},
+                #{SysUser.orgId, jdbcType=BIGINT},
+                #{SysUser.userStatus, jdbcType=INTEGER},
+                #{SysUser.createTime, jdbcType=TIMESTAMP},
+                #{SysUser.updateTime, jdbcType=TIMESTAMP},
+                #{SysUser.invalidTime, jdbcType=TIMESTAMP},
+                #{SysUser.lastLogin, jdbcType=TIMESTAMP}
+                )
+            </foreach>
+        </insert>
+        <!--用户备份数据导入-->
+        <insert id="batchUpdateSysUserBackup">
+            insert  into sys_user_backup(
+            user_id,
+            user_name,
+            password,
+            true_name,
+            user_type,
+            sex,
+            e_mail,
+            mobile_phone,
+            work_no,
+            state,
+            user_level,
+            creator_id,
+            secret,
+            appkey,
+            image_url,
+            role_id,
+            org_id,
+            user_status,
+            create_time,
+            update_time,
+            last_login
+            ) values
+            <foreach collection="sysUserBackupList" item="SysUserBackUp" separator=",">
+                (
+                null,
+                #{SysUserBackUp.userName, jdbcType=VARCHAR},
+                #{SysUserBackUp.password, jdbcType=VARCHAR},
+                #{SysUserBackUp.trueName, jdbcType=VARCHAR},
+                #{SysUserBackUp.userType, jdbcType=INTEGER},
+                #{SysUserBackUp.sex, jdbcType=INTEGER},
+                #{SysUserBackUp.eMail, jdbcType=VARCHAR},
+                #{SysUserBackUp.mobilePhone, jdbcType=VARCHAR},
+                #{SysUserBackUp.workNo, jdbcType=VARCHAR},
+                #{SysUserBackUp.state, jdbcType=INTEGER},
+                #{SysUserBackUp.userLevel, jdbcType=INTEGER},
+                #{SysUserBackUp.creatorId, jdbcType=BIGINT},
+                #{SysUserBackUp.secret, jdbcType=VARCHAR},
+                #{SysUserBackUp.appkey, jdbcType=VARCHAR},
+                #{SysUserBackUp.imageUrl, jdbcType=VARCHAR},
+                #{SysUserBackUp.roleId, jdbcType=BIGINT},
+                #{SysUserBackUp.orgId, jdbcType=BIGINT},
+                #{SysUserBackUp.userStatus, jdbcType=INTEGER},
+                #{SysUserBackUp.createTime, jdbcType=TIMESTAMP},
+                #{SysUserBackUp.updateTime, jdbcType=TIMESTAMP},
+                #{SysUserBackUp.lastLogin, jdbcType=TIMESTAMP}
+                )
+            </foreach>
+        </insert>
+        <!--机器人区域数据导入-->
+        <insert id="batchUpdateTRobotRegion">
+            insert  into t_robot_region(
+            region_id               ,
+            region_name,
+            sort,
+            up_region_id,
+            up_region_ids,
+            region_type,
+            station_id,
+            station_name,
+            state,
+            create_time
+            ) values
+            <foreach collection="tRobotRegionList" item="TRobotRegion" separator=",">
+                (
+                #{TRobotRegion.regionId, jdbcType=BIGINT},
+                #{TRobotRegion.regionName, jdbcType=VARCHAR},
+                #{TRobotRegion.sort, jdbcType=INTEGER},
+                #{TRobotRegion.upRegionId, jdbcType=BIGINT},
+                #{TRobotRegion.upRegionIds, jdbcType=VARCHAR},
+                #{TRobotRegion.regionType, jdbcType=INTEGER},
+                #{TRobotRegion.stationId, jdbcType=VARCHAR},
+                #{TRobotRegion.stationName, jdbcType=VARCHAR},
+                #{TRobotRegion.state, jdbcType=INTEGER},
+                #{TRobotRegion.createTime, jdbcType=TIMESTAMP}
+                )
+            </foreach>
+        </insert>
+        <!--获取标准区域表的最后一条regionId-->
+        <select id="selectLastRegionId" resultType="java.lang.Long">
+             select region_id from t_std_region order by region_id DESC limit 1;
+        </select>
+        <!--标准区域数据导入-->
+        <insert id="batchUpdateTStdRegion">
+            insert  into t_std_region(
+            region_id,
+            region_name,
+            sort,
+            up_region_id,
+            up_region_ids,
+            region_code,
+            station_id,
+            station_name,
+            state,
+            create_time
+            ) values
+            <foreach collection="tStdRegionList" item="TStdRegion" separator=",">
+                (
+                null,
+                #{TStdRegion.regionName, jdbcType=VARCHAR},
+                #{TStdRegion.sort, jdbcType=INTEGER},
+                #{TStdRegion.upRegionId, jdbcType=BIGINT},
+                #{TStdRegion.upRegionIds, jdbcType=VARCHAR},
+                #{TStdRegion.regionCode, jdbcType=INTEGER},
+                #{TStdRegion.stationId, jdbcType=VARCHAR},
+                #{TStdRegion.stationName, jdbcType=VARCHAR},
+                #{TStdRegion.state, jdbcType=INTEGER},
+                #{TStdRegion.createTime, jdbcType=TIMESTAMP}
+                )
+            </foreach>
+        </insert>
+        <!--权限区域数据导入-->
+        <insert id="batchUpdateSysRoleRegion">
+            insert  into sys_role_region(
+            role_id,
+            region_id,
+            is_checked
+            ) values
+            <foreach collection="sysRoleRegionList" item="SysRoleRegion" separator=",">
+                (
+                #{SysRoleRegion.roleId, jdbcType=BIGINT},
+                #{SysRoleRegion.regionId, jdbcType=BIGINT},
+                #{SysRoleRegion.isChecked, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--遥测量数据导入-->
+        <insert id="batchUpdateTCfgTelemeter">
+            insert  into t_cfg_telemeter(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            limit_band,
+            change_limit,
+            valid_mid,
+            valid_string,
+            invalid_value,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            hilimit1,
+            lolimit1,
+            hilimit2,
+            lolimit2,
+            hilimit3,
+            lolimit3,
+            hilimit4,
+            lolimit4,
+            stander,
+            isshield,
+            storageperiod,
+            link_mete_id
+            ) values
+            <foreach collection="tCfgTelemeterList" item="tCfgTelemeter" separator=",">
+                (
+                #{tCfgTelemeter.deviceId, jdbcType=VARCHAR},
+                #{tCfgTelemeter.meteId, jdbcType=VARCHAR},
+                #{tCfgTelemeter.meteName, jdbcType=VARCHAR},
+                #{tCfgTelemeter.upEffect, jdbcType=REAL},
+                #{tCfgTelemeter.lowEffect, jdbcType=REAL},
+                #{tCfgTelemeter.metePrecision, jdbcType=INTEGER},
+                #{tCfgTelemeter.unit, jdbcType=VARCHAR},
+                #{tCfgTelemeter.meteIndex, jdbcType=INTEGER},
+                #{tCfgTelemeter.meteCid, jdbcType=INTEGER},
+                #{tCfgTelemeter.limitBand, jdbcType=REAL},
+                #{tCfgTelemeter.changeLimit, jdbcType=REAL},
+                #{tCfgTelemeter.validMid, jdbcType=VARCHAR},
+                #{tCfgTelemeter.validString, jdbcType=VARCHAR},
+                #{tCfgTelemeter.invalidValue, jdbcType=REAL},
+                #{tCfgTelemeter.lastValue, jdbcType=REAL},
+                #{tCfgTelemeter.lastTime, jdbcType=TIMESTAMP},
+                #{tCfgTelemeter.meteCode, jdbcType=VARCHAR},
+                #{tCfgTelemeter.deviceType, jdbcType=VARCHAR},
+                #{tCfgTelemeter.description, jdbcType=VARCHAR},
+                #{tCfgTelemeter.hilimit1, jdbcType=REAL},
+                #{tCfgTelemeter.lolimit1, jdbcType=REAL},
+                #{tCfgTelemeter.hilimit2, jdbcType=REAL},
+                #{tCfgTelemeter.lolimit2, jdbcType=REAL},
+                #{tCfgTelemeter.hilimit3, jdbcType=REAL},
+                #{tCfgTelemeter.lolimit3, jdbcType=REAL},
+                #{tCfgTelemeter.hilimit4, jdbcType=REAL},
+                #{tCfgTelemeter.lolimit4, jdbcType=REAL},
+                #{tCfgTelemeter.stander, jdbcType=REAL},
+                #{tCfgTelemeter.isshield, jdbcType=INTEGER},
+                #{tCfgTelemeter.storageperiod, jdbcType=BIGINT},
+                #{tCfgTelemeter.linkMeteId, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--遥信量数据导入-->
+        <insert id="batchUpdateTCfgTelesignal">
+            insert  into t_cfg_telesignal(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            low_effect,
+            mete_index,
+            mete_cid,
+            signal_kind,
+            last_value,
+            last_time,
+            explain_type,
+            report_type,
+            report_level,
+            mask_type,
+            mask_mid,
+            mask_string,
+            mask_value,
+            delay_time,
+            mete_code,
+            device_type,
+            description,
+            isshield,
+            storageperiod,
+            describer,
+            alarmthresbhold,
+            alarmlevel,
+            link_mete_id
+            ) values
+            <foreach collection="tCfgTelesignalList" item="TCfgTelesignal" separator=",">
+                (
+                #{TCfgTelesignal.deviceId, jdbcType=VARCHAR},
+                #{TCfgTelesignal.meteId, jdbcType=VARCHAR},
+                #{TCfgTelesignal.meteName, jdbcType=VARCHAR},
+                #{TCfgTelesignal.upEffect, jdbcType=INTEGER},
+                #{TCfgTelesignal.lowEffect, jdbcType=INTEGER},
+                #{TCfgTelesignal.meteIndex, jdbcType=INTEGER},
+                #{TCfgTelesignal.meteCid, jdbcType=INTEGER},
+                #{TCfgTelesignal.signalKind, jdbcType=INTEGER},
+                #{TCfgTelesignal.lastValue, jdbcType=INTEGER},
+                #{TCfgTelesignal.lastTime, jdbcType=TIMESTAMP},
+                #{TCfgTelesignal.explainType, jdbcType=INTEGER},
+                #{TCfgTelesignal.reportType, jdbcType=INTEGER},
+                #{TCfgTelesignal.reportLevel, jdbcType=INTEGER},
+                #{TCfgTelesignal.maskType, jdbcType=INTEGER},
+                #{TCfgTelesignal.maskMid, jdbcType=VARCHAR},
+                #{TCfgTelesignal.maskString, jdbcType=VARCHAR},
+                #{TCfgTelesignal.maskValue, jdbcType=INTEGER},
+                #{TCfgTelesignal.delayTime, jdbcType=INTEGER},
+                #{TCfgTelesignal.meteCode, jdbcType=VARCHAR},
+                #{TCfgTelesignal.deviceType, jdbcType=VARCHAR},
+                #{TCfgTelesignal.description, jdbcType=VARCHAR},
+                #{TCfgTelesignal.isshield, jdbcType=INTEGER},
+                #{TCfgTelesignal.storageperiod, jdbcType=BIGINT},
+                #{TCfgTelesignal.describer, jdbcType=VARCHAR},
+                #{TCfgTelesignal.alarmthresbhold, jdbcType=INTEGER},
+                #{TCfgTelesignal.alarmlevel, jdbcType=INTEGER},
+                #{TCfgTelesignal.linkMeteId, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--算法数据导入-->
+        <insert id="batchUpdateTAlgorithmInfo">
+            insert  into t_algorithm_info(
+            algorithm_id,
+            algorithm_name,
+            algorithm_type,
+            describel,
+            algorithm_code,
+            analys_type
+            ) values
+            <foreach collection="tAlgorithmInfoList" item="tAlgorithmInfo" separator=",">
+                (
+                #{tAlgorithmInfo.algorithmId, jdbcType=BIGINT},
+                #{tAlgorithmInfo.algorithmName, jdbcType=VARCHAR},
+                #{tAlgorithmInfo.algorithmType, jdbcType=VARCHAR},
+                #{tAlgorithmInfo.describel, jdbcType=VARCHAR},
+                #{tAlgorithmInfo.algorithmCode, jdbcType=INTEGER},
+                #{tAlgorithmInfo.analysType, jdbcType=VARCHAR}
+                )
+            </foreach>
+        </insert>
+        <!--算法配置导入-->
+        <insert id="batchUpdateTAlgorithmConf">
+            insert  into t_algorithm_conf(
+            ins_id,
+            algorithm_id,
+            ins_name,
+            inspectiondev_id,
+            algorithm_name,
+            status,
+            if_del,
+            if_show,
+            pic_url,
+            apply_module,
+            create_time,
+            update_time
+            ) values
+            <foreach collection="tAlgorithmConfList" item="tAlgorithmConf" separator=",">
+                (
+                #{tAlgorithmConf.insId, jdbcType=VARCHAR},
+                #{tAlgorithmConf.algorithmId, jdbcType=BIGINT},
+                #{tAlgorithmConf.insName, jdbcType=VARCHAR},
+                #{tAlgorithmConf.inspectiondevId, jdbcType=BIGINT},
+                #{tAlgorithmConf.algorithmName, jdbcType=VARCHAR},
+                #{tAlgorithmConf.status, jdbcType=INTEGER},
+                #{tAlgorithmConf.ifDel, jdbcType=INTEGER},
+                #{tAlgorithmConf.ifShow, jdbcType=INTEGER},
+                #{tAlgorithmConf.picUrl, jdbcType=VARCHAR},
+                #{tAlgorithmConf.applyModule, jdbcType=INTEGER},
+                #{tAlgorithmConf.createTime, jdbcType=TIMESTAMP},
+                #{tAlgorithmConf.updateTime, jdbcType=TIMESTAMP}
+                )
+            </foreach>
+        </insert>
 </mapper>
