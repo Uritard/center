@@ -1,11 +1,15 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.module.task.entity.CruiseResultCounter;
 import com.yjh.platform.module.task.service.TCruiseTaskResultService;
 import com.yjh.platform.module.task.entity.TCruiseTaskResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+
+
+import org.jboss.netty.util.internal.ReusableIterator;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -153,8 +157,8 @@ public class TCruiseTaskResultController {
         return result;
     }
 
-    @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
-    @RequestMapping(value = "/selectCruiseTaskResult",method = RequestMethod.GET)
+    @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息(巡检点信息初始化)")
+    @RequestMapping(value = "/selectIniCruiseTaskResult",method = RequestMethod.GET)
     public Result selectCruiseTaskResult(@RequestParam Long taskId){
         Result result=new Result();
         try {
@@ -164,6 +168,79 @@ public class TCruiseTaskResultController {
             log.error("失败描述：", e);
         }
 
+        return result;
+
+    }
+
+    @ApiOperation(value = "A-获取当前任务的巡检点结果信息(巡检点结果)")
+    @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.POST)
+    public Result selectCurrentCruiseTaskResult(@RequestParam(value = "taskId") Long taskId,
+                                                @RequestParam(value = "cruiseId") Long cruiseId,
+                                                @RequestBody List<Map> cruiseResult){
+        Result result=new Result();
+        try {
+            result.setData(tCruiseTaskResultService.selectCurrentCruiseTaskResult(taskId,cruiseId,cruiseResult));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+
+        return result;
+
+    }
+
+    @ApiOperation(value = "A-获取巡检任务进度")
+    @RequestMapping(value = "selectCruiseAdvance",method = RequestMethod.GET)
+    public Result selectCruiseAdvance(@RequestParam Long taskId){
+        Result result=new Result();
+       try{
+           result.setData(tCruiseTaskResultService.selectCruiseAdvance(taskId));
+       }catch (Exception e){
+           result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+           log.error("失败描述",e);
+       }
+
+        return  result;
+    }
+
+    @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数")
+    @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
+    public Result selectCruiseStatusCount(@RequestParam Long taskId){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.selectCruiseStatusCount(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "C-获取当前任务运行累计时间")
+    @RequestMapping(value = "selectTaskRunniTime",method = RequestMethod.GET)
+    public Result selectTaskRunningTime(@RequestParam Long taskId){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.selectTaskRunningTime(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+
+        return  result;
+    }
+
+    @ApiOperation(value = "C-获取当前任务下的机器人信息以及机器人工作巡检点结果状态")
+    @RequestMapping(value = "selectRobotAndCruiseResult",method = RequestMethod.GET)
+    public Result selectRobotAndCruiseResult(@RequestParam Long taskId){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.selectRobotAndCruiseResult(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
         return result;
 
     }
