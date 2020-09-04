@@ -170,7 +170,7 @@ public class TStdDeviceService{
         tStdDeviceAttr.setProductionDate(tStdDeviceDetail.getProductionDate());
         tStdDeviceAttr.setResponsiblePerson(tStdDeviceDetail.getResponsiblePerson());
         tStdDeviceAttr.setAddress(tStdDeviceDetail.getAddress());
-        return this.tStdDeviceDao.update(tStdDevice)+tStdDeviceAttrDao.update(tStdDeviceAttr);
+        return this.tStdDeviceDao.update(tStdDevice)+ this.tStdDeviceAttrDao.update(tStdDeviceAttr);
     }
 
     @Logs(title = "主键查询", code = "module")

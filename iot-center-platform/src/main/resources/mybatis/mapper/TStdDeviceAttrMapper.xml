@@ -93,10 +93,10 @@
         <if test="pmsType != null and pmsType != ''">a.pms_type = #{pmsType, jdbcType=VARCHAR},</if>
         <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
         <if test="deviceVendor != null and deviceVendor != ''">a.device_vendor = #{deviceVendor, jdbcType=VARCHAR},</if>
-        <if test="productionDate != null and productionDate != ''">a.production_date = #{productionDate, jdbcType=TIMESTAMP},</if>
-        <if test="usedTime != null and usedTime != ''">a.used_time = #{usedTime, jdbcType=TIMESTAMP},</if>
-        <if test="disableDate != null and disableDate != ''">a.disable_date = #{disableDate, jdbcType=TIMESTAMP},</if>
-        <if test="lastMaintenance != null and lastMaintenance != ''">a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP},</if>
+        <if test="productionDate != null ">a.production_date = #{productionDate, jdbcType=TIMESTAMP},</if>
+        <if test="usedTime != null ">a.used_time = #{usedTime, jdbcType=TIMESTAMP},</if>
+        <if test="disableDate != null ">a.disable_date = #{disableDate, jdbcType=TIMESTAMP},</if>
+        <if test="lastMaintenance != null ">a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP},</if>
         <if test="maintenanceCount != null and maintenanceCount != ''">a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR},</if>
         <if test="organization != null and organization != ''">a.organization = #{organization, jdbcType=VARCHAR},</if>
         <if test="department != null and department != ''">a.department = #{department, jdbcType=VARCHAR},</if>
@@ -172,10 +172,10 @@
         <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
         <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="deviceVendor != null and deviceVendor != ''"> and a.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
-        <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="usedTime != null and usedTime != ''"> and a.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
-        <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
-        <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
+        <if test="productionDate != null "> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
+        <if test="usedTime != null "> and a.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
+        <if test="disableDate != null "> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
+        <if test="lastMaintenance != null"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
         <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
         <if test="organization != null and organization != ''"> and a.organization = #{organization, jdbcType=VARCHAR}</if>
         <if test="department != null and department != ''"> and a.department = #{department, jdbcType=VARCHAR}</if>
@@ -220,10 +220,10 @@
         <if test="pmsType != null and pmsType != ''"> and a.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
         <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="deviceVendor != null and deviceVendor != ''"> and a.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
-        <if test="productionDate != null and productionDate != ''"> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="usedTime != null and usedTime != ''"> and a.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
-        <if test="disableDate != null and disableDate != ''"> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
-        <if test="lastMaintenance != null and lastMaintenance != ''"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
+        <if test="productionDate != null "> and a.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
+        <if test="usedTime != null "> and a.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
+        <if test="disableDate != null "> and a.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
+        <if test="lastMaintenance != null"> and a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
         <if test="maintenanceCount != null and maintenanceCount != ''"> and a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
         <if test="organization != null and organization != ''"> and a.organization = #{organization, jdbcType=VARCHAR}</if>
         <if test="department != null and department != ''"> and a.department = #{department, jdbcType=VARCHAR}</if>

@@ -370,10 +370,10 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
-    public Result batchDelete(@RequestParam(value="list")String list){
+    public Result batchDelete(@RequestParam(value="deviceIds")String deviceIds){
         Result result=new Result();
         try{
-            result.setData(tStdDeviceService.batchDelete(list));
+            result.setData(tStdDeviceService.batchDelete(deviceIds));
         }catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除设备异常:", e);

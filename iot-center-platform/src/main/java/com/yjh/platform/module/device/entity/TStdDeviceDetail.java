@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -40,6 +41,8 @@ public class TStdDeviceDetail {
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
 
+    private String deviceTypeName;
+
     @ApiModelProperty(value = "点号位置，inside-内部设备，outside-外部设备")
     private String positionType;
 
@@ -65,17 +68,19 @@ public class TStdDeviceDetail {
 
     @ApiModelProperty(value = "设备状态(0：新建，1：在线，2：离线)")
     private Integer status;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     @ApiModelProperty(value = "设备型号")
     private Integer deviceModel;
 
-    private String devideModelName;
+    private String deviceModelName;
 
     @ApiModelProperty(value = "PMS类型")
     private String pmsType;
@@ -85,14 +90,21 @@ public class TStdDeviceDetail {
 
     @ApiModelProperty(value = "生产厂家")
     private String deviceVendor;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+
+    private String deviceVendorName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date productionDate;
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     @ApiModelProperty(value = "投运时间")
     private Date usedTime;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date disableDate;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date lastMaintenance;
 
     @ApiModelProperty(value = "维修次数")
@@ -121,6 +133,8 @@ public class TStdDeviceDetail {
 
     @ApiModelProperty(value = "电压等级")
     private String voltageLevel;
+
+    private String voltageLevelName;
 
     @ApiModelProperty(value = "顺控点号")
     private String sequencePoint;
