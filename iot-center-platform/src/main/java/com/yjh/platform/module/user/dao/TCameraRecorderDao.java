@@ -30,7 +30,7 @@ public interface TCameraRecorderDao {
                                        @Param(value = "rtspPort") Integer rtspPort,
                                        @Param(value = "userName") String userName,
                                        @Param(value = "pwd") String pwd,
-                                       @Param(value = "root") String root,
+                                       @Param(value = "protocolUrl") String protocolUrl,
                                        @Param(value = "maxChannel") Integer maxChannel,
                                        @Param(value = "hddSize") Integer hddSize,
                                        @Param(value = "bufferDay") Integer bufferDay,

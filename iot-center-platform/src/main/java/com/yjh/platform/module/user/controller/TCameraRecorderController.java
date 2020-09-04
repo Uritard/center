@@ -128,14 +128,14 @@ public class TCameraRecorderController {
                             @RequestParam(value = "rtspPort", required = false) Integer rtspPort,
                             @RequestParam(value = "userName", required = false) String userName,
                             @RequestParam(value = "pwd", required = false) String pwd,
-                            @RequestParam(value = "root", required = false) String root,
+                            @RequestParam(value = "protocolUrl", required = false) String protocolUrl,
                             @RequestParam(value = "maxChannel", required = false) Integer maxChannel,
                             @RequestParam(value = "hddSize", required = false) Integer hddSize,
                             @RequestParam(value = "bufferDay", required = false) Integer bufferDay,
                             @RequestParam(value = "timeLong", required = false) Integer timeLong) {
         Result result = new Result();
         try {
-            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, root, maxChannel, hddSize, bufferDay, timeLong);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

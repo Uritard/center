@@ -15,7 +15,7 @@
         <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort" />
         <result column="user_name" jdbcType="VARCHAR" property="userName" />
         <result column="pwd" jdbcType="VARCHAR" property="pwd" />
-        <result column="root" jdbcType="VARCHAR" property="root" />
+        <result column="protocolUrl" jdbcType="VARCHAR" property="protocolUrl" />
         <result column="max_channel" jdbcType="INTEGER" property="maxChannel" />
         <result column="hdd_size" jdbcType="INTEGER" property="hddSize" />
         <result column="buffer_day" jdbcType="INTEGER" property="bufferDay" />
@@ -24,7 +24,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        record_id, record_name, recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, root, max_channel, hdd_size, buffer_day, time_long
+        record_id, record_name, recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
     </sql>
 
 
@@ -41,7 +41,7 @@
             rtsp_port,
             user_name,
             pwd,
-            root,
+            protocol_url,
             max_channel,
             hdd_size,
             buffer_day,
@@ -58,7 +58,7 @@
                 #{rtspPort, jdbcType=INTEGER},
                 #{userName, jdbcType=VARCHAR},
                 #{pwd, jdbcType=VARCHAR},
-                #{root, jdbcType=VARCHAR},
+                #{protocolUrl, jdbcType=VARCHAR},
                 #{maxChannel, jdbcType=INTEGER},
                 #{hddSize, jdbcType=INTEGER},
                 #{bufferDay, jdbcType=INTEGER},
@@ -100,13 +100,13 @@
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
         <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
         <if test="pwd != null and pwd != ''">a.pwd = #{pwd, jdbcType=VARCHAR},</if>
-        <if test="root != null and root != ''">a.root = #{root, jdbcType=VARCHAR},</if>
+        <if test="protocolUrl != null and protocolUrl != ''">a.protocol_url = #{protocolUrl, jdbcType=VARCHAR},</if>
         <if test="maxChannel != null ">a.max_channel = #{maxChannel, jdbcType=INTEGER},</if>
         <if test="hddSize != null ">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>
         <if test="bufferDay != null ">a.buffer_day = #{bufferDay, jdbcType=INTEGER},</if>
         <if test="timeLong != null ">a.time_long = #{timeLong, jdbcType=INTEGER},</if>
     </set>
-            where a.record_id = #{recordId, jdbcType=Long}
+            where a.record_id = #{recordId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
@@ -122,7 +122,7 @@
         a.rtsp_port,
         a.user_name,
         a.pwd,
-        a.root,
+        a.protocol_url,
         a.max_channel,
         a.hdd_size,
         a.buffer_day,
@@ -148,7 +148,7 @@
         a.rtsp_port,
         a.user_name,
         a.pwd,
-        a.root,
+        a.protocol_url,
         a.max_channel,
         a.hdd_size,
         a.buffer_day,
@@ -166,7 +166,7 @@
         <if test="rtspPort != null "> and a.rtsp_port = #{rtspPort, jdbcType=INTEGER}</if>
         <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
         <if test="pwd != null and pwd != ''"> and a.pwd = #{pwd, jdbcType=VARCHAR}</if>
-        <if test="root != null and root != ''"> and a.root = #{root, jdbcType=VARCHAR}</if>
+        <if test="protocolUrl != null and protocolUrl != ''"> and a.protocol_url = #{protocolUrl, jdbcType=VARCHAR}</if>
         <if test="maxChannel != null "> and a.max_channel = #{maxChannel, jdbcType=INTEGER}</if>
         <if test="hddSize != null "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
         <if test="bufferDay != null "> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
@@ -188,7 +188,7 @@
         a.rtsp_port,
         a.user_name,
         a.pwd,
-        a.root,
+        a.protocol_url,
         a.max_channel,
         a.hdd_size,
         a.buffer_day,
@@ -206,7 +206,7 @@
         <if test="rtspPort != null "> and a.rtsp_port = #{rtspPort, jdbcType=INTEGER}</if>
         <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
         <if test="pwd != null and pwd != ''"> and a.pwd = #{pwd, jdbcType=VARCHAR}</if>
-        <if test="root != null and root != ''"> and a.root = #{root, jdbcType=VARCHAR}</if>
+        <if test="protocolUrl != null and protocolUrl != ''"> and a.protocol_url = #{protocolUrl, jdbcType=VARCHAR}</if>
         <if test="maxChannel != null "> and a.max_channel = #{maxChannel, jdbcType=INTEGER}</if>
         <if test="hddSize != null  "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
         <if test="bufferDay != null "> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
@@ -228,7 +228,7 @@
             rtsp_port,
             user_name,
             pwd,
-            root,
+            protocol_url,
             max_channel,
             hdd_size,
             buffer_day,
@@ -247,7 +247,7 @@
                 #{TCameraRecorder.rtspPort, jdbcType=INTEGER},
                 #{TCameraRecorder.userName, jdbcType=VARCHAR},
                 #{TCameraRecorder.pwd, jdbcType=VARCHAR},
-                #{TCameraRecorder.root, jdbcType=VARCHAR},
+                #{TCameraRecorder.protocolUrl, jdbcType=VARCHAR},
                 #{TCameraRecorder.maxChannel, jdbcType=INTEGER},
                 #{TCameraRecorder.hddSize, jdbcType=INTEGER},
                 #{TCameraRecorder.bufferDay, jdbcType=INTEGER},

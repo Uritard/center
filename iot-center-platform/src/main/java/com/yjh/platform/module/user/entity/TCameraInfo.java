@@ -43,7 +43,7 @@ public class TCameraInfo implements Serializable {
     @ApiModelProperty(value = "主录像媒体服务器")
     private Integer rmsId;
 
-    @ApiModelProperty(value = "厂家名称")
+    @ApiModelProperty(value = "厂家ID")
     private Integer vendorId;
 
     @ApiModelProperty(value = "码流类型")
@@ -66,6 +66,15 @@ public class TCameraInfo implements Serializable {
 
     @ApiModelProperty(value = "摄像机ip")
     private String cameraIp;
+
+    @ApiModelProperty(value = "安装地址")
+    private String address;
+
+    @ApiModelProperty(value = "纬度")
+    private String latitude;
+
+    @ApiModelProperty(value = "经度")
+    private String longitude;
 
 
 

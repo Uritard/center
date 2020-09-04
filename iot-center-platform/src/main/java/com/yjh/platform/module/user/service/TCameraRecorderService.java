@@ -52,8 +52,8 @@ public class TCameraRecorderService {
 
     @Logs(title = "查询", code = "TCameraRecorder")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraRecorderByDict> select(Long recordId, String recordName, String recorderType, String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String root, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong) {
-        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, root, maxChannel, hddSize, bufferDay, timeLong);
+    public List<TCameraRecorderByDict> select(Long recordId, String recordName, String recorderType, String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong) {
+        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong);
         return tCameraRecorderByDictList;
     }
 

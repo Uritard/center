@@ -1946,52 +1946,45 @@ public class TemplateToImportController {
             SysRoleRegion sysRoleRegion = new SysRoleRegion();
 
             excelTemplateList.add(new ExcelTemplate("角色ID", true, "Integer"));
-            excelTemplateList.add(new ExcelTemplate("机器人ID", true, "Integer"));
+            excelTemplateList.add(new ExcelTemplate("机器人ID", true, "Long"));
             excelTemplateList.add(new ExcelTemplate("是否检查", false, "String"));
 
             System.out.println("excelTemplateList是：" + excelTemplateList);
+            int count = 0;
+            for (ExcelTemplate itemAsLie : excelTemplateList) {
+                System.out.println("itemAsLie是：" + itemAsLie);
 
-            //遍历所有行
-            for (int i = 1; i <= total; i++) {
-                Row row = sheet.getRow(i);
-
-                for (int j = 0; j < excelTemplateList.size(); j++) {
-                    //判断列是否必填
-//                        if(itemAsLie.IsRequire && (row.getCell(j).getStringCellValue() == null || "".equals(row.getCell(j).getStringCellValue()))){
-                    if (row.getCell(j) == null) {
-                        System.out.println("第" + (i + 1) + "行第" + (j + 1) + "列的值为空，请检查");
-                    } else {
-                        String jieguo = row.getCell(j).getStringCellValue();
-                        System.out.println("第" + (i + 1) + "行第" + (j + 1) + "列的值为：" + jieguo);
-                    }
-
-                }
-                //遍历列
-                for (ExcelTemplate itemAsLie : excelTemplateList) {
-                    System.out.println("itemAsLie是：" + itemAsLie);
-                    //判断列类型尝试类型转换
-                    switch (itemAsLie.ColumnType) {
-                        case "Long": {
-                            System.out.println("Long");
-                            break;
-                        }
-                        case "Integer": {
-                            System.out.println("Integer类型");
-                            break;
-                        }
-                        case "String": {
-                            System.out.println("String类型");
-                            break;
+//                for (int j = 0; j < excelTemplateList.size(); j++){
+                    for (int i = 1; i <= total; i++) {
+                        Row row = sheet.getRow(i);
+                        if (row.getCell(count) == null){
+                            System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为空，请检查");
+                        }else {
+                            switch (itemAsLie.ColumnType) {
+                                case "Long": {
+                                    System.out.println("Long转型");
+                                    String jieguo = row.getCell(count).getStringCellValue();
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + jieguo);
+                                    break;
+                                }
+                                case "Integer": {
+                                    System.out.println("Integer转型");
+                                    String jieguo = row.getCell(count).getStringCellValue();
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + jieguo);
+                                    break;
+                                }
+                                case "String": {
+                                    System.out.println("String转型");
+                                    String jieguo = row.getCell(count).getStringCellValue();
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + jieguo);
+                                    break;
+                                }
+                            }
                         }
                     }
-                    //判断列是否必填
-                    if (itemAsLie.IsRequire && row.getCell(0) == null || "".equals(row.getCell(0))) {
-                        System.out.println("该列是必填的，不能为空");
-                    }
-                }
-
+                    count++;
+//                }
             }
-
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("导入失败：" + e);

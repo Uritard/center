@@ -54,7 +54,7 @@ public class TCameraRecorderByDict {
     private String pwd;
 
     @ApiModelProperty(value = "根目录")
-    private String root;
+    private String protocolUrl;
 
     @ApiModelProperty(value = "最大通道数")
     private Integer maxChannel;

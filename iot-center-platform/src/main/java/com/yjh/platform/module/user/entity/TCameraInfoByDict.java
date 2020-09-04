@@ -32,8 +32,8 @@ public class TCameraInfoByDict implements Serializable {
     @ApiModelProperty(value = "录像机ID")
     private String recordId;
 
-    @ApiModelProperty(value = "上级区域ID")
-    private Long upRegionId;
+    @ApiModelProperty(value = "区域名称")
+    private String upRegionName;
 
     @ApiModelProperty(value = "通道号")
     private Integer channelNum;
@@ -44,8 +44,8 @@ public class TCameraInfoByDict implements Serializable {
     @ApiModelProperty(value = "主录像媒体服务器")
     private Integer rmsId;
 
-    @ApiModelProperty(value = "字典描述")
-    private String dictNote;
+    @ApiModelProperty(value = "厂家名称")
+    private String vendorName;
 
     @ApiModelProperty(value = "码流类型")
     private Integer streamType;
@@ -60,12 +60,21 @@ public class TCameraInfoByDict implements Serializable {
     private Integer port;
 
     @ApiModelProperty(value = "0可见光摄像机, 1红外摄像机")
-    private Integer cameraType;
+    private String cameraTypeName;
 
     @ApiModelProperty(value = "是否可控(0-可控球机，1-不可控枪机)")
     private Integer isControl;
 
     @ApiModelProperty(value = "摄像机ip")
     private String cameraIp;
+
+    @ApiModelProperty(value = "安装地址")
+    private String address;
+
+    @ApiModelProperty(value = "纬度")
+    private String latitude;
+
+    @ApiModelProperty(value = "经度")
+    private String longitude;
 
 }

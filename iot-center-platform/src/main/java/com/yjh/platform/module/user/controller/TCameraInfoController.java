@@ -185,10 +185,15 @@ public class TCameraInfoController {
                          @RequestParam(value = "url", required = false) String url,
                          @RequestParam(value = "port", required = false) Integer port,
                          @RequestParam(value = "cameraType", required = false) Integer cameraType,
+                         @RequestParam(value = "latitude", required = false) String latitude,
+                         @RequestParam(value = "longitude", required = false) String longitude,
+                         @RequestParam(value = "address", required = false) String address,
                          @RequestParam(value = "isControl", required = false) Integer isControl) {
         Result result = new Result();
         try {
-            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType, cameraIp,url, port, cameraType, isControl);
+            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, aliasName,
+                    recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,
+                    cameraIp,url, port, cameraType, isControl,latitude,longitude,address);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

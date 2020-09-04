@@ -57,8 +57,8 @@ public class TCameraRecorder implements Serializable {
     @ApiModelProperty(value = "密码")
     private String pwd;
 
-    @ApiModelProperty(value = "根目录")
-    private String root;
+    @ApiModelProperty(value = "协议路径")
+    private String protocolUrl;
 
     @ApiModelProperty(value = "最大通道数")
     private Integer maxChannel;

@@ -67,8 +67,14 @@ public class TCameraInfoService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId, Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId, Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,String url, Integer port, Integer cameraType, Integer isControl) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, aliasName, recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,cameraIp, url, port, cameraType, isControl);
+    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId,
+                                          Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,
+                                          Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
+                                          String url, Integer port, Integer cameraType, Integer isControl,String latitude,
+                                          String longitude,String address) {
+        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, aliasName,
+                recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,cameraIp, url,
+                port, cameraType, latitude,longitude,address,isControl);
         return tCameraInfoByDictList;
     }
 

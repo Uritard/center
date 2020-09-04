@@ -7,6 +7,7 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author tt
@@ -38,6 +39,9 @@ public interface TCameraInfoDao {
                              @Param(value = "url") String url,
                              @Param(value = "port") Integer port,
                              @Param(value = "cameraType") Integer cameraType,
+                             @RequestParam(value = "latitude", required = false) String latitude,
+                             @RequestParam(value = "longitude", required = false) String longitude,
+                             @RequestParam(value = "address", required = false) String address,
                              @Param(value = "isControl") Integer isControl);
     List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
 
