@@ -51,7 +51,7 @@ public interface TCruisePointInstanceDao {
 
     //为创建实例服务
     TStdRegion selectTSRegionForStation();
-    TDictBusiness selectTDBusinessForUnitName(String colName);
+    TDictBusiness selectTDBusinessForUnitName(String dictCode);
     //统计当前任务下的巡检点数量
     int selectCruiseCount(@Param(value = "taskId")Long taskId);
 

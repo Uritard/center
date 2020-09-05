@@ -58,8 +58,8 @@ public class TStdDevicemeteService{
     //告警规则未定
     @Logs(title = "分页查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMete tStdDeviceMete) {
-        return tStdDevicemeteDao.selectByPage(tStdDeviceMete);
+    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        return tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail);
     }
 
     @Logs(title = "批量插入", code = "device")

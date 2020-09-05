@@ -45,7 +45,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "thresholdPer") BigDecimal thresholdPer,
                                 @Param(value = "modulus") Integer modulus,
                                 @Param(value = "remark") String remark);
-    List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMete tStdDeviceMete);
+    List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
     int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);

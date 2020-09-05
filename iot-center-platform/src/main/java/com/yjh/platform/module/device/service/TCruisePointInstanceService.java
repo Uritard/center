@@ -99,7 +99,6 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
         tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
         tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
-        tCruisePointInstance.setUnitVal(mapAll.get("unit"));
         tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
         tCruisePointInstance.setPositionType(mapAll.get("positionType"));
         //间接的数据
@@ -133,7 +132,6 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setStationName(mapAll.get("stationName"));
         tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
         tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        tCruisePointInstance.setUnitVal(mapAll.get("unit"));
         TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("unit"));
         tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
         return tCruisePointInstanceDao.insert(tCruisePointInstance);
@@ -227,7 +225,6 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
         tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
         tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
-        //tCruisePointInstance.setUnitVal(mapAll.get("unit"));
         tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
         tCruisePointInstance.setPositionType(mapAll.get("positionType"));
         //间接的数据

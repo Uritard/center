@@ -18,12 +18,8 @@ public class TCruisePointInstanceDetail extends TCruisePointInstance{
 
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
-    @ApiModelProperty(value = "设备类型")
-    private String deviceTypeName;
-    @ApiModelProperty(value = "实物ID")
-    private String realId;
+    @ApiModelProperty(value = "巡检方式")
+    private String cruiseTypeName;
     @ApiModelProperty(value ="设备部位")
     private String customName;
-    @ApiModelProperty(value = "设备类型-ID")
-    private Integer deviceType;
 }

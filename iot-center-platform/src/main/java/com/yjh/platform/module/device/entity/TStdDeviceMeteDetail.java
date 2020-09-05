@@ -17,12 +17,18 @@ import lombok.experimental.Accessors;
 public class TStdDeviceMeteDetail extends TStdDeviceMete{
 
 
-    private String deviceName;
+    private String deviceMeteName;
 
-    private String customName;
+    private Integer upRergionId;
+
+    private String upRergionName;
 
     private String meteTypeName;
 
-    private String alarmTypeName;
+    private String alarmLevelName;
+
+    private String unitName;
+
+    private String customName;
 }
 
