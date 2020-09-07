@@ -22,14 +22,14 @@ public class TCruiseResultExpand extends TCruiseResult {
     private String taskName;
 
     @ApiModelProperty(value = "异常数")
-    private String taskAbnormal;
-
-    @ApiModelProperty(value = "当前状态")
-    private String cruiseState;
+    private Integer taskAbnormal;
 
     @ApiModelProperty(value = "任务状态")
-    private Integer cruiseStatus;
+    private String taskState;
+
+    @ApiModelProperty(value = "巡检数据状态")
+    private Integer cruiseDataState;
 
     @ApiModelProperty(value = "巡检类型")
-    private String cruiseType;
+    private String planType;
 }

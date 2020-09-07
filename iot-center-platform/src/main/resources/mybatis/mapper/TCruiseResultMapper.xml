@@ -29,9 +29,11 @@
     <sql id="TongYong">
         a.task_result_id,
         a.task_id,b.task_name,
-		a.c_type,d.dict_note as cruise_type,
-        a.c_state,e.dict_note as cruise_state,
-		a.task_count,a.execute_time,a.check_user,a.check_date,a.modify_state,
+		a.c_type,d.dict_note as plan_type,
+        a.c_state,e.dict_note as task_state,
+		a.task_count,a.execute_time,
+		f.task_abnormal,
+		a.check_user,a.check_date,a.modify_state,
 		a.task_wait,a.weather,a.area_id,a.create_time,a.task_code,a.remark
     </sql>
 
@@ -171,11 +173,12 @@
     </select>
 
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
-        select<include refid="TongYong"></include>
+        select distinct <include refid="TongYong"></include>
         from t_cruise_result a,
              t_cruise_task b,
              t_dict_business d,
-             t_dict_business e
+             t_dict_business e,
+             t_cruise_task_result f
         where 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR},</if>
@@ -196,6 +199,43 @@
         and a.task_id = b.task_id
         and a.c_type = d.dict_code
         and a.c_state  = e.dict_code
+        and a.task_result_id = f.task_result_id
+    </select>
+
+    <select id="selectCruiseByPage" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+        select
+            a.task_id,
+            b.device_id,
+            b.instance_id,
+            e.real_code,
+            d.device_name,
+            f.instance_name,
+            g.point_type,
+            h.dict_note as cruise_type,
+            g.result_num,
+            g.state,
+            j.dict_note as data_state,
+            b.cruise_time,
+            g.identify_state,
+            k.dict_note as identify_state1
+        from t_cruise_result a,
+             t_cruise_task_result_detail b,
+             t_std_device d,
+             t_std_device_attr e,
+             t_cruise_point_attr f,
+             t_cruise_data_result g,
+             t_dict_business h,
+             t_dict_business j,
+             t_dict_business k
+        where a.task_id = #{taskId}
+            and a.task_result_id = b.task_result_id
+            and d.device_id = b.device_id
+            and e.device_id = b.device_id
+            and b.instance_id = f.instance_id
+            and g.cruise_result_id = b.cruise_result_id
+            and h.dict_code = g.point_type
+            and j.dict_code = g.state
+            and k.dict_code = g.identify_state
     </select>
 
     <insert id="batchInsert">
@@ -237,7 +277,7 @@
         </foreach>
     </insert>
 
-<select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
+    <select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
   SELECT
 	a.*
   FROM
@@ -247,4 +287,30 @@
 	b.c_state = 0
 </select>
 
+    <!--本周巡视任务结果统计-->
+    <select id="taskStatistical" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TaskStatistical">
+        select
+            count(if(c_type=213,true,null)) as planType1,
+            count(if(c_type=214,true,null)) as planType2,
+            count(if(c_type=215,true,null)) as planType3,
+            count(if(c_type=216,true,null)) as planType4,
+            count(if(c_type=217,true,null)) as planType5,
+            count(if(c_type=218,true,null)) as planType6
+        from t_cruise_result
+        where create_time BETWEEN #{Start} and #{End}
+    </select>
+
+    <!--本周巡视点结果统计-->
+    <select id="cruiseStatistical" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseStatistical">
+        select
+            count(if(state=245,true,null)) as dataState1,
+            count(if(state=246,true,null)) as dataState2,
+            count(if(state=247,true,null)) as dataState3,
+            count(if(state=248,true,null)) as dataState4,
+            count(if(state=249,true,null)) as dataState5,
+            count(if(state=250,true,null)) as dataState6,
+            count(if(state=251,true,null)) as dataState7
+        from t_cruise_data_result
+        where createtime BETWEEN #{Start} and #{End}
+    </select>
 </mapper>

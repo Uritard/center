@@ -1,9 +1,8 @@
 package com.yjh.platform.module.task.controller;
 
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.entity.TCruiseResultExpand;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseResultService;
-import com.yjh.platform.module.task.entity.TCruiseResult;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
@@ -128,45 +127,72 @@ public class TCruiseResultController {
         return result;
     }
 
-//    @ApiOperation(value = "分页查询--巡视结果确认")
-//    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-//    public Result selectTaskByPage(@RequestBody TCruiseResultExpand tCruiseResultExpand,
-//                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-//                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-//        Result result = new Result();
-//        Map<String, Object> resultMap = new HashMap<>();
-//        try {
-//            Page page = PageHelper.startPage(pageNum, pageSize);
-//            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(tCruiseResultExpand);
-//            resultMap.put("count", page.getTotal());
-//            resultMap.put("list", list);
-//            result.setData(resultMap);
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-//            log.error("失败描述：", e);
-//        }
-//        return result;
-//    }
-//    @ApiOperation(value = "分页查询--任务结果详细")
-//    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-//    public Result selectCruiseByPage(@RequestBody TCruiseResultExpand tCruiseResultExpand,
-//                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-//                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-//        Result result = new Result();
-//        Map<String, Object> resultMap = new HashMap<>();
-//        try {
-//            Page page = PageHelper.startPage(pageNum, pageSize);
-//            List<TCruiseResultExpand> list = tCruiseResultService.selectCruiseByPage(tCruiseResultExpand);
-//            resultMap.put("count", page.getTotal());
-//            resultMap.put("list", list);
-//            result.setData(resultMap);
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-//            log.error("失败描述：", e);
-//        }
-//        return result;
-//    }
-//
+    @ApiOperation(value = "分页查询--巡视结果确认")
+    @RequestMapping(value = "/selectTaskByPage", method = RequestMethod.POST)
+    public Result selectTaskByPage(@RequestBody TCruiseResultExpand tCruiseResultExpand,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(tCruiseResultExpand);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "巡视任务结果统计")
+    @RequestMapping(value = "/taskStatistical", method = RequestMethod.GET)
+    public Result taskStatistical() {
+        Result result = new Result();
+        try {
+            List<TaskStatistical> taskStatisticalList = tCruiseResultService.taskStatistical();
+            result.setData(taskStatisticalList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视点结果统计")
+    @RequestMapping(value = "/cruiseStatistical", method = RequestMethod.GET)
+    public Result cruiseStatistical() {
+        Result result = new Result();
+        try {
+            List<CruiseStatistical> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
+            result.setData(cruiseStatisticalList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "分页查询--任务结果详细")
+    @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.POST)
+    public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskId);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 //    @ApiOperation(value = "人工复核")
 //    @RequestMapping(value = "/manualReview", method = RequestMethod.POST)
 //    public Result manualReview(@RequestBody TCruiseDataResult tCruiseDataResult) {
@@ -181,19 +207,19 @@ public class TCruiseResultController {
 //        }
 //        return result;
 //    }
-//
-//    @ApiOperation(value = "批量插入")
-//    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-//    public Result batchInsert(@RequestBody List<TCruiseResult> list) {
-//        Result result = new Result();
-//        try {
-//        result.setData(tCruiseResultService.batchInsert(list));
-//        } catch (Exception e) {
-//        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-//        log.error("批量插入失败：" + e);
-//        }
-//        return result;
-//    }
+
+    @ApiOperation(value = "批量插入")
+    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    public Result batchInsert(@RequestBody List<TCruiseResult> list) {
+        Result result = new Result();
+        try {
+        result.setData(tCruiseResultService.batchInsert(list));
+        } catch (Exception e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
 
 
     @ApiOperation(value = "A-查询正在执行的任务")

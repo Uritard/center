@@ -1,14 +1,13 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.entity.TCruiseResult;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
-import com.yjh.platform.module.task.entity.TCruiseResultExpand;
-import com.yjh.platform.module.task.entity.TCruiseTask;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -63,14 +62,38 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseResultExpand> selectCruiseByPage(TCruiseResultExpand tCruiseResultExpand) {
-        List<TCruiseResultExpand> tCruiseResultExpandList = tCruiseResultDao.selectCruiseByPage(tCruiseResultExpand);
-        return tCruiseResultExpandList;
+    public List<CruiseResultDetail> selectCruiseByPage(String taskId) {
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskId);
+        return cruiseResultDetailList;
     }
     @Logs(title = "人工复核", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(TCruiseDataResult tCruiseDataResult) {
         return this.tCruiseResultDao.manualReview(tCruiseDataResult);
+    }
+    @Logs(title = "巡视任务结果统计", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TaskStatistical> taskStatistical() {
+        String weekStart = DateTimeUtil.getWeekStart();
+        String weekEnd = DateTimeUtil.getWeekEnd();
+        List<TaskStatistical> taskStatisticalList = new ArrayList<>();
+        taskStatisticalList.add(tCruiseResultDao.taskStatistical(weekStart,weekEnd));
+        String lastWeekStart = DateTimeUtil.getLastWeekStart();
+        String lastWeekend = DateTimeUtil.getLastWeekend();
+        taskStatisticalList.add(tCruiseResultDao.taskStatistical(lastWeekStart,lastWeekend));
+        return taskStatisticalList;
+    }
+    @Logs(title = "巡视点结果统计", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseStatistical> cruiseStatistical() {
+        String weekStart = DateTimeUtil.getWeekStart();
+        String weekEnd = DateTimeUtil.getWeekEnd();
+        List<CruiseStatistical> cruiseStatisticalList = new ArrayList<>();
+        cruiseStatisticalList.add(tCruiseResultDao.cruiseStatistical(weekStart,weekEnd));
+        String lastWeekStart = DateTimeUtil.getLastWeekStart();
+        String lastWeekend = DateTimeUtil.getLastWeekend();
+        cruiseStatisticalList.add(tCruiseResultDao.cruiseStatistical(lastWeekStart,lastWeekend));
+        return cruiseStatisticalList;
     }
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)

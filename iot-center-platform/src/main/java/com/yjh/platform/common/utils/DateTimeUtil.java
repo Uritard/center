@@ -1105,4 +1105,36 @@ public class DateTimeUtil {
         }
         return cronExp.toString();
     }
+    // 获得本周一0点时间
+    public static String getWeekStart() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.WEEK_OF_MONTH, 0);
+        cal.set(Calendar.DAY_OF_WEEK, 2);
+        Date time = cal.getTime();
+        return new SimpleDateFormat("yyyy-MM-dd 00:00:00").format(time);
+    }
+    // 获得本周日24点时间
+    public static String getWeekEnd(){
+        Calendar cal=Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
+        cal.add(Calendar.DAY_OF_WEEK, 1);
+        Date time=cal.getTime();
+        return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
+    }
+    //获得上周一0点时间
+    public static String getLastWeekStart() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_WEEK,cal.getActualMaximum(Calendar.DAY_OF_WEEK));
+        cal.add(Calendar.DAY_OF_WEEK, -12);
+        Date time=cal.getTime();
+        return new SimpleDateFormat("yyyy-MM-dd 00:00:00").format(time);
+    }
+    //获得上周日24点时间
+    public static String getLastWeekend() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_WEEK,cal.getActualMaximum(Calendar.DAY_OF_WEEK));
+        cal.add(Calendar.DAY_OF_WEEK, -6);
+        Date time=cal.getTime();
+        return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
+    }
 }
