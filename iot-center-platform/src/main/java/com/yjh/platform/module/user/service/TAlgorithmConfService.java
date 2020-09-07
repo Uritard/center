@@ -30,8 +30,8 @@ public class TAlgorithmConfService{
 
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(Long cameraId) {
-        return this.tAlgorithmConfDao.deleteByPrimaryId(cameraId);
+    public int deleteByPrimaryId(Long presetId) {
+        return this.tAlgorithmConfDao.deleteByPrimaryId(presetId);
     }
 
     @Logs(title = "更新", code = "module")
@@ -42,21 +42,21 @@ public class TAlgorithmConfService{
 
     @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public TAlgorithmConf selectByPrimaryId(Long cameraId) {
-        return this.tAlgorithmConfDao.selectByPrimaryId(cameraId);
+    public TAlgorithmConf selectByPrimaryId(Long presetId) {
+        return this.tAlgorithmConfDao.selectByPrimaryId(presetId);
     }
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TAlgorithmConf> select(Long cameraId, Long algorithmId, String algorithmName, Integer status, String presetId, Integer ifDel, Integer ifShow, String picUrl, Integer applyModule, Date createTime, Date updateTime) {
-        List<TAlgorithmConf> tAlgorithmConfList = tAlgorithmConfDao.select(cameraId, algorithmId, algorithmName, status, presetId, ifDel, ifShow, picUrl, applyModule, createTime, updateTime);
+    public List<TAlgorithmConf> select(Long presetId, Long algorithmId, String configName, Integer status, Integer ifDel, Integer ifShow, String picUrl, Integer applyModule, Date createTime, Date updateTime) {
+        List<TAlgorithmConf> tAlgorithmConfList = tAlgorithmConfDao.select(presetId, algorithmId, configName, status, ifDel, ifShow, picUrl, applyModule, createTime, updateTime);
         return tAlgorithmConfList;
     }
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TAlgorithmConfDetail> selectByPage(TAlgorithmConfDetail tAlgorithmConfDetail) {
-        List<TAlgorithmConfDetail> tAlgorithmConfList = tAlgorithmConfDao.selectByPage(tAlgorithmConfDetail);
+    public List<TAlgorithmConfDetail> selectByPage(TAlgorithmConf tAlgorithmConf) {
+        List<TAlgorithmConfDetail> tAlgorithmConfList = tAlgorithmConfDao.selectByPage(tAlgorithmConf);
         return tAlgorithmConfList;
     }
 

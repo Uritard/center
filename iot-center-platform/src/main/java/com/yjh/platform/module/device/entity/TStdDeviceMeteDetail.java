@@ -31,5 +31,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private String meteTypeName;
 
     private Long upRegionId;
+
+    private String alarmLevelName;
 }
 

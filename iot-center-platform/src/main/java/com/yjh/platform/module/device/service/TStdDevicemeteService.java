@@ -4,6 +4,7 @@ import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -104,8 +105,9 @@ public class TStdDevicemeteService{
 
     @Logs(title = "批量删除", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public int batchDelete(List<String> list) {
-        return this.tStdDevicemeteDao.batchDelete(list);
+    public int batchDelete(String list) {
+        List<String> list1= Arrays.asList(list.split(","));
+        return this.tStdDevicemeteDao.batchDelete(list1);
     }
 
 

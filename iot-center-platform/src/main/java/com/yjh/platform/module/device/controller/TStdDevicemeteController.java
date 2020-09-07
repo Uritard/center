@@ -263,10 +263,10 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
-    public Result batchDelete(@RequestParam(value = "list") List<String> list) {
+    public Result batchDelete(@RequestParam(value = "deviceMteIds") String deviceMteIds) {
         Result result = new Result();
         try {
-               result.setData(tStdDevicemeteService.batchDelete(list));
+               result.setData(tStdDevicemeteService.batchDelete(deviceMteIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("根据设备Id删除设备测点异常:", e);
