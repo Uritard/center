@@ -60,6 +60,7 @@ public class TStdDeviceService{
         //tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
         tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
         if(tStdDevice.getCustomId() == null){
+            //不传 设为本体，根据字典表查，暂定为101
             tStdDevice.setCustomId("101");
             List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
             tStdDevice.setCustomName(list.get(0).getDictNote());

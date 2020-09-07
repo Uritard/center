@@ -17,7 +17,7 @@
         <result column="station_name" jdbcType="VARCHAR" property="stationName" />
         <result column="station_id" jdbcType="VARCHAR" property="stationId" />
         <result column="up_effect" jdbcType="INTEGER" property="upEffect" />
-        <result column="low_effect" jdbcType="INTEGER" property="lowEffect" />
+        <result column="down_effect" jdbcType="INTEGER" property="downEffect" />
         <result column="alarmlevel" jdbcType="INTEGER" property="alarmlevel" />
         <result column="alarmthresbhold" jdbcType="INTEGER" property="alarmthresbhold" />
         <result column="describer" jdbcType="VARCHAR" property="describer" />
@@ -36,7 +36,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        mete_id, mete_type, mete_kind, mete_name, mete_code, unit, mete_explain_type, create_time, update_time, modulus, station_name, station_id, up_effect, low_effect, alarmlevel, alarmthresbhold, describer, mete_precision, change_limit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable
+        mete_id, mete_type, mete_kind, mete_name, mete_code, unit, mete_explain_type, create_time, update_time, modulus, station_name, station_id, up_effect, down_effect, alarmlevel, alarmthresbhold, describer, mete_precision, change_limit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable
     </sql>
 
 
@@ -55,7 +55,7 @@
             station_name,
             station_id,
             up_effect,
-            low_effect,
+            down_effect,
             alarmlevel,
             alarmthresbhold,
             describer,
@@ -84,7 +84,7 @@
                 #{stationName, jdbcType=VARCHAR},
                 #{stationId, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=INTEGER},
-                #{lowEffect, jdbcType=INTEGER},
+                #{downEffect, jdbcType=INTEGER},
                 #{alarmlevel, jdbcType=INTEGER},
                 #{alarmthresbhold, jdbcType=INTEGER},
                 #{describer, jdbcType=VARCHAR},
@@ -122,7 +122,7 @@
         <if test="stationName != null and stationName != ''">a.station_name = #{stationName, jdbcType=VARCHAR},</if>
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
         <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
-        <if test="lowEffect != null ">a.low_effect = #{lowEffect, jdbcType=INTEGER},</if>
+        <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=INTEGER},</if>
         <if test="alarmlevel != null ">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
         <if test="alarmthresbhold != null ">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
         <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
@@ -156,7 +156,7 @@
         a.station_name,
         a.station_id,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.alarmlevel,
         a.alarmthresbhold,
         a.describer,
@@ -192,7 +192,7 @@
         a.station_name,
         a.station_id,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.alarmlevel,
         a.alarmthresbhold,
         a.describer,
@@ -222,7 +222,7 @@
         <if test="stationName != null and stationName != ''"> and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="upEffect != null "> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
-        <if test="lowEffect != null "> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="downEffect != null "> and a.down_effect = #{downEffect, jdbcType=INTEGER}</if>
         <if test="alarmlevel != null "> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
         <if test="alarmthresbhold != null "> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
         <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
@@ -254,7 +254,7 @@
         a.station_name,
         a.station_id,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.alarmlevel,
         a.alarmthresbhold,
         a.describer,
@@ -284,7 +284,7 @@
         <if test="stationName != null and stationName != ''"> and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="upEffect != null "> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
-        <if test="lowEffect != null "> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="downEffect != null "> and a.down_effect = #{downEffect, jdbcType=INTEGER}</if>
         <if test="alarmlevel != null "> and a.alarmlevel = #{alarmlevel, jdbcType=INTEGER}</if>
         <if test="alarmthresbhold != null "> and a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER}</if>
         <if test="describer != null and describer != ''"> and a.describer = #{describer, jdbcType=VARCHAR}</if>
@@ -316,7 +316,7 @@
             station_name,
             station_id,
             up_effect,
-            low_effect,
+            down_effect,
             alarmlevel,
             alarmthresbhold,
             describer,
@@ -347,7 +347,7 @@
                 #{TCfgMete.stationName, jdbcType=VARCHAR},
                 #{TCfgMete.stationId, jdbcType=VARCHAR},
                 #{TCfgMete.upEffect, jdbcType=INTEGER},
-                #{TCfgMete.lowEffect, jdbcType=INTEGER},
+                #{TCfgMete.downEffect, jdbcType=INTEGER},
                 #{TCfgMete.alarmlevel, jdbcType=INTEGER},
                 #{TCfgMete.alarmthresbhold, jdbcType=INTEGER},
                 #{TCfgMete.describer, jdbcType=VARCHAR},

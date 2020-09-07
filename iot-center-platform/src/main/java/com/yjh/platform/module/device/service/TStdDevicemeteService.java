@@ -50,8 +50,8 @@ public class TStdDevicemeteService{
 
     @Logs(title = "查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId, String customId, Long meteId, String meteType, String meteName, Integer deviceType, Integer customType, String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float lowEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark) {
-        List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId, customId, meteId, meteType, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
+    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId, String customId, Long meteId, String meteKind, String meteName, Integer deviceType, Integer customType, String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float lowEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer,String meteType, Integer modulus, String remark,String stateZero,String stateOne,Integer  alarmState) {
+        List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId, customId, meteId, meteKind, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer,meteType, modulus, remark,stateZero,stateOne,alarmState);
         return tStdDeviceMeteList;
     }
 

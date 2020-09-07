@@ -24,7 +24,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "deviceId") Long deviceId,
                                 @Param(value = "customId") String customId,
                                 @Param(value = "meteId") Long meteId,
-                                @Param(value = "meteType") String meteType,
+                                @Param(value = "meteKind") String meteKind,
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "deviceType") Integer deviceType,
                                 @Param(value = "customType") Integer customType,
@@ -43,8 +43,12 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "alarmCnt") Integer alarmCnt,
                                 @Param(value = "thresholdAbs") BigDecimal thresholdAbs,
                                 @Param(value = "thresholdPer") BigDecimal thresholdPer,
+                                @Param(value = "meteType") String meteType,
                                 @Param(value = "modulus") Integer modulus,
-                                @Param(value = "remark") String remark);
+                                @Param(value = "remark") String remark,
+                                @Param(value = "stateZero") String stateZero,
+                                @Param(value = "stateOne") String stateOne,
+                                @Param(value = "alarmState") Integer alarmState);
     List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
     int batchAdd(List<TStdDeviceMete> list);

@@ -8,7 +8,7 @@
         <result column="mete_id" jdbcType="VARCHAR" property="meteId" />
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="up_effect" jdbcType="INTEGER" property="upEffect" />
-        <result column="low_effect" jdbcType="INTEGER" property="lowEffect" />
+        <result column="down_effect" jdbcType="INTEGER" property="downEffect" />
         <result column="mete_index" jdbcType="INTEGER" property="meteIndex" />
         <result column="mete_cid" jdbcType="INTEGER" property="meteCid" />
         <result column="signal_kind" jdbcType="INTEGER" property="signalKind" />
@@ -35,7 +35,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_id, mete_id, mete_name, up_effect, low_effect, mete_index, mete_cid, signal_kind, last_value, last_time, explain_type, report_type, report_level, mask_type, mask_mid, mask_string, mask_value, delay_time, mete_code, device_type, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, link_mete_id
+        device_id, mete_id, mete_name, up_effect, down_effect, mete_index, mete_cid, signal_kind, last_value, last_time, explain_type, report_type, report_level, mask_type, mask_mid, mask_string, mask_value, delay_time, mete_code, device_type, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, link_mete_id
     </sql>
 
 
@@ -45,7 +45,7 @@
             mete_id,
             mete_name,
             up_effect,
-            low_effect,
+            down_effect,
             mete_index,
             mete_cid,
             signal_kind,
@@ -73,7 +73,7 @@
                 #{meteId, jdbcType=VARCHAR},
                 #{meteName, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=INTEGER},
-                #{lowEffect, jdbcType=INTEGER},
+                #{downEffect, jdbcType=INTEGER},
                 #{meteIndex, jdbcType=INTEGER},
                 #{meteCid, jdbcType=INTEGER},
                 #{signalKind, jdbcType=INTEGER},
@@ -110,7 +110,7 @@
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
-        <if test="lowEffect != null ">a.low_effect = #{lowEffect, jdbcType=INTEGER},</if>
+        <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=INTEGER},</if>
         <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
         <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
         <if test="signalKind != null ">a.signal_kind = #{signalKind, jdbcType=INTEGER},</if>
@@ -143,7 +143,7 @@
         a.mete_id,
         a.mete_name,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.mete_index,
         a.mete_cid,
         a.signal_kind,
@@ -178,7 +178,7 @@
         a.mete_id,
         a.mete_name,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.mete_index,
         a.mete_cid,
         a.signal_kind,
@@ -207,7 +207,7 @@
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="upEffect != null "> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
-        <if test="lowEffect != null "> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="downEffect != null "> and a.down_effect = #{downEffect, jdbcType=INTEGER}</if>
         <if test="meteIndex != null "> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
         <if test="meteCid != null "> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
         <if test="signalKind != null "> and a.signal_kind = #{signalKind, jdbcType=INTEGER}</if>
@@ -238,7 +238,7 @@
         a.mete_id,
         a.mete_name,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.mete_index,
         a.mete_cid,
         a.signal_kind,
@@ -267,7 +267,7 @@
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="upEffect != null "> and a.up_effect = #{upEffect, jdbcType=INTEGER}</if>
-        <if test="lowEffect != null "> and a.low_effect = #{lowEffect, jdbcType=INTEGER}</if>
+        <if test="downEffect != null "> and a.down_effect = #{downEffect, jdbcType=INTEGER}</if>
         <if test="meteIndex != null "> and a.mete_index = #{meteIndex, jdbcType=INTEGER}</if>
         <if test="meteCid != null "> and a.mete_cid = #{meteCid, jdbcType=INTEGER}</if>
         <if test="signalKind != null "> and a.signal_kind = #{signalKind, jdbcType=INTEGER}</if>
@@ -298,7 +298,7 @@
             mete_id,
             mete_name,
             up_effect,
-            low_effect,
+            down_effect,
             mete_index,
             mete_cid,
             signal_kind,
@@ -328,7 +328,7 @@
                 #{TCfgTelesignal.meteId, jdbcType=VARCHAR},
                 #{TCfgTelesignal.meteName, jdbcType=VARCHAR},
                 #{TCfgTelesignal.upEffect, jdbcType=INTEGER},
-                #{TCfgTelesignal.lowEffect, jdbcType=INTEGER},
+                #{TCfgTelesignal.downEffect, jdbcType=INTEGER},
                 #{TCfgTelesignal.meteIndex, jdbcType=INTEGER},
                 #{TCfgTelesignal.meteCid, jdbcType=INTEGER},
                 #{TCfgTelesignal.signalKind, jdbcType=INTEGER},

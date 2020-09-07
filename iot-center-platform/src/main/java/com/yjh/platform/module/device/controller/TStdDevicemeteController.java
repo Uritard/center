@@ -108,7 +108,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "deviceId", required = false) Long deviceId,
                          @RequestParam(value = "customId", required = false) String customId,
                          @RequestParam(value = "meteId", required = false) Long meteId,
-                         @RequestParam(value = "meteType", required = false) String meteType,
+                         @RequestParam(value = "meteKind", required = false) String meteKind,
                          @RequestParam(value = "meteName", required = false) String meteName,
                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                          @RequestParam(value = "customType", required = false) Integer customType,
@@ -127,11 +127,15 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
                          @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
                          @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
+                         @RequestParam(value = "meteType", required = false) String meteType,
                          @RequestParam(value = "modulus", required = false) Integer modulus,
-                         @RequestParam(value = "remark", required = false) String remark) {
+                         @RequestParam(value = "remark", required = false) String remark,
+                         @RequestParam(value = "stateZero", required = false) String stateZero,
+                         @RequestParam(value = "stateOne", required = false) String stateOne,
+                         @RequestParam(value = "alarmState", required = false) Integer alarmState) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteType, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer,meteType, modulus, remark,stateZero,stateOne,alarmState);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -55,7 +55,7 @@ public class TCfgMete implements Serializable {
 
     private Integer upEffect;
 
-    private Integer lowEffect;
+    private Integer downEffect;
 
     private Integer alarmlevel;
 

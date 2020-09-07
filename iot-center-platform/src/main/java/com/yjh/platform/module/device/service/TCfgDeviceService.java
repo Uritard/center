@@ -103,7 +103,7 @@ public class TCfgDeviceService{
         tCfgTeleadjust.setMeteName(mapAll.get("meteName"));
         tCfgTeleadjust.setMeteCode(mapAll.get("meteCode"));
         tCfgTeleadjust.setUpEffect(Float.valueOf(mapAll.get("upEffect")));
-        tCfgTeleadjust.setLowEffect(Float.valueOf(mapAll.get("lowEffect")));
+        tCfgTeleadjust.setDownEffect(Float.valueOf(mapAll.get("downEffect")));
         tCfgTeleadjust.setMetePrecision(Integer.valueOf(mapAll.get("metePrecision")));
         tCfgTeleadjust.setUnit(mapAll.get("unit"));
         tCfgTeleadjust.setDeviceType(mapAll.get("deviceType"));
@@ -122,7 +122,7 @@ public class TCfgDeviceService{
         tCfgTelesignal.setMeteId(mapAll.get("meteId"));
         tCfgTelesignal.setMeteName(mapAll.get("meteName"));
         tCfgTelesignal.setUpEffect(Integer.valueOf(mapAll.get("upEffect")));
-        tCfgTelesignal.setLowEffect(Integer.valueOf(mapAll.get("lowEffect")));
+        tCfgTelesignal.setDownEffect(Integer.valueOf(mapAll.get("downEffect")));
         tCfgTelesignal.setMeteCode(mapAll.get("meteCode"));
         tCfgTelesignal.setDeviceType(mapAll.get("deviceType"));
         tCfgTelesignal.setAlarmthresbhold(Integer.valueOf(mapAll.get("alarmthresbhold")));
@@ -141,7 +141,7 @@ public class TCfgDeviceService{
         tCfgTelemeter.setMeteId(mapAll.get("meteId"));
         tCfgTelemeter.setMeteName(mapAll.get("meteName"));
         tCfgTelemeter.setUpEffect(Float.valueOf(mapAll.get("upEffect")));
-        tCfgTelemeter.setLowEffect(Float.valueOf(mapAll.get("lowEffect")));
+        tCfgTelemeter.setDownEffect(Float.valueOf(mapAll.get("downEffect")));
         tCfgTelemeter.setMeteCode(mapAll.get("meteCode"));
         tCfgTelemeter.setDeviceType(mapAll.get("deviceType"));
         tCfgTelemeter.setMetePrecision(Integer.valueOf(mapAll.get("metePrecision")));

@@ -47,8 +47,8 @@ public class TCfgMeteService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgMete> select(String meteId, String meteType, Integer meteKind, String meteName, String meteCode, String unit, String meteExplainType, Date createTime, Date updateTime, Integer modulus, String stationName, String stationId, Integer upEffect, Integer lowEffect, Integer alarmlevel, Integer alarmthresbhold, String describer, Integer metePrecision, Float changeLimit, Float hilimit1, Float lolimit1, Float hilimit2, Float lolimit2, Float hilimit3, Float lolimit3, Float hilimit4, Float stander, Integer controlenable) {
-        List<TCfgMete> tCfgMeteList = tCfgMeteDao.select(meteId, meteType, meteKind, meteName, meteCode, unit, meteExplainType, createTime, updateTime, modulus, stationName, stationId, upEffect, lowEffect, alarmlevel, alarmthresbhold, describer, metePrecision, changeLimit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable);
+    public List<TCfgMete> select(String meteId, String meteType, Integer meteKind, String meteName, String meteCode, String unit, String meteExplainType, Date createTime, Date updateTime, Integer modulus, String stationName, String stationId, Integer upEffect, Integer downEffect, Integer alarmlevel, Integer alarmthresbhold, String describer, Integer metePrecision, Float changeLimit, Float hilimit1, Float lolimit1, Float hilimit2, Float lolimit2, Float hilimit3, Float lolimit3, Float hilimit4, Float stander, Integer controlenable) {
+        List<TCfgMete> tCfgMeteList = tCfgMeteDao.select(meteId, meteType, meteKind, meteName, meteCode, unit, meteExplainType, createTime, updateTime, modulus, stationName, stationId, upEffect, downEffect, alarmlevel, alarmthresbhold, describer, metePrecision, changeLimit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable);
         return tCfgMeteList;
     }
 

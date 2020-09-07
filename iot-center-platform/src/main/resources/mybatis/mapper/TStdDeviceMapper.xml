@@ -261,7 +261,7 @@
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
-        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id &gt;= #{upRegionId, jdbcType=BIGINT}</if>
         <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
         <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
         <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>

@@ -104,7 +104,7 @@ public class TCfgTelesignalController {
                             @RequestParam(value = "meteId", required = false) String meteId,
                             @RequestParam(value = "meteName", required = false) String meteName,
                             @RequestParam(value = "upEffect", required = false) Integer upEffect,
-                            @RequestParam(value = "lowEffect", required = false) Integer lowEffect,
+                            @RequestParam(value = "downEffect", required = false) Integer downEffect,
                             @RequestParam(value = "meteIndex", required = false) Integer meteIndex,
                             @RequestParam(value = "meteCid", required = false) Integer meteCid,
                             @RequestParam(value = "signalKind", required = false) Integer signalKind,
@@ -129,7 +129,7 @@ public class TCfgTelesignalController {
                             @RequestParam(value = "linkMeteId", required = false) String linkMeteId) {
         Result result = new Result();
         try {
-            List<TCfgTelesignal> list = tCfgTelesignalService.select(deviceId, meteId, meteName, upEffect, lowEffect, meteIndex, meteCid, signalKind, lastValue, lastTime, explainType, reportType, reportLevel, maskType, maskMid, maskString, maskValue, delayTime, meteCode, deviceType, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, linkMeteId);
+            List<TCfgTelesignal> list = tCfgTelesignalService.select(deviceId, meteId, meteName, upEffect, downEffect, meteIndex, meteCid, signalKind, lastValue, lastTime, explainType, reportType, reportLevel, maskType, maskMid, maskString, maskValue, delayTime, meteCode, deviceType, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, linkMeteId);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

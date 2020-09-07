@@ -1204,7 +1204,7 @@ public class TemplateToImportController {
                 tStdDeviceMete.setAlarmNote(row.getCell(21).getStringCellValue());
                 tStdDeviceMete.setAlarmType(row.getCell(23).getStringCellValue());
                 tStdDeviceMete.setUpEffect((float) row.getCell(24).getNumericCellValue());
-                tStdDeviceMete.setLowEffect((float) row.getCell(25).getNumericCellValue());
+                tStdDeviceMete.setDownEffect((float) row.getCell(25).getNumericCellValue());
                 tStdDeviceMete.setAlarmLevel(new Double(row.getCell(26).getNumericCellValue()).intValue());
                 tStdDeviceMete.setHighLimit1((float) row.getCell(27).getNumericCellValue());
                 tStdDeviceMete.setLowLimit1((float) row.getCell(28).getNumericCellValue());
@@ -2069,7 +2069,7 @@ public class TemplateToImportController {
                     break;
                 } else if (row.getCell(4).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     lowEffect = (float) row.getCell(4).getNumericCellValue();
-                    tCfgTelemeter.setLowEffect(lowEffect);//第5列
+                    tCfgTelemeter.setDownEffect(lowEffect);//第5列
                 }
                 Integer metePrecision = null;
                 if (row.getCell(5) != null && row.getCell(5).getCellTypeEnum().equals(CellType.STRING)) {
@@ -2392,7 +2392,7 @@ public class TemplateToImportController {
                     break;
                 } else if (row.getCell(4).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     lowEffect = new Double(row.getCell(4).getNumericCellValue()).intValue();
-                    tCfgTelesignal.setLowEffect(lowEffect);//第5列
+                    tCfgTelesignal.setDownEffect(lowEffect);//第5列
                 }
                 Integer meteIndex = null;
                 if (row.getCell(5) != null && row.getCell(5).getCellTypeEnum().equals(CellType.STRING)) {
@@ -2611,204 +2611,204 @@ public class TemplateToImportController {
         return result;
     }
 
-    @ApiOperation(value = "算法数据模板导入", notes = "导入")
-    @RequestMapping(value = "/importExcelTAlgorithm", method = RequestMethod.POST)
-    public Result importExcelTAlgorithm(@RequestParam("excelFile") String pathName) {
-        Result result = new Result();
-        try {
-            XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(pathName));//创建工作簿
-            Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
-            int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
-
-            List<TAlgorithmInfo> tAlgorithmInfoList = new ArrayList<>();
-            List<TAlgorithmConf> tAlgorithmConfList = new ArrayList<>();
-
-            StringBuffer errMsg = new StringBuffer();
-            //算法
-            for (int i = 2; i <= total; i++) {
-                Row row = sheet.getRow(i);//获取第i+1行
-                //创建算法
-                TAlgorithmInfo tAlgorithmInfo = new TAlgorithmInfo();
-
-                if (row.getCell(0) == null || row.getCell(0).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(0).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(0).getStringCellValue()))) {
-                    errMsg.append("第" + (i + 1) + "行," + "A列,点号不能为空<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                }
-                if (row.getCell(0) != null && row.getCell(0).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    tAlgorithmInfo.setAlgorithmId(new Double(row.getCell(0).getNumericCellValue()).longValue());//第17列
-                } else {
-                    errMsg.append("第" + (i + 1) + "行," + "A列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                }
-                String algorithmName = null;
-                if (row.getCell(1) != null && row.getCell(1).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    errMsg.append("第" + (i + 1) + "行," + "B列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    algorithmName = (row.getCell(1).getStringCellValue() == null || "".equals(row.getCell(1).getStringCellValue())) ? algorithmName : row.getCell(1).getStringCellValue();
-                    tAlgorithmInfo.setAlgorithmName(algorithmName);//第2列
-                }
-                String algorithmType = null;
-                if (row.getCell(2) != null && row.getCell(2).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    errMsg.append("第" + (i + 1) + "行," + "C列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    algorithmType = (row.getCell(2).getStringCellValue() == null || "".equals(row.getCell(2).getStringCellValue())) ? algorithmType : row.getCell(2).getStringCellValue();
-                    tAlgorithmInfo.setAlgorithmType(algorithmType);//第3列
-                }
-                String describel = null;
-                if (row.getCell(3) != null && row.getCell(3).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    errMsg.append("第" + (i + 1) + "行," + "D列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    describel = (row.getCell(3).getStringCellValue() == null || "".equals(row.getCell(3).getStringCellValue())) ? describel : row.getCell(3).getStringCellValue();
-                    tAlgorithmInfo.setDescribel(describel);//第4列
-                }
-                Integer algorithmCode = null;
-                if (row.getCell(4) != null && row.getCell(4).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "E列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else if (row.getCell(4).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    algorithmCode = new Double(row.getCell(4).getNumericCellValue()).intValue();
-                    tAlgorithmInfo.setAlgorithmCode(algorithmCode);//第5列
-                }
-                String analysType = null;
-                if (row.getCell(5) != null && row.getCell(5).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    errMsg.append("第" + (i + 1) + "行," + "F列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    analysType = (row.getCell(5).getStringCellValue() == null || "".equals(row.getCell(5).getStringCellValue())) ? analysType : row.getCell(5).getStringCellValue();
-                    tAlgorithmInfo.setAnalysType(analysType);//第6列
-                }
-                tAlgorithmInfoList.add(tAlgorithmInfo);
-            }
-
-            //算法配置
-            for (int i = 2; i <= total; i++){
-                Row row = sheet.getRow(i);//获取第i+1行
-                //创建算法配置
-                TAlgorithmConf  tAlgorithmConf = new TAlgorithmConf();
-                if (row.getCell(6) == null || row.getCell(6).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(6).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(6).getStringCellValue()))) {
-                    errMsg.append("第" + (i + 1) + "行," + "G列,点号不能为空<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                }
-                if (row.getCell(6) != null && row.getCell(6).getCellTypeEnum().equals(CellType.STRING)) {
-                    tAlgorithmConf.setInsId(row.getCell(6).getStringCellValue());//第7列
-                } else {
-                    errMsg.append("第" + (i + 1) + "行," + "G列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                }
-                tAlgorithmConf.setAlgorithmId(new Double(row.getCell(0).getNumericCellValue()).longValue());
-                String insName = null;
-                if (row.getCell(7) != null && row.getCell(7).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    errMsg.append("第" + (i + 1) + "行," + "H列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    insName = (row.getCell(7).getStringCellValue() == null || "".equals(row.getCell(7).getStringCellValue())) ? insName : row.getCell(7).getStringCellValue();
-                    tAlgorithmConf.setInsName(insName);//第8列
-                }
-                Long inspectiondevId = null;
-                if (row.getCell(8) != null && row.getCell(8).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "I列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else if (row.getCell(8).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    inspectiondevId = new Double(row.getCell(8).getNumericCellValue()).longValue();
-                    tAlgorithmConf.setInspectiondevId(inspectiondevId);//第9列
-                }
-                tAlgorithmConf.setAlgorithmName(row.getCell(1).getStringCellValue());
-                Integer status = null;
-                if (row.getCell(9) != null && row.getCell(9).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "J列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else if (row.getCell(9).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    status = new Double(row.getCell(9).getNumericCellValue()).intValue();
-                    tAlgorithmConf.setStatus(status);//第10列
-                }
-                Integer ifDel = null;
-                if (row.getCell(10) != null && row.getCell(10).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "K列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else if (row.getCell(10).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    ifDel = new Double(row.getCell(10).getNumericCellValue()).intValue();
-                    tAlgorithmConf.setIfDel(ifDel);//第11列
-                }
-                Integer ifShow = null;
-                if (row.getCell(11) != null && row.getCell(11).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "L列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else if (row.getCell(11).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    ifShow = new Double(row.getCell(11).getNumericCellValue()).intValue();
-                    tAlgorithmConf.setIfShow(ifShow);//第12列
-                }
-                String picUrl = null;
-                if (row.getCell(12) != null && row.getCell(12).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    errMsg.append("第" + (i + 1) + "行," + "M列,点号不是字符串类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    picUrl = (row.getCell(12).getStringCellValue() == null || "".equals(row.getCell(12).getStringCellValue())) ? picUrl : row.getCell(12).getStringCellValue();
-                    tAlgorithmConf.setPicUrl(picUrl);//第13列
-                }
-                Integer applyModule = null;
-                if (row.getCell(13) != null && row.getCell(13).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "N列,点号不是数值类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else if (row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    applyModule = new Double(row.getCell(13).getNumericCellValue()).intValue();
-                    tAlgorithmConf.setApplyModule(applyModule);//第14列
-                }
-                Date createTime = null;
-                if (row.getCell(14) != null && row.getCell(14).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "O列,点号不是日期类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    createTime = (row.getCell(14).getDateCellValue() == null || "".equals(row.getCell(14).getDateCellValue())) ? createTime : row.getCell(14).getDateCellValue();
-                    tAlgorithmConf.setCreateTime(createTime);//第15列
-                }
-                Date updateTime = null;
-                if (row.getCell(15) != null && row.getCell(15).getCellTypeEnum().equals(CellType.STRING)) {
-                    errMsg.append("第" + (i + 1) + "行," + "P列,点号不是日期类型<br>");
-                    log.error("模板有误:" + errMsg);
-                    break;
-                } else {
-                    updateTime = (row.getCell(15).getDateCellValue() == null || "".equals(row.getCell(15).getDateCellValue())) ? updateTime : row.getCell(15).getDateCellValue();
-                    tAlgorithmConf.setUpdateTime(updateTime);//第16列
-                }
-                tAlgorithmConfList.add(tAlgorithmConf);
-            }
-
-            int sizeNum1 = tAlgorithmInfoList.size();
-            int sizeNum2 = tAlgorithmConfList.size();
-            int resultNum = 0;
-            if(sizeNum1 == total - 1 && sizeNum2 == total - 1){
-                resultNum = templateToImportService.batchUpdateTAlgorithmInfo(tAlgorithmInfoList);
-                int resultNum2 = templateToImportService.batchUpdateTAlgorithmConf(tAlgorithmConfList);
-            } else {
-                log.error("导入异常：数据格式有误");
-            }
-
-            result.setData(resultNum);//返回插入的条数
-
-        } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("导入失败：" + e);
-        }
-        return result;
-    }
+//    @ApiOperation(value = "算法数据模板导入", notes = "导入")
+//    @RequestMapping(value = "/importExcelTAlgorithm", method = RequestMethod.POST)
+//    public Result importExcelTAlgorithm(@RequestParam("excelFile") String pathName) {
+//        Result result = new Result();
+//        try {
+//            XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(pathName));//创建工作簿
+//            Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
+//            int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
+//
+//            List<TAlgorithmInfo> tAlgorithmInfoList = new ArrayList<>();
+//            List<TAlgorithmConf> tAlgorithmConfList = new ArrayList<>();
+//
+//            StringBuffer errMsg = new StringBuffer();
+//            //算法
+//            for (int i = 2; i <= total; i++) {
+//                Row row = sheet.getRow(i);//获取第i+1行
+//                //创建算法
+//                TAlgorithmInfo tAlgorithmInfo = new TAlgorithmInfo();
+//
+//                if (row.getCell(0) == null || row.getCell(0).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(0).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(0).getStringCellValue()))) {
+//                    errMsg.append("第" + (i + 1) + "行," + "A列,点号不能为空<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                }
+//                if (row.getCell(0) != null && row.getCell(0).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    tAlgorithmInfo.setAlgorithmId(new Double(row.getCell(0).getNumericCellValue()).longValue());//第17列
+//                } else {
+//                    errMsg.append("第" + (i + 1) + "行," + "A列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                }
+//                String algorithmName = null;
+//                if (row.getCell(1) != null && row.getCell(1).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "B列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    algorithmName = (row.getCell(1).getStringCellValue() == null || "".equals(row.getCell(1).getStringCellValue())) ? algorithmName : row.getCell(1).getStringCellValue();
+//                    tAlgorithmInfo.setAlgorithmName(algorithmName);//第2列
+//                }
+//                String algorithmType = null;
+//                if (row.getCell(2) != null && row.getCell(2).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "C列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    algorithmType = (row.getCell(2).getStringCellValue() == null || "".equals(row.getCell(2).getStringCellValue())) ? algorithmType : row.getCell(2).getStringCellValue();
+//                    tAlgorithmInfo.setAlgorithmType(algorithmType);//第3列
+//                }
+//                String describel = null;
+//                if (row.getCell(3) != null && row.getCell(3).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "D列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    describel = (row.getCell(3).getStringCellValue() == null || "".equals(row.getCell(3).getStringCellValue())) ? describel : row.getCell(3).getStringCellValue();
+//                    tAlgorithmInfo.setDescribel(describel);//第4列
+//                }
+//                Integer algorithmCode = null;
+//                if (row.getCell(4) != null && row.getCell(4).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "E列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else if (row.getCell(4).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    algorithmCode = new Double(row.getCell(4).getNumericCellValue()).intValue();
+//                    tAlgorithmInfo.setAlgorithmCode(algorithmCode);//第5列
+//                }
+//                String analysType = null;
+//                if (row.getCell(5) != null && row.getCell(5).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "F列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    analysType = (row.getCell(5).getStringCellValue() == null || "".equals(row.getCell(5).getStringCellValue())) ? analysType : row.getCell(5).getStringCellValue();
+//                    tAlgorithmInfo.setAnalysType(analysType);//第6列
+//                }
+//                tAlgorithmInfoList.add(tAlgorithmInfo);
+//            }
+//
+//            //算法配置
+//            for (int i = 2; i <= total; i++){
+//                Row row = sheet.getRow(i);//获取第i+1行
+//                //创建算法配置
+//                TAlgorithmConf  tAlgorithmConf = new TAlgorithmConf();
+//                if (row.getCell(6) == null || row.getCell(6).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(6).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(6).getStringCellValue()))) {
+//                    errMsg.append("第" + (i + 1) + "行," + "G列,点号不能为空<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                }
+//                if (row.getCell(6) != null && row.getCell(6).getCellTypeEnum().equals(CellType.STRING)) {
+//                    tAlgorithmConf.setInsId(row.getCell(6).getStringCellValue());//第7列
+//                } else {
+//                    errMsg.append("第" + (i + 1) + "行," + "G列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                }
+//                tAlgorithmConf.setAlgorithmId(new Double(row.getCell(0).getNumericCellValue()).longValue());
+//                String insName = null;
+//                if (row.getCell(7) != null && row.getCell(7).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "H列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    insName = (row.getCell(7).getStringCellValue() == null || "".equals(row.getCell(7).getStringCellValue())) ? insName : row.getCell(7).getStringCellValue();
+//                    tAlgorithmConf.setInsName(insName);//第8列
+//                }
+//                Long inspectiondevId = null;
+//                if (row.getCell(8) != null && row.getCell(8).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "I列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else if (row.getCell(8).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    inspectiondevId = new Double(row.getCell(8).getNumericCellValue()).longValue();
+//                    tAlgorithmConf.setInspectiondevId(inspectiondevId);//第9列
+//                }
+//                tAlgorithmConf.setAlgorithmName(row.getCell(1).getStringCellValue());
+//                Integer status = null;
+//                if (row.getCell(9) != null && row.getCell(9).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "J列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else if (row.getCell(9).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    status = new Double(row.getCell(9).getNumericCellValue()).intValue();
+//                    tAlgorithmConf.setStatus(status);//第10列
+//                }
+//                Integer ifDel = null;
+//                if (row.getCell(10) != null && row.getCell(10).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "K列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else if (row.getCell(10).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    ifDel = new Double(row.getCell(10).getNumericCellValue()).intValue();
+//                    tAlgorithmConf.setIfDel(ifDel);//第11列
+//                }
+//                Integer ifShow = null;
+//                if (row.getCell(11) != null && row.getCell(11).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "L列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else if (row.getCell(11).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    ifShow = new Double(row.getCell(11).getNumericCellValue()).intValue();
+//                    tAlgorithmConf.setIfShow(ifShow);//第12列
+//                }
+//                String picUrl = null;
+//                if (row.getCell(12) != null && row.getCell(12).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "M列,点号不是字符串类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    picUrl = (row.getCell(12).getStringCellValue() == null || "".equals(row.getCell(12).getStringCellValue())) ? picUrl : row.getCell(12).getStringCellValue();
+//                    tAlgorithmConf.setPicUrl(picUrl);//第13列
+//                }
+//                Integer applyModule = null;
+//                if (row.getCell(13) != null && row.getCell(13).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "N列,点号不是数值类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else if (row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    applyModule = new Double(row.getCell(13).getNumericCellValue()).intValue();
+//                    tAlgorithmConf.setApplyModule(applyModule);//第14列
+//                }
+//                Date createTime = null;
+//                if (row.getCell(14) != null && row.getCell(14).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "O列,点号不是日期类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    createTime = (row.getCell(14).getDateCellValue() == null || "".equals(row.getCell(14).getDateCellValue())) ? createTime : row.getCell(14).getDateCellValue();
+//                    tAlgorithmConf.setCreateTime(createTime);//第15列
+//                }
+//                Date updateTime = null;
+//                if (row.getCell(15) != null && row.getCell(15).getCellTypeEnum().equals(CellType.STRING)) {
+//                    errMsg.append("第" + (i + 1) + "行," + "P列,点号不是日期类型<br>");
+//                    log.error("模板有误:" + errMsg);
+//                    break;
+//                } else {
+//                    updateTime = (row.getCell(15).getDateCellValue() == null || "".equals(row.getCell(15).getDateCellValue())) ? updateTime : row.getCell(15).getDateCellValue();
+//                    tAlgorithmConf.setUpdateTime(updateTime);//第16列
+//                }
+//                tAlgorithmConfList.add(tAlgorithmConf);
+//            }
+//
+//            int sizeNum1 = tAlgorithmInfoList.size();
+//            int sizeNum2 = tAlgorithmConfList.size();
+//            int resultNum = 0;
+//            if(sizeNum1 == total - 1 && sizeNum2 == total - 1){
+//                resultNum = templateToImportService.batchUpdateTAlgorithmInfo(tAlgorithmInfoList);
+//                int resultNum2 = templateToImportService.batchUpdateTAlgorithmConf(tAlgorithmConfList);
+//            } else {
+//                log.error("导入异常：数据格式有误");
+//            }
+//
+//            result.setData(resultNum);//返回插入的条数
+//
+//        } catch (Exception e) {
+//            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+//            log.error("导入失败：" + e);
+//        }
+//        return result;
+//    }
 }

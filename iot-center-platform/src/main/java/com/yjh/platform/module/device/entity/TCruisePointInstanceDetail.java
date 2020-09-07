@@ -22,4 +22,6 @@ public class TCruisePointInstanceDetail extends TCruisePointInstance{
     private String cruiseTypeName;
     @ApiModelProperty(value ="设备部位")
     private String customName;
+
+    private Long upRegionId;
 }

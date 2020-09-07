@@ -37,7 +37,7 @@ public class TStdDeviceMete implements Serializable {
     private Long meteId;
 
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
-    private String meteType;
+    private String meteKind;
 
     @ApiModelProperty(value = "设备名称")
     private String meteName;
@@ -64,7 +64,7 @@ public class TStdDeviceMete implements Serializable {
     private Float upEffect;
 
     @ApiModelProperty(value = "有效下限")
-    private Float lowEffect;
+    private Float downEffect;
 
     @ApiModelProperty(value = "告警级别")
     private Integer alarmLevel;
@@ -105,11 +105,18 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "百分比阀值")
     private BigDecimal thresholdPer;
 
+    private String meteType;
+
     @ApiModelProperty(value = "系数")
     private Integer modulus;
 
     @ApiModelProperty(value = "是否生成告警 0-生成 1-不生成")
     private String remark;
 
+    private String stateZero;
+
+    private String stateOne;
+
+    private Integer alarmState;
 
 }

@@ -47,8 +47,8 @@ public class TCfgTeleadjustService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgTeleadjust> select(String deviceId, String meteId, String meteName, Float upEffect, Float lowEffect, Integer metePrecision, String unit, Integer meteIndex, Integer meteCid, Integer adjustKind, Float lastValue, Date lastTime, String meteCode, String deviceType, String description, Float stander, Integer controlenable) {
-        List<TCfgTeleadjust> tCfgTeleadjustList = tCfgTeleadjustDao.select(deviceId, meteId, meteName, upEffect, lowEffect, metePrecision, unit, meteIndex, meteCid, adjustKind, lastValue, lastTime, meteCode, deviceType, description, stander, controlenable);
+    public List<TCfgTeleadjust> select(String deviceId, String meteId, String meteName, Float upEffect, Float downEffect, Integer metePrecision, String unit, Integer meteIndex, Integer meteCid, Integer adjustKind, Float lastValue, Date lastTime, String meteCode, String deviceType, String description, Float stander, Integer controlenable) {
+        List<TCfgTeleadjust> tCfgTeleadjustList = tCfgTeleadjustDao.select(deviceId, meteId, meteName, upEffect, downEffect, metePrecision, unit, meteIndex, meteCid, adjustKind, lastValue, lastTime, meteCode, deviceType, description, stander, controlenable);
         return tCfgTeleadjustList;
     }
 

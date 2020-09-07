@@ -21,7 +21,7 @@ public interface TCfgTelemeterDao {
                                 @Param(value = "meteId") String meteId,
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "upEffect") Float upEffect,
-                                @Param(value = "lowEffect") Float lowEffect,
+                                @Param(value = "downEffect") Float downEffect,
                                 @Param(value = "metePrecision") Integer metePrecision,
                                 @Param(value = "unit") String unit,
                                 @Param(value = "meteIndex") Integer meteIndex,

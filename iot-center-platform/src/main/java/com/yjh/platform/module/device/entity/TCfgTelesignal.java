@@ -34,7 +34,7 @@ public class TCfgTelesignal implements Serializable {
     private Integer upEffect;
 
     @ApiModelProperty(value = "有效下限")
-    private Integer lowEffect;
+    private Integer downEffect;
 
     @ApiModelProperty(value = "同一设备下的监控量序号")
     private Integer meteIndex;

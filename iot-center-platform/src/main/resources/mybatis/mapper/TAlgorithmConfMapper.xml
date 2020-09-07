@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TAlgorithmConfDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TAlgorithmConf">
+        <id column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
+        <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="preset_id" jdbcType="VARCHAR" property="presetId" />
+        <result column="if_del" jdbcType="INTEGER" property="ifDel" />
+        <result column="if_show" jdbcType="INTEGER" property="ifShow" />
+        <result column="pic_url" jdbcType="VARCHAR" property="picUrl" />
+        <result column="apply_module" jdbcType="INTEGER" property="applyModule" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        camera_id, algorithm_id, algorithm_name, status, preset_id, if_del, if_show, pic_url, apply_module, create_time, update_time
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf">
+        insert into t_algorithm_conf(
+            camera_id,
+            algorithm_id,
+            algorithm_name,
+            status,
+            preset_id,
+            if_del,
+            if_show,
+            pic_url,
+            apply_module,
+            create_time,
+            update_time
+        )values(
+                #{cameraId, jdbcType=BIGINT},
+                #{algorithmId, jdbcType=BIGINT},
+                #{algorithmName, jdbcType=VARCHAR},
+                #{status, jdbcType=INTEGER},
+                #{presetId, jdbcType=VARCHAR},
+                #{ifDel, jdbcType=INTEGER},
+                #{ifShow, jdbcType=INTEGER},
+                #{picUrl, jdbcType=VARCHAR},
+                #{applyModule, jdbcType=INTEGER},
+                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP()
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_algorithm_conf
+                where camera_id = #{cameraId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf">
+        update t_algorithm_conf a <set>
+        <if test="cameraId != null and cameraId != ''">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
+        <if test="algorithmName != null and algorithmName != ''">a.algorithm_name = #{algorithmName, jdbcType=VARCHAR},</if>
+        <if test="status != null and status != ''">a.status = #{status, jdbcType=INTEGER},</if>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=VARCHAR},</if>
+        <if test="ifDel != null and ifDel != ''">a.if_del = #{ifDel, jdbcType=INTEGER},</if>
+        <if test="ifShow != null and ifShow != ''">a.if_show = #{ifShow, jdbcType=INTEGER},</if>
+        <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
+        <if test="applyModule != null and applyModule != ''">a.apply_module = #{applyModule, jdbcType=INTEGER},</if>
+    </set>
+            where a.camera_id = #{cameraId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TAlgorithmConf">
+        select
+        a.camera_id,
+        a.algorithm_id,
+        a.algorithm_name,
+        a.status,
+        a.preset_id,
+        a.if_del,
+        a.if_show,
+        a.pic_url,
+        a.apply_module,
+        a.create_time,
+        a.update_time
+        from t_algorithm_conf a
+        where 1 = 1
+            and a.camera_id = #{cameraId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf" resultType="com.yjh.platform.module.user.entity.TAlgorithmConf">
+        select
+        a.camera_id,
+        a.algorithm_id,
+        a.algorithm_name,
+        a.status,
+        a.preset_id,
+        a.if_del,
+        a.if_show,
+        a.pic_url,
+        a.apply_module,
+        a.create_time,
+        a.update_time,
+        b.preset_name as presetName,
+        d.dict_note as analysTypeName,
+        e.analys_type as analysType
+        from t_algorithm_conf a,t_camera_preset b,t_dict_business d,t_algorithm_info e
+        where 1 = 1 and a.preset_id = b.preset_id and d.dict_code = e.analys_type and a.algorithm_id=e.algorithm_id
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
+        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=VARCHAR}</if>
+        <if test="ifDel != null and ifDel != ''"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
+        <if test="ifShow != null and ifShow != ''"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
+        <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
+        <if test="applyModule != null and applyModule != ''"> and a.apply_module = #{applyModule, jdbcType=INTEGER}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConfDetail" resultType="com.yjh.platform.module.user.entity.TAlgorithmConfDetail">
+        select
+        a.camera_id,
+        a.algorithm_id,
+        a.algorithm_name,
+        a.status,
+        a.preset_id,
+        a.if_del,
+        a.if_show,
+        a.pic_url,
+        a.apply_module,
+        a.create_time,
+        a.update_time,
+        b.preset_name as presetName,
+        d.dict_note as analysTypeName,
+        e.analys_type as analysType
+        from t_algorithm_conf a,t_camera_preset b,t_dict_business d,t_algorithm_info e
+        where 1 = 1 and a.preset_id = b.preset_id and d.dict_code = e.analys_type and a.algorithm_id=e.algorithm_id
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
+        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=VARCHAR}</if>
+        <if test="ifDel != null and ifDel != ''"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
+        <if test="ifShow != null and ifShow != ''"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
+        <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
+        <if test="applyModule != null and applyModule != ''"> and a.apply_module = #{applyModule, jdbcType=INTEGER}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_algorithm_conf(
+            camera_id,
+            algorithm_id,
+            algorithm_name,
+            status,
+            preset_id,
+            if_del,
+            if_show,
+            pic_url,
+            apply_module,
+            create_time,
+            update_time
+        )values
+        <foreach collection="list" item="TAlgorithmConf" separator=",">
+            (
+                #{TAlgorithmConf.cameraId, jdbcType=BIGINT},
+                #{TAlgorithmConf.algorithmId, jdbcType=BIGINT},
+                #{TAlgorithmConf.algorithmName, jdbcType=VARCHAR},
+                #{TAlgorithmConf.status, jdbcType=INTEGER},
+                #{TAlgorithmConf.presetId, jdbcType=VARCHAR},
+                #{TAlgorithmConf.ifDel, jdbcType=INTEGER},
+                #{TAlgorithmConf.ifShow, jdbcType=INTEGER},
+                #{TAlgorithmConf.picUrl, jdbcType=VARCHAR},
+                #{TAlgorithmConf.applyModule, jdbcType=INTEGER},
+                #{TAlgorithmConf.createTime, jdbcType=TIMESTAMP},
+                #{TAlgorithmConf.updateTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

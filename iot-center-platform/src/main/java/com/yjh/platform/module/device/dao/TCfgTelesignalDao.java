@@ -21,7 +21,7 @@ public interface TCfgTelesignalDao {
                                 @Param(value = "meteId") String meteId,
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "upEffect") Integer upEffect,
-                                @Param(value = "lowEffect") Integer lowEffect,
+                                @Param(value = "downEffect") Integer downEffect,
                                 @Param(value = "meteIndex") Integer meteIndex,
                                 @Param(value = "meteCid") Integer meteCid,
                                 @Param(value = "signalKind") Integer signalKind,

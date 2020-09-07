@@ -113,7 +113,7 @@ public class TCfgMeteController {
                             @RequestParam(value = "stationName", required = false) String stationName,
                             @RequestParam(value = "stationId", required = false) String stationId,
                             @RequestParam(value = "upEffect", required = false) Integer upEffect,
-                            @RequestParam(value = "lowEffect", required = false) Integer lowEffect,
+                            @RequestParam(value = "downEffect", required = false) Integer downEffect,
                             @RequestParam(value = "alarmlevel", required = false) Integer alarmlevel,
                             @RequestParam(value = "alarmthresbhold", required = false) Integer alarmthresbhold,
                             @RequestParam(value = "describer", required = false) String describer,
@@ -130,7 +130,7 @@ public class TCfgMeteController {
                             @RequestParam(value = "controlenable", required = false) Integer controlenable) {
         Result result = new Result();
         try {
-            List<TCfgMete> list = tCfgMeteService.select(meteId, meteType, meteKind, meteName, meteCode, unit, meteExplainType, createTime, updateTime, modulus, stationName, stationId, upEffect, lowEffect, alarmlevel, alarmthresbhold, describer, metePrecision, changeLimit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable);
+            List<TCfgMete> list = tCfgMeteService.select(meteId, meteType, meteKind, meteName, meteCode, unit, meteExplainType, createTime, updateTime, modulus, stationName, stationId, upEffect, downEffect, alarmlevel, alarmthresbhold, describer, metePrecision, changeLimit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

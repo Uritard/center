@@ -47,8 +47,8 @@ public class TCfgTelemeterService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgTelemeter> select(String deviceId, String meteId, String meteName, Float upEffect, Float lowEffect, Integer metePrecision, String unit, Integer meteIndex, Integer meteCid, Float limitBand, Float changeLimit, String validMid, String validString, Float invalidValue, Float lastValue, Date lastTime, String meteCode, String deviceType, String description, Float hilimit1, Float lolimit1, Float hilimit2, Float lolimit2, Float hilimit3, Float lolimit3, Float hilimit4, Float lolimit4, Float stander, Integer isshield, Long storageperiod, String linkMeteId) {
-        List<TCfgTelemeter> tCfgTelemeterList = tCfgTelemeterDao.select(deviceId, meteId, meteName, upEffect, lowEffect, metePrecision, unit, meteIndex, meteCid, limitBand, changeLimit, validMid, validString, invalidValue, lastValue, lastTime, meteCode, deviceType, description, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, lolimit4, stander, isshield, storageperiod, linkMeteId);
+    public List<TCfgTelemeter> select(String deviceId, String meteId, String meteName, Float upEffect, Float downEffect, Integer metePrecision, String unit, Integer meteIndex, Integer meteCid, Float limitBand, Float changeLimit, String validMid, String validString, Float invalidValue, Float lastValue, Date lastTime, String meteCode, String deviceType, String description, Float hilimit1, Float lolimit1, Float hilimit2, Float lolimit2, Float hilimit3, Float lolimit3, Float hilimit4, Float lolimit4, Float stander, Integer isshield, Long storageperiod, String linkMeteId) {
+        List<TCfgTelemeter> tCfgTelemeterList = tCfgTelemeterDao.select(deviceId, meteId, meteName, upEffect, downEffect, metePrecision, unit, meteIndex, meteCid, limitBand, changeLimit, validMid, validString, invalidValue, lastValue, lastTime, meteCode, deviceType, description, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, lolimit4, stander, isshield, storageperiod, linkMeteId);
         return tCfgTelemeterList;
     }
 

@@ -47,8 +47,8 @@ public class TCfgTelesignalService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgTelesignal> select(String deviceId, String meteId, String meteName, Integer upEffect, Integer lowEffect, Integer meteIndex, Integer meteCid, Integer signalKind, Integer lastValue, Date lastTime, Integer explainType, Integer reportType, Integer reportLevel, Integer maskType, String maskMid, String maskString, Integer maskValue, Integer delayTime, String meteCode, String deviceType, String description, Integer isshield, Long storageperiod, String describer, Integer alarmthresbhold, Integer alarmlevel, String linkMeteId) {
-        List<TCfgTelesignal> tCfgTelesignalList = tCfgTelesignalDao.select(deviceId, meteId, meteName, upEffect, lowEffect, meteIndex, meteCid, signalKind, lastValue, lastTime, explainType, reportType, reportLevel, maskType, maskMid, maskString, maskValue, delayTime, meteCode, deviceType, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, linkMeteId);
+    public List<TCfgTelesignal> select(String deviceId, String meteId, String meteName, Integer upEffect, Integer downEffect, Integer meteIndex, Integer meteCid, Integer signalKind, Integer lastValue, Date lastTime, Integer explainType, Integer reportType, Integer reportLevel, Integer maskType, String maskMid, String maskString, Integer maskValue, Integer delayTime, String meteCode, String deviceType, String description, Integer isshield, Long storageperiod, String describer, Integer alarmthresbhold, Integer alarmlevel, String linkMeteId) {
+        List<TCfgTelesignal> tCfgTelesignalList = tCfgTelesignalDao.select(deviceId, meteId, meteName, upEffect, downEffect, meteIndex, meteCid, signalKind, lastValue, lastTime, explainType, reportType, reportLevel, maskType, maskMid, maskString, maskValue, delayTime, meteCode, deviceType, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, linkMeteId);
         return tCfgTelesignalList;
     }
 

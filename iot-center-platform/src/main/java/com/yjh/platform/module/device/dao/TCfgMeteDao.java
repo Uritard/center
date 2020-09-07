@@ -30,7 +30,7 @@ public interface TCfgMeteDao {
                                 @Param(value = "stationName") String stationName,
                                 @Param(value = "stationId") String stationId,
                                 @Param(value = "upEffect") Integer upEffect,
-                                @Param(value = "lowEffect") Integer lowEffect,
+                                @Param(value = "downEffect") Integer downEffect,
                                 @Param(value = "alarmlevel") Integer alarmlevel,
                                 @Param(value = "alarmthresbhold") Integer alarmthresbhold,
                                 @Param(value = "describer") String describer,

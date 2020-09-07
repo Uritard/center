@@ -23,21 +23,19 @@ public class TAlgorithmConf  implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "摄像头预置位ID或者机器人巡检点ID")
-    private String insId;
+    private Long cameraId;
 
     private Long algorithmId;
 
-    @ApiModelProperty(value = "预置点名称")
-    private String insName;
-
-    @ApiModelProperty(value = "巡检设备ID")
-    private Long inspectiondevId;
 
     @ApiModelProperty(value = "算法名称")
     private String algorithmName;
 
     @ApiModelProperty(value = "状态")
     private Integer status;
+
+    private String presetId;
+
 
     @ApiModelProperty(value = "是否删除")
     private Integer ifDel;
@@ -52,11 +50,11 @@ public class TAlgorithmConf  implements Serializable {
     private Integer applyModule;
 
     @ApiModelProperty(value = "创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间",example = "2018-10-01 12:18:48")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date updateTime;
 
 

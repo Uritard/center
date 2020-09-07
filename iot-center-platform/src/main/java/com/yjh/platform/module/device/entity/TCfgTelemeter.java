@@ -34,7 +34,7 @@ public class TCfgTelemeter implements Serializable {
     private Float upEffect;
 
     @ApiModelProperty(value = "有效下限")
-    private Float lowEffect;
+    private Float downEffect;
 
     @ApiModelProperty(value = "小数点后的有效位数")
     private Integer metePrecision;

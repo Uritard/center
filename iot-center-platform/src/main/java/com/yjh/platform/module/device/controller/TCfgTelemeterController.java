@@ -104,7 +104,7 @@ public class TCfgTelemeterController {
                             @RequestParam(value = "meteId", required = false) String meteId,
                             @RequestParam(value = "meteName", required = false) String meteName,
                             @RequestParam(value = "upEffect", required = false) Float upEffect,
-                            @RequestParam(value = "lowEffect", required = false) Float lowEffect,
+                            @RequestParam(value = "downEffect", required = false) Float downEffect,
                             @RequestParam(value = "metePrecision", required = false) Integer metePrecision,
                             @RequestParam(value = "unit", required = false) String unit,
                             @RequestParam(value = "meteIndex", required = false) Integer meteIndex,
@@ -133,7 +133,7 @@ public class TCfgTelemeterController {
                             @RequestParam(value = "linkMeteId", required = false) String linkMeteId) {
         Result result = new Result();
         try {
-            List<TCfgTelemeter> list = tCfgTelemeterService.select(deviceId, meteId, meteName, upEffect, lowEffect, metePrecision, unit, meteIndex, meteCid, limitBand, changeLimit, validMid, validString, invalidValue, lastValue, lastTime, meteCode, deviceType, description, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, lolimit4, stander, isshield, storageperiod, linkMeteId);
+            List<TCfgTelemeter> list = tCfgTelemeterService.select(deviceId, meteId, meteName, upEffect, downEffect, metePrecision, unit, meteIndex, meteCid, limitBand, changeLimit, validMid, validString, invalidValue, lastValue, lastTime, meteCode, deviceType, description, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, lolimit4, stander, isshield, storageperiod, linkMeteId);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

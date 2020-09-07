@@ -92,7 +92,8 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setCustomId(mapAll.get("customId"));
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
         tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        tCruisePointInstance.setCruiseType(4002);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(1);
         tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
         tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
@@ -123,7 +124,8 @@ public class TCruisePointInstanceService{
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
         tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        tCruisePointInstance.setCruiseType(4002);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
 
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥测",null,null,null);
@@ -148,7 +150,8 @@ public class TCruisePointInstanceService{
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
         tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        tCruisePointInstance.setCruiseType(4002);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥控",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
@@ -170,7 +173,8 @@ public class TCruisePointInstanceService{
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
         tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        tCruisePointInstance.setCruiseType(4002);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥调",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
@@ -192,7 +196,8 @@ public class TCruisePointInstanceService{
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
         tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        tCruisePointInstance.setCruiseType(4002);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥信",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
@@ -218,7 +223,8 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setCustomId(mapAll.get("customId"));
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
         tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        tCruisePointInstance.setCruiseType(4001);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(1);
         tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
         tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
@@ -250,7 +256,8 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
         tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        tCruisePointInstance.setCruiseType(4001);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥测",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
@@ -272,7 +279,8 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
         tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        tCruisePointInstance.setCruiseType(4001);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥控",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
@@ -294,7 +302,8 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
         tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        tCruisePointInstance.setCruiseType(4001);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥调",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
@@ -316,7 +325,8 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
         tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
         tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        tCruisePointInstance.setCruiseType(4001);
+        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
+        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(0);
         List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥信",null,null,null);
         tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));

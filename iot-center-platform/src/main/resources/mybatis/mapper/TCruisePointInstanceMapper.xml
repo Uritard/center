@@ -251,6 +251,9 @@
         <if test="videotapeTime != null and videotapeTime != ''"> and a.videotape_time = #{videotapeTime, jdbcType=VARCHAR}</if>
         <if test="textDesc != null and textDesc != ''"> and a.text_desc = #{textDesc, jdbcType=VARCHAR}</if>
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and b.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and b.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''and upRegionId != 1"> and b.up_regio_id = #{upRegionId, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
