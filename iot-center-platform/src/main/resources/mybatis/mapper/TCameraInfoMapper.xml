@@ -33,10 +33,11 @@
     </sql>
 
     <sql id="tongTong">
-        a.camera_id,a.camera_name,a.alias_name,a.record_id,c.region_name as upRegionName,a.channel_num,a.sms_id,
-        a.rms_id,b.dict_note as vendorName ,a.stream_type,a.protocol_type,a.camera_ip,a.url, a.port,
-        d.dict_note as cameraTypeName,
-        a.is_control,a.address,a.latitude,a.longitude
+        a.camera_id,a.camera_name,a.alias_name,a.record_id,c.region_name as upRegionName,
+        a.vendor_id as cameraVendor,b.dict_note as vendorName ,
+        d.dict_note as cameraTypeName,a.camera_type,
+        a.channel_num,a.sms_id,a.rms_id,a.stream_type,a.protocol_type,
+        a.camera_ip,a.url, a.port,a.is_control,a.address,a.latitude,a.longitude
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">

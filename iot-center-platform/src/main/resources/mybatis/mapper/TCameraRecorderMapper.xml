@@ -26,7 +26,11 @@
     <sql id="Base_Column_List">
         record_id, record_name, recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
     </sql>
-
+    <sql id="TongYong">
+        a.record_id,a.record_name,a.recorder_type,b.dict_note as NVR_type ,a.alias_name,a.record_ip,
+		a.protocol,d.dict_note as protocol_type,a.http_port,a.trans_port,a.rtsp_port,a.user_name,
+        a.pwd,a.protocol_url,a.max_channel,a.hdd_size,a.buffer_day,a.time_long
+    </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="recordId" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
         insert into t_camera_recorder(
@@ -110,50 +114,18 @@
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
-        select
-        a.record_id,
-        a.record_name,
-        b.dict_note,
-        a.alias_name,
-        a.record_ip,
-        a.protocol,
-        a.http_port,
-        a.trans_port,
-        a.rtsp_port,
-        a.user_name,
-        a.pwd,
-        a.protocol_url,
-        a.max_channel,
-        a.hdd_size,
-        a.buffer_day,
-        a.time_long
-        from t_camera_recorder a,t_dict_business b
+        select<include refid="TongYong"></include>
+        from t_camera_recorder a,t_dict_business b,t_dict_business d
         where 1 = 1
             and a.record_id = #{recordId, jdbcType=BIGINT}
-            and b.dict_note in
-                (SELECT b.dict_note from t_dict_business where b.dict_code=a.recorder_type)
+            and b.dict_code = a.recorder_type
+            and d.dict_code = a.protocol
         limit 1
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
-        select
-        a.record_id,
-        a.record_name,
-        b.dict_note,
-        a.alias_name,
-        a.record_ip,
-        a.protocol,
-        a.http_port,
-        a.trans_port,
-        a.rtsp_port,
-        a.user_name,
-        a.pwd,
-        a.protocol_url,
-        a.max_channel,
-        a.hdd_size,
-        a.buffer_day,
-        a.time_long
-        from t_camera_recorder a,t_dict_business b
+        select<include refid="TongYong"></include>
+        from t_camera_recorder a,t_dict_business b,t_dict_business d
         where 1 = 1
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
@@ -171,29 +143,13 @@
         <if test="hddSize != null "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
         <if test="bufferDay != null "> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
         <if test="timeLong != null "> and a.time_long = #{timeLong, jdbcType=INTEGER}</if>
-        and b.dict_note in
-        (SELECT b.dict_note from t_dict_business where b.dict_code=a.recorder_type)
+        and b.dict_code = a.recorder_type
+        and d.dict_code = a.protocol
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
-        select
-        a.record_id,
-        a.record_name,
-        b.dict_note,
-        a.alias_name,
-        a.record_ip,
-        a.protocol,
-        a.http_port,
-        a.trans_port,
-        a.rtsp_port,
-        a.user_name,
-        a.pwd,
-        a.protocol_url,
-        a.max_channel,
-        a.hdd_size,
-        a.buffer_day,
-        a.time_long
-        from t_camera_recorder a,t_dict_business b
+        select<include refid="TongYong"></include>
+        from t_camera_recorder a,t_dict_business b,t_dict_business d
         where 1 = 1
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
@@ -211,8 +167,8 @@
         <if test="hddSize != null  "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
         <if test="bufferDay != null "> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
         <if test="timeLong != null "> and a.time_long = #{timeLong, jdbcType=INTEGER}</if>
-        and b.dict_note in
-        (SELECT b.dict_note from t_dict_business where b.dict_code=a.recorder_type)
+        and b.dict_code = a.recorder_type
+        and d.dict_code = a.protocol
     </select>
 
     <insert id="batchInsert">

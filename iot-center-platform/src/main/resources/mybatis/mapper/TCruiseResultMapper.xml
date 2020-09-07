@@ -26,6 +26,15 @@
         task_result_id, task_id, area_id, c_type, c_state, modify_state, task_count, task_wait, check_user, check_date, weather, create_time, execute_time, task_code, remark
     </sql>
 
+    <sql id="TongYong">
+        a.task_result_id,
+        a.task_id,b.task_name,
+		a.c_type,d.dict_note as cruise_type,
+        a.c_state,e.dict_note as cruise_state,
+		a.task_count,a.execute_time,a.check_user,a.check_date,a.modify_state,
+		a.task_wait,a.weather,a.area_id,a.create_time,a.task_code,a.remark
+    </sql>
+
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="taskResultId" parameterType="com.yjh.platform.module.task.entity.TCruiseResult">
         insert into t_cruise_result(
@@ -61,6 +70,19 @@
                 #{taskCode, jdbcType=VARCHAR},
                 #{remark, jdbcType=VARCHAR}
         )
+    </insert>
+
+    <insert id="manualReview" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        insert into t_cruise_data_result(
+            personcheck,
+            identify_result,
+            evaluation_state
+        )values(
+            #{personcheck, jdbcType=VARCHAR},
+            #{identifyResult, jdbcType=INTEGER},
+            #{evaluationState, jdbcType=VARCHAR}
+        )
+
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">
@@ -148,40 +170,32 @@
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResult" resultType="com.yjh.platform.module.task.entity.TCruiseResult">
-        select
-        a.task_result_id,
-        a.task_id,
-        a.area_id,
-        a.c_type,
-        a.c_state,
-        a.modify_state,
-        a.task_count,
-        a.task_wait,
-        a.check_user,
-        a.check_date,
-        a.weather,
-        a.create_time,
-        a.execute_time,
-        a.task_code,
-        a.remark
-        from t_cruise_result a
+    <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
+        select<include refid="TongYong"></include>
+        from t_cruise_result a,
+             t_cruise_task b,
+             t_dict_business d,
+             t_dict_business e
         where 1 = 1
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="cType != null and cType != ''">a.c_type = #{cType, jdbcType=INTEGER},</if>
-        <if test="cState != null and cState != ''">a.c_state = #{cState, jdbcType=INTEGER},</if>
-        <if test="modifyState != null and modifyState != ''">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
-        <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
-        <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
-        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
-        <if test="checkDate != null and checkDate != ''">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
-        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="executeTime != null and executeTime != ''">a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
-        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="areaId != null and areaId != ''">and a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="cType != null and cType != ''">and a.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cState != null and cState != ''">and a.c_state = #{cState, jdbcType=INTEGER}</if>
+        <if test="modifyState != null and modifyState != ''">and a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+        <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+        <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+        <if test="weather != null and weather != ''">and a.weather = #{weather, jdbcType=VARCHAR},</if>
+        <if test="createTime != null and createTime != ''">and a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
+        <if test="taskCode != null and taskCode != ''">and a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}, </if>
+        <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
+        and a.task_id = b.task_id
+        and a.c_type = d.dict_code
+        and a.c_state  = e.dict_code
     </select>
 
     <insert id="batchInsert">

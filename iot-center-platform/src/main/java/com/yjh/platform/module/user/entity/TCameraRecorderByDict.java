@@ -26,8 +26,11 @@ public class TCameraRecorderByDict {
     @ApiModelProperty(value = "服务器名称")
     private String recordName;
 
-    @ApiModelProperty(value = "字典描述")
-    private String dictNote;
+    @ApiModelProperty(value = "NVR类型")
+    private String NVRType;
+
+    @ApiModelProperty(value = "录像机类型")
+    private String recorderType;
 
     @ApiModelProperty(value = "备用名称")
     private String aliasName;
@@ -37,6 +40,9 @@ public class TCameraRecorderByDict {
 
     @ApiModelProperty(value = "传输协议")
     private String protocol;
+
+    @ApiModelProperty(value = "协议类型")
+    private String protocolType;
 
     @ApiModelProperty(value = "http端口")
     private Integer httpPort;
@@ -67,5 +73,6 @@ public class TCameraRecorderByDict {
 
     @ApiModelProperty(value = "录制文件时长 单位秒")
     private Integer timeLong;
+
 
 }

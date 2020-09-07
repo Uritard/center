@@ -2,7 +2,10 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import com.yjh.platform.module.task.entity.TCruiseResult;
+import com.yjh.platform.module.task.entity.TCruiseResultExpand;
 import com.yjh.platform.module.task.entity.TCruiseTask;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -33,8 +36,9 @@ public interface TCruiseResultDao {
                                 @Param(value = "executeTime") Date executeTime,
                                 @Param(value = "taskCode") String taskCode,
                                 @Param(value = "remark") String remark);
-    List<TCruiseResult> selectByPage(TCruiseResult tCruiseResult);
-
+    List<TCruiseResultExpand> selectTaskByPage(TCruiseResultExpand tCruiseResultExpand);
+    List<TCruiseResultExpand> selectCruiseByPage(TCruiseResultExpand tCruiseResultExpand);
+    int manualReview(TCruiseDataResult tCruiseDataResult);
     int batchInsert(List<TCruiseResult> list);
 
     List<TCruiseTask> selectTaskIsRunning();
