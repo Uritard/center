@@ -2,6 +2,9 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
+import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -36,4 +39,7 @@ public interface TCruiseDataResultDao {
     List<TCruiseDataResult> selectByPage(TCruiseDataResult tCruiseDataResult);
 
     int batchInsert(List<TCruiseDataResult> list);
+    CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId")Long deviceId,
+                                                        @Param(value = "deviceMeteId")Long deviceMeteId);
+    List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "deviceMeteId")Long deviceMeteId);
 }

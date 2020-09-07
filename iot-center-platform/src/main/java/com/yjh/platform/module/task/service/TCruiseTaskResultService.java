@@ -2,9 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Sets;
-import com.yjh.platform.module.task.entity.CruiseResultCounter;
-import com.yjh.platform.module.task.entity.CruiseTaskRunningTime;
-import com.yjh.platform.module.task.entity.TCruiseTaskResult;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 
 import java.lang.reflect.Array;
@@ -12,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.yjh.platform.module.user.entity.CameraInfo;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -118,7 +117,7 @@ public class TCruiseTaskResultService{
             Object values=resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
             String value=values.toString();
             String TaskId=taskId.toString(); //转化成统一格式进行比较筛选
-            if(TaskId.equals(value)&&resultMap.get("cruiseStatus").equals("1")){
+            if(TaskId.equals(value)){
                 dataResult.add(resultMap);
             }
 
@@ -127,30 +126,30 @@ public class TCruiseTaskResultService{
     }
 
 
-    @Logs(title = "获取当前任务的巡检点结果信息(巡检点结果)")
-    @Transactional(rollbackFor = Exception.class)
-    public List<Map> selectCurrentCruiseTaskResult(Long taskId,Long cruiseId,List<Map> cruiseResult){
-        //获取数据库键名列表
-        Set<String> keyResult=redisScan("t_cruise_task_result*");
-        //创建容纳结果信息的容器
-        List<Map> dataResult=cruiseResult;
-         for(String key:keyResult){
-             Map<String,Object> resultMap=redisTemplate.opsForHash().entries(key);//循环每个键名取相应的键值对数据
-             String value1=(resultMap.get("taskId")).toString();//取出每条数据的key值为“taskId”的value值
-             String value2=(resultMap.get("cruiseId").toString());
-             String TaskId=taskId.toString();
-             String CruiseId=cruiseId.toString();//转化成统一格式进行比较筛选
-             if(TaskId.equals(value1)&&CruiseId.equals(value2)&&resultMap.get("cruiseStatus").equals("0")){  //巡检完成数据插入结果集
-                 dataResult.add(resultMap);
-             }else if (TaskId.equals(value1)&&CruiseId.equals(value2)&&resultMap.get("cruiseStatus").equals("1")){ //删除对应的未完成信息
-                 dataResult.remove(resultMap);
-             }
-
-         }
-
-
-        return dataResult;
-    }
+//    @Logs(title = "获取当前任务的巡检点结果信息(巡检点结果)")
+//    @Transactional(rollbackFor = Exception.class)
+//    public List<Map> selectCurrentCruiseTaskResult(Long taskId,Long cruiseId,List<Map> cruiseResult){
+//        //获取数据库键名列表
+//        Set<String> keyResult=redisScan("t_cruise_task_result*");
+//        //创建容纳结果信息的容器
+//        List<Map> dataResult=cruiseResult;
+//         for(String key:keyResult){
+//             Map<String,Object> resultMap=redisTemplate.opsForHash().entries(key);//循环每个键名取相应的键值对数据
+//             String value1=(resultMap.get("taskId")).toString();//取出每条数据的key值为“taskId”的value值
+//             String value2=(resultMap.get("cruiseId").toString());
+//             String TaskId=taskId.toString();
+//             String CruiseId=cruiseId.toString();//转化成统一格式进行比较筛选
+//             if(TaskId.equals(value1)&&CruiseId.equals(value2)&&resultMap.get("cruiseStatus").equals("0")){  //巡检完成数据插入结果集
+//                 dataResult.add(resultMap);
+//             }else if (TaskId.equals(value1)&&CruiseId.equals(value2)&&resultMap.get("cruiseStatus").equals("1")){ //删除对应的未完成信息
+//                 dataResult.remove(resultMap);
+//             }
+//
+//         }
+//
+//
+//        return dataResult;
+//    }
 
 
     @Logs(title = "统计获取当前任务的执行进度")
@@ -164,10 +163,13 @@ public class TCruiseTaskResultService{
            Object values=resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
            String value=values.toString();
            String TaskId=taskId.toString(); //转化成统一格式进行比较筛选
-           if(TaskId.equals(value)&&resultMap.get("cruiseStatus").equals("1")){
+           if(TaskId.equals(value)){
               cruiseCount=cruiseCount+1;
-           }else if (TaskId.equals(value)&&resultMap.get("cruiseStatus").equals("0")){
-               cruiseComCount=cruiseComCount+1;
+              if(resultMap.get("cruiseStatus").equals("0")){   //执行成功
+                  cruiseComCount=cruiseComCount+1;
+              }else if(resultMap.get("cruiseStatus").equals("2")){  //执行失败
+                  cruiseComCount=cruiseComCount+1;
+              }
            }
        }
        return cruiseComCount/cruiseCount;
@@ -179,23 +181,23 @@ public class TCruiseTaskResultService{
     public CruiseResultCounter selectCruiseStatusCount(Long taskId){
         Set<String>keyResult=redisScan("t_cruise_task_result*");
         CruiseResultCounter cruiseResultCounter=new CruiseResultCounter();
-        Integer abnormalCount=0;
-        Integer cruisedCount=0;
-        Integer cruiseCount=0;
+        Integer abnormalCount=0;//异常个数
+        Integer cruisedCount=0;//已执行个数
+        Integer cruiseCount=0;//未执行个数
         for(String keys:keyResult){
             Map<String,Object> resultMap=redisTemplate.opsForHash().entries(keys);
             String value=(resultMap.get("taskId")).toString();
             String TaskId=taskId.toString();
-            if(TaskId.equals(value)&&resultMap.get("cruiseResult").equals("1")){
+            if(TaskId.equals(value)){
+                cruiseCount=cruiseCount+1;
+                if(resultMap.get("cruiseStatus").equals("2")&&resultMap.get("cruiseResult").equals("1")){
                     abnormalCount=abnormalCount+1;
                     cruisedCount=cruisedCount+1;
-            }else if(TaskId.equals(value)&&resultMap.get("cruiseStatus").equals("0")){
-                   cruisedCount=cruisedCount+1;
-            }else if (TaskId.equals(value)&&resultMap.get("cruiseStatus").equals("1")){
-                cruiseCount=cruiseCount+1;
+                }else if(resultMap.get("cruiseStatus").equals("0")){
+                    cruisedCount=cruisedCount+1;
+                }
             }
-
-            }
+        }
         Integer cruiseNotCount=cruiseCount-cruisedCount;
         cruiseResultCounter.setAbnormalCount(abnormalCount);
         cruiseResultCounter.setCruisedCount(cruisedCount);
@@ -204,7 +206,7 @@ public class TCruiseTaskResultService{
         return cruiseResultCounter;
     }
 
-    @Logs(title = "获取当前任务已运行的时间")
+    @Logs(title = "获取当前任务已运行的时间")//本功能待优化
     @Transactional(rollbackFor = Exception.class)
     public CruiseTaskRunningTime selectTaskRunningTime(Long taskId) throws ParseException {
 
@@ -243,18 +245,89 @@ public class TCruiseTaskResultService{
 
     @Logs(title = "获取执行当前任务的机器人信息及相应巡检点结果状态")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map> selectRobotAndCruiseResult(Long taskId){
+    public RobotCruiseInfo selectRobotAndCruiseResult(Long taskId){
         Set<String> robotKeys=redisScan("robot_info");
-        List<Map> robotResult=new ArrayList<>();
+        Set<String> cruiseKeys=redisScan("t_cruise_task_result");
+        RobotCruiseInfo robotCruiseInfo=new RobotCruiseInfo();
+        float cruisedCount=0;
+        float cruiseCount=0;
         for(String key:robotKeys){
             Map<String,Object> robotInfo=redisTemplate.opsForHash().entries(key);
             String value=robotInfo.get("taskId").toString();
             String TaskId=taskId.toString();
             if(TaskId.equals(value)){
-                robotResult.add(robotInfo);
+                robotCruiseInfo.setRobotInfo(robotInfo);
+                for(String cKey:cruiseKeys){
+                    Map<String,Object> cruiseInfo=redisTemplate.opsForHash().entries(cKey);
+                    if(cruiseInfo.get("taskId").equals(TaskId)&&robotInfo.get("inspectionId").equals(cruiseInfo.get("cruiseDevId"))){
+                        cruiseCount=cruiseCount+1;
+                        if (cruiseInfo.get("cruiseStatus").equals("0")){
+                              cruisedCount=cruisedCount+1;
+                        }
+                    }
+                }
+
             }
         }
-        return robotResult;
+        robotCruiseInfo.setRate(cruisedCount/cruiseCount);
+        return robotCruiseInfo;
     }
+
+    @Logs(title ="获取执行当前任务的摄像头的信息及相应巡检点结果状态")
+    @Transactional(rollbackFor = Exception.class)
+    public CameraCruiseInfo selectCameraAndCruiseResult(Long taskId,Integer cameraType){
+        Set<String>cameraKeys=redisScan("camera_info");
+        Set<String>cruiseKeys=redisScan("t_cruise_task_result");
+        float cruiseCount=0;
+        float cruisedCount=0;
+        float cruisedFailCount=0;
+        int cameraFault=0;
+        int cameraNotFault=0;
+        CameraCruiseInfo cameraCruiseInfo=new CameraCruiseInfo();
+        List<Map>result=new ArrayList<>();
+        Map<String,Object>cameraStatusCount=new HashMap<>();
+        for(String cameraKey:cameraKeys){
+            Map<String,Object>cameraInfo=redisTemplate.opsForHash().entries(cameraKey);
+            String TaskId=taskId.toString();
+            String CameraType=cameraType.toString();
+            if(cameraInfo.get("taskId").equals(TaskId)&&cameraInfo.get("cameraType").equals(CameraType)){
+                result.add(cameraInfo);
+                cruiseCount=cruiseCount+1;//摄像头/巡检点总数
+                for (String cruiseKey:cruiseKeys){
+                    Map<String,Object>cruiseInfo=redisTemplate.opsForHash().entries(cruiseKey);
+                    if (cruiseInfo.get("taskId").equals(TaskId)&&cameraInfo.get("presetId").equals(cruiseInfo.get("cruiseDevId"))){
+
+                        if(cameraInfo.get("isFault").equals("0")&&cruiseInfo.get("cruiseStatus").equals("0")){ //摄像头正常-巡检点正常
+                            cameraNotFault=cameraNotFault+1;//可运行数量
+                            cruisedCount=cruisedCount+1; //巡检点已执行个数
+                        }else if (cameraInfo.get("isFault").equals("0")&&cruiseInfo.get("cruiseStatus").equals("2")){  //摄像头正常-巡检点异常
+                            cameraNotFault=cameraNotFault+1;//可运行数量
+                            cruisedFailCount=cruisedFailCount+1;//执行失败个数
+                        }else if(!cameraInfo.get("isFault").equals("0")&&cruiseInfo.get("cruiseStatus").equals("2")){  //摄像头故障-巡检点异常
+                            cameraFault=cameraFault+1;//故障数量
+                            cameraFault=cameraFault+1;//故障数量
+                        }else if (cameraInfo.get("isFault").equals("0")&&cruiseInfo.get("cruiseStatus").equals("1")){
+                            cameraNotFault=cameraNotFault+1;//可运行数量
+                        }else if (!cameraInfo.get("isFault").equals("0")&&cruiseInfo.get("cruiseStatus").equals("1")){
+                            cameraFault=cameraFault+1;//故障数量
+                        }
+                    }
+                }
+
+            }else if (cameraInfo.get("taskId").equals(TaskId)&&!cameraInfo.get("cameraType").equals(CameraType)){
+                       cameraCruiseInfo.setNotice("摄像头未参与任务!");
+            }else if (!(cameraInfo.get("taskId").equals(TaskId)&&cameraInfo.get("cameraType").equals(CameraType))){
+                       cameraCruiseInfo.setNotice("本任务未使用摄像头!");
+            }
+        }
+        cameraStatusCount.put("已启用数量",cameraNotFault);
+        cameraStatusCount.put("故障数量",cameraFault);
+        cameraCruiseInfo.setCameraInfo(result);
+        cameraCruiseInfo.setRate((cruisedCount+cruisedFailCount)/cruiseCount);
+        cameraCruiseInfo.setCameraStatusCount(cameraStatusCount);
+
+        return  cameraCruiseInfo;
+    }
+
 }
 

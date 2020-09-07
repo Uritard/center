@@ -489,4 +489,15 @@
         </foreach>
     </delete>
 
+    <select id="selectDeviceMeteByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
+        SELECT
+	      a.device_mete_id AS deviceMeteId,
+	      a.device_id AS deviceId,
+	      b.device_name AS deviceName
+        FROM
+	      t_std_devicemete a
+        LEFT JOIN t_std_device b ON a.device_id = b.device_id
+        WHERE
+	      a.device_id =#{deviceId,jdbcType=BIGINT}
+    </select>
 </mapper>

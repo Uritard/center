@@ -157,7 +157,7 @@ public class TCruiseTaskResultController {
         return result;
     }
 
-    @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息(巡检点信息初始化)")
+    @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
     @RequestMapping(value = "/selectIniCruiseTaskResult",method = RequestMethod.GET)
     public Result selectCruiseTaskResult(@RequestParam Long taskId){
         Result result=new Result();
@@ -172,22 +172,22 @@ public class TCruiseTaskResultController {
 
     }
 
-    @ApiOperation(value = "A-获取当前任务的巡检点结果信息(巡检点结果)")
-    @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.POST)
-    public Result selectCurrentCruiseTaskResult(@RequestParam(value = "taskId") Long taskId,
-                                                @RequestParam(value = "cruiseId") Long cruiseId,
-                                                @RequestBody List<Map> cruiseResult){
-        Result result=new Result();
-        try {
-            result.setData(tCruiseTaskResultService.selectCurrentCruiseTaskResult(taskId,cruiseId,cruiseResult));
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
-        }
-
-        return result;
-
-    }
+//    @ApiOperation(value = "A-获取当前任务的巡检点结果信息(巡检点结果)")
+//    @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.POST)
+//    public Result selectCurrentCruiseTaskResult(@RequestParam(value = "taskId") Long taskId,
+//                                                @RequestParam(value = "cruiseId") Long cruiseId,
+//                                                @RequestBody List<Map> cruiseResult){
+//        Result result=new Result();
+//        try {
+//            result.setData(tCruiseTaskResultService.selectCurrentCruiseTaskResult(taskId,cruiseId,cruiseResult));
+//        } catch (Exception e) {
+//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+//            log.error("失败描述：", e);
+//        }
+//
+//        return result;
+//
+//    }
 
     @ApiOperation(value = "A-获取巡检任务进度")
     @RequestMapping(value = "selectCruiseAdvance",method = RequestMethod.GET)
@@ -243,5 +243,19 @@ public class TCruiseTaskResultController {
         }
         return result;
 
+    }
+
+    @ApiOperation(value = "C-获取当前任务下的摄像头信息以及摄像头工作巡检点结果状态")
+    @RequestMapping(value = "/selectCameraAndCruiseResult",method = RequestMethod.GET)
+    public Result selectCameraAndCruiseResult(@RequestParam Long taskId,
+                                              @RequestParam Integer cameraType){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.selectCameraAndCruiseResult(taskId, cameraType));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+        return  result;
     }
 }

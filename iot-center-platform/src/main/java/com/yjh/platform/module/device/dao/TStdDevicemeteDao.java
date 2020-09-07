@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
+import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -59,6 +60,8 @@ public interface TStdDevicemeteDao {
     List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customId")Long customId);
 
     int batchDelete(@Param(value = "list") List<String> list);
+
+    List<CruiseResultAnalMeteInfo> selectDeviceMeteByDeviceId(@Param(value = "deviceId")Long deviceId);
 
 
 

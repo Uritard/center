@@ -160,4 +160,30 @@ public class TCruiseDataResultController {
         return result;
     }
 
+
+    @ApiOperation(value = "巡视结果分析--测点查询")
+    @RequestMapping(value = "/selectCruiseResultAnal",method = RequestMethod.GET)
+    public Result selectCruiseResultAnal(@RequestParam Long deviceId){
+        Result result=new Result();
+        try {
+            result.setData(tCruiseDataResultService.selectCruiseResultAnal(deviceId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "巡视结果分析--巡检点结果列表")
+    @RequestMapping(value = "/selectCruiseDataResultByList",method = RequestMethod.GET)
+    public Result selectCruiseDataResultByList(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
+        Result result=new Result();
+        try {
+            result.setData(tCruiseDataResultService.selectCruiseDataResultByList(deviceMeteId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }
