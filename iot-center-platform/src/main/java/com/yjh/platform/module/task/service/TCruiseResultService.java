@@ -1,11 +1,13 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import com.yjh.platform.module.task.entity.TCruiseResult;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.TCruiseResultExpand;
 import com.yjh.platform.module.task.entity.TCruiseTask;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,13 +55,23 @@ public class TCruiseResultService{
         return tCruiseResultList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询--巡视结果确认", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseResult> selectByPage(TCruiseResult tCruiseResult) {
-        List<TCruiseResult> tCruiseResultList = tCruiseResultDao.selectByPage(tCruiseResult);
-        return tCruiseResultList;
+    public List<TCruiseResultExpand> selectTaskByPage(TCruiseResultExpand tCruiseResultExpand) {
+        List<TCruiseResultExpand> tCruiseResultExpandList = tCruiseResultDao.selectTaskByPage(tCruiseResultExpand);
+        return tCruiseResultExpandList;
     }
-
+    @Logs(title = "分页查询--任务结果详细", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruiseResultExpand> selectCruiseByPage(TCruiseResultExpand tCruiseResultExpand) {
+        List<TCruiseResultExpand> tCruiseResultExpandList = tCruiseResultDao.selectCruiseByPage(tCruiseResultExpand);
+        return tCruiseResultExpandList;
+    }
+    @Logs(title = "人工复核", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int manualReview(TCruiseDataResult tCruiseDataResult) {
+        return this.tCruiseResultDao.manualReview(tCruiseDataResult);
+    }
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseResult> list) {

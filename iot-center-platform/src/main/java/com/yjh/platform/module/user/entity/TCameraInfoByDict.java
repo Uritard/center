@@ -47,6 +47,9 @@ public class TCameraInfoByDict implements Serializable {
     @ApiModelProperty(value = "厂家名称")
     private String vendorName;
 
+    @ApiModelProperty(value = "厂家类型")
+    private String cameraVendor;
+
     @ApiModelProperty(value = "码流类型")
     private Integer streamType;
 
@@ -61,6 +64,9 @@ public class TCameraInfoByDict implements Serializable {
 
     @ApiModelProperty(value = "0可见光摄像机, 1红外摄像机")
     private String cameraTypeName;
+
+    @ApiModelProperty(value = "相机类型")
+    private String cameraType;
 
     @ApiModelProperty(value = "是否可控(0-可控球机，1-不可控枪机)")
     private Integer isControl;

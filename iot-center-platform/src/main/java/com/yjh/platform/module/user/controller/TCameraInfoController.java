@@ -84,7 +84,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedCamera", method = RequestMethod.DELETE)
-    public Result deleteSelectedCamera(@RequestParam(value = "cameraIds[]", required = true) String[] cameraIds) {
+    public Result deleteSelectedCamera(@RequestParam(value = "cameraIds", required = true) String cameraIds) {
         Result result = new Result();
         try {
             result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));

@@ -19,7 +19,7 @@ public interface TCameraInfoDao {
     int insert(TCameraInfo tCameraInfo);
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
     int update(TCameraInfo tCameraInfo);
-    int deleteSelectedCamera(@Param(value = "cameraIds") String[] cameraIds);
+    int deleteSelectedCamera(@Param(value = "cameraIds") String cameraIds);
     List<TCameraInfo> select(@Param(value = "cameraId") Long cameraId);
     TCameraInfoByDict selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
     List<TCameraInfoByDict> selectByRegionId(@Param(value = "regionId") Long regionId);

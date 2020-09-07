@@ -1945,7 +1945,7 @@ public class TemplateToImportController {
             List<ExcelTemplate> excelTemplateList = new ArrayList<>();
             SysRoleRegion sysRoleRegion = new SysRoleRegion();
 
-            excelTemplateList.add(new ExcelTemplate("角色ID", true, "Integer"));
+            excelTemplateList.add(new ExcelTemplate("角色ID", true, "Long"));
             excelTemplateList.add(new ExcelTemplate("机器人ID", true, "Long"));
             excelTemplateList.add(new ExcelTemplate("是否检查", false, "String"));
 
@@ -1953,8 +1953,6 @@ public class TemplateToImportController {
             int count = 0;
             for (ExcelTemplate itemAsLie : excelTemplateList) {
                 System.out.println("itemAsLie是：" + itemAsLie);
-
-//                for (int j = 0; j < excelTemplateList.size(); j++){
                     for (int i = 1; i <= total; i++) {
                         Row row = sheet.getRow(i);
                         if (row.getCell(count) == null){
@@ -1963,27 +1961,38 @@ public class TemplateToImportController {
                             switch (itemAsLie.ColumnType) {
                                 case "Long": {
                                     System.out.println("Long转型");
-                                    String jieguo = row.getCell(count).getStringCellValue();
-                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + jieguo);
+                                    if (row.getCell(count) != null && row.getCell(count).getCellTypeEnum().equals(CellType.STRING)){
+                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值" );
+                                    }else if (row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)){
+                                        Long result0 = new Double(row.getCell(count).getNumericCellValue()).longValue();
+                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                    }
                                     break;
                                 }
                                 case "Integer": {
                                     System.out.println("Integer转型");
-                                    String jieguo = row.getCell(count).getStringCellValue();
-                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + jieguo);
+                                    if (row.getCell(count) != null && row.getCell(count).getCellTypeEnum().equals(CellType.STRING)){
+                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值" );
+                                    }else if (row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)) {
+                                        Integer result0 = new Double(row.getCell(count).getNumericCellValue()).intValue();
+                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                    }
                                     break;
                                 }
                                 case "String": {
                                     System.out.println("String转型");
-                                    String jieguo = row.getCell(count).getStringCellValue();
-                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + jieguo);
+                                    if (row.getCell(count) != null && row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)){
+                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值" );
+                                    }else {
+                                        String result0 = row.getCell(count).getStringCellValue();
+                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                    }
                                     break;
                                 }
                             }
                         }
                     }
                     count++;
-//                }
             }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

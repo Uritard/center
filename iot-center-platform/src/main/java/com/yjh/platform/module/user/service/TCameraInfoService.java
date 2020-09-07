@@ -35,7 +35,7 @@ public class TCameraInfoService{
 
     @Logs(title = "批量删除", code = "TCameraPreset")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteSelectedCamera(String[] cameraIds) {
+    public int deleteSelectedCamera(String cameraIds) {
         return this.tCameraInfoDao.deleteSelectedCamera(cameraIds);
     }
 
