@@ -46,6 +46,7 @@ public interface TCameraInfoDao {
     List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
 
     List<AreaInfo> selectCameraTreeDevice();
+    List<AreaInfo> selectCameraPresetTree();
 
     List<CameraInfo> selectCameraByTaskId(@Param(value = "taskId")Long taskId);
 

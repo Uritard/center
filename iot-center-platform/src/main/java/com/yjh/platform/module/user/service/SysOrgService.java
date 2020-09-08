@@ -76,7 +76,7 @@ public class SysOrgService{
         List<OrgInfo> orgInfoStartList = new ArrayList<>();
         Integer level = 1;
         for (OrgInfo orgInfo:listTree) {
-            if (Objects.equals(orgInfo.getUpId(), null) || Objects.equals(orgInfo.getUpId(), "")) {
+            if (orgInfo.getUpId()==null || orgInfo.getUpId()==-1) {
                 orgInfo.setLevel(level);
                 orgInfoStartList.add(orgInfo);
             }
@@ -94,7 +94,7 @@ public class SysOrgService{
             List<OrgInfo> orgInfoStartList = new ArrayList<>();
             Integer level = 1;
             for (OrgInfo orgInfo:listTreeAll) {
-                if (Objects.equals(orgInfo.getUpId(), null) || Objects.equals(orgInfo.getUpId(), "")) {
+                if (orgInfo.getUpId()==null || orgInfo.getUpId()==-1) {
                     orgInfo.setLevel(level);
                     orgInfoStartList.add(orgInfo);
                 }
@@ -108,7 +108,7 @@ public class SysOrgService{
         if (listTreeByName.size()>0) {
             for (OrgInfo orgInfo : listTreeByName) {
                 listTree.add(orgInfo);
-                if (orgInfo.getUpId() != null) {
+                if (orgInfo.getUpId() != null && orgInfo.getUpId() != -1) {
                     Long orgInfoUpId = orgInfo.getUpId();
                     System.out.println("orgInfoUpId: "+orgInfoUpId);
                     for (OrgInfo orgInfoAll : listTreeAll) {
@@ -125,7 +125,7 @@ public class SysOrgService{
         List<OrgInfo> orgInfoStartList = new ArrayList<>();
         Integer level = 1;
         for (OrgInfo orgInfo:listTree) {
-            if (Objects.equals(orgInfo.getUpId(), null) || Objects.equals(orgInfo.getUpId(), "")) {
+            if (orgInfo.getUpId()==null || orgInfo.getUpId()==-1) {
                 orgInfo.setLevel(level);
                 orgInfoStartList.add(orgInfo);
             }
@@ -135,7 +135,7 @@ public class SysOrgService{
     }
 
     private void diGuiMoHu(OrgInfo orgInfoAll, List<OrgInfo> listTreeAll, List<OrgInfo> listTree) {
-        if (orgInfoAll.getUpId() != null) {
+        if (orgInfoAll.getUpId() != null && orgInfoAll.getUpId() != -1) {
             Long orgInfoUpId = orgInfoAll.getUpId();
             for (OrgInfo orgInfo : listTreeAll) {
                 if (Objects.equals(orgInfoUpId, orgInfo.getId())) {

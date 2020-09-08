@@ -502,6 +502,46 @@
         LEFT JOIN t_std_region d ON b.up_region_id = d.region_id);
     </select>
 
+    <select id="selectRobotInspectionTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+          FROM t_std_region a
+          LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+          SELECT DISTINCT c.robot_id AS Id, c.robot_name AS label, c.up_region_id AS upId, d.region_name AS upName, "robot" AS infoType
+            FROM t_robot_info c
+            LEFT JOIN t_std_region d ON c.up_region_id = d.region_id)
+        union all (
+	      select e.inspection_id as Id, e.inspection_name as label, f.robot_id as upId, f.robot_name as upName, "inspection" as infoType
+		    from t_robot_inspection e
+		    left join t_robot_info f on f.robot_id = e.robot_id);
+    </select>
+
+    <select id="selectAllMeteTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
+                FROM t_camera_info d
+                LEFT JOIN t_std_region b ON d.up_region_id = b.region_id)
+        UNION ALL (
+            SELECT DISTINCT b.robot_id AS Id, b.robot_name AS label, b.up_region_id AS upId, d.region_name AS upName, "robot" AS infoType
+                FROM t_robot_info b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+	        SELECT e.inspection_id AS Id, e.inspection_name AS label, f.robot_id AS upId, f.robot_name AS upName, "inspection" AS infoType
+		        FROM t_robot_inspection e
+		        LEFT JOIN t_robot_info f ON f.robot_id = e.robot_id)
+        UNION ALL (
+            SELECT e.preset_id AS Id, e.preset_name AS label, f.camera_id AS upId, f.camera_name AS upName, "preset" AS infoType
+                FROM t_camera_preset e
+                LEFT JOIN t_camera_info f ON f.camera_id = e.camera_id);
+    </select>
+
     <select id="selectByModelId" parameterType="java.lang.Long" resultType="java.lang.String">
         select
         a.device_id

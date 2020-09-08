@@ -219,63 +219,40 @@ public class TStdDeviceService{
         return this.tStdDeviceDao.selectRegionById(deviceId);
     }
 
-    @Logs(title = "设备树查询(区域-间隔5-设备6-部位7,所有设备all-设备dev-摄像头camera-机器人-robot)", code = "module")
+    @Logs(title = "设备树查询(level：5-间隔，6-设备，7-部位，8-点位；deviceShow：dev-设备，camera-摄像头，robot-机器人，all-所有设备)", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectDevTree(String level, String deviceShow) {
         List<AreaInfo> listTree = new ArrayList<>();
-        if (Objects.equals(deviceShow, "dev")) {
-            switch (level) {
-                case "7":
-                    listTree = this.tStdDeviceDao.selectDevTreeCustom();
-                    break;
-                case "6":
-                    listTree = this.tStdDeviceDao.selectDevTreeDevice();
-                    break;
-                case "5":
-                    listTree = this.tStdDeviceDao.selectDevTreeRegion();
-                    break;
-                default:
-                    throw new BusinessException("设备类型输入有误！");
-            }
-        } else if (Objects.equals(deviceShow, "camera")) {
-            switch (level) {
-                case "6":
-                    listTree = this.tCameraInfoDao.selectCameraTreeDevice();
-                    break;
-                case "5":
-                    listTree = this.tStdDeviceDao.selectDevTreeRegion();
-                    break;
-                default:
-                    throw new BusinessException("设备类型输入有误！");
-            }
-        } else if (Objects.equals(deviceShow, "robot")) {
-            switch (level) {
-                case "6":
-                    listTree = this.tStdDeviceDao.selectRobotTree();
-                    break;
-                default:
-                    throw new BusinessException("类型输入有误！");
-            }
-        } else if (Objects.equals(deviceShow, "all")) {
-            switch (level) {
-                case "5":
-                    listTree = this.tStdDeviceDao.selectDevTreeRegion();
-                    break;
-                case "7":
-                    listTree = this.tStdDeviceDao.selectAllTreeCustom();
-                    break;
-                case "6":
-                    listTree = this.tStdDeviceDao.selectAllTreeDevice();
-                    break;
-                default:
-                    throw new BusinessException("设备类型输入有误！");
-            }
-        } else { throw new BusinessException("设备类型输入有误！");}
+        switch (level) {
+            case "5":
+                listTree = this.tStdDeviceDao.selectDevTreeRegion();
+                break;
+            case "6":
+                if (Objects.equals(deviceShow, "dev")) { listTree = this.tStdDeviceDao.selectDevTreeDevice(); }
+                else if (Objects.equals(deviceShow, "camera")) { listTree = this.tCameraInfoDao.selectCameraTreeDevice(); }
+                else if (Objects.equals(deviceShow, "robot")) { listTree = this.tStdDeviceDao.selectRobotTree(); }
+                else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllTreeDevice(); }
+                else { throw new BusinessException("设备树展示内容输入有误！"); }
+                break;
+            case "7":
+                if (Objects.equals(deviceShow, "dev")) { listTree = this.tStdDeviceDao.selectDevTreeCustom(); }
+                else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllTreeCustom(); }
+                else { throw new BusinessException("设备树展示内容输入有误！"); }
+                break;
+            case "8":
+                if (Objects.equals(deviceShow, "camera")) { listTree = this.tCameraInfoDao.selectCameraPresetTree(); }
+                else if (Objects.equals(deviceShow, "robot")) { listTree = this.tStdDeviceDao.selectRobotInspectionTree(); }
+                else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteTree(); }
+                else { throw new BusinessException("设备树展示内容输入有误！"); }
+                break;
+            default:
+                throw new BusinessException("设备树展示层级输入有误！");
+        }
+
         List<AreaInfo> areaInfoCountryList = new ArrayList<>();
-        System.out.println("listTree: "+listTree);
         for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
             AreaInfo areaInfoMap = it.next();
-            if (Objects.equals(areaInfoMap.getUpId(), null)) {
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
                 AreaInfo areaInfoCountry = new AreaInfo();
                 areaInfoCountry.setId(areaInfoMap.getId());
                 areaInfoCountry.setLabel(areaInfoMap.getLabel());
@@ -297,7 +274,7 @@ public class TStdDeviceService{
             List<AreaInfo> areaInfoCountryList = new ArrayList<>();
             for(Iterator<AreaInfo> it = listTreeAll.iterator();it.hasNext();){
                 AreaInfo areaInfoMap = it.next();
-                if (Objects.equals(areaInfoMap.getUpId(), null)) {
+                if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
                     AreaInfo areaInfoCountry = new AreaInfo();
                     areaInfoCountry.setLabel(areaInfoMap.getLabel());
                     areaInfoCountry.setId(areaInfoMap.getId());
@@ -319,7 +296,7 @@ public class TStdDeviceService{
                 areaInfo.setUpId(areaInfoRegionCode.getUpId());
                 areaInfo.setInfoType(areaInfoRegionCode.getInfoType());
                 listTree.add(areaInfo);
-                if (areaInfoRegionCode.getUpId() != null) {
+                if (areaInfoRegionCode.getUpId() != -1 && areaInfoRegionCode.getUpId() != null) {
                     Long areaInfoRegionCodeUpId = areaInfoRegionCode.getUpId();
                     System.out.println("areaInfoRegionCodeUpId: "+areaInfoRegionCodeUpId);
                     for (AreaInfo areaInfoAll : listTreeAll) {
@@ -335,7 +312,7 @@ public class TStdDeviceService{
             List<AreaInfo> areaInfoCountryList = new ArrayList<>();
             for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
                 AreaInfo areaInfoMap = it.next();
-                if (Objects.equals(areaInfoMap.getUpId(), null)) {
+                if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
                     AreaInfo areaInfoCountry = new AreaInfo();
                     areaInfoCountry.setId(areaInfoMap.getId());
                     areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
@@ -349,7 +326,7 @@ public class TStdDeviceService{
     }
 
     private void diGuiMoHu(AreaInfo areaInfoAll, List<AreaInfo> listTreeAll, List<AreaInfo> listTree) {
-        if (areaInfoAll.getUpId() != null) {
+        if (areaInfoAll.getUpId() != null && areaInfoAll.getUpId() != -1) {
             Long areaInfoRegionCodeUpId = areaInfoAll.getUpId();
             for (AreaInfo areaInfo : listTreeAll) {
                 if (Objects.equals(areaInfo.getId(), areaInfoRegionCodeUpId)) {

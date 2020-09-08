@@ -88,6 +88,8 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectAllTreeCustom();
     List<AreaInfo> selectAllTreeDevice();
     List<AreaInfo> selectRobotTree();
+    List<AreaInfo> selectRobotInspectionTree();
+    List<AreaInfo> selectAllMeteTree();
     List<String> selectByModelId(@Param(value = "modelId") Long modelId);
 
     int updateModelIdByDevCus(@Param(value = "deviceId")Long deviceId,
