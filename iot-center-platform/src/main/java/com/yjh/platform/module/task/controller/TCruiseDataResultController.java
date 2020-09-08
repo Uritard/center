@@ -1,5 +1,8 @@
 package com.yjh.platform.module.task.controller;
 
+import com.google.gson.internal.$Gson$Preconditions;
+import com.yjh.platform.module.task.entity.BrokenLineInfo;
+import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import java.util.HashMap;
@@ -175,11 +178,31 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
-    @RequestMapping(value = "/selectCruiseDataResultByList",method = RequestMethod.GET)
-    public Result selectCruiseDataResultByList(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
+    @RequestMapping(value = "/selectCruiseDataResultByList",method = RequestMethod.POST)
+    public Result selectCruiseDataResultByList(@RequestBody CruiseResultAnalInfo cruiseResultAnalInfo,
+                                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize){
+        Result result=new Result();
+        Map<String,Object> resultMap=new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<CruiseResultAnalInfo> list=(tCruiseDataResultService.selectCruiseDataResultByList(cruiseResultAnalInfo));
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取折线图元素信息")
+    @RequestMapping(value = "/selectBrokenLine",method = RequestMethod.POST)
+    public Result selectBrokenLine(@RequestBody BrokenLineInfo brokenLineInfo){
         Result result=new Result();
         try {
-            result.setData(tCruiseDataResultService.selectCruiseDataResultByList(deviceMeteId));
+            result.setData(tCruiseDataResultService.selectBrokenLine(brokenLineInfo));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

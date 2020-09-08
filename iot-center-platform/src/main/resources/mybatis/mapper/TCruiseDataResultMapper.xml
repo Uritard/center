@@ -117,7 +117,7 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultMap="BaseResultMap">
         select
         a.cruise_data_id,
         a.cruise_result_id,
@@ -236,7 +236,7 @@
 
 
 
-    <select id="selectMeteCruiseByDeviceId" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
+    <select id="selectMeteCruiseByDeviceId" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo" >
       SELECT
 	    b.instance_id,
 	    d.identify_state,
@@ -263,7 +263,7 @@
 
     </select>
 
-    <select id="selectCruiseDataResultByList" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
+    <select id="selectCruiseDataResultByList"  parameterType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
         SELECT
 	      e.end_time,
           c.instance_name,
@@ -293,8 +293,49 @@
 	       )
 	    LEFT JOIN (t_cruise_result g LEFT JOIN t_dict_business i ON g.c_type=i.dict_code AND i.col_name="plan_type") ON d.task_result_id=g.task_result_id
          )ON b.instance_id=e.instance_id
+
         WHERE a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}
+
+        <if test="startDate != null " ><if test="endDate != null">and e.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
+        <if test="instanceName != null and instanceName != ''"> and c.instance_name = #{instanceName, jdbcType=VARCHAR}</if>
+        <if test="cType != null and cType != ''">and g.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cTypeName != null and cTypeName != ''">and i.dict_note= #{cTypeName, jdbcType=VARCHAR}</if>
+        <if test="cruiseType != null and cruiseType != ''">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="cruiseTypeName!= null and cruiseTypeName != ''">and h.dict_note = #{cruiseTypeName, jdbcType=VARCHAR}</if>
+        <if test="identifyState!= null and identifyState != ''">and f.identify_state = #{identifyState, jdbcType=INTEGER}</if>
+        <if test="identifyStateName != null and identifyStateName != ''">and j.dict_note = #{identifyStateName, jdbcType=VARCHAR}</if>
+        <if test="resultNum != null and resultNum != ''">and f.result_num = #{resultNum, jdbcType=VARCHAR}</if>
+        <if test="picPath != null and picPath != ''">and f.picpath = #{picPath, jdbcType=VARCHAR}</if>
         ORDER BY e.end_time DESC
     </select>
 
+
+    <select id="selectBrokenLine" parameterType="com.yjh.platform.module.task.entity.BrokenLineInfo" resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
+        SELECT
+	     c.end_time,
+	     d.result_num,
+         b.cruise_type,
+         h.dict_note as cruiseTypeName
+        FROM
+	       (
+		     t_std_devicemete a
+		     LEFT JOIN (
+			 t_cruise_point_instance b
+			  LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code
+			  AND h.col_name = "cruise_type"
+		   ) ON a.device_mete_id = b.device_mete_id
+	     )
+        LEFT JOIN (
+	       (
+		    t_cruise_task_result_detail c
+		    LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
+	       )
+         ) ON b.instance_id = c.instance_id
+         WHERE
+	       a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+        <if test="startDate != null " ><if test="endDate != null">and c.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
+        <if test="resultNum != null and resultNum != ''">and d.result_num = #{resultNum, jdbcType=VARCHAR}</if>
+        <if test="cruiseType != null and cruiseType != ''" >and #{cruiseType,jdbcType=INTEGER}</if>
+        <if test="cruiseTypeName!= null and cruiseTypeName != ''">and h.dict_note = #{cruiseTypeName, jdbcType=VARCHAR}</if>
+    </select>
 </mapper>

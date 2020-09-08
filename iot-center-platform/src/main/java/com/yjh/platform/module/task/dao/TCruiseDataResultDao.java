@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.BrokenLineInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
@@ -41,5 +42,7 @@ public interface TCruiseDataResultDao {
     int batchInsert(List<TCruiseDataResult> list);
     CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId")Long deviceId,
                                                         @Param(value = "deviceMeteId")Long deviceMeteId);
-    List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "deviceMeteId")Long deviceMeteId);
+    List<CruiseResultAnalInfo> selectCruiseDataResultByList(CruiseResultAnalInfo cruiseResultAnalInfo);
+
+    List<BrokenLineInfo> selectBrokenLine(BrokenLineInfo brokenLineInfo);
 }

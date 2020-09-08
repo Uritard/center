@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.task.entity.BrokenLineInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
@@ -108,10 +109,16 @@ public class TCruiseDataResultService{
 
     @Logs(title = "获取当前测点下的巡检结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalInfo> selectCruiseDataResultByList(Long deviceMeteId){
-        List<CruiseResultAnalInfo> cruiseResultAnalInfos=new ArrayList<>();
-        cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(deviceMeteId);
+    public List<CruiseResultAnalInfo> selectCruiseDataResultByList(CruiseResultAnalInfo cruiseResultAnalInfo){
+        List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(cruiseResultAnalInfo);
         return cruiseResultAnalInfos;
+    }
+
+    @Logs(title = "获取折线图元素信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<BrokenLineInfo> selectBrokenLine(BrokenLineInfo brokenLineInfo){
+        List<BrokenLineInfo> brokenLineInfos=tCruiseDataResultDao.selectBrokenLine(brokenLineInfo);
+        return brokenLineInfos;
     }
 
 }

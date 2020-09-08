@@ -18,6 +18,10 @@ public class CruiseResultAnalInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long deviceMeteId;
+    @ApiModelProperty(value = "条件查询时间上下限")
+    private Date startDate;
+    private Date endDate;
     @ApiModelProperty(value = "识别时间")
     private Date endTime;
     @ApiModelProperty(value = "点位名称")
