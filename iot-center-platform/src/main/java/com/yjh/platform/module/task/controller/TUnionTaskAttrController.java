@@ -1,32 +1,31 @@
 package com.yjh.platform.module.task.controller;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.task.entity.TUnionTaskAttr;
 import com.yjh.platform.module.task.service.TUnionTaskAttrService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
+import com.yjh.platform.module.task.entity.TUnionTaskAttr;
 import java.util.HashMap;
 import java.util.List;
+
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yjh.platform.common.result.Result;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.Page;
 import java.util.Map;
+
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.result.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * @author wf
- * @since 2020-08-19
+ * @author tt
+ * @since 2020-09-04
  */
 @RestController
 @RequestMapping("/tUnionTaskAttr/v1")
-@Api(value = "/tUnionTaskAttr", description = "联合巡视预案属性操作接口")
+@Api(value = "/tUnionTaskAttr", description = "联合巡视预案属性表操作接口")
 public class TUnionTaskAttrController {
 
     @Autowired
@@ -42,13 +41,12 @@ public class TUnionTaskAttrController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TUnionTaskAttr tUnionTaskAttr) {
         Result result = new Result();
-
         try {
             result.setData(tUnionTaskAttrService.insert(tUnionTaskAttr));
         } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), b.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("添加联合巡视预案属性错误:", e);
         }
         return result;
@@ -56,26 +54,20 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "UnionId", required = true) String UnionId,
-                         @RequestParam(value = "instanceId", required = true) Long instanceId) {
+    public Result delete(@RequestParam(value = "unionId", required = true) String unionId) {
         Result result = new Result();
-        Map<String, Object> map = new HashMap<>();
-        map.put("UnionId", UnionId);
-        map.put("instanceId", instanceId);
-
         try {
-            result.setData(tUnionTaskAttrService.deleteByPrimaryId(map));
+            result.setData(tUnionTaskAttrService.deleteByPrimaryId(unionId));
         } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.DELETEERROR.getCode(), e.getMessage());
-            log.error("联合巡视预案属性删除异常:", e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除联合巡视预案属性异常:", e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.DELETEERROR.getCode(), ResultCodeEnum.DELETEERROR.getName());
-            log.error("联合巡视预案属性删除错误:", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
         }
         return result;
     }
 
-    //更新
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public Result update(@RequestBody TUnionTaskAttr tUnionTaskAttr) {
@@ -84,60 +76,55 @@ public class TUnionTaskAttrController {
             result.setData(tUnionTaskAttrService.update(tUnionTaskAttr));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新巡检预案参数异常:", e);
+            log.error("更新联合巡视预案属性异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("更新巡检预案参数错误:", e);
+            log.error("更新错误:", e);
         }
         return result;
     }
 
-    //查询 根据主键ID查询
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "UnionId", required = true) String UnionId){
+    public Result selectByPrimaryId(@RequestParam(value = "unionId", required = true) String unionId) {
         Result result = new Result();
-
         try {
-            result.setData(tUnionTaskAttrService.selectByPrimaryId(UnionId));
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            TUnionTaskAttr tUnionTaskAttr = tUnionTaskAttrService.selectByPrimaryId(unionId);
+            result.setData(tUnionTaskAttr);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
 
-    //查询
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "UnionId", required = false) String UnionId,
-                         @RequestParam(value = "instanceId", required = false) Long instanceId,
-                         @RequestParam(value = "DeviceMeteId", required = false) Long DeviceMeteId,
-                         @RequestParam(value = "DeviceCustomIId", required = false) String DeviceCustomIId,
-                         @RequestParam(value = "PointTaskId", required = false) String PointTaskId,
-                         @RequestParam(value = "IfRobot", required = false) Integer IfRobot,
-                         @RequestParam(value = "IfVideo", required = false) Integer IfVideo,
-                         @RequestParam(value = "IfInferad", required = false) Integer IfInferad,
-                         @RequestParam(value = "IfArtificial", required = false) Integer IfArtificial
-    ){
+    public Result select(@RequestParam(value = "unionId", required = false) String unionId,
+                            @RequestParam(value = "instanceId", required = false) Long instanceId,
+                            @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
+                            @RequestParam(value = "deviceCustomId", required = false) String deviceCustomId,
+                            @RequestParam(value = "pointTaskId", required = false) Long pointTaskId,
+                            @RequestParam(value = "ifRobot", required = false) Integer ifRobot,
+                            @RequestParam(value = "ifVideo", required = false) Integer ifVideo,
+                            @RequestParam(value = "ifInferad", required = false) Integer ifInferad,
+                            @RequestParam(value = "ifArtificial", required = false) Integer ifArtificial) {
         Result result = new Result();
         try {
-            List<TUnionTaskAttr> list = this.tUnionTaskAttrService.select(UnionId,instanceId,DeviceMeteId,DeviceCustomIId,
-                    PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
+            List<TUnionTaskAttr> list = tUnionTaskAttrService.select(unionId, instanceId, deviceMeteId, deviceCustomId, pointTaskId, ifRobot, ifVideo, ifInferad, ifArtificial);
             result.setData(list);
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
 
-    //分页查询
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TUnionTaskAttr tUnionTaskAttr,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -147,8 +134,21 @@ public class TUnionTaskAttrController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "批量插入")
+    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    public Result batchInsert(@RequestBody List<TUnionTaskAttr> list) {
+        Result result = new Result();
+        try {
+        result.setData(tUnionTaskAttrService.batchInsert(list));
+        } catch (Exception e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
         }
         return result;
     }

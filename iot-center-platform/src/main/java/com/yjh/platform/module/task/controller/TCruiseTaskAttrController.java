@@ -1,31 +1,31 @@
 package com.yjh.platform.module.task.controller;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
+import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import java.util.HashMap;
 import java.util.List;
+
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yjh.platform.common.result.Result;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.Page;
 import java.util.Map;
+
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.result.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * @author wf
- * @since 2020-08-19
+ * @author tt
+ * @since 2020-09-04
  */
 @RestController
 @RequestMapping("/tCruiseTaskAttr/v1")
-@Api(value = "/tCruiseTaskAttr", description = "任务关联操作接口")
+@Api(value = "/tCruiseTaskAttr", description = "任务关联表操作接口")
 public class TCruiseTaskAttrController {
 
     @Autowired
@@ -41,40 +41,33 @@ public class TCruiseTaskAttrController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCruiseTaskAttr tCruiseTaskAttr) {
         Result result = new Result();
-
         try {
             result.setData(tCruiseTaskAttrService.insert(tCruiseTaskAttr));
         } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), b.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
-            log.error("添加任务关联错误:", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加任务关联表错误:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "TaskId", required = true) String TaskId,
-                         @RequestParam(value = "instanceId", required = true) Long instanceId) {
+    public Result delete(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
-        Map<String, Object> map = new HashMap<>();
-        map.put("TaskId", TaskId);
-        map.put("instanceId", instanceId);
-
         try {
-            result.setData(tCruiseTaskAttrService.deleteByPrimaryId(map));
+            result.setData(tCruiseTaskAttrService.deleteByPrimaryId(taskId));
         } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.DELETEERROR.getCode(), e.getMessage());
-            log.error("任务关联删除异常:", e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除任务关联表异常:", e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.DELETEERROR.getCode(), ResultCodeEnum.DELETEERROR.getName());
-            log.error("任务关联删除错误:", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
         }
         return result;
     }
 
-    //更新
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public Result update(@RequestBody TCruiseTaskAttr tCruiseTaskAttr) {
@@ -83,61 +76,56 @@ public class TCruiseTaskAttrController {
             result.setData(tCruiseTaskAttrService.update(tCruiseTaskAttr));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新任务关联参数异常:", e);
+            log.error("更新任务关联表异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("更新任务关联参数错误:", e);
+            log.error("更新错误:", e);
         }
         return result;
     }
 
-    //查询 根据主键ID查询
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "TaskId", required = true) String TaskId){
+    public Result selectByPrimaryId(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
-
         try {
-            result.setData(tCruiseTaskAttrService.selectByPrimaryId(TaskId));
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            TCruiseTaskAttr tCruiseTaskAttr = tCruiseTaskAttrService.selectByPrimaryId(taskId);
+            result.setData(tCruiseTaskAttr);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
 
-    //查询
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "TaskId", required = false) String TaskId,
-                         @RequestParam(value = "instanceId", required = false) Long instanceId,
-                         @RequestParam(value = "DeviceMeteId", required = false) Long DeviceMeteId,
-                         @RequestParam(value = "DeviceId", required = false) Long DeviceId,
-                         @RequestParam(value = "CustomId", required = false) String CustomId,
-                         @RequestParam(value = "PointTaskId", required = false) String PointTaskId,
-                         @RequestParam(value = "IfRobot", required = false) Integer IfRobot,
-                         @RequestParam(value = "IfVideo", required = false) Integer IfVideo,
-                         @RequestParam(value = "IfInferad", required = false) Integer IfInferad,
-                         @RequestParam(value = "IfArtificial", required = false) Integer IfArtificial
-    ){
+    public Result select(@RequestParam(value = "taskId", required = false) String taskId,
+                            @RequestParam(value = "instanceId", required = false) Long instanceId,
+                            @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
+                            @RequestParam(value = "deviceId", required = false) Long deviceId,
+                            @RequestParam(value = "customId", required = false) String customId,
+                            @RequestParam(value = "pointTaskId", required = false) String pointTaskId,
+                            @RequestParam(value = "ifRobot", required = false) Integer ifRobot,
+                            @RequestParam(value = "ifVideo", required = false) Integer ifVideo,
+                            @RequestParam(value = "ifInferad", required = false) Integer ifInferad,
+                            @RequestParam(value = "ifArtificial", required = false) Integer ifArtificial) {
         Result result = new Result();
         try {
-            List<TCruiseTaskAttr> list = this.tCruiseTaskAttrService.select(TaskId,instanceId,DeviceMeteId,DeviceId,CustomId,
-                    PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
+            List<TCruiseTaskAttr> list = tCruiseTaskAttrService.select(taskId, instanceId, deviceMeteId, deviceId, customId, pointTaskId, ifRobot, ifVideo, ifInferad, ifArtificial);
             result.setData(list);
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;
     }
 
-    //分页查询
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruiseTaskAttr tCruiseTaskAttr,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -147,8 +135,21 @@ public class TCruiseTaskAttrController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "批量插入")
+    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    public Result batchInsert(@RequestBody List<TCruiseTaskAttr> list) {
+        Result result = new Result();
+        try {
+        result.setData(tCruiseTaskAttrService.batchInsert(list));
+        } catch (Exception e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
         }
         return result;
     }

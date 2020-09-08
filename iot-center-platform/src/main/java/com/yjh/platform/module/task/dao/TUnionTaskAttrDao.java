@@ -1,38 +1,32 @@
 package com.yjh.platform.module.task.dao;
 
+import java.util.List;
+
 import com.yjh.platform.module.task.entity.TUnionTaskAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 /**
- * @author wf
- * @since 2020-08-19
+ * @author tt
+ * @since 2020-09-04
  */
 @Repository
 public interface TUnionTaskAttrDao {
-     //插入
+
     int insert(TUnionTaskAttr tUnionTaskAttr);
-    //删除
-    String deleteByPrimaryId(Map<String, Object> map);
-    //修改
+    int deleteByPrimaryId(@Param(value = "unionId") String unionId);
     int update(TUnionTaskAttr tUnionTaskAttr);
-
-    TUnionTaskAttr selectByPrimaryId(@Param(value = "UnionId") String UnionId);
-
-    List<TUnionTaskAttr> select(@Param(value = "UnionId") String UnionId,
+    TUnionTaskAttr selectByPrimaryId(@Param(value = "unionId") String unionId);
+    List<TUnionTaskAttr> select(@Param(value = "unionId") String unionId,
                                 @Param(value = "instanceId") Long instanceId,
-                                @Param(value = "DeviceMeteId") Long DeviceMeteId,
-                                @Param(value = "DeviceCustomId") String DeviceCustomId,
-                                @Param(value = "PointTaskId") String PointTaskId,
-                                @Param(value = "IfRobot") Integer IfRobot,
-                                @Param(value = "IfVideo") Integer IfVideo,
-                                @Param(value = "IfInferad") Integer IfInferad,
-                                @Param(value = "IfArtificial") Integer IfArtificial);
+                                @Param(value = "deviceMeteId") Long deviceMeteId,
+                                @Param(value = "deviceCustomId") String deviceCustomId,
+                                @Param(value = "pointTaskId") Long pointTaskId,
+                                @Param(value = "ifRobot") Integer ifRobot,
+                                @Param(value = "ifVideo") Integer ifVideo,
+                                @Param(value = "ifInferad") Integer ifInferad,
+                                @Param(value = "ifArtificial") Integer ifArtificial);
+    List<TUnionTaskAttr> selectByPage(TUnionTaskAttr tUnionTaskAttr);
 
-    //分页查询
-    List<TUnionTaskAttr> select(TUnionTaskAttr tUnionTaskAttr);
+    int batchInsert(List<TUnionTaskAttr> list);
 }

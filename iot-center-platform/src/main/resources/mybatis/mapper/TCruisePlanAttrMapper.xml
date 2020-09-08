@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCruisePlanAttrDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+        <id column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="point_type" jdbcType="INTEGER" property="pointType" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="cruise_region_ids" jdbcType="VARCHAR" property="cruiseRegionIds" />
+        <result column="exception_type" jdbcType="INTEGER" property="exceptionType" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="position" jdbcType="VARCHAR" property="position" />
+        <result column="algorithm_id" jdbcType="INTEGER" property="algorithmId" />
+        <result column="inferad_analyze" jdbcType="VARCHAR" property="inferadAnalyze" />
+        <result column="ir_temp_box" jdbcType="VARCHAR" property="irTempBox" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        plan_id, instance_id, point_type, area_id, cruise_region_ids, exception_type, robot_id, position, algorithm_id, inferad_analyze, ir_temp_box, create_time, update_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="planId" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+        insert into t_cruise_plan_attr(
+            plan_id,
+            instance_id,
+            point_type,
+            area_id,
+            cruise_region_ids,
+            exception_type,
+            robot_id,
+            position,
+            algorithm_id,
+            inferad_analyze,
+            ir_temp_box,
+            create_time,
+            update_time
+        )values(
+                #{planId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
+                #{pointType, jdbcType=INTEGER},
+                #{areaId, jdbcType=VARCHAR},
+                #{cruiseRegionIds, jdbcType=VARCHAR},
+                #{exceptionType, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
+                #{position, jdbcType=VARCHAR},
+                #{algorithmId, jdbcType=INTEGER},
+                #{inferadAnalyze, jdbcType=VARCHAR},
+                #{irTempBox, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{updateTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cruise_plan_attr
+                where plan_id = #{planId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+        update t_cruise_plan_attr a <set>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="pointType != null and pointType != ''">a.point_type = #{pointType, jdbcType=INTEGER},</if>
+        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="cruiseRegionIds != null and cruiseRegionIds != ''">a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR},</if>
+        <if test="exceptionType != null and exceptionType != ''">a.exception_type = #{exceptionType, jdbcType=INTEGER},</if>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="position != null and position != ''">a.position = #{position, jdbcType=VARCHAR},</if>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=INTEGER},</if>
+        <if test="inferadAnalyze != null and inferadAnalyze != ''">a.inferad_analyze = #{inferadAnalyze, jdbcType=VARCHAR},</if>
+        <if test="irTempBox != null and irTempBox != ''">a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.plan_id = #{planId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+        select
+        a.plan_id,
+        a.instance_id,
+        a.point_type,
+        a.area_id,
+        a.cruise_region_ids,
+        a.exception_type,
+        a.robot_id,
+        a.position,
+        a.algorithm_id,
+        a.algorithm_name,
+        a.inferad_analyze,
+        a.ir_temp_box,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan_attr a
+        where 1 = 1
+            and a.plan_id = #{planId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+        select
+        a.plan_id,
+        a.instance_id,
+        a.point_type,
+        a.area_id,
+        a.cruise_region_ids,
+        a.exception_type,
+        a.robot_id,
+        a.position,
+        a.algorithm_id,
+        a.inferad_analyze,
+        a.ir_temp_box,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan_attr a
+        where 1 = 1
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="pointType != null and pointType != ''"> and a.point_type = #{pointType, jdbcType=INTEGER}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="cruiseRegionIds != null and cruiseRegionIds != ''"> and a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR}</if>
+        <if test="exceptionType != null and exceptionType != ''"> and a.exception_type = #{exceptionType, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="position != null and position != ''"> and a.position = #{position, jdbcType=VARCHAR}</if>
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=INTEGER}</if>
+        <if test="inferadAnalyze != null and inferadAnalyze != ''"> and a.inferad_analyze = #{inferadAnalyze, jdbcType=VARCHAR}</if>
+        <if test="irTempBox != null and irTempBox != ''"> and a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+        select
+        a.plan_id,
+        a.instance_id,
+        a.point_type,
+        a.area_id,
+        a.cruise_region_ids,
+        a.exception_type,
+        a.robot_id,
+        a.position,
+        a.algorithm_id,
+        a.inferad_analyze,
+        a.ir_temp_box,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan_attr a
+        where 1 = 1
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="pointType != null and pointType != ''"> and a.point_type = #{pointType, jdbcType=INTEGER}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="cruiseRegionIds != null and cruiseRegionIds != ''"> and a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR}</if>
+        <if test="exceptionType != null and exceptionType != ''"> and a.exception_type = #{exceptionType, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="position != null and position != ''"> and a.position = #{position, jdbcType=VARCHAR}</if>
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=INTEGER}</if>
+        <if test="inferadAnalyze != null and inferadAnalyze != ''"> and a.inferad_analyze = #{inferadAnalyze, jdbcType=VARCHAR}</if>
+        <if test="irTempBox != null and irTempBox != ''"> and a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cruise_plan_attr(
+            plan_id,
+            instance_id,
+            point_type,
+            area_id,
+            cruise_region_ids,
+            exception_type,
+            robot_id,
+            position,
+            algorithm_id,
+            inferad_analyze,
+            ir_temp_box,
+            create_time,
+            update_time
+        )values
+        <foreach collection="list" item="TCruisePlanAttr" separator=",">
+            (
+                #{TCruisePlanAttr.planId, jdbcType=BIGINT},
+                #{TCruisePlanAttr.instanceId, jdbcType=BIGINT},
+                #{TCruisePlanAttr.pointType, jdbcType=INTEGER},
+                #{TCruisePlanAttr.areaId, jdbcType=VARCHAR},
+                #{TCruisePlanAttr.cruiseRegionIds, jdbcType=VARCHAR},
+                #{TCruisePlanAttr.exceptionType, jdbcType=INTEGER},
+                #{TCruisePlanAttr.robotId, jdbcType=BIGINT},
+                #{TCruisePlanAttr.position, jdbcType=VARCHAR},
+                #{TCruisePlanAttr.algorithmId, jdbcType=INTEGER},
+                #{TCruisePlanAttr.inferadAnalyze, jdbcType=VARCHAR},
+                #{TCruisePlanAttr.irTempBox, jdbcType=VARCHAR},
+                #{TCruisePlanAttr.createTime, jdbcType=TIMESTAMP},
+                #{TCruisePlanAttr.updateTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

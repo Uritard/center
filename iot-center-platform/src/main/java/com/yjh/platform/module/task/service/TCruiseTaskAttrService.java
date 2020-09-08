@@ -1,21 +1,21 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 
 import java.util.List;
-import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yjh.platform.common.logs.Logs;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * @author wf
- * @since 2020-08-19
- */
+* @author tt
+* @since 2020-09-04
+*/
 @Service
-public class TCruiseTaskAttrService {
+public class TCruiseTaskAttrService{
 
     @Autowired
     private TCruiseTaskAttrDao tCruiseTaskAttrDao;
@@ -28,39 +28,41 @@ public class TCruiseTaskAttrService {
 
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public String deleteByPrimaryId(Map<String, Object> map) {
-        return this.tCruiseTaskAttrDao.deleteByPrimaryId(map);
+    public int deleteByPrimaryId(String taskId) {
+        return this.tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
     }
 
-    //修改
-    @Logs(title = "修改",code = "moudle")
+    @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int update(TCruiseTaskAttr tCruiseTaskAttr){
+    public int update(TCruiseTaskAttr tCruiseTaskAttr) {
         return this.tCruiseTaskAttrDao.update(tCruiseTaskAttr);
     }
 
-    //主键查询
     @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public TCruiseTaskAttr selectByPrimaryId(String TaskId){
-        return this.tCruiseTaskAttrDao.selectByPrimaryId(TaskId);
+    public TCruiseTaskAttr selectByPrimaryId(String taskId) {
+        return this.tCruiseTaskAttrDao.selectByPrimaryId(taskId);
     }
 
-    //查询
-    @Logs(title = "查询",code = "module")
+    @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTaskAttr> select(String TaskId,Long instanceId,Long DeviceMeteId,Long DeviceId,String CustomId,
-                                    String PointTaskId,Integer IfRobot,Integer IfVideo,Integer IfInferad,Integer IfArtificial){
-        List<TCruiseTaskAttr> list = this.tCruiseTaskAttrDao.select(TaskId,instanceId,DeviceMeteId,DeviceId,CustomId,
-                PointTaskId,IfRobot,IfVideo,IfInferad,IfArtificial);
-        return list;
+    public List<TCruiseTaskAttr> select(String taskId, Long instanceId, Long deviceMeteId, Long deviceId, String customId, String pointTaskId, Integer ifRobot, Integer ifVideo, Integer ifInferad, Integer ifArtificial) {
+        List<TCruiseTaskAttr> tCruiseTaskAttrList = tCruiseTaskAttrDao.select(taskId, instanceId, deviceMeteId, deviceId, customId, pointTaskId, ifRobot, ifVideo, ifInferad, ifArtificial);
+        return tCruiseTaskAttrList;
     }
 
-    //分页查询
-    @Logs(title = "分页查询",code = "module")
+    @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTaskAttr> selectByPage(TCruiseTaskAttr tCruiseTaskAttr){
-        return this.tCruiseTaskAttrDao.select(tCruiseTaskAttr);
+    public List<TCruiseTaskAttr> selectByPage(TCruiseTaskAttr tCruiseTaskAttr) {
+        List<TCruiseTaskAttr> tCruiseTaskAttrList = tCruiseTaskAttrDao.selectByPage(tCruiseTaskAttr);
+        return tCruiseTaskAttrList;
     }
+
+    @Logs(title = "批量插入", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int batchInsert(List<TCruiseTaskAttr> list) {
+        return this.tCruiseTaskAttrDao.batchInsert(list);
+    }
+
 }
 

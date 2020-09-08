@@ -1,7 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
-import com.yjh.platform.module.task.service.TUnionTaskService;
-import com.yjh.platform.module.task.entity.TUnionTask;
+import com.yjh.platform.module.task.service.TCruisePlanAttrService;
+import com.yjh.platform.module.task.entity.TCruisePlanAttr;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
@@ -24,43 +24,43 @@ import org.slf4j.LoggerFactory;
  * @since 2020-09-04
  */
 @RestController
-@RequestMapping("/tUnionTask/v1")
-@Api(value = "/tUnionTask", description = "巡检任务表操作接口")
-public class TUnionTaskController {
+@RequestMapping("/tCruisePlanAttr/v1")
+@Api(value = "/tCruisePlanAttr", description = "巡检预案属性表操作接口")
+public class TCruisePlanAttrController {
 
     @Autowired
-    private final TUnionTaskService tUnionTaskService;
+    private final TCruisePlanAttrService tCruisePlanAttrService;
 
-    private Logger log = LoggerFactory.getLogger(TUnionTaskController.class);
+    private Logger log = LoggerFactory.getLogger(TCruisePlanAttrController.class);
 
-    public TUnionTaskController(TUnionTaskService tUnionTaskService) {
-        this.tUnionTaskService = tUnionTaskService;
+    public TCruisePlanAttrController(TCruisePlanAttrService tCruisePlanAttrService) {
+        this.tCruisePlanAttrService = tCruisePlanAttrService;
     }
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TUnionTask tUnionTask) {
+    public Result insert(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
         Result result = new Result();
         try {
-            result.setData(tUnionTaskService.insert(tUnionTask));
+            result.setData(tCruisePlanAttrService.insert(tCruisePlanAttr));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加巡检任务表错误:", e);
+            log.error("添加预案属性错误:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "unionId", required = true) String unionId) {
+    public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
-            result.setData(tUnionTaskService.deleteByPrimaryId(unionId));
+            result.setData(tCruisePlanAttrService.deleteByPrimaryId(planId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("删除巡检任务表异常:", e);
+            log.error("删除预案属性异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除错误:", e);
@@ -70,13 +70,13 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TUnionTask tUnionTask) {
+    public Result update(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
         Result result = new Result();
         try {
-            result.setData(tUnionTaskService.update(tUnionTask));
+            result.setData(tCruisePlanAttrService.update(tCruisePlanAttr));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新巡检任务表异常:", e);
+            log.error("更新预案属性异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("更新错误:", e);
@@ -86,11 +86,11 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "unionId", required = true) String unionId) {
+    public Result selectByPrimaryId(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
-            TUnionTask tUnionTask = tUnionTaskService.selectByPrimaryId(unionId);
-            result.setData(tUnionTask);
+            TCruisePlanAttr tCruisePlanAttr = tCruisePlanAttrService.selectByPrimaryId(planId);
+            result.setData(tCruisePlanAttr);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -100,23 +100,22 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "unionId", required = false) String unionId,
-                            @RequestParam(value = "planId", required = false) Long planId,
+    public Result select(@RequestParam(value = "planId", required = false) Long planId,
+                            @RequestParam(value = "instanceId", required = false) Long instanceId,
+                            @RequestParam(value = "pointType", required = false) Integer pointType,
                             @RequestParam(value = "areaId", required = false) String areaId,
-                            @RequestParam(value = "name", required = false) String name,
-                            @RequestParam(value = "type", required = false) Integer type,
-                            @RequestParam(value = "ifRun", required = false) Integer ifRun,
+                            @RequestParam(value = "cruiseRegionIds", required = false) String cruiseRegionIds,
+                            @RequestParam(value = "exceptionType", required = false) Integer exceptionType,
                             @RequestParam(value = "robotId", required = false) Long robotId,
-                            @RequestParam(value = "dateType", required = false) Integer dateType,
-                            @RequestParam(value = "remark1", required = false) Integer remark1,
-                            @RequestParam(value = "remark2", required = false) Integer remark2,
-                            @RequestParam(value = "remark3", required = false) String remark3,
-                            @RequestParam(value = "taskType", required = false) Integer taskType,
-                            @RequestParam(value = "startTime", required = false) Date startTime,
-                            @RequestParam(value = "createTime", required = false) Date createTime) {
+                            @RequestParam(value = "position", required = false) String position,
+                            @RequestParam(value = "algorithmId", required = false) Integer algorithmId,
+                            @RequestParam(value = "inferadAnalyze", required = false) String inferadAnalyze,
+                            @RequestParam(value = "irTempBox", required = false) String irTempBox,
+                            @RequestParam(value = "createTime", required = false) Date createTime,
+                            @RequestParam(value = "updateTime", required = false) Date updateTime) {
         Result result = new Result();
         try {
-            List<TUnionTask> list = tUnionTaskService.select(unionId, planId, areaId, name, type, ifRun, robotId, dateType, remark1, remark2, remark3, taskType, startTime, createTime);
+            List<TCruisePlanAttr> list = tCruisePlanAttrService.select(planId, instanceId, pointType, areaId, cruiseRegionIds, exceptionType, robotId, position, algorithmId, inferadAnalyze, irTempBox, createTime, updateTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -127,14 +126,14 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TUnionTask tUnionTask,
+    public Result selectByPage(@RequestBody TCruisePlanAttr tCruisePlanAttr,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TUnionTask> list = tUnionTaskService.selectByPage(tUnionTask);
+            List<TCruisePlanAttr> list = tCruisePlanAttrService.selectByPage(tCruisePlanAttr);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -147,10 +146,10 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TUnionTask> list) {
+    public Result batchInsert(@RequestBody List<TCruisePlanAttr> list) {
         Result result = new Result();
         try {
-        result.setData(tUnionTaskService.batchInsert(list));
+        result.setData(tCruisePlanAttrService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);

@@ -1,59 +1,54 @@
 package com.yjh.platform.module.task.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-
 /**
- * @author wf
- * @since 2020-08-19
+ * @author tt
+ * @since 2020-09-04
  */
-
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TCruiseTaskAttr", description = "任务关联表")
+@ApiModel(value = "TCruiseTaskAttr对象", description = "任务关联表")
 public class TCruiseTaskAttr implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+
     @ApiModelProperty(value = "关联任务表id")
-    @TableId(value = "task_id", type = IdType.AUTO)
-    private String TaskId;
+    private String taskId;
 
     @ApiModelProperty(value = "巡检点实例ID")
-    @TableId(value = "instance_id", type = IdType.AUTO)
     private Long instanceId;
 
     @ApiModelProperty(value = "测点实例ID")
-    private Long DeviceMeteId;
+    private Long deviceMeteId;
 
     @ApiModelProperty(value = "关联设备id")
-    private Long DeviceId;
+    private Long deviceId;
 
     @ApiModelProperty(value = "关联部位表id")
-    private String CustomId;
+    private String customId;
 
     @ApiModelProperty(value = "关联巡视点表id")
-    private String PointTaskId;
+    private String pointTaskId;
 
     @ApiModelProperty(value = "是否支持机器人巡视")
-    private Integer IfRobot;
+    private Integer ifRobot;
 
     @ApiModelProperty(value = "是否支持视频巡视")
-    private Integer IfVideo;
+    private Integer ifVideo;
 
     @ApiModelProperty(value = "是否支持红外巡视")
-    private Integer IfInferad;
+    private Integer ifInferad;
 
     @ApiModelProperty(value = "是否支持人工巡视")
-    private Integer IfArtificial;
+    private Integer ifArtificial;
 
 
 }

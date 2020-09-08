@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCruisePlanDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruisePlan">
+        <id column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="plan_name" jdbcType="VARCHAR" property="planName" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="plan_point_types" jdbcType="VARCHAR" property="planPointTypes" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        plan_id, plan_name, type, plan_point_types, create_time, update_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="planId" parameterType="com.yjh.platform.module.task.entity.TCruisePlan">
+        insert into t_cruise_plan(
+            plan_id,
+            plan_name,
+            type,
+            plan_point_types,
+            create_time,
+            update_time
+        )values(
+                #{planId, jdbcType=BIGINT},
+                #{planName, jdbcType=VARCHAR},
+                #{type, jdbcType=INTEGER},
+                #{planPointTypes, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{updateTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cruise_plan
+                where plan_id = #{planId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruisePlan">
+        update t_cruise_plan a <set>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="planName != null and planName != ''">a.plan_name = #{planName, jdbcType=VARCHAR},</if>
+        <if test="type != null and type != ''">a.type = #{type, jdbcType=INTEGER},</if>
+        <if test="planPointTypes != null and planPointTypes != ''">a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.plan_id = #{planId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
+        select
+        a.plan_id,
+        a.plan_name,
+        a.type,
+        a.plan_point_types,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan a
+        where 1 = 1
+            and a.plan_id = #{planId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
+        select
+        a.plan_id,
+        a.plan_name,
+        a.type,
+        a.plan_point_types,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan a
+        where 1 = 1
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="planName != null and planName != ''"> and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
+        select
+        a.plan_id,
+        a.plan_name,
+        a.type,
+        a.plan_point_types,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan a
+        where 1 = 1
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="planName != null and planName != ''"> and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cruise_plan(
+            plan_id,
+            plan_name,
+            type,
+            plan_point_types,
+            create_time,
+            update_time
+        )values
+        <foreach collection="list" item="TCruisePlan" separator=",">
+            (
+                #{TCruisePlan.planId, jdbcType=BIGINT},
+                #{TCruisePlan.planName, jdbcType=VARCHAR},
+                #{TCruisePlan.type, jdbcType=INTEGER},
+                #{TCruisePlan.planPointTypes, jdbcType=VARCHAR},
+                #{TCruisePlan.createTime, jdbcType=TIMESTAMP},
+                #{TCruisePlan.updateTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findInstanceTree" resultType="com.yjh.platform.module.task.entity.InstanceTree">
+        select a.*,b.device_name,b.custom_name,c.instance_name,e.robot_name,g.camera_name,h.camera_name as inferad_name from t_cruise_point_instance a
+	        left join t_std_device b on a.device_id = b.device_id
+	        left join t_cruise_point_attr c on a.instance_id = c.instance_id
+	        left join t_robot_inspection d on d.inspection_id = a.cruise_id
+	        LEFT JOIN t_robot_info e on d.robot_id = e.robot_id
+	        left join t_camera_preset f on a.cruise_id = f.preset_id
+	        left join t_camera_info g on f.preset_id = g.camera_name and g.camera_type = 205
+	        left join t_camera_info h on f.preset_id = h.camera_name and h.camera_type = 206
+        where 1 = 1;
+    </select>
+
+</mapper>

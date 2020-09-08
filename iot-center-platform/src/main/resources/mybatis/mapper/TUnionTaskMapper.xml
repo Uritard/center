@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TUnionTaskDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TUnionTask">
+        <id column="union_id" jdbcType="VARCHAR" property="unionId" />
+        <result column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="if_run" jdbcType="INTEGER" property="ifRun" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="date_type" jdbcType="INTEGER" property="dateType" />
+        <result column="remark1" jdbcType="INTEGER" property="remark1" />
+        <result column="remark2" jdbcType="INTEGER" property="remark2" />
+        <result column="remark3" jdbcType="VARCHAR" property="remark3" />
+        <result column="task_type" jdbcType="INTEGER" property="taskType" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        union_id, plan_id, area_id, name, type, if_run, robot_id, date_type, remark1, remark2, remark3, task_type, start_time, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="unionId" parameterType="com.yjh.platform.module.task.entity.TUnionTask">
+        insert into t_union_task(
+            union_id,
+            plan_id,
+            area_id,
+            name,
+            type,
+            if_run,
+            robot_id,
+            date_type,
+            remark1,
+            remark2,
+            remark3,
+            task_type,
+            start_time,
+            create_time
+        )values(
+                #{unionId, jdbcType=VARCHAR},
+                #{planId, jdbcType=BIGINT},
+                #{areaId, jdbcType=VARCHAR},
+                #{name, jdbcType=VARCHAR},
+                #{type, jdbcType=INTEGER},
+                #{ifRun, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
+                #{dateType, jdbcType=INTEGER},
+                #{remark1, jdbcType=INTEGER},
+                #{remark2, jdbcType=INTEGER},
+                #{remark3, jdbcType=VARCHAR},
+                #{taskType, jdbcType=INTEGER},
+                #{startTime, jdbcType=TIMESTAMP},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_union_task
+                where union_id = #{unionId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TUnionTask">
+        update t_union_task a <set>
+        <if test="unionId != null and unionId != ''">a.union_id = #{unionId, jdbcType=VARCHAR},</if>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="name != null and name != ''">a.name = #{name, jdbcType=VARCHAR},</if>
+        <if test="type != null and type != ''">a.type = #{type, jdbcType=INTEGER},</if>
+        <if test="ifRun != null and ifRun != ''">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="dateType != null and dateType != ''">a.date_type = #{dateType, jdbcType=INTEGER},</if>
+        <if test="remark1 != null and remark1 != ''">a.remark1 = #{remark1, jdbcType=INTEGER},</if>
+        <if test="remark2 != null and remark2 != ''">a.remark2 = #{remark2, jdbcType=INTEGER},</if>
+        <if test="remark3 != null and remark3 != ''">a.remark3 = #{remark3, jdbcType=VARCHAR},</if>
+        <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="startTime != null and startTime != ''">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.union_id = #{unionId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TUnionTask">
+        select
+        a.union_id,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        a.type,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.remark1,
+        a.remark2,
+        a.remark3,
+        a.task_type,
+        a.start_time,
+        a.create_time
+        from t_union_task a
+        where 1 = 1
+            and a.union_id = #{unionId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTask">
+        select
+        a.union_id,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        a.type,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.remark1,
+        a.remark2,
+        a.remark3,
+        a.task_type,
+        a.start_time,
+        a.create_time
+        from t_union_task a
+        where 1 = 1
+        <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=INTEGER}</if>
+        <if test="remark1 != null and remark1 != ''"> and a.remark1 = #{remark1, jdbcType=INTEGER}</if>
+        <if test="remark2 != null and remark2 != ''"> and a.remark2 = #{remark2, jdbcType=INTEGER}</if>
+        <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTask">
+        select
+        a.union_id,
+        a.plan_id,
+        a.area_id,
+        a.name,
+        a.type,
+        a.if_run,
+        a.robot_id,
+        a.date_type,
+        a.remark1,
+        a.remark2,
+        a.remark3,
+        a.task_type,
+        a.start_time,
+        a.create_time
+        from t_union_task a
+        where 1 = 1
+        <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=INTEGER}</if>
+        <if test="remark1 != null and remark1 != ''"> and a.remark1 = #{remark1, jdbcType=INTEGER}</if>
+        <if test="remark2 != null and remark2 != ''"> and a.remark2 = #{remark2, jdbcType=INTEGER}</if>
+        <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_union_task(
+            union_id,
+            plan_id,
+            area_id,
+            name,
+            type,
+            if_run,
+            robot_id,
+            date_type,
+            remark1,
+            remark2,
+            remark3,
+            task_type,
+            start_time,
+            create_time
+        )values
+        <foreach collection="list" item="TUnionTask" separator=",">
+            (
+                #{TUnionTask.unionId, jdbcType=VARCHAR},
+                #{TUnionTask.planId, jdbcType=BIGINT},
+                #{TUnionTask.areaId, jdbcType=VARCHAR},
+                #{TUnionTask.name, jdbcType=VARCHAR},
+                #{TUnionTask.type, jdbcType=INTEGER},
+                #{TUnionTask.ifRun, jdbcType=INTEGER},
+                #{TUnionTask.robotId, jdbcType=BIGINT},
+                #{TUnionTask.dateType, jdbcType=INTEGER},
+                #{TUnionTask.remark1, jdbcType=INTEGER},
+                #{TUnionTask.remark2, jdbcType=INTEGER},
+                #{TUnionTask.remark3, jdbcType=VARCHAR},
+                #{TUnionTask.taskType, jdbcType=INTEGER},
+                #{TUnionTask.startTime, jdbcType=TIMESTAMP},
+                #{TUnionTask.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

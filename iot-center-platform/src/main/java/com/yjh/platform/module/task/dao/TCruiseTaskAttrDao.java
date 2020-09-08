@@ -1,38 +1,33 @@
 package com.yjh.platform.module.task.dao;
 
+import java.util.List;
+
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * @author wf
- * @since 2020-08-19
+ * @author tt
+ * @since 2020-09-04
  */
 @Repository
 public interface TCruiseTaskAttrDao {
-     //插入
+
     int insert(TCruiseTaskAttr tCruiseTaskAttr);
-    //删除
-    String deleteByPrimaryId(Map<String, Object> map);
-    //修改
+    int deleteByPrimaryId(@Param(value = "taskId") String taskId);
     int update(TCruiseTaskAttr tCruiseTaskAttr);
-
-    TCruiseTaskAttr selectByPrimaryId(@Param(value = "TaskId") String TaskId);
-
-    List<TCruiseTaskAttr> select(@Param(value = "TaskId") String TaskId,
+    TCruiseTaskAttr selectByPrimaryId(@Param(value = "taskId") String taskId);
+    List<TCruiseTaskAttr> select(@Param(value = "taskId") String taskId,
                                  @Param(value = "instanceId") Long instanceId,
-                                 @Param(value = "DeviceMeteId") Long DeviceMeteId,
-                                 @Param(value = "DeviceId") Long DeviceId,
-                                 @Param(value = "CustomId") String CustomId,
-                                 @Param(value = "PointTaskId") String PointTaskId,
-                                 @Param(value = "IfRobot") Integer IfRobot,
-                                 @Param(value = "IfVideo") Integer IfVideo,
-                                 @Param(value = "IfInferad") Integer IfInferad,
-                                 @Param(value = "IfArtificial") Integer IfArtificial);
+                                 @Param(value = "deviceMeteId") Long deviceMeteId,
+                                 @Param(value = "deviceId") Long deviceId,
+                                 @Param(value = "customId") String customId,
+                                 @Param(value = "pointTaskId") String pointTaskId,
+                                 @Param(value = "ifRobot") Integer ifRobot,
+                                 @Param(value = "ifVideo") Integer ifVideo,
+                                 @Param(value = "ifInferad") Integer ifInferad,
+                                 @Param(value = "ifArtificial") Integer ifArtificial);
+    List<TCruiseTaskAttr> selectByPage(TCruiseTaskAttr tCruiseTaskAttr);
 
-    //分页查询
-    List<TCruiseTaskAttr> select(TCruiseTaskAttr tCruiseTaskAttr);
+    int batchInsert(List<TCruiseTaskAttr> list);
 }
