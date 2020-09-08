@@ -21,6 +21,8 @@ public class CruiseResultDetail {
 
     @ApiModelProperty(value = "实物编码")
     private String realCode;
+    @ApiModelProperty(value = "巡检任务id")
+    private Integer taskId;
 
     @ApiModelProperty(value = "设备id")
     private Integer deviceId;
@@ -38,7 +40,7 @@ public class CruiseResultDetail {
     private String cruiseType;
 
     @ApiModelProperty(value = "巡视值")
-    private Integer resultNum;
+    private String resultNum;
 
     @ApiModelProperty(value = "巡视结果")
     private Integer state;

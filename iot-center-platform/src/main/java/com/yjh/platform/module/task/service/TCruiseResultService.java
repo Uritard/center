@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
-* @author czh
-* @since 2020-08-25
-*/
+ * @author czh
+ * @since 2020-08-25
+ */
 @Service
 public class TCruiseResultService{
 
@@ -62,9 +64,14 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultDetail> selectCruiseByPage(String taskId) {
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskId);
+    public List<CruiseResultDetail> selectCruiseByPage( CruiseResultDetail cruiseResultDetail) {
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(cruiseResultDetail);
         return cruiseResultDetailList;
+    }
+    @Logs(title = "巡视点结果操作", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public CruiseResultDetail cruiseResultOperate(CruiseResultDetail cruiseResultDetail) {
+        return this.tCruiseResultDao.cruiseResultOperate(cruiseResultDetail);
     }
     @Logs(title = "人工复核", code = "module")
     @Transactional(rollbackFor = Exception.class)

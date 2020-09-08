@@ -102,20 +102,20 @@ public class TCruiseResultController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "taskResultId", required = false) String taskResultId,
-                            @RequestParam(value = "taskId", required = false) String taskId,
-                            @RequestParam(value = "areaId", required = false) String areaId,
-                            @RequestParam(value = "cType", required = false) Integer cType,
-                            @RequestParam(value = "cState", required = false) Integer cState,
-                            @RequestParam(value = "modifyState", required = false) Integer modifyState,
-                            @RequestParam(value = "taskCount", required = false) Integer taskCount,
-                            @RequestParam(value = "taskWait", required = false) Integer taskWait,
-                            @RequestParam(value = "checkUser", required = false) String checkUser,
-                            @RequestParam(value = "checkDate", required = false) Date checkDate,
-                            @RequestParam(value = "weather", required = false) String weather,
-                            @RequestParam(value = "createTime", required = false) Date createTime,
-                            @RequestParam(value = "executeTime", required = false) Date executeTime,
-                            @RequestParam(value = "taskCode", required = false) String taskCode,
-                            @RequestParam(value = "remark", required = false) String remark) {
+                         @RequestParam(value = "taskId", required = false) String taskId,
+                         @RequestParam(value = "areaId", required = false) String areaId,
+                         @RequestParam(value = "cType", required = false) Integer cType,
+                         @RequestParam(value = "cState", required = false) Integer cState,
+                         @RequestParam(value = "modifyState", required = false) Integer modifyState,
+                         @RequestParam(value = "taskCount", required = false) Integer taskCount,
+                         @RequestParam(value = "taskWait", required = false) Integer taskWait,
+                         @RequestParam(value = "checkUser", required = false) String checkUser,
+                         @RequestParam(value = "checkDate", required = false) Date checkDate,
+                         @RequestParam(value = "weather", required = false) String weather,
+                         @RequestParam(value = "createTime", required = false) Date createTime,
+                         @RequestParam(value = "executeTime", required = false) Date executeTime,
+                         @RequestParam(value = "taskCode", required = false) String taskCode,
+                         @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
             List<TCruiseResult> list = tCruiseResultService.select(taskResultId, taskId, areaId, cType, cState, modifyState, taskCount, taskWait, checkUser, checkDate, weather, createTime, executeTime, taskCode, remark);
@@ -130,8 +130,8 @@ public class TCruiseResultController {
     @ApiOperation(value = "分页查询--巡视结果确认")
     @RequestMapping(value = "/selectTaskByPage", method = RequestMethod.POST)
     public Result selectTaskByPage(@RequestBody TCruiseResultExpand tCruiseResultExpand,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -175,14 +175,14 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "分页查询--任务结果详细")
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.POST)
-    public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+    public Result selectCruiseByPage(@RequestBody CruiseResultDetail cruiseResultDetail,
+                                     @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskId);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(cruiseResultDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -193,30 +193,45 @@ public class TCruiseResultController {
         return result;
     }
 
-//    @ApiOperation(value = "人工复核")
-//    @RequestMapping(value = "/manualReview", method = RequestMethod.POST)
-//    public Result manualReview(@RequestBody TCruiseDataResult tCruiseDataResult) {
-//        Result result = new Result();
-//        try {
-//            result.setData(tCruiseResultService.manualReview(tCruiseDataResult));
-//        } catch (BusinessException b) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-//            log.error("添加错误:", e);
-//        }
-//        return result;
-//    }
+    @ApiOperation(value = "巡视点结果操作")
+    @RequestMapping(value = "/cruiseResultOperate", method = RequestMethod.POST)
+    public Result cruiseResultOperate(@RequestBody CruiseResultDetail cruiseResultDetail) {
+        Result result = new Result();
+        try {
+            CruiseResultDetail cRD = tCruiseResultService.cruiseResultOperate(cruiseResultDetail);
+            result.setData(cRD);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "人工复核")
+    @RequestMapping(value = "/manualReview", method = RequestMethod.POST)
+    public Result manualReview(@RequestBody TCruiseDataResult tCruiseDataResult) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseResultService.manualReview(tCruiseDataResult));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     public Result batchInsert(@RequestBody List<TCruiseResult> list) {
         Result result = new Result();
         try {
-        result.setData(tCruiseResultService.batchInsert(list));
+            result.setData(tCruiseResultService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }
