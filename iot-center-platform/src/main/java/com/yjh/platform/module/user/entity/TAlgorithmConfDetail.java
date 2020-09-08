@@ -19,4 +19,5 @@ public class TAlgorithmConfDetail  extends TAlgorithmConf{
     private String presetName;
     private String analysTypeName;
     private String analysType;
+    private String cameraName;
 }

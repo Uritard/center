@@ -55,10 +55,10 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+    public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
-            result.setData(tAlgorithmConfService.deleteByPrimaryId(cameraId));
+            result.setData(tAlgorithmConfService.deleteByPrimaryId(presetId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -87,10 +87,10 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+    public Result selectByPrimaryId(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
-            TAlgorithmConf tAlgorithmConf = tAlgorithmConfService.selectByPrimaryId(cameraId);
+            TAlgorithmConf tAlgorithmConf = tAlgorithmConfService.selectByPrimaryId(presetId);
             result.setData(tAlgorithmConf);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -101,11 +101,10 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "cameraId", required = false) Long cameraId,
+    public Result select(@RequestParam(value = "presetId", required = false) Long presetId,
                             @RequestParam(value = "algorithmId", required = false) Long algorithmId,
-                            @RequestParam(value = "algorithmName", required = false) String algorithmName,
+                            @RequestParam(value = "configName", required = false) String configName,
                             @RequestParam(value = "status", required = false) Integer status,
-                            @RequestParam(value = "presetId", required = false) String presetId,
                             @RequestParam(value = "ifDel", required = false) Integer ifDel,
                             @RequestParam(value = "ifShow", required = false) Integer ifShow,
                             @RequestParam(value = "picUrl", required = false) String picUrl,
@@ -114,7 +113,7 @@ public class TAlgorithmConfController {
                             @RequestParam(value = "updateTime", required = false) Date updateTime) {
         Result result = new Result();
         try {
-            List<TAlgorithmConf> list = tAlgorithmConfService.select(cameraId, algorithmId, algorithmName, status, presetId, ifDel, ifShow, picUrl, applyModule, createTime, updateTime);
+            List<TAlgorithmConf> list = tAlgorithmConfService.select(presetId, algorithmId, configName, status, ifDel, ifShow, picUrl, applyModule, createTime, updateTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -125,14 +124,14 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TAlgorithmConfDetail tAlgorithmConfDetail,
+    public Result selectByPage(@RequestBody TAlgorithmConf tAlgorithmConf,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TAlgorithmConfDetail> list = tAlgorithmConfService.selectByPage(tAlgorithmConfDetail);
+            List<TAlgorithmConfDetail> list = tAlgorithmConfService.selectByPage(tAlgorithmConf);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

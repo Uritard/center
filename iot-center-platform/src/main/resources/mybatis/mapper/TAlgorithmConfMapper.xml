@@ -4,11 +4,10 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TAlgorithmConf">
-        <id column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <id column="preset_id" jdbcType="BIGINT" property="presetId" />
         <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
-        <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
+        <result column="config_name" jdbcType="VARCHAR" property="configName" />
         <result column="status" jdbcType="INTEGER" property="status" />
-        <result column="preset_id" jdbcType="VARCHAR" property="presetId" />
         <result column="if_del" jdbcType="INTEGER" property="ifDel" />
         <result column="if_show" jdbcType="INTEGER" property="ifShow" />
         <result column="pic_url" jdbcType="VARCHAR" property="picUrl" />
@@ -19,17 +18,16 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        camera_id, algorithm_id, algorithm_name, status, preset_id, if_del, if_show, pic_url, apply_module, create_time, update_time
+        preset_id, algorithm_id, config_name, status, if_del, if_show, pic_url, apply_module, create_time, update_time
     </sql>
 
 
-    <insert id="add" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf">
+    <insert id="add" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf">
         insert into t_algorithm_conf(
-            camera_id,
-            algorithm_id,
-            algorithm_name,
-            status,
             preset_id,
+            algorithm_id,
+            config_name,
+            status,
             if_del,
             if_show,
             pic_url,
@@ -37,11 +35,10 @@
             create_time,
             update_time
         )values(
-                #{cameraId, jdbcType=BIGINT},
+                #{presetId, jdbcType=BIGINT},
                 #{algorithmId, jdbcType=BIGINT},
-                #{algorithmName, jdbcType=VARCHAR},
+                #{configName, jdbcType=VARCHAR},
                 #{status, jdbcType=INTEGER},
-                #{presetId, jdbcType=VARCHAR},
                 #{ifDel, jdbcType=INTEGER},
                 #{ifShow, jdbcType=INTEGER},
                 #{picUrl, jdbcType=VARCHAR},
@@ -53,31 +50,31 @@
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
         delete from t_algorithm_conf
-                where camera_id = #{cameraId, jdbcType=BIGINT}
+                where preset_id = #{presetId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf">
         update t_algorithm_conf a <set>
-        <if test="cameraId != null and cameraId != ''">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
         <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
-        <if test="algorithmName != null and algorithmName != ''">a.algorithm_name = #{algorithmName, jdbcType=VARCHAR},</if>
+        <if test="configName != null and configName != ''">a.config_name = #{configName, jdbcType=VARCHAR},</if>
         <if test="status != null and status != ''">a.status = #{status, jdbcType=INTEGER},</if>
-        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=VARCHAR},</if>
         <if test="ifDel != null and ifDel != ''">a.if_del = #{ifDel, jdbcType=INTEGER},</if>
         <if test="ifShow != null and ifShow != ''">a.if_show = #{ifShow, jdbcType=INTEGER},</if>
         <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
         <if test="applyModule != null and applyModule != ''">a.apply_module = #{applyModule, jdbcType=INTEGER},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
     </set>
-            where a.camera_id = #{cameraId, jdbcType=BIGINT}
+            where a.preset_id = #{presetId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TAlgorithmConf">
         select
-        a.camera_id,
-        a.algorithm_id,
-        a.algorithm_name,
-        a.status,
         a.preset_id,
+        a.algorithm_id,
+        a.config_name,
+        a.status,
         a.if_del,
         a.if_show,
         a.pic_url,
@@ -86,33 +83,28 @@
         a.update_time
         from t_algorithm_conf a
         where 1 = 1
-            and a.camera_id = #{cameraId, jdbcType=BIGINT}
+            and a.preset_id = #{presetId, jdbcType=BIGINT}
         limit 1
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf" resultType="com.yjh.platform.module.user.entity.TAlgorithmConf">
         select
-        a.camera_id,
-        a.algorithm_id,
-        a.algorithm_name,
-        a.status,
         a.preset_id,
+        a.algorithm_id,
+        a.config_name,
+        a.status,
         a.if_del,
         a.if_show,
         a.pic_url,
         a.apply_module,
         a.create_time,
-        a.update_time,
-        b.preset_name as presetName,
-        d.dict_note as analysTypeName,
-        e.analys_type as analysType
-        from t_algorithm_conf a,t_camera_preset b,t_dict_business d,t_algorithm_info e
-        where 1 = 1 and a.preset_id = b.preset_id and d.dict_code = e.analys_type and a.algorithm_id=e.algorithm_id
-        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        a.update_time
+        from t_algorithm_conf a
+        where 1 = 1
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
-        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="configName != null and configName != ''"> and a.config_name = #{configName, jdbcType=VARCHAR}</if>
         <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
-        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=VARCHAR}</if>
         <if test="ifDel != null and ifDel != ''"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
         <if test="ifShow != null and ifShow != ''"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
         <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
@@ -123,11 +115,10 @@
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConfDetail" resultType="com.yjh.platform.module.user.entity.TAlgorithmConfDetail">
         select
-        a.camera_id,
-        a.algorithm_id,
-        a.algorithm_name,
-        a.status,
         a.preset_id,
+        a.algorithm_id,
+        a.config_name,
+        a.status,
         a.if_del,
         a.if_show,
         a.pic_url,
@@ -136,14 +127,15 @@
         a.update_time,
         b.preset_name as presetName,
         d.dict_note as analysTypeName,
-        e.analys_type as analysType
-        from t_algorithm_conf a,t_camera_preset b,t_dict_business d,t_algorithm_info e
+        e.analys_type as analysType,
+        f.camera_name as cameraName
+        from t_algorithm_conf a,t_camera_preset b,t_dict_business d,t_algorithm_info e,t_camera_info f
         where 1 = 1 and a.preset_id = b.preset_id and d.dict_code = e.analys_type and a.algorithm_id=e.algorithm_id
-        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        and f.camera_id = b.camera_id
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
-        <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name = #{algorithmName, jdbcType=VARCHAR}</if>
+        <if test="configName != null and configName != ''"> and a.config_name = #{configName, jdbcType=VARCHAR}</if>
         <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
-        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=VARCHAR}</if>
         <if test="ifDel != null and ifDel != ''"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
         <if test="ifShow != null and ifShow != ''"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
         <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
@@ -154,11 +146,10 @@
 
     <insert id="batchAdd">
         insert into t_algorithm_conf(
-            camera_id,
-            algorithm_id,
-            algorithm_name,
-            status,
             preset_id,
+            algorithm_id,
+            config_name,
+            status,
             if_del,
             if_show,
             pic_url,
@@ -168,11 +159,10 @@
         )values
         <foreach collection="list" item="TAlgorithmConf" separator=",">
             (
-                #{TAlgorithmConf.cameraId, jdbcType=BIGINT},
+                #{TAlgorithmConf.presetId, jdbcType=BIGINT},
                 #{TAlgorithmConf.algorithmId, jdbcType=BIGINT},
-                #{TAlgorithmConf.algorithmName, jdbcType=VARCHAR},
+                #{TAlgorithmConf.configName, jdbcType=VARCHAR},
                 #{TAlgorithmConf.status, jdbcType=INTEGER},
-                #{TAlgorithmConf.presetId, jdbcType=VARCHAR},
                 #{TAlgorithmConf.ifDel, jdbcType=INTEGER},
                 #{TAlgorithmConf.ifShow, jdbcType=INTEGER},
                 #{TAlgorithmConf.picUrl, jdbcType=VARCHAR},

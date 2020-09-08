@@ -64,6 +64,10 @@
             low_limit1,
             high_limit2,
             low_limit2,
+            high_limit3,
+            low_limit3,
+            high_limit4,
+            low_limit4,
             alarm_delay,
             alarm_cnt,
             threshold_abs,
@@ -94,6 +98,10 @@
                 #{lowLimit1, jdbcType=REAL},
                 #{highLimit2, jdbcType=REAL},
                 #{lowLimit2, jdbcType=REAL},
+                #{highLimit3, jdbcType=REAL},
+                #{lowLimit3, jdbcType=REAL},
+                #{highLimit4, jdbcType=REAL},
+                #{lowLimit4, jdbcType=REAL},
                 #{alarmDelay, jdbcType=INTEGER},
                 #{alarmCnt, jdbcType=INTEGER},
                 #{thresholdAbs, jdbcType=NUMERIC},
@@ -262,44 +270,13 @@
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
-        a.device_mete_id,
-        a.device_id,
-        a.custom_id,
-        a.mete_id,
-        a.mete_kind,
-        d.dict_note as meteKindName,
-        a.mete_name,
-        a.device_type,
-        a.custom_type,
-        a.position_type,
-        a.unit,
-        a.alarm_note,
-        a.alarm_type,
-        a.up_effect,
-        a.down_effect ,
-        a.alarm_level ,
-        a.high_limit1 ,
-        a.low_limit1 ,
-        a.high_limit2 ,
-        a.low_limit2 ,
-        a.alarm_delay ,
-        a.alarm_cnt ,
-        a.threshold_abs ,
-        a.threshold_per ,
-        a.mete_type,
-        a.modulus ,
-        a.remark ,
-        state_zero,
-        state_one,
-        alarm_state,
-        e.device_name as deviceName,
-        b.dict_note as meteTypeName,
-        f.dict_note as alarmTypeName,
-        e.custom_name as customName
-        from t_std_devicemete a, t_dict_business b,t_dict_business d,t_std_device e,t_dict_business f
-        where 1 = 1
-        and a.device_id = e.device_id and a.mete_kind = d.dict_code
-        and a.alarm_type = f.dict_code and a.mete_type = b.dict_code
+        *
+        from t_std_devicemete a
+        left join (select dict_code,dict_note as alarmLevelName from t_dict_business) g on a.alarm_level= g.dict_code
+        left join(select dict_code,dict_note as alarmTypeName from t_dict_business) f on a.alarm_type= f.dict_code
+        left join(select dict_code,dict_note as meteTypeName from t_dict_business) b on a.mete_type= b.dict_code
+        left join(select dict_code,dict_note as meteKindName from t_dict_business) d on a.mete_kind= d.dict_code
+        left join(select device_id,device_name as deviceName,custom_name as customName from t_std_device) e on a.device_id = e.device_id
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
