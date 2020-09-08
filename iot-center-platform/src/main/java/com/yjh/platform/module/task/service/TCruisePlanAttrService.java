@@ -47,7 +47,7 @@ public class TCruisePlanAttrService{
 
     @Logs(title = "查询", code = "task")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruisePlanAttr> select(Long planId, Long instanceId, Integer pointType, String areaId, String cruiseRegionIds, Integer exceptionType, Long robotId, String position, Integer algorithmId, String inferadAnalyze, String irTempBox, Date createTime, Date updateTime) {
+    public List<TCruisePlanAttr> select(Long planId, Long instanceId, Integer pointType, String areaId, String cruiseRegionIds, Integer exceptionType, Long robotId, String position, Long algorithmId, String inferadAnalyze, String irTempBox, Date createTime, Date updateTime) {
         List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(planId, instanceId, pointType, areaId, cruiseRegionIds, exceptionType, robotId, position, algorithmId, inferadAnalyze, irTempBox, createTime, updateTime);
         return tCruisePlanAttrList;
     }

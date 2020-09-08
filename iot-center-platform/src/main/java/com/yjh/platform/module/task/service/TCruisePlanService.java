@@ -11,6 +11,7 @@ import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import java.util.*;
 
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
+import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class TCruisePlanService{
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
     private TCruisePlanAttrDao tCruisePlanAttrDao;
+    @Autowired
+    private TAlgorithmConfDao tAlgorithmConfDao;
 
     @Logs(title = "新增预案", code = "task")
     @Transactional(rollbackFor = Exception.class)
@@ -61,7 +64,9 @@ public class TCruisePlanService{
                         break;
                     case 229:
                     case 230:
-                        //TODO 加入摄像头算法配置信息
+                        Long cruiseAlgorithmId = Long.valueOf(attrMap.get("cruiseId"));
+                        TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
+                        tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
                         break;
                     default:
                         break;

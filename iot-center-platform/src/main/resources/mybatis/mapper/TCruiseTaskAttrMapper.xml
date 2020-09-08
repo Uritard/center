@@ -168,6 +168,40 @@
         </foreach>
     </insert>
 
+    <select id="batchSelect" parameterType="java.util.List" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+        select
+        a.instance_id,
+        a.device_mete_id,
+        a.station_id,
+        a.station_name,
+        a.device_id,
+        a.custom_id,
+        a.data_format,
+        a.identify_type,
+        a.identify_son_type,
+        a.cruise_type,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_content,
+        a.position_type,
+        a.unit_val,
+        a.unit_name,
+        a.if_sy,
+        a.sy_type,
+        a.if_videotape,
+        a.videotape_time,
+        a.text_desc,
+        a.sort
+        from t_cruise_point_instance a
+        WHERE 1 = 1
+        <if test="instanceList != null and instanceList.size() > 0">
+            AND instance_id IN
+            <foreach collection="instanceList" separator="," open="(" close=")" item="instanceId">
+                #{instanceId, jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+
 
 
 </mapper>

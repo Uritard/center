@@ -25,7 +25,7 @@ public interface TCruisePlanAttrDao {
                                  @Param(value = "exceptionType") Integer exceptionType,
                                  @Param(value = "robotId") Long robotId,
                                  @Param(value = "position") String position,
-                                 @Param(value = "algorithmId") Integer algorithmId,
+                                 @Param(value = "algorithmId") Long algorithmId,
                                  @Param(value = "inferadAnalyze") String inferadAnalyze,
                                  @Param(value = "irTempBox") String irTempBox,
                                  @Param(value = "createTime") Date createTime,

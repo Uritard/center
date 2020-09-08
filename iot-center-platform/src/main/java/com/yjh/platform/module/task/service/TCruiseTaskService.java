@@ -3,10 +3,11 @@ package com.yjh.platform.module.task.service;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
+import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
-import com.yjh.platform.module.task.entity.TCruiseTask;
-import com.yjh.platform.module.task.entity.TCruiseTaskCount;
-import com.yjh.platform.module.task.entity.TCruiseTaskCron;
+import com.yjh.platform.module.task.entity.*;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,10 @@ public class TCruiseTaskService {
 
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
+    @Autowired
+    private TCruiseTaskAttrDao tCruiseTaskAttrDao;
+    @Autowired
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -36,8 +41,27 @@ public class TCruiseTaskService {
             startTime = format.parse("2000-01-01 00:00:00");
         } catch (Exception e) { e.getMessage(); }
         tCruiseTask.setStartTime(startTime);
-        tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()));
-        return this.tCruiseTaskDao.insert(tCruiseTask);
+        tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(),null,null,null,null,null,null,null,null,null,null,null,null);
+        List<Long> instanceList = new ArrayList<>();
+        for (TCruisePlanAttr tCruisePlanAttr:tCruisePlanAttrList) {
+            instanceList.add(tCruisePlanAttr.getInstanceId());
+        }
+        List<TCruisePointInstance> tCruisePointInstanceList = this.tCruiseTaskAttrDao.batchSelect(instanceList);
+        List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
+        for (TCruisePointInstance tCruisePointInstance:tCruisePointInstanceList) {
+            TCruiseTaskAttr tCruiseTaskAttr = new TCruiseTaskAttr();
+            tCruiseTaskAttr.setTaskId(tCruiseTask.getTaskId());
+            tCruiseTaskAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+            tCruiseTaskAttr.setDeviceMeteId(tCruisePointInstance.getDeviceMeteId());
+            tCruiseTaskAttr.setDeviceId(tCruisePointInstance.getDeviceId());
+            tCruiseTaskAttr.setCustomId(tCruisePointInstance.getCustomId());
+            tCruiseTaskAttr.setPointTaskId(String.valueOf(tCruisePointInstance.getCruiseId()));
+            tCruiseTaskAttrList.add(tCruiseTaskAttr);
+        }
+        //TODO 增加定时器任务
+        this.tCruiseTaskDao.insert(tCruiseTask);
+        return this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
     }
 
     @Logs(title = "删除", code = "module")
@@ -60,8 +84,8 @@ public class TCruiseTaskService {
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTask> select(String taskId, String taskName, Long planId, String areaId, String name, Integer type, Integer ifRun, Long robotId, String dateType, Integer taskType, Date startTime, Date createTime) {
-        List<TCruiseTask> tCruiseTaskList = tCruiseTaskDao.select(taskId, taskName, planId, areaId, name, type, ifRun, robotId, dateType, taskType, startTime, createTime);
+    public List<TCruiseTask> select(String taskId, String taskName, Long planId, String areaId, Integer type, Integer ifRun, Long robotId, String dateType, Integer taskType, Date startTime, Date createTime) {
+        List<TCruiseTask> tCruiseTaskList = tCruiseTaskDao.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, startTime, createTime);
         return tCruiseTaskList;
     }
 
@@ -140,6 +164,13 @@ public class TCruiseTaskService {
         }
         System.out.println("listTask: "+listTask);
         return listTask;
+    }
+
+    @Logs(title = "分页查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruiseTaskList> selectPointStatus(String taskId) {
+        List<TCruiseTaskList> tCruiseTaskList = tCruiseTaskDao.selectPointStatus(taskId);
+        return tCruiseTaskList;
     }
 
 }

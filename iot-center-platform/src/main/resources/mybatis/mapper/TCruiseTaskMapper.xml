@@ -8,7 +8,6 @@
         <result column="task_name" jdbcType="VARCHAR" property="taskName" />
         <result column="plan_id" jdbcType="BIGINT" property="planId" />
         <result column="area_id" jdbcType="VARCHAR" property="areaId" />
-        <result column="name" jdbcType="VARCHAR" property="name" />
         <result column="type" jdbcType="INTEGER" property="type" />
         <result column="if_run" jdbcType="INTEGER" property="ifRun" />
         <result column="robot_id" jdbcType="BIGINT" property="robotId" />
@@ -20,7 +19,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        task_id, task_name, plan_id, area_id, name, type, if_run, robot_id, date_type, task_type, start_time, create_time
+        task_id, task_name, plan_id, area_id, type, if_run, robot_id, date_type, task_type, start_time, create_time
     </sql>
 
 
@@ -30,7 +29,6 @@
             task_name,
             plan_id,
             area_id,
-            name,
             type,
             if_run,
             robot_id,
@@ -43,7 +41,6 @@
                 #{taskName, jdbcType=VARCHAR},
                 #{planId, jdbcType=BIGINT},
                 #{areaId, jdbcType=VARCHAR},
-                #{name, jdbcType=VARCHAR},
                 #{type, jdbcType=INTEGER},
                 #{ifRun, jdbcType=INTEGER},
                 #{robotId, jdbcType=BIGINT},
@@ -65,7 +62,6 @@
         <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
         <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="name != null and name != ''">a.name = #{name, jdbcType=VARCHAR},</if>
         <if test="type != null and type != ''">a.type = #{type, jdbcType=INTEGER},</if>
         <if test="ifRun != null and ifRun != ''">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
@@ -83,7 +79,6 @@
         a.task_name,
         a.plan_id,
         a.area_id,
-        a.name,
         a.type,
         a.if_run,
         a.robot_id,
@@ -103,7 +98,6 @@
         a.task_name,
         a.plan_id,
         a.area_id,
-        a.name,
         a.type,
         a.if_run,
         a.robot_id,
@@ -117,7 +111,6 @@
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
-        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
         <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -133,7 +126,6 @@
         a.task_name,
         a.plan_id,
         a.area_id,
-        a.name,
         a.type,
         a.if_run,
         a.robot_id,
@@ -147,7 +139,6 @@
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
-        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
         <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -163,7 +154,6 @@
             task_name,
             plan_id,
             area_id,
-            name,
             type,
             if_run,
             robot_id,
@@ -178,7 +168,6 @@
                 #{TCruiseTask.taskName, jdbcType=VARCHAR},
                 #{TCruiseTask.planId, jdbcType=BIGINT},
                 #{TCruiseTask.areaId, jdbcType=VARCHAR},
-                #{TCruiseTask.name, jdbcType=VARCHAR},
                 #{TCruiseTask.type, jdbcType=INTEGER},
                 #{TCruiseTask.ifRun, jdbcType=INTEGER},
                 #{TCruiseTask.robotId, jdbcType=BIGINT},
@@ -196,7 +185,6 @@
         a.task_name,
         a.plan_id,
         a.area_id,
-        a.name,
         b.dict_note,
         a.if_run,
         a.robot_id,
@@ -213,7 +201,6 @@
         a.task_name,
         a.plan_id,
         a.area_id,
-        a.name,
         b.dict_note,
         a.if_run,
         a.robot_id,
@@ -231,7 +218,6 @@
         a.task_name,
         a.plan_id,
         a.area_id,
-        a.name,
         b.dict_note,
         a.if_run,
         a.robot_id,
@@ -243,6 +229,16 @@
         LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "task_kind"
         where a.if_run = 172 AND a.start_time = "2000-01-01 00:00:00"
         );
+    </select>
+
+    <select id="selectPointStatus" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruiseTaskList">
+        SELECT a.task_id,a.task_name,b.*,c.device_name,c.custom_name,a.start_time,a.if_run,f.personcheck,f.identify_state FROM t_cruise_task a
+        LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+        LEFT JOIN t_std_device c ON b.device_id = c.device_id AND b.custom_id = c.custom_id
+        LEFT JOIN t_cruise_task_result d ON a.task_id = d.task_id
+        LEFT JOIN t_cruise_task_result_detail e ON d.task_result_id = e.task_result_id AND e.instance_id = b.instance_id
+        LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
+        WHERE a.task_id = #{taskId, jdbcType=VARCHAR};
     </select>
 
 </mapper>

@@ -7,6 +7,9 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.entity.TCruiseTask;
+import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
+import com.yjh.platform.module.task.entity.TCruiseTaskList;
+import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +33,8 @@ public class TCruiseTaskController {
 
     @Autowired
     private final TCruiseTaskService tCruiseTaskService;
+    @Autowired
+    private TCruiseTaskAttrService tCruiseTaskAttrService;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskController.class);
 
@@ -58,7 +63,6 @@ public class TCruiseTaskController {
                 if (Objects.isNull(dayOfWeek)) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", dayOfWeek);}
                 if (Objects.isNull(year)) {mapTime.put("year", "");} else {mapTime.put("year", year);}
                 String cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
-                System.out.println("cronExpressionDate: "+cronExpressionDate);
                 if (CronExpression.isValidExpression(cronExpressionDate)) {
                     tCruiseTask.setDateType(cronExpressionDate);
                     result.setData(tCruiseTaskService.insert(tCruiseTask));
@@ -128,7 +132,6 @@ public class TCruiseTaskController {
                          @RequestParam(value = "taskName", required = false) String taskName,
                          @RequestParam(value = "planId", required = false) Long planId,
                          @RequestParam(value = "areaId", required = false) String areaId,
-                         @RequestParam(value = "name", required = false) String name,
                          @RequestParam(value = "type", required = false) Integer type,
                          @RequestParam(value = "ifRun", required = false) Integer ifRun,
                          @RequestParam(value = "robotId", required = false) Long robotId,
@@ -138,7 +141,7 @@ public class TCruiseTaskController {
                          @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TCruiseTask> list = tCruiseTaskService.select(taskId, taskName, planId, areaId, name, type, ifRun, robotId, dateType, taskType, startTime, createTime);
+            List<TCruiseTask> list = tCruiseTaskService.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, startTime, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -190,6 +193,26 @@ public class TCruiseTaskController {
             result.setData(list);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询任务巡检点状态信息")
+    @RequestMapping(value = "/selectPointStatus", method = RequestMethod.POST)
+    public Result selectPointStatus(@RequestParam(value = "taskId", required = false) String taskId,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCruiseTaskList> list = tCruiseTaskService.selectPointStatus(taskId);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
         return result;

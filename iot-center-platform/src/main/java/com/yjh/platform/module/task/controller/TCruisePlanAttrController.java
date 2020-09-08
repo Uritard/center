@@ -108,7 +108,7 @@ public class TCruisePlanAttrController {
                             @RequestParam(value = "exceptionType", required = false) Integer exceptionType,
                             @RequestParam(value = "robotId", required = false) Long robotId,
                             @RequestParam(value = "position", required = false) String position,
-                            @RequestParam(value = "algorithmId", required = false) Integer algorithmId,
+                            @RequestParam(value = "algorithmId", required = false) Long algorithmId,
                             @RequestParam(value = "inferadAnalyze", required = false) String inferadAnalyze,
                             @RequestParam(value = "irTempBox", required = false) String irTempBox,
                             @RequestParam(value = "createTime", required = false) Date createTime,

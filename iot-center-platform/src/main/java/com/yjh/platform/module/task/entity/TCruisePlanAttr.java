@@ -48,7 +48,7 @@ public class TCruisePlanAttr implements Serializable {
     private String position;
 
     @ApiModelProperty(value = "算法实例ID")
-    private Integer algorithmId;
+    private Long algorithmId;
 
     @ApiModelProperty(value = "红外诊断公式id")
     private String inferadAnalyze;

@@ -99,7 +99,7 @@ public class TCruisePlanController {
         return result;
     }
 
-    @ApiOperation(value = "查询")
+    @ApiOperation(value = "查询预案")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "planId", required = false) Long planId,
                             @RequestParam(value = "planName", required = false) String planName,

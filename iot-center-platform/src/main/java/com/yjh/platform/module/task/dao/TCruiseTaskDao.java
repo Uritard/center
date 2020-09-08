@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.dao;
 
 import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.entity.TCruiseTaskCount;
+import com.yjh.platform.module.task.entity.TCruiseTaskList;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,6 @@ public interface TCruiseTaskDao {
                              @Param(value = "taskName") String taskName,
                              @Param(value = "planId") Long planId,
                              @Param(value = "areaId") String areaId,
-                             @Param(value = "name") String name,
                              @Param(value = "type") Integer type,
                              @Param(value = "ifRun") Integer ifRun,
                              @Param(value = "robotId") Long robotId,
@@ -37,4 +37,6 @@ public interface TCruiseTaskDao {
 
     List<TCruiseTaskCount> taskCount(@Param(value = "startTime") Date startTime,
                                      @Param(value = "endTime") Date endTime);
+
+    List<TCruiseTaskList> selectPointStatus(String taskId);
 }

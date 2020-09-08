@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,5 @@ public interface TCruiseTaskAttrDao {
     List<TCruiseTaskAttr> selectByPage(TCruiseTaskAttr tCruiseTaskAttr);
 
     int batchInsert(List<TCruiseTaskAttr> list);
+    List<TCruisePointInstance> batchSelect(List<Long> instanceList);
 }
