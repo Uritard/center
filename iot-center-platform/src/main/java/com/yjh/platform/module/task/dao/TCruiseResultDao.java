@@ -3,10 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.entity.TCruiseResult;
-import com.yjh.platform.module.task.entity.TCruiseResultExpand;
-import com.yjh.platform.module.task.entity.TCruiseTask;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -37,9 +34,13 @@ public interface TCruiseResultDao {
                                 @Param(value = "taskCode") String taskCode,
                                 @Param(value = "remark") String remark);
     List<TCruiseResultExpand> selectTaskByPage(TCruiseResultExpand tCruiseResultExpand);
-    List<TCruiseResultExpand> selectCruiseByPage(TCruiseResultExpand tCruiseResultExpand);
+    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId")String taskId);
     int manualReview(TCruiseDataResult tCruiseDataResult);
     int batchInsert(List<TCruiseResult> list);
+    TaskStatistical taskStatistical(@Param(value = "Start")String Start,
+                                    @Param(value = "End")String End);
+    CruiseStatistical  cruiseStatistical(@Param(value = "Start")String Start,
+                                         @Param(value = "End")String End);
 
     List<TCruiseTask> selectTaskIsRunning();
 }
