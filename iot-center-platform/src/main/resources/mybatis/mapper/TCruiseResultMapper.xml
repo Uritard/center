@@ -110,7 +110,7 @@
         <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
-            where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseResult">
@@ -175,16 +175,19 @@
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
         from t_cruise_result a,
-             t_cruise_task b,
-             t_dict_business d,
-             t_dict_business e,
-             t_cruise_task_result f
+        t_cruise_task b,
+        t_dict_business d,
+        t_dict_business e,
+        t_cruise_task_result f
         where 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
         <if test="areaId != null and areaId != ''">and a.area_id = #{areaId, jdbcType=VARCHAR},</if>
         <if test="cType != null and cType != ''">and a.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="planType != null and planType != ''">and d.dict_note = #{planType, jdbcType=VARCHAR}</if>
         <if test="cState != null and cState != ''">and a.c_state = #{cState, jdbcType=INTEGER}</if>
+        <if test="taskState != null and taskState != ''">and e.dict_note = #{taskState, jdbcType=VARCHAR}</if>
         <if test="modifyState != null and modifyState != ''">and a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
         <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER},</if>
         <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
@@ -195,84 +198,92 @@
         <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
         <if test="taskCode != null and taskCode != ''">and a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
         <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}, </if>
-        <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
         and a.task_id = b.task_id
         and a.c_type = d.dict_code
         and a.c_state  = e.dict_code
         and a.task_result_id = f.task_result_id
     </select>
 
-    <select id="selectCruiseByPage" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+    <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
         select
-            a.task_id,
-            b.device_id,
-            b.instance_id,
-            e.real_code,
-            d.device_name,
-            f.instance_name,
-            g.point_type,
-            h.dict_note as cruise_type,
-            g.result_num,
-            g.state,
-            j.dict_note as data_state,
-            b.cruise_time,
-            g.identify_state,
-            k.dict_note as identify_state1
+        a.task_id,
+        b.device_id,
+        b.instance_id,
+        e.real_code,
+        d.device_name,
+        f.instance_name,
+        g.point_type,
+        h.dict_note as cruise_type,
+        g.result_num,
+        g.state,
+        j.dict_note as data_state,
+        b.cruise_time,
+        g.identify_state,
+        k.dict_note as identify_state1
         from t_cruise_result a,
-             t_cruise_task_result_detail b,
-             t_std_device d,
-             t_std_device_attr e,
-             t_cruise_point_attr f,
-             t_cruise_data_result g,
-             t_dict_business h,
-             t_dict_business j,
-             t_dict_business k
+        t_cruise_task_result_detail b,
+        t_std_device d,
+        t_std_device_attr e,
+        t_cruise_point_attr f,
+        t_cruise_data_result g,
+        t_dict_business h,
+        t_dict_business j,
+        t_dict_business k
         where a.task_id = #{taskId}
-            and a.task_result_id = b.task_result_id
-            and d.device_id = b.device_id
-            and e.device_id = b.device_id
-            and b.instance_id = f.instance_id
-            and g.cruise_result_id = b.cruise_result_id
-            and h.dict_code = g.point_type
-            and j.dict_code = g.state
-            and k.dict_code = g.identify_state
+        and a.task_result_id = b.task_result_id
+        and d.device_id = b.device_id
+        and e.device_id = b.device_id
+        and b.instance_id = f.instance_id
+        and g.cruise_result_id = b.cruise_result_id
+        and h.dict_code = g.point_type
+        and j.dict_code = g.state
+        and k.dict_code = g.identify_state
+        <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
+        <if test="deviceId != null "> and d.device_id like concat ('%',#{deviceId,jdbcType=INTEGER},'%')</if>
+
+        <if test="pointType != null "> and g.point_type = #{pointType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != ''"> and h.dict_note = #{cruiseType, jdbcType=VARCHAR}</if>
+
+        <if test="state != null "> and g.state = #{state, jdbcType=INTEGER}</if>
+        <if test="dataState != null and dataState != ''"> and j.dict_note = #{dataState, jdbcType=VARCHAR}</if>
+
     </select>
 
     <insert id="batchInsert">
         insert into t_cruise_result(
-            task_result_id,
-            task_id,
-            area_id,
-            c_type,
-            c_state,
-            modify_state,
-            task_count,
-            task_wait,
-            check_user,
-            check_date,
-            weather,
-            create_time,
-            execute_time,
-            task_code,
-            remark
+        task_result_id,
+        task_id,
+        area_id,
+        c_type,
+        c_state,
+        modify_state,
+        task_count,
+        task_wait,
+        check_user,
+        check_date,
+        weather,
+        create_time,
+        execute_time,
+        task_code,
+        remark
         )values
         <foreach collection="list" item="TCruiseResult" separator=",">
             (
-                #{TCruiseResult.taskResultId, jdbcType=VARCHAR},
-                #{TCruiseResult.taskId, jdbcType=VARCHAR},
-                #{TCruiseResult.areaId, jdbcType=VARCHAR},
-                #{TCruiseResult.cType, jdbcType=INTEGER},
-                #{TCruiseResult.cState, jdbcType=INTEGER},
-                #{TCruiseResult.modifyState, jdbcType=INTEGER},
-                #{TCruiseResult.taskCount, jdbcType=INTEGER},
-                #{TCruiseResult.taskWait, jdbcType=INTEGER},
-                #{TCruiseResult.checkUser, jdbcType=VARCHAR},
-                #{TCruiseResult.checkDate, jdbcType=TIMESTAMP},
-                #{TCruiseResult.weather, jdbcType=VARCHAR},
-                #{TCruiseResult.createTime, jdbcType=TIMESTAMP},
-                #{TCruiseResult.executeTime, jdbcType=TIMESTAMP},
-                #{TCruiseResult.taskCode, jdbcType=VARCHAR},
-                #{TCruiseResult.remark, jdbcType=VARCHAR}
+            #{TCruiseResult.taskResultId, jdbcType=VARCHAR},
+            #{TCruiseResult.taskId, jdbcType=VARCHAR},
+            #{TCruiseResult.areaId, jdbcType=VARCHAR},
+            #{TCruiseResult.cType, jdbcType=INTEGER},
+            #{TCruiseResult.cState, jdbcType=INTEGER},
+            #{TCruiseResult.modifyState, jdbcType=INTEGER},
+            #{TCruiseResult.taskCount, jdbcType=INTEGER},
+            #{TCruiseResult.taskWait, jdbcType=INTEGER},
+            #{TCruiseResult.checkUser, jdbcType=VARCHAR},
+            #{TCruiseResult.checkDate, jdbcType=TIMESTAMP},
+            #{TCruiseResult.weather, jdbcType=VARCHAR},
+            #{TCruiseResult.createTime, jdbcType=TIMESTAMP},
+            #{TCruiseResult.executeTime, jdbcType=TIMESTAMP},
+            #{TCruiseResult.taskCode, jdbcType=VARCHAR},
+            #{TCruiseResult.remark, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -298,6 +309,48 @@
             count(if(c_type=218,true,null)) as planType6
         from t_cruise_result
         where create_time BETWEEN #{Start} and #{End}
+    </select>
+
+    <!--巡视点结果操作-->
+    <select id="cruiseResultOperate" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+        select
+        e.result_num,
+        e.picpath,
+        e.state,
+        f.dict_note as data_state,
+        a.task_id,
+        d.device_id,
+        g.real_code,
+        h.device_name,
+        d.instance_id,
+        i.instance_name,
+        e.point_type,
+        j.dict_note as cruise_type,
+        d.cruise_time,
+        e.identify_state,
+        k.dict_note as identify_state1
+        from
+        t_cruise_result a,
+        t_cruise_task_result_detail d,
+        t_cruise_data_result e,
+        t_dict_business f,
+        t_std_device_attr g,
+        t_std_device h,
+        t_cruise_point_attr i,
+        t_dict_business j,
+        t_dict_business k
+        where 1 = 1
+        <if test="taskId != null ">and a.task_id = #{taskId, jdbcType=INTEGER}</if>
+        <if test="instanceId != null ">and d.instance_id = #{instanceId, jdbcType=INTEGER}</if>
+        and a.task_result_id = d.task_result_id
+        and d.cruise_result_id = e.cruise_result_id
+        and f.dict_code = e.state
+        and g.device_id = d.device_id
+        and h.device_id = d.device_id
+        and i.instance_id = d.instance_id
+        and j.dict_code = e.point_type
+        and k.dict_code = e.identify_state
+
     </select>
 
     <!--本周巡视点结果统计-->

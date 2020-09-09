@@ -19,28 +19,28 @@ public interface TCruiseResultDao {
     int update(TCruiseResult tCruiseResult);
     TCruiseResult selectByPrimaryId(@Param(value = "taskResultId") String taskResultId);
     List<TCruiseResult> select(@Param(value = "taskResultId") String taskResultId,
-                                @Param(value = "taskId") String taskId,
-                                @Param(value = "areaId") String areaId,
-                                @Param(value = "cType") Integer cType,
-                                @Param(value = "cState") Integer cState,
-                                @Param(value = "modifyState") Integer modifyState,
-                                @Param(value = "taskCount") Integer taskCount,
-                                @Param(value = "taskWait") Integer taskWait,
-                                @Param(value = "checkUser") String checkUser,
-                                @Param(value = "checkDate") Date checkDate,
-                                @Param(value = "weather") String weather,
-                                @Param(value = "createTime") Date createTime,
-                                @Param(value = "executeTime") Date executeTime,
-                                @Param(value = "taskCode") String taskCode,
-                                @Param(value = "remark") String remark);
+                               @Param(value = "taskId") String taskId,
+                               @Param(value = "areaId") String areaId,
+                               @Param(value = "cType") Integer cType,
+                               @Param(value = "cState") Integer cState,
+                               @Param(value = "modifyState") Integer modifyState,
+                               @Param(value = "taskCount") Integer taskCount,
+                               @Param(value = "taskWait") Integer taskWait,
+                               @Param(value = "checkUser") String checkUser,
+                               @Param(value = "checkDate") Date checkDate,
+                               @Param(value = "weather") String weather,
+                               @Param(value = "createTime") Date createTime,
+                               @Param(value = "executeTime") Date executeTime,
+                               @Param(value = "taskCode") String taskCode,
+                               @Param(value = "remark") String remark);
     List<TCruiseResultExpand> selectTaskByPage(TCruiseResultExpand tCruiseResultExpand);
-    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId")String taskId);
+    List<CruiseResultDetail> selectCruiseByPage(CruiseResultDetail cruiseResultDetail);
     int manualReview(TCruiseDataResult tCruiseDataResult);
     int batchInsert(List<TCruiseResult> list);
     TaskStatistical taskStatistical(@Param(value = "Start")String Start,
                                     @Param(value = "End")String End);
     CruiseStatistical  cruiseStatistical(@Param(value = "Start")String Start,
                                          @Param(value = "End")String End);
-
+    CruiseResultDetail cruiseResultOperate(CruiseResultDetail cruiseResultDetail);
     List<TCruiseTask> selectTaskIsRunning();
 }
