@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TRobotInspection;
@@ -148,6 +149,8 @@ public class TCruisePlanService{
                     case 223:
                         voiceList.add(instanceTree);
                         break;
+                    default:
+                        throw new BusinessException("无此巡检类型！");
                 }
             }
             meterListMap.put("表计读数", meterList);
