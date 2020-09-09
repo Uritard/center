@@ -3,9 +3,9 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
+import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -69,6 +69,36 @@ public class TRobotInfoService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TRobotInfo> list) {
         return this.tRobotInfoDao.batchInsert(list);
+    }
+
+    @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectInspectionTree() {
+        List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree();
+        List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection();
+        List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
+        for (TRobotInspectionTree tRobot:robotList) {
+            Map<String, Object> robotPresetTreeTem = new HashMap<>();
+            List<Map<String, Object>> presetList = new ArrayList<>();
+            Long robotId = tRobot.getRobotId();
+            for (TRobotInspectionTree tRobotInspectionTree:tRobotInspectionTreeList) {
+                Long robotIdTem = tRobotInspectionTree.getRobotId();
+                if (Objects.nonNull(robotIdTem) && Objects.equals(robotId, robotIdTem)) {
+                    Map<String, Object> inspectionMap = new HashMap<>();
+                    inspectionMap.put("inspectionId", tRobotInspectionTree.getInspectionId());
+                    inspectionMap.put("inspectionName", tRobotInspectionTree.getInspectionName());
+                    presetList.add(inspectionMap);
+                }
+            }
+            robotPresetTreeTem.put("robotId", robotId);
+            robotPresetTreeTem.put("robotName",tRobot.getRobotName());
+            robotPresetTreeTem.put("robotPosition", tRobot.getRobotPosition());
+            robotPresetTreeTem.put("inspectionInfo",presetList);
+            robotPresetTreeTemList.add(robotPresetTreeTem);
+        }
+        Map<String, Object> robotInspectionTree = new HashMap<>();
+        robotInspectionTree.put("机器人巡检点列表", robotPresetTreeTemList);
+        return robotInspectionTree;
     }
 
 }

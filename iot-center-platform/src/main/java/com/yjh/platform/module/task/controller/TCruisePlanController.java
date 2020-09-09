@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.module.task.entity.InstanceTree;
+import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import com.yjh.platform.module.task.service.TCruisePlanService;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import java.util.HashMap;
@@ -127,7 +128,7 @@ public class TCruisePlanController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCruisePlan> list = tCruisePlanService.selectByPage(tCruisePlan);
+            List<TCruisePlanCount> list = tCruisePlanService.selectByPage(tCruisePlan);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -151,9 +152,9 @@ public class TCruisePlanController {
         return result;
     }
 
-    @ApiOperation(value = "查询巡检点树")
-    @RequestMapping(value = "/findInstanceTree", method = RequestMethod.GET)
-    public Result findInstanceTree() {
+    @ApiOperation(value = "查询标准设备下挂巡检点")
+    @RequestMapping(value = "/findInstances", method = RequestMethod.GET)
+    public Result findInstances() {
         Result result = new Result();
         try {
             Map<String, Object> list = tCruisePlanService.findInstanceTree();

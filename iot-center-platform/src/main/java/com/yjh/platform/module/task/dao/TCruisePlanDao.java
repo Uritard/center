@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.yjh.platform.module.task.entity.InstanceTree;
 import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +26,7 @@ public interface TCruisePlanDao {
                              @Param(value = "planPointTypes") String planPointTypes,
                              @Param(value = "createTime") Date createTime,
                              @Param(value = "updateTime") Date updateTime);
-    List<TCruisePlan> selectByPage(TCruisePlan tCruisePlan);
+    List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan);
 
     int batchInsert(List<TCruisePlan> list);
     List<InstanceTree> findInstanceTree();

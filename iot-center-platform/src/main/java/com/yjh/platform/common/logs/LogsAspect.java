@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -37,6 +38,8 @@ public class LogsAspect {
     private static final String LOG_URL = "http://iot-center-logs/sysLogs/v1/add";
     @Autowired
     private LogsConfig logsConfig;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @LoadBalanced
     @Bean(name = "serviceRestTemplate")
@@ -60,7 +63,7 @@ public class LogsAspect {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
             request = servletRequestAttributes.getRequest();
-            userName = request.getHeader("userName");
+            userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             userId = request.getHeader("userId");
             ip = IPUtil.getRemoteIP(request);
         }
@@ -83,17 +86,17 @@ public class LogsAspect {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
                 params.set("content", "参数：" + content.toString());
-//                post(params);
+                post(params);
                 return result;
             } catch (BusinessException e) {
                 params.set("content", "参数：" + content.toString() + "；错误信息：" + e.getMessage());
                 params.set("state", 2);
-//                post(params);
+                post(params);
                 throw e;
             } catch (Throwable e) {
                 params.set("content", "参数：" + content.toString() + "；异常信息：" + e.getMessage());
                 params.set("state", 3);
-//                post(params);
+                post(params);
                 throw e;
             }
         }
@@ -108,7 +111,7 @@ public class LogsAspect {
             params.set("content", "参数：" + Arrays.toString(joinPoint.getArgs()) + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
             params.set("userId", userId);
             params.set("userName", userName);
-//            post(params);
+            post(params);
             throw e;
         }
     }

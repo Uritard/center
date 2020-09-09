@@ -347,6 +347,15 @@
         </foreach>
     </insert>
 
+    <select id="selectInspectionTree" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
+        select a.robot_id, a.robot_name from t_robot_info a
+    </select>
+
+    <select id="batchSelectInspection" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
+        select a.robot_id, b.robot_name, b.robot_position, a.inspection_id, a.inspection_name from t_robot_inspection a
+        LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
+    </select>
+
 
 
 </mapper>

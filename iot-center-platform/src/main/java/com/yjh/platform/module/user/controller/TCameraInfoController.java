@@ -236,4 +236,18 @@ public class TCameraInfoController {
      }
         return  result;
     }
+
+    @ApiOperation(value = "查询所有摄像头预置位信息树")
+    @RequestMapping(value = "/selectPresetTree", method = RequestMethod.POST)
+    public Result selectPresetTree() {
+        Result result = new Result();
+        try {
+            Map<String, Object> cameraPresetTree = tCameraInfoService.selectPresetTree();
+            result.setData(cameraPresetTree);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("摄像头预置位信息树失败描述：", e);
+        }
+        return result;
+    }
 }

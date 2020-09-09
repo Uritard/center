@@ -85,12 +85,13 @@
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
         select
         a.plan_id,
         a.plan_name,
         a.type,
         a.plan_point_types,
+        (select count(*) from t_cruise_plan_attr b where b.plan_id = a.plan_id) as total,
         a.create_time,
         a.update_time
         from t_cruise_plan a

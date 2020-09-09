@@ -4,8 +4,10 @@ import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
-import java.util.List;
+import java.util.*;
+
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -89,6 +91,35 @@ public class TCameraInfoService{
     @Transactional(rollbackFor = Exception.class)
     public List<CameraInfo> selectCameraByTaskId(Long taskId){
         return this.tCameraInfoDao.selectCameraByTaskId(taskId);
+    }
+
+    @Logs(title = "查询所有摄像头预置位信息树", code = "cameraInfo")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectPresetTree() {
+        List<TCamreaPresetTree> cameraList = tCameraInfoDao.selectCameraId();
+        List<TCamreaPresetTree> tCamreaPresetTreeList = tCameraInfoDao.batchSelectPreset();
+        List<Map<String, Object>> cameraPresetTreeTemList = new ArrayList<>();
+        for (TCamreaPresetTree tCamrea:cameraList) {
+            Map<String, Object> cameraPresetTreeTem = new HashMap<>();
+            List<Map<String, Object>> presetList = new ArrayList<>();
+            Long cameraId = tCamrea.getCameraId();
+            for (TCamreaPresetTree tCamreaPresetTree:tCamreaPresetTreeList) {
+                Long cameraIdTem = tCamreaPresetTree.getCameraId();
+                if (Objects.nonNull(cameraIdTem) && Objects.equals(cameraId, cameraIdTem)) {
+                    Map<String, Object> presetMap = new HashMap<>();
+                    presetMap.put("presetId", tCamreaPresetTree.getPresetId());
+                    presetMap.put("presetName", tCamreaPresetTree.getPresetName());
+                    presetList.add(presetMap);
+                }
+            }
+            cameraPresetTreeTem.put("cameraId", cameraId);
+            cameraPresetTreeTem.put("cameraName",tCamrea.getCameraName());
+            cameraPresetTreeTem.put("presetInfo",presetList);
+            cameraPresetTreeTemList.add(cameraPresetTreeTem);
+        }
+        Map<String, Object> cameraPresetTree = new HashMap<>();
+        cameraPresetTree.put("摄像机预置位列表", cameraPresetTreeTemList);
+        return cameraPresetTree;
     }
 }
 

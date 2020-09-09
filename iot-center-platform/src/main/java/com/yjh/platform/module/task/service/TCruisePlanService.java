@@ -12,6 +12,7 @@ import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import java.util.*;
 
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
+import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import org.springframework.stereotype.Service;
@@ -105,8 +106,8 @@ public class TCruisePlanService{
 
     @Logs(title = "分页查询", code = "task")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruisePlan> selectByPage(TCruisePlan tCruisePlan) {
-        List<TCruisePlan> tCruisePlanList = tCruisePlanDao.selectByPage(tCruisePlan);
+    public List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan) {
+        List<TCruisePlanCount> tCruisePlanList = tCruisePlanDao.selectByPage(tCruisePlan);
         return tCruisePlanList;
     }
 

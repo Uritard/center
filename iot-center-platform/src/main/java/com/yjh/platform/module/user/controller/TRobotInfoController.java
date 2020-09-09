@@ -187,4 +187,18 @@ public class TRobotInfoController {
         return result;
     }
 
+    @ApiOperation(value = "查询所有机器人巡检点信息树")
+    @RequestMapping(value = "/selectInspectionTree", method = RequestMethod.POST)
+    public Result selectInspectionTree() {
+        Result result = new Result();
+        try {
+            Map<String, Object> robotInspectionTree = tRobotInfoService.selectInspectionTree();
+            result.setData(robotInspectionTree);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询所有机器人巡检点信息树失败描述：", e);
+        }
+        return result;
+    }
+
 }

@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -55,5 +56,7 @@ public interface TRobotInfoDao {
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
 
     int batchInsert(@Param("list") List<TRobotInfo> list);
+    List<TRobotInspectionTree> selectInspectionTree();
+    List<TRobotInspectionTree> batchSelectInspection();
 
 }

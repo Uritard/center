@@ -1,10 +1,13 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
+import java.util.Map;
+
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,5 +52,7 @@ public interface TCameraInfoDao {
     List<AreaInfo> selectCameraPresetTree();
 
     List<CameraInfo> selectCameraByTaskId(@Param(value = "taskId")Long taskId);
+    List<TCamreaPresetTree> selectCameraId();
+    List<TCamreaPresetTree> batchSelectPreset();
 
 }
