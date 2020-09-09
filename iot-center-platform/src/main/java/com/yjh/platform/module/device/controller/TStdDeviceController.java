@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -35,6 +36,8 @@ public class TStdDeviceController {
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     private Logger log = LoggerFactory.getLogger(TStdDeviceController.class);
 
@@ -272,8 +275,9 @@ public class TStdDeviceController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceDetail.getUpRegionId());
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail);
+            List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail, upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

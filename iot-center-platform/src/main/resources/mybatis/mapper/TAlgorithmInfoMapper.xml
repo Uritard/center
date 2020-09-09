@@ -6,31 +6,31 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TAlgorithmInfo">
         <id column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
         <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
-        <result column="algorithm_type" jdbcType="VARCHAR" property="algorithmType" />
+        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
         <result column="describel" jdbcType="VARCHAR" property="describel" />
         <result column="algorithm_code" jdbcType="INTEGER" property="algorithmCode" />
-        <result column="analys_type" jdbcType="VARCHAR" property="analysType" />
+        <result column="analyse_type" jdbcType="VARCHAR" property="analyseType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        algorithm_id, algorithm_name, algorithm_type, describel, algorithm_code, analys_type
+        algorithm_id, algorithm_name, alias_name, describel, algorithm_code, analyse_type
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="algorithmId" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
         insert into t_algorithm_info(
             algorithm_name,
-            algorithm_type,
+            alias_name,
             describel,
             algorithm_code,
-            analys_type
+            analyse_type
         )values(
                 #{algorithmName, jdbcType=VARCHAR},
-                #{algorithmType, jdbcType=VARCHAR},
+                #{aliasName, jdbcType=VARCHAR},
                 #{describel, jdbcType=VARCHAR},
                 #{algorithmCode, jdbcType=INTEGER},
-                #{analysType, jdbcType=VARCHAR}
+                #{analyseType, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -43,10 +43,10 @@
         update t_algorithm_info a <set>
         <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
         <if test="algorithmName != null and algorithmName != ''">a.algorithm_name = #{algorithmName, jdbcType=VARCHAR},</if>
-        <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
+        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="describel != null and describel != ''">a.describel = #{describel, jdbcType=VARCHAR},</if>
         <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=INTEGER},</if>
-        <if test="analysType != null and analysType != ''">a.analys_type = #{analysType, jdbcType=VARCHAR},</if>
+        <if test="analyseType != null and analyseType != ''">a.analyse_type = #{analyseType, jdbcType=VARCHAR},</if>
     </set>
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </update>
@@ -55,10 +55,10 @@
         select
         a.algorithm_id,
         a.algorithm_name,
-        a.algorithm_type,
+        a.alias_name,
         a.describel,
         a.algorithm_code,
-        a.analys_type
+        a.analyse_type
         from t_algorithm_info a
         where 1 = 1
             and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
@@ -69,66 +69,66 @@
         select
         a.algorithm_id,
         a.algorithm_name,
-        a.algorithm_type,
+        a.alias_name,
         a.describel,
         a.algorithm_code,
-        a.analys_type
+        a.analyse_type
         from t_algorithm_info a
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
         <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
-        <if test="algorithmType != null and algorithmType != ''"> and a.algorithm_type = #{algorithmType, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
-        <if test="analysType != null and analysType != ''"> and a.analys_type = #{analysType, jdbcType=VARCHAR}</if>
+        <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
     </select>
 
     <resultMap id="algorithmInfoMap" type="java.util.HashMap">
         <result property="algorithmId" column="algorithm_id"/>
         <result property="algorithmName" column="algorithm_name"/>
-        <result property="algorithmType" column="algorithm_type"/>
+        <result property="aliasName" column="alias_name"/>
         <result property="describel" column="describel"/>
         <result property="algorithmCode" column="algorithm_code"/>
-        <result property="analysType" column="analys_type"/>
-        <result property="analysTypeName" column="dict_note"/>
+        <result property="analyseType" column="analyse_type"/>
+        <result property="analyseTypeName" column="dict_note"/>
     </resultMap>
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultMap="algorithmInfoMap">
         select
         a.algorithm_id,
         a.algorithm_name,
-        a.algorithm_type,
+        a.alias_name,
         a.describel,
         a.algorithm_code,
-        a.analys_type,
+        a.analyse_type,
         b.dict_note
         from t_algorithm_info a
-        LEFT JOIN t_dict_business b ON b.dict_code = a.analys_type
+        LEFT JOIN t_dict_business b ON b.dict_code = a.analyse_type
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
         <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
-        <if test="algorithmType != null and algorithmType != ''"> and a.algorithm_type = #{algorithmType, jdbcType=VARCHAR}</if>
+        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
-        <if test="analysType != null and analysType != ''"> and a.analys_type = #{analysType, jdbcType=VARCHAR}</if>
+        <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
         insert into t_algorithm_info(
             algorithm_id,
             algorithm_name,
-            algorithm_type,
+            alias_name,
             describel,
             algorithm_code,
-            analys_type
+            analyse_type
         )values
         <foreach collection="list" item="TAlgorithmInfo" separator=",">
             (
                 #{TAlgorithmInfo.algorithmId, jdbcType=BIGINT},
                 #{TAlgorithmInfo.algorithmName, jdbcType=VARCHAR},
-                #{TAlgorithmInfo.algorithmType, jdbcType=VARCHAR},
+                #{TAlgorithmInfo.aliasName, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.describel, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.algorithmCode, jdbcType=INTEGER},
-                #{TAlgorithmInfo.analysType, jdbcType=VARCHAR}
+                #{TAlgorithmInfo.analyseType, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

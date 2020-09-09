@@ -124,14 +124,14 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TAlgorithmConf tAlgorithmConf,
+    public Result selectByPage(@RequestBody TAlgorithmConfDetail tAlgorithmConfDetail,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TAlgorithmConfDetail> list = tAlgorithmConfService.selectByPage(tAlgorithmConf);
+            List<TAlgorithmConfDetail> list = tAlgorithmConfService.selectByPage(tAlgorithmConfDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

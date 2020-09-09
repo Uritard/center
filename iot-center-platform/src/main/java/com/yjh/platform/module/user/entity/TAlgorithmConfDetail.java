@@ -17,7 +17,9 @@ import lombok.experimental.Accessors;
 public class TAlgorithmConfDetail  extends TAlgorithmConf{
     private String deviceName;
     private String presetName;
-    private String analysTypeName;
-    private String analysType;
+    private String analyseTypeName;
+    private String analyseType;
     private String cameraName;
+    private String algorithmName;
+    private String unitName;
 }

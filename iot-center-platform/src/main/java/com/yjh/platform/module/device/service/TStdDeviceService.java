@@ -38,6 +38,8 @@ public class TStdDeviceService{
 
 
 
+
+
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
 
@@ -209,7 +211,14 @@ public class TStdDeviceService{
 
     @Logs(title = "分页查询设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail) {
+    public List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail, List<Long> upRegionIds) {
+
+        if(upRegionIds.size() != 0){
+            tStdDeviceDetail.setUpRegionIds(upRegionIds);
+        }else {
+            upRegionIds.add(tStdDeviceDetail.getUpRegionId());
+            tStdDeviceDetail.setUpRegionIds(upRegionIds);
+        }
         return this.tStdDeviceDao.selectByPageAll(tStdDeviceDetail);
     }
 

@@ -55,8 +55,8 @@ public class TAlgorithmConfService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TAlgorithmConfDetail> selectByPage(TAlgorithmConf tAlgorithmConf) {
-        List<TAlgorithmConfDetail> tAlgorithmConfList = tAlgorithmConfDao.selectByPage(tAlgorithmConf);
+    public List<TAlgorithmConfDetail> selectByPage(TAlgorithmConfDetail tAlgorithmConfDetail) {
+        List<TAlgorithmConfDetail> tAlgorithmConfList = tAlgorithmConfDao.selectByPage(tAlgorithmConfDetail);
         return tAlgorithmConfList;
     }
 
