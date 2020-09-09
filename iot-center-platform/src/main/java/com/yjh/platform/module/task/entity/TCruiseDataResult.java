@@ -57,7 +57,7 @@ public class TCruiseDataResult implements Serializable {
     private Integer state;
 
     @ApiModelProperty(value = "评价状态 1误报 2漏报")
-    private String evaluationState;
+    private Integer evaluationState;
 
     @ApiModelProperty(value = "识别状态 1识别正常 2识别异常")
     private Integer identifyState;

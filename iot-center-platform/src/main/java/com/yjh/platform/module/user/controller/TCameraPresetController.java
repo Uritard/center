@@ -7,6 +7,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.user.entity.SysRoleRobot;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +25,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/tCameraPreset/v1")
-@Api(value = "/tCameraPreset", description = "摄像机预位置表操作接口")
+@Api(value = "/tCameraPreset", description = "摄像机预置位表操作接口")
 public class TCameraPresetController {
 
     @Autowired
@@ -68,7 +69,7 @@ public class TCameraPresetController {
     }
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedPreset", method = RequestMethod.DELETE)
-    public Result deleteSelectedPreset(@RequestParam(value = "presetIds[]", required = true) String[] presetIds) {
+    public Result deleteSelectedPreset(@RequestParam(value = "presetIds") String presetIds) {
         Result result = new Result();
         try {
             result.setData(tCameraPresetService.deleteSelectedPreset(presetIds));
@@ -183,7 +184,7 @@ public class TCameraPresetController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCameraPreset> list = tCameraPresetService.selectByPage(tCameraPreset);
+            List<TCameraPresetExpand> list = tCameraPresetService.selectByPage(tCameraPreset);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

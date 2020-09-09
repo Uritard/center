@@ -210,10 +210,10 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "人工复核")
     @RequestMapping(value = "/manualReview", method = RequestMethod.POST)
-    public Result manualReview(@RequestBody TCruiseDataResult tCruiseDataResult) {
+    public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview) {
         Result result = new Result();
         try {
-            result.setData(tCruiseResultService.manualReview(tCruiseDataResult));
+            result.setData(tCruiseResultService.manualReview(cruiseManualReview));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

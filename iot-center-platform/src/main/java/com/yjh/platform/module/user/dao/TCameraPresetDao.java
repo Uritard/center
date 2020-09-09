@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,7 @@ public interface TCameraPresetDao {
 
     int insert(TCameraPreset tCameraPreset);
     int deleteByPrimaryId(@Param(value = "presetId") Long presetId);
-    int deleteSelectedPreset(@Param(value = "presetIds") String[] presetIds);
+    int deleteSelectedPreset(@Param(value = "list") List<String> list);
     int update(TCameraPreset tCameraPreset);
     TCameraPreset selectByPrimaryId(@Param(value = "presetId") Long presetId);
     List<TCameraPreset> selectByCameraId(@Param(value = "cameraId") Long cameraId);
@@ -32,7 +33,7 @@ public interface TCameraPresetDao {
                                @Param(value = "inspectionPostion") Integer inspectionPostion,
                                @Param(value = "collectStatus") Integer collectStatus,
                                @Param(value = "calibrationStatus") Integer calibrationStatus);
-    List<TCameraPreset> selectByPage(TCameraPreset tCameraPreset);
+    List<TCameraPresetExpand> selectByPage(TCameraPreset tCameraPreset);
 
     int batchInsert(List<TCameraPreset> list);
     String selectPreImgByCruiseId(@Param(value = "instanceId")Long instanceId);

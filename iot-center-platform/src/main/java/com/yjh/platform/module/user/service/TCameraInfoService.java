@@ -4,8 +4,13 @@ import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
+<<<<<<< Updated upstream
 import java.util.*;
 
+=======
+import java.util.Arrays;
+import java.util.List;
+>>>>>>> Stashed changes
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.springframework.stereotype.Service;
@@ -38,7 +43,8 @@ public class TCameraInfoService{
     @Logs(title = "批量删除", code = "TCameraPreset")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedCamera(String cameraIds) {
-        return this.tCameraInfoDao.deleteSelectedCamera(cameraIds);
+        List<String> list= Arrays.asList(cameraIds.split(","));
+        return this.tCameraInfoDao.deleteSelectedCamera(list);
     }
 
     @Logs(title = "更新", code = "module")

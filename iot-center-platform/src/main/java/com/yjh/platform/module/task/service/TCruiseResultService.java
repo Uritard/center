@@ -75,8 +75,8 @@ public class TCruiseResultService{
     }
     @Logs(title = "人工复核", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int manualReview(TCruiseDataResult tCruiseDataResult) {
-        return this.tCruiseResultDao.manualReview(tCruiseDataResult);
+    public int manualReview(CruiseManualReview cruiseManualReview) {
+        return this.tCruiseResultDao.manualReview(cruiseManualReview);
     }
     @Logs(title = "巡视任务结果统计", code = "module")
     @Transactional(rollbackFor = Exception.class)

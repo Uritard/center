@@ -15,7 +15,7 @@
         <result column="personcheck" jdbcType="VARCHAR" property="personcheck" />
         <result column="origpic" jdbcType="VARCHAR" property="origpic" />
         <result column="state" jdbcType="INTEGER" property="state" />
-        <result column="evaluation_state" jdbcType="VARCHAR" property="evaluationState" />
+        <result column="evaluation_state" jdbcType="INTEGER" property="evaluationState" />
         <result column="identify_state" jdbcType="INTEGER" property="identifyState" />
         <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
         <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
@@ -58,7 +58,7 @@
                 #{personcheck, jdbcType=VARCHAR},
                 #{origpic, jdbcType=VARCHAR},
                 #{state, jdbcType=INTEGER},
-                #{evaluationState, jdbcType=VARCHAR},
+                #{evaluationState, jdbcType=INTEGER},
                 #{identifyState, jdbcType=INTEGER},
                 #{identifyResult, jdbcType=INTEGER},
                 #{createtime, jdbcType=TIMESTAMP},
@@ -84,7 +84,7 @@
         <if test="personcheck != null and personcheck != ''">a.personcheck = #{personcheck, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
         <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
-        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=VARCHAR},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
         <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
         a.createtime = #{createtime, jdbcType=TIMESTAMP},
@@ -148,7 +148,7 @@
         <if test="personcheck != null and personcheck != ''">a.personcheck = #{personcheck, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
         <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
-        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=VARCHAR},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
         <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
         <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
@@ -186,7 +186,7 @@
         <if test="personcheck != null and personcheck != ''">a.personcheck = #{personcheck, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
         <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
-        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=VARCHAR},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
         <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
         <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
@@ -225,7 +225,7 @@
                 #{TCruiseDataResult.personcheck, jdbcType=VARCHAR},
                 #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
                 #{TCruiseDataResult.state, jdbcType=INTEGER},
-                #{TCruiseDataResult.evaluationState, jdbcType=VARCHAR},
+                #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
                 #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
                 #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
                 #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},

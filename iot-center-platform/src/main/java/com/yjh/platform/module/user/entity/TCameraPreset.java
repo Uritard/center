@@ -28,7 +28,7 @@ public class TCameraPreset implements Serializable {
     private Long cameraId ;
 
     @ApiModelProperty(value = "预置位号")
-    private int presetNum ;
+    private Integer presetNum ;
 
     @ApiModelProperty(value = "预置位名称")
     private String presetName ;
@@ -40,17 +40,20 @@ public class TCameraPreset implements Serializable {
     private Date creatorTime ;
 
     @ApiModelProperty(value = "是否使用")
-    private int isUse ;
+    private Integer isUse ;
 
     @ApiModelProperty(value = "啥也不是啊")
     private String presetImg ;
 
     @ApiModelProperty(value = "检测点位置，0-室外 1-室内")
-    private int inspectionPostion ;
+    private Integer inspectionPostion ;
 
     @ApiModelProperty(value = "采集状态，0-未采集 1-已采集")
-    private int collectStatus ;
+    private Integer collectStatus ;
 
     @ApiModelProperty(value = "标定状态，0-未标定 1-已标定")
-    private int calibrationStatus ;
+    private Integer calibrationStatus ;
+
+    @ApiModelProperty(value = "备注")
+    private String remark ;
 }

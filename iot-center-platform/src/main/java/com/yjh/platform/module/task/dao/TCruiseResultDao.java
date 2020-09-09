@@ -35,7 +35,7 @@ public interface TCruiseResultDao {
                                @Param(value = "remark") String remark);
     List<TCruiseResultExpand> selectTaskByPage(TCruiseResultExpand tCruiseResultExpand);
     List<CruiseResultDetail> selectCruiseByPage(CruiseResultDetail cruiseResultDetail);
-    int manualReview(TCruiseDataResult tCruiseDataResult);
+    int manualReview(CruiseManualReview cruiseManualReview);
     int batchInsert(List<TCruiseResult> list);
     TaskStatistical taskStatistical(@Param(value = "Start")String Start,
                                     @Param(value = "End")String End);

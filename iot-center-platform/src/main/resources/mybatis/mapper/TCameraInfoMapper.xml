@@ -74,12 +74,12 @@
     </delete>
 
     <!--批量删除-->
-    <delete id="deleteSelectedCamera"  parameterType="java.lang.String">
+    <delete id="deleteSelectedCamera"  >
         delete t_camera_info,t_camera_preset from
         t_camera_info left join t_camera_preset
         on t_camera_info.camera_id=t_camera_preset.camera_id
         where  t_camera_info.camera_id in
-        <foreach collection="cameraIds" item="cameraId" open="(" separator="," close=")">
+        <foreach collection="list" item="cameraId" open="(" separator="," close=")">
             #{cameraId, jdbcType=BIGINT}
         </foreach>
     </delete>

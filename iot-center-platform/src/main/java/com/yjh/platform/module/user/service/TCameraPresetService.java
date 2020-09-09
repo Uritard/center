@@ -3,10 +3,12 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -34,8 +36,9 @@ public class TCameraPresetService {
 
     @Logs(title = "批量删除", code = "TCameraPreset")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteSelectedPreset(String[] presetIds) {
-        return this.tCameraPresetDao.deleteSelectedPreset(presetIds);
+    public int deleteSelectedPreset(String presetIds) {
+        List<String> list= Arrays.asList(presetIds.split(","));
+        return this.tCameraPresetDao.deleteSelectedPreset(list);
     }
 
     @Logs(title = "更新", code = "module")
@@ -73,9 +76,9 @@ public class TCameraPresetService {
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraPreset> selectByPage(TCameraPreset tCameraPreset) {
-        List<TCameraPreset> tCameraPresetList = tCameraPresetDao.selectByPage(tCameraPreset);
-        return tCameraPresetList;
+    public List<TCameraPresetExpand> selectByPage(TCameraPreset tCameraPreset) {
+        List<TCameraPresetExpand> tCameraPresetExpandList = tCameraPresetDao.selectByPage(tCameraPreset);
+        return tCameraPresetExpandList;
     }
 
     @Logs(title = "批量插入", code = "module")

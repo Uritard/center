@@ -74,16 +74,24 @@
         )
     </insert>
 
-    <insert id="manualReview" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult">
-        insert into t_cruise_data_result(
-            personcheck,
-            identify_result,
-            evaluation_state
-        )values(
-            #{personcheck, jdbcType=VARCHAR},
-            #{identifyResult, jdbcType=INTEGER},
-            #{evaluationState, jdbcType=VARCHAR}
-        )
+    <insert id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        update t_cruise_data_result set
+            personcheck = #{personcheck,jdbcType=VARCHAR},
+            identify_result = #{identifyResult,jdbcType=INTEGER},
+            evaluation_state = #{evaluationState,jdbcType=INTEGER}
+
+        where cruise_data_id in
+            (select cruise_data_id
+                 from
+                    (select cruise_data_id
+                        FROM
+                                t_cruise_result a,
+                                t_cruise_task_result_detail d,
+                                t_cruise_data_result e
+                        where  a.task_id = #{taskId,jdbcType =INTEGER }
+                        and d.instance_id = #{instanceId,jdbcType = INTEGER}
+                        and a.task_result_id = d.task_result_id
+                        and e.cruise_result_id = d.cruise_result_id) t1)
 
     </insert>
 

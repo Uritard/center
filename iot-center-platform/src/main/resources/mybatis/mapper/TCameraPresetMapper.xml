@@ -15,13 +15,14 @@
         <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
         <result column="collect_status" jdbcType="INTEGER" property="collectStatus" />
         <result column="calibration_status" jdbcType="INTEGER" property="calibrationStatus" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        preset_id, camera_id, preset_num, preset_name, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status
+        preset_id, camera_id, preset_num, preset_name, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status,remark
     </sql>
-
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
         insert into t_camera_preset(
@@ -35,7 +36,8 @@
             preset_img,
             inspection_postion,
             collect_status,
-            calibration_status
+            calibration_status,
+            remark
         )values(
                 #{presetId, jdbcType=BIGINT},
                 #{cameraId, jdbcType=BIGINT},
@@ -47,7 +49,9 @@
                 #{presetImg, jdbcType=VARCHAR},
                 #{inspectionPostion, jdbcType=INTEGER},
                 #{collectStatus, jdbcType=INTEGER},
-                #{calibrationStatus, jdbcType=INTEGER}
+                #{calibrationStatus, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR}
+
         )
     </insert>
 
@@ -57,11 +61,11 @@
     </delete>
 
     <!--批量删除-->
-    <delete id="deleteSelectedPreset"  parameterType="java.lang.Long">
+    <delete id="deleteSelectedPreset" >
         delete from t_camera_preset
         where 1=1
         and preset_id in
-           <foreach collection="presetIds" item="presetIds" open="(" separator="," close=")">
+           <foreach collection="list" item="presetIds" open="(" separator="," close=")">
                #{presetIds, jdbcType=BIGINT}
             </foreach>
     </delete>
@@ -79,6 +83,7 @@
         <if test="inspectionPostion != null ">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
         <if test="collectStatus != null ">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
         <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
+        <if test="remark != null ">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}
     </update>
@@ -168,10 +173,11 @@
         <if test="calibrationStatus != null "> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraPresetExpand" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
         a.preset_id,
         a.camera_id,
+        b.camera_name,
         a.preset_num,
         a.preset_name,
         a.creator_user,
@@ -180,12 +186,13 @@
         a.preset_img,
         a.inspection_postion,
         a.collect_status,
-        a.calibration_status
-        from t_camera_preset a
+        a.calibration_status,
+        a.remark
+        from t_camera_preset a,t_camera_info b
         where 1 = 1
         <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
-        <if test="presetNum != null "> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="presetNum != null "> and a.preset_num like concat('%',#{presetNum, jdbcType=INTEGER},'%')</if>
         <if test="presetName != null and presetName != ''"> and a.preset_name like concat('%',#{presetName, jdbcType=VARCHAR},'%')</if>
         <if test="creatorUser != null and creatorUser != ''"> and a.creator_user = #{creatorUser, jdbcType=VARCHAR}</if>
         <if test="creatorTime != null and creatorTime != ''"> and a.creator_time = #{creatorTime, jdbcType=TIMESTAMP}</if>
@@ -194,6 +201,8 @@
         <if test="inspectionPostion != null "> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
         <if test="collectStatus != null "> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
         <if test="calibrationStatus != null "> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        and a.camera_id = b.camera_id
     </select>
 
     <insert id="batchInsert">
@@ -208,7 +217,8 @@
             preset_img,
             inspection_postion,
             collect_status,
-            calibration_status
+            calibration_status,
+            remark
         )values
         <foreach collection="list" item="TCameraPreset" separator=",">
             (
@@ -222,7 +232,8 @@
                 #{TCameraPreset.presetImg, jdbcType=VARCHAR},
                 #{TCameraPreset.inspectionPostion, jdbcType=INTEGER},
                 #{TCameraPreset.collectStatus, jdbcType=INTEGER},
-                #{TCameraPreset.calibrationStatus, jdbcType=INTEGER}
+                #{TCameraPreset.remark, jdbcType=VARCHAR},
+
             )
         </foreach>
     </insert>
