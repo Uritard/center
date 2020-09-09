@@ -1,5 +1,6 @@
 package com.yjh.logs.module.log.controller;
 
+import com.yjh.logs.module.log.entity.SysLogsTime;
 import com.yjh.logs.module.log.service.SysLogsService;
 import com.yjh.logs.module.log.entity.SysLogs;
 
@@ -158,16 +159,14 @@ public class SysLogsController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody SysLogs sysLogs,
+    public Result selectByPage(@RequestBody SysLogsTime sysLogsTime,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize,
-                               @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
-                               @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date endTime) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<SysLogs> list = sysLogsService.selectByPage(sysLogs,startTime,endTime);
+            List<SysLogs> list = sysLogsService.selectByPage(sysLogsTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

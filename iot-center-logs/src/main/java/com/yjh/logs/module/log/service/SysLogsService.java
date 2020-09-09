@@ -5,6 +5,7 @@ import com.yjh.logs.module.log.dao.SysLogsDao;
 
 import java.util.*;
 
+import com.yjh.logs.module.log.entity.SysLogsTime;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,19 +50,19 @@ public class SysLogsService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLogs> selectByPage(SysLogs sysLogs,Date startTime,Date endTime) {
+    public List<SysLogs> selectByPage(SysLogsTime sysLogsTime) {
         HashMap<String,Object> map = new HashMap<>();
-        map.put("logId",sysLogs.getLogId());
-        map.put("logType",sysLogs.getLogType());
-        map.put("ip",sysLogs.getIp());
-        map.put("title",sysLogs.getTitle());
-        map.put("state",sysLogs.getState());
-        map.put("content",sysLogs.getContent());
-        map.put("userId",sysLogs.getUserId());
-        map.put("userName",sysLogs.getUserName());
-        map.put("createTime",sysLogs.getCreateTime());
-        map.put("startTime",startTime);
-        map.put("endTime",endTime);
+        map.put("logId",sysLogsTime.getLogId());
+        map.put("logType",sysLogsTime.getLogType());
+        map.put("ip",sysLogsTime.getIp());
+        map.put("title",sysLogsTime.getTitle());
+        map.put("state",sysLogsTime.getState());
+        map.put("content",sysLogsTime.getContent());
+        map.put("userId",sysLogsTime.getUserId());
+        map.put("userName",sysLogsTime.getUserName());
+        map.put("createTime",sysLogsTime.getCreateTime());
+        map.put("startTime",sysLogsTime.getStartTime());
+        map.put("endTime",sysLogsTime.getEndTime());
         List<SysLogs> sysLogsList = sysLogsDao.selectByPage(map);
         return sysLogsList;
     }
