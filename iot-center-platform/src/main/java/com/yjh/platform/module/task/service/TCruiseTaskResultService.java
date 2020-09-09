@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,6 +35,9 @@ public class TCruiseTaskResultService{
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private TCameraPresetDao tCameraPresetDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -206,11 +210,11 @@ public class TCruiseTaskResultService{
         return cruiseResultCounter;
     }
 
-    @Logs(title = "获取当前任务已运行的时间")//本功能待优化
+    @Logs(title = "获取当前任务已运行的时间")
     @Transactional(rollbackFor = Exception.class)
     public CruiseTaskRunningTime selectTaskRunningTime(Long taskId) throws ParseException {
 
-        Set<String>keyResult=redisScan("t_cruise_task_result*");
+        Set<String>keyResult=redisScan("TaskExcutedTime*");
         CruiseTaskRunningTime cruiseTaskRunningTime=new CruiseTaskRunningTime();//创建时间对象
         String startTime="yyyy-mm-dd HH:MM:SS";
         //获取任务开始时间
@@ -218,8 +222,8 @@ public class TCruiseTaskResultService{
            Map<String,Object>mapResult=redisTemplate.opsForHash().entries(keys);
             String value=(mapResult.get("taskId")).toString();
             String TaskId=taskId.toString();
-            if(TaskId.equals(value)&&mapResult.get("cruiseStatus").equals("1")){
-                startTime=mapResult.get("cruiseTaskTime").toString();
+            if(TaskId.equals(value)){
+                startTime=mapResult.get("excutedTime").toString();
             }
 
         }
@@ -276,8 +280,8 @@ public class TCruiseTaskResultService{
     @Logs(title ="获取执行当前任务的摄像头的信息及相应巡检点结果状态")
     @Transactional(rollbackFor = Exception.class)
     public CameraCruiseInfo selectCameraAndCruiseResult(Long taskId,Integer cameraType){
-        Set<String>cameraKeys=redisScan("camera_info");
-        Set<String>cruiseKeys=redisScan("t_cruise_task_result");
+        Set<String>cameraKeys=redisScan("camera_info*");
+        Set<String>cruiseKeys=redisScan("t_cruise_task_result*");
         float cruiseCount=0;
         float cruisedCount=0;
         float cruisedFailCount=0;
@@ -329,5 +333,26 @@ public class TCruiseTaskResultService{
         return  cameraCruiseInfo;
     }
 
+    @Logs(title = "A-图片比较")//结果集仍需优化
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> PictureCompare(Long taskId,Long instanceId){
+     List<String> pictureResult=new ArrayList<>();
+     String collectPic=null;
+     String preImg=tCameraPresetDao.selectPreImgByCruiseId(instanceId);
+     Set<String>cruiseKeys=redisScan("t_cruise_task_result*");
+     for(String key:cruiseKeys){
+         Map<String,Object>cruiseInfo=redisTemplate.opsForHash().entries(key);
+         String TaskId=taskId.toString();
+         String InstanceId=instanceId.toString();
+         if(cruiseInfo.get("taskId").equals(TaskId)&&cruiseInfo.get("cruiseId").equals(InstanceId)){
+             Object collectedPic=cruiseInfo.get("colletcPic");
+             collectPic=collectedPic.toString();
+         }
+     }
+     pictureResult.add(preImg);
+     pictureResult.add(collectPic);
+
+     return pictureResult;
+    }
 }
 

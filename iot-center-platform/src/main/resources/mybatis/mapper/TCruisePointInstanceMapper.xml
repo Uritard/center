@@ -394,4 +394,5 @@ FROM
 	      c.cruise_type = #{cruiseType,jdbcType=INTEGER}
        AND a.task_id = #{taskId,jdbcType=BIGINT}
     </select>
+    
 </mapper>

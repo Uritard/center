@@ -258,4 +258,18 @@ public class TCruiseTaskResultController {
         }
         return  result;
     }
+
+    @ApiOperation(value = "A-巡视结果图片比对")
+    @RequestMapping(value = "/PictureCompare",method = RequestMethod.GET)
+    public Result PictureCompare(@RequestParam(value = "taskId")Long taskId,
+                                 @RequestParam(value = "instanceId")Long instanceId){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.PictureCompare(taskId, instanceId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+        return  result;
+    }
 }

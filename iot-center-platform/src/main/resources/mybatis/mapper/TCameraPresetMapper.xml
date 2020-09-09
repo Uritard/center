@@ -227,6 +227,20 @@
         </foreach>
     </insert>
 
-
+<select id="selectPreImgByCruiseId" parameterType="java.lang.Long" resultType="java.lang.String">
+       SELECT
+	     preset_img
+       FROM
+	    t_camera_preset
+       WHERE
+	    preset_id IN (
+		  SELECT
+			  cruise_id
+		  FROM
+			  t_cruise_point_instance
+		  WHERE
+			  instance_id = #{instanceId,jdbcType=BIGINT}
+	    )
+</select>
 
 </mapper>

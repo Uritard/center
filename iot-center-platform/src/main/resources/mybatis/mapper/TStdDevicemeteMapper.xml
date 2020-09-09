@@ -442,14 +442,22 @@
     </delete>
 
     <select id="selectDeviceMeteByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
-        SELECT
-	      a.device_mete_id AS deviceMeteId,
-	      a.device_id AS deviceId,
-	      b.device_name AS deviceName
-        FROM
-	      t_std_devicemete a
-        LEFT JOIN t_std_device b ON a.device_id = b.device_id
-        WHERE
-	      a.device_id =#{deviceId,jdbcType=BIGINT}
+          SELECT DISTINCT
+             b.device_mete_id AS deviceMeteId,
+             b.device_id AS deviceId,
+             c.device_name AS deviceName
+          FROM
+            (
+             t_cruise_point_instance a
+          LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+            )
+          LEFT JOIN t_std_device c ON b.device_id = c.device_id
+          WHERE
+            a.device_id = #{deviceId,jdbcType=BIGINT}
+          and a.instance_id IN
+           (
+             SELECT instance_id FROM t_cruise_task_result_detail
+           )
+
     </select>
 </mapper>

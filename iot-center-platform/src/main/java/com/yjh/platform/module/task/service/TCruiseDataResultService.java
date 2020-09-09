@@ -76,19 +76,18 @@ public class TCruiseDataResultService{
     @Logs(title = "巡视结果查询-测点查询",code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId){
-     List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=new ArrayList<>();
      //获取同一设备下的所有测点信息
-     cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceId);
+        List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceId);
      for(CruiseResultAnalMeteInfo deviceInfo:cruiseResultAnalMeteInfos){
-         CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=new CruiseResultAnalMeteInfo();
-         //通过测点ID获取相应的符合条件的巡检点结果
-         cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
-         deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
-         deviceInfo.setIdentifyState(cruiseResultAnalMeteInfo.getIdentifyState());
-         deviceInfo.setIdentifyStateName(cruiseResultAnalMeteInfo.getIdentifyStateName());
-         deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
-         deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
-         deviceInfo.setInstanceName(cruiseResultAnalMeteInfo.getInstanceName());
+
+             //通过测点ID获取相应的符合条件的巡检点结果
+             CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
+             deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
+             deviceInfo.setIdentifyState(cruiseResultAnalMeteInfo.getIdentifyState());
+             deviceInfo.setIdentifyStateName(cruiseResultAnalMeteInfo.getIdentifyStateName());
+             deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
+             deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
+             deviceInfo.setInstanceName(cruiseResultAnalMeteInfo.getInstanceName());
      }
      //按时间降序排列
         Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
