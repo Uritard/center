@@ -364,13 +364,6 @@ public class TStdDeviceController {
     }
 
 
-    @ApiOperation(value="查询详细设备信息")
-    @RequestMapping(value = "/selectDeviceDetail",method = RequestMethod.GET)
-    public Result selectDeviceDetail(@RequestParam(value = "deviceId")Long deviceId){
-        Result result=new Result();
-
-        return  result;
-    }
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)

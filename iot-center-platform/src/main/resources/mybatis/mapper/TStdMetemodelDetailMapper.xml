@@ -209,7 +209,7 @@
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
-        select
+        SELECT
         a.model_id,
         a.mete_id,
         a.custom_type,
@@ -240,12 +240,22 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus
-        from (((t_std_metemodel_detail a
-        left join t_dict_business b ON a.custom_type = b.dict_code)
-        LEFT JOIN t_dict_business c ON a.mete_type=c.dict_code)
-        LEFT JOIN t_std_metemodel d ON a.model_id=d.model_id)
-        LEFT JOIN t_dict_business e ON d.device_type=e.dict_code
-        WHERE 1=1 AND b.col_name="custom_type"  AND c.col_name="mete_type" AND e.col_name="device_type"
+        FROM
+        (
+        (
+        t_std_metemodel_detail a
+        LEFT JOIN t_dict_business b ON a.custom_type = b.dict_code
+        AND b.col_name = "custom_type"
+        )
+        LEFT JOIN t_dict_business c ON a.mete_type = c.dict_code
+        AND c.col_name = "mete_kind"
+        )
+        LEFT JOIN (
+        t_std_metemodel d
+        LEFT JOIN t_dict_business e ON d.device_type = e.dict_code
+        AND e.col_name = "device_type"
+        ) ON a.model_id = d.model_id
+        where 1=1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
