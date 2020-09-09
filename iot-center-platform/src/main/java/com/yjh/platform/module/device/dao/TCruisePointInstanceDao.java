@@ -6,6 +6,7 @@ import java.util.logging.Handler;
 
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
+import com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
@@ -45,6 +46,8 @@ public interface TCruisePointInstanceDao {
                                       @Param(value = "textDesc") String textDesc,
                                       @Param(value = "sort") String sort);
     List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail);
+
+    List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetail);
 
     int batchInsert(List<TCruisePointInstance> list);
     List<TCruisePointInstance> StdMeteUnionInspectionId(@Param(value = "deviceId") Long deviceId);

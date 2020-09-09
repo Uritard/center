@@ -28,7 +28,7 @@ public interface TAlgorithmConfDao {
                                 @Param(value = "applyModule") Integer applyModule,
                                 @Param(value = "createTime") Date createTime,
                                 @Param(value = "updateTime") Date updateTime);
-    List<TAlgorithmConfDetail> selectByPage(TAlgorithmConf tAlgorithmConf);
+    List<TAlgorithmConfDetail> selectByPage(TAlgorithmConfDetail tAlgorithmConfDetail);
 
     int batchAdd(List<TAlgorithmConf> list);
 }

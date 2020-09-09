@@ -102,13 +102,13 @@ public class TAlgorithmInfoController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "algorithmId", required = false) Long algorithmId,
                             @RequestParam(value = "algorithmName", required = false) String algorithmName,
-                            @RequestParam(value = "algorithmType", required = false) String algorithmType,
+                            @RequestParam(value = "aliasName", required = false) String aliasName,
                             @RequestParam(value = "describel", required = false) String describel,
                             @RequestParam(value = "algorithmCode", required = false) Integer algorithmCode,
-                            @RequestParam(value = "analysType", required = false) String analysType) {
+                            @RequestParam(value = "analyseType", required = false) String analyseType) {
         Result result = new Result();
         try {
-            List<TAlgorithmInfo> list = tAlgorithmInfoService.select(algorithmId, algorithmName, algorithmType, describel, algorithmCode, analysType);
+            List<TAlgorithmInfo> list = tAlgorithmInfoService.select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

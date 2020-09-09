@@ -46,8 +46,8 @@ public class TAlgorithmInfoService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TAlgorithmInfo> select(Long algorithmId, String algorithmName, String algorithmType, String describel, Integer algorithmCode, String analysType) {
-        List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.select(algorithmId, algorithmName, algorithmType, describel, algorithmCode, analysType);
+    public List<TAlgorithmInfo> select(Long algorithmId, String algorithmName, String aliasName, String describel, Integer algorithmCode, String analyseType) {
+        List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType);
         return tAlgorithmInfoList;
     }
 

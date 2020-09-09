@@ -5,6 +5,7 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import java.util.*;
 
 import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
+import com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
@@ -58,11 +59,64 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceList;
     }
 
+
+    @Logs(title = "巡检点分页查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(TStdDeviceMeteForPointDetail tCruisePointInstanceDetail) {
+
+        List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(tCruisePointInstanceDetail);
+        List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
+        List<Object> list1 = new LinkedList<>();
+        listAll.add(list.get(0));
+        if(list.get(0).getCruiseType() != null){
+            System.out.println(list.get(0).getCruiseType());
+            list.get(0).getListType().add(list.get(0).getCruiseType());
+            list1.add(list.get(0).getCruiseId());
+            list.get(0).getListType().add(list1);
+            list.get(0).getListType().add(list.get(0).getCruiseTypeName());
+        }
+        list.remove(0);
+        for (TStdDeviceMeteForPointDetail tCruisePointInstanceDetail1:list) {
+            int length = listAll.size()-1;
+            if(tCruisePointInstanceDetail1.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())){
+                if(tCruisePointInstanceDetail1.getCruiseType() != null) {
+                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseType());
+                    list1.add(tCruisePointInstanceDetail1.getCruiseId());
+                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseId());
+                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseTypeName());
+                }
+            }else {
+                listAll.add(tCruisePointInstanceDetail1);
+            }
+        }
+        return listAll;
+    }
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail) {
         List<TCruisePointInstanceDetail> list = tCruisePointInstanceDao.selectByPage(tCruisePointInstanceDetail);
-        return list;
+        List<TCruisePointInstanceDetail> listAll = new LinkedList<>();
+        listAll.add(list.get(0));
+        if(list.get(0).getCruiseType() != null){
+            System.out.println(list.get(0).getCruiseType());
+            list.get(0).getListType().add(list.get(0).getCruiseType());
+            list.get(0).getListType().add(list.get(0).getCruiseId());
+            list.get(0).getListType().add(list.get(0).getCruiseTypeName());
+        }
+        list.remove(0);
+        for (TCruisePointInstanceDetail tCruisePointInstanceDetail1:list) {
+            int length = listAll.size()-1;
+            if(tCruisePointInstanceDetail1.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())){
+                if(tCruisePointInstanceDetail1.getCruiseType() != null) {
+                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseType());
+                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseId());
+                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseTypeName());
+                }
+            }else {
+                listAll.add(tCruisePointInstanceDetail1);
+            }
+        }
+        return listAll;
     }
 
     @Logs(title = "批量插入", code = "module")

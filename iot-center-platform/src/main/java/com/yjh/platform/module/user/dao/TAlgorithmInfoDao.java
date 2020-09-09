@@ -19,10 +19,10 @@ public interface TAlgorithmInfoDao {
     TAlgorithmInfo selectByPrimaryId(@Param(value = "algorithmId") Long algorithmId);
     List<TAlgorithmInfo> select(@Param(value = "algorithmId") Long algorithmId,
                                 @Param(value = "algorithmName") String algorithmName,
-                                @Param(value = "algorithmType") String algorithmType,
+                                @Param(value = "aliasName") String aliasName,
                                 @Param(value = "describel") String describel,
                                 @Param(value = "algorithmCode") Integer algorithmCode,
-                                @Param(value = "analysType") String analysType);
+                                @Param(value = "analyseType") String analyseType);
     List<TAlgorithmInfo> selectByPage(TAlgorithmInfo tAlgorithmInfo);
 
     int batchInsert(List<TAlgorithmInfo> list);

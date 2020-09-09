@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -56,6 +57,8 @@ public class TStdDeviceDetail {
 
     @ApiModelProperty(value = "上级区域id")
     private Long upRegionId;
+
+    private List<Long> upRegionIds;
 
     @ApiModelProperty(value = "上级区域名称")
     private String upRegionName;

@@ -22,6 +22,13 @@
     </sql>
 
 
+    <select id="selectRegionIds" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT a.region_id
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id and a.up_region_id =#{upRegionId,jdbcType=VARCHAR}
+					WHERE	a.up_region_id &gt;= #{upRegionId,jdbcType=VARCHAR}
+    </select>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="regionId" parameterType="com.yjh.platform.module.device.entity.TStdRegion">
         insert into t_std_region(
             region_id,

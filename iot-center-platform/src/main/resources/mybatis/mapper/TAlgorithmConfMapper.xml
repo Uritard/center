@@ -63,8 +63,6 @@
         <if test="ifShow != null and ifShow != ''">a.if_show = #{ifShow, jdbcType=INTEGER},</if>
         <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
         <if test="applyModule != null and applyModule != ''">a.apply_module = #{applyModule, jdbcType=INTEGER},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}
     </update>
@@ -126,12 +124,14 @@
         a.create_time,
         a.update_time,
         b.preset_name as presetName,
-        d.dict_note as analysTypeName,
-        e.analys_type as analysType,
+        d.dict_note as analyseTypeName,
+        e.analyse_type as analyseType,
+        e.algorithm_name as algorithmName,
         f.camera_name as cameraName
         from t_algorithm_conf a,t_camera_preset b,t_dict_business d,t_algorithm_info e,t_camera_info f
-        where 1 = 1 and a.preset_id = b.preset_id and d.dict_code = e.analys_type and a.algorithm_id=e.algorithm_id
+        where 1 = 1 and a.preset_id = b.preset_id and d.dict_code = e.analyse_type and a.algorithm_id=e.algorithm_id
         and f.camera_id = b.camera_id
+        <if test="analyseType != null and analyseType != ''"> and e.analyse_type = #{analyseType, jdbcType=BIGINT} </if>
         <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
         <if test="configName != null and configName != ''"> and a.config_name = #{configName, jdbcType=VARCHAR}</if>

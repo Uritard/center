@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author lqh
  * @since 2020/9/3
@@ -24,4 +27,8 @@ public class TCruisePointInstanceDetail extends TCruisePointInstance{
     private String customName;
 
     private Long upRegionId;
+
+    private String deviceType;
+
+    private List<Object> listType = new LinkedList<>();
 }
