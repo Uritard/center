@@ -4,10 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Handler;
 
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail;
-import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -47,7 +44,13 @@ public interface TCruisePointInstanceDao {
                                       @Param(value = "sort") String sort);
     List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail);
 
-    List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetail);
+    int delete(TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetail);
+
+    List<Long> selectForCruiseByPage(TStdDeviceMete tStdDeviceMete);
+    List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(@Param(value = "list") List<Long> list);
+
+    List<String> selectSYForCruiseByPage(TCfgMete tCfgMete);
+    List<TCfgMeteForPointDetail> selectSYCruisePointByPage(@Param(value = "list") List<String> list);
 
     int batchInsert(List<TCruisePointInstance> list);
     List<TCruisePointInstance> StdMeteUnionInspectionId(@Param(value = "deviceId") Long deviceId);

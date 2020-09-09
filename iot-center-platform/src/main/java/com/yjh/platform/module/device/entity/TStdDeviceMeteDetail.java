@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * @author lqh
  * @since 2020/9/3
@@ -30,8 +32,12 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
 
     private String meteTypeName;
 
-    private Long upRegionId;
+
 
     private String alarmLevelName;
+
+    private Long upRegionId;
+    private List<Long> ids;
+
 }
 

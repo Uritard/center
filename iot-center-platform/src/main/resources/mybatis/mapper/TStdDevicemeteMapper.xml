@@ -241,6 +241,15 @@
     </select>
 
 
+    <select id="selectIds" resultType="java.lang.Long">
+        select device_id
+        from t_std_device a
+        where 1=1
+            and a.up_region_id in
+            <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
+                #{upRegionIds,jdbcType=VARCHAR}
+            </foreach>
+    </select>
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
         *
@@ -249,11 +258,16 @@
         left join(select dict_code,dict_note as alarmTypeName from t_dict_business) f on a.alarm_type= f.dict_code
         left join(select dict_code,dict_note as meteTypeName from t_dict_business) b on a.mete_type= b.dict_code
         left join(select dict_code,dict_note as meteKindName from t_dict_business) d on a.mete_kind= d.dict_code
-        left join(select device_id,device_name as deviceName,custom_name as customName from t_std_device) e on a.device_id = e.device_id
+        left join(select device_id,device_name as deviceName,custom_name as customName,up_region_id from t_std_device) e on a.device_id = e.device_id
         left join(select dict_code,dict_note as unitName from t_dict_business) h on a.unit = h.dict_code
         where 1=1
+        <if test="upRegionId != null and upRegionId != ''">
+            and a.device_id in
+            <foreach collection="ids" item="deviceId"  separator="," open="(" close=")"  >
+                #{deviceId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
@@ -282,7 +296,6 @@
         <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
         <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and g.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
-        <if test="upRegionId != null and upRegionId != '' and upRegionId != 1 "> and e.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchAdd">

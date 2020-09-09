@@ -84,6 +84,12 @@
         )
     </insert>
 
+    <delete id="delete" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
+        delete from t_cruise_point_instance
+                where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+                and cruise_type = #{cruiseType,jdbcType=VARCHAR}
+    </delete>
+
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
         delete from t_cruise_point_instance
                 where instance_id = #{instanceId, jdbcType=BIGINT}
@@ -200,7 +206,15 @@
         <if test="sort != null and sort != ''"> and a.sort = #{sort, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectCruisePointByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
+    <select id="selectForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="java.lang.Long">
+    select a.device_mete_id
+    from  t_std_devicemete a
+    where 1=1
+    <if test="meteName != null and meteName != ''">and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+    <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+    <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectCruisePointByPage"  resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
     SELECT
 	a.*,
 	b.cruise_type as cruiseType,
@@ -208,11 +222,107 @@
 	c.dict_note as cruiseTypeName,
 	d.device_name as deviceName,
 	d.custom_name as customName
-FROM
+    FROM
 	t_std_devicemete a
 	LEFT JOIN t_cruise_point_instance b ON a.device_mete_id = b.device_mete_id
 	LEFT JOIN t_dict_business c ON b.cruise_type = c.dict_code
 	left join t_std_device d on a.device_id = d.device_id
+	where 1=1
+    and a.device_mete_id in
+    <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
+            #{deviceMeteId,jdbcType=BIGINT}
+    </foreach>
+    </select>
+
+    <select id="selectSYForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMete" resultType="java.lang.String">
+        select a.mete_id
+        from  t_cfg_mete a
+        where 1=1
+        <if test="meteName != null and meteName != ''">and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectSYCruisePointByPage" resultType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail">
+        SELECT
+        a.*,
+        b.cruise_type as cruiseType,
+        b.cruise_id as cruiseId,
+        c.dict_note as cruiseTypeName,
+        d.device_name as deviceName,
+        e.dict_note as meteKindName
+        FROM
+        t_cfg_mete a
+        LEFT JOIN t_cruise_point_instance b ON a.mete_id = b.device_mete_id
+        left join t_dict_business e on e.dict_code = a.mete_kind
+        LEFT JOIN t_dict_business c ON b.cruise_type = c.dict_code
+        left join t_cfg_teleadjust f on a.mete_id = f.mete_id
+        left join t_cfg_device d on f.device_id = d.device_id
+        where
+        a.mete_id in
+        <foreach collection="list" item="meteId"  separator="," open="(" close=")"  >
+            #{meteId,jdbcType=VARCHAR}
+        </foreach>
+        union all (
+        SELECT
+        a.*,
+        b.cruise_type as cruiseType,
+        b.cruise_id as cruiseId,
+        c.dict_note as cruiseTypeName,
+        d.device_name as deviceName,
+        e.dict_note as meteKindName
+        FROM
+        t_cfg_mete a
+        LEFT JOIN t_cruise_point_instance b ON a.mete_id = b.device_mete_id
+        left join t_dict_business e on e.dict_code = a.mete_kind
+        LEFT JOIN t_dict_business c ON b.cruise_type = c.dict_code
+        left join t_cfg_telecontrol g on a.mete_id = g.mete_id
+        left join t_cfg_device d on g.device_id = d.device_id
+        where
+        a.mete_id in
+        <foreach collection="list" item="meteId"  separator="," open="(" close=")"  >
+            #{meteId,jdbcType=VARCHAR}
+        </foreach>
+        )
+        union all (
+        SELECT
+        a.*,
+        b.cruise_type as cruiseType,
+        b.cruise_id as cruiseId,
+        c.dict_note as cruiseTypeName,
+        d.device_name as deviceName,
+        e.dict_note as meteKindName
+        FROM
+        t_cfg_mete a
+        LEFT JOIN t_cruise_point_instance b ON a.mete_id = b.device_mete_id
+        left join t_dict_business e on e.dict_code = a.mete_kind
+        LEFT JOIN t_dict_business c ON b.cruise_type = c.dict_code
+        left join t_cfg_telemeter h on a.mete_id = h.mete_id
+        left join t_cfg_device d on h.device_id = d.device_id
+        where
+        a.mete_id in
+        <foreach collection="list" item="meteId"  separator="," open="(" close=")"  >
+            #{meteId,jdbcType=VARCHAR}
+        </foreach>
+        )
+        union all (
+        SELECT
+        a.*,
+        b.cruise_type as cruiseType,
+        b.cruise_id as cruiseId,
+        c.dict_note as cruiseTypeName,
+        d.device_name as deviceName,
+        e.dict_note as meteKindName
+        FROM
+        t_cfg_mete a
+        LEFT JOIN t_cruise_point_instance b ON a.mete_id = b.device_mete_id
+        left join t_dict_business e on e.dict_code = a.mete_kind
+        LEFT JOIN t_dict_business c ON b.cruise_type = c.dict_code
+        left join t_cfg_telesignal i on a.mete_id = i.mete_id
+        left join t_cfg_device d on i.device_id = d.device_id
+        where
+        a.mete_id in
+        <foreach collection="list" item="meteId"  separator="," open="(" close=")"  >
+            #{meteId,jdbcType=VARCHAR}
+        </foreach>
+        )
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail">
