@@ -105,50 +105,67 @@ public class TCruiseTaskService {
     //任务统计
     @Logs(title = "任务统计",code = "task")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> taskCount(){
+    public List<Map<String, Object>> taskCount(Date taskStartDate){
 
+        List<Map<String, Object>> listTask = new ArrayList<>();
         SimpleDateFormat sdfF = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat sdfF2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MONTH, date.getMonth());
-        int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-        calendar.set(Calendar.DAY_OF_MONTH, fDay-7);
-        String firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
-
-        int lDay=0;
-        //2月的平年瑞年天数
-        if(date.getMonth()==2) {
-            lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
-        }else { lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH); }
-        calendar.set(Calendar.MONTH, date.getMonth());
-        calendar.set(Calendar.DAY_OF_MONTH, lDay+7);
-        String lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
-        List<TCruiseTaskCount> list = new ArrayList<>();
-        Date dayBeforeOneWeek = new Date();
-        Date dayAfterOneWeek = new Date();
+        Date dayBefore = new Date();
+        Date dayAfter = new Date();
         Date originTime = new Date();
+        String firstDay = "", lastDay = "";
+        if (Objects.equals(null, taskStartDate)) {
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, date.getMonth());
+            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
+            int lDay=0;
+            //2月的平年瑞年天数
+            if(date.getMonth()==2) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            }else { lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH); }
+            calendar.set(Calendar.MONTH, date.getMonth());
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
+            int lDay=0;
+            //2月的平年瑞年天数
+            if(taskStartDate.getMonth()==2) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            }else { lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH); }
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
+        }
+
         try {
             originTime = format.parse("2000-01-01 00:00:00");
-            dayBeforeOneWeek = format.parse(firstDay);
-            dayAfterOneWeek = format.parse(lastDay);
-            list = this.tCruiseTaskDao.taskCount(dayBeforeOneWeek,dayAfterOneWeek);
+            dayBefore = format.parse(firstDay);
+            dayAfter = format.parse(lastDay);
         } catch (Exception e) { e.getMessage(); }
-
-        List<Map<String, Object>> listTask = new ArrayList<>();
-        for (int i=0;i<list.size();i++) {
-            TCruiseTaskCount tCruiseTaskCount = list.get(i);
-            if (tCruiseTaskCount.getIfRun()==172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayAfterOneWeek);
-                for(int j=0;j<timeList.size();j++) {
+        List<TCruiseTaskCount> list = new ArrayList<>();
+        list = this.tCruiseTaskDao.taskCount(dayBefore,dayAfter);
+        for (TCruiseTaskCount tCruiseTaskCount:list) {
+            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+                for (Date aTimeList:timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
                     taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
                     taskCountMap.put("type", tCruiseTaskCount.getDictNote());
                     //TODO 增加MQ获取任务状态
                     taskCountMap.put("taskStatus", "fuckWHL");
-                    taskCountMap.put("startTime", sdfF2.format(timeList.get(j)));
+                    taskCountMap.put("startTime", sdfF2.format(aTimeList));
                     listTask.add(taskCountMap);
                 }
             } else {

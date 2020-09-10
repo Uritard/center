@@ -393,7 +393,7 @@ public class SysUserController {
             String oldPassword = map.get("oldPassword");
             if (sysUserCurrent.getPassword().equals(oldPassword)) {
                 result.setData(sysUserService.changePassword(userId, map));
-            } else {result.setData("旧密码输入错误！");}
+            } else {result.setData("{ code: "+ResultCodeEnum.CODE10106.getCode()+", data: \"旧密码输入错误！\" }");}
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("用户修改密码异常:", e);

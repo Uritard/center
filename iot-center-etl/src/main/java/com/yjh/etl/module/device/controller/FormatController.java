@@ -1,8 +1,10 @@
 package com.yjh.etl.module.device.controller;
 
+import com.yjh.etl.common.quartz.JobManager;
 import com.yjh.etl.commons.result.BusinessException;
 import com.yjh.etl.commons.result.Result;
 import com.yjh.etl.commons.result.ResultCodeEnum;
+import com.yjh.etl.module.device.entity.QuartzTask;
 import com.yjh.etl.module.device.service.FormatService;
 import com.yjh.etl.module.device.entity.Format;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ public class FormatController {
 
     @Autowired
     private final FormatService formatService;
+    @Autowired
+    private JobManager jobManager;
 
     private Logger log = LoggerFactory.getLogger(FormatController.class);
 
@@ -99,12 +103,14 @@ public class FormatController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "testId", required = false) String testId,
-                            @RequestParam(value = "testType", required = false) String testType) {
+    public Result select() {
         Result result = new Result();
         try {
-            List<Format> list = formatService.select(testId, testType);
-            result.setData(list);
+            QuartzTask quartzTask = new QuartzTask();
+            quartzTask.setJobName("tttest1");
+            quartzTask.setJobGroup("tttest");
+            jobManager.addJob(quartzTask);
+            result.setData("success");
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

@@ -30,6 +30,6 @@ public interface TCruiseTaskAttrDao {
                                  @Param(value = "ifArtificial") Integer ifArtificial);
     List<TCruiseTaskAttr> selectByPage(TCruiseTaskAttr tCruiseTaskAttr);
 
-    int batchInsert(List<TCruiseTaskAttr> list);
-    List<TCruisePointInstance> batchSelect(List<Long> instanceList);
+    int batchInsert(@Param("list") List<TCruiseTaskAttr> list);
+    List<TCruisePointInstance> batchSelect(@Param("instanceList") List<Long> instanceList);
 }

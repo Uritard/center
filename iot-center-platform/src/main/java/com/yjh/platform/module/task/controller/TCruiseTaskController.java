@@ -17,6 +17,7 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -63,6 +64,7 @@ public class TCruiseTaskController {
                 if (Objects.isNull(dayOfWeek)) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", dayOfWeek);}
                 if (Objects.isNull(year)) {mapTime.put("year", "");} else {mapTime.put("year", year);}
                 String cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
+                System.out.println("cronExpressionDate: "+cronExpressionDate);
                 if (CronExpression.isValidExpression(cronExpressionDate)) {
                     tCruiseTask.setDateType(cronExpressionDate);
                     result.setData(tCruiseTaskService.insert(tCruiseTask));
@@ -186,10 +188,10 @@ public class TCruiseTaskController {
     //任务统计
     @ApiOperation(value = "任务统计")
     @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
-    public Result taskCount(){
+    public Result taskCount(@RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskStartDate){
         Result result = new Result();
         try {
-            List<Map<String, Object>> list = this.tCruiseTaskService.taskCount();
+            List<Map<String, Object>> list = this.tCruiseTaskService.taskCount(taskStartDate);
             result.setData(list);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());

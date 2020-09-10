@@ -3,6 +3,7 @@ package com.yjh.platform.common.utils;
 import com.mysql.jdbc.StringUtils;
 import com.yjh.platform.module.task.entity.TCruiseTaskCron;
 import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -891,7 +892,7 @@ public class DateTimeUtil {
      * @Author tt
      * @CreateTime 2020/8/27 18:15
      */
-    public static List<Date> cornTransTime(String cronExpression, Date dayAfterOneWeek) {
+    public static List<Date> cornTransTime(String cronExpression, Date dayBefore,Date dayAfter) {
         List<Date> validTimeList = new ArrayList<Date>();
         if (cronExpression == null || cronExpression.length() < 1) {
             return validTimeList;
@@ -915,9 +916,12 @@ public class DateTimeUtil {
 //                dEnd = calendar.getTime();
 //            } catch (Exception e) { e.getMessage(); }
             Date date = new Date();
-            Date dd = exp.getNextValidTimeAfter(date);
+            Date dd = new Date();
+            if (date.getMonth() > dayBefore.getMonth()) { return validTimeList;}
+            if (date.getMonth() == dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
+            if (date.getMonth() < dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
 //            validTimeList.add(sdf.format(dd));
-            while (dd.getTime() < dayAfterOneWeek.getTime()) {
+            while (dd.getTime() < dayAfter.getTime()) {
                 validTimeList.add(dd);
                 dd = exp.getNextValidTimeAfter(dd);
             }
@@ -935,7 +939,7 @@ public class DateTimeUtil {
 
     public static String createCronExpression(Map<String, String> mapTime){
 
-        StringBuffer croExp=new StringBuffer();
+        String croExp="";
         String min = mapTime.get("min");
         String hour = mapTime.get("hour");
         String dayOfMonth = mapTime.get("dayOfMonth");
@@ -944,62 +948,42 @@ public class DateTimeUtil {
         String year = mapTime.get("year");
 
         //按日执行：每天上午10:15触发：0 15 10 ? * *
-        if (!hour.equals("") && dayOfMonth.equals("") && dayOfWeek.equals("")) {croExp.append("0 ").append(min).append(" ").append(hour).append(" ? * *");}
+        if (!hour.equals("") && dayOfMonth.equals("") && dayOfWeek.equals("")) {
+            Integer hourIn = Integer.parseInt(hour);
+            if (Objects.equals("", min)) {
+                croExp = String.format("0 %d %d ? * *", 0, hourIn);
+            } else {
+                Integer minIn = Integer.parseInt(min);
+                croExp = String.format("0 %d %d ? * *", minIn, hourIn);
+            }
+        }
         //按周执行：每周三四点执行：0 0 4 ? * 3
-        if (dayOfMonth.equals("") && !dayOfWeek.equals("")) {croExp.append("0 ").append(min).append(" ").append(hour).append(" ? * ").append(dayOfWeek);}
+        if (dayOfMonth.equals("") && !dayOfWeek.equals("")) {
+            Integer dayOfWeekIn = Integer.parseInt(dayOfWeek);
+            Integer hourIn = Integer.parseInt(hour);
+            if (Objects.equals("", min)) {
+                croExp = String.format("0 %d %d %d * ?", 0, hourIn,
+                        dayOfWeekIn);
+            } else {
+                Integer minIn = Integer.parseInt(min);
+                croExp = String.format("0 %d %d %d * ?", minIn, hourIn,
+                        dayOfWeekIn);
+            }
+        }
         //按月执行：每月15日上午10:15触发：0 15 10 15 * ?
-        if (!dayOfMonth.equals("") && dayOfWeek.equals("")) {croExp.append("0 ").append(min).append(" ").append(hour).append(" ? * ").append(dayOfMonth);}
-
-
-//        if(!day.equals("")){
-//            croExp.append("0 ");//分钟
-//            croExp.append("15 ");//小时
-//            croExp.append("* * ? *");
-//        }
-        //按月执行：每月15号三点执行：0 0 3 15 * ？ *
-//        if(!month.equals("")){
-//            croExp.append("0 ");//分钟
-//            croExp.append("3 ");//小时
-//            croExp.append("15 * ? *");
-//        }
-        //按年执行：每年6月1号5点执行：0 0 5 1 6 ？ *
-//        if(!year.equals("")){
-//            croExp.append("0 ");//分钟
-//            croExp.append("5 ");//小时
-//            croExp.append("1 6 ? *");
-//        }
-        //按季度执行：7月18号开始每三个月执行一次：0 0 2 18 7,10,1,4 ？ *
-//        if(!season.equals("")){
-//            //指定月份执行
-//            int month1=7;
-//            int month2=(month1+3)%12==0?12:(month1+3)%12;
-//            int month3=(month2+3)%12==0?12:(month2+3)%12;
-//            int month4=(month3+3)%12==0?12:(month3+3)%12;
-//            croExp.append("0 ");//分钟
-//            croExp.append("15 ");//小时
-//            croExp.append("18 month1,month2,month3,month4 ? *");
-//        }
-        //按周执行：每周三四点执行：0 0 4 * * 2 *
-//        if(!week.equals("")){
-//            croExp.append("0 ");//分钟
-//            croExp.append("4 ");//小时
-//            croExp.append("* * 2 *");
-//        }
-        //按半年执行：七月一月18号执行一次：0 0 2 18 1,7 ？ *
-//        if(!min.equals("")){
-//            int month1=7;
-//            int month2=(month1+6)%12==0?12:(month1+6)%12;
-//            croExp.append("0 ");//分钟
-//            croExp.append("2 ");//小时
-//            croExp.append("18 month1,month2 ? *");
-//        }
-        //按时间执行：每五分钟执行：0 */5 * * * ？ *
-//        if(!day.equals("")){
-//            croExp.append("0 ");//分钟
-//            croExp.append("*/5 ");//小时
-//            croExp.append("* * ? *");
-//        }
-        return croExp.toString();
+        if (!dayOfMonth.equals("") && dayOfWeek.equals("")) {
+            Integer dayOfMonthIn = Integer.parseInt(dayOfMonth);
+            Integer hourIn = Integer.parseInt(hour);
+            if (Objects.equals("", min)) {
+                croExp = String.format("0 %d %d %d * ?", 0, hourIn,
+                        dayOfMonthIn);
+            } else {
+                Integer minIn = Integer.parseInt(min);
+                croExp = String.format("0 %d %d %d * ?", minIn, hourIn,
+                        dayOfMonthIn);
+            }
+        }
+        return croExp;
     }
 
     /**
