@@ -2,11 +2,8 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.parser.impl.HsqldbParser;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
-import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
-import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +32,10 @@ public class TStdDeviceService{
     private TStdDeviceAttrDao tStdDeviceAttrDao;
     @Autowired
     private TDictBusinessDao tDictBusinessDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
+    private TStdMetemodelDetailDao tStdMetemodelDetailDao;
 
 
 
@@ -108,6 +109,12 @@ public class TStdDeviceService{
         tStdDeviceAttr.setResponsiblePerson(tStdDeviceDetail.getResponsiblePerson());
         tStdDeviceAttr.setAddress(tStdDeviceDetail.getAddress());
 
+        List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());
+        for (TStdMeteModelDetail tStdMeteModelDetailItem: tStdMeteModelDetailList) {
+            tStdMeteModelDetailItem.setDeviceId(tStdDevice.getDeviceId());
+            tStdDevicemeteDao.add(tStdMeteModelDetailItem);
+        }
+
 
         return tStdDeviceAttrDao.add(tStdDeviceAttr);
     }
@@ -133,7 +140,15 @@ public class TStdDeviceService{
     @Logs(title = "更新设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int updateAll(TStdDeviceDetail tStdDeviceDetail) {
-        TStdDevice tStdDevice = new TStdDevice();
+        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tStdDeviceDetail.getDeviceId());
+        if(tStdDevice.getModelId() != tStdDeviceDetail.getModelId()){
+            tStdDevicemeteDao.deleteByDevId(tStdDeviceDetail.getDeviceId());
+            List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());
+            for (TStdMeteModelDetail tStdMeteModelDetailItem: tStdMeteModelDetailList) {
+                tStdMeteModelDetailItem.setDeviceId(tStdDevice.getDeviceId());
+                tStdDevicemeteDao.add(tStdMeteModelDetailItem);
+            }
+        }
         tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
         tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
         tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
@@ -212,7 +227,6 @@ public class TStdDeviceService{
     @Logs(title = "分页查询设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail, List<Long> upRegionIds) {
-
         if(upRegionIds.size() != 0){
             tStdDeviceDetail.setUpRegionIds(upRegionIds);
         }else {

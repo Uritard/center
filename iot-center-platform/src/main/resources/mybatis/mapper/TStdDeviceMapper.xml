@@ -307,17 +307,17 @@
         left join (select model_id ,model_name as modelName from t_std_metemodel) d on d.model_id=a.model_id
         left join (select dict_code as code4,dict_note as deviceTypeName from t_dict_business) h on h.code4 = a.device_type
         where 1=1
-        <if test="upRegionId != null and upRegionId != ''">
+        <if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
         and a.up_region_id in
         <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
-            #{upRegionIds,jdbcType=VARCHAR}
+            #{upRegionIds,jdbcType=BIGINT}
         </foreach></if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
-        <if test="deviceType != null "> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
+        <if test="deviceType != null and deviceType!=-1"> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>

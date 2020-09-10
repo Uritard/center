@@ -10,12 +10,13 @@
         <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
+        <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
         <result column="alarm_explain" jdbcType="VARCHAR" property="alarmExplain" />
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
         <result column="up_effect" jdbcType="REAL" property="upEffect" />
-        <result column="low_effect" jdbcType="REAL" property="lowEffect" />
+        <result column="down_effect" jdbcType="REAL" property="downEffect" />
         <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
         <result column="high_limit1" jdbcType="REAL" property="highLimit1" />
         <result column="low_limit1" jdbcType="REAL" property="lowLimit1" />
@@ -34,7 +35,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        model_id, mete_id, custom_type, mete_code, mete_name, mete_type, unit, alarm_note, alarm_explain, alarm_type, up_effect, low_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
+        model_id, mete_id, custom_type, mete_code, mete_name, mete_type,mete_kind, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
     </sql>
 
 
@@ -50,8 +51,9 @@
             alarm_note,
             alarm_explain,
             alarm_type,
+            mete_kind,
             up_effect,
-            low_effect,
+            down_effect,
             alarm_level,
             high_limit1,
             low_limit1,
@@ -73,12 +75,13 @@
                 #{meteCode, jdbcType=VARCHAR},
                 #{meteName, jdbcType=VARCHAR},
                 #{meteType, jdbcType=VARCHAR},
+                #{meteKind, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR},
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmExplain, jdbcType=VARCHAR},
                 #{alarmType, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
-                #{lowEffect, jdbcType=REAL},
+                #{downEffect, jdbcType=REAL},
                 #{alarmLevel, jdbcType=INTEGER},
                 #{highLimit1, jdbcType=REAL},
                 #{lowLimit1, jdbcType=REAL},
@@ -110,12 +113,13 @@
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
+        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
         <if test="alarmExplain != null and alarmExplain != ''">a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR},</if>
         <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
         <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
-        <if test="lowEffect != null and lowEffect != ''">a.low_effect = #{lowEffect, jdbcType=REAL},</if>
+        <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
         <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="highLimit1 != null and highLimit1 != ''">a.high_limit1 = #{highLimit1, jdbcType=REAL},</if>
         <if test="lowLimit1 != null and lowLimit1 != ''">a.low_limit1 = #{lowLimit1, jdbcType=REAL},</if>
@@ -144,7 +148,6 @@
       WHERE
 	      b.col_name = "custom_type"
       and a.model_id = #{modelId, jdbcType=BIGINT}
-        limit 1
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
@@ -156,12 +159,13 @@
         a.mete_code,
         a.mete_name,
         a.mete_type,
+        a.mete_kind,
         a.unit,
         a.alarm_note,
         a.alarm_explain,
         a.alarm_type,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.alarm_level,
         a.high_limit1,
         a.low_limit1,
@@ -186,12 +190,13 @@
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
-        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
+        <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
         <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
         <if test="highLimit1 != null and highLimit1 != ''"> and a.high_limit1 = #{highLimit1, jdbcType=REAL}</if>
         <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
@@ -220,12 +225,13 @@
         a.mete_code,
         a.mete_name,
         a.mete_type,
+        a.mete_kind,
         a.unit,
         a.alarm_note,
         a.alarm_explain,
         a.alarm_type,
         a.up_effect,
-        a.low_effect,
+        a.down_effect,
         a.alarm_level,
         a.high_limit1,
         a.low_limit1,
@@ -266,12 +272,13 @@
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT ('%',#{meteName, jdbcType=VARCHAR},'%')</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
-        <if test="lowEffect != null and lowEffect != ''"> and a.low_effect = #{lowEffect, jdbcType=REAL}</if>
+        <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
         <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
         <if test="highLimit1 != null and highLimit1 != ''"> and a.high_limit1 = #{highLimit1, jdbcType=REAL}</if>
         <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
@@ -296,12 +303,13 @@
             mete_code,
             mete_name,
             mete_type,
+            mete_kind,
             unit,
             alarm_note,
             alarm_explain,
             alarm_type,
             up_effect,
-            low_effect,
+            down_effect,
             alarm_level,
             high_limit1,
             low_limit1,
@@ -325,12 +333,13 @@
                 #{TStdMeteModelDetail.meteCode, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
+                #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},
                 #{TStdMeteModelDetail.unit, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.alarmNote, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.alarmExplain, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.alarmType, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.upEffect, jdbcType=REAL},
-                #{TStdMeteModelDetail.lowEffect, jdbcType=REAL},
+                #{TStdMeteModelDetail.downEffect, jdbcType=REAL},
                 #{TStdMeteModelDetail.alarmLevel, jdbcType=INTEGER},
                 #{TStdMeteModelDetail.highLimit1, jdbcType=REAL},
                 #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},

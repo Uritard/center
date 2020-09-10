@@ -57,6 +57,9 @@ public class TCfgDeviceService{
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<HashMap<String,Object>> selectByPage(TCfgDeviceDetail tCfgDeviceDetail) {
+        if ("-1".equals(tCfgDeviceDetail.getMeteKind())){
+            tCfgDeviceDetail.setMeteKind(null);
+        }
         List<HashMap<String,Object>> list= tCfgDeviceDao.selectByPage(tCfgDeviceDetail);
         return list;
     }
@@ -95,8 +98,6 @@ public class TCfgDeviceService{
     @Logs(title = "遥调", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTeleadjust(Map<String,String> mapAll){
-
-
         TCfgTeleadjust tCfgTeleadjust = new TCfgTeleadjust();
         tCfgTeleadjust.setDeviceId(mapAll.get("deviceId"));
         tCfgTeleadjust.setMeteId(mapAll.get("meteId"));
