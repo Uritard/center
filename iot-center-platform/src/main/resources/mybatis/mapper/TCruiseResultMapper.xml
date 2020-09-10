@@ -296,14 +296,27 @@
         </foreach>
     </insert>
 
-    <select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
-  SELECT
-	a.*
-  FROM
-	t_cruise_task a
-  LEFT JOIN t_cruise_result b ON a.task_id = b.task_id
-  WHERE
-	b.c_state = 0
+    <select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TaskSimpleInfo">
+         SELECT
+	       a.task_id,
+	       a.task_name,
+	       a.task_type,
+	       a.type,
+	       d.dict_note AS typeName,
+	       c.dict_note AS taskTypeName
+         FROM
+	       (
+		      (
+			     t_cruise_task a
+			     LEFT JOIN t_dict_business c ON a.task_type = c.dict_code
+			     AND c.col_name = "task_type"
+		      )
+		     LEFT JOIN t_dict_business d ON a.type = d.dict_code
+		     AND d.col_name = "plan_type"
+	       )
+          LEFT JOIN t_cruise_result b ON a.task_id = b.task_id
+          WHERE
+	      b.c_state = 0
 </select>
 
     <!--本周巡视任务结果统计-->

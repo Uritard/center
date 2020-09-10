@@ -2,6 +2,11 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Sets;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 
@@ -38,6 +43,15 @@ public class TCruiseTaskResultService{
 
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
+
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
+
+    @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
+
+    @Autowired
+    private TStdDeviceDao stdDeviceDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -111,7 +125,9 @@ public class TCruiseTaskResultService{
     }
     @Logs(title = "获取当前任务的巡检点全量信息 (巡检点初始化查询)")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map> selectCruiseTaskResult(Long taskId){
+    public List<CruiseInspectResult> selectCruiseTaskResult(Long taskId) throws ParseException {
+        List<CruiseInspectResult>cruiseInspectResults=new ArrayList<>();
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //获取数据库键名列表
         Set<String> keyResult=redisScan("t_cruise_task_result*");
         //创建容纳结果信息的容器
@@ -122,11 +138,29 @@ public class TCruiseTaskResultService{
             String value=values.toString();
             String TaskId=taskId.toString(); //转化成统一格式进行比较筛选
             if(TaskId.equals(value)){
-                dataResult.add(resultMap);
+                CruiseInspectResult cruiseInspectResult=new CruiseInspectResult();
+                //todo 增加websocket
+                cruiseInspectResult.setCruiseResultName(resultMap.get("cruiseResultName").toString());
+                cruiseInspectResult.setInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
+                cruiseInspectResult.setDeviceId(Long.valueOf(resultMap.get("deviceId").toString()));
+                TStdDevice tStdDevice=stdDeviceDao.selectByPrimaryId(Long.valueOf(resultMap.get("deviceId").toString()));
+                cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());
+                cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstancename(Long.valueOf(resultMap.get("cruiseId").toString())));
+                if(resultMap.get("cruiseResult").equals("")&&resultMap.get("endTime").equals("")){
+                    cruiseInspectResult.setCruiseResult(null);
+                    cruiseInspectResult.setEndTime(null);
+                }else {
+                    cruiseInspectResult.setCruiseResult(Integer.valueOf(resultMap.get("cruiseResult").toString()));
+                    cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));
+                }
+
+
+                cruiseInspectResults.add(cruiseInspectResult);
             }
 
         }
-        return dataResult;
+
+        return cruiseInspectResults;
     }
 
 
@@ -185,27 +219,27 @@ public class TCruiseTaskResultService{
     public CruiseResultCounter selectCruiseStatusCount(Long taskId){
         Set<String>keyResult=redisScan("t_cruise_task_result*");
         CruiseResultCounter cruiseResultCounter=new CruiseResultCounter();
-        Integer abnormalCount=0;//异常个数
-        Integer cruisedCount=0;//已执行个数
-        Integer cruiseCount=0;//未执行个数
+        Set<Long>deviceMete=new HashSet<>();//全部标准测点
+        Set<Long>deviceMeteAbnormal=new HashSet<>();//结果异常的标准测点
+        Set<Long>deviceMeteNotComp=new HashSet<>();//未执行的标准测点
         for(String keys:keyResult){
             Map<String,Object> resultMap=redisTemplate.opsForHash().entries(keys);
             String value=(resultMap.get("taskId")).toString();
             String TaskId=taskId.toString();
+            Long a=Long.valueOf(resultMap.get("cruiseId").toString());
             if(TaskId.equals(value)){
-                cruiseCount=cruiseCount+1;
-                if(resultMap.get("cruiseStatus").equals("2")&&resultMap.get("cruiseResult").equals("1")){
-                    abnormalCount=abnormalCount+1;
-                    cruisedCount=cruisedCount+1;
-                }else if(resultMap.get("cruiseStatus").equals("0")){
-                    cruisedCount=cruisedCount+1;
-                }
+               deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+               if(resultMap.get("cruiseStatus").equals("2")){
+                   deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+               }else if (resultMap.get("cruiseStatus").equals("1")){
+                   deviceMeteNotComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+               }
             }
         }
-        Integer cruiseNotCount=cruiseCount-cruisedCount;
-        cruiseResultCounter.setAbnormalCount(abnormalCount);
+        Integer cruisedCount=deviceMete.size()-deviceMeteNotComp.size();//已执行的标准测点数量
+        cruiseResultCounter.setAbnormalCount(deviceMeteAbnormal.size());
         cruiseResultCounter.setCruisedCount(cruisedCount);
-        cruiseResultCounter.setCruiseNotCount(cruiseNotCount);
+        cruiseResultCounter.setCruiseNotCount(deviceMeteNotComp.size());
 
         return cruiseResultCounter;
     }
@@ -324,8 +358,8 @@ public class TCruiseTaskResultService{
                        cameraCruiseInfo.setNotice("本任务未使用摄像头!");
             }
         }
-        cameraStatusCount.put("已启用数量",cameraNotFault);
-        cameraStatusCount.put("故障数量",cameraFault);
+        cameraStatusCount.put("runningNum",cameraNotFault);
+        cameraStatusCount.put("faultNum",cameraFault);
         cameraCruiseInfo.setCameraInfo(result);
         cameraCruiseInfo.setRate((cruisedCount+cruisedFailCount)/cruiseCount);
         cameraCruiseInfo.setCameraStatusCount(cameraStatusCount);
@@ -333,7 +367,7 @@ public class TCruiseTaskResultService{
         return  cameraCruiseInfo;
     }
 
-    @Logs(title = "A-图片比较")//结果集仍需优化
+    @Logs(title = "A-图片比较")//结果集仍需优化、只获取了摄像头原始图片
     @Transactional(rollbackFor = Exception.class)
     public List<String> PictureCompare(Long taskId,Long instanceId){
      List<String> pictureResult=new ArrayList<>();
