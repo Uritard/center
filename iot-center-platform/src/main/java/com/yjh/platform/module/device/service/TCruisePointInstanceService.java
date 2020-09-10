@@ -33,11 +33,6 @@ public class TCruisePointInstanceService{
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
-    @Autowired
-    private TDictBusinessDao tDictBusinessDao;
-
-    @Autowired
-    private TStdDevicemeteDao tStdDevicemeteDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -115,20 +110,22 @@ public class TCruisePointInstanceService{
             Page page = PageHelper.startPage(pageNum, pageSize);
             List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
-            List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(listForPage);
             List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
-            listAll.add(list.get(0));
-            if (list.get(0).getCruiseType() != null) {
-                getConForCruisePoint(0, list.get(0), listAll);
-            }
-            list.remove(0);
-            for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
-                int length = listAll.size() - 1;
-                if (tStdDeviceMeteForPointDetailItem.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())) {
-                    getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
-                } else {
-                    listAll.add(tStdDeviceMeteForPointDetailItem);
-                    getConForCruisePoint(length + 1, tStdDeviceMeteForPointDetailItem, listAll);
+            if(listForPage != null) {
+                List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(listForPage);
+                listAll.add(list.get(0));
+                if (list.get(0).getCruiseType() != null) {
+                    getConForCruisePoint(0, list.get(0), listAll);
+                }
+                list.remove(0);
+                for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
+                    int length = listAll.size() - 1;
+                    if (tStdDeviceMeteForPointDetailItem.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())) {
+                        getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
+                    } else {
+                        listAll.add(tStdDeviceMeteForPointDetailItem);
+                        getConForCruisePoint(length + 1, tStdDeviceMeteForPointDetailItem, listAll);
+                    }
                 }
             }
             resultMap.put("list", listAll);
@@ -172,12 +169,12 @@ public class TCruisePointInstanceService{
     }
     @Logs(title = "告警联动分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Result selectSYCruisePointByPage(TCfgMete tCfgMete,int pageNum,int pageSize) {
+    public Result selectSYCruisePointByPage(TCfgMeteForPointDetail tCfgMeteForPointDetail,int pageNum,int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<String> listForPage = tCruisePointInstanceDao.selectSYForCruiseByPage(tCfgMete);
+            List<String> listForPage = tCruisePointInstanceDao.selectSYForCruiseByPage(tCfgMeteForPointDetail);
             resultMap.put("count", page.getTotal());
 
             List<TCfgMeteForPointDetail> list = tCruisePointInstanceDao.selectSYCruisePointByPage(listForPage);

@@ -180,10 +180,10 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "告警联动分页查询")
     @RequestMapping(value = "/selectSYCruisePointByPage", method = RequestMethod.POST)
-    public Result selectSYCruisePointByPage(@RequestBody TCfgMete tCfgMete,
+    public Result selectSYCruisePointByPage(@RequestBody TCfgMeteForPointDetail tCfgMeteForPointDetail,
                                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                           @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-        return tCruisePointInstanceService.selectSYCruisePointByPage(tCfgMete,pageNum,pageSize);
+        return tCruisePointInstanceService.selectSYCruisePointByPage(tCfgMeteForPointDetail,pageNum,pageSize);
     }
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)

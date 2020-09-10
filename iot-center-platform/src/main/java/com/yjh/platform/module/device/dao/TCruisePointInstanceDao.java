@@ -49,7 +49,7 @@ public interface TCruisePointInstanceDao {
     List<Long> selectForCruiseByPage(TStdDeviceMete tStdDeviceMete);
     List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(@Param(value = "list") List<Long> list);
 
-    List<String> selectSYForCruiseByPage(TCfgMete tCfgMete);
+    List<String> selectSYForCruiseByPage(TCfgMeteForPointDetail tCfgMeteForPointDetail);
     List<TCfgMeteForPointDetail> selectSYCruisePointByPage(@Param(value = "list") List<String> list);
 
     int batchInsert(List<TCruisePointInstance> list);
