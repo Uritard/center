@@ -35,7 +35,6 @@ public class TCruisePointInstanceService{
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
 
-<<<<<<< Updated upstream
     @Autowired
     private TDictBusinessDao tDictBusinessDao;
 
@@ -48,8 +47,6 @@ public class TCruisePointInstanceService{
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
 
-=======
->>>>>>> Stashed changes
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
 
@@ -130,11 +127,8 @@ public class TCruisePointInstanceService{
             List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
             List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
-<<<<<<< Updated upstream
-            if(listForPage.size() != 0) {
-=======
             if(listForPage != null) {
->>>>>>> Stashed changes
+
                 List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(listForPage);
                 listAll.add(list.get(0));
                 if (list.get(0).getCruiseType() != null) {

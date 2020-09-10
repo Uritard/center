@@ -202,11 +202,7 @@
     from  t_std_devicemete a
     where 1=1
     <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
-<<<<<<< Updated upstream
     <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-=======
-    <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
->>>>>>> Stashed changes
     <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectCruisePointByPage"  resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
@@ -235,12 +231,7 @@
         from  t_cfg_mete a
         where 1=1
         <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>
-<<<<<<< Updated upstream
         <if test="meteKind != null and meteKind != -1"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
-=======
-        <if test="deviceId != null and deviceId != ''"> and b.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTRGER}</if>
->>>>>>> Stashed changes
         <if test="meteCode != null and meteCode != ''"> and a.mete_code like concat('%',#{meteCode, jdbcType=VARCHAR},'%')</if>
     </select>
     <select id="selectSYCruisePointByPage" resultType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail">
