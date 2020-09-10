@@ -22,4 +22,5 @@ public class TAlgorithmConfDetail  extends TAlgorithmConf{
     private String cameraName;
     private String algorithmName;
     private String unitName;
+    private Long cameraId;
 }

@@ -1,5 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
@@ -34,6 +36,12 @@ public class TStdDevicemeteController {
 
     @Autowired
     private final TStdDevicemeteService tStdDevicemeteService;
+
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
+
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
 
     private Logger log = LoggerFactory.getLogger(TStdDevicemeteController.class);
 
@@ -152,8 +160,13 @@ public class TStdDevicemeteController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceMeteDetail.getUpRegionId());
+            if (upRegionIds.size() == 0){
+                upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
+            }
+            List<Long> ids = tStdDevicemeteDao.selectIds(upRegionIds);
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail);
+            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,ids);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

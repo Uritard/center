@@ -56,8 +56,8 @@ public class TCruisePointInstanceController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "instanceId", required = true) Long instanceId) {
+    @RequestMapping(value = "/deleteByPrimaryId", method = RequestMethod.DELETE)
+    public Result deleteByPrimaryId(@RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
         try {
             result.setData(tCruisePointInstanceService.deleteByPrimaryId(instanceId));
@@ -156,26 +156,21 @@ public class TCruisePointInstanceController {
         return result;
     }
 
-    @ApiOperation(value = "分页查询")
+    @ApiOperation(value = "巡检点关联分页查询")
     @RequestMapping(value = "/selectCruisePointByPage", method = RequestMethod.POST)
-    public Result selectCruisePointByPage(@RequestBody TStdDeviceMeteForPointDetail tCruisePointInstanceDetail,
+    public Result selectCruisePointByPage(@RequestBody TStdDeviceMete tStdDeviceMete,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-        Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceService.selectCruisePointByPage(tCruisePointInstanceDetail);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("巡检点实例分页查询失败描述：", e);
-        }
-        return result;
+        return tCruisePointInstanceService.selectCruisePointByPage(tStdDeviceMete,pageNum,pageSize);
     }
 
+    @ApiOperation(value = "告警联动分页查询")
+    @RequestMapping(value = "/selectSYCruisePointByPage", method = RequestMethod.POST)
+    public Result selectSYCruisePointByPage(@RequestBody TCfgMete tCfgMete,
+                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                          @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        return tCruisePointInstanceService.selectSYCruisePointByPage(tCfgMete,pageNum,pageSize);
+    }
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     public Result batchAdd(@RequestBody List<TCruisePointInstance> list) {

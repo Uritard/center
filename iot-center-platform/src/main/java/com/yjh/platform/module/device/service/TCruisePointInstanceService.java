@@ -1,19 +1,25 @@
 package com.yjh.platform.module.device.service;
 
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import java.util.*;
 
-import com.yjh.platform.module.device.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail;
-import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.java.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author tt
@@ -25,8 +31,13 @@ public class TCruisePointInstanceService{
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
 
+    private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
+
     @Autowired
     private TDictBusinessDao tDictBusinessDao;
+
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -34,10 +45,16 @@ public class TCruisePointInstanceService{
         return this.tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "根据主键删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long instanceId) {
         return this.tCruisePointInstanceDao.deleteByPrimaryId(instanceId);
+    }
+
+    @Logs(title = "删除", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetail) {
+        return this.tCruisePointInstanceDao.delete(tStdDeviceMeteForPointDetail);
     }
 
     @Logs(title = "更新", code = "module")
@@ -59,38 +76,136 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceList;
     }
 
-
+    private void getConForCruisePoint(Integer length,TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem,List<TStdDeviceMeteForPointDetail> listAll){
+        if("机器人巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map = new HashMap<>();
+            map.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getRobotType().getList().add(map);
+            listAll.get(length).getRobotType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if("视频巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getCameraType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map1 = new HashMap<>();
+            map1.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getCameraType().getList().add(map1);
+            listAll.get(length).getCameraType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if("红外巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getInfraredType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map2 = new HashMap<>();
+            map2.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getInfraredType().getList().add(map2);
+            listAll.get(length).getInfraredType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if("声纹巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map3 = new HashMap<>();
+            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getVoiceType().getList().add(map3);
+            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
+    }
     @Logs(title = "巡检点分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(TStdDeviceMeteForPointDetail tCruisePointInstanceDetail) {
-
-        List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(tCruisePointInstanceDetail);
-        List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
-        List<Object> list1 = new LinkedList<>();
-        listAll.add(list.get(0));
-        if(list.get(0).getCruiseType() != null){
-            System.out.println(list.get(0).getCruiseType());
-            list.get(0).getListType().add(list.get(0).getCruiseType());
-            list1.add(list.get(0).getCruiseId());
-            list.get(0).getListType().add(list1);
-            list.get(0).getListType().add(list.get(0).getCruiseTypeName());
-        }
-        list.remove(0);
-        for (TStdDeviceMeteForPointDetail tCruisePointInstanceDetail1:list) {
-            int length = listAll.size()-1;
-            if(tCruisePointInstanceDetail1.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())){
-                if(tCruisePointInstanceDetail1.getCruiseType() != null) {
-                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseType());
-                    list1.add(tCruisePointInstanceDetail1.getCruiseId());
-                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseId());
-                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseTypeName());
-                }
-            }else {
-                listAll.add(tCruisePointInstanceDetail1);
+    public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
+            resultMap.put("count", page.getTotal());
+            List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(listForPage);
+            List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
+            listAll.add(list.get(0));
+            if (list.get(0).getCruiseType() != null) {
+                getConForCruisePoint(0, list.get(0), listAll);
             }
+            list.remove(0);
+            for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
+                int length = listAll.size() - 1;
+                if (tStdDeviceMeteForPointDetailItem.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())) {
+                    getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
+                } else {
+                    listAll.add(tStdDeviceMeteForPointDetailItem);
+                    getConForCruisePoint(length + 1, tStdDeviceMeteForPointDetailItem, listAll);
+                }
+            }
+            resultMap.put("list", listAll);
+            result.setData(resultMap);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("巡检点实例分页查询失败描述：", e);
         }
-        return listAll;
+        return result;
     }
+
+    private void getConSYForCruisePoint(Integer length,TCfgMeteForPointDetail tCfgMeteForPointDetailItem,List<TCfgMeteForPointDetail> listAll){
+        if("机器人巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getRobotType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map = new HashMap<>();
+            map.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getRobotType().getList().add(map);
+            listAll.get(length).getRobotType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if("视频巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getCameraType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map1 = new HashMap<>();
+            map1.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getCameraType().getList().add(map1);
+            listAll.get(length).getCameraType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if("红外巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getInfraredType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map2 = new HashMap<>();
+            map2.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getInfraredType().getList().add(map2);
+            listAll.get(length).getInfraredType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if("声纹巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+            listAll.get(length).getVoiceType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map3 = new HashMap<>();
+            map3.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getVoiceType().getList().add(map3);
+            listAll.get(length).getVoiceType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
+        }
+    }
+    @Logs(title = "告警联动分页查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public Result selectSYCruisePointByPage(TCfgMete tCfgMete,int pageNum,int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<String> listForPage = tCruisePointInstanceDao.selectSYForCruiseByPage(tCfgMete);
+            resultMap.put("count", page.getTotal());
+
+            List<TCfgMeteForPointDetail> list = tCruisePointInstanceDao.selectSYCruisePointByPage(listForPage);
+            List<TCfgMeteForPointDetail> listAll = new LinkedList<>();
+            listAll.add(list.get(0));
+            if (list.get(0).getCruiseType() != null) {
+                getConSYForCruisePoint(0, list.get(0), listAll);
+            }
+            list.remove(0);
+            for (TCfgMeteForPointDetail tCfgMeteForPointDetailItem : list) {
+                int length = listAll.size() - 1;
+                if (tCfgMeteForPointDetailItem.getMeteId().equals(listAll.get(length).getMeteId())) {
+                    getConSYForCruisePoint(length, tCfgMeteForPointDetailItem, listAll);
+                } else {
+                    listAll.add(tCfgMeteForPointDetailItem);
+                    getConSYForCruisePoint(length + 1, tCfgMeteForPointDetailItem, listAll);
+                }
+            }
+            resultMap.put("list", listAll);
+            result.setData(resultMap);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("巡检点实例分页查询失败描述：", e);
+        }
+        return result;
+    }
+
+
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail) {
@@ -149,13 +264,13 @@ public class TCruisePointInstanceService{
         List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
         tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(1);
-        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
-        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
-        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
-        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
-        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
-        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
-        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
+//        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
+//        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
+//        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
+//        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
+//        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
+//        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
+//        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
         //间接的数据
         //station_id station_name unit_name
         TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
@@ -280,13 +395,13 @@ public class TCruisePointInstanceService{
         List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
         tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
         tCruisePointInstance.setIfSy(1);
-        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
-        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
-        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
-        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
-        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
-        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
-        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
+//        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
+//        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
+//        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
+//        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
+//        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
+//        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
+//        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
         //间接的数据
         //station_id station_name
         TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
