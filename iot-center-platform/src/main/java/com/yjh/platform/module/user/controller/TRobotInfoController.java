@@ -192,7 +192,7 @@ public class TRobotInfoController {
     public Result selectInspectionTree() {
         Result result = new Result();
         try {
-            Map<String, Object> robotInspectionTree = tRobotInfoService.selectInspectionTree();
+            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree();
             result.setData(robotInspectionTree);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

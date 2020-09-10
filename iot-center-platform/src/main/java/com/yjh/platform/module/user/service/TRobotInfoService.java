@@ -73,7 +73,7 @@ public class TRobotInfoService{
 
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectInspectionTree() {
+    public List<Map<String, Object>> selectInspectionTree() {
         List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree();
         List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection();
         List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
@@ -103,7 +103,9 @@ public class TRobotInfoService{
         robotInspectionTree.put("label", "机器人巡检点列表");
         robotInspectionTree.put("infoType", "tree");
         robotInspectionTree.put("id", "-1");
-        return robotInspectionTree;
+        List<Map<String, Object>> robotInspectionList = new ArrayList<>();
+        robotInspectionList.add(robotInspectionTree);
+        return robotInspectionList;
     }
 
 }

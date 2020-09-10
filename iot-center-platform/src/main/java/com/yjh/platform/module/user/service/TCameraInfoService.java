@@ -95,7 +95,7 @@ public class TCameraInfoService{
 
     @Logs(title = "查询所有摄像头预置位信息树", code = "cameraInfo")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectPresetTree() {
+    public List<Map<String, Object>> selectPresetTree() {
         List<TCamreaPresetTree> cameraList = tCameraInfoDao.selectCameraId();
         List<TCamreaPresetTree> tCamreaPresetTreeList = tCameraInfoDao.batchSelectPreset();
         List<Map<String, Object>> cameraPresetTreeTemList = new ArrayList<>();
@@ -124,7 +124,9 @@ public class TCameraInfoService{
         cameraPresetTree.put("label", "摄像机预置位树");
         cameraPresetTree.put("id", "-1");
         cameraPresetTree.put("infoType", "tree");
-        return cameraPresetTree;
+        List<Map<String, Object>> cameraPresetList = new ArrayList<>();
+        cameraPresetList.add(cameraPresetTree);
+        return cameraPresetList;
     }
 }
 

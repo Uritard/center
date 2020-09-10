@@ -242,7 +242,7 @@ public class TCameraInfoController {
     public Result selectPresetTree() {
         Result result = new Result();
         try {
-            Map<String, Object> cameraPresetTree = tCameraInfoService.selectPresetTree();
+            List<Map<String, Object>> cameraPresetTree = tCameraInfoService.selectPresetTree();
             result.setData(cameraPresetTree);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
