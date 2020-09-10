@@ -15,6 +15,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "TCfgMete对象扩充", description = "四遥标准设备测点关联巡检")
 public class TCfgMeteForPointDetail  extends TCfgMete{
 
+    private String deviceId;
     private String deviceName;
 
     private String cruiseType;

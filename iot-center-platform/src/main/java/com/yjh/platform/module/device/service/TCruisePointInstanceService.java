@@ -210,28 +210,7 @@ public class TCruisePointInstanceService{
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail) {
         List<TCruisePointInstanceDetail> list = tCruisePointInstanceDao.selectByPage(tCruisePointInstanceDetail);
-        List<TCruisePointInstanceDetail> listAll = new LinkedList<>();
-        listAll.add(list.get(0));
-        if(list.get(0).getCruiseType() != null){
-            System.out.println(list.get(0).getCruiseType());
-            list.get(0).getListType().add(list.get(0).getCruiseType());
-            list.get(0).getListType().add(list.get(0).getCruiseId());
-            list.get(0).getListType().add(list.get(0).getCruiseTypeName());
-        }
-        list.remove(0);
-        for (TCruisePointInstanceDetail tCruisePointInstanceDetail1:list) {
-            int length = listAll.size()-1;
-            if(tCruisePointInstanceDetail1.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())){
-                if(tCruisePointInstanceDetail1.getCruiseType() != null) {
-                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseType());
-                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseId());
-                    listAll.get(length).getListType().add(tCruisePointInstanceDetail1.getCruiseTypeName());
-                }
-            }else {
-                listAll.add(tCruisePointInstanceDetail1);
-            }
-        }
-        return listAll;
+        return list;
     }
 
     @Logs(title = "批量插入", code = "module")
@@ -247,9 +226,9 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceList;
     }
 
-    @Logs(title = "标准设备测点关联机器人巡检实例",code = "module")
+    @Logs(title = "巡检点关联配置",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int STDMateUnionTRInspection(List<Map<String,String> > list){
+    public int ConfINstancePoint(List<Map<String,String> > list){
         Map<String,String> mapAll = new HashMap<>();
         for (Map map:list) {
             mapAll.putAll(map);
@@ -259,10 +238,19 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("deviceMeteId")));
         tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
         tCruisePointInstance.setCustomId(mapAll.get("customId"));
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
+        if(mapAll.get("inspectionId") != null){
+            tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
+            tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
+            TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("unit"));
+            tCruisePointInstance.setUnitVal(mapAll.get("unit"));
+            tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
+        }
+        if(mapAll.get("presetId") != null){
+            tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
+            tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
+        }
+
+        tCruisePointInstance.setCruiseType(Integer.valueOf(mapAll.get("cruiseType")));
         tCruisePointInstance.setIfSy(1);
 //        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
 //        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
@@ -274,31 +262,36 @@ public class TCruisePointInstanceService{
         //间接的数据
         //station_id station_name unit_name
         TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
-        String str = mapAll.get("unit");
-        TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("unit"));
-        tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
+
         tCruisePointInstance.setStationId(tStdRegion.getStationId());
         tCruisePointInstance.setStationName(tStdRegion.getStationName());
         return tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
 
-    @Logs(title = "遥测量测点关联机器人巡检实例",code = "module")
+    @Logs(title = "告警联动配置",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int telemeterUnionTRInspection(List<Map<String,String> > list){
+    public int SYUnionInspectionPoint(List<Map<String,String> > list){
         Map<String,String> mapAll = new HashMap<>();
         for (Map map:list) {
             mapAll.putAll(map);
         }
         //传入的数据
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
+        if(mapAll.get("inspectionId") != null){
+            tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
+            tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
+            TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("unit"));
+            tCruisePointInstance.setUnitVal(mapAll.get("unit"));
+            tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
+        }
+        if(mapAll.get("presetId") != null){
+            tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
+            tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
+        }
+        tCruisePointInstance.setCruiseType(Integer.valueOf(mapAll.get("cruiseType")));
         tCruisePointInstance.setIfSy(0);
 
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥测",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
+        tCruisePointInstance.setSyType(Integer.valueOf(mapAll.get("meteKind")));
         tCruisePointInstance.setStationId(mapAll.get("stationId"));
         tCruisePointInstance.setStationName(mapAll.get("stationName"));
         tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
@@ -308,201 +301,8 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
 
-    @Logs(title = "遥控量测点关联机器人巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int telecontrolUnionTRInspection(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥控",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
-
-    @Logs(title = "遥调量测点关联机器人巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int teleadjustUnionTRInspection(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥调",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
-
-    @Logs(title = "遥信量测点关联机器人巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int telesignalUnionTRInspection(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("inspectionId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("inspectionName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥信",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
 
 
-    @Logs(title = "标准设备测点关联摄像头预置位巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int STDMateUnionTCPreset(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("deviceMeteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        tCruisePointInstance.setCustomId(mapAll.get("customId"));
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(1);
-//        tCruisePointInstance.setDataFormat(mapAll.get("dataFormat"));
-//        tCruisePointInstance.setIdentifyType(Integer.valueOf(mapAll.get("identifyType")));
-//        tCruisePointInstance.setIfVideotape(Integer.valueOf(mapAll.get("ifVideotape")));
-//        tCruisePointInstance.setVideotapeTime(mapAll.get("videotapeTime"));
-//        tCruisePointInstance.setCruiseContent(mapAll.get("cruiseContent"));
-//        tCruisePointInstance.setTextDesc(mapAll.get("textDesc"));
-//        tCruisePointInstance.setPositionType(mapAll.get("positionType"));
-        //间接的数据
-        //station_id station_name
-        TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
-//        TDictBusiness tDictBusiness = tCruisePointInstanceDao.selectTDBusinessForUnitName(mapAll.get("uint"));
-//        tCruisePointInstance.setUnitName(tDictBusiness.getDictNote());
-        tCruisePointInstance.setStationId(tStdRegion.getStationId());
-        tCruisePointInstance.setStationName(tStdRegion.getStationName());
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
-
-    @Logs(title = "遥测量测点关联摄像头预置位巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int telemeterUnionTCPreset(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥测",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
-
-    @Logs(title = "遥控量测点关联摄像头预置位巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int telecontrolUnionTCPreset(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥控",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
-
-    @Logs(title = "遥调量测点关联摄像头预置位巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int teleadjustUnionTCPreset(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥调",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
-
-    @Logs(title = "遥信量测点关联摄像头预置位巡检实例",code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public int telesignalUnionTCPreset(List<Map<String,String> > list){
-        Map<String,String> mapAll = new HashMap<>();
-        for (Map map:list) {
-            mapAll.putAll(map);
-        }
-        //传入的数据
-        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(Long.valueOf(mapAll.get("meteId")));
-        tCruisePointInstance.setDeviceId(Long.valueOf(mapAll.get("deviceId")));
-        tCruisePointInstance.setCruiseId(Long.valueOf(mapAll.get("presetId")));
-        tCruisePointInstance.setCruiseName(mapAll.get("presetName"));
-        List<TDictBusiness> listCruiseType = tDictBusinessDao.select(null,null,null,mapAll.get("cruiseType"),null,null,null);
-        tCruisePointInstance.setCruiseType(Integer.valueOf(listCruiseType.get(0).getDictCode()));
-        tCruisePointInstance.setIfSy(0);
-        List<TDictBusiness> list2 = tDictBusinessDao.select(null,null,null,"遥信",null,null,null);
-        tCruisePointInstance.setSyType(Integer.valueOf(list2.get(0).getDictCode()));
-        tCruisePointInstance.setStationId(mapAll.get("stationId"));
-        tCruisePointInstance.setStationName(mapAll.get("stationName"));
-        return tCruisePointInstanceDao.insert(tCruisePointInstance);
-    }
 
     @Logs(title="统计当前任务下的巡检点数量",code = "module")
     @Transactional(rollbackFor = Exception.class)
