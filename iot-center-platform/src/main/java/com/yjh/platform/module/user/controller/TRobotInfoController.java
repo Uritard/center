@@ -188,7 +188,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "查询所有机器人巡检点信息树")
-    @RequestMapping(value = "/selectInspectionTree", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectInspectionTree", method = RequestMethod.GET)
     public Result selectInspectionTree() {
         Result result = new Result();
         try {

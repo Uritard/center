@@ -4,13 +4,8 @@ import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
-<<<<<<< Updated upstream
 import java.util.*;
 
-=======
-import java.util.Arrays;
-import java.util.List;
->>>>>>> Stashed changes
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.springframework.stereotype.Service;
@@ -113,18 +108,23 @@ public class TCameraInfoService{
                 Long cameraIdTem = tCamreaPresetTree.getCameraId();
                 if (Objects.nonNull(cameraIdTem) && Objects.equals(cameraId, cameraIdTem)) {
                     Map<String, Object> presetMap = new HashMap<>();
-                    presetMap.put("presetId", tCamreaPresetTree.getPresetId());
-                    presetMap.put("presetName", tCamreaPresetTree.getPresetName());
+                    presetMap.put("id", tCamreaPresetTree.getPresetId());
+                    presetMap.put("name", tCamreaPresetTree.getPresetName());
+                    presetMap.put("infoType", "preset");
                     presetList.add(presetMap);
                 }
             }
-            cameraPresetTreeTem.put("cameraId", cameraId);
-            cameraPresetTreeTem.put("cameraName",tCamrea.getCameraName());
-            cameraPresetTreeTem.put("presetInfo",presetList);
+            cameraPresetTreeTem.put("id", cameraId);
+            cameraPresetTreeTem.put("name",tCamrea.getCameraName());
+            cameraPresetTreeTem.put("infoType", "camera");
+            cameraPresetTreeTem.put("children",presetList);
             cameraPresetTreeTemList.add(cameraPresetTreeTem);
         }
         Map<String, Object> cameraPresetTree = new HashMap<>();
-        cameraPresetTree.put("摄像机预置位列表", cameraPresetTreeTemList);
+        cameraPresetTree.put("children", cameraPresetTreeTemList);
+        cameraPresetTree.put("name", "摄像机预置位树");
+        cameraPresetTree.put("id", "-1");
+        cameraPresetTree.put("infoType", "tree");
         return cameraPresetTree;
     }
 }

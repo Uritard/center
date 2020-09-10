@@ -85,19 +85,24 @@ public class TRobotInfoService{
                 Long robotIdTem = tRobotInspectionTree.getRobotId();
                 if (Objects.nonNull(robotIdTem) && Objects.equals(robotId, robotIdTem)) {
                     Map<String, Object> inspectionMap = new HashMap<>();
-                    inspectionMap.put("inspectionId", tRobotInspectionTree.getInspectionId());
-                    inspectionMap.put("inspectionName", tRobotInspectionTree.getInspectionName());
+                    inspectionMap.put("id", tRobotInspectionTree.getInspectionId());
+                    inspectionMap.put("Name", tRobotInspectionTree.getInspectionName());
+                    inspectionMap.put("infoType", "inspection");
                     presetList.add(inspectionMap);
                 }
             }
-            robotPresetTreeTem.put("robotId", robotId);
-            robotPresetTreeTem.put("robotName",tRobot.getRobotName());
-            robotPresetTreeTem.put("robotPosition", tRobot.getRobotPosition());
-            robotPresetTreeTem.put("inspectionInfo",presetList);
+            robotPresetTreeTem.put("id", robotId);
+            robotPresetTreeTem.put("name",tRobot.getRobotName());
+            robotPresetTreeTem.put("position", tRobot.getRobotPosition());
+            robotPresetTreeTem.put("children",presetList);
+            robotPresetTreeTem.put("infoType","robot");
             robotPresetTreeTemList.add(robotPresetTreeTem);
         }
         Map<String, Object> robotInspectionTree = new HashMap<>();
-        robotInspectionTree.put("机器人巡检点列表", robotPresetTreeTemList);
+        robotInspectionTree.put("children", robotPresetTreeTemList);
+        robotInspectionTree.put("name", "机器人巡检点列表");
+        robotInspectionTree.put("infoType", "tree");
+        robotInspectionTree.put("id", "-1");
         return robotInspectionTree;
     }
 

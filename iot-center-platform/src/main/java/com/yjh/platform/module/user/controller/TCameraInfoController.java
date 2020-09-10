@@ -238,7 +238,7 @@ public class TCameraInfoController {
     }
 
     @ApiOperation(value = "查询所有摄像头预置位信息树")
-    @RequestMapping(value = "/selectPresetTree", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectPresetTree", method = RequestMethod.GET)
     public Result selectPresetTree() {
         Result result = new Result();
         try {
