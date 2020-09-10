@@ -347,6 +347,7 @@
         <if test="sequencePoint != null and sequencePoint != ''"> and b.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
         <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
         <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
+         order by a.device_id
     </select>
 
     <select id="selectRegionById" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdRegion">

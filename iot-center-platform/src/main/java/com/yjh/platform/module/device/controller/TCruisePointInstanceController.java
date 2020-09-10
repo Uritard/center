@@ -69,21 +69,6 @@ public class TCruisePointInstanceController {
         return result;
     }
 
-    @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestBody TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetail) {
-        Result result = new Result();
-        try {
-            result.setData(tCruisePointInstanceService.delete(tStdDeviceMeteForPointDetail));
-        } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("巡检点实例删除异常:", e);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡检点实例删除错误:", e);
-        }
-        return result;
-    }
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
@@ -131,8 +116,7 @@ public class TCruisePointInstanceController {
                          @RequestParam(value = "cruiseName", required = false) String cruiseName,
                          @RequestParam(value = "cruiseContent", required = false) String cruiseContent,
                          @RequestParam(value = "fluctuatingValue", required = false) String fluctuatingValue,
-                         @RequestParam(value = "unitVal", required = false) String unitVal,
-                         @RequestParam(value = "unitName", required = false) String unitName,
+                         @RequestParam(value = "unit", required = false) String unit,
                          @RequestParam(value = "ifSy", required = false) Integer ifSy,
                          @RequestParam(value = "syType", required = false) Integer syType,
                          @RequestParam(value = "ifVideotape", required = false) Integer ifVideotape,
@@ -141,7 +125,7 @@ public class TCruisePointInstanceController {
                          @RequestParam(value = "sort", required = false) String sort) {
         Result result = new Result();
         try {
-            List<TCruisePointInstance> list = tCruisePointInstanceService.select(instanceId, deviceMeteId, stationId, stationName, deviceId, customId, dataFormat, identifyType, identifySonType, cruiseType, cruiseId, cruiseName, cruiseContent, fluctuatingValue, unitVal, unitName, ifSy, syType, ifVideotape, videotapeTime, textDesc, sort);
+            List<TCruisePointInstance> list = tCruisePointInstanceService.select(instanceId, deviceMeteId, stationId, stationName, deviceId, customId, dataFormat, identifyType, identifySonType, cruiseType, cruiseId, cruiseName, cruiseContent, fluctuatingValue, unit, ifSy, syType, ifVideotape, videotapeTime, textDesc, sort);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -152,14 +136,14 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail,
+    public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCruisePointInstanceDetail> list = tCruisePointInstanceService.selectByPage(tCruisePointInstanceDetail);
+            List<TCruisePointInstance> list = tCruisePointInstanceService.selectByPage(tCruisePointInstance);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -213,11 +197,11 @@ public class TCruisePointInstanceController {
     }
 
     @ApiOperation(value = "巡检点关联配置")
-    @RequestMapping(value = "/ConfINstancePoint", method = RequestMethod.POST)
-    public Result ConfINstancePoint(@RequestBody List<Map<String,String> > list){
+    @RequestMapping(value = "/instanceUpdate", method = RequestMethod.PUT)
+    public Result instanceUnionUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();
         try{
-            result.setData(tCruisePointInstanceService.ConfINstancePoint(list));
+            result.setData(tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail));
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡检点关联配置失败描述：", e);
@@ -228,11 +212,11 @@ public class TCruisePointInstanceController {
 
 
     @ApiOperation(value = "告警配置")
-    @RequestMapping(value = "/SYUnionInspectionPoint", method = RequestMethod.POST)
-    public Result SYUnionInspectionPoint(@RequestBody List<Map<String,String> > list){
+    @RequestMapping(value = "/warnInspectUpdate", method = RequestMethod.PUT)
+    public Result warnInspectUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();
         try{
-            result.setData(tCruisePointInstanceService.SYUnionInspectionPoint(list));
+            result.setData(tCruisePointInstanceService.warnInspectUpdate(tCruisePointInstanceDetail));
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("告警配置失败描述：", e);

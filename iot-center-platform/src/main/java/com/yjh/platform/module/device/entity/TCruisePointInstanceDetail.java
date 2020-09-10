@@ -19,16 +19,11 @@ import java.util.List;
 @ApiModel(value = "TCruisePointInstance对象扩充", description = "巡检点实例表的扩充")
 public class TCruisePointInstanceDetail extends TCruisePointInstance{
 
-    @ApiModelProperty(value = "设备名称")
-    private String deviceName;
-    @ApiModelProperty(value = "巡检方式")
-    private String cruiseTypeName;
-    @ApiModelProperty(value ="设备部位")
-    private String customName;
+    private String meteId;
 
-    private Long upRegionId;
+    private Integer meteKind;
 
-    private String deviceType;
+    private List<Long> ids;
 
-    private List<Object> listType = new LinkedList<>();
+
 }

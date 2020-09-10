@@ -18,8 +18,7 @@
         <result column="cruise_name" jdbcType="VARCHAR" property="cruiseName" />
         <result column="cruise_content" jdbcType="VARCHAR" property="cruiseContent" />
         <result column="position_type" jdbcType="VARCHAR" property="positionType" />
-        <result column="unit_val" jdbcType="VARCHAR" property="unitVal" />
-        <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="if_sy" jdbcType="INTEGER" property="ifSy" />
         <result column="sy_type" jdbcType="INTEGER" property="syType" />
         <result column="if_videotape" jdbcType="INTEGER" property="ifVideotape" />
@@ -30,13 +29,12 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        instance_id, device_mete_id, station_id, station_name, device_id, custom_id, data_format, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, cruise_content, position_type, unit_val, unit_name, if_sy, sy_type, if_videotape, videotape_time, text_desc, sort
+        instance_id, device_mete_id, station_id, station_name, device_id, custom_id, data_format, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, cruise_content, position_type, unit, if_sy, sy_type, if_videotape, videotape_time, text_desc, sort
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="instanceId" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         insert into t_cruise_point_instance(
-            instance_id,
             device_mete_id,
             station_id,
             station_name,
@@ -50,8 +48,7 @@
             cruise_name,
             cruise_content,
             position_type,
-            unit_val,
-            unit_name,
+            unit,
             if_sy,
             sy_type,
             if_videotape,
@@ -59,7 +56,6 @@
             text_desc,
             sort
         )values(
-                #{instanceId, jdbcType=BIGINT},
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{stationId, jdbcType=VARCHAR},
                 #{stationName, jdbcType=VARCHAR},
@@ -73,8 +69,7 @@
                 #{cruiseName, jdbcType=VARCHAR},
                 #{cruiseContent, jdbcType=VARCHAR},
                 #{positionType, jdbcType=VARCHAR},
-                #{unitVal, jdbcType=VARCHAR},
-                #{unitName, jdbcType=VARCHAR},
+                #{unit, jdbcType=VARCHAR},
                 #{ifSy, jdbcType=INTEGER},
                 #{syType, jdbcType=INTEGER},
                 #{ifVideotape, jdbcType=INTEGER},
@@ -84,7 +79,7 @@
         )
     </insert>
 
-    <delete id="delete" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
+    <delete id="delete" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         delete from t_cruise_point_instance
                 where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
                 and cruise_type = #{cruiseType,jdbcType=VARCHAR}
@@ -111,8 +106,7 @@
         <if test="cruiseName != null and cruiseName != ''">a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
         <if test="cruiseContent != null and cruiseContent != ''">a.cruise_content = #{cruiseContent, jdbcType=VARCHAR},</if>
         <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
-        <if test="unitVal != null and unitVal != ''">a.unit_val = #{unitVal, jdbcType=VARCHAR},</if>
-        <if test="unitName != null and unitName != ''">a.unit_name = #{unitName, jdbcType=VARCHAR},</if>
+        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="ifSy != null ">a.if_sy = #{ifSy, jdbcType=INTEGER},</if>
         <if test="syType != null ">a.sy_type = #{syType, jdbcType=INTEGER},</if>
         <if test="ifVideotape != null ">a.if_videotape = #{ifVideotape, jdbcType=INTEGER},</if>
@@ -139,8 +133,7 @@
         a.cruise_name,
         a.cruise_content,
         a.position_type,
-        a.unit_val,
-        a.unit_name,
+        a.unit,
         a.if_sy,
         a.sy_type,
         a.if_videotape,
@@ -169,8 +162,7 @@
         a.cruise_name,
         a.cruise_content,
         a.position_type,
-        a.unit_val,
-        a.unit_name,
+        a.unit,
         a.if_sy,
         a.sy_type,
         a.if_videotape,
@@ -196,8 +188,7 @@
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name like concat('%',#{cruiseName, jdbcType=VARCHAR},'%') </if>
         <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
-        <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
-        <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="ifSy != null "> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
         <if test="syType != null "> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
         <if test="ifVideotape != null "> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
@@ -211,7 +202,7 @@
     from  t_std_devicemete a
     where 1=1
     <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
-    <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+    <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
     <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectCruisePointByPage"  resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
@@ -232,15 +223,15 @@
     <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
             #{deviceMeteId,jdbcType=BIGINT}
     </foreach>
+    order by a.device_mete_id
     </select>
 
-    <select id="selectSYForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail" resultType="java.lang.String">
+    <select id="selectSYForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMete" resultType="java.lang.String">
         select a.mete_id
-        from  t_cfg_mete a,t_cfg_device b
+        from  t_cfg_mete a
         where 1=1
         <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>
-        <if test="deviceId != null and deviceId != ''"> and b.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTRGER}</if>
+        <if test="meteKind != null and meteKind != -1"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code like concat('%',#{meteCode, jdbcType=VARCHAR},'%')</if>
     </select>
     <select id="selectSYCruisePointByPage" resultType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail">
@@ -251,7 +242,8 @@
         c.dict_note as cruiseTypeName,
         d.device_id as deviceId,
         d.device_name as deviceName,
-        e.dict_note as meteKindName
+        e.dict_note as meteKindName,
+        j.mete_id as deviceMeteId
         FROM
         t_cfg_mete a
         LEFT JOIN t_cruise_point_instance b ON a.mete_id = b.device_mete_id
@@ -267,10 +259,11 @@
         <foreach collection="list" item="meteId"  separator="," open="(" close=")"  >
             #{meteId,jdbcType=VARCHAR}
         </foreach>
+        order by a.mete_id
     </select>
 
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         select
         a.instance_id,
         a.device_mete_id,
@@ -286,8 +279,7 @@
         a.cruise_name,
         a.cruise_content,
         a.position_type,
-        a.unit_val,
-        a.unit_name,
+        a.unit,
         a.if_sy,
         a.sy_type,
         a.if_videotape,
@@ -310,8 +302,7 @@
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name like concat('%',#{cruiseName, jdbcType=VARCHAR},'%') </if>
         <if test="cruiseContent != null and cruiseContent != ''"> and a.cruise_content = #{cruiseContent, jdbcType=VARCHAR}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
-        <if test="unitVal != null and unitVal != ''"> and a.unit_val = #{unitVal, jdbcType=VARCHAR}</if>
-        <if test="unitName != null and unitName != ''"> and a.unit_name = #{unitName, jdbcType=VARCHAR}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="ifSy != null "> and a.if_sy = #{ifSy, jdbcType=INTEGER}</if>
         <if test="syType != null "> and a.sy_type = #{syType, jdbcType=INTEGER}</if>
         <if test="ifVideotape != null "> and a.if_videotape = #{ifVideotape, jdbcType=INTEGER}</if>
@@ -336,8 +327,7 @@
         cruise_name,
         cruise_content,
         position_type,
-        unit_val,
-        unit_name,
+        unit,
         if_sy,
         sy_type,
         if_videotape,
@@ -361,8 +351,7 @@
             #{TCruisePointInstance.cruiseName, jdbcType=VARCHAR},
             #{TCruisePointInstance.cruiseContent, jdbcType=VARCHAR},
             #{TCruisePointInstance.positionType, jdbcType=VARCHAR},
-            #{TCruisePointInstance.unitVal, jdbcType=VARCHAR},
-            #{TCruisePointInstance.unitName, jdbcType=VARCHAR},
+            #{TCruisePointInstance.unit, jdbcType=VARCHAR},
             #{TCruisePointInstance.ifSy, jdbcType=INTEGER},
             #{TCruisePointInstance.syType, jdbcType=INTEGER},
             #{TCruisePointInstance.ifVideotape, jdbcType=INTEGER},
@@ -389,8 +378,7 @@
         a.cruise_name,
         a.cruise_content,
         a.position_type,
-        a.unit_val,
-        a.unit_name,
+        a.unit,
         a.if_sy,
         a.sy_type,
         a.if_videotape,

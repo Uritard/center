@@ -34,17 +34,16 @@ public interface TCruisePointInstanceDao {
                                       @Param(value = "cruiseName") String cruiseName,
                                       @Param(value = "cruiseContent") String cruiseContent,
                                       @Param(value = "positionType") String positionType,
-                                      @Param(value = "unitVal") String unitVal,
-                                      @Param(value = "unitName") String unitName,
+                                      @Param(value = "unit") String unit,
                                       @Param(value = "ifSy") Integer ifSy,
                                       @Param(value = "syType") Integer syType,
                                       @Param(value = "ifVideotape") Integer ifVideotape,
                                       @Param(value = "videotapeTime") String videotapeTime,
                                       @Param(value = "textDesc") String textDesc,
                                       @Param(value = "sort") String sort);
-    List<TCruisePointInstanceDetail> selectByPage(TCruisePointInstanceDetail tCruisePointInstanceDetail);
+    List<TCruisePointInstance> selectByPage(TCruisePointInstance tCruisePointInstance);
 
-    int delete(TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetail);
+    int delete(TCruisePointInstance tCruisePointInstance);
 
     List<Long> selectForCruiseByPage(TStdDeviceMete tStdDeviceMete);
     List<TStdDeviceMeteForPointDetail> selectCruisePointByPage(@Param(value = "list") List<Long> list);

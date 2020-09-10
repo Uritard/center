@@ -296,6 +296,7 @@
         <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
         <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and g.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+         order by a.device_mete_id
     </select>
 
     <insert id="batchAdd">

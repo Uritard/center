@@ -16,6 +16,9 @@ import lombok.experimental.Accessors;
 public class TCfgMeteForPointDetail  extends TCfgMete{
 
     private String deviceId;
+
+    private Long deviceMeteId;
+
     private String deviceName;
 
     private String cruiseType;
@@ -28,6 +31,6 @@ public class TCfgMeteForPointDetail  extends TCfgMete{
 
     private CruisePointType robotType = new CruisePointType();
     private CruisePointType cameraType = new CruisePointType();
-    private CruisePointType infraredType = new CruisePointType();
+    //private CruisePointType infraredType = new CruisePointType();
     private CruisePointType voiceType = new CruisePointType();
 }

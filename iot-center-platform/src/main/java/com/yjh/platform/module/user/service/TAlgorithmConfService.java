@@ -56,6 +56,9 @@ public class TAlgorithmConfService{
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TAlgorithmConfDetail> selectByPage(TAlgorithmConfDetail tAlgorithmConfDetail) {
+        if("-1".equals(tAlgorithmConfDetail.getAnalyseType())){
+            tAlgorithmConfDetail.setAnalyseType(null);
+        }
         List<TAlgorithmConfDetail> tAlgorithmConfList = tAlgorithmConfDao.selectByPage(tAlgorithmConfDetail);
         return tAlgorithmConfList;
     }

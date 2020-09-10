@@ -75,16 +75,16 @@ public class TCfgDeviceService{
             mapAll.putAll(map);
         }
         //0：遥信，1：遥测，2：遥控，3：遥调，
-        if(mapAll.get("meteKind").equals("0")){
+        if(mapAll.get("meteKind").equals("1")){
             return this.insertIntoTelesignal(mapAll);
         }
-        if(mapAll.get("meteKind").equals("1")){
+        if(mapAll.get("meteKind").equals("2")){
             return this.insertIntoTelemeter(mapAll);
         }
-        if(mapAll.get("meteKind").equals("2")){
+        if(mapAll.get("meteKind").equals("3")){
             return this.insertIntoTelecontrol(mapAll);
         }
-        if(mapAll.get("meteKind").equals("3")){
+        if(mapAll.get("meteKind").equals("4")){
             return this.insertIntoTeleadjust(mapAll);
         }
         return 0;

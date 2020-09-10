@@ -66,10 +66,7 @@ public class TCruisePointInstance implements Serializable {
     private String positionType;
 
     @ApiModelProperty(value = "单位字典值")
-    private String unitVal;
-
-    @ApiModelProperty(value = "单位字典名称")
-    private String unitName;
+    private String unit;
 
     @ApiModelProperty(value = "是否四遥ID：0-是，1-否")
     private Integer ifSy;
