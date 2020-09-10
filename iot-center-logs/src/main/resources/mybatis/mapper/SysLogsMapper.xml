@@ -107,7 +107,7 @@
         <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="startTime != null and endTime == null"> and a.create_time &gt;= #{startTime, jdbcType=TIMESTAMP} </if>
         <if test="startTime == null and endTime != null"> and a.create_time &lt;= #{endTime, jdbcType=TIMESTAMP} </if>
-
+        ORDER BY a.create_time DESC
     </select>
 
     <select id="select" parameterType="com.yjh.logs.module.log.entity.SysLogs" resultType="com.yjh.logs.module.log.entity.SysLogs">

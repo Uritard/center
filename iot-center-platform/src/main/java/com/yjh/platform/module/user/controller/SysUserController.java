@@ -187,6 +187,7 @@ public class SysUserController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
+            if (sysUser.getState()==-1) { sysUser.setState(null); }
             List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -372,7 +373,11 @@ public class SysUserController {
                 mapCache.put("errorInputTimes", "0");
                 String key = Constant.account_lock_times.replace("userAccountID", map.get("lockedUserId"));
                 redisTemplate.opsForHash().putAll(key, mapCache);
-            } else { result.setData(ResultCodeEnum.CODE10008.getCode()); }
+            } else if (!password.equals(sysUserCurrent.getPassword())){
+                result.setData("{ code: "+ResultCodeEnum.CODE10106.getCode()+", data: \"旧密码输入错误！\" }");
+            } else if (sysUserCurrent.getRoleId() != 1234){
+                result.setData("{ code: "+ResultCodeEnum.CODE10008.getCode()+", data: \"用户权限不足\" }");
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("用户帐号解锁异常:", e);
