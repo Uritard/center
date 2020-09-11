@@ -152,7 +152,8 @@ public class TCruiseResultController {
     public Result taskStatistical() {
         Result result = new Result();
         try {
-            List<TaskStatistical> taskStatisticalList = tCruiseResultService.taskStatistical();
+            List<Map<String,Integer>> taskStatisticalList = tCruiseResultService.taskStatistical();
+
             result.setData(taskStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -165,7 +166,7 @@ public class TCruiseResultController {
     public Result cruiseStatistical() {
         Result result = new Result();
         try {
-            List<CruiseStatistical> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
+            List<Map<String,Integer>> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
             result.setData(cruiseStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -195,11 +196,11 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "巡视点结果操作")
     @RequestMapping(value = "/cruiseResultOperate", method = RequestMethod.POST)
-    public Result cruiseResultOperate(@RequestBody CruiseResultDetail cruiseResultDetail) {
+    public Result cruiseResultOperate(@RequestBody CruiseAudit cruiseAudit) {
         Result result = new Result();
         try {
-            CruiseResultDetail cRD = tCruiseResultService.cruiseResultOperate(cruiseResultDetail);
-            result.setData(cRD);
+            CruiseAudit ca = tCruiseResultService.cruiseResultOperate(cruiseAudit);
+            result.setData(ca);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

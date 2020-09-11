@@ -76,22 +76,22 @@
 
     <insert id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update t_cruise_data_result set
-            personcheck = #{personcheck,jdbcType=VARCHAR},
-            identify_result = #{identifyResult,jdbcType=INTEGER},
-            evaluation_state = #{evaluationState,jdbcType=INTEGER}
-
+        <if test="personcheck != null and personcheck != ''">personcheck = #{personcheck,jdbcType=VARCHAR},</if>
+        <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
+        <if test="evaluationState != null ">evaluation_state = #{evaluationState,jdbcType=INTEGER},</if>
+        <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
         where cruise_data_id in
-            (select cruise_data_id
-                 from
-                    (select cruise_data_id
-                        FROM
-                                t_cruise_result a,
-                                t_cruise_task_result_detail d,
-                                t_cruise_data_result e
-                        where  a.task_id = #{taskId,jdbcType =INTEGER }
-                        and d.instance_id = #{instanceId,jdbcType = INTEGER}
-                        and a.task_result_id = d.task_result_id
-                        and e.cruise_result_id = d.cruise_result_id) t1)
+        (select cruise_data_id
+        from
+        (select cruise_data_id
+        FROM
+        t_cruise_result a,
+        t_cruise_task_result_detail d,
+        t_cruise_data_result e
+        where  a.task_id = #{taskId,jdbcType =INTEGER }
+        and d.instance_id = #{instanceId,jdbcType = INTEGER}
+        and a.task_result_id = d.task_result_id
+        and e.cruise_result_id = d.cruise_result_id) t1)
 
     </insert>
 
@@ -226,8 +226,8 @@
         g.state,
         j.dict_note as data_state,
         b.cruise_time,
-        g.identify_state,
-        k.dict_note as identify_state1
+        g.evaluation_state,
+        k.dict_note as evaluation_state1
         from t_cruise_result a,
         t_cruise_task_result_detail b,
         t_std_device d,
@@ -245,7 +245,7 @@
         and g.cruise_result_id = b.cruise_result_id
         and h.dict_code = g.point_type
         and j.dict_code = g.state
-        and k.dict_code = g.identify_state
+        and k.dict_code = g.evaluation_state
         <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
         <if test="deviceId != null "> and d.device_id like concat ('%',#{deviceId,jdbcType=INTEGER},'%')</if>
 
@@ -320,71 +320,70 @@
 </select>
 
     <!--本周巡视任务结果统计-->
-    <select id="taskStatistical" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TaskStatistical">
+    <select id="taskStatistical"  resultType="java.util.Map">
         select
-            count(if(c_type=213,true,null)) as planType1,
-            count(if(c_type=214,true,null)) as planType2,
-            count(if(c_type=215,true,null)) as planType3,
-            count(if(c_type=216,true,null)) as planType4,
-            count(if(c_type=217,true,null)) as planType5,
-            count(if(c_type=218,true,null)) as planType6
+        <foreach collection="pTypeMap" item="pType" separator="," index="key">
+            count(if(c_type = #{key},true,null))as #{pType}
+        </foreach>
+
         from t_cruise_result
         where create_time BETWEEN #{Start} and #{End}
     </select>
 
     <!--巡视点结果操作-->
-    <select id="cruiseResultOperate" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+    <select id="cruiseResultOperate" parameterType="com.yjh.platform.module.task.entity.CruiseAudit" resultType="com.yjh.platform.module.task.entity.CruiseAudit">
         select
-        e.result_num,
-        e.picpath,
-        e.state,
-        f.dict_note as data_state,
         a.task_id,
-        d.device_id,
-        g.real_code,
-        h.device_name,
         d.instance_id,
-        i.instance_name,
-        e.point_type,
-        j.dict_note as cruise_type,
-        d.cruise_time,
+        j.instance_name,
+        e.picpath,
+        e.result_num,
+        e.identify_result,
+
+        e.evaluation_state,
+        h.dict_note as evaluation_state1,
         e.identify_state,
-        k.dict_note as identify_state1
+
+        e.personcheck
         from
         t_cruise_result a,
         t_cruise_task_result_detail d,
         t_cruise_data_result e,
-        t_dict_business f,
-        t_std_device_attr g,
-        t_std_device h,
-        t_cruise_point_attr i,
-        t_dict_business j,
-        t_dict_business k
+
+        t_cruise_point_attr j,
+        t_dict_business h
+
         where 1 = 1
-        <if test="taskId != null ">and a.task_id = #{taskId, jdbcType=INTEGER}</if>
-        <if test="instanceId != null ">and d.instance_id = #{instanceId, jdbcType=INTEGER}</if>
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null "> and d.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         and a.task_result_id = d.task_result_id
         and d.cruise_result_id = e.cruise_result_id
-        and f.dict_code = e.state
-        and g.device_id = d.device_id
-        and h.device_id = d.device_id
-        and i.instance_id = d.instance_id
-        and j.dict_code = e.point_type
-        and k.dict_code = e.identify_state
+
+        and e.evaluation_state = h.dict_code
+        and d.instance_id = j.instance_id
+
 
     </select>
 
     <!--本周巡视点结果统计-->
-    <select id="cruiseStatistical" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseStatistical">
+    <select id="cruiseStatistical" resultType="java.util.Map" >
         select
-            count(if(state=245,true,null)) as dataState1,
-            count(if(state=246,true,null)) as dataState2,
-            count(if(state=247,true,null)) as dataState3,
-            count(if(state=248,true,null)) as dataState4,
-            count(if(state=249,true,null)) as dataState5,
-            count(if(state=250,true,null)) as dataState6,
-            count(if(state=251,true,null)) as dataState7
+        <foreach collection="pTypeMap" item="pType" separator="," index="key">
+            count(if(state = #{key},true,null))as #{pType}
+        </foreach>
         from t_cruise_data_result
         where createtime BETWEEN #{Start} and #{End}
+    </select>
+
+    <select id="selectByIdentifyResult" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select dict_note from t_dict_business where dict_code = #{identifyResult,jdbcType=INTEGER}
+    </select>
+    <select id="selectByIdentifyState" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select dict_note from t_dict_business where dict_code = #{identifyState,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectPType"  resultType="com.yjh.platform.module.task.entity.TDictBussinessExpand">
+        select a.dict_code ,a.dict_note from t_dict_business a
+        where a.col_name = #{colName1,jdbcType=VARCHAR}
     </select>
 </mapper>

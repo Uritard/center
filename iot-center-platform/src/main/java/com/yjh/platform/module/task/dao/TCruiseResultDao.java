@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
@@ -37,10 +38,18 @@ public interface TCruiseResultDao {
     List<CruiseResultDetail> selectCruiseByPage(CruiseResultDetail cruiseResultDetail);
     int manualReview(CruiseManualReview cruiseManualReview);
     int batchInsert(List<TCruiseResult> list);
-    TaskStatistical taskStatistical(@Param(value = "Start")String Start,
-                                    @Param(value = "End")String End);
-    CruiseStatistical  cruiseStatistical(@Param(value = "Start")String Start,
-                                         @Param(value = "End")String End);
-    CruiseResultDetail cruiseResultOperate(CruiseResultDetail cruiseResultDetail);
+    Map<String,Integer> taskStatistical(Map<String,String> pTypeMap,
+                                        @Param(value = "Start")String Start,
+                                        @Param(value = "End")String End);
+    Map<String,Integer>  cruiseStatistical(Map<String,String> pTypeMap,
+                                           @Param(value = "Start")String Start,
+                                           @Param(value = "End")String End);
     List<TaskSimpleInfo> selectTaskIsRunning();
+
+    CruiseAudit cruiseResultOperate(CruiseAudit cruiseAudit);
+    String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
+    String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
+    List<TDictBussinessExpand> selectPType(@Param(value = "colName1")String colName1);
+
+
 }
