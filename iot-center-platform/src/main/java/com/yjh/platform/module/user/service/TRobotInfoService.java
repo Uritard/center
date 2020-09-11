@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
-import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
 * @author tt
 * @since 2020-08-05
@@ -24,9 +26,6 @@ public class TRobotInfoService{
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
-
-    @Autowired
-    private TStdRegionDao tStdRegionDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -68,11 +67,6 @@ public class TRobotInfoService{
     @Logs(title = "分页模糊查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo) {
-        if(tRobotInfo.getUpRegionId() != null ) {
-            List<Long> upRegionIdList = new ArrayList<>();
-            Long upRegionId=tRobotInfo.getUpRegionId();
-            upRegionIdList=tStdRegionDao.selectByRegionId(upRegionId);
-        }
         List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(tRobotInfo);
         return tRobotInfoList;
     }
@@ -82,7 +76,6 @@ public class TRobotInfoService{
     public int batchInsert(List<TRobotInfo> list) {
         return this.tRobotInfoDao.batchInsert(list);
     }
-
 
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
@@ -128,4 +121,3 @@ public class TRobotInfoService{
     }
 
 }
-

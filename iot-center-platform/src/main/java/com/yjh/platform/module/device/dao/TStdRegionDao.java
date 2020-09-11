@@ -3,7 +3,6 @@ package com.yjh.platform.module.device.dao;
 import java.util.List;
 import java.util.Date;
 
-import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import org.apache.ibatis.annotations.Param;
@@ -31,9 +30,5 @@ public interface TStdRegionDao {
                                 @Param(value = "createTime") Date createTime);
     List<TStdRegion> selectByPage(TStdRegion tStdRegion);
     List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
-
     List<Long> selectRegionIds(Long upRegionId);
-
-    List<Long> selectByRegionId(@Param(value = "upRegionId") Long upRegionId);
-
 }

@@ -154,22 +154,4 @@
         <if test="regionName != null and regionName != ''"> AND a.region_name LIKE CONCAT('%',#{regionName, jdbcType=VARCHAR},'%')</if>
     </select>
 
-    <select id="selectByRegionId" parameterType="java.lang.Long" >
-        select
-        a.region_id,
-        a.region_name,
-        a.sort,
-        a.up_region_id,
-        a.up_region_ids,
-        a.region_code,
-        a.station_id,
-        a.state,
-        a.create_time,
-        a.station_name
-        from t_std_region a
-        where 1 = 1
-            and a.region_id = #{regionId, jdbcType=BIGINT}
-        limit 1
-    </select>
-
 </mapper>

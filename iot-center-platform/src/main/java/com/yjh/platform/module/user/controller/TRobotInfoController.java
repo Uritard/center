@@ -1,18 +1,17 @@
 package com.yjh.platform.module.user.controller;
 
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.service.TRobotInfoService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
+
 import io.swagger.annotations.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
@@ -20,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+
 
 
 /**
@@ -201,11 +201,9 @@ public class TRobotInfoController {
         return result;
     }
 
-
-
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedRobot", method = RequestMethod.DELETE)
-    public Result deleteSelectedCamera(@RequestParam(value = "robotIds[]", required = true) String[] robotIds) {
+    public Result deleteSelectedRobot(@RequestParam(value = "robotIds[]", required = true) String[] robotIds) {
         Result result = new Result();
         try {
             result.setData(tRobotInfoService.deleteSelectedRobot(robotIds));
@@ -218,5 +216,4 @@ public class TRobotInfoController {
         }
         return result;
     }
-
 }
