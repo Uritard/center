@@ -4,16 +4,10 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 import java.util.*;
-=======
-=======
->>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
->>>>>>> Stashed changes
 
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.springframework.stereotype.Service;
@@ -89,19 +83,18 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.batchInsert(list);
     }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectInspectionTree() {
         List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree();
         List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection();
         List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
-        for (TRobotInspectionTree tRobot:robotList) {
+        for (TRobotInspectionTree tRobot : robotList) {
             Map<String, Object> robotPresetTreeTem = new HashMap<>();
             List<Map<String, Object>> presetList = new ArrayList<>();
             Long robotId = tRobot.getRobotId();
-            for (TRobotInspectionTree tRobotInspectionTree:tRobotInspectionTreeList) {
+            for (TRobotInspectionTree tRobotInspectionTree : tRobotInspectionTreeList) {
                 Long robotIdTem = tRobotInspectionTree.getRobotId();
                 if (Objects.nonNull(robotIdTem) && Objects.equals(robotId, robotIdTem)) {
                     Map<String, Object> inspectionMap = new HashMap<>();
@@ -112,10 +105,10 @@ public class TRobotInfoService{
                 }
             }
             robotPresetTreeTem.put("id", robotId);
-            robotPresetTreeTem.put("label",tRobot.getRobotName());
+            robotPresetTreeTem.put("label", tRobot.getRobotName());
             robotPresetTreeTem.put("position", tRobot.getRobotPosition());
-            robotPresetTreeTem.put("children",presetList);
-            robotPresetTreeTem.put("infoType","robot");
+            robotPresetTreeTem.put("children", presetList);
+            robotPresetTreeTem.put("infoType", "robot");
             robotPresetTreeTemList.add(robotPresetTreeTem);
         }
         Map<String, Object> robotInspectionTree = new HashMap<>();
@@ -126,17 +119,12 @@ public class TRobotInfoService{
         List<Map<String, Object>> robotInspectionList = new ArrayList<>();
         robotInspectionList.add(robotInspectionTree);
         return robotInspectionList;
-=======
-=======
->>>>>>> Stashed changes
+    }
+
     @Logs(title = "批量删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedRobot(String[] robotIds) {
         return this.tRobotInfoDao.deleteSelectedRobot(robotIds);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     }
 
 }

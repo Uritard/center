@@ -347,8 +347,6 @@
         </foreach>
     </insert>
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     <select id="selectInspectionTree" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
         select a.robot_id, a.robot_name from t_robot_info a
     </select>
@@ -358,7 +356,6 @@
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
     </select>
 
-=======
     <!--批量删除-->
     <delete id="deleteSelectedRobot"  parameterType="java.lang.String">
         delete  from t_robot_info
@@ -367,17 +364,5 @@
             #{robotId, jdbcType=BIGINT}
         </foreach>
     </delete>
->>>>>>> Stashed changes
-
-=======
-    <!--批量删除-->
-    <delete id="deleteSelectedRobot"  parameterType="java.lang.String">
-        delete  from t_robot_info
-        where  robot_id in
-        <foreach collection="robotIds" item="robotId" open="(" separator="," close=")">
-            #{robotId, jdbcType=BIGINT}
-        </foreach>
-    </delete>
->>>>>>> Stashed changes
 
 </mapper>
