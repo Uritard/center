@@ -3,16 +3,9 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
-<<<<<<< Updated upstream
-import java.util.*;
-
-=======
-
-
 import java.util.*;
 
 
->>>>>>> Stashed changes
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.springframework.stereotype.Service;
