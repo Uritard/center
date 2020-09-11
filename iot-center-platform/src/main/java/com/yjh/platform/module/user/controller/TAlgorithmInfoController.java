@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
+import com.mysql.jdbc.StringUtils;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import java.util.HashMap;
@@ -46,7 +47,12 @@ public class TAlgorithmInfoController {
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_algorithm_name") != -1) {
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode());
+                result.setData("算法名称重复");
+            } else {
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
+            }
             log.error("算法添加错误:", e);
         }
         return result;

@@ -88,8 +88,12 @@ public class TDictBusinessController {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("业务字典更新异常:", e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("业务字典更新错误:", e);
+            if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_dictcode") != -1) {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "字典表编码重复");
+            } else {
+                result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+                log.error("业务字典更新错误:", e);
+            }
         }
         return result;
     }
@@ -155,8 +159,12 @@ public class TDictBusinessController {
         try {
         result.setData(tDictBusinessService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("业务字典批量插入失败：" + e);
+            if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_dictcode") != -1) {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "字典表编码重复");
+            } else {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                log.error("业务字典添加错误:", e);
+            }
         }
         return result;
     }
