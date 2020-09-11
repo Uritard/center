@@ -188,6 +188,7 @@ public class TRobotInfoController {
     }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     @ApiOperation(value = "查询所有机器人巡检点信息树")
     @RequestMapping(value = "/selectInspectionTree", method = RequestMethod.GET)
     public Result selectInspectionTree() {
@@ -199,6 +200,8 @@ public class TRobotInfoController {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询所有机器人巡检点信息树失败描述：", e);
 =======
+=======
+>>>>>>> Stashed changes
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedRobot", method = RequestMethod.DELETE)
     public Result deleteSelectedCamera(@RequestParam(value = "robotIds[]", required = true) String[] robotIds) {
@@ -211,6 +214,9 @@ public class TRobotInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除错误:", e);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         }
         return result;

@@ -61,4 +61,6 @@ public interface TRobotInfoDao {
 
     int deleteSelectedRobot(@Param(value = "robotIds") String[] robotIds);
 
+    int deleteSelectedRobot(@Param(value = "robotIds") String[] robotIds);
+
 }

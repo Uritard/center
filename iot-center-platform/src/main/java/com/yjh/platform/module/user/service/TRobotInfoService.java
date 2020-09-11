@@ -5,8 +5,11 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import java.util.*;
 =======
+=======
+>>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -87,6 +90,7 @@ public class TRobotInfoService{
     }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectInspectionTree() {
@@ -123,10 +127,15 @@ public class TRobotInfoService{
         robotInspectionList.add(robotInspectionTree);
         return robotInspectionList;
 =======
+=======
+>>>>>>> Stashed changes
     @Logs(title = "批量删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedRobot(String[] robotIds) {
         return this.tRobotInfoDao.deleteSelectedRobot(robotIds);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 
