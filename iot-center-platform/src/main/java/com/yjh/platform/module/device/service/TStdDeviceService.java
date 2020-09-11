@@ -145,10 +145,11 @@ public class TStdDeviceService{
             tStdDevicemeteDao.deleteByDevId(tStdDeviceDetail.getDeviceId());
             List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());
             for (TStdMeteModelDetail tStdMeteModelDetailItem: tStdMeteModelDetailList) {
-                tStdMeteModelDetailItem.setDeviceId(tStdDevice.getDeviceId());
+                tStdMeteModelDetailItem.setDeviceId(tStdDeviceDetail.getDeviceId());
                 tStdDevicemeteDao.add(tStdMeteModelDetailItem);
             }
         }
+        tStdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
         tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
         tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
         tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());

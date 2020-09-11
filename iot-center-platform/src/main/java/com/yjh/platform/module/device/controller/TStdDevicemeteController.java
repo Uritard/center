@@ -117,6 +117,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "customId", required = false) String customId,
                          @RequestParam(value = "meteId", required = false) Long meteId,
                          @RequestParam(value = "meteKind", required = false) String meteKind,
+                         @RequestParam(value = "meteType", required = false) String meteType,
                          @RequestParam(value = "meteName", required = false) String meteName,
                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                          @RequestParam(value = "customType", required = false) Integer customType,
@@ -125,7 +126,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmNote", required = false) String alarmNote,
                          @RequestParam(value = "alarmType", required = false) String alarmType,
                          @RequestParam(value = "upEffect", required = false) Float upEffect,
-                         @RequestParam(value = "lowEffect", required = false) Float lowEffect,
+                         @RequestParam(value = "downEffect", required = false) Float downEffect,
                          @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
                          @RequestParam(value = "highLimit1", required = false) Float highLimit1,
                          @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
@@ -135,7 +136,6 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
                          @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
                          @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
-                         @RequestParam(value = "meteType", required = false) String meteType,
                          @RequestParam(value = "modulus", required = false) Integer modulus,
                          @RequestParam(value = "remark", required = false) String remark,
                          @RequestParam(value = "stateZero", required = false) String stateZero,
@@ -143,7 +143,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmState", required = false) Integer alarmState) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer,meteType, modulus, remark,stateZero,stateOne,alarmState);
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind,meteType, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

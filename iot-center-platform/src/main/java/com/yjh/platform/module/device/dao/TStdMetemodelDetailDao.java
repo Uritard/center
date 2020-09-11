@@ -23,7 +23,7 @@ public interface TStdMetemodelDetailDao {
     List<TStdMeteModelDetail> selectByPrimaryId(@Param(value = "modelId") Long modelId);
     List<TStdMeteModelDetail> select(@Param(value = "modelId") Long modelId,
                                      @Param(value = "meteId") Long meteId,
-                                     @Param(value = "customType") Integer customType,
+                                     @Param(value = "customId") String customId,
                                      @Param(value = "customTypeName")String customTypeName,
                                      @Param(value = "meteCode") String meteCode,
                                      @Param(value = "meteName") String meteName,

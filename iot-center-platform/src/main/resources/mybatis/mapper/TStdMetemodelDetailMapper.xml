@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
         <id column="model_id" jdbcType="BIGINT" property="modelId" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
-        <result column="custom_type" jdbcType="INTEGER" property="customType" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
         <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
@@ -35,7 +35,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        model_id, mete_id, custom_type, mete_code, mete_name, mete_type,mete_kind, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
+        model_id, mete_id, custom_id, mete_code, mete_name, mete_type,mete_kind, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
     </sql>
 
 
@@ -43,7 +43,7 @@
         insert into t_std_metemodel_detail(
             model_id,
             mete_id,
-            custom_type,
+            custom_id,
             mete_code,
             mete_name,
             mete_type,
@@ -71,7 +71,7 @@
         )values(
                 #{modelId, jdbcType=BIGINT},
                 #{meteId, jdbcType=BIGINT},
-                #{customType, jdbcType=INTEGER},
+                #{customId, jdbcType=VARCHAR},
                 #{meteCode, jdbcType=VARCHAR},
                 #{meteName, jdbcType=VARCHAR},
                 #{meteType, jdbcType=VARCHAR},
@@ -109,7 +109,7 @@
         update t_std_metemodel_detail a <set>
         <if test="modelId != null and modelId != ''">a.model_id = #{modelId, jdbcType=BIGINT},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
+        <if test="customId != null ">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
@@ -144,7 +144,7 @@
 	    a.*,b.dict_note AS "customTypeName"
        FROM
 	      t_std_metemodel_detail a
-       LEFT JOIN t_dict_business b ON a.custom_type = b.dict_code
+       LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
       WHERE
 	      b.col_name = "custom_type"
       and a.model_id = #{modelId, jdbcType=BIGINT}
@@ -154,7 +154,7 @@
         select
         a.model_id,
         a.mete_id,
-        a.custom_type,
+        a.custom_id,
         b.dict_note AS "customTypeName",
         a.mete_code,
         a.mete_name,
@@ -181,11 +181,11 @@
         a.threshold_per,
         a.modulus
         from t_std_metemodel_detail a
-        left join t_dict_business b ON a.custom_type = b.dict_code
+        left join t_dict_business b ON a.custom_id = b.dict_code
         where 1 = 1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
-        <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
+        <if test="customId != null "> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="customTypeName != null "> and b.dict_note = #{customTypeName, jdbcType=VARCHAR}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
@@ -217,7 +217,7 @@
         SELECT
         a.model_id,
         a.mete_id,
-        a.custom_type,
+        a.custom_id,
         b.dict_note AS "customTypeName",
         c.dict_note AS "meteTypeName",
         d.device_type AS "deviceType",
@@ -250,8 +250,8 @@
         (
         (
         t_std_metemodel_detail a
-        LEFT JOIN t_dict_business b ON a.custom_type = b.dict_code
-        AND b.col_name = "custom_type"
+        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
+        AND b.col_name = "custom_id"
         )
         LEFT JOIN t_dict_business c ON a.mete_type = c.dict_code
         AND c.col_name = "mete_kind"
@@ -264,7 +264,7 @@
         where 1=1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
-        <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
+        <if test="customId != null "> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="customTypeName != null "> and b.dict_note = #{customTypeName, jdbcType=VARCHAR}</if>
         <if test="meteTypeName != null "> and c.dict_note = #{meteTypeName, jdbcType=VARCHAR}</if>
         <if test="deviceType != null "> and d.device_type = #{deviceType, jdbcType=INTEGER}</if>
@@ -299,7 +299,7 @@
         insert into t_std_metemodel_detail(
             model_id,
             mete_id,
-            custom_type,
+            custom_id,
             mete_code,
             mete_name,
             mete_type,
@@ -329,7 +329,7 @@
             (
                 #{TStdMeteModelDetail.modelId, jdbcType=BIGINT},
                 #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
-                #{TStdMeteModelDetail.customType, jdbcType=INTEGER},
+                #{TStdMeteModelDetail.customId, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.meteCode, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
                 #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},

@@ -127,8 +127,7 @@ public class TCruisePointInstanceService{
             List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
             List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
-            if(listForPage != null) {
-
+            if(listForPage != null && listForPage.size()!=0) {
                 List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(listForPage);
                 listAll.add(list.get(0));
                 if (list.get(0).getCruiseType() != null) {
