@@ -226,7 +226,7 @@ public class TemplateToImportController {
                     break;
                 } else if (row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     lowEffect = (float) row.getCell(13).getNumericCellValue();
-                    tStdMeteModelDetail.setLowEffect(lowEffect);//第14列
+                    tStdMeteModelDetail.setDownEffect(lowEffect);//第14列
                 }
 
                 Integer alarmLevel = null;
@@ -1029,7 +1029,7 @@ public class TemplateToImportController {
                     break;
                 } else if (row.getCell(25).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     lowEffect = (float) row.getCell(25).getNumericCellValue();
-                    tStdMeteModelDetail.setLowEffect(lowEffect);//第26列
+                    tStdMeteModelDetail.setDownEffect(lowEffect);//第26列
                 }
 
                 Integer alarmLevel = null;

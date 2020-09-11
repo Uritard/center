@@ -110,12 +110,13 @@ public class TStdMetemodelDetailController {
                             @RequestParam(value = "meteCode", required = false) String meteCode,
                             @RequestParam(value = "meteName", required = false) String meteName,
                             @RequestParam(value = "meteType", required = false) String meteType,
+                            @RequestParam(value = "meteKind", required = false) Integer meteKind,
                             @RequestParam(value = "unit", required = false) String unit,
                             @RequestParam(value = "alarmNote", required = false) String alarmNote,
                             @RequestParam(value = "alarmExplain", required = false) String alarmExplain,
                             @RequestParam(value = "alarmType", required = false) String alarmType,
                             @RequestParam(value = "upEffect", required = false) Float upEffect,
-                            @RequestParam(value = "lowEffect", required = false) Float lowEffect,
+                            @RequestParam(value = "downEffect", required = false) Float downEffect,
                             @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
                             @RequestParam(value = "highLimit1", required = false) Float highLimit1,
                             @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
@@ -132,7 +133,7 @@ public class TStdMetemodelDetailController {
                             @RequestParam(value = "modulus", required = false) Integer modulus) {
         Result result = new Result();
         try {
-            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType,customTypeName, meteCode, meteName, meteType, unit, alarmNote, alarmExplain, alarmType, upEffect, lowEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
+            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType,customTypeName, meteCode, meteName, meteType,meteKind, unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
