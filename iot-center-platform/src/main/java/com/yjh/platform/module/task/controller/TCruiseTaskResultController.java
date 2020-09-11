@@ -158,8 +158,8 @@ public class TCruiseTaskResultController {
     }
 
     @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
-    @RequestMapping(value = "/selectIniCruiseTaskResult",method = RequestMethod.GET)
-    public Result selectCruiseTaskResult(@RequestParam Long taskId){
+    @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.GET)
+    public Result selectCurrentCruiseTaskResult(@RequestParam Long taskId){
         Result result=new Result();
         try {
             result.setData(tCruiseTaskResultService.selectCruiseTaskResult(taskId));

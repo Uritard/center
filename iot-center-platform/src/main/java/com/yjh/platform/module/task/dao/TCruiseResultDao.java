@@ -42,5 +42,5 @@ public interface TCruiseResultDao {
     CruiseStatistical  cruiseStatistical(@Param(value = "Start")String Start,
                                          @Param(value = "End")String End);
     CruiseResultDetail cruiseResultOperate(CruiseResultDetail cruiseResultDetail);
-    List<TCruiseTask> selectTaskIsRunning();
+    List<TaskSimpleInfo> selectTaskIsRunning();
 }

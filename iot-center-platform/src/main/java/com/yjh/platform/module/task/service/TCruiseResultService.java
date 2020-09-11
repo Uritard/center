@@ -110,7 +110,7 @@ public class TCruiseResultService{
 
     @Logs(title = "查询正在执行中的任务",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTask> selectTaskIsRunning(){
+    public List<TaskSimpleInfo> selectTaskIsRunning(){
         return this.tCruiseResultDao.selectTaskIsRunning();
     }
 

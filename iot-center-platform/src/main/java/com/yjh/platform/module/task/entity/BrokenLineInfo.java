@@ -28,6 +28,8 @@ public class BrokenLineInfo implements Serializable {
     @ApiModelProperty(value = "查询开始与结束时间")
     private Date startDate;
     private Date endDate;
+    @ApiModelProperty(value = "查询条件-巡检方式")
+    private Integer cType;
 
     @ApiModelProperty(value = "巡视类型名称")
     private String cruiseTypeName;

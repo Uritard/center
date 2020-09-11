@@ -63,4 +63,5 @@ public interface TCruisePointInstanceDao {
     //根据巡检点类型查询巡检点数量
     int selectCruiseCountByType(@Param(value = "taskId")Long taskId,
             @Param(value = "cruiseType")Integer cruiseType);
+    String selectInstancename(@Param("instanceId")Long instanceId);
 }

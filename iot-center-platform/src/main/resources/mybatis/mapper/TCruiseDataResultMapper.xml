@@ -312,30 +312,33 @@
 
     <select id="selectBrokenLine" parameterType="com.yjh.platform.module.task.entity.BrokenLineInfo" resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
-	     c.end_time,
-	     d.result_num,
-         b.cruise_type,
-         h.dict_note as cruiseTypeName
+        c.end_time,
+        d.result_num,
+        b.cruise_type,
+        h.dict_note as cruiseTypeName,
+        i.c_type
         FROM
-	       (
-		     t_std_devicemete a
-		     LEFT JOIN (
-			 t_cruise_point_instance b
-			  LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code
-			  AND h.col_name = "cruise_type"
-		   ) ON a.device_mete_id = b.device_mete_id
-	     )
+        (
+        t_std_devicemete a
         LEFT JOIN (
-	       (
-		    t_cruise_task_result_detail c
-		    LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
-	       )
-         ) ON b.instance_id = c.instance_id
-         WHERE
-	       a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+        t_cruise_point_instance b
+        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code
+        AND h.col_name = "cruise_type"
+        ) ON a.device_mete_id = b.device_mete_id
+        )
+        LEFT JOIN (
+        (
+        (t_cruise_task_result_detail c
+        LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id)
+        LEFT JOIN (t_cruise_result i LEFT JOIN t_dict_business j ON i.c_type=j.dict_code AND j.col_name="plan_type") ON c.task_result_id=i.task_result_id
+        )
+        ) ON b.instance_id = c.instance_id
+        WHERE
+        a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
         <if test="startDate != null " ><if test="endDate != null">and c.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
         <if test="resultNum != null and resultNum != ''">and d.result_num = #{resultNum, jdbcType=VARCHAR}</if>
-        <if test="cruiseType != null and cruiseType != ''" >and #{cruiseType,jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != ''" >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
         <if test="cruiseTypeName!= null and cruiseTypeName != ''">and h.dict_note = #{cruiseTypeName, jdbcType=VARCHAR}</if>
+        <if test="cType != null and cType != ''" >and i.c_type=#{cType,jdbcType=INTEGER}</if>
     </select>
 </mapper>

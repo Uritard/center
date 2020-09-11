@@ -173,7 +173,7 @@
         <if test="calibrationStatus != null "> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraPresetExpand" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPresetExpand">
         select
         a.preset_id,
         a.camera_id,

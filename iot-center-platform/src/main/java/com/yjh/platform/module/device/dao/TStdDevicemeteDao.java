@@ -64,6 +64,6 @@ public interface TStdDevicemeteDao {
 
     List<CruiseResultAnalMeteInfo> selectDeviceMeteByDeviceId(@Param(value = "deviceId")Long deviceId);
 
-
+    Long getdeviceMeteByPointinstance(@Param(value = "instanceId")Long instanceId);
 
 }
