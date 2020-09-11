@@ -59,4 +59,6 @@ public interface TRobotInfoDao {
     List<TRobotInspectionTree> selectInspectionTree();
     List<TRobotInspectionTree> batchSelectInspection();
 
+    int deleteSelectedRobot(@Param(value = "robotIds") String[] robotIds);
+
 }

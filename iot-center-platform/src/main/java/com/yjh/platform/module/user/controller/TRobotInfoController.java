@@ -154,7 +154,7 @@ public class TRobotInfoController {
         return result;
     }
 
-    @ApiOperation(value = "分页查询查询")
+    @ApiOperation(value = "分页模糊查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage( @RequestBody TRobotInfo tRobotInfo,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -187,6 +187,7 @@ public class TRobotInfoController {
         return result;
     }
 
+<<<<<<< Updated upstream
     @ApiOperation(value = "查询所有机器人巡检点信息树")
     @RequestMapping(value = "/selectInspectionTree", method = RequestMethod.GET)
     public Result selectInspectionTree() {
@@ -197,6 +198,20 @@ public class TRobotInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询所有机器人巡检点信息树失败描述：", e);
+=======
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/deleteSelectedRobot", method = RequestMethod.DELETE)
+    public Result deleteSelectedCamera(@RequestParam(value = "robotIds[]", required = true) String[] robotIds) {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInfoService.deleteSelectedRobot(robotIds));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
+>>>>>>> Stashed changes
         }
         return result;
     }

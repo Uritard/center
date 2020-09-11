@@ -1,9 +1,16 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 
+<<<<<<< Updated upstream
 import java.util.*;
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
+>>>>>>> Stashed changes
 
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.springframework.stereotype.Service;
@@ -20,6 +27,9 @@ public class TRobotInfoService{
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -58,9 +68,14 @@ public class TRobotInfoService{
         return tRobotInfoList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页模糊查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo) {
+        if(tRobotInfo.getUpRegionId() != null ) {
+            List<Long> upRegionIdList = new ArrayList<>();
+            Long upRegionId=tRobotInfo.getUpRegionId();
+            upRegionIdList=tStdRegionDao.selectByRegionId(upRegionId);
+        }
         List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(tRobotInfo);
         return tRobotInfoList;
     }
@@ -71,6 +86,7 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.batchInsert(list);
     }
 
+<<<<<<< Updated upstream
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectInspectionTree() {
@@ -106,6 +122,12 @@ public class TRobotInfoService{
         List<Map<String, Object>> robotInspectionList = new ArrayList<>();
         robotInspectionList.add(robotInspectionTree);
         return robotInspectionList;
+=======
+    @Logs(title = "批量删除", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteSelectedRobot(String[] robotIds) {
+        return this.tRobotInfoDao.deleteSelectedRobot(robotIds);
+>>>>>>> Stashed changes
     }
 
 }

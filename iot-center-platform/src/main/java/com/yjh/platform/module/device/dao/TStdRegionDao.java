@@ -31,6 +31,10 @@ public interface TStdRegionDao {
                                 @Param(value = "createTime") Date createTime);
     List<TStdRegion> selectByPage(TStdRegion tStdRegion);
     List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
+<<<<<<< Updated upstream
 
     List<Long> selectRegionIds(Long upRegionId);
+=======
+    List<Long> selectByRegionId(@Param(value = "upRegionId") Long upRegionId);
+>>>>>>> Stashed changes
 }
