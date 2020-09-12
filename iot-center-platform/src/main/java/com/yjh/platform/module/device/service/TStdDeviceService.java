@@ -87,6 +87,7 @@ public class TStdDeviceService{
 
         int i = this.tStdDeviceDao.add(tStdDevice);
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
+        tStdDeviceAttr.setRealCode(tStdDeviceDetail.getRealCode());
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
         tStdDeviceAttr.setDeviceId(Long.valueOf(tStdDevice.getDeviceId()));
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
@@ -168,6 +169,7 @@ public class TStdDeviceService{
         tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
 
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
+        tStdDeviceAttr.setRealCode(tStdDeviceDetail.getRealCode());
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
         tStdDeviceAttr.setDeviceId(Long.valueOf(tStdDevice.getDeviceId()));
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
