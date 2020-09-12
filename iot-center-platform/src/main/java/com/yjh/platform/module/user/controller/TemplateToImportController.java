@@ -131,13 +131,13 @@ public class TemplateToImportController {
                     break;
                 }
 
-                Integer customType = null;
-                if (row.getCell(3) != null && row.getCell(3).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    customType = new Double(row.getCell(3).getNumericCellValue()).intValue();
-                    tStdMeteModelDetail.setCustomType(customType);//第4列
-                } else {
-                    tStdMeteModelDetail.setCustomType(0);
-                }
+//                Integer customType = null;
+//                if (row.getCell(3) != null && row.getCell(3).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    customType = new Double(row.getCell(3).getNumericCellValue()).intValue();
+//                    tStdMeteModelDetail.setCustomType(customType);//第4列
+//                } else {
+//                    tStdMeteModelDetail.setCustomType(0);
+//                }
 
                 String meteCode = null;
                 if (row.getCell(5) != null && row.getCell(5).getCellTypeEnum().equals(CellType.NUMERIC)) {
@@ -943,12 +943,12 @@ public class TemplateToImportController {
                     break;
                 }
                 Integer customType = null;
-                if (row.getCell(13) != null && row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    customType = new Double(row.getCell(13).getNumericCellValue()).intValue();
-                    tStdMeteModelDetail.setCustomType(customType);//第14列
-                } else {
-                    tStdMeteModelDetail.setCustomType(0);
-                }
+//                if (row.getCell(13) != null && row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    customType = new Double(row.getCell(13).getNumericCellValue()).intValue();
+//                    tStdMeteModelDetail.setCustomType(customType);//第14列
+//                } else {
+//                    tStdMeteModelDetail.setCustomType(0);
+//                }
                 String meteType = null;
                 if (row.getCell(17) != null && row.getCell(17).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     errMsg.append("第" + (i + 1) + "行," + "R列,点号不是字符串类型<br>");
@@ -1186,19 +1186,19 @@ public class TemplateToImportController {
                     long lastDeviceId2 = -1;
                     tStdDeviceMete.setDeviceId(lastDeviceId2 + i);
                 }
-
-                tStdDeviceMete.setCustomId(row.getCell(11).getStringCellValue());
-                tStdDeviceMete.setMeteId(new Double(row.getCell(16).getNumericCellValue()).longValue());
-                tStdDeviceMete.setMeteType(row.getCell(17).getStringCellValue());
-                tStdDeviceMete.setMeteName(row.getCell(18).getStringCellValue());
-                tStdDeviceMete.setDeviceType(new Double(row.getCell(4).getNumericCellValue()).intValue());
-                Integer customType = null;
-                if (row.getCell(13) != null && row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    customType = new Double(row.getCell(13).getNumericCellValue()).intValue();
-                    tStdDeviceMete.setCustomType(customType);
-                } else {
-                    tStdDeviceMete.setCustomType(0);
-                }
+//
+//                tStdDeviceMete.setCustomId(row.getCell(11).getStringCellValue());
+//                tStdDeviceMete.setMeteId(new Double(row.getCell(16).getNumericCellValue()).longValue());
+//                tStdDeviceMete.setMeteType(row.getCell(17).getStringCellValue());
+//                tStdDeviceMete.setMeteName(row.getCell(18).getStringCellValue());
+//                tStdDeviceMete.setDeviceType(new Double(row.getCell(4).getNumericCellValue()).intValue());
+//                Integer customType = null;
+//                if (row.getCell(13) != null && row.getCell(13).getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                    customType = new Double(row.getCell(13).getNumericCellValue()).intValue();
+//                    tStdDeviceMete.setCustomType(customType);
+//                } else {
+//                    tStdDeviceMete.setCustomType(0);
+//                }
                 tStdDeviceMete.setPositionType(row.getCell(5).getStringCellValue());
                 tStdDeviceMete.setUnit(row.getCell(20).getStringCellValue());
                 tStdDeviceMete.setAlarmNote(row.getCell(21).getStringCellValue());

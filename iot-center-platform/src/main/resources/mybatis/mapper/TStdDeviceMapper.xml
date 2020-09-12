@@ -512,7 +512,7 @@
         </foreach>
     </delete>
 
-    <select id="selectCustomTypeByDict" resultType="java.lang.Integer">
+    <select id="selectCustomTypeByDict" resultType="java.lang.String">
          SELECT
 	        dict_code AS customType
          FROM

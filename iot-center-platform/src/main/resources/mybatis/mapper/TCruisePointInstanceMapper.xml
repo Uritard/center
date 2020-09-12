@@ -449,4 +449,16 @@
         WHERE
 	    instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectCruiseCommonInfoByInstanceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.CruiseTypeInfo">
+        SELECT
+	      a.cruise_type,
+	      b.dict_note AS cruiseTypeName,
+	      a.cruise_id
+        FROM
+	      t_cruise_point_instance a
+        LEFT JOIN t_dict_business b ON a.cruise_type = b.dict_code
+       AND b.col_name = "cruise_type"
+       WHERE a.instance_id=#{instanceId,jdbcType=BIGINT}
+    </select>
 </mapper>

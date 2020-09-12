@@ -97,6 +97,6 @@ public interface TStdDeviceDao {
                               @Param(value = "modelId")Long modelId);
 
     int batchDelete(@Param(value = "list")List<String> list);
-    Integer selectCustomTypeByDict();
+    String selectCustomTypeByDict();
     List<CustomInfo> selectCustomInfoByDict();
 }
