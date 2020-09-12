@@ -27,7 +27,7 @@
         record_id, record_name, recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
     </sql>
     <sql id="TongYong">
-        a.record_id,a.record_name,a.recorder_type,b.dict_note as NVR_type ,a.alias_name,a.record_ip,
+        a.record_id,a.record_name,a.recorder_type,b.dict_note as recorder_type1 ,a.alias_name,a.record_ip,
 		a.protocol,d.dict_note as protocol_type,a.http_port,a.trans_port,a.rtsp_port,a.user_name,
         a.pwd,a.protocol_url,a.max_channel,a.hdd_size,a.buffer_day,a.time_long
     </sql>

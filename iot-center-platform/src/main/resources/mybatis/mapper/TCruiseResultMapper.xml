@@ -28,13 +28,23 @@
 
     <sql id="TongYong">
         a.task_result_id,
-        a.task_id,b.task_name,
-		a.c_type,d.dict_note as plan_type,
-        a.c_state,e.dict_note as task_state,
-		a.task_count,a.execute_time,
-		f.task_abnormal,
-		a.check_user,a.check_date,a.modify_state,
-		a.task_wait,a.weather,a.area_id,a.create_time,a.task_code,a.remark
+        a.task_id,
+        b.task_name,
+        a.c_type,
+        d.dict_note as plan_type,
+        a.c_state,
+        e.dict_note as task_state,
+        a.task_count,
+        g.cruise_status,
+        COUNT(g.cruise_status = 252 or null) as cruise_data_state1,
+        COUNT(g.cruise_status = 253 or null) as cruise_data_state2,
+        f.task_abnormal,
+        a.execute_time,
+        a.check_user,
+        a.check_date,
+        a.modify_state,
+        a.task_wait,a.weather,a.area_id,a.create_time,a.task_code,
+        a.remark
     </sql>
 
 
@@ -74,26 +84,26 @@
         )
     </insert>
 
-    <insert id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
+    <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update t_cruise_data_result set
         <if test="personcheck != null and personcheck != ''">personcheck = #{personcheck,jdbcType=VARCHAR},</if>
         <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
         <if test="evaluationState != null ">evaluation_state = #{evaluationState,jdbcType=INTEGER},</if>
         <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
         where cruise_data_id in
-        (select cruise_data_id
-        from
-        (select cruise_data_id
-        FROM
-        t_cruise_result a,
-        t_cruise_task_result_detail d,
-        t_cruise_data_result e
-        where  a.task_id = #{taskId,jdbcType =INTEGER }
-        and d.instance_id = #{instanceId,jdbcType = INTEGER}
-        and a.task_result_id = d.task_result_id
-        and e.cruise_result_id = d.cruise_result_id) t1)
+            (select cruise_data_id
+                from
+                    (select cruise_data_id
+                        FROM
+                            t_cruise_result a,
+                            t_cruise_task_result_detail d,
+                            t_cruise_data_result e
+                        where  a.task_id = #{taskId,jdbcType =INTEGER }
+                        and d.instance_id = #{instanceId,jdbcType = INTEGER}
+                        and a.task_result_id = d.task_result_id
+                        and e.cruise_result_id = d.cruise_result_id) t1)
 
-    </insert>
+    </update>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">
         delete from t_cruise_result
@@ -183,10 +193,11 @@
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
         from t_cruise_result a,
-        t_cruise_task b,
-        t_dict_business d,
-        t_dict_business e,
-        t_cruise_task_result f
+             t_cruise_task b,
+             t_dict_business d,
+             t_dict_business e,
+             t_cruise_task_result f,
+             t_cruise_task_result_detail g
         where 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR},</if>
@@ -210,6 +221,8 @@
         and a.c_type = d.dict_code
         and a.c_state  = e.dict_code
         and a.task_result_id = f.task_result_id
+        and g.task_result_id = a.task_result_id
+        GROUP BY a.task_result_id
     </select>
 
     <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
@@ -319,15 +332,16 @@
 	      b.c_state = 0
 </select>
 
-    <!--本周巡视任务结果统计-->
+    <!--巡视任务结果统计-->
     <select id="taskStatistical"  resultType="java.util.Map">
         select
         <foreach collection="pTypeMap" item="pType" separator="," index="key">
             count(if(c_type = #{key},true,null))as #{pType}
         </foreach>
 
-        from t_cruise_result
-        where create_time BETWEEN #{Start} and #{End}
+        from t_cruise_result a,t_cruise_task_result b
+        where a.task_result_id = b.task_result_id
+        and create_time BETWEEN #{Start} and #{End}
     </select>
 
     <!--巡视点结果操作-->
@@ -365,7 +379,7 @@
 
     </select>
 
-    <!--本周巡视点结果统计-->
+    <!--巡视点结果统计-->
     <select id="cruiseStatistical" resultType="java.util.Map" >
         select
         <foreach collection="pTypeMap" item="pType" separator="," index="key">

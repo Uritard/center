@@ -94,26 +94,21 @@ public class TCruiseResultService{
 
         String colName1 = "plan_type";
         List<TDictBussinessExpand> pType = tCruiseResultDao.selectPType(colName1);
-//        System.out.println("pType是："+pType);
 
         Map<String,String> pTypeMap = new HashMap<>();
         for (int i = 0;i<pType.size();i++){
             pTypeMap.put(pType.get(i).getDictCode(),pType.get(i).getDictNote());
         }
-//        System.out.println("pTypeMap是："+pTypeMap);
 
         List<Map<String,Integer>> taskStatisticalList = new ArrayList<>();
+        //本周
         taskStatisticalList.add(tCruiseResultDao.taskStatistical(pTypeMap,weekStart,weekEnd));
-
-        Map<String,Integer> hhhmap = new HashMap<>();
-        hhhmap =  tCruiseResultDao.taskStatistical(pTypeMap,weekStart,weekEnd);
-//        System.out.println("hhhmap是："+hhhmap);
 
         String lastWeekStart = DateTimeUtil.getLastWeekStart();
         String lastWeekend = DateTimeUtil.getLastWeekend();
+        //上周
         taskStatisticalList.add(tCruiseResultDao.taskStatistical(pTypeMap,lastWeekStart,lastWeekend));
 
-//        System.out.println("taskStatisticalList是："+taskStatisticalList);
         return taskStatisticalList;
     }
     @Logs(title = "巡视点结果统计", code = "module")
@@ -124,23 +119,19 @@ public class TCruiseResultService{
 
         String colName1 = "data_state";
         List<TDictBussinessExpand> pType = tCruiseResultDao.selectPType(colName1);
-//        System.out.println("pType是："+pType);
 
         Map<String,String> pTypeMap = new HashMap<>();
         for (int i = 0;i<pType.size();i++){
             pTypeMap.put(pType.get(i).getDictCode(),pType.get(i).getDictNote());
         }
-//        System.out.println("pTypeMap是："+pTypeMap);
 
         List<Map<String,Integer>> cruiseStatisticalList = new ArrayList<>();
+        //本周
         cruiseStatisticalList.add(tCruiseResultDao.cruiseStatistical(pTypeMap,weekStart,weekEnd));
-
-        Map<String,Integer> hhhmap = new HashMap<>();
-        hhhmap =  tCruiseResultDao.taskStatistical(pTypeMap,weekStart,weekEnd);
-//        System.out.println("hhhmap是："+hhhmap);
 
         String lastWeekStart = DateTimeUtil.getLastWeekStart();
         String lastWeekend = DateTimeUtil.getLastWeekend();
+        //上周
         cruiseStatisticalList.add(tCruiseResultDao.cruiseStatistical(pTypeMap,lastWeekStart,lastWeekend));
         return cruiseStatisticalList;
     }

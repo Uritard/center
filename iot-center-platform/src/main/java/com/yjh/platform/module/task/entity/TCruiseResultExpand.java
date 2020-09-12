@@ -27,9 +27,15 @@ public class TCruiseResultExpand extends TCruiseResult {
     @ApiModelProperty(value = "任务状态")
     private String taskState;
 
-    @ApiModelProperty(value = "巡检数据状态")
-    private Integer cruiseDataState;
+    @ApiModelProperty(value = "巡检数据状态--已测点数")
+    private Integer cruiseDataState1;
+
+    @ApiModelProperty(value = "巡检数据状态--未处理")
+    private Integer cruiseDataState2;
 
     @ApiModelProperty(value = "巡检类型")
     private String planType;
+
+    @ApiModelProperty(value = "状态")
+    private Integer cruiseStatus;
 }

@@ -34,5 +34,9 @@ public class CruiseManualReview {
     private Integer identifyResult;
     @ApiModelProperty(value = "实际结果-字典表")
     private String identifyResult1;
+    @ApiModelProperty(value = "识别状态")
+    private Integer identifyState;
+    @ApiModelProperty(value = "识别状态-字典表")
+    private String identifyState1;
 
 }
