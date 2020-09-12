@@ -135,8 +135,8 @@
         <if test="thresholdPer != null and thresholdPer != ''">a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},</if>
         <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
     </set>
-            where a.model_id = #{modelId, jdbcType=BIGINT}
-            and a.mete_id=#{meteId,jdbcType=BIGINT}
+        where a.model_id = #{modelId, jdbcType=BIGINT}
+        and a.mete_id=#{meteId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
@@ -146,7 +146,7 @@
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
       WHERE
-	      b.col_name = "custom_type"
+	      b.col_name = "custom_id"
       and a.model_id = #{modelId, jdbcType=BIGINT}
     </select>
 
@@ -154,7 +154,7 @@
         select
         a.model_id,
         a.mete_id,
-        a.custom_id,
+        a.custom_id as customType,
         b.dict_note AS "customTypeName",
         a.mete_code,
         a.mete_name,
@@ -185,7 +185,7 @@
         where 1 = 1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
-        <if test="customId != null "> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="customType != null "> and a.custom_id = #customType, jdbcType=VARCHAR}</if>
         <if test="customTypeName != null "> and b.dict_note = #{customTypeName, jdbcType=VARCHAR}</if>
         <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
@@ -217,7 +217,7 @@
         SELECT
         a.model_id,
         a.mete_id,
-        a.custom_id,
+        a.custom_id as customType,
         b.dict_note AS "customTypeName",
         c.dict_note AS "meteTypeName",
         d.device_type AS "deviceType",
@@ -264,7 +264,7 @@
         where 1=1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
-        <if test="customId != null "> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="customType != null "> and a.custom_id = #{customType, jdbcType=VARCHAR}</if>
         <if test="customTypeName != null "> and b.dict_note = #{customTypeName, jdbcType=VARCHAR}</if>
         <if test="meteTypeName != null "> and c.dict_note = #{meteTypeName, jdbcType=VARCHAR}</if>
         <if test="deviceType != null "> and d.device_type = #{deviceType, jdbcType=INTEGER}</if>
@@ -297,63 +297,63 @@
 
     <insert id="batchAdd">
         insert into t_std_metemodel_detail(
-            model_id,
-            mete_id,
-            custom_id,
-            mete_code,
-            mete_name,
-            mete_type,
-            mete_kind,
-            unit,
-            alarm_note,
-            alarm_explain,
-            alarm_type,
-            up_effect,
-            down_effect,
-            alarm_level,
-            high_limit1,
-            low_limit1,
-            high_limit2,
-            low_limit2,
-            high_limit3,
-            low_limit3,
-            high_limit4,
-            low_limit4,
-            alarm_delay,
-            alarm_cnt,
-            threshold_abs,
-            threshold_per,
-            modulus
+        model_id,
+        mete_id,
+        custom_id,
+        mete_code,
+        mete_name,
+        mete_type,
+        mete_kind,
+        unit,
+        alarm_note,
+        alarm_explain,
+        alarm_type,
+        up_effect,
+        down_effect,
+        alarm_level,
+        high_limit1,
+        low_limit1,
+        high_limit2,
+        low_limit2,
+        high_limit3,
+        low_limit3,
+        high_limit4,
+        low_limit4,
+        alarm_delay,
+        alarm_cnt,
+        threshold_abs,
+        threshold_per,
+        modulus
         )values
         <foreach collection="list" item="TStdMeteModelDetail" separator=",">
             (
-                #{TStdMeteModelDetail.modelId, jdbcType=BIGINT},
-                #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
-                #{TStdMeteModelDetail.customId, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.meteCode, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},
-                #{TStdMeteModelDetail.unit, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.alarmNote, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.alarmExplain, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.alarmType, jdbcType=VARCHAR},
-                #{TStdMeteModelDetail.upEffect, jdbcType=REAL},
-                #{TStdMeteModelDetail.downEffect, jdbcType=REAL},
-                #{TStdMeteModelDetail.alarmLevel, jdbcType=INTEGER},
-                #{TStdMeteModelDetail.highLimit1, jdbcType=REAL},
-                #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},
-                #{TStdMeteModelDetail.highLimit2, jdbcType=REAL},
-                #{TStdMeteModelDetail.lowLimit2, jdbcType=REAL},
-                #{TStdMeteModelDetail.highLimit3, jdbcType=REAL},
-                #{TStdMeteModelDetail.lowLimit3, jdbcType=REAL},
-                #{TStdMeteModelDetail.highLimit4, jdbcType=REAL},
-                #{TStdMeteModelDetail.lowLimit4, jdbcType=REAL},
-                #{TStdMeteModelDetail.alarmDelay, jdbcType=INTEGER},
-                #{TStdMeteModelDetail.alarmCnt, jdbcType=INTEGER},
-                #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
-                #{TStdMeteModelDetail.thresholdPer, jdbcType=NUMERIC},
-                #{TStdMeteModelDetail.modulus, jdbcType=INTEGER}
+            #{TStdMeteModelDetail.modelId, jdbcType=BIGINT},
+            #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
+            #{TStdMeteModelDetail.customId, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteCode, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.unit, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmNote, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmExplain, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.upEffect, jdbcType=REAL},
+            #{TStdMeteModelDetail.downEffect, jdbcType=REAL},
+            #{TStdMeteModelDetail.alarmLevel, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.highLimit1, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit3, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit3, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit4, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit4, jdbcType=REAL},
+            #{TStdMeteModelDetail.alarmDelay, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.alarmCnt, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
+            #{TStdMeteModelDetail.thresholdPer, jdbcType=NUMERIC},
+            #{TStdMeteModelDetail.modulus, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

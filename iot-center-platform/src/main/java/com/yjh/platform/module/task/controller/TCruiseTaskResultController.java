@@ -172,22 +172,6 @@ public class TCruiseTaskResultController {
 
     }
 
-//    @ApiOperation(value = "A-获取当前任务的巡检点结果信息(巡检点结果)")
-//    @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.POST)
-//    public Result selectCurrentCruiseTaskResult(@RequestParam(value = "taskId") Long taskId,
-//                                                @RequestParam(value = "cruiseId") Long cruiseId,
-//                                                @RequestBody List<Map> cruiseResult){
-//        Result result=new Result();
-//        try {
-//            result.setData(tCruiseTaskResultService.selectCurrentCruiseTaskResult(taskId,cruiseId,cruiseResult));
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-//            log.error("失败描述：", e);
-//        }
-//
-//        return result;
-//
-//    }
 
     @ApiOperation(value = "A-获取巡检任务进度")
     @RequestMapping(value = "selectCruiseAdvance",method = RequestMethod.GET)
@@ -233,10 +217,11 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "C-获取当前任务下的机器人信息以及机器人工作巡检点结果状态")
     @RequestMapping(value = "selectRobotAndCruiseResult",method = RequestMethod.GET)
-    public Result selectRobotAndCruiseResult(@RequestParam Long taskId){
+    public Result selectRobotAndCruiseResult(@RequestParam Long taskId,
+                                              @RequestParam String robotPosition){
         Result result=new Result();
         try{
-            result.setData(tCruiseTaskResultService.selectRobotAndCruiseResult(taskId));
+            result.setData(tCruiseTaskResultService.selectRobotAndCruiseResult(taskId,robotPosition));
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);

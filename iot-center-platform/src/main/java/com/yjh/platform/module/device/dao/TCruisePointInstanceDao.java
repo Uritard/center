@@ -1,10 +1,9 @@
 package com.yjh.platform.module.device.dao;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Handler;
 
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -64,4 +63,7 @@ public interface TCruisePointInstanceDao {
     int selectCruiseCountByType(@Param(value = "taskId")Long taskId,
             @Param(value = "cruiseType")Integer cruiseType);
     String selectInstancename(@Param("instanceId")Long instanceId);
+
+    //查询巡检类型
+    CruiseTypeInfo selectCruiseCommonInfoByInstanceId(@Param(value = "instanceId")Long instanceId);
 }

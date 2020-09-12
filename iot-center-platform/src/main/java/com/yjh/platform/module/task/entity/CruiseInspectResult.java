@@ -31,6 +31,9 @@ public class CruiseInspectResult implements Serializable {
     private String cruiseResultName;
     @ApiModelProperty(value = "巡视时间")
     private Date endTime;
+    @ApiModelProperty(value = "数据来源")
+    private Integer cruiseType;
+    private  String cruiseTypeName;
 
 }
 
