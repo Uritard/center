@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TWarnInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TWarnInfo">
+        <id column="warn_id" jdbcType="BIGINT" property="warnId" />
+        <result column="warn_level" jdbcType="INTEGER" property="warnLevel" />
+        <result column="warn_time" jdbcType="TIMESTAMP" property="warnTime" />
+        <result column="warn_type" jdbcType="INTEGER" property="warnType" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="std_mete_id" jdbcType="BIGINT" property="stdMeteId" />
+        <result column="conf_mode" jdbcType="INTEGER" property="confMode" />
+        <result column="conf_time" jdbcType="TIMESTAMP" property="confTime" />
+        <result column="conf_user_id" jdbcType="VARCHAR" property="confUserId" />
+        <result column="conf_info" jdbcType="VARCHAR" property="confInfo" />
+        <result column="if_warn_disable" jdbcType="INTEGER" property="ifWarnDisable" />
+        <result column="alarm_source" jdbcType="INTEGER" property="alarmSource" />
+        <result column="warn_subtype" jdbcType="INTEGER" property="warnSubtype" />
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+        <result column="image_path" jdbcType="VARCHAR" property="imagePath" />
+        <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
+        <result column="value" jdbcType="VARCHAR" property="value" />
+        <result column="defect" jdbcType="INTEGER" property="defect" />
+        <result column="defect_level" jdbcType="INTEGER" property="defectLevel" />
+        <result column="out_range" jdbcType="VARCHAR" property="outRange" />
+        <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        warn_id, warn_level, warn_time, warn_type, device_id, cunstom_id, instance_id, std_mete_id, conf_mode, conf_time, conf_user_id, conf_info, if_warn_disable, alarm_source, warn_subtype, device_code, image_path, video_path, value, defect, defect_level, out_range, link_message
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
+        insert into t_warn_info(
+            warn_id,
+            warn_level,
+            warn_time,
+            warn_type,
+            device_id,
+            cunstom_id,
+            instance_id,
+            std_mete_id,
+            conf_mode,
+            conf_time,
+            conf_user_id,
+            conf_info,
+            if_warn_disable,
+            alarm_source,
+            warn_subtype,
+            device_code,
+            image_path,
+            video_path,
+            value,
+            defect,
+            defect_level,
+            out_range,
+            link_message
+        )values(
+                #{warnId, jdbcType=BIGINT},
+                #{warnLevel, jdbcType=INTEGER},
+                #{warnTime, jdbcType=TIMESTAMP},
+                #{warnType, jdbcType=INTEGER},
+                #{deviceId, jdbcType=BIGINT},
+                #{cunstomId, jdbcType=VARCHAR},
+                #{instanceId, jdbcType=BIGINT},
+                #{stdMeteId, jdbcType=BIGINT},
+                #{confMode, jdbcType=INTEGER},
+                #{confTime, jdbcType=TIMESTAMP},
+                #{confUserId, jdbcType=VARCHAR},
+                #{confInfo, jdbcType=VARCHAR},
+                #{ifWarnDisable, jdbcType=INTEGER},
+                #{alarmSource, jdbcType=INTEGER},
+                #{warnSubtype, jdbcType=INTEGER},
+                #{deviceCode, jdbcType=VARCHAR},
+                #{imagePath, jdbcType=VARCHAR},
+                #{videoPath, jdbcType=VARCHAR},
+                #{value, jdbcType=VARCHAR},
+                #{defect, jdbcType=INTEGER},
+                #{defectLevel, jdbcType=INTEGER},
+                #{outRange, jdbcType=VARCHAR},
+                #{linkMessage, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_warn_info
+                where warn_id = #{warnId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
+        update t_warn_info a <set>
+        <if test="warnId != null and warnId != ''">a.warn_id = #{warnId, jdbcType=BIGINT},</if>
+        <if test="warnLevel != null and warnLevel != ''">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+        a.warn_time = #{warnTime, jdbcType=TIMESTAMP},
+        <if test="warnType != null and warnType != ''">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+        <if test="confMode != null and confMode != ''">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
+        a.conf_time = #{confTime, jdbcType=TIMESTAMP},
+        <if test="confUserId != null and confUserId != ''">a.conf_user_id = #{confUserId, jdbcType=VARCHAR},</if>
+        <if test="confInfo != null and confInfo != ''">a.conf_info = #{confInfo, jdbcType=VARCHAR},</if>
+        <if test="ifWarnDisable != null and ifWarnDisable != ''">a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER},</if>
+        <if test="alarmSource != null and alarmSource != ''">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
+        <if test="warnSubtype != null and warnSubtype != ''">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
+        <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
+        <if test="imagePath != null and imagePath != ''">a.image_path = #{imagePath, jdbcType=VARCHAR},</if>
+        <if test="videoPath != null and videoPath != ''">a.video_path = #{videoPath, jdbcType=VARCHAR},</if>
+        <if test="value != null and value != ''">a.value = #{value, jdbcType=VARCHAR},</if>
+        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="outRange != null and outRange != ''">a.out_range = #{outRange, jdbcType=VARCHAR},</if>
+        <if test="linkMessage != null and linkMessage != ''">a.link_message = #{linkMessage, jdbcType=VARCHAR},</if>
+    </set>
+            where a.warn_id = #{warnId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        select
+        a.warn_id,
+        a.warn_level,
+        a.warn_time,
+        a.warn_type,
+        a.device_id,
+        a.cunstom_id,
+        a.instance_id,
+        a.std_mete_id,
+        a.conf_mode,
+        a.conf_time,
+        a.conf_user_id,
+        a.conf_info,
+        a.if_warn_disable,
+        a.alarm_source,
+        a.warn_subtype,
+        a.device_code,
+        a.image_path,
+        a.video_path,
+        a.value,
+        a.defect,
+        a.defect_level,
+        a.out_range,
+        a.link_message
+        from t_warn_info a
+        where 1 = 1
+            and a.warn_id = #{warnId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TWarnInfo" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        select
+        a.warn_id,
+        a.warn_level,
+        a.warn_time,
+        a.warn_type,
+        a.device_id,
+        a.cunstom_id,
+        a.instance_id,
+        a.std_mete_id,
+        a.conf_mode,
+        a.conf_time,
+        a.conf_user_id,
+        a.conf_info,
+        a.if_warn_disable,
+        a.alarm_source,
+        a.warn_subtype,
+        a.device_code,
+        a.image_path,
+        a.video_path,
+        a.value,
+        a.defect,
+        a.defect_level,
+        a.out_range,
+        a.link_message
+        from t_warn_info a
+        where 1 = 1
+        <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnTime != null and warnTime != ''"> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="confTime != null and confTime != ''"> and a.conf_time = #{confTime, jdbcType=TIMESTAMP}</if>
+        <if test="confUserId != null and confUserId != ''"> and a.conf_user_id = #{confUserId, jdbcType=VARCHAR}</if>
+        <if test="confInfo != null and confInfo != ''"> and a.conf_info = #{confInfo, jdbcType=VARCHAR}</if>
+        <if test="ifWarnDisable != null and ifWarnDisable != ''"> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="warnSubtype != null and warnSubtype != ''"> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
+        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="imagePath != null and imagePath != ''"> and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
+        <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
+        <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
+        <if test="defect != null and defect != ''"> and a.defect = #{defect, jdbcType=INTEGER}</if>
+        <if test="defectLevel != null and defectLevel != ''"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
+        <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
+        <if test="linkMessage != null and linkMessage != ''"> and a.link_message = #{linkMessage, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TWarnInfo" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        select
+        a.warn_id,
+        a.warn_level,
+        a.warn_time,
+        a.warn_type,
+        a.device_id,
+        a.cunstom_id,
+        a.instance_id,
+        a.std_mete_id,
+        a.conf_mode,
+        a.conf_time,
+        a.conf_user_id,
+        a.conf_info,
+        a.if_warn_disable,
+        a.alarm_source,
+        a.warn_subtype,
+        a.device_code,
+        a.image_path,
+        a.video_path,
+        a.value,
+        a.defect,
+        a.defect_level,
+        a.out_range,
+        a.link_message
+        from t_warn_info a
+        where 1 = 1
+        <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnTime != null and warnTime != ''"> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="confTime != null and confTime != ''"> and a.conf_time = #{confTime, jdbcType=TIMESTAMP}</if>
+        <if test="confUserId != null and confUserId != ''"> and a.conf_user_id = #{confUserId, jdbcType=VARCHAR}</if>
+        <if test="confInfo != null and confInfo != ''"> and a.conf_info = #{confInfo, jdbcType=VARCHAR}</if>
+        <if test="ifWarnDisable != null and ifWarnDisable != ''"> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="warnSubtype != null and warnSubtype != ''"> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
+        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="imagePath != null and imagePath != ''"> and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
+        <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
+        <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
+        <if test="defect != null and defect != ''"> and a.defect = #{defect, jdbcType=INTEGER}</if>
+        <if test="defectLevel != null and defectLevel != ''"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
+        <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
+        <if test="linkMessage != null and linkMessage != ''"> and a.link_message = #{linkMessage, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_warn_info(
+            warn_id,
+            warn_level,
+            warn_time,
+            warn_type,
+            device_id,
+            cunstom_id,
+            instance_id,
+            std_mete_id,
+            conf_mode,
+            conf_time,
+            conf_user_id,
+            conf_info,
+            if_warn_disable,
+            alarm_source,
+            warn_subtype,
+            device_code,
+            image_path,
+            video_path,
+            value,
+            defect,
+            defect_level,
+            out_range,
+            link_message
+        )values
+        <foreach collection="list" item="TWarnInfo" separator=",">
+            (
+                #{TWarnInfo.warnId, jdbcType=BIGINT},
+                #{TWarnInfo.warnLevel, jdbcType=INTEGER},
+                #{TWarnInfo.warnTime, jdbcType=TIMESTAMP},
+                #{TWarnInfo.warnType, jdbcType=INTEGER},
+                #{TWarnInfo.deviceId, jdbcType=BIGINT},
+                #{TWarnInfo.cunstomId, jdbcType=VARCHAR},
+                #{TWarnInfo.instanceId, jdbcType=BIGINT},
+                #{TWarnInfo.stdMeteId, jdbcType=BIGINT},
+                #{TWarnInfo.confMode, jdbcType=INTEGER},
+                #{TWarnInfo.confTime, jdbcType=TIMESTAMP},
+                #{TWarnInfo.confUserId, jdbcType=VARCHAR},
+                #{TWarnInfo.confInfo, jdbcType=VARCHAR},
+                #{TWarnInfo.ifWarnDisable, jdbcType=INTEGER},
+                #{TWarnInfo.alarmSource, jdbcType=INTEGER},
+                #{TWarnInfo.warnSubtype, jdbcType=INTEGER},
+                #{TWarnInfo.deviceCode, jdbcType=VARCHAR},
+                #{TWarnInfo.imagePath, jdbcType=VARCHAR},
+                #{TWarnInfo.videoPath, jdbcType=VARCHAR},
+                #{TWarnInfo.value, jdbcType=VARCHAR},
+                #{TWarnInfo.defect, jdbcType=INTEGER},
+                #{TWarnInfo.defectLevel, jdbcType=INTEGER},
+                #{TWarnInfo.outRange, jdbcType=VARCHAR},
+                #{TWarnInfo.linkMessage, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectAllWarn" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+        a.warn_id,
+        a.warn_time,
+        a.value,
+        b.device_name,
+        a.alarm_source,
+         a.warn_level,
+         a.conf_mode
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        union all(
+        select
+        robot_alarm_id,
+        alarm_time,
+        alarm_info,
+        "检测机器人" as deviceName,
+        "机器人本体" as alarmSource,
+        alarm_level,
+        alarm_state
+        from robot_alarm c
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        )
+    </select>
+
+    <select id="countSixDay" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (select
+        a.warn_time
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        union all(
+        select
+        b.alarm_time
+        from robot_alarm b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and b.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        )) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        GROUP BY
+        day1;
+    </select>
+
+    <select id="selectByType" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+        a.warn_id,
+        a.warn_time,
+        a.value,
+        b.device_name,
+        a.alarm_source,
+        a.warn_level,
+        a.conf_mode
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="countByType" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (select
+        a.warn_time
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        GROUP BY
+        day1;
+    </select>
+
+    <select id="selectByRobot" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.RobotAlarm">
+        select
+        robot_alarm_id,
+        alarm_time,
+        alarm_info,
+        "检测机器人" as deviceName,
+        "机器人本体" as alarmSource,
+        alarm_level,
+        alarm_state
+        from robot_alarm c
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="countByRobot" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( alarm_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (
+        select
+        alarm_time
+        from robot_alarm b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and b.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        ) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(alarm_time,'%y%m'))=0  ) as robot
+        GROUP BY
+        day1;
+    </select>
+
+    <select id="selectOthers" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select
+        a.warn_id,
+        a.warn_time,
+        a.value,
+        b.device_name,
+        a.alarm_source,
+        a.warn_level,
+        a.conf_mode
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != ''">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="countOthers" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
+        count(*) count
+        FROM
+        ( SELECT * FROM (select
+        a.warn_time
+        from t_warn_info a, t_std_device b
+        where 1=1
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
+        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
+        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        GROUP BY
+        day1;
+    </select>
+</mapper>

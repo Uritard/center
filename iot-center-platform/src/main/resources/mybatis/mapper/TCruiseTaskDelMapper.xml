@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCruiseTaskDelDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="del_time" jdbcType="TIMESTAMP" property="delTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id, del_time, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="taskId" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        insert into t_cruise_task_del(
+            task_id,
+            del_time,
+            create_time
+        )values(
+                #{taskId, jdbcType=VARCHAR},
+                #{delTime, jdbcType=TIMESTAMP},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_cruise_task_del
+                where task_id = #{taskId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        update t_cruise_task_del a <set>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="delTime != null and delTime != ''">a.del_time = #{delTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        select
+        a.task_id,
+        a.del_time,
+        a.create_time
+        from t_cruise_task_del a
+        where 1 = 1
+            and a.task_id = #{taskId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskDel" resultType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        select
+        a.task_id,
+        a.del_time,
+        a.create_time
+        from t_cruise_task_del a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="delTime != null and delTime != ''"> and a.del_time = #{delTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskDel" resultType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        select
+        a.task_id,
+        a.del_time,
+        a.create_time
+        from t_cruise_task_del a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="delTime != null and delTime != ''"> and a.del_time = #{delTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_cruise_task_del(
+            task_id,
+            del_time,
+            create_time
+        )values
+        <foreach collection="list" item="TCruiseTaskDel" separator=",">
+            (
+                #{TCruiseTaskDel.taskId, jdbcType=VARCHAR},
+                #{TCruiseTaskDel.delTime, jdbcType=TIMESTAMP},
+                #{TCruiseTaskDel.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <select id="slectByTimeZone" parameterType="java.util.Date" resultType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
+        select
+        a.task_id,
+        a.del_time,
+        a.create_time
+        from t_cruise_task_del a
+        where 1 = 1
+        <if test="startTime != null"> and a.del_time &gt;= #{startTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null"> and a.del_time &lt;= #{endTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+
+
+</mapper>

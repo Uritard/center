@@ -7,6 +7,7 @@ import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
+import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class TCruiseTaskService {
     private TCruiseTaskAttrDao tCruiseTaskAttrDao;
     @Autowired
     private TCruisePlanAttrDao tCruisePlanAttrDao;
+    @Autowired
+    private TCruiseTaskDelDao tCruiseTaskDelDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -66,8 +69,16 @@ public class TCruiseTaskService {
 
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(String taskId) {
-        return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
+    public int deleteByPrimaryId(String taskId, Date taskDate) {
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        if (tCruiseTask.getIfRun()==172) {
+            TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
+            tCruiseTaskDel.setTaskId(taskId);
+            tCruiseTaskDel.setDelTime(taskDate);
+            Date date = new Date("yyyy-MM-dd HH:mm:ss");
+            tCruiseTaskDel.setCreateTime(date);
+            return tCruiseTaskDelDao.insert(tCruiseTaskDel);
+        } else {return this.tCruiseTaskDao.deleteByPrimaryId(taskId);}
     }
 
     @Logs(title = "更新", code = "module")
@@ -155,22 +166,29 @@ public class TCruiseTaskService {
         } catch (Exception e) { e.getMessage(); }
         List<TCruiseTaskCount> list = new ArrayList<>();
         list = this.tCruiseTaskDao.taskCount(dayBefore,dayAfter);
+        List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         for (TCruiseTaskCount tCruiseTaskCount:list) {
             if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
                 List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
                 for (Date aTimeList:timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
-                    taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
-                    taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
-                    taskCountMap.put("type", tCruiseTaskCount.getDictNote());
-                    //TODO 增加MQ获取任务状态
-                    taskCountMap.put("taskStatus", "fuckWHL");
-                    taskCountMap.put("startTime", sdfF2.format(aTimeList));
-                    listTask.add(taskCountMap);
+                    for (TCruiseTaskDel tCruiseTaskDel:listDel) {
+                        long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
+                        long taskTime = aTimeList.getTime();
+                        if (!Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) || !(taskDelTime==taskTime)) {
+                            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                            //TODO 增加MQ获取任务状态
+                            taskCountMap.put("taskStatus", "fuckWHL");
+                            taskCountMap.put("startTime", sdfF2.format(aTimeList));
+                            listTask.add(taskCountMap);
+                        }
+                    }
                 }
             } else {
                 Map<String, Object> taskCountMap = new HashMap<>();
-                taskCountMap.put("type", tCruiseTaskCount.getDictNote());
+                taskCountMap.put("type", tCruiseTaskCount.getIfRun());
                 taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
                 taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
                 //TODO 增加MQ获取任务状态
