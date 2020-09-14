@@ -36,6 +36,8 @@ public class TStdDeviceService{
     private TStdDevicemeteDao tStdDevicemeteDao;
     @Autowired
     private TStdMetemodelDetailDao tStdMetemodelDetailDao;
+    @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
 
 
 
@@ -129,7 +131,8 @@ public class TStdDeviceService{
     @Logs(title = "删除设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryIdALL(Long deviceId) {
-        return this.tStdDeviceDao.deleteByPrimaryId(deviceId)+tStdDeviceAttrDao.deleteByPrimaryId(deviceId)+this.tStdDevicemeteDao.deleteByDeviceId(deviceId);
+        return this.tStdDeviceDao.deleteByPrimaryId(deviceId)+tStdDeviceAttrDao.deleteByPrimaryId(deviceId)
+                +this.tStdDevicemeteDao.deleteByDeviceId(deviceId)+tCruisePointInstanceDao.deleteByDeviceId(deviceId);
     }
 
     @Logs(title = "更新", code = "module")
@@ -402,6 +405,11 @@ public class TStdDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String list){
         List<String> list1= Arrays.asList(list.split(","));
+        for (String item:list1) {
+            tStdDeviceAttrDao.deleteByPrimaryId(Long.valueOf(item));
+            tStdDevicemeteDao.deleteByDeviceId(Long.valueOf(item));
+            tCruisePointInstanceDao.deleteByDeviceId(Long.valueOf(item));
+        }
         return this.tStdDeviceDao.batchDelete(list1);
     }
 

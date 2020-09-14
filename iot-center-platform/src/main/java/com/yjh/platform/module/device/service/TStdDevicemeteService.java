@@ -1,5 +1,7 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 
@@ -25,6 +27,8 @@ public class TStdDevicemeteService{
 
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
 
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
@@ -35,7 +39,7 @@ public class TStdDevicemeteService{
     @Logs(title = "删除", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceMeteId) {
-        return this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);
+        return this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId)+tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);
     }
 
     @Logs(title = "更新", code = "device")
@@ -122,6 +126,9 @@ public class TStdDevicemeteService{
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String list) {
         List<String> list1= Arrays.asList(list.split(","));
+        for (String item:list1) {
+            tCruisePointInstanceDao.deleteByDeviceMeteId(Long.valueOf(item));
+        }
         return this.tStdDevicemeteDao.batchDelete(list1);
     }
 

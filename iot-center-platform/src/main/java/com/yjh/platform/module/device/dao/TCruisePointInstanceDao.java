@@ -17,6 +17,8 @@ public interface TCruisePointInstanceDao {
 
     int insert(TCruisePointInstance tCruisePointInstance);
     int deleteByPrimaryId(@Param(value = "instanceId") Long instanceId);
+    int deleteByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
     int update(TCruisePointInstance tCruisePointInstance);
     TCruisePointInstance selectByPrimaryId(@Param(value = "instanceId") Long instanceId);
     List<TCruisePointInstance> select(@Param(value = "instanceId") Long instanceId,

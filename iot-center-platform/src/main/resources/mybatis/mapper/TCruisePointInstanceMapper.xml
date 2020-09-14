@@ -90,6 +90,16 @@
                 where instance_id = #{instanceId, jdbcType=BIGINT}
     </delete>
 
+    <delete id="deleteByDeviceMeteId" parameterType="java.lang.Long">
+        delete from t_cruise_point_instance
+                where deviceP_mete_id = #{DeviceMeteId, jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByDeviceId" parameterType="java.lang.Long">
+        delete from t_cruise_point_instance
+                where device_id = #{DeviceId, jdbcType=BIGINT}
+    </delete>
+
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         update t_cruise_point_instance a <set>
         <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
