@@ -129,7 +129,7 @@ public class TStdDeviceService{
     @Logs(title = "删除设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryIdALL(Long deviceId) {
-        return this.tStdDeviceDao.deleteByPrimaryId(deviceId)+tStdDeviceAttrDao.deleteByPrimaryId(deviceId);
+        return this.tStdDeviceDao.deleteByPrimaryId(deviceId)+tStdDeviceAttrDao.deleteByPrimaryId(deviceId)+this.tStdDevicemeteDao.deleteByDeviceId(deviceId);
     }
 
     @Logs(title = "更新", code = "module")
