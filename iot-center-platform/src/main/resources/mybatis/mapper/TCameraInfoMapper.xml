@@ -67,17 +67,24 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete t_camera_info,t_camera_preset
+        delete t_camera_info,t_camera_preset,t_algorithm_conf
         from t_camera_info left join t_camera_preset
         on t_camera_info.camera_id=t_camera_preset.camera_id
+        left join t_algorithm_conf
+        on t_camera_preset.preset_id = t_algorithm_conf.preset_id
         where t_camera_info.camera_id = #{cameraId, jdbcType=BIGINT}
     </delete>
 
     <!--批量删除-->
     <delete id="deleteSelectedCamera"  >
-        delete t_camera_info,t_camera_preset from
-        t_camera_info left join t_camera_preset
+        delete t_camera_info,t_camera_preset,t_algorithm_conf,t_cruise_point_instance
+        from t_camera_info left join t_camera_preset
         on t_camera_info.camera_id=t_camera_preset.camera_id
+        left join t_algorithm_conf
+        on t_camera_preset.preset_id = t_algorithm_conf.preset_id
+        left join t_cruise_point_instance
+        on t_algorithm_conf.preset_id = t_cruise_point_instance.cruise_id
+        and t_cruise_point_instance.cruise_type = 229
         where  t_camera_info.camera_id in
         <foreach collection="list" item="cameraId" open="(" separator="," close=")">
             #{cameraId, jdbcType=BIGINT}
