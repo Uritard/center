@@ -124,6 +124,7 @@ public class TCruiseTaskResultService{
             return keys;
         });
     }
+
     @Logs(title = "获取当前任务的巡检点全量信息 ")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseInspectResult> selectCruiseTaskResult(Long taskId) throws ParseException {
@@ -131,8 +132,6 @@ public class TCruiseTaskResultService{
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //获取数据库键名列表
         Set<String> keyResult=redisScan("t_cruise_task_result*");
-        //创建容纳结果信息的容器
-        List<Map> dataResult=new ArrayList<>();
         for(String key:keyResult){
             Map<String,Object> resultMap=redisTemplate.opsForHash().entries(key);//循环每个键名取相应的键值对数据
             Object values=resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
@@ -159,7 +158,6 @@ public class TCruiseTaskResultService{
                     cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));//巡检时间
                 }
 
-
                 cruiseInspectResults.add(cruiseInspectResult);
             }
 
@@ -167,8 +165,6 @@ public class TCruiseTaskResultService{
 
         return cruiseInspectResults;
     }
-
-
 
 
     @Logs(title = "统计获取当前任务的执行进度")
@@ -266,15 +262,17 @@ public class TCruiseTaskResultService{
 
     @Logs(title = "获取执行当前任务的机器人信息及相应巡检点结果状态")
     @Transactional(rollbackFor = Exception.class)
-    public RobotCruiseInfo selectRobotAndCruiseResult(Long taskId,String robotPosition){
-        Set<String> robotKeys=redisScan("robot_info");
+    public List<RobotCruiseInfo> selectRobotAndCruiseResult(Long taskId,String robotPosition){
+        Set<String> robotKeys=redisScan("robot_info*");
         Set<String> cruiseKeys=redisScan("t_cruise_task_result*");
-        RobotCruiseInfo robotCruiseInfo=new RobotCruiseInfo();
-        float cruisedCount=0;//已执行的巡视点个数（已执行、执行失败、未知）
-        float cruiseCount=0;//未执行的巡视点个数
+        List<RobotCruiseInfo>cruiseInfos=new ArrayList<>();//返回参与任务每一个机器人的信息
+
         for(String key:robotKeys){
             Map<String,Object> robotInfo=redisTemplate.opsForHash().entries(key);
             String TaskId=taskId.toString();
+            RobotCruiseInfo robotCruiseInfo=new RobotCruiseInfo();
+            float cruisedNotCount=0;//未执行的巡视点个数
+            float cruiseCount=0;//该巡视设别下巡视点总个数
             if(robotInfo.get("robotPosition").equals(robotPosition)){//判断机器人类型
                 for(String cKey:cruiseKeys){
                     Map<String,Object> cruiseInfo=redisTemplate.opsForHash().entries(cKey);
@@ -283,20 +281,20 @@ public class TCruiseTaskResultService{
                         if(robotInfo.get("inspectionId").equals(cruiseTypeInfo.getCruiseId().toString())){
                             robotCruiseInfo.setRobotInfo(robotInfo);
                             cruiseCount=cruiseCount+1;
-                            if (cruiseInfo.get("cruiseStatus").equals("0")){
-                                cruisedCount=cruisedCount+1;
+                            if (cruiseInfo.get("cruiseStatus").equals("1")){
+                                cruisedNotCount=cruisedNotCount+1;
                             }
                         }
-
                     }
                 }
-            }
+            }robotCruiseInfo.setRate((cruiseCount-cruisedNotCount)/cruiseCount);//已执行=总-未执行
+            cruiseInfos.add(robotCruiseInfo);
 
 
 
         }
-        robotCruiseInfo.setRate(cruisedCount/cruiseCount);
-        return robotCruiseInfo;
+
+        return cruiseInfos;
     }
 
     @Logs(title ="获取执行当前任务的摄像头的信息及相应巡检点结果状态")
@@ -343,10 +341,6 @@ public class TCruiseTaskResultService{
                     }
                 }
 
-            }else if (cameraInfo.get("taskId").equals(TaskId)&&!cameraInfo.get("cameraType").equals(CameraType)){
-                       cameraCruiseInfo.setNotice("摄像头未参与任务!");
-            }else if (!(cameraInfo.get("taskId").equals(TaskId)&&cameraInfo.get("cameraType").equals(CameraType))){
-                       cameraCruiseInfo.setNotice("本任务未使用摄像头!");
             }
         }
         cameraStatusCount.put("runningNum",cameraNotFault);
@@ -360,8 +354,8 @@ public class TCruiseTaskResultService{
 
     @Logs(title = "图片比较")//结果集仍需优化、只获取了摄像头原始图片
     @Transactional(rollbackFor = Exception.class)
-    public List<String> PictureCompare(Long taskId,Long instanceId){
-     List<String> pictureResult=new ArrayList<>();
+    public Map<String, String> PictureCompare(Long taskId, Long instanceId){
+//     List<String> pictureResult=new ArrayList<>();
      String collectPic=null;
      String preImg=tCameraPresetDao.selectPreImgByCruiseId(instanceId);
      Set<String>cruiseKeys=redisScan("t_cruise_task_result*");
@@ -374,10 +368,13 @@ public class TCruiseTaskResultService{
              collectPic=collectedPic.toString();
          }
      }
-     pictureResult.add(preImg);
-     pictureResult.add(collectPic);
+     Map<String,String> map=new HashMap<>();
+     map.put("preImg",preImg);
+     map.put("collectPic",collectPic);
+//     pictureResult.add(preImg);
+//     pictureResult.add(collectPic);
 
-     return pictureResult;
+     return map;
     }
 }
 

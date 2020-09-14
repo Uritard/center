@@ -329,7 +329,7 @@
 	       )
           LEFT JOIN t_cruise_result b ON a.task_id = b.task_id
           WHERE
-	      b.c_state = 0
+	      b.c_state = 239
 </select>
 
     <!--巡视任务结果统计-->

@@ -145,6 +145,7 @@
        FROM
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
+
       WHERE a.model_id = #{modelId, jdbcType=BIGINT}
     </select>
 

@@ -27,6 +27,4 @@ public class CameraCruiseInfo implements Serializable {
     @ApiModelProperty(value = "巡检任务完成度")
     private Float rate;
 
-    @ApiModelProperty(value = "提示信息")
-    private String Notice;
 }

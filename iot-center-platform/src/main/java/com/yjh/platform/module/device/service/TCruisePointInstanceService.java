@@ -338,13 +338,17 @@ public class TCruisePointInstanceService{
 
     @Logs(title="统计当前任务下的巡检点数量",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int selectCruiseCount(Long taskId){
-        return this.tCruisePointInstanceDao.selectCruiseCount(taskId);
+    public Map<String, Integer> selectCruiseCount(Long taskId){
+        Map<String,Integer>map=new HashMap<>();
+        map.put("Count",this.tCruisePointInstanceDao.selectCruiseCount(taskId));
+        return map;
     }
 
     @Logs(title = "查询各种巡检类型下的巡检点数量",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int selectCruiseCountByType(Long taskId,Integer cruiseType){
-        return this.tCruisePointInstanceDao.selectCruiseCountByType(taskId,cruiseType);
+    public Map<String, Integer> selectCruiseCountByType(Long taskId, Integer cruiseType){
+        Map<String,Integer>map=new HashMap<>();
+        map.put("Count",this.tCruisePointInstanceDao.selectCruiseCountByType(taskId,cruiseType));
+        return map;
     }
 }

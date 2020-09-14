@@ -17,7 +17,7 @@ public class TaskSimpleInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "任务ID")
-    private Long taskID;
+    private Long taskId;
     @ApiModelProperty(value = "任务名称")
     private String taskName;
     @ApiModelProperty(value = "任务类型")
