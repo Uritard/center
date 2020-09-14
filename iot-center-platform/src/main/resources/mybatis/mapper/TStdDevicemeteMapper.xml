@@ -119,6 +119,10 @@
         delete from t_std_devicemete
                 where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </delete>
+    <delete id="deleteByDeviceId" parameterType="java.lang.Long">
+        delete from t_std_devicemete
+                where device_id = #{deviceId, jdbcType=BIGINT}
+    </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         update t_std_devicemete a <set>

@@ -145,9 +145,7 @@
        FROM
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
-      WHERE
-	      b.col_name = "custom_id"
-      and a.model_id = #{modelId, jdbcType=BIGINT}
+      WHERE a.model_id = #{modelId, jdbcType=BIGINT}
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
