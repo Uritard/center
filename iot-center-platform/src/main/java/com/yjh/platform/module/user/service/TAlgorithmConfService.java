@@ -37,7 +37,11 @@ public class TAlgorithmConfService{
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TAlgorithmConf tAlgorithmConf) {
-        return this.tAlgorithmConfDao.update(tAlgorithmConf);
+        TAlgorithmConf tAlgorithmConfByselect = this.tAlgorithmConfDao.selectByPrimaryId(tAlgorithmConf.getPresetId());
+        if(tAlgorithmConfByselect != null){
+            return this.tAlgorithmConfDao.update(tAlgorithmConf);
+        }
+        return this.tAlgorithmConfDao.add(tAlgorithmConf);
     }
 
     @Logs(title = "主键查询", code = "module")
