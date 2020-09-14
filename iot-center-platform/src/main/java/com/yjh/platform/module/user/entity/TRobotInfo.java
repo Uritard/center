@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.entity;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -107,6 +108,8 @@ public class TRobotInfo implements Serializable {
 
     @ApiModelProperty(value = "区域ID")
     private Long upRegionId;
+
+    private List<Long> upRegionIds;
 
     private String regionName;
 

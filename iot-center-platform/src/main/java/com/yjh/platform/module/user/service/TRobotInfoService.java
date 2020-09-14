@@ -66,7 +66,13 @@ public class TRobotInfoService{
 
     @Logs(title = "分页模糊查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo) {
+    public List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo, List<Long> upRegionIds) {
+        if(upRegionIds.size() != 0){
+            tRobotInfo.setUpRegionIds(upRegionIds);
+        }else {
+            upRegionIds.add(tRobotInfo.getUpRegionId());
+            tRobotInfo.setUpRegionIds(upRegionIds);
+        }
         List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(tRobotInfo);
         return tRobotInfoList;
     }

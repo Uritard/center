@@ -291,7 +291,46 @@ public class TStdDeviceService{
         }
         diGui(areaInfoCountryList, listTree);
         return areaInfoCountryList;
+    }
 
+    @Logs(title = "区域设备树", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectRegionIdTree(Long UpRegionId) {
+        List<Long> upRegionIds = new ArrayList<>();
+        List<AreaInfo> upRegionTree = new ArrayList<>();
+        upRegionTree = this.tStdDeviceDao.selectAllRegion();
+        List<AreaInfo> upRegionList = new ArrayList<>();
+        for (Iterator<AreaInfo> it = upRegionTree.iterator(); it.hasNext(); ) {
+            AreaInfo areaInfoMap = it.next();
+            if (areaInfoMap.getId().equals(UpRegionId)) {
+                AreaInfo upRegion = new AreaInfo();
+                upRegion.setId(areaInfoMap.getId());
+                upRegionList.add(upRegion);
+                upRegionIds.add(UpRegionId);
+            }
+        }
+        Recursion(upRegionIds, upRegionList, upRegionTree);
+        return upRegionIds;
+    }
+
+    private void Recursion(List<Long> upRegionIds, List<AreaInfo> upRegionList, List<AreaInfo> upRegionTree) {
+        for(AreaInfo areaInfo : upRegionList){
+            List<AreaInfo> childrenList = new ArrayList<>();
+            for(Iterator<AreaInfo> it = upRegionTree.iterator();it.hasNext();) {
+                AreaInfo areaInfoMap = it.next();
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                    AreaInfo areaInfoTem = new AreaInfo();
+                    areaInfoTem.setId(areaInfoMap.getId());
+                    areaInfoTem.setUpId(areaInfoMap.getUpId());
+                    childrenList.add(areaInfoTem);
+                    upRegionIds.add(areaInfoTem.getId());
+                }
+            }
+            if (childrenList.size()>0 ) {
+                areaInfo.setChildren(childrenList);
+                Recursion(upRegionIds, childrenList, upRegionTree);
+            }
+        }
     }
 
     @Logs(title = "区域树模糊查询", code = "module")

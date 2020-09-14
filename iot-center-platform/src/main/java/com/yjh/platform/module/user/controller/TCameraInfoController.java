@@ -1,24 +1,17 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
 
 
-import org.apache.ibatis.annotations.Param;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -29,8 +22,6 @@ import java.util.Map;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mysql.jdbc.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -45,10 +36,14 @@ public class TCameraInfoController {
     @Autowired
     private final TCameraInfoService tCameraInfoService;
 
+    @Autowired
+    private final TStdDeviceService tStdDeviceService;
+
     private Logger log = LoggerFactory.getLogger(TCameraInfoController.class);
 
-    public TCameraInfoController(TCameraInfoService tCameraInfoService) {
+    public TCameraInfoController(TCameraInfoService tCameraInfoService, TStdDeviceService tStdDeviceService) {
         this.tCameraInfoService = tCameraInfoService;
+        this.tStdDeviceService = tStdDeviceService;
     }
 
     @ApiOperation(value = "插入")
@@ -210,8 +205,9 @@ public class TCameraInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tCameraInfo.getUpRegionId());
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(tCameraInfo);
+            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(tCameraInfo, upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

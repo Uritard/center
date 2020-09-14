@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.entity;
 
 import java.io.Serializable;
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -76,6 +78,5 @@ public class TCameraInfo implements Serializable {
     @ApiModelProperty(value = "经度")
     private String longitude;
 
-
-
+    private List<Long> upRegionIds;
 }

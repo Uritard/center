@@ -285,7 +285,12 @@
         where 1 = 1
         <if test="robotName != null and robotName != ''"> and a.robot_name like '%${robotName}%'</if>
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
-        <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="upRegionId != null and upRegionId != ''">
+            and a.up_region_id in
+            <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
+                #{upRegionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
     </select>
 
     <insert id="batchInsert">

@@ -83,7 +83,13 @@ public class TCameraInfoService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo) {
+    public List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo,  List<Long> upRegionIds) {
+        if(upRegionIds.size() != 0){
+            tCameraInfo.setUpRegionIds(upRegionIds);
+        }else {
+            upRegionIds.add(tCameraInfo.getUpRegionId());
+            tCameraInfo.setUpRegionIds(upRegionIds);
+        }
         List<TCameraInfoByDict> tCameraInfoByDict = tCameraInfoDao.selectByPage(tCameraInfo);
         return tCameraInfoByDict;
     }

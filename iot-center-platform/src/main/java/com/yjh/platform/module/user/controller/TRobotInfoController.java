@@ -34,10 +34,14 @@ public class TRobotInfoController {
     @Autowired
     private final TRobotInfoService tRobotInfoService;
 
+    @Autowired
+    private final TStdDeviceService tStdDeviceService;
+
     private Logger log = LoggerFactory.getLogger(TRobotInfoController.class);
 
-    public TRobotInfoController(TRobotInfoService tRobotInfoService) {
+    public TRobotInfoController(TRobotInfoService tRobotInfoService, TStdDeviceService tStdDeviceService) {
         this.tRobotInfoService = tRobotInfoService;
+        this.tStdDeviceService = tStdDeviceService;
     }
 
     @ApiOperation(value = "插入")
@@ -162,8 +166,9 @@ public class TRobotInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TRobotInfo> list = tRobotInfoService.selectByPage(tRobotInfo);
+            List<TRobotInfo> list = tRobotInfoService.selectByPage(tRobotInfo,upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

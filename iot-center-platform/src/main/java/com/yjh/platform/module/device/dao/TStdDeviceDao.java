@@ -99,4 +99,6 @@ public interface TStdDeviceDao {
     int batchDelete(@Param(value = "list")List<String> list);
     String selectCustomTypeByDict();
     List<CustomInfo> selectCustomInfoByDict();
+
+    List<AreaInfo> selectAllRegion();
 }
