@@ -29,7 +29,7 @@ public class TCameraInfo implements Serializable {
     private String aliasName;
 
     @ApiModelProperty(value = "录像机ID")
-    private String recordId;
+    private Long recordId;
 
     @ApiModelProperty(value = "上级区域ID")
     private Long upRegionId;
