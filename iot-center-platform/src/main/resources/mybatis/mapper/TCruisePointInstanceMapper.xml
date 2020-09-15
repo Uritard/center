@@ -434,21 +434,31 @@
      WHERE d.task_id = #{taskId,jdbcType=BIGINT}
     </select>
 
-    <select id="selectCruiseCountByType" resultType="java.lang.Integer">
+    <select id="selectCruiseCountByType" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.CruiseCountOfType">
         SELECT
-	      COUNT(*)
-        FROM
-	     t_cruise_point_instance a
-        LEFT JOIN (
+	      dict_code as"cruiseType",
+	      dict_note as "cruiseTypeName",
 	    (
-		     t_cruise_plan b
-		     JOIN t_cruise_plan_attr c ON b.plan_id = c.plan_id
-	    )
-	      LEFT JOIN t_cruise_task d ON b.plan_id = d.plan_id
-        ) ON a.instance_id = c.instance_id
-         WHERE
-	        a.cruise_type = #{cruiseType,jdbcType=INTEGER}
-         AND d.task_id = #{taskId,jdbcType=BIGINT}
+		     SELECT
+			    COUNT(*)
+		     FROM
+			    t_cruise_point_instance a
+		     LEFT JOIN (
+			   (
+				   t_cruise_plan b
+				   JOIN t_cruise_plan_attr c ON b.plan_id = c.plan_id
+			   )
+			 LEFT JOIN t_cruise_task d ON b.plan_id = d.plan_id
+		   ) ON a.instance_id = c.instance_id
+		    WHERE
+			    a.cruise_type=dict_code
+                AND d.task_id=#{taskId,jdbcType=BIGINT}
+	       ) AS "Count"
+        FROM
+	       t_dict_business
+        WHERE
+	dict_code IN(SELECT dict_code FROM t_dict_business WHERE col_name="cruise_type" ORDER BY dict_code)
+
     </select>
 
     <select id="selectInstancename" parameterType="java.lang.Long" resultType="java.lang.String">

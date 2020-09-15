@@ -242,11 +242,10 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-查询各种巡检类型下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCountByType",method = RequestMethod.GET)
-    public Result selectCruiseCountByType(@RequestParam Long taskId,
-                                          @RequestParam Integer cruiseType){
+    public Result selectCruiseCountByType(@RequestParam Long taskId){
         Result result=new Result();
         try {
-           result.setData(tCruisePointInstanceService.selectCruiseCountByType(taskId,cruiseType));
+           result.setData(tCruisePointInstanceService.selectCruiseCountByType(taskId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡检点实例查询失败描述：", e);

@@ -233,6 +233,7 @@ public class TCruiseTaskResultService{
         //获取任务开始时间
         for(String keys:keyResult){
            Map<String,Object>mapResult=redisTemplate.opsForHash().entries(keys);
+
             String value=(mapResult.get("taskId")).toString();
             String TaskId=taskId.toString();
             if(TaskId.equals(value)){
@@ -289,8 +290,6 @@ public class TCruiseTaskResultService{
                 }
             }robotCruiseInfo.setRate((cruiseCount-cruisedNotCount)/cruiseCount);//已执行=总-未执行
             cruiseInfos.add(robotCruiseInfo);
-
-
 
         }
 
