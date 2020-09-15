@@ -1,18 +1,15 @@
-package com.yjh.access.netty.server;
+package com.yjh.accessvideo.netty.server;
 
-import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**

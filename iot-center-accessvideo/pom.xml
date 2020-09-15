@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>iot-center-access</artifactId>
+    <artifactId>iot-center-accessvideo</artifactId>
 
     <dependencies>
         <dependency>
@@ -257,7 +257,7 @@
                             <!-- 生成的manifest中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前 缀是lib/ -->
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- 应用的main class -->
-                            <mainClass>com.yjh.access.AccessApplication</mainClass>
+                            <mainClass>com.yjh.accessvideo.AccessVideoApplication</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>config/</Class-Path>

@@ -1,6 +1,6 @@
-package com.yjh.access;
+package com.yjh.accessvideo;
 
-import com.yjh.access.netty.server.NettyServer;
+import com.yjh.accessvideo.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +20,10 @@ import java.util.Enumeration;
 /**
  * Created by tt on 2019/7/31
  */
-@SpringBootApplication(scanBasePackages = "com.yjh.access")
+@SpringBootApplication(scanBasePackages = "com.yjh.accessvideo")
 @EnableDiscoveryClient
 @Slf4j
-public class AccessApplication implements CommandLineRunner {
+public class AccessVideoApplication implements CommandLineRunner {
 
     @Value("${netty.server.port}")
     private int port;
@@ -41,7 +41,7 @@ public class AccessApplication implements CommandLineRunner {
     private RedisTemplate redisTemplate2;
 
     public static void main(String[] args) {
-        SpringApplication.run(AccessApplication.class, args);
+        SpringApplication.run(AccessVideoApplication.class, args);
     }
 
     @Override

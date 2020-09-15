@@ -1,4 +1,4 @@
-package com.yjh.access.netty.server;
+package com.yjh.accessvideo.netty.server;
 
 public class IpRange {
 

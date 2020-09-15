@@ -1,4 +1,4 @@
-package com.yjh.access.netty.server;
+package com.yjh.accessvideo.netty.server;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;

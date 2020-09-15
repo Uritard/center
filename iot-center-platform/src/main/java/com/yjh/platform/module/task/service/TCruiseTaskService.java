@@ -179,7 +179,7 @@ public class TCruiseTaskService {
                             taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
                             taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
                             taskCountMap.put("type", tCruiseTaskCount.getIfRun());
-                            //TODO 增加MQ获取任务状态
+                            //TODO 增加MQ获取任务状态，1是真
                             taskCountMap.put("taskStatus", "fuckWHL");
                             taskCountMap.put("startTime", sdfF2.format(aTimeList));
                             listTask.add(taskCountMap);

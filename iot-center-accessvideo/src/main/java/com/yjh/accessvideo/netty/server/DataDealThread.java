@@ -1,4 +1,4 @@
-package com.yjh.access.netty.server;
+package com.yjh.accessvideo.netty.server;
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {
@@ -16,7 +16,6 @@ public class DataDealThread implements Runnable {
     public void run() {
         while (isThreadStart) {
             try {
-                iec104ServerHandler.ProcSend();
                 if (!iec104ServerHandler.getIsThreadStart()) {
                     isThreadStart = false;
                     log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
