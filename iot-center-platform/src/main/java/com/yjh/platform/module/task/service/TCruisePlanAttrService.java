@@ -6,6 +6,7 @@ import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -41,7 +42,7 @@ public class TCruisePlanAttrService{
 
     @Logs(title = "主键查询", code = "task")
     @Transactional(rollbackFor = Exception.class)
-    public TCruisePlanAttr selectByPrimaryId(Long planId) {
+    public List<TCruisePlanAttrDetail> selectByPrimaryId(Long planId) {
         return this.tCruisePlanAttrDao.selectByPrimaryId(planId);
     }
 

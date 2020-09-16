@@ -19,7 +19,7 @@ public interface TCruisePlanDao {
     int insert(TCruisePlan tCruisePlan);
     int deleteByPrimaryId(@Param(value = "planId") Long planId);
     int update(TCruisePlan tCruisePlan);
-    TCruisePlan selectByPrimaryId(@Param(value = "planId") Long planId);
+    TCruisePlanCount selectByPrimaryId(@Param(value = "planId") Long planId);
     List<TCruisePlan> select(@Param(value = "planId") Long planId,
                              @Param(value = "planName") String planName,
                              @Param(value = "type") Integer type,
@@ -29,5 +29,5 @@ public interface TCruisePlanDao {
     List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan);
 
     int batchInsert(List<TCruisePlan> list);
-    List<InstanceTree> findInstanceTree();
+    List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList);
 }

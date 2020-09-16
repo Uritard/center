@@ -32,17 +32,23 @@ public class TCruiseTaskCount implements Serializable {
     @ApiModelProperty(value = "所属预案id")
     private Long planId;
 
+    @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
+    private String planTypeName;
+
     @ApiModelProperty(value = "所属厂站")
     private String areaId;
 
-    @ApiModelProperty(value = "任务名称")
-    private String name;
+    @ApiModelProperty(value = "任务状态：1.正在执行 2.执行完成 3.任务终止")
+    private String taskState;
 
-    @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
-    private String dictNote;
+    @ApiModelProperty(value = "任务状态：1.成功 0.失败")
+    private String taskStatus;
 
     @ApiModelProperty(value = "是否立即执行（172.周期，173.立即，174.定期）")
     private Integer ifRun;
+
+    @ApiModelProperty(value = "172.周期，173.立即，174.定期")
+    private String typeName;
 
     @ApiModelProperty(value = "机器人id")
     private Long robotId;
@@ -61,5 +67,7 @@ public class TCruiseTaskCount implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    @ApiModelProperty(value = "测点数量")
+    private Integer total;
 
 }

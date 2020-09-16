@@ -1,19 +1,18 @@
 package com.yjh.platform.module.task.controller;
 
-import com.yjh.platform.module.task.entity.InstanceTree;
-import com.yjh.platform.module.task.entity.TCruisePlanCount;
+import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.TCruisePlanAttrService;
 import com.yjh.platform.module.task.service.TCruisePlanService;
-import com.yjh.platform.module.task.entity.TCruisePlan;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
@@ -32,6 +31,8 @@ public class TCruisePlanController {
 
     @Autowired
     private final TCruisePlanService tCruisePlanService;
+    @Autowired
+    private TCruisePlanAttrService tCruisePlanAttrService;
 
     private Logger log = LoggerFactory.getLogger(TCruisePlanController.class);
 
@@ -41,10 +42,10 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "新增预案")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody List<Object> list) {
+    public Result insert(@RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanService.insert(list));
+            result.setData(tCruisePlanService.insert(map));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -72,10 +73,10 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TCruisePlan tCruisePlan) {
+    public Result update(@RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanService.update(tCruisePlan));
+            result.setData(tCruisePlanService.update(planDetailMap));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新预案异常:", e);
@@ -91,8 +92,8 @@ public class TCruisePlanController {
     public Result selectByPrimaryId(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
-            TCruisePlan tCruisePlan = tCruisePlanService.selectByPrimaryId(planId);
-            result.setData(tCruisePlan);
+            TCruisePlanCount tCruisePlanCount = tCruisePlanService.selectByPrimaryId(planId);
+            result.setData(tCruisePlanCount);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -154,11 +155,49 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询标准设备下挂巡检点")
     @RequestMapping(value = "/findInstances", method = RequestMethod.GET)
-    public Result findInstances() {
+    public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        if (Objects.equals(null,deviceIds) || Objects.equals("",deviceIds)) {
+            resultMap.put("count", 0);
+            resultMap.put("list", "[]");
+            result.setData(resultMap);
+            return result;
+        }
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询预案详情")
+    @RequestMapping(value = "/selectPlanDetail", method = RequestMethod.GET)
+    public Result selectPlanDetail(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
-            Map<String, Object> list = tCruisePlanService.findInstanceTree();
-            result.setData(list);
+            Map<String, Object> planDetailMap = new HashMap<>();
+            TCruisePlanCount tCruisePlanCount = tCruisePlanService.selectByPrimaryId(planId);
+            planDetailMap.put("planName", tCruisePlanCount.getPlanName());
+            planDetailMap.put("planTypeName", tCruisePlanCount.getPlanTypeName());
+            planDetailMap.put("planType", tCruisePlanCount.getType());
+            List<TCruisePlanAttrDetail> tCruisePlanAttrDetailList = tCruisePlanAttrService.selectByPrimaryId(planId);
+            List<Long> deviceIds = new ArrayList<>();
+            for (TCruisePlanAttrDetail tCruisePlanAttrDetail:tCruisePlanAttrDetailList) {
+                deviceIds.add(tCruisePlanAttrDetail.getDeviceId());
+            }
+            deviceIds = deviceIds.stream().distinct().collect(Collectors.toList());
+            planDetailMap.put("instanceList", tCruisePlanAttrDetailList);
+            planDetailMap.put("deviceIds", deviceIds);
+            result.setData(planDetailMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
