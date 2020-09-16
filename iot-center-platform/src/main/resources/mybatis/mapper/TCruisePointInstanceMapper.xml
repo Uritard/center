@@ -97,7 +97,7 @@
 
     <delete id="deleteByDeviceId" parameterType="java.lang.Long">
         delete from t_cruise_point_instance
-                where device_id = #{DeviceId, jdbcType=BIGINT}
+                where device_id = #{deviceId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
@@ -233,7 +233,7 @@
     <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
             #{deviceMeteId,jdbcType=BIGINT}
     </foreach>
-    order by a.device_mete_id
+    order by a.device_mete_id desc
     </select>
 
     <select id="selectSYForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail" resultType="java.lang.String">

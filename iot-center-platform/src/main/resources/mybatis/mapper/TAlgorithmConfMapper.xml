@@ -137,7 +137,7 @@
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
         <if test="cameraId != null and cameraId != ''"> and f.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="analyseType != null and analyseType != '' "> and e.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
-
+        order by a.preset_id desc
     </select>
 
     <insert id="batchAdd">
