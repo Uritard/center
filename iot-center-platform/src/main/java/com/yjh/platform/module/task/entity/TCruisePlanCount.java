@@ -34,6 +34,9 @@ public class TCruisePlanCount implements Serializable {
     @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
     private Integer type;
 
+    @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
+    private String planTypeName;
+
     @ApiModelProperty(value = "表计读数，位置状态识别，外观缺陷识别，红外测温，声音检测")
     private String planPointTypes;
 

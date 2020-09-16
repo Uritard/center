@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TPeriodModelDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TPeriodModel">
+        <id column="period_id" jdbcType="BIGINT" property="periodId" />
+        <result column="cron_expression" jdbcType="VARCHAR" property="cronExpression" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        period_id, cron_expression, remark, update_time, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="periodId" parameterType="com.yjh.platform.module.task.entity.TPeriodModel">
+        insert into t_period_model(
+            period_id,
+            cron_expression,
+            remark,
+            update_time,
+            create_time
+        )values(
+                #{periodId, jdbcType=BIGINT},
+                #{cronExpression, jdbcType=VARCHAR},
+                #{remark, jdbcType=VARCHAR},
+                #{updateTime, jdbcType=TIMESTAMP},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_period_model
+                where period_id = #{periodId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TPeriodModel">
+        update t_period_model a <set>
+        <if test="periodId != null and periodId != ''">a.period_id = #{periodId, jdbcType=BIGINT},</if>
+        <if test="cronExpression != null and cronExpression != ''">a.cron_expression = #{cronExpression, jdbcType=VARCHAR},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.period_id = #{periodId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TPeriodModel">
+        select
+        a.period_id,
+        a.cron_expression,
+        a.remark,
+        a.update_time,
+        a.create_time
+        from t_period_model a
+        where 1 = 1
+            and a.period_id = #{periodId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TPeriodModel" resultType="com.yjh.platform.module.task.entity.TPeriodModel">
+        select
+        a.period_id,
+        a.cron_expression,
+        a.remark,
+        a.update_time,
+        a.create_time
+        from t_period_model a
+        where 1 = 1
+        <if test="periodId != null and periodId != ''"> and a.period_id = #{periodId, jdbcType=BIGINT}</if>
+        <if test="cronExpression != null and cronExpression != ''"> and a.cron_expression = #{cronExpression, jdbcType=VARCHAR}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TPeriodModel" resultType="com.yjh.platform.module.task.entity.TPeriodModel">
+        select
+        a.period_id,
+        a.cron_expression,
+        a.remark,
+        a.update_time,
+        a.create_time
+        from t_period_model a
+        where 1 = 1
+        <if test="periodId != null and periodId != ''"> and a.period_id = #{periodId, jdbcType=BIGINT}</if>
+        <if test="cronExpression != null and cronExpression != ''"> and a.cron_expression = #{cronExpression, jdbcType=VARCHAR}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_period_model(
+            period_id,
+            cron_expression,
+            remark,
+            update_time,
+            create_time
+        )values
+        <foreach collection="list" item="TPeriodModel" separator=",">
+            (
+                #{TPeriodModel.periodId, jdbcType=BIGINT},
+                #{TPeriodModel.cronExpression, jdbcType=VARCHAR},
+                #{TPeriodModel.remark, jdbcType=VARCHAR},
+                #{TPeriodModel.updateTime, jdbcType=TIMESTAMP},
+                #{TPeriodModel.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

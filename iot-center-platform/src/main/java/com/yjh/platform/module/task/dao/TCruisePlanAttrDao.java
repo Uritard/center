@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
+import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,7 @@ public interface TCruisePlanAttrDao {
     int insert(TCruisePlanAttr tCruisePlanAttr);
     int deleteByPrimaryId(@Param(value = "planId") Long planId);
     int update(TCruisePlanAttr tCruisePlanAttr);
-    TCruisePlanAttr selectByPrimaryId(@Param(value = "planId") Long planId);
+    List<TCruisePlanAttrDetail> selectByPrimaryId(@Param(value = "planId") Long planId);
     List<TCruisePlanAttr> select(@Param(value = "planId") Long planId,
                                  @Param(value = "instanceId") Long instanceId,
                                  @Param(value = "pointType") Integer pointType,
@@ -32,5 +33,5 @@ public interface TCruisePlanAttrDao {
                                  @Param(value = "updateTime") Date updateTime);
     List<TCruisePlanAttr> selectByPage(TCruisePlanAttr tCruisePlanAttr);
 
-    int batchInsert(List<TCruisePlanAttr> list);
+    int batchInsert(@Param(value = "tCruisePlanAttrList") List<TCruisePlanAttr> tCruisePlanAttrList);
 }

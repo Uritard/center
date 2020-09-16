@@ -53,15 +53,17 @@
             where a.plan_id = #{planId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
         select
         a.plan_id,
         a.plan_name,
         a.type,
+        b.dict_note AS plan_type_name,
         a.plan_point_types,
         a.create_time,
         a.update_time
         from t_cruise_plan a
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         where 1 = 1
             and a.plan_id = #{planId, jdbcType=BIGINT}
         limit 1
@@ -126,7 +128,8 @@
     </insert>
 
     <select id="findInstanceTree" resultType="com.yjh.platform.module.task.entity.InstanceTree">
-        select a.*,b.device_name,b.custom_name,c.instance_name,e.robot_name,g.camera_name,h.camera_name as inferad_name from t_cruise_point_instance a
+        select a.device_id, a.instance_id, a.device_mete_id, a.station_id, a.custom_id, a.station_name, a.cruise_id, a.cruise_name, b.device_name,b.custom_name,c.instance_name,e.robot_name,
+            g.camera_name,h.camera_name as inferad_name,i.dict_note AS cruise_type_name,a.identify_type from t_cruise_point_instance a
 	        left join t_std_device b on a.device_id = b.device_id
 	        left join t_cruise_point_attr c on a.instance_id = c.instance_id
 	        left join t_robot_inspection d on d.inspection_id = a.cruise_id
@@ -134,7 +137,11 @@
 	        left join t_camera_preset f on a.cruise_id = f.preset_id
 	        left join t_camera_info g on f.preset_id = g.camera_name and g.camera_type = 205
 	        left join t_camera_info h on f.preset_id = h.camera_name and h.camera_type = 206
-        where 1 = 1;
+            LEFT JOIN t_dict_business i ON i.dict_code = a.cruise_type AND i.col_name = "cruise_type"
+        where 1 = 1 AND a.device_id IN
+        <foreach collection="deviceIdList" item="deviceId" index="no" open="(" separator="," close=")">
+            #{deviceId, jdbcType=BIGINT}
+        </foreach> ORDER BY device_id
     </select>
 
 </mapper>

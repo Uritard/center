@@ -81,10 +81,17 @@
             where a.plan_id = #{planId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttrDetail">
         select
         a.plan_id,
         a.instance_id,
+        c.instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        d.custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name,
         a.point_type,
         a.area_id,
         a.cruise_region_ids,
@@ -92,12 +99,15 @@
         a.robot_id,
         a.position,
         a.algorithm_id,
-        a.algorithm_name,
         a.inferad_analyze,
         a.ir_temp_box,
         a.create_time,
         a.update_time
         from t_cruise_plan_attr a
+        LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
+        LEFT JOIN t_cruise_point_attr c ON a.instance_id = c.instance_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
         where 1 = 1
             and a.plan_id = #{planId, jdbcType=BIGINT}
     </select>
@@ -182,7 +192,7 @@
             create_time,
             update_time
         )values
-        <foreach collection="list" item="TCruisePlanAttr" separator=",">
+        <foreach collection="tCruisePlanAttrList" item="TCruisePlanAttr" separator=",">
             (
                 #{TCruisePlanAttr.planId, jdbcType=BIGINT},
                 #{TCruisePlanAttr.instanceId, jdbcType=BIGINT},
