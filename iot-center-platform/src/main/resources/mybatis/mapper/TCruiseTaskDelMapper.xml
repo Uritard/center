@@ -98,8 +98,8 @@
         a.create_time
         from t_cruise_task_del a
         where 1 = 1
-        <if test="startTime != null"> and a.del_time &gt;= #{startTime, jdbcType=TIMESTAMP}</if>
-        <if test="endTime != null"> and a.del_time &lt;= #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="dayBefore != null"> and a.del_time &gt;= #{dayBefore, jdbcType=TIMESTAMP}</if>
+        <if test="dayAfter != null"> and a.del_time &lt;= #{dayAfter, jdbcType=TIMESTAMP}</if>
     </select>
 
 

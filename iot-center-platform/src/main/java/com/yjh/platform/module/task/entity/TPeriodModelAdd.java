@@ -1,16 +1,16 @@
 package com.yjh.platform.module.task.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author tt
@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "TPeriodModel对象", description = "周期任务模版表")
-public class TPeriodModel implements Serializable {
+public class TPeriodModelAdd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,5 +43,22 @@ public class TPeriodModel implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    @ApiModelProperty(value = "定时时间类型（分）")
+    private String min;
+
+    @ApiModelProperty(value = "定时时间类型（时）")
+    private String hour;
+
+    @ApiModelProperty(value = "定时时间类型（月的天数）")
+    private String dayOfMonth;
+
+    @ApiModelProperty(value = "定时时间类型（月份）")
+    private String month;
+
+    @ApiModelProperty(value = "定时时间类型（周的天数）")
+    private String dayOfWeek;
+
+    @ApiModelProperty(value = "定时时间类型（年）")
+    private String year;
 
 }

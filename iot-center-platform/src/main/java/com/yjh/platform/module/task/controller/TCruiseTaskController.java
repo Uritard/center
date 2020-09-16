@@ -6,9 +6,8 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.module.task.entity.TCruiseTask;
-import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
-import com.yjh.platform.module.task.entity.TCruiseTaskList;
+import com.yjh.platform.module.task.dao.TPeriodModelDao;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import io.swagger.annotations.Api;
@@ -36,6 +35,8 @@ public class TCruiseTaskController {
     private final TCruiseTaskService tCruiseTaskService;
     @Autowired
     private TCruiseTaskAttrService tCruiseTaskAttrService;
+    @Autowired
+    private TPeriodModelDao tPeriodModelDao;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskController.class);
 
@@ -45,34 +46,58 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestParam(value = "min", required = false) String min,
-                         @RequestParam(value = "hour", required = false) String hour,
-                         @RequestParam(value = "dayOfMonth", required = false) String dayOfMonth,
-                         @RequestParam(value = "month", required = false) String month,
-                         @RequestParam(value = "dayOfWeek", required = false) String dayOfWeek,
-                         @RequestParam(value = "year", required = false) String year,
-                         @RequestBody TCruiseTask tCruiseTask) {
+    public Result insert(@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {
-            if (tCruiseTask.getIfRun() == 172) {
-                // 秒  分  时  天  月  星期  年
-                Map<String, String> mapTime = new HashMap<>();
-                if (Objects.isNull(min)) {mapTime.put("min", "");} else {mapTime.put("min", min);}
-                if (Objects.isNull(hour)) {mapTime.put("hour", "");} else {mapTime.put("hour", hour);}
-                if (Objects.isNull(dayOfMonth)) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", dayOfMonth);}
-                if (Objects.isNull(month)) {mapTime.put("month", "");} else {mapTime.put("month", month);}
-                if (Objects.isNull(dayOfWeek)) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", dayOfWeek);}
-                if (Objects.isNull(year)) {mapTime.put("year", "");} else {mapTime.put("year", year);}
-                String cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
-                System.out.println("cronExpressionDate: "+cronExpressionDate);
+            TCruiseTask tCruiseTask = new TCruiseTask();
+            if (tCruiseTaskAdd.getIfRun() == 172) {
+                String cronExpressionDate = "";
+                Long periodId = tCruiseTaskAdd.getPeriodId();
+                if (Objects.nonNull(periodId)) {
+                    TPeriodModel tPeriodModel = tPeriodModelDao.selectByPrimaryId(periodId);
+                    cronExpressionDate = tPeriodModel.getCronExpression();
+                } else {
+                    // 秒  分  时  天  月  星期  年
+                    Map<String, String> mapTime = new HashMap<>();
+                    if (Objects.isNull(tCruiseTaskAdd.getMin())) {mapTime.put("min", "");} else {mapTime.put("min", tCruiseTaskAdd.getMin());}
+                    if (Objects.isNull(tCruiseTaskAdd.getHour())) {mapTime.put("hour", "");} else {mapTime.put("hour", tCruiseTaskAdd.getHour());}
+                    if (Objects.isNull(tCruiseTaskAdd.getDayOfMonth())) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", tCruiseTaskAdd.getDayOfMonth());}
+                    if (Objects.isNull(tCruiseTaskAdd.getMonth())) {mapTime.put("month", "");} else {mapTime.put("month", tCruiseTaskAdd.getMonth());}
+                    if (Objects.isNull(tCruiseTaskAdd.getDayOfWeek())) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", tCruiseTaskAdd.getDayOfWeek());}
+                    if (Objects.isNull(tCruiseTaskAdd.getYear())) {mapTime.put("year", "");} else {mapTime.put("year", tCruiseTaskAdd.getYear());}
+                    cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
+                    System.out.println("cronExpressionDate: "+cronExpressionDate);
+                }
                 if (CronExpression.isValidExpression(cronExpressionDate)) {
+                    tCruiseTaskAdd.setDateType(cronExpressionDate);
                     tCruiseTask.setDateType(cronExpressionDate);
+                    tCruiseTask.setAreaId(tCruiseTaskAdd.getAreaId());
+                    tCruiseTask.setIfRun(tCruiseTaskAdd.getIfRun());
+                    tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
+                    tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
+                    tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
+                    tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
+                    tCruiseTask.setType(tCruiseTaskAdd.getType());
                     result.setData(tCruiseTaskService.insert(tCruiseTask));
                 } else {
                     result.setData(ResultCodeEnum.CODE10005.getName());
                     return result;
                 }
-            } else { result.setData(tCruiseTaskService.insert(tCruiseTask)); }
+            } else {
+                tCruiseTask.setAreaId(tCruiseTaskAdd.getAreaId());
+                tCruiseTask.setIfRun(tCruiseTaskAdd.getIfRun());
+                tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
+                tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
+                tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
+                tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
+                tCruiseTask.setType(tCruiseTaskAdd.getType());
+                if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
+                    tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
+                } else { tCruiseTask.setStartTime(new Date()); }
+                result.setData(tCruiseTaskService.insert(tCruiseTask));
+            }
+
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

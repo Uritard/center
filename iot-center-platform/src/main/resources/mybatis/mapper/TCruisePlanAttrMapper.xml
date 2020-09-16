@@ -85,7 +85,7 @@
         select
         a.plan_id,
         a.instance_id,
-        c.instance_name,
+        b.cruise_name,
         b.device_id,
         d.device_name,
         b.custom_id,
@@ -105,7 +105,6 @@
         a.update_time
         from t_cruise_plan_attr a
         LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
-        LEFT JOIN t_cruise_point_attr c ON a.instance_id = c.instance_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
         where 1 = 1

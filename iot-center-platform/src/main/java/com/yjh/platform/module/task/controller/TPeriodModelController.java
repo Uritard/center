@@ -1,17 +1,18 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.task.entity.TPeriodModelAdd;
 import com.yjh.platform.module.task.service.TPeriodModelService;
 import com.yjh.platform.module.task.entity.TPeriodModel;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
+
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
@@ -39,9 +40,24 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TPeriodModel tPeriodModel) {
+    public Result insert(@RequestBody TPeriodModelAdd tPeriodModelAdd) {
         Result result = new Result();
         try {
+            // 秒  分  时  天  月  星期  年
+            Map<String, String> mapTime = new HashMap<>();
+            if (Objects.isNull(tPeriodModelAdd.getMin())) {mapTime.put("min", "");} else {mapTime.put("min", tPeriodModelAdd.getMin());}
+            if (Objects.isNull(tPeriodModelAdd.getHour())) {mapTime.put("hour", "");} else {mapTime.put("hour", tPeriodModelAdd.getHour());}
+            if (Objects.isNull(tPeriodModelAdd.getDayOfMonth())) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", tPeriodModelAdd.getDayOfMonth());}
+            if (Objects.isNull(tPeriodModelAdd.getMonth())) {mapTime.put("month", "");} else {mapTime.put("month", tPeriodModelAdd.getMonth());}
+            if (Objects.isNull(tPeriodModelAdd.getDayOfWeek())) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", tPeriodModelAdd.getDayOfWeek());}
+            if (Objects.isNull(tPeriodModelAdd.getYear())) {mapTime.put("year", "");} else {mapTime.put("year", tPeriodModelAdd.getYear());}
+
+            String cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
+            System.out.println("cronExpressionDate: "+cronExpressionDate);
+            tPeriodModelAdd.setCronExpression(cronExpressionDate);
+            TPeriodModel tPeriodModel = new TPeriodModel();
+            tPeriodModel.setCronExpression(cronExpressionDate);
+            tPeriodModel.setRemark(tPeriodModelAdd.getRemark());
             result.setData(tPeriodModelService.insert(tPeriodModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -70,9 +86,24 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TPeriodModel tPeriodModel) {
+    public Result update(@RequestBody TPeriodModelAdd tPeriodModelAdd) {
         Result result = new Result();
         try {
+            // 秒  分  时  天  月  星期  年
+            Map<String, String> mapTime = new HashMap<>();
+            if (Objects.isNull(tPeriodModelAdd.getMin())) {mapTime.put("min", "");} else {mapTime.put("min", tPeriodModelAdd.getMin());}
+            if (Objects.isNull(tPeriodModelAdd.getHour())) {mapTime.put("hour", "");} else {mapTime.put("hour", tPeriodModelAdd.getHour());}
+            if (Objects.isNull(tPeriodModelAdd.getDayOfMonth())) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", tPeriodModelAdd.getDayOfMonth());}
+            if (Objects.isNull(tPeriodModelAdd.getMonth())) {mapTime.put("month", "");} else {mapTime.put("month", tPeriodModelAdd.getMonth());}
+            if (Objects.isNull(tPeriodModelAdd.getDayOfWeek())) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", tPeriodModelAdd.getDayOfWeek());}
+            if (Objects.isNull(tPeriodModelAdd.getYear())) {mapTime.put("year", "");} else {mapTime.put("year", tPeriodModelAdd.getYear());}
+
+            String cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
+            System.out.println("cronExpressionDate: "+cronExpressionDate);
+            tPeriodModelAdd.setCronExpression(cronExpressionDate);
+            TPeriodModel tPeriodModel = new TPeriodModel();
+            tPeriodModel.setCronExpression(cronExpressionDate);
+            tPeriodModel.setRemark(tPeriodModelAdd.getRemark());
             result.setData(tPeriodModelService.update(tPeriodModel));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

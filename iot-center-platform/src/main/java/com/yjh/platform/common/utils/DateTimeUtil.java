@@ -904,6 +904,24 @@ public class DateTimeUtil {
                 e.getMessage();
                 return validTimeList;
             }
+            Date date = new Date();
+            Date dd = new Date();
+            if (dayAfter.getYear() <= date.getYear()) {
+                if (date.getMonth() > dayBefore.getMonth()) { return validTimeList;}
+                if (date.getMonth() == dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
+                if (date.getMonth() < dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
+                while (dd.getTime() < dayAfter.getTime()) {
+                    validTimeList.add(dd);
+                    dd = exp.getNextValidTimeAfter(dd);
+                }
+            } else {
+                dd = exp.getNextValidTimeAfter(dayBefore);
+                while (dd.getTime() < dayAfter.getTime()) {
+                    validTimeList.add(dd);
+                    dd = exp.getNextValidTimeAfter(dd);
+                }
+            }
+            exp = null;
 //            Calendar calendar = Calendar.getInstance();
 //            String cronDate = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.DATE);
 //            String sStart = cronDate + " 00:00:00";
@@ -915,17 +933,7 @@ public class DateTimeUtil {
 //                calendar.add(Calendar.DATE, 1);
 //                dEnd = calendar.getTime();
 //            } catch (Exception e) { e.getMessage(); }
-            Date date = new Date();
-            Date dd = new Date();
-            if (date.getMonth() > dayBefore.getMonth()) { return validTimeList;}
-            if (date.getMonth() == dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
-            if (date.getMonth() < dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
 //            validTimeList.add(sdf.format(dd));
-            while (dd.getTime() < dayAfter.getTime()) {
-                validTimeList.add(dd);
-                dd = exp.getNextValidTimeAfter(dd);
-            }
-            exp = null;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -947,40 +955,33 @@ public class DateTimeUtil {
         String month = mapTime.get("month");
         String year = mapTime.get("year");
 
+
         //按日执行：每天上午10:15触发：0 15 10 ? * *
         if (!hour.equals("") && dayOfMonth.equals("") && dayOfWeek.equals("")) {
-            Integer hourIn = Integer.parseInt(hour);
             if (Objects.equals("", min)) {
-                croExp = String.format("0 %d %d ? * *", 0, hourIn);
+                croExp = String.format("0 %s %s ? * *", 0, hour);
             } else {
-                Integer minIn = Integer.parseInt(min);
-                croExp = String.format("0 %d %d ? * *", minIn, hourIn);
+                croExp = String.format("0 %s %s ? * *", min, hour);
             }
         }
         //按周执行：每周三四点执行：0 0 4 ? * 3
         if (dayOfMonth.equals("") && !dayOfWeek.equals("")) {
-            Integer dayOfWeekIn = Integer.parseInt(dayOfWeek);
-            Integer hourIn = Integer.parseInt(hour);
             if (Objects.equals("", min)) {
-                croExp = String.format("0 %d %d %d * ?", 0, hourIn,
-                        dayOfWeekIn);
+                croExp = String.format("0 %s %s ? * %s", 0, hour,
+                        dayOfWeek);
             } else {
-                Integer minIn = Integer.parseInt(min);
-                croExp = String.format("0 %d %d %d * ?", minIn, hourIn,
-                        dayOfWeekIn);
+                croExp = String.format("0 %s %s ? * %s", min, hour,
+                        dayOfWeek);
             }
         }
         //按月执行：每月15日上午10:15触发：0 15 10 15 * ?
         if (!dayOfMonth.equals("") && dayOfWeek.equals("")) {
-            Integer dayOfMonthIn = Integer.parseInt(dayOfMonth);
-            Integer hourIn = Integer.parseInt(hour);
             if (Objects.equals("", min)) {
-                croExp = String.format("0 %d %d %d * ?", 0, hourIn,
-                        dayOfMonthIn);
+                croExp = String.format("0 %s %s %s * ?", 0, hour,
+                        dayOfMonth);
             } else {
-                Integer minIn = Integer.parseInt(min);
-                croExp = String.format("0 %d %d %d * ?", minIn, hourIn,
-                        dayOfMonthIn);
+                croExp = String.format("0 %s %s %s * ?", min, hour,
+                        dayOfMonth);
             }
         }
         return croExp;

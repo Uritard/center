@@ -94,8 +94,8 @@ public class TCruisePlanService{
         TCruisePlan tCruisePlan = new TCruisePlan();
         Long planId = Long.valueOf(String.valueOf(planDetailMap.get("planId")));
         tCruisePlan.setPlanId(planId);
-        tCruisePlan.setPlanName(String.valueOf(planDetailMap.get("planId")));
-        List<Map<String, Object>> instanceList = new ArrayList<>();
+        tCruisePlan.setPlanName(String.valueOf(planDetailMap.get("planName")));
+        List<Map<String, Object>> instanceList = (List<Map<String, Object>>) planDetailMap.get("instanceList");
         List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
         Date date = new Date();
         for (Map<String, Object> map:instanceList) {

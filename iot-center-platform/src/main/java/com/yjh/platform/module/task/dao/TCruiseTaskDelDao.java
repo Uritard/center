@@ -24,6 +24,6 @@ public interface TCruiseTaskDelDao {
     List<TCruiseTaskDel> selectByPage(TCruiseTaskDel tCruiseTaskDel);
 
     int batchInsert(List<TCruiseTaskDel> list);
-    List<TCruiseTaskDel> slectByTimeZone(@Param(value = "startTime") Date startTime,
-                                         @Param(value = "endTime") Date endTime);
+    List<TCruiseTaskDel> slectByTimeZone(@Param(value = "dayBefore") Date dayBefore,
+                                         @Param(value = "dayAfter") Date dayAfter);
 }
