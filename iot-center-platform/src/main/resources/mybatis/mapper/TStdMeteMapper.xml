@@ -7,6 +7,7 @@
         <id column="std_mete_id" jdbcType="BIGINT" property="stdMeteId" />
         <result column="device_type" jdbcType="INTEGER" property="deviceType" />
         <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
+        <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
         <result column="alarm_explain" jdbcType="VARCHAR" property="alarmExplain" />
@@ -34,7 +35,8 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        std_mete_id, device_type, mete_type, mete_name, alarm_note, alarm_explain, alarm_type, unit, up_effect, low_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
+     device_type, mete_type, mete_name, alarm_note, alarm_explain, alarm_type, unit, up_effect, low_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
+
     </sql>
 
 
@@ -43,6 +45,7 @@
             std_mete_id,
             device_type,
             mete_type,
+            mete_kind,
             mete_name,
             alarm_note,
             alarm_explain,
@@ -52,7 +55,7 @@
             low_effect,
             alarm_level,
             alarm_limit,
-             high_limit1,
+            high_limit1,
             low_limit1,
             high_limit2,
             low_limit2,
@@ -70,6 +73,7 @@
                 #{stdMeteId, jdbcType=BIGINT},
                 #{deviceType, jdbcType=INTEGER},
                 #{meteType, jdbcType=VARCHAR},
+                #{meteKind, jdbcType=INTEGER},
                 #{meteName, jdbcType=VARCHAR},
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmExplain, jdbcType=VARCHAR},
@@ -106,6 +110,7 @@
         <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
         <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
+        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
         <if test="alarmExplain != null and alarmExplain != ''">a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR},</if>
@@ -138,6 +143,7 @@
         a.std_mete_id,
         a.device_type,
         a.mete_type,
+        a.mete_kind,
         a.mete_name,
         a.alarm_note,
         a.alarm_explain,
@@ -172,6 +178,7 @@
         a.std_mete_id,
         a.device_type,
         a.mete_type,
+        a.mete_kind,
         a.mete_name,
         a.alarm_note,
         a.alarm_explain,
@@ -200,6 +207,7 @@
         <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
@@ -230,6 +238,7 @@
         a.std_mete_id,
         a.device_type,
         a.mete_type,
+        a.mete_kind,
         a.mete_name,
         a.alarm_note,
         a.alarm_explain,
@@ -258,6 +267,7 @@
         <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
@@ -288,6 +298,7 @@
             std_mete_id,
             device_type,
             mete_type,
+            mete_kind,
             mete_name,
             alarm_note,
             alarm_explain,
@@ -317,6 +328,7 @@
                 #{TStdMete.stdMeteId, jdbcType=BIGINT},
                 #{TStdMete.deviceType, jdbcType=INTEGER},
                 #{TStdMete.meteType, jdbcType=VARCHAR},
+                #{TStdMete.meteKind, jdbcType=INTEGER},
                 #{TStdMete.meteName, jdbcType=VARCHAR},
                 #{TStdMete.alarmNote, jdbcType=VARCHAR},
                 #{TStdMete.alarmExplain, jdbcType=VARCHAR},

@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.google.gson.internal.$Gson$Preconditions;
 import com.yjh.platform.module.task.entity.BrokenLineInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
+import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import java.util.HashMap;
@@ -166,10 +167,17 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "巡视结果分析--测点查询")
     @RequestMapping(value = "/selectCruiseResultAnal",method = RequestMethod.GET)
-    public Result selectCruiseResultAnal(@RequestParam Long deviceId){
+    public Result selectCruiseResultAnal(@RequestParam Long deviceId,
+                                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                         @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize){
         Result result=new Result();
+        Map<String,Object> resultMap=new HashMap<>();
         try {
-            result.setData(tCruiseDataResultService.selectCruiseResultAnal(deviceId));
+            Page page=PageHelper.startPage(pageNum, pageSize);
+            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tCruiseDataResultService.selectCruiseResultAnal(deviceId);
+            resultMap.put("count",page.getTotal());
+            resultMap.put("list",cruiseResultAnalMeteInfos);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

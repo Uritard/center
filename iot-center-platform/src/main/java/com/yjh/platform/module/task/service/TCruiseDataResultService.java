@@ -7,6 +7,8 @@ import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
@@ -75,9 +77,10 @@ public class TCruiseDataResultService{
 
     @Logs(title = "巡视结果查询-测点查询",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId){
+    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId) throws ParseException {
      //获取同一设备下的所有测点信息
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceId);
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
      for(CruiseResultAnalMeteInfo deviceInfo:cruiseResultAnalMeteInfos){
 
              //通过测点ID获取相应的符合条件的巡检点结果
@@ -85,6 +88,7 @@ public class TCruiseDataResultService{
              deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
              deviceInfo.setIdentifyState(cruiseResultAnalMeteInfo.getIdentifyState());
              deviceInfo.setIdentifyStateName(cruiseResultAnalMeteInfo.getIdentifyStateName());
+             deviceInfo.setDate(simpleDateFormat.format(cruiseResultAnalMeteInfo.getEndTime()));//时间戳转换
              deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
              deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
              deviceInfo.setInstanceName(cruiseResultAnalMeteInfo.getInstanceName());
@@ -110,6 +114,9 @@ public class TCruiseDataResultService{
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalInfo> selectCruiseDataResultByList(CruiseResultAnalInfo cruiseResultAnalInfo){
         List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(cruiseResultAnalInfo);
+        for(CruiseResultAnalInfo cruiseResultAnalInfo1:cruiseResultAnalInfos){
+            cruiseResultAnalInfo1.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cruiseResultAnalInfo1.getEndTime()));
+        }
         return cruiseResultAnalInfos;
     }
 
@@ -117,6 +124,9 @@ public class TCruiseDataResultService{
     @Transactional(rollbackFor = Exception.class)
     public List<BrokenLineInfo> selectBrokenLine(BrokenLineInfo brokenLineInfo){
         List<BrokenLineInfo> brokenLineInfos=tCruiseDataResultDao.selectBrokenLine(brokenLineInfo);
+        for(BrokenLineInfo brokenLineInfo1:brokenLineInfos){
+            brokenLineInfo1.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(brokenLineInfo1.getEndTime()));
+        }
         return brokenLineInfos;
     }
 

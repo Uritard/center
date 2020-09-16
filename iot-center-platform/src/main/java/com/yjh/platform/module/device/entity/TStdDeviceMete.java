@@ -37,7 +37,7 @@ public class TStdDeviceMete implements Serializable {
     private Long meteId;
 
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
-    private String meteKind;
+    private Integer meteKind;
 
     @ApiModelProperty(value = "设备名称")
     private String meteName;

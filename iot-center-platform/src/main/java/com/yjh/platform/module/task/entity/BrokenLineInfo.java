@@ -33,4 +33,6 @@ public class BrokenLineInfo implements Serializable {
 
     @ApiModelProperty(value = "巡视类型名称")
     private String cruiseTypeName;
+
+    private String date;
 }
