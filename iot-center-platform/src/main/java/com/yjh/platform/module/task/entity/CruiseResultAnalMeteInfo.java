@@ -35,5 +35,7 @@ public class CruiseResultAnalMeteInfo implements Serializable {
     private Long deviceId;
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
+
+    private String date;
 }
 

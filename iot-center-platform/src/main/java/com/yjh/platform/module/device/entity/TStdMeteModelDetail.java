@@ -27,10 +27,6 @@ public class TStdMeteModelDetail extends TStdDeviceMete implements Serializable 
     @ApiModelProperty(value = "部位类型名称")
     private String customTypeName;
 
-    @ApiModelProperty(value = "信号标准化编码")
-    private String meteCode;
-
-
     @ApiModelProperty(value = "测点类型名称")
     private String meteTypeName;
 

@@ -34,6 +34,9 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "测点类型")
     private String meteType;
 
+    @ApiModelProperty(value = "测点种类")
+    private Integer meteKind;
+
     @ApiModelProperty(value = "测点标准名")
     private String meteName;
 

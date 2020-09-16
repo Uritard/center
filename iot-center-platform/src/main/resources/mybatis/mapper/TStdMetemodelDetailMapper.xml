@@ -7,7 +7,6 @@
         <id column="model_id" jdbcType="BIGINT" property="modelId" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
         <result column="custom_id" jdbcType="VARCHAR" property="customId" />
-        <result column="mete_code" jdbcType="VARCHAR" property="meteCode" />
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
         <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
@@ -44,14 +43,13 @@
             model_id,
             mete_id,
             custom_id,
-            mete_code,
             mete_name,
             mete_type,
+            mete_kind,
             unit,
             alarm_note,
             alarm_explain,
             alarm_type,
-            mete_kind,
             up_effect,
             down_effect,
             alarm_level,
@@ -71,8 +69,7 @@
         )values(
                 #{modelId, jdbcType=BIGINT},
                 #{meteId, jdbcType=BIGINT},
-                #{customId, jdbcType=VARCHAR},
-                #{meteCode, jdbcType=VARCHAR},
+                #{customType, jdbcType=VARCHAR},
                 #{meteName, jdbcType=VARCHAR},
                 #{meteType, jdbcType=VARCHAR},
                 #{meteKind, jdbcType=INTEGER},
@@ -109,8 +106,7 @@
         update t_std_metemodel_detail a <set>
         <if test="modelId != null and modelId != ''">a.model_id = #{modelId, jdbcType=BIGINT},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="customId != null ">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
-        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="customType != null and customType!= ''">a.custom_id = #{customType, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
         <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
@@ -141,7 +137,33 @@
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
        SELECT
-	    a.*,b.dict_note AS "customTypeName"
+	    a.model_id,
+        a.mete_id,
+        a.custom_id as customType,
+        b.dict_note AS "customTypeName",
+        a.mete_name,
+        a.mete_type,
+        a.mete_kind,
+        a.unit,
+        a.alarm_note,
+        a.alarm_explain,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus
        FROM
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
@@ -155,7 +177,6 @@
         a.mete_id,
         a.custom_id as customType,
         b.dict_note AS "customTypeName",
-        a.mete_code,
         a.mete_name,
         a.mete_type,
         a.mete_kind,
@@ -186,7 +207,6 @@
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="customType != null "> and a.custom_id = #customType, jdbcType=VARCHAR}</if>
         <if test="customTypeName != null "> and b.dict_note = #{customTypeName, jdbcType=VARCHAR}</if>
-        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
@@ -221,7 +241,6 @@
         c.dict_note AS "meteTypeName",
         d.device_type AS "deviceType",
         e.dict_note AS "deviceTypeName",
-        a.mete_code,
         a.mete_name,
         a.mete_type,
         a.mete_kind,
@@ -268,7 +287,6 @@
         <if test="meteTypeName != null "> and c.dict_note = #{meteTypeName, jdbcType=VARCHAR}</if>
         <if test="deviceType != null "> and d.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="deviceTypeName != null "> and e.dict_note = #{deviceTypeName, jdbcType=VARCHAR}</if>
-        <if test="meteCode != null and meteCode != ''"> and a.mete_code = #{meteCode, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT ('%',#{meteName, jdbcType=VARCHAR},'%')</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
@@ -299,7 +317,6 @@
         model_id,
         mete_id,
         custom_id,
-        mete_code,
         mete_name,
         mete_type,
         mete_kind,
@@ -329,7 +346,6 @@
             #{TStdMeteModelDetail.modelId, jdbcType=BIGINT},
             #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
             #{TStdMeteModelDetail.customId, jdbcType=VARCHAR},
-            #{TStdMeteModelDetail.meteCode, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},

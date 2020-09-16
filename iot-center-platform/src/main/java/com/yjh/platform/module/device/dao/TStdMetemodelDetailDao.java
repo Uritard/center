@@ -25,7 +25,6 @@ public interface TStdMetemodelDetailDao {
                                      @Param(value = "meteId") Long meteId,
                                      @Param(value = "customType") String customType,
                                      @Param(value = "customTypeName")String customTypeName,
-                                     @Param(value = "meteCode") String meteCode,
                                      @Param(value = "meteName") String meteName,
                                      @Param(value = "meteType") String meteType,
                                      @Param(value = "meteKind") Integer meteKind,

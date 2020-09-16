@@ -143,6 +143,7 @@ public class TStdMetemodelService {
           detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
           detail.setMeteName(mete.getMeteName());
           detail.setMeteType(mete.getMeteType());
+          detail.setMeteKind(mete.getMeteKind());//插入meteKind
           detail.setUnit(mete.getUnit());
           detail.setAlarmNote(mete.getAlarmNote());
           detail.setAlarmExplain(mete.getAlarmExplain());
@@ -230,6 +231,7 @@ public class TStdMetemodelService {
                 detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
                 detail.setMeteName(mete.getMeteName());
                 detail.setMeteType(mete.getMeteType());
+                detail.setMeteKind(mete.getMeteKind());//插入meteKind
                 detail.setUnit(mete.getUnit());
                 detail.setAlarmNote(mete.getAlarmNote());
                 detail.setAlarmExplain(mete.getAlarmExplain());
@@ -252,6 +254,7 @@ public class TStdMetemodelService {
                 detail.setModulus(mete.getModulus());
 
                 tStdMetemodelDetailDao.add(detail);
+
             }
         }
         else {
@@ -266,6 +269,7 @@ public class TStdMetemodelService {
                     detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
                     detail.setMeteName(mete.getMeteName());
                     detail.setMeteType(mete.getMeteType());
+                    detail.setMeteKind(mete.getMeteKind());//插入meteKind
                     detail.setUnit(mete.getUnit());
                     detail.setAlarmNote(mete.getAlarmNote());
                     detail.setAlarmExplain(mete.getAlarmExplain());
