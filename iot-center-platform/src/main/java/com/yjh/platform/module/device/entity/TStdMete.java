@@ -31,9 +31,6 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
 
-    @ApiModelProperty(value = "信号标准化编码")
-    private String meteCode;
-
     @ApiModelProperty(value = "测点类型")
     private String meteType;
 

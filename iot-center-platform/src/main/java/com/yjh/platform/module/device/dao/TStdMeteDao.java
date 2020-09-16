@@ -21,7 +21,6 @@ public interface TStdMeteDao {
     TStdMete selectByPrimaryId(@Param(value = "stdMeteId") Long stdMeteId);
     List<TStdMete> select(@Param(value = "stdMeteId") Long stdMeteId,
                                 @Param(value = "deviceType") Integer deviceType,
-                                @Param(value = "meteCode") String meteCode,
                                 @Param(value = "meteType") String meteType,
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "alarmNote") String alarmNote,

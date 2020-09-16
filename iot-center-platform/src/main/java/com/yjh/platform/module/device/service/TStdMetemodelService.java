@@ -141,7 +141,6 @@ public class TStdMetemodelService {
           detail.setMeteId(mete.getStdMeteId());
           detail.setCustomTypeName("本体");
           detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
-          detail.setMeteCode(mete.getMeteCode());
           detail.setMeteName(mete.getMeteName());
           detail.setMeteType(mete.getMeteType());
           detail.setUnit(mete.getUnit());
@@ -229,7 +228,6 @@ public class TStdMetemodelService {
                 detail.setMeteId(mete.getStdMeteId());
                 detail.setCustomTypeName("本体");
                 detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
-                detail.setMeteCode(mete.getMeteCode());
                 detail.setMeteName(mete.getMeteName());
                 detail.setMeteType(mete.getMeteType());
                 detail.setUnit(mete.getUnit());
@@ -266,7 +264,6 @@ public class TStdMetemodelService {
                     detail.setMeteId(mete.getStdMeteId());
                     detail.setCustomTypeName("本体");
                     detail.setCustomType(tStdDeviceDao.selectCustomTypeByDict());
-                    detail.setMeteCode(mete.getMeteCode());
                     detail.setMeteName(mete.getMeteName());
                     detail.setMeteType(mete.getMeteType());
                     detail.setUnit(mete.getUnit());
