@@ -333,15 +333,24 @@
 </select>
 
     <!--巡视任务结果统计-->
-    <select id="taskStatistical"  resultType="java.util.Map">
-        select
-        <foreach collection="pTypeMap" item="pType" separator="," index="key">
-            count(if(c_type = #{key},true,null))as #{pType}
-        </foreach>
-
-        from t_cruise_result a,t_cruise_task_result b
-        where a.task_result_id = b.task_result_id
-        and create_time BETWEEN #{Start} and #{End}
+    <select id="taskStatistical"  resultType="com.yjh.platform.module.task.entity.StatisticalTools">
+    select
+        dict_code,
+        dict_note,
+        (select COUNT(*)
+            from t_cruise_result a,t_cruise_task_result b
+            where a.task_result_id = b.task_result_id
+            and c_type = dict_code
+            and a.create_time BETWEEN #{Start} and #{End}
+        ) AS "counts"
+    from t_dict_business
+    where dict_code IN
+        (
+            select dict_code
+            from t_dict_business
+            where col_name = #{colName1}
+        )
+    ORDER BY dict_code
     </select>
 
     <!--巡视点结果操作-->
@@ -380,13 +389,23 @@
     </select>
 
     <!--巡视点结果统计-->
-    <select id="cruiseStatistical" resultType="java.util.Map" >
-        select
-        <foreach collection="pTypeMap" item="pType" separator="," index="key">
-            count(if(state = #{key},true,null))as #{pType}
-        </foreach>
-        from t_cruise_data_result
-        where createtime BETWEEN #{Start} and #{End}
+    <select id="cruiseStatistical" resultType="com.yjh.platform.module.task.entity.StatisticalTools" >
+    select
+        dict_code,
+        dict_note,
+        (select COUNT(*)
+            from t_cruise_data_result
+            WHERE  state = dict_code
+            AND createtime  BETWEEN #{Start} and #{End}
+        ) AS "counts"
+    from t_dict_business
+    where dict_code IN
+        (
+            select dict_code
+            from t_dict_business
+            where col_name = #{colName1}
+        )
+    ORDER BY dict_code
     </select>
 
     <select id="selectByIdentifyResult" parameterType="java.lang.Integer" resultType="java.lang.String">
@@ -396,8 +415,4 @@
         select dict_note from t_dict_business where dict_code = #{identifyState,jdbcType=INTEGER}
     </select>
 
-    <select id="selectPType"  resultType="com.yjh.platform.module.task.entity.TDictBussinessExpand">
-        select a.dict_code ,a.dict_note from t_dict_business a
-        where a.col_name = #{colName1,jdbcType=VARCHAR}
-    </select>
 </mapper>

@@ -17,7 +17,7 @@ public interface TCameraRecorderDao {
     int insert(TCameraRecorder tCameraRecorder);
     int deleteByPrimaryId(@Param(value = "recordId") Long recordId);
     int update(TCameraRecorder tCameraRecorder);
-    int deleteSelectedRecord(@Param(value = "recordIds") String[] recordIds);
+    int deleteSelectedRecord(@Param(value = "list") List<String> list);
     TCameraRecorderByDict selectByPrimaryId(@Param(value = "recordId") Long recordId);
     List<TCameraRecorderByDict> select(@Param(value = "recordId") Long recordId,
                                        @Param(value = "recordName") String recordName,

@@ -67,11 +67,14 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete t_camera_info,t_camera_preset,t_algorithm_conf
+        delete t_camera_info,t_camera_preset,t_algorithm_conf,t_cruise_point_instance
         from t_camera_info left join t_camera_preset
         on t_camera_info.camera_id=t_camera_preset.camera_id
         left join t_algorithm_conf
         on t_camera_preset.preset_id = t_algorithm_conf.preset_id
+        left join t_cruise_point_instance
+        on t_algorithm_conf.preset_id = t_cruise_point_instance.cruise_id
+        and t_cruise_point_instance.cruise_type = 229
         where t_camera_info.camera_id = #{cameraId, jdbcType=BIGINT}
     </delete>
 
@@ -92,7 +95,7 @@
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
-        update t_camera_info a <set>
+        update d a <set>
         <if test="cameraName != null and cameraName != ''">a.camera_name = #{cameraName, jdbcType=VARCHAR},</if>
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=BIGINT},</if>
@@ -174,7 +177,10 @@
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select<include refid="tongTong"></include>
-        from t_camera_info a,t_dict_business b,t_std_region c,t_dict_business d
+        from t_camera_info a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code
+        LEFT JOIN t_std_region c on a.up_region_id = c.region_id
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
@@ -202,9 +208,7 @@
         <if test="address != null">and a.address = #{address, jdbcType=VARCHAR},</if>
         <if test="latitude != null">and a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null">and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        and b.dict_code = a.vendor_id
-        and d.dict_code = a.camera_type
-        and c.region_id = a.up_region_id
+
     </select>
 
     <select id="selectCameraTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">

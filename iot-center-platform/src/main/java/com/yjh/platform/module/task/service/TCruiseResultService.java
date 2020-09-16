@@ -87,53 +87,35 @@ public class TCruiseResultService{
     }
     @Logs(title = "巡视任务结果统计", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,Integer>> taskStatistical() {
+    public List<List<StatisticalTools>> taskStatistical() {
 
         String weekStart = DateTimeUtil.getWeekStart();
         String weekEnd = DateTimeUtil.getWeekEnd();
-
-        String colName1 = "plan_type";
-        List<TDictBussinessExpand> pType = tCruiseResultDao.selectPType(colName1);
-
-        Map<String,String> pTypeMap = new HashMap<>();
-        for (int i = 0;i<pType.size();i++){
-            pTypeMap.put(pType.get(i).getDictCode(),pType.get(i).getDictNote());
-        }
-
-        List<Map<String,Integer>> taskStatisticalList = new ArrayList<>();
-        //本周
-        taskStatisticalList.add(tCruiseResultDao.taskStatistical(pTypeMap,weekStart,weekEnd));
-
         String lastWeekStart = DateTimeUtil.getLastWeekStart();
         String lastWeekend = DateTimeUtil.getLastWeekend();
-        //上周
-        taskStatisticalList.add(tCruiseResultDao.taskStatistical(pTypeMap,lastWeekStart,lastWeekend));
 
-        return taskStatisticalList;
+        String colName1 = "plan_type";
+        List<List<StatisticalTools>> statisticalList = new ArrayList<>();
+        statisticalList.add(tCruiseResultDao.taskStatistical(colName1,weekStart,weekEnd));//本周
+        statisticalList.add(tCruiseResultDao.taskStatistical(colName1,lastWeekStart,lastWeekend));//上周
+
+        return statisticalList;
     }
     @Logs(title = "巡视点结果统计", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,Integer>> cruiseStatistical() {
+    public List<List<StatisticalTools>> cruiseStatistical() {
+
         String weekStart = DateTimeUtil.getWeekStart();
         String weekEnd = DateTimeUtil.getWeekEnd();
-
-        String colName1 = "data_state";
-        List<TDictBussinessExpand> pType = tCruiseResultDao.selectPType(colName1);
-
-        Map<String,String> pTypeMap = new HashMap<>();
-        for (int i = 0;i<pType.size();i++){
-            pTypeMap.put(pType.get(i).getDictCode(),pType.get(i).getDictNote());
-        }
-
-        List<Map<String,Integer>> cruiseStatisticalList = new ArrayList<>();
-        //本周
-        cruiseStatisticalList.add(tCruiseResultDao.cruiseStatistical(pTypeMap,weekStart,weekEnd));
-
         String lastWeekStart = DateTimeUtil.getLastWeekStart();
         String lastWeekend = DateTimeUtil.getLastWeekend();
-        //上周
-        cruiseStatisticalList.add(tCruiseResultDao.cruiseStatistical(pTypeMap,lastWeekStart,lastWeekend));
-        return cruiseStatisticalList;
+
+        String colName1 = "data_state";
+        List<List<StatisticalTools>> statisticalList = new ArrayList<>();
+        statisticalList.add(tCruiseResultDao.cruiseStatistical(colName1,weekStart,weekEnd));//本周
+        statisticalList.add(tCruiseResultDao.cruiseStatistical(colName1,lastWeekStart,lastWeekend));//上周
+
+        return statisticalList;
     }
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)

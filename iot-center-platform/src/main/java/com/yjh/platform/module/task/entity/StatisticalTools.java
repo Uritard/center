@@ -10,18 +10,22 @@ import java.io.Serializable;
 
 /**
  * @author YC
- * @date 2020/9/11 - 9:08
- */
-@Data
+ * @date 2020/9/15 - 15:19
+ */@Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TDictBussinessExpand对象", description = "字典表拓展")
-public class TDictBussinessExpand implements Serializable {
+@ApiModel(value = "StatisticalTools对象", description = "统计实体类")
+public class StatisticalTools  implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "字典编码")
     private String dictCode;
+
     @ApiModelProperty(value = "字典描述")
     private String dictNote;
+
+    @ApiModelProperty(value = "次数")
+    private Integer counts;
+
 }

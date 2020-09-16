@@ -38,18 +38,16 @@ public interface TCruiseResultDao {
     List<CruiseResultDetail> selectCruiseByPage(CruiseResultDetail cruiseResultDetail);
     int manualReview(CruiseManualReview cruiseManualReview);
     int batchInsert(List<TCruiseResult> list);
-    Map<String,Integer> taskStatistical(Map<String,String> pTypeMap,
-                                        @Param(value = "Start")String Start,
-                                        @Param(value = "End")String End);
-    Map<String,Integer>  cruiseStatistical(Map<String,String> pTypeMap,
+    List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "Start")String Start,
                                            @Param(value = "End")String End);
+    List<StatisticalTools> cruiseStatistical(@Param(value = "colName1")String colName1,
+                                            @Param(value = "Start")String Start,
+                                            @Param(value = "End")String End);
     List<TaskSimpleInfo> selectTaskIsRunning();
 
     CruiseAudit cruiseResultOperate(CruiseAudit cruiseAudit);
     String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
-    List<TDictBussinessExpand> selectPType(@Param(value = "colName1")String colName1);
-
 
 }

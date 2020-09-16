@@ -152,7 +152,7 @@ public class TCruiseResultController {
     public Result taskStatistical() {
         Result result = new Result();
         try {
-            List<Map<String,Integer>> taskStatisticalList = tCruiseResultService.taskStatistical();
+            List<List<StatisticalTools>> taskStatisticalList = tCruiseResultService.taskStatistical();
 
             result.setData(taskStatisticalList);
         } catch (Exception e) {
@@ -166,7 +166,7 @@ public class TCruiseResultController {
     public Result cruiseStatistical() {
         Result result = new Result();
         try {
-            List<Map<String,Integer>> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
+            List<List<StatisticalTools>> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
             result.setData(cruiseStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

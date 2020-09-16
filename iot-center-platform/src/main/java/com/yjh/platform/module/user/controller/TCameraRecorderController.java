@@ -71,7 +71,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedRecord", method = RequestMethod.DELETE)
-    public Result deleteSelectedRecord(@RequestParam(value = "recordIds[]", required = true) String[] recordIds) {
+    public Result deleteSelectedRecord(@RequestParam(value = "recordIds", required = true) String recordIds) {
         Result result = new Result();
         try {
             result.setData(tCameraRecorderService.deleteSelectedRecord(recordIds));

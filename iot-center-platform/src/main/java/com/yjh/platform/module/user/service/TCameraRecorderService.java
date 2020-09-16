@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,8 +35,9 @@ public class TCameraRecorderService {
 
     @Logs(title = "批量删除", code = "TCameraRecorder")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteSelectedRecord(String[] recordIds) {
-        return this.tCameraRecorderDao.deleteSelectedRecord(recordIds);
+    public int deleteSelectedRecord(String recordIds) {
+        List<String> list= Arrays.asList(recordIds.split(","));
+        return this.tCameraRecorderDao.deleteSelectedRecord(list);
     }
 
     @Logs(title = "更新", code = "TCameraRecorder")
