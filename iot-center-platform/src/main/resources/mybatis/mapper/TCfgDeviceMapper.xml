@@ -147,6 +147,7 @@
         <if test="meteKind != null and meteKind != ''"> and h.dict_code = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>
         )
+        order by a.device_id desc
     </select>
 
     <insert id="batchInsert">
