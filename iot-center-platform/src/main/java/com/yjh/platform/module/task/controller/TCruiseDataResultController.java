@@ -165,6 +165,25 @@ public class TCruiseDataResultController {
     }
 
 
+    @ApiOperation(value = "全量标准测点及第一条巡检结果查询-分页无条件")
+    @RequestMapping(value = "/selectCruiseResultAnalAll",method =RequestMethod.GET)
+    public Result selectCruiseResultAnalAll(@RequestParam(value = "pageNum" ,required = false,defaultValue = "1")int pageNum,
+                                            @RequestParam(value = "pageSize",required = false,defaultValue = "6")int pageSize){
+        Result result=new Result();
+        Map<String,Object>resultMap=new HashMap<>();
+        try {
+            Page page=PageHelper.startPage(pageNum, pageSize);
+            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tCruiseDataResultService.selectCruiseResultAnalAll();
+            resultMap.put("count",page.getTotal());
+            resultMap.put("list",cruiseResultAnalMeteInfos);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "巡视结果分析--测点查询")
     @RequestMapping(value = "/selectCruiseResultAnal",method = RequestMethod.GET)
     public Result selectCruiseResultAnal(@RequestParam Long deviceId,
