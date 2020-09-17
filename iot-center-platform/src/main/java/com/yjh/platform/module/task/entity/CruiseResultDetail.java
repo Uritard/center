@@ -24,15 +24,15 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "实物编码")
     private String realCode;
     @ApiModelProperty(value = "巡检任务id")
-    private Integer taskId;
+    private String taskId;
 
     @ApiModelProperty(value = "设备id")
-    private Integer deviceId;
+    private Long deviceId;
     @ApiModelProperty(value = "巡视设备")
     private String deviceName;
 
     @ApiModelProperty(value = "巡视点id")
-    private Integer instanceId;
+    private Long instanceId;
     @ApiModelProperty(value = "巡视点名称")
     private String instanceName;
 

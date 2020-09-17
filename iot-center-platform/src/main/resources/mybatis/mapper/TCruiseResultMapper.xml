@@ -98,8 +98,8 @@
                             t_cruise_result a,
                             t_cruise_task_result_detail d,
                             t_cruise_data_result e
-                        where  a.task_id = #{taskId,jdbcType =INTEGER }
-                        and d.instance_id = #{instanceId,jdbcType = INTEGER}
+                        where  a.task_id = #{taskId,jdbcType =VARCHAR }
+                        and d.instance_id = #{instanceId,jdbcType = BIGINT}
                         and a.task_result_id = d.task_result_id
                         and e.cruise_result_id = d.cruise_result_id) t1)
 
@@ -192,20 +192,29 @@
 
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
-        from t_cruise_result a,
-             t_cruise_task b,
-             t_dict_business d,
-             t_dict_business e,
-             t_cruise_task_result f,
-             t_cruise_task_result_detail g
+        FROM
+            (
+                (
+                    (
+                        t_cruise_result a
+                        LEFT JOIN t_dict_business d ON a.c_type = d.dict_code
+                    )
+                    LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
+                )
+                LEFT JOIN (
+                    t_cruise_task_result f
+                    LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
+                ) ON a.task_result_id = f.task_result_id
+            )
+        LEFT JOIN t_cruise_task b ON a.task_id = b.task_id
         where 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR},</if>
         <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
         <if test="areaId != null and areaId != ''">and a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="cType != null and cType != ''">and a.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cType != null ">and a.c_type = #{cType, jdbcType=INTEGER}</if>
         <if test="planType != null and planType != ''">and d.dict_note = #{planType, jdbcType=VARCHAR}</if>
-        <if test="cState != null and cState != ''">and a.c_state = #{cState, jdbcType=INTEGER}</if>
+        <if test="cState != null ">and a.c_state = #{cState, jdbcType=INTEGER}</if>
         <if test="taskState != null and taskState != ''">and e.dict_note = #{taskState, jdbcType=VARCHAR}</if>
         <if test="modifyState != null and modifyState != ''">and a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
         <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER},</if>
@@ -217,11 +226,6 @@
         <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
         <if test="taskCode != null and taskCode != ''">and a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
         <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}, </if>
-        and a.task_id = b.task_id
-        and a.c_type = d.dict_code
-        and a.c_state  = e.dict_code
-        and a.task_result_id = f.task_result_id
-        and g.task_result_id = a.task_result_id
         GROUP BY a.task_result_id
     </select>
 
@@ -241,26 +245,33 @@
         b.cruise_time,
         g.evaluation_state,
         k.dict_note as evaluation_state1
-        from t_cruise_result a,
-        t_cruise_task_result_detail b,
-        t_std_device d,
-        t_std_device_attr e,
-        t_cruise_point_attr f,
-        t_cruise_data_result g,
-        t_dict_business h,
-        t_dict_business j,
-        t_dict_business k
-        where a.task_id = #{taskId}
-        and a.task_result_id = b.task_result_id
-        and d.device_id = b.device_id
-        and e.device_id = b.device_id
-        and b.instance_id = f.instance_id
-        and g.cruise_result_id = b.cruise_result_id
-        and h.dict_code = g.point_type
-        and j.dict_code = g.state
-        and k.dict_code = g.evaluation_state
+        FROM
+            (
+            t_std_device d
+            LEFT JOIN t_std_device_attr e ON d.device_id = e.device_id
+            )
+        LEFT JOIN (
+        (
+            (
+                t_cruise_task_result_detail b
+                LEFT JOIN t_cruise_point_attr f ON f.instance_id = b.instance_id
+            )
+            LEFT JOIN t_cruise_result a ON a.task_result_id = b.task_result_id
+        )
+            LEFT JOIN (
+                (
+                    (
+                        t_cruise_data_result g
+                        LEFT JOIN t_dict_business h ON h.dict_code = g.point_type
+                    )
+                    LEFT JOIN t_dict_business k ON k.dict_code = g.evaluation_state
+                )
+                LEFT JOIN t_dict_business j ON j.dict_code = g.state
+            ) ON g.cruise_result_id = b.cruise_result_id
+        ) ON d.device_id = b.device_id
+        WHERE a.task_id = #{taskId,jdbcType=BIGINT}
         <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
-        <if test="deviceId != null "> and d.device_id like concat ('%',#{deviceId,jdbcType=INTEGER},'%')</if>
+        <if test="deviceId != null "> and d.device_id like concat ('%',#{deviceId,jdbcType=BIGINT},'%')</if>
 
         <if test="pointType != null "> and g.point_type = #{pointType, jdbcType=INTEGER}</if>
         <if test="cruiseType != null and cruiseType != ''"> and h.dict_note = #{cruiseType, jdbcType=VARCHAR}</if>
@@ -362,30 +373,25 @@
         e.picpath,
         e.result_num,
         e.identify_result,
-
         e.evaluation_state,
         h.dict_note as evaluation_state1,
         e.identify_state,
-
         e.personcheck
-        from
-        t_cruise_result a,
-        t_cruise_task_result_detail d,
-        t_cruise_data_result e,
-
-        t_cruise_point_attr j,
-        t_dict_business h
-
+        FROM
+            (
+                (
+                    (
+                        t_cruise_result a
+                        LEFT JOIN t_cruise_task_result_detail d ON a.task_result_id = d.task_result_id
+                    )
+                    LEFT JOIN t_cruise_data_result e ON d.cruise_result_id = e.cruise_result_id
+                )
+                LEFT JOIN t_cruise_point_attr j ON d.instance_id = j.instance_id
+            )
+            LEFT JOIN t_dict_business h ON e.evaluation_state = h.dict_code
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
         <if test="instanceId != null "> and d.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        and a.task_result_id = d.task_result_id
-        and d.cruise_result_id = e.cruise_result_id
-
-        and e.evaluation_state = h.dict_code
-        and d.instance_id = j.instance_id
-
-
     </select>
 
     <!--巡视点结果统计-->

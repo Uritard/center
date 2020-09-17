@@ -21,9 +21,9 @@ public class CruiseManualReview {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "巡检任务id")
-    private Integer taskId;
+    private String taskId;
     @ApiModelProperty(value = "巡检点实例id")
-    private Integer instanceId;
+    private Long instanceId;
     @ApiModelProperty(value = "人工校核结果")
     private String personcheck;
     @ApiModelProperty(value = "评价状态")
