@@ -6,6 +6,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
@@ -37,6 +38,8 @@ public class TCruiseTaskController {
     private TCruiseTaskAttrService tCruiseTaskAttrService;
     @Autowired
     private TPeriodModelDao tPeriodModelDao;
+    @Autowired
+    private TCruisePlanDao tCruisePlanDao;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskController.class);
 
@@ -76,7 +79,8 @@ public class TCruiseTaskController {
                     tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
                     tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
                     tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
-                    tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
+                    TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+                    tCruiseTask.setTaskType(tCruisePlanCount.getType());
                     tCruiseTask.setType(tCruiseTaskAdd.getType());
                     result.setData(tCruiseTaskService.insert(tCruiseTask));
                 } else {
@@ -90,7 +94,8 @@ public class TCruiseTaskController {
                 tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
                 tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
                 tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
-                tCruiseTask.setType(tCruiseTaskAdd.getType());
+                TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+                tCruiseTask.setType(tCruisePlanCount.getType());
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
                 } else { tCruiseTask.setStartTime(new Date()); }

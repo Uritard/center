@@ -107,8 +107,8 @@ public class FormatController {
         Result result = new Result();
         try {
             QuartzTask quartzTask = new QuartzTask();
-            quartzTask.setJobName("tttest1");
-            quartzTask.setJobGroup("tttest");
+            quartzTask.setJobName("ETLScheduler");
+            quartzTask.setJobGroup("ETL");
             jobManager.addJob(quartzTask);
             result.setData("success");
         } catch (Exception e) {

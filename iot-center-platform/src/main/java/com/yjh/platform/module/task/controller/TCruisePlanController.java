@@ -168,6 +168,7 @@ public class TCruisePlanController {
         }
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
+            if (deviceIds.equals(-1)) deviceIds = "";
             List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

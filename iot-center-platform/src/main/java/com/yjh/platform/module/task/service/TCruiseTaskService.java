@@ -74,14 +74,17 @@ public class TCruiseTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskId, Date taskDate) {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-        if (tCruiseTask.getIfRun()==172) {
+        if (tCruiseTask.getIfRun()==172 && !tCruiseTask.getStartTime().equals(-1)) {
             TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
             tCruiseTaskDel.setTaskId(taskId);
             tCruiseTaskDel.setDelTime(taskDate);
             Date date = new Date("yyyy-MM-dd HH:mm:ss");
             tCruiseTaskDel.setCreateTime(date);
             return tCruiseTaskDelDao.insert(tCruiseTaskDel);
-        } else {return this.tCruiseTaskDao.deleteByPrimaryId(taskId);}
+        } else {
+            tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
+            return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
+        }
     }
 
     @Logs(title = "更新", code = "module")
@@ -190,8 +193,12 @@ public class TCruiseTaskService {
                                 taskCountMap.put("type", tCruiseTaskCount.getIfRun());
                                 taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
                                 //TODO 增加redis获取任务状态，1是真
-                                if (Objects.nonNull(tCruiseTaskCount.getTaskState())) taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
-                                if (Objects.nonNull(tCruiseTaskCount.getTaskStatus())) taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                                if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                                    taskCountMap.put("taskState", "任务未开始");
+                                } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                                if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                                    taskCountMap.put("taskStatus", "-1");
+                                } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
                                 taskCountMap.put("startTime", sdfF2.format(aTimeList));
                                 listTask.add(taskCountMap);
                             }
@@ -204,8 +211,12 @@ public class TCruiseTaskService {
                         taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
                         taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
                         //TODO 增加redis获取任务状态，1是真
-                        if (Objects.nonNull(tCruiseTaskCount.getTaskState())) taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
-                        if (Objects.nonNull(tCruiseTaskCount.getTaskStatus())) taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                            taskCountMap.put("taskState", "任务未开始");
+                        } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                            taskCountMap.put("taskStatus", "-1");
+                        } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
                         taskCountMap.put("startTime", sdfF2.format(aTimeList));
                         listTask.add(taskCountMap);
                     }
@@ -218,11 +229,13 @@ public class TCruiseTaskService {
                 taskCountMap.put("total",tCruiseTaskCount.getTotal());
                 taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
                 taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
-                if (Objects.nonNull(tCruiseTaskCount.getTaskState())) taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
-                if (Objects.nonNull(tCruiseTaskCount.getTaskState()) && tCruiseTaskCount.getTaskState().equals("239")) {
-                    //TODO taskStatus增加redis获取任务状态，1是真
-                    taskCountMap.put("taskStatus", "");
-                } else {taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());}
+                //TODO 增加redis获取任务状态，1是真
+                if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                    taskCountMap.put("taskState", "任务未开始");
+                } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                    taskCountMap.put("taskStatus", "-1");
+                } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
 
                 taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getStartTime()));
                 listTask.add(taskCountMap);

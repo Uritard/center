@@ -1,7 +1,11 @@
 package com.yjh.platform;
 
+import com.yjh.platform.common.quartz.JobManager;
+import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import org.apache.catalina.connector.Connector;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
@@ -16,13 +20,26 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
+
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
 @EnableFeignClients 
-public class PlatformApplication {
+public class PlatformApplication  implements CommandLineRunner {
+
+    @Autowired
+    private JobManager jobManager;
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
+    }
+
+    @Override
+    public void run(String... strings) throws Exception {
+        QuartzTask quartzTask = new QuartzTask();
+        quartzTask.setJobName("PlatformScheduler");
+        quartzTask.setJobGroup("Platform");
+        jobManager.addJob(quartzTask);
     }
 
     @Bean
