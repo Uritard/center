@@ -75,12 +75,44 @@ public class TCruiseDataResultService{
         return this.tCruiseDataResultDao.batchInsert(list);
     }
 
+
+    @Logs(title = "全量测点巡视结果",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseResultAnalMeteInfo>  selectCruiseResultAnalAll (){
+        //查询全量有巡检结果的标准测点
+        List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMete();
+        for(CruiseResultAnalMeteInfo deviceInfo:cruiseResultAnalMeteInfos){
+
+            //通过测点ID获取相应的符合条件的巡检点结果
+            CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
+            deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
+            deviceInfo.setIdentifyState(cruiseResultAnalMeteInfo.getIdentifyState());
+            deviceInfo.setIdentifyStateName(cruiseResultAnalMeteInfo.getIdentifyStateName());
+            deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
+            deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
+            deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
+        }
+        //按时间降序排列
+        Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
+            @Override
+            public int compare(CruiseResultAnalMeteInfo o1, CruiseResultAnalMeteInfo o2) {
+                int flag = o1.getEndTime().compareTo(o2.getEndTime());
+                if(flag == -1){
+                    flag = 1;
+                }else if(flag == 1){
+                    flag = -1;
+                }
+                return flag;
+            }
+        });
+        return cruiseResultAnalMeteInfos;
+    }
+
     @Logs(title = "巡视结果查询-测点查询",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId) throws ParseException {
-     //获取同一设备下的所有测点信息
+    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId)  {
+     //获取同一设备下的有巡检结果的标准测点
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceId);
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
      for(CruiseResultAnalMeteInfo deviceInfo:cruiseResultAnalMeteInfos){
 
              //通过测点ID获取相应的符合条件的巡检点结果
@@ -88,10 +120,9 @@ public class TCruiseDataResultService{
              deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
              deviceInfo.setIdentifyState(cruiseResultAnalMeteInfo.getIdentifyState());
              deviceInfo.setIdentifyStateName(cruiseResultAnalMeteInfo.getIdentifyStateName());
-             deviceInfo.setDate(simpleDateFormat.format(cruiseResultAnalMeteInfo.getEndTime()));//时间戳转换
              deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
              deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
-             deviceInfo.setInstanceName(cruiseResultAnalMeteInfo.getInstanceName());
+             deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
      }
      //按时间降序排列
         Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
@@ -114,9 +145,7 @@ public class TCruiseDataResultService{
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalInfo> selectCruiseDataResultByList(CruiseResultAnalInfo cruiseResultAnalInfo){
         List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(cruiseResultAnalInfo);
-        for(CruiseResultAnalInfo cruiseResultAnalInfo1:cruiseResultAnalInfos){
-            cruiseResultAnalInfo1.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cruiseResultAnalInfo1.getEndTime()));
-        }
+
         return cruiseResultAnalInfos;
     }
 
@@ -124,9 +153,6 @@ public class TCruiseDataResultService{
     @Transactional(rollbackFor = Exception.class)
     public List<BrokenLineInfo> selectBrokenLine(BrokenLineInfo brokenLineInfo){
         List<BrokenLineInfo> brokenLineInfos=tCruiseDataResultDao.selectBrokenLine(brokenLineInfo);
-        for(BrokenLineInfo brokenLineInfo1:brokenLineInfos){
-            brokenLineInfo1.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(brokenLineInfo1.getEndTime()));
-        }
         return brokenLineInfos;
     }
 

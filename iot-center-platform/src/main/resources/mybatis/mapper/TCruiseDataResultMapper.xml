@@ -243,11 +243,10 @@
         f.dict_note AS identifyStateName,
 	    b.end_time,
 	    d.picpath,
-        e.instance_name
+        a.cruise_name
      FROM
 	   (
-		   (t_cruise_point_instance a LEFT JOIN t_cruise_point_attr e
-     ON a.instance_id=e.instance_id)
+		   t_cruise_point_instance a
 		 LEFT JOIN (
 			t_cruise_task_result_detail b
 			LEFT JOIN (t_cruise_data_result d left JOIN t_dict_business f ON d.identify_state=f.dict_code AND f.col_name="identify_state") ON b.cruise_result_id = d.cruise_result_id
@@ -266,7 +265,7 @@
     <select id="selectCruiseDataResultByList"  parameterType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
         SELECT
 	      e.end_time,
-          c.instance_name,
+          b.cruise_name,
           g.c_type,
           i.dict_note AS cTypeName,
           b.cruise_type,
@@ -280,7 +279,6 @@
 		      t_std_devicemete a
 		      LEFT JOIN (
 			  (t_cruise_point_instance b LEFT JOIN t_dict_business h ON b.cruise_type=h.dict_code AND h.col_name="cruise_type")
-			  LEFT JOIN t_cruise_point_attr c ON b.instance_id = c.instance_id
 		     ) ON a.device_mete_id = b.device_mete_id
 	      )
         LEFT JOIN (
@@ -297,7 +295,7 @@
         WHERE a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}
 
         <if test="startDate != null " ><if test="endDate != null">and e.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
-        <if test="instanceName != null and instanceName != ''"> and c.instance_name = #{instanceName, jdbcType=VARCHAR}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and b.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
         <if test="cType != null and cType != ''">and g.c_type = #{cType, jdbcType=INTEGER}</if>
         <if test="cTypeName != null and cTypeName != ''">and i.dict_note= #{cTypeName, jdbcType=VARCHAR}</if>
         <if test="cruiseType != null and cruiseType != ''">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
@@ -316,7 +314,8 @@
         d.result_num,
         b.cruise_type,
         h.dict_note as cruiseTypeName,
-        i.c_type
+        i.c_type,
+        a.mete_name
         FROM
         (
         t_std_devicemete a
@@ -340,5 +339,6 @@
         <if test="cruiseType != null and cruiseType != ''" >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
         <if test="cruiseTypeName!= null and cruiseTypeName != ''">and h.dict_note = #{cruiseTypeName, jdbcType=VARCHAR}</if>
         <if test="cType != null and cType != ''" >and i.c_type=#{cType,jdbcType=INTEGER}</if>
+        ORDER BY c.end_time ASC
     </select>
 </mapper>

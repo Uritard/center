@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class BrokenLineInfo implements Serializable {
 
     private Long deviceMeteId;
     @ApiModelProperty(value = "采集时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     @ApiModelProperty(value = "巡视数据")
     private String ResultNum;
@@ -26,13 +28,18 @@ public class BrokenLineInfo implements Serializable {
     private int cruiseType;
 
     @ApiModelProperty(value = "查询开始与结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startDate;
-    private Date endDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date   endDate;
     @ApiModelProperty(value = "查询条件-巡检方式")
     private Integer cType;
 
     @ApiModelProperty(value = "巡视类型名称")
     private String cruiseTypeName;
 
-    private String date;
+    @ApiModelProperty(value = "测点名称")
+    private String meteName;
+
+
 }

@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,12 +21,15 @@ public class CruiseResultAnalInfo implements Serializable {
 
     private Long deviceMeteId;
     @ApiModelProperty(value = "条件查询时间上下限")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endDate;
     @ApiModelProperty(value = "识别时间")
-    private Date endTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date  endTime;
     @ApiModelProperty(value = "点位名称")
-    private String instanceName;
+    private String cruiseName;
     @ApiModelProperty(value = "巡检类型")
     private int cruiseType;
     @ApiModelProperty(value = "巡检类型名")
@@ -43,5 +47,5 @@ public class CruiseResultAnalInfo implements Serializable {
     @ApiModelProperty(value = "识别图片")
     private String picPath;
 
-    private String date;
+
 }
