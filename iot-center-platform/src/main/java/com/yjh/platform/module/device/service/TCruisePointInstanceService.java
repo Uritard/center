@@ -88,14 +88,16 @@ public class TCruisePointInstanceService{
     }
 
     private void getConForCruisePoint(Integer length,TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem,List<TStdDeviceMeteForPointDetail> listAll){
-        if("机器人巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+        //机器人
+        if("228".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
             listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map = new HashMap<>();
             map.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
             listAll.get(length).getRobotType().getList().add(map);
             listAll.get(length).getRobotType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
-        if("视频巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+        //视频 红外
+        if("229".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
             listAll.get(length).getCameraType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map1 = new HashMap<>();
             map1.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -109,7 +111,16 @@ public class TCruisePointInstanceService{
 //            listAll.get(length).getInfraredType().getList().add(map2);
 //            listAll.get(length).getInfraredType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
 //        }
-        if("声纹巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+        //在线监控  内容未作
+        if("231".equals((tStdDeviceMeteForPointDetailItem.getCruiseTypeName()))) {
+            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map3 = new HashMap<>();
+            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getVoiceType().getList().add(map3);
+            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
+        //scada 内容未作
+        if("233".equals((tStdDeviceMeteForPointDetailItem.getCruiseTypeName()))) {
             listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -154,28 +165,39 @@ public class TCruisePointInstanceService{
     }
 
     private void getConSYForCruisePoint(Integer length,TCfgMeteForPointDetail tCfgMeteForPointDetailItem,List<TCfgMeteForPointDetail> listAll){
-        if("机器人巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+        //机器人
+        if("228".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
             listAll.get(length).getRobotType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map = new HashMap<>();
             map.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
             listAll.get(length).getRobotType().getList().add(map);
             listAll.get(length).getRobotType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
         }
-        if("视频巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+        //视频 红外
+        if("229".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
             listAll.get(length).getCameraType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map1 = new HashMap<>();
             map1.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
             listAll.get(length).getCameraType().getList().add(map1);
             listAll.get(length).getCameraType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
         }
-//        if("红外巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
-//            listAll.get(length).getInfraredType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
+//        if("红外巡检".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+//            listAll.get(length).getInfraredType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
 //            Map<Object,Object> map2 = new HashMap<>();
-//            map2.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
+//            map2.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
 //            listAll.get(length).getInfraredType().getList().add(map2);
-//            listAll.get(length).getInfraredType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
+//            listAll.get(length).getInfraredType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
 //        }
-        if("声纹巡检".equals(tCfgMeteForPointDetailItem.getCruiseTypeName())) {
+        //在线监控  内容未作
+        if("231".equals((tCfgMeteForPointDetailItem.getCruiseTypeName()))) {
+            listAll.get(length).getVoiceType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map3 = new HashMap<>();
+            map3.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getVoiceType().getList().add(map3);
+            listAll.get(length).getVoiceType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
+        }
+        //scada 内容未作
+        if("233".equals((tCfgMeteForPointDetailItem.getCruiseTypeName()))) {
             listAll.get(length).getVoiceType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());

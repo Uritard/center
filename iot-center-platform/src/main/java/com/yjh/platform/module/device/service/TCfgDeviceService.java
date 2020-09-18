@@ -49,8 +49,8 @@ public class TCfgDeviceService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgDevice> select(String deviceId, String deviceName, String deviceType, String deviceCode, String logicalType, Long projectId, String relationCode, Date createTime, Date updateTime, String remark) {
-        List<TCfgDevice> tCfgDeviceList = tCfgDeviceDao.select(deviceId, deviceName, deviceType, deviceCode, logicalType, projectId, relationCode, createTime, updateTime, remark);
+    public List<TCfgDevice> select(String deviceId, String deviceName, String deviceType, String deviceCode, Long stationId, String relationCode, Date createTime, Date updateTime, String remark) {
+        List<TCfgDevice> tCfgDeviceList = tCfgDeviceDao.select(deviceId, deviceName, deviceType, deviceCode, stationId, relationCode, createTime, updateTime, remark);
         return tCfgDeviceList;
     }
 

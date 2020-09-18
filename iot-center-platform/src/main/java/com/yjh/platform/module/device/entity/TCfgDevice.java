@@ -33,11 +33,9 @@ public class TCfgDevice implements Serializable {
     @ApiModelProperty(value = "设备编码+设备测点地址")
     private String deviceCode;
 
-    @ApiModelProperty(value = "逻辑分类")
-    private String logicalType;
 
     @ApiModelProperty(value = "项目id")
-    private Long projectId;
+    private Long stationId;
 
     @ApiModelProperty(value = "关联设备编码")
     private String relationCode;

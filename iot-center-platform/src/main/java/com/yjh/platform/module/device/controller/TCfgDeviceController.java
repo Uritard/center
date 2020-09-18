@@ -105,15 +105,14 @@ public class TCfgDeviceController {
                             @RequestParam(value = "deviceName", required = false) String deviceName,
                             @RequestParam(value = "deviceType", required = false) String deviceType,
                             @RequestParam(value = "deviceCode", required = false) String deviceCode,
-                            @RequestParam(value = "logicalType", required = false) String logicalType,
-                            @RequestParam(value = "projectId", required = false) Long projectId,
+                            @RequestParam(value = "stationId", required = false) Long stationId,
                             @RequestParam(value = "relationCode", required = false) String relationCode,
                             @RequestParam(value = "createTime", required = false) Date createTime,
                             @RequestParam(value = "updateTime", required = false) Date updateTime,
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TCfgDevice> list = tCfgDeviceService.select(deviceId, deviceName, deviceType, deviceCode, logicalType, projectId, relationCode, createTime, updateTime, remark);
+            List<TCfgDevice> list = tCfgDeviceService.select(deviceId, deviceName, deviceType, deviceCode, stationId, relationCode, createTime, updateTime, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
