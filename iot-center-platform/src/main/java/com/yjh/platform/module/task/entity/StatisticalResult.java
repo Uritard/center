@@ -7,26 +7,22 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author YC
- * @date 2020/9/15 - 15:19
+ * @date 2020/9/18 - 17:12
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "StatisticalTools对象", description = "统计实体类")
-public class StatisticalTools  implements Serializable {
-
+@ApiModel(value = "StatisticalToolsList对象", description = "统计实体类拓展")
+public class StatisticalResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "字典编码")
-    private String dictCode;
+    @ApiModelProperty(value = "时间")
+    private String timeNode;
 
-    @ApiModelProperty(value = "字典描述")
-    private String dictNote;
-
-    @ApiModelProperty(value = "次数")
-    private Integer counts;
+    private List<StatisticalTools> statisticalList;
 
 }

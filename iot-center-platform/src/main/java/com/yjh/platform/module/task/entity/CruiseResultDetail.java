@@ -57,7 +57,7 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "评价状态")
     private Integer evaluationState;
     @ApiModelProperty(value = "评价状态-字典表")
-    private String evaluationState1;
+    private String evaluationStateName;
 
 
 }

@@ -38,19 +38,19 @@ public class CruiseAudit implements Serializable {
     private Integer identifyResult;
 
     @ApiModelProperty(value = "实际结果-字典表")
-    private String identifyResult1;
+    private String identifyResultName;
 
     @ApiModelProperty(value = "评价状态")
     private Integer evaluationState;
 
     @ApiModelProperty(value = "评价状态-字典表")
-    private String evaluationState1;
+    private String evaluationStateName;
 
     @ApiModelProperty(value = "识别状态")
     private Integer identifyState;
 
     @ApiModelProperty(value = "识别状态-字典表")
-    private String identifyState1;
+    private String identifyStateName;
 
     @ApiModelProperty(value = "人工校核结果")
     private String personcheck;

@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author czh
@@ -72,11 +70,11 @@ public class TCruiseResultService{
         CruiseAudit ca = tCruiseResultDao.cruiseResultOperate(cruiseAudit);
         if (ca.getIdentifyResult() != null){
             String identifyResult1  = tCruiseResultDao.selectByIdentifyResult(ca.getIdentifyResult());
-            ca.setIdentifyResult1(identifyResult1);
+            ca.setIdentifyResultName(identifyResult1);
         }
         if (ca.getIdentifyState() != null){
             String identifyState1 = tCruiseResultDao.selectByIdentifyState(ca.getIdentifyState());
-            ca.setIdentifyState1(identifyState1);
+            ca.setIdentifyResultName(identifyState1);
         }
         return ca;
     }
@@ -87,7 +85,7 @@ public class TCruiseResultService{
     }
     @Logs(title = "巡视任务结果统计", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<List<StatisticalTools>> taskStatistical() {
+    public List<StatisticalResult> taskStatistical() {
 
         String weekStart = DateTimeUtil.getWeekStart();
         String weekEnd = DateTimeUtil.getWeekEnd();
@@ -95,15 +93,24 @@ public class TCruiseResultService{
         String lastWeekend = DateTimeUtil.getLastWeekend();
 
         String colName1 = "plan_type";
-        List<List<StatisticalTools>> statisticalList = new ArrayList<>();
-        statisticalList.add(tCruiseResultDao.taskStatistical(colName1,weekStart,weekEnd));//本周
-        statisticalList.add(tCruiseResultDao.taskStatistical(colName1,lastWeekStart,lastWeekend));//上周
 
-        return statisticalList;
+        List<StatisticalResult> taskStatisticalList = new ArrayList<>();
+
+        StatisticalResult statisticalResult = new StatisticalResult();
+        statisticalResult.setTimeNode("本周");
+        statisticalResult.setStatisticalList(tCruiseResultDao.taskStatistical(colName1,weekStart,weekEnd));
+        taskStatisticalList.add(statisticalResult);
+
+        StatisticalResult statisticalResult1 = new StatisticalResult();
+        statisticalResult1.setTimeNode("上周");
+        statisticalResult1.setStatisticalList(tCruiseResultDao.taskStatistical(colName1,lastWeekStart,lastWeekend));
+        taskStatisticalList.add(statisticalResult1);
+
+        return taskStatisticalList;
     }
     @Logs(title = "巡视点结果统计", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<List<StatisticalTools>> cruiseStatistical() {
+    public List<StatisticalResult> cruiseStatistical() {
 
         String weekStart = DateTimeUtil.getWeekStart();
         String weekEnd = DateTimeUtil.getWeekEnd();
@@ -111,11 +118,20 @@ public class TCruiseResultService{
         String lastWeekend = DateTimeUtil.getLastWeekend();
 
         String colName1 = "data_state";
-        List<List<StatisticalTools>> statisticalList = new ArrayList<>();
-        statisticalList.add(tCruiseResultDao.cruiseStatistical(colName1,weekStart,weekEnd));//本周
-        statisticalList.add(tCruiseResultDao.cruiseStatistical(colName1,lastWeekStart,lastWeekend));//上周
 
-        return statisticalList;
+        List<StatisticalResult> taskStatisticalList = new ArrayList<>();
+
+        StatisticalResult statisticalResult = new StatisticalResult();//本周
+        statisticalResult.setTimeNode("本周");
+        statisticalResult.setStatisticalList(tCruiseResultDao.cruiseStatistical(colName1,weekStart,weekEnd));
+        taskStatisticalList.add(statisticalResult);
+
+        StatisticalResult statisticalResult1 = new StatisticalResult();//上周
+        statisticalResult1.setTimeNode("上周");
+        statisticalResult1.setStatisticalList(tCruiseResultDao.cruiseStatistical(colName1,lastWeekStart,lastWeekend));
+        taskStatisticalList.add(statisticalResult1);
+
+        return taskStatisticalList;
     }
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
