@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
 import io.swagger.annotations.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -111,21 +113,21 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "cruiseDataId", required = false) Long cruiseDataId,
-                            @RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
-                            @RequestParam(value = "cruiseId", required = false) Long cruiseId,
-                            @RequestParam(value = "pointType", required = false) Integer pointType,
-                            @RequestParam(value = "resultDesc", required = false) String resultDesc,
-                            @RequestParam(value = "resultNum", required = false) String resultNum,
-                            @RequestParam(value = "modifyNum", required = false) String modifyNum,
-                            @RequestParam(value = "picpath", required = false) String picpath,
-                            @RequestParam(value = "personcheck", required = false) String personcheck,
-                            @RequestParam(value = "origpic", required = false) String origpic,
-                            @RequestParam(value = "state", required = false) Integer state,
-                            @RequestParam(value = "evaluationState", required = false) String evaluationState,
-                            @RequestParam(value = "identifyState", required = false) Integer identifyState,
-                            @RequestParam(value = "identifyResult", required = false) Integer identifyResult,
-                            @RequestParam(value = "createtime", required = false) Date createtime,
-                            @RequestParam(value = "remark", required = false) String remark) {
+                         @RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
+                         @RequestParam(value = "cruiseId", required = false) Long cruiseId,
+                         @RequestParam(value = "pointType", required = false) Integer pointType,
+                         @RequestParam(value = "resultDesc", required = false) String resultDesc,
+                         @RequestParam(value = "resultNum", required = false) String resultNum,
+                         @RequestParam(value = "modifyNum", required = false) String modifyNum,
+                         @RequestParam(value = "picpath", required = false) String picpath,
+                         @RequestParam(value = "personcheck", required = false) String personcheck,
+                         @RequestParam(value = "origpic", required = false) String origpic,
+                         @RequestParam(value = "state", required = false) Integer state,
+                         @RequestParam(value = "evaluationState", required = false) String evaluationState,
+                         @RequestParam(value = "identifyState", required = false) Integer identifyState,
+                         @RequestParam(value = "identifyResult", required = false) Integer identifyResult,
+                         @RequestParam(value = "createtime", required = false) Date createtime,
+                         @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
             List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, pointType, resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
@@ -140,8 +142,8 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruiseDataResult tCruiseDataResult,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -162,28 +164,27 @@ public class TCruiseDataResultController {
     public Result batchInsert(@RequestBody List<TCruiseDataResult> list) {
         Result result = new Result();
         try {
-        result.setData(tCruiseDataResultService.batchInsert(list));
+            result.setData(tCruiseDataResultService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }
 
 
-
     @ApiOperation(value = "巡视结果分析--测点查询")
-    @RequestMapping(value = "/selectCruiseResultAnal",method = RequestMethod.GET)
-    public Result selectCruiseResultAnal(@RequestParam (value = "deviceId" ,required = false)Long deviceId,
+    @RequestMapping(value = "/selectCruiseResultAnal", method = RequestMethod.GET)
+    public Result selectCruiseResultAnal(@RequestParam(value = "deviceId", required = false) Long deviceId,
                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                         @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize){
-        Result result=new Result();
-        Map<String,Object> resultMap=new HashMap<>();
+                                         @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page=PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tCruiseDataResultService.selectCruiseResultAnal(deviceId);
-            resultMap.put("count",page.getTotal());
-            resultMap.put("list",cruiseResultAnalMeteInfos);
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultAnalMeteInfos);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -193,30 +194,30 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
-    @RequestMapping(value = "/selectCruiseDataResultByList",method = RequestMethod.GET)
-    public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType",required = false)Integer cruiseType,
-                                               @RequestParam(value = "cType",required = false)Integer cType,
-                                               @RequestParam(value = "deviceMeteId")Long deviceMeteId,
-                                               @RequestParam(value = "endDate",required = false)String endDate,
-                                               @RequestParam(value = "startDate",required = false)String startDate,
+    @RequestMapping(value = "/selectCruiseDataResultByList", method = RequestMethod.GET)
+    public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+                                               @RequestParam(value = "cType", required = false) Integer cType,
+                                               @RequestParam(value = "deviceMeteId") Long deviceMeteId,
+                                               @RequestParam(value = "endDate", required = false) String endDate,
+                                               @RequestParam(value = "startDate", required = false) String startDate,
                                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize)  {
-        Result result=new Result();
-        Map<String,Object> resultMap=new HashMap<>();
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date EndDate;
-        Date StartDate;
+                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date endDateTemp;
+        Date startDateTemp;
 
         try {
-            if(endDate==null && startDate==null){
-                EndDate=null;
-                StartDate=null;
-            }else {
-                EndDate=dateFormat.parse(endDate);
-                StartDate=dateFormat.parse(startDate);
+            if (endDate.equals("") && startDate.equals("")) {
+                endDateTemp = null;
+                startDateTemp = null;
+            } else {
+                endDateTemp = dateFormat.parse(endDate);
+                startDateTemp = dateFormat.parse(startDate);
             }
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultAnalInfo> list=(tCruiseDataResultService.selectCruiseDataResultByList(cruiseType,cType,deviceMeteId,EndDate,StartDate));
+            List<CruiseResultAnalInfo> list = (tCruiseDataResultService.selectCruiseDataResultByList(cruiseType, cType, deviceMeteId, endDateTemp, startDateTemp));
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -228,25 +229,26 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "获取折线图元素信息")
-    @RequestMapping(value = "/selectBrokenLine",method = RequestMethod.GET)
-    public Result selectBrokenLine(@RequestParam(value = "cruiseType",required = false)Integer cruiseType,
-                                   @RequestParam(value = "cType",required = false)Integer cType,
-                                   @RequestParam(value = "deviceMeteId")Long deviceMeteId,
-                                   @RequestParam(value = "endDate",required = false)String  endDate,
-                                   @RequestParam(value = "startDate",required = false)String startDate){
-        Result result=new Result();
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date EndDate;
-        Date StartDate;
+    @RequestMapping(value = "/selectBrokenLine", method = RequestMethod.GET)
+    public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+                                   @RequestParam(value = "cType", required = false) Integer cType,
+                                   @RequestParam(value = "deviceMeteId") Long deviceMeteId,
+                                   @RequestParam(value = "endDate", required = false) String endDate,
+                                   @RequestParam(value = "startDate", required = false) String startDate) {
+        Result result = new Result();
+        //时间数据类型转换
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date endDateTemp;
+        Date startDateTemp;
         try {
-            if(endDate==null && startDate==null){
-                EndDate=null;
-                StartDate=null;
-            }else {
-                EndDate=dateFormat.parse(endDate);
-                StartDate=dateFormat.parse(startDate);
+            if (endDate.equals("") && startDate.equals("")) {
+                endDateTemp = null;
+                startDateTemp = null;
+            } else {
+                endDateTemp = dateFormat.parse(endDate);
+                startDateTemp = dateFormat.parse(startDate);
             }
-            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType,cType,deviceMeteId,EndDate,StartDate));
+            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, endDateTemp, startDateTemp));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
