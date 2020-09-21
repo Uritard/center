@@ -42,7 +42,15 @@ public interface TCruiseDataResultDao {
     int batchInsert(List<TCruiseDataResult> list);
     CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId")Long deviceId,
                                                         @Param(value = "deviceMeteId")Long deviceMeteId);
-    List<CruiseResultAnalInfo> selectCruiseDataResultByList(CruiseResultAnalInfo cruiseResultAnalInfo);
+    List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "cruiseType")Integer cruiseType,
+                                                            @Param(value = "cType")Integer cType,
+                                                            @Param(value = "deviceMeteId")Long deviceMeteId,
+                                                            @Param(value = "endDate")Date endDate,
+                                                            @Param(value = "startDate")Date startDate);
 
-    List<BrokenLineInfo> selectBrokenLine(BrokenLineInfo brokenLineInfo);
+    List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType")Integer cruiseType,
+                                          @Param(value = "cType")Integer cType,
+                                          @Param(value = "deviceMeteId")Long deviceMeteId,
+                                          @Param(value = "endDate")Date endDate,
+                                          @Param(value = "startDate")Date startDate);
 }

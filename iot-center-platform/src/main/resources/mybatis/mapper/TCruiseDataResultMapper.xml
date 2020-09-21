@@ -262,7 +262,7 @@
 
     </select>
 
-    <select id="selectCruiseDataResultByList"  parameterType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
+    <select id="selectCruiseDataResultByList" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
         SELECT
 	      e.end_time,
           b.cruise_name,
@@ -295,20 +295,13 @@
         WHERE a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}
 
         <if test="startDate != null " ><if test="endDate != null">and e.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
-        <if test="cruiseName != null and cruiseName != ''"> and b.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
-        <if test="cType != null and cType != ''">and g.c_type = #{cType, jdbcType=INTEGER}</if>
-        <if test="cTypeName != null and cTypeName != ''">and i.dict_note= #{cTypeName, jdbcType=VARCHAR}</if>
-        <if test="cruiseType != null and cruiseType != ''">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
-        <if test="cruiseTypeName!= null and cruiseTypeName != ''">and h.dict_note = #{cruiseTypeName, jdbcType=VARCHAR}</if>
-        <if test="identifyState!= null and identifyState != ''">and f.identify_state = #{identifyState, jdbcType=INTEGER}</if>
-        <if test="identifyStateName != null and identifyStateName != ''">and j.dict_note = #{identifyStateName, jdbcType=VARCHAR}</if>
-        <if test="resultNum != null and resultNum != ''">and f.result_num = #{resultNum, jdbcType=VARCHAR}</if>
-        <if test="picPath != null and picPath != ''">and f.picpath = #{picPath, jdbcType=VARCHAR}</if>
+        <if test="cType != -1 ">and g.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != -1 ">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         ORDER BY e.end_time DESC
     </select>
 
 
-    <select id="selectBrokenLine" parameterType="com.yjh.platform.module.task.entity.BrokenLineInfo" resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
+    <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
         c.end_time,
         d.result_num,
@@ -335,10 +328,8 @@
         WHERE
         a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
         <if test="startDate != null " ><if test="endDate != null">and c.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
-        <if test="resultNum != null and resultNum != ''">and d.result_num = #{resultNum, jdbcType=VARCHAR}</if>
-        <if test="cruiseType != null and cruiseType != ''" >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
-        <if test="cruiseTypeName!= null and cruiseTypeName != ''">and h.dict_note = #{cruiseTypeName, jdbcType=VARCHAR}</if>
-        <if test="cType != null and cType != ''" >and i.c_type=#{cType,jdbcType=INTEGER}</if>
+        <if test="cruiseType != -1 " >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
+        <if test="cType != -1" >and i.c_type=#{cType,jdbcType=INTEGER}</if>
         ORDER BY c.end_time ASC
     </select>
 </mapper>

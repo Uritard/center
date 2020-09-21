@@ -20,11 +20,6 @@ public class CruiseResultAnalInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long deviceMeteId;
-    @ApiModelProperty(value = "条件查询时间上下限")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date endDate;
     @ApiModelProperty(value = "识别时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date  endTime;
@@ -46,6 +41,8 @@ public class CruiseResultAnalInfo implements Serializable {
     private String resultNum;
     @ApiModelProperty(value = "识别图片")
     private String picPath;
+
+
 
 
 }

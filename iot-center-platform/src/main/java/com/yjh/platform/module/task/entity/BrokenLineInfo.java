@@ -27,11 +27,6 @@ public class BrokenLineInfo implements Serializable {
     @ApiModelProperty(value = "巡视类型")
     private int cruiseType;
 
-    @ApiModelProperty(value = "查询开始与结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date   endDate;
     @ApiModelProperty(value = "查询条件-巡检方式")
     private Integer cType;
 

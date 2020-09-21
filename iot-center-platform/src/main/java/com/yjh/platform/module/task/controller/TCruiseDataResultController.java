@@ -6,10 +6,16 @@ import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ibatis.jdbc.Null;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -165,28 +171,10 @@ public class TCruiseDataResultController {
     }
 
 
-    @ApiOperation(value = "全量标准测点及第一条巡检结果查询-分页无条件")
-    @RequestMapping(value = "/selectCruiseResultAnalAll",method =RequestMethod.GET)
-    public Result selectCruiseResultAnalAll(@RequestParam(value = "pageNum" ,required = false,defaultValue = "1")int pageNum,
-                                            @RequestParam(value = "pageSize",required = false,defaultValue = "6")int pageSize){
-        Result result=new Result();
-        Map<String,Object>resultMap=new HashMap<>();
-        try {
-            Page page=PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=tCruiseDataResultService.selectCruiseResultAnalAll();
-            resultMap.put("count",page.getTotal());
-            resultMap.put("list",cruiseResultAnalMeteInfos);
-            result.setData(resultMap);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
-        }
-        return result;
-    }
 
     @ApiOperation(value = "巡视结果分析--测点查询")
     @RequestMapping(value = "/selectCruiseResultAnal",method = RequestMethod.GET)
-    public Result selectCruiseResultAnal(@RequestParam Long deviceId,
+    public Result selectCruiseResultAnal(@RequestParam (value = "deviceId" ,required = false)Long deviceId,
                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                          @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize){
         Result result=new Result();
@@ -205,15 +193,30 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
-    @RequestMapping(value = "/selectCruiseDataResultByList",method = RequestMethod.POST)
-    public Result selectCruiseDataResultByList(@RequestBody CruiseResultAnalInfo cruiseResultAnalInfo,
+    @RequestMapping(value = "/selectCruiseDataResultByList",method = RequestMethod.GET)
+    public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType",required = false)Integer cruiseType,
+                                               @RequestParam(value = "cType",required = false)Integer cType,
+                                               @RequestParam(value = "deviceMeteId")Long deviceMeteId,
+                                               @RequestParam(value = "endDate",required = false)String endDate,
+                                               @RequestParam(value = "startDate",required = false)String startDate,
                                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize){
+                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize)  {
         Result result=new Result();
         Map<String,Object> resultMap=new HashMap<>();
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date EndDate;
+        Date StartDate;
+
         try {
+            if(endDate==null && startDate==null){
+                EndDate=null;
+                StartDate=null;
+            }else {
+                EndDate=dateFormat.parse(endDate);
+                StartDate=dateFormat.parse(startDate);
+            }
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultAnalInfo> list=(tCruiseDataResultService.selectCruiseDataResultByList(cruiseResultAnalInfo));
+            List<CruiseResultAnalInfo> list=(tCruiseDataResultService.selectCruiseDataResultByList(cruiseType,cType,deviceMeteId,EndDate,StartDate));
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -225,11 +228,25 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "获取折线图元素信息")
-    @RequestMapping(value = "/selectBrokenLine",method = RequestMethod.POST)
-    public Result selectBrokenLine(@RequestBody BrokenLineInfo brokenLineInfo){
+    @RequestMapping(value = "/selectBrokenLine",method = RequestMethod.GET)
+    public Result selectBrokenLine(@RequestParam(value = "cruiseType",required = false)Integer cruiseType,
+                                   @RequestParam(value = "cType",required = false)Integer cType,
+                                   @RequestParam(value = "deviceMeteId")Long deviceMeteId,
+                                   @RequestParam(value = "endDate",required = false)String  endDate,
+                                   @RequestParam(value = "startDate",required = false)String startDate){
         Result result=new Result();
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date EndDate;
+        Date StartDate;
         try {
-            result.setData(tCruiseDataResultService.selectBrokenLine(brokenLineInfo));
+            if(endDate==null && startDate==null){
+                EndDate=null;
+                StartDate=null;
+            }else {
+                EndDate=dateFormat.parse(endDate);
+                StartDate=dateFormat.parse(startDate);
+            }
+            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType,cType,deviceMeteId,EndDate,StartDate));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
