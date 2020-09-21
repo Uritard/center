@@ -248,7 +248,7 @@ public class TStdDeviceService{
         return this.tStdDeviceDao.selectRegionById(deviceId);
     }
 
-    @Logs(title = "设备树查询(level：5-间隔，6-设备，7-部位，8-点位；deviceShow：dev-设备，camera-摄像头，robot-机器人，all-所有设备)", code = "module")
+    @Logs(title = "设备树查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectDevTree(String level, String deviceShow) {
         List<AreaInfo> listTree = new ArrayList<>();
