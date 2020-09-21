@@ -34,7 +34,7 @@
 
     <sql id="tongTong">
         a.camera_id,a.camera_name,a.alias_name,a.record_id,c.region_name as upRegionName,
-        a.vendor_id as cameraVendor,b.dict_note as vendorName ,
+        a.vendor_id ,b.dict_note as vendorName ,
         d.dict_note as cameraTypeName,a.camera_type,
         a.channel_num,a.sms_id,a.rms_id,a.stream_type,a.protocol_type,
         a.camera_ip,a.url, a.port,a.is_control,a.address,a.latitude,a.longitude
@@ -95,7 +95,7 @@
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
-        update d a <set>
+        update t_camera_info a <set>
         <if test="cameraName != null and cameraName != ''">a.camera_name = #{cameraName, jdbcType=VARCHAR},</if>
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=BIGINT},</if>
@@ -208,7 +208,7 @@
         <if test="address != null">and a.address = #{address, jdbcType=VARCHAR},</if>
         <if test="latitude != null">and a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null">and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-
+        order by a.camera_id
     </select>
 
     <select id="selectCameraTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">

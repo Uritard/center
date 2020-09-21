@@ -208,24 +208,10 @@
             )
         LEFT JOIN t_cruise_task b ON a.task_id = b.task_id
         where 1 = 1
-        <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR},</if>
         <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
-        <if test="areaId != null and areaId != ''">and a.area_id = #{areaId, jdbcType=VARCHAR},</if>
         <if test="cType != null and cType != -1">and a.c_type = #{cType, jdbcType=INTEGER}</if>
-        <if test="planType != null and planType != ''">and d.dict_note = #{planType, jdbcType=VARCHAR}</if>
         <if test="cState != null and cState != -1">and a.c_state = #{cState, jdbcType=INTEGER}</if>
-        <if test="taskState != null and taskState != ''">and e.dict_note = #{taskState, jdbcType=VARCHAR}</if>
-        <if test="modifyState != null and modifyState != ''">and a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
-        <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER},</if>
-        <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
-        <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
-        <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
-        <if test="weather != null and weather != ''">and a.weather = #{weather, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">and a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
-        <if test="taskCode != null and taskCode != ''">and a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}, </if>
+
         GROUP BY a.task_result_id
     </select>
 
@@ -244,20 +230,23 @@
         j.dict_note as data_state,
         b.cruise_time,
         g.evaluation_state,
-        k.dict_note as evaluation_state_name
+        k.dict_note as evaluation_state_name,
+        g.check_user,
+        g.check_date,
+        g.picpath
         FROM
             (
             t_std_device d
             LEFT JOIN t_std_device_attr e ON d.device_id = e.device_id
             )
         LEFT JOIN (
-        (
             (
-                t_cruise_task_result_detail b
-                LEFT JOIN t_cruise_point_attr f ON f.instance_id = b.instance_id
+                (
+                    t_cruise_task_result_detail b
+                    LEFT JOIN t_cruise_point_attr f ON f.instance_id = b.instance_id
+                )
+                LEFT JOIN t_cruise_result a ON a.task_result_id = b.task_result_id
             )
-            LEFT JOIN t_cruise_result a ON a.task_result_id = b.task_result_id
-        )
             LEFT JOIN (
                 (
                     (
@@ -269,15 +258,16 @@
                 LEFT JOIN t_dict_business j ON j.dict_code = g.state
             ) ON g.cruise_result_id = b.cruise_result_id
         ) ON d.device_id = b.device_id
-        WHERE a.task_id = #{taskId,jdbcType=BIGINT}
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=BIGINT}</if>
+        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime,jdbcType=TIMESTAMP}</if>
+
         <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
-        <if test="deviceId != null "> and d.device_id like concat ('%',#{deviceId,jdbcType=BIGINT},'%')</if>
 
         <if test="pointType != null and pointType != -1"> and g.point_type = #{pointType, jdbcType=INTEGER}</if>
-        <if test="cruiseType != null and cruiseType != ''"> and h.dict_note = #{cruiseType, jdbcType=VARCHAR}</if>
 
         <if test="state != null and state != -1 "> and g.state = #{state, jdbcType=INTEGER}</if>
-        <if test="dataState != null and dataState != ''"> and j.dict_note = #{dataState, jdbcType=VARCHAR}</if>
+
 
     </select>
 
@@ -346,14 +336,14 @@
     <!--巡视任务结果统计-->
     <select id="taskStatistical"  resultType="com.yjh.platform.module.task.entity.StatisticalTools">
     select
-        dict_code,
-        dict_note,
+        dict_code as c_type,
+        dict_note as plan_type,
         (select COUNT(*)
             from t_cruise_result a,t_cruise_task_result b
             where a.task_result_id = b.task_result_id
             and c_type = dict_code
             and a.create_time BETWEEN #{Start} and #{End}
-        ) AS "counts"
+        ) AS "count"
     from t_dict_business
     where dict_code IN
         (
@@ -397,13 +387,12 @@
     <!--巡视点结果统计-->
     <select id="cruiseStatistical" resultType="com.yjh.platform.module.task.entity.StatisticalTools" >
     select
-        dict_code,
-        dict_note,
+        dict_code as state,
+        dict_note as data_state,
         (select COUNT(*)
             from t_cruise_data_result
             WHERE  state = dict_code
-            AND createtime  BETWEEN #{Start} and #{End}
-        ) AS "counts"
+        ) AS "count"
     from t_dict_business
     where dict_code IN
         (

@@ -21,12 +21,18 @@ public class StatisticalTools  implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "字典编码")
-    private String dictCode;
+    private Integer cType;
 
     @ApiModelProperty(value = "字典描述")
-    private String dictNote;
+    private String planType;
+
+    @ApiModelProperty(value = "字典编码")
+    private Integer state;
+
+    @ApiModelProperty(value = "字典描述")
+    private String dataState;
 
     @ApiModelProperty(value = "次数")
-    private Integer counts;
+    private Integer count;
 
 }

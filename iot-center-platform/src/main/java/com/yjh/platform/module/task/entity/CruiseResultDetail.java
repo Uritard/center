@@ -59,6 +59,17 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "评价状态-字典表")
     private String evaluationStateName;
 
+    @ApiModelProperty(value = "审核人")
+    private String checkUser;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "审核时间")
+    private Date checkDate;
+
+    @ApiModelProperty(value = "执行时间")
+    private String executeTime;
+
 
 }
 

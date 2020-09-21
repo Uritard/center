@@ -128,15 +128,17 @@ public class TCruiseResultController {
     }
 
     @ApiOperation(value = "分页查询--巡视结果确认")
-    @RequestMapping(value = "/selectTaskByPage", method = RequestMethod.POST)
-    public Result selectTaskByPage(@RequestBody TCruiseResultExpand tCruiseResultExpand,
+    @RequestMapping(value = "/selectTaskByPage", method = RequestMethod.GET)
+    public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
+                                   @RequestParam(value = "cState", required = false) Integer cState,
+                                   @RequestParam(value = "cType", required = false) Integer cType,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(tCruiseResultExpand);
+            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -175,15 +177,19 @@ public class TCruiseResultController {
         return result;
     }
     @ApiOperation(value = "分页查询--任务结果详细")
-    @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.POST)
-    public Result selectCruiseByPage(@RequestBody CruiseResultDetail cruiseResultDetail,
+    @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
+    public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
+                                     @RequestParam(value = "pointType", required = false) Integer pointType,
+                                     @RequestParam(value = "state", required = false) Integer state,
+                                     @RequestParam(value = "executeTime", required = false) String executeTime,
+                                     @RequestParam(value = "deviceName", required = false) String deviceName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(cruiseResultDetail);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskId,pointType,state,executeTime,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -195,11 +201,12 @@ public class TCruiseResultController {
     }
 
     @ApiOperation(value = "巡视点结果操作")
-    @RequestMapping(value = "/cruiseResultOperate", method = RequestMethod.POST)
-    public Result cruiseResultOperate(@RequestBody CruiseAudit cruiseAudit) {
+    @RequestMapping(value = "/cruiseResultOperate", method = RequestMethod.GET)
+    public Result cruiseResultOperate(@RequestParam(value = "taskId", required = false) String taskId,
+                                      @RequestParam(value = "instanceId", required = false) Long instanceId) {
         Result result = new Result();
         try {
-            CruiseAudit ca = tCruiseResultService.cruiseResultOperate(cruiseAudit);
+            CruiseAudit ca = tCruiseResultService.cruiseResultOperate(taskId,instanceId);
             result.setData(ca);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

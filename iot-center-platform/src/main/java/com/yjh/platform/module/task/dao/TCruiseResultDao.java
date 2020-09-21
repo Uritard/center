@@ -34,19 +34,25 @@ public interface TCruiseResultDao {
                                @Param(value = "executeTime") Date executeTime,
                                @Param(value = "taskCode") String taskCode,
                                @Param(value = "remark") String remark);
-    List<TCruiseResultExpand> selectTaskByPage(TCruiseResultExpand tCruiseResultExpand);
-    List<CruiseResultDetail> selectCruiseByPage(CruiseResultDetail cruiseResultDetail);
+    List<TCruiseResultExpand> selectTaskByPage(@Param(value = "taskName") String taskName,
+                                               @Param(value = "cType") Integer cType,
+                                               @Param(value = "cState") Integer cState);
+    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId") String taskId,
+                                                @Param(value = "pointType") Integer pointType,
+                                                @Param(value = "state") Integer state,
+                                                @Param(value = "executeTime") String executeTime,
+                                                @Param(value = "deviceName") String deviceName);
+
     int manualReview(CruiseManualReview cruiseManualReview);
     int batchInsert(List<TCruiseResult> list);
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "Start")String Start,
                                            @Param(value = "End")String End);
-    List<StatisticalTools> cruiseStatistical(@Param(value = "colName1")String colName1,
-                                            @Param(value = "Start")String Start,
-                                            @Param(value = "End")String End);
+    List<StatisticalTools> cruiseStatistical(@Param(value = "colName1")String colName1);
     List<TaskSimpleInfo> selectTaskIsRunning();
 
-    CruiseAudit cruiseResultOperate(CruiseAudit cruiseAudit);
+    CruiseAudit cruiseResultOperate(@Param(value = "taskId")String taskId,
+                                    @Param(value = "instanceId")Long instanceId);
     String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
 
