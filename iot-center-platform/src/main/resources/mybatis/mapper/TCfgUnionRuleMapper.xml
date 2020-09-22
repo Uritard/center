@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCfgUnionRuleDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCfgUnionRule">
+        <id column="rule_id" jdbcType="BIGINT" property="ruleId" />
+        <result column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="rule_name" jdbcType="VARCHAR" property="ruleName" />
+        <result column="rule_type" jdbcType="VARCHAR" property="ruleType" />
+        <result column="rule_content" jdbcType="VARCHAR" property="ruleContent" />
+        <result column="rule_delay" jdbcType="INTEGER" property="ruleDelay" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="input_param" jdbcType="VARCHAR" property="inputParam" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        rule_id, plan_id, rule_name, rule_type, rule_content, rule_delay, description, input_param, create_time, update_time
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="ruleId" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule">
+        insert into t_cfg_union_rule(
+            rule_id,
+            plan_id,
+            rule_name,
+            rule_type,
+            rule_content,
+            rule_delay,
+            description,
+            input_param,
+            create_time,
+            update_time
+        )values(
+                #{ruleId, jdbcType=BIGINT},
+                #{planId, jdbcType=BIGINT},
+                #{ruleName, jdbcType=VARCHAR},
+                #{ruleType, jdbcType=VARCHAR},
+                #{ruleContent, jdbcType=VARCHAR},
+                #{ruleDelay, jdbcType=INTEGER},
+                #{description, jdbcType=VARCHAR},
+                #{inputParam, jdbcType=VARCHAR},
+                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP()
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cfg_union_rule
+                where rule_id = #{ruleId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule">
+        update t_cfg_union_rule a <set>
+        <if test="ruleId != null and ruleId != ''">a.rule_id = #{ruleId, jdbcType=BIGINT},</if>
+        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="ruleName != null and ruleName != ''">a.rule_name = #{ruleName, jdbcType=VARCHAR},</if>
+        <if test="ruleType != null and ruleType != ''">a.rule_type = #{ruleType, jdbcType=VARCHAR},</if>
+        <if test="ruleContent != null and ruleContent != ''">a.rule_content = #{ruleContent, jdbcType=VARCHAR},</if>
+        <if test="ruleDelay != null">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="inputParam != null and inputParam != ''">a.input_param = #{inputParam, jdbcType=VARCHAR},</if>
+    </set>
+            where a.rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCfgUnionRule">
+        select
+        a.rule_id,
+        a.plan_id,
+        a.rule_name,
+        a.rule_type,
+        a.rule_content,
+        a.rule_delay,
+        a.description,
+        a.input_param,
+        a.create_time,
+        a.update_time
+        from t_cfg_union_rule a
+        where 1 = 1
+            and a.rule_id = #{ruleId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule" resultType="com.yjh.platform.module.task.entity.TCfgUnionRule">
+        select
+        a.rule_id,
+        a.plan_id,
+        a.rule_name,
+        a.rule_type,
+        a.rule_content,
+        a.rule_delay,
+        a.description,
+        a.input_param,
+        a.create_time,
+        a.update_time
+        from t_cfg_union_rule a
+        where 1 = 1
+        <if test="ruleId != null and ruleId != ''"> and a.rule_id = #{ruleId, jdbcType=BIGINT}</if>
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="ruleName != null and ruleName != ''"> and a.rule_name = #{ruleName, jdbcType=VARCHAR}</if>
+        <if test="ruleType != null and ruleType != ''"> and a.rule_type = #{ruleType, jdbcType=VARCHAR}</if>
+        <if test="ruleContent != null and ruleContent != ''"> and a.rule_content = #{ruleContent, jdbcType=VARCHAR}</if>
+        <if test="ruleDelay != null"> and a.rule_delay = #{ruleDelay, jdbcType=INTEGER}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="inputParam != null and inputParam != ''"> and a.input_param = #{inputParam, jdbcType=VARCHAR}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule" resultType="com.yjh.platform.module.task.entity.TCfgUnionRuleDetail">
+        select
+        a.rule_id,
+        a.plan_id,
+        a.rule_name,
+        a.rule_type,
+        a.rule_content,
+        a.rule_delay,
+        a.description,
+        a.input_param,
+        a.create_time,
+        a.update_time,
+        b.plan_name
+        from t_cfg_union_rule a
+        left join t_cruise_plan b on a.plan_id = b.plan_id
+        where 1 = 1
+        <if test="ruleId != null and ruleId != ''"> and a.rule_id = #{ruleId, jdbcType=BIGINT}</if>
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="ruleName != null and ruleName != ''"> and a.rule_name = #{ruleName, jdbcType=VARCHAR}</if>
+        <if test="ruleType != null and ruleType != ''"> and a.rule_type = #{ruleType, jdbcType=VARCHAR}</if>
+        <if test="ruleContent != null and ruleContent != ''"> and a.rule_content = #{ruleContent, jdbcType=VARCHAR}</if>
+        <if test="ruleDelay != null"> and a.rule_delay = #{ruleDelay, jdbcType=INTEGER}</if>
+        <if test="description != null and description != ''"> and a.description = #{description, jdbcType=VARCHAR}</if>
+        <if test="inputParam != null and inputParam != ''"> and a.input_param = #{inputParam, jdbcType=VARCHAR}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+         order by a.rule_id desc
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_cfg_union_rule(
+            rule_id,
+            plan_id,
+            rule_name,
+            rule_type,
+            rule_content,
+            rule_delay,
+            description,
+            input_param,
+            create_time,
+            update_time
+        )values
+        <foreach collection="list" item="TCfgUnionRule" separator=",">
+            (
+                #{TCfgUnionRule.ruleId, jdbcType=BIGINT},
+                #{TCfgUnionRule.planId, jdbcType=BIGINT},
+                #{TCfgUnionRule.ruleName, jdbcType=VARCHAR},
+                #{TCfgUnionRule.ruleType, jdbcType=VARCHAR},
+                #{TCfgUnionRule.ruleContent, jdbcType=VARCHAR},
+                #{TCfgUnionRule.ruleDelay, jdbcType=INTEGER},
+                #{TCfgUnionRule.description, jdbcType=VARCHAR},
+                #{TCfgUnionRule.inputParam, jdbcType=VARCHAR},
+                #{TCfgUnionRule.createTime, jdbcType=TIMESTAMP},
+                #{TCfgUnionRule.updateTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchDelete">
+        delete from t_cfg_union_rule
+        where rule_id in (
+            <foreach collection="list" item="ruleId" separator=",">
+                #{ruleId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </insert>
+
+</mapper>
