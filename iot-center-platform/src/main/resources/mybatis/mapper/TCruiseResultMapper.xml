@@ -84,12 +84,16 @@
         )
     </insert>
 
+    <select id="selectUserName" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select user_name from sys_user where user_id = #{userID}
+    </select>
     <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update t_cruise_data_result set
-        <if test="personcheck != null and personcheck != ''">personcheck = #{personcheck,jdbcType=VARCHAR},</if>
-        <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
-        <if test="evaluationState != null ">evaluation_state = #{evaluationState,jdbcType=INTEGER},</if>
-        <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
+        person_check = #{personCheck,jdbcType=VARCHAR},
+        identify_result = #{identifyResult,jdbcType=INTEGER},
+        evaluation_state = 256,
+        check_user = #{checkUser,jdbcType=VARCHAR},
+        identify_state = #{identifyState,jdbcType=INTEGER}
         where cruise_data_id in
             (select cruise_data_id
                 from
@@ -223,8 +227,8 @@
         e.real_code,
         d.device_name,
         f.instance_name,
-        g.point_type,
-        h.dict_note as cruise_type,
+        g.cruise_type,
+        h.dict_note as cruise_type_name,
         g.result_num,
         g.state,
         j.dict_note as data_state,
@@ -233,7 +237,10 @@
         k.dict_note as evaluation_state_name,
         g.check_user,
         g.check_date,
-        g.picpath
+        g.picpath,
+        g.identify_result,
+        g.identify_state,
+        g.person_check
         FROM
             (
             t_std_device d
@@ -251,7 +258,7 @@
                 (
                     (
                         t_cruise_data_result g
-                        LEFT JOIN t_dict_business h ON h.dict_code = g.point_type
+                        LEFT JOIN t_dict_business h ON h.dict_code = g.cruise_type
                     )
                     LEFT JOIN t_dict_business k ON k.dict_code = g.evaluation_state
                 )
@@ -264,7 +271,7 @@
 
         <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
 
-        <if test="pointType != null and pointType != -1"> and g.point_type = #{pointType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
         <if test="state != null and state != -1 "> and g.state = #{state, jdbcType=INTEGER}</if>
 
@@ -342,7 +349,7 @@
             from t_cruise_result a,t_cruise_task_result b
             where a.task_result_id = b.task_result_id
             and c_type = dict_code
-            and a.create_time BETWEEN #{Start} and #{End}
+            and a.execute_time BETWEEN #{Start} and #{End}
         ) AS "count"
     from t_dict_business
     where dict_code IN
@@ -366,7 +373,7 @@
         e.evaluation_state,
         h.dict_note as evaluation_state_name,
         e.identify_state,
-        e.personcheck
+        e.person_check
         FROM
             (
                 (

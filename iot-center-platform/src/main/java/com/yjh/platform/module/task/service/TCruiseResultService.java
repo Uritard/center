@@ -60,8 +60,8 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultDetail> selectCruiseByPage( String taskId,Integer pointType,Integer state,String executeTime,String deviceName ) {
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskId,pointType,state,executeTime,deviceName);
+    public List<CruiseResultDetail> selectCruiseByPage( String taskId,Integer cruiseType,Integer state,String executeTime,String deviceName ) {
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskId,cruiseType,state,executeTime,deviceName);
         return cruiseResultDetailList;
     }
     @Logs(title = "巡视点结果操作", code = "module")
@@ -80,7 +80,10 @@ public class TCruiseResultService{
     }
     @Logs(title = "人工复核", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int manualReview(CruiseManualReview cruiseManualReview) {
+    public int manualReview(CruiseManualReview cruiseManualReview,String userId) {
+        Integer userID = Integer.valueOf(userId);
+        String userName = tCruiseResultDao.selectUserName(userID);
+        cruiseManualReview.setCheckUser(userName);
         return this.tCruiseResultDao.manualReview(cruiseManualReview);
     }
     @Logs(title = "巡视任务结果统计", code = "module")
@@ -112,22 +115,11 @@ public class TCruiseResultService{
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalResult> cruiseStatistical() {
 
-//        String weekStart = DateTimeUtil.getWeekStart();
-//        String weekEnd = DateTimeUtil.getWeekEnd();
-//        String lastWeekStart = DateTimeUtil.getLastWeekStart();
-//        String lastWeekend = DateTimeUtil.getLastWeekend();
-
         String colName1 = "data_state";
 
         List<StatisticalResult> taskStatisticalList = new ArrayList<>();
 
-//        StatisticalResult statisticalResult = new StatisticalResult();//本周
-//        statisticalResult.setTimeNode("本周");
-//        statisticalResult.setStatisticalList(tCruiseResultDao.cruiseStatistical(colName1,weekStart,weekEnd));
-//        taskStatisticalList.add(statisticalResult);
-
-        StatisticalResult statisticalResult1 = new StatisticalResult();//上周
-//        statisticalResult1.setTimeNode("上周");
+        StatisticalResult statisticalResult1 = new StatisticalResult();
         statisticalResult1.setStatisticalList(tCruiseResultDao.cruiseStatistical(colName1));
         taskStatisticalList.add(statisticalResult1);
 

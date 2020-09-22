@@ -37,9 +37,9 @@ public class CruiseResultDetail {
     private String instanceName;
 
     @ApiModelProperty(value = "巡视点类型")
-    private Integer pointType;
-    @ApiModelProperty(value = "巡检方式")
-    private String cruiseType;
+    private Integer cruiseType;
+    @ApiModelProperty(value = "巡检方式字典表")
+    private String cruiseTypeName;
 
     @ApiModelProperty(value = "巡视值")
     private String resultNum;
@@ -69,6 +69,16 @@ public class CruiseResultDetail {
 
     @ApiModelProperty(value = "执行时间")
     private String executeTime;
+
+    @ApiModelProperty(value = "状态评价")
+    private Integer identifyState;
+
+    @ApiModelProperty(value = "实际结果")
+    private Integer identifyResult;
+
+    @ApiModelProperty(value = "人工校核结果")
+    private String personCheck;
+
 
 
 }

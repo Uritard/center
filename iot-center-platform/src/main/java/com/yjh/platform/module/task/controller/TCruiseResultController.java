@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -132,8 +134,10 @@ public class TCruiseResultController {
     public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
                                    @RequestParam(value = "cState", required = false) Integer cState,
                                    @RequestParam(value = "cType", required = false) Integer cType,
+
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -179,7 +183,7 @@ public class TCruiseResultController {
     @ApiOperation(value = "分页查询--任务结果详细")
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
     public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
-                                     @RequestParam(value = "pointType", required = false) Integer pointType,
+                                     @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "state", required = false) Integer state,
                                      @RequestParam(value = "executeTime", required = false) String executeTime,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
@@ -189,7 +193,7 @@ public class TCruiseResultController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskId,pointType,state,executeTime,deviceName);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskId,cruiseType,state,executeTime,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -217,11 +221,15 @@ public class TCruiseResultController {
         return result;
     }
     @ApiOperation(value = "人工复核")
-    @RequestMapping(value = "/manualReview", method = RequestMethod.POST)
-    public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview) {
+    @RequestMapping(value = "/manualReview", method = RequestMethod.PUT)
+    public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
+
+        String userId = request.getHeader("userId");
+        System.out.println("userId是："+userId);
+
         Result result = new Result();
         try {
-            result.setData(tCruiseResultService.manualReview(cruiseManualReview));
+            result.setData(tCruiseResultService.manualReview(cruiseManualReview,userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

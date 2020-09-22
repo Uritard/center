@@ -48,7 +48,7 @@ public class TCruiseDataResult implements Serializable {
     private String picpath;
 
     @ApiModelProperty(value = "人工校核结果")
-    private String personcheck;
+    private String personCheck;
 
     @ApiModelProperty(value = "算法原始图片/红外可见光")
     private String origpic;

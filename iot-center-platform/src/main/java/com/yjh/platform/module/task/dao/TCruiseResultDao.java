@@ -38,7 +38,7 @@ public interface TCruiseResultDao {
                                                @Param(value = "cType") Integer cType,
                                                @Param(value = "cState") Integer cState);
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId") String taskId,
-                                                @Param(value = "pointType") Integer pointType,
+                                                @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "state") Integer state,
                                                 @Param(value = "executeTime") String executeTime,
                                                 @Param(value = "deviceName") String deviceName);
@@ -56,4 +56,5 @@ public interface TCruiseResultDao {
     String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
 
+    String selectUserName(@Param(value = "userID")Integer  userID);
 }

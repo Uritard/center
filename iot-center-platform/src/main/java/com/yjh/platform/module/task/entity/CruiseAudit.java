@@ -53,7 +53,11 @@ public class CruiseAudit implements Serializable {
     private String identifyStateName;
 
     @ApiModelProperty(value = "人工校核结果")
-    private String personcheck;
+    private String personCheck;
+
+    @ApiModelProperty(value = "审核人")
+    private String checkUser;
+
 
 
 }

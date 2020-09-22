@@ -25,7 +25,7 @@ public class CruiseManualReview {
     @ApiModelProperty(value = "巡检点实例id")
     private Long instanceId;
     @ApiModelProperty(value = "人工校核结果")
-    private String personcheck;
+    private String personCheck;
     @ApiModelProperty(value = "评价状态")
     private Integer evaluationState;
     @ApiModelProperty(value = "评价状态-字典表")
@@ -38,5 +38,7 @@ public class CruiseManualReview {
     private Integer identifyState;
     @ApiModelProperty(value = "识别状态-字典表")
     private String identifyState1;
+    @ApiModelProperty(value = "审核人")
+    private String checkUser;
 
 }
