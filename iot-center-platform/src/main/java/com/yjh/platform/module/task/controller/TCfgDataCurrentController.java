@@ -1,22 +1,26 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.service.TCfgDataCurrentService;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
 import io.swagger.annotations.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 
 /**
@@ -152,4 +156,18 @@ public class TCfgDataCurrentController {
         return result;
     }
 
+
+    @ApiOperation(value = "联动控制--测试接口")
+    @RequestMapping(value = "/unionTest",method = RequestMethod.GET)
+    public Result unionTest(@RequestParam List<Long> meteIds){
+        Result result=new Result();
+        try {
+
+            result.setData(tCfgDataCurrentService.unionRulescaculator(meteIds));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

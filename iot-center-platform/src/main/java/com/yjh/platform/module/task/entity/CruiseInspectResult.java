@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class CruiseInspectResult implements Serializable {
     @ApiModelProperty(value = "巡检结果名称")
     private String cruiseResultName;
     @ApiModelProperty(value = "巡视时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     @ApiModelProperty(value = "数据来源")
     private Integer cruiseType;

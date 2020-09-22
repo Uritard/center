@@ -187,7 +187,7 @@ public class TCruiseTaskResultController {
         return  result;
     }
 
-    @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数")
+    @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间")
     @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
     public Result selectCruiseStatusCount(@RequestParam Long taskId){
         Result result=new Result();
@@ -201,42 +201,16 @@ public class TCruiseTaskResultController {
 
     }
 
-    @ApiOperation(value = "C-获取当前任务运行累计时间")
-    @RequestMapping(value = "selectTaskRunniTime",method = RequestMethod.GET)
-    public Result selectTaskRunningTime(@RequestParam Long taskId){
-        Result result=new Result();
-        try{
-            result.setData(tCruiseTaskResultService.selectTaskRunningTime(taskId));
-        }catch (Exception e){
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述",e);
-        }
 
-        return  result;
-    }
 
-    @ApiOperation(value = "C-获取当前任务下的机器人信息以及机器人工作巡检点结果状态")
-    @RequestMapping(value = "selectRobotAndCruiseResult",method = RequestMethod.GET)
-    public Result selectRobotAndCruiseResult(@RequestParam Long taskId,
-                                              @RequestParam String robotPosition){
-        Result result=new Result();
-        try{
-            result.setData(tCruiseTaskResultService.selectRobotAndCruiseResult(taskId,robotPosition));
-        }catch (Exception e){
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述",e);
-        }
-        return result;
-
-    }
-
-    @ApiOperation(value = "C-获取当前任务下的摄像头信息以及摄像头工作巡检点结果状态")
+    @ApiOperation(value = "C-获取当前任务下的摄像头/机器人信息以及其工作的巡检点结果状态")
     @RequestMapping(value = "/selectCameraAndCruiseResult",method = RequestMethod.GET)
-    public Result selectCameraAndCruiseResult(@RequestParam Long taskId,
-                                              @RequestParam Integer cameraType){
+    public Result selectCruiseDeviceAndCruiseAdvance(@RequestParam Long taskId,
+                                                     @RequestParam(value = "cameraType",required = false) Integer cameraType,
+                                                     @RequestParam (value = "robotPosition",required = false)String robotPosition){
         Result result=new Result();
         try{
-            result.setData(tCruiseTaskResultService.selectCameraAndCruiseResult(taskId, cameraType));
+            result.setData(tCruiseTaskResultService.selectCruiseDeviceAndCruiseAdvance(taskId,robotPosition,cameraType));
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);

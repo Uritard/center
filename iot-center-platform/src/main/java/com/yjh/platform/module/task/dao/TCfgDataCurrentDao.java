@@ -28,4 +28,7 @@ public interface TCfgDataCurrentDao {
     List<TCfgDataCurrent> selectByPage(TCfgDataCurrent tCfgDataCurrent);
 
     int batchInsert(List<TCfgDataCurrent> list);
+    List<Long> selectAllMeteId();
+    TCfgDataCurrent selectCurrentDataByMeteId(@Param(value = "meteId")Long meteId);
+
 }

@@ -146,6 +146,11 @@
         </foreach>
     </insert>
 
+        <select id="selectAllMeteId" resultType="java.lang.Long">
+            select mete_id from t_cfg_data_current
+        </select>
 
-
+        <select id="selectCurrentDataByMeteId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+            select * from t_cfg_data_current where mete_id=#{meteId,jdbcType=BIGINT}
+        </select>
 </mapper>

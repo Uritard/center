@@ -39,6 +39,7 @@ public class TCfgDataCurrent implements Serializable {
     @ApiModelProperty(value = "区域编号")
     private String regionId;
 
+    @ApiModelProperty(value = "本次四遥值")
     private String meteValue;
 
     @ApiModelProperty(value = "上一次值")

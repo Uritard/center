@@ -24,5 +24,8 @@ public class CruiseResultCounter implements Serializable {
 
     @ApiModelProperty(value = "未巡视结果个数")
     private Integer cruiseNotCount;
+
+    @ApiModelProperty(value = "运行时间")
+    private Long runningTime;
 }
 
