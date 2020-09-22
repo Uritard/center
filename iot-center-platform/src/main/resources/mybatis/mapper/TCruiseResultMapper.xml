@@ -361,36 +361,6 @@
     ORDER BY dict_code
     </select>
 
-    <!--巡视点结果操作-->
-    <select id="cruiseResultOperate" parameterType="com.yjh.platform.module.task.entity.CruiseAudit" resultType="com.yjh.platform.module.task.entity.CruiseAudit">
-        select
-        a.task_id,
-        d.instance_id,
-        j.instance_name,
-        e.picpath,
-        e.result_num,
-        e.identify_result,
-        e.evaluation_state,
-        h.dict_note as evaluation_state_name,
-        e.identify_state,
-        e.person_check
-        FROM
-            (
-                (
-                    (
-                        t_cruise_result a
-                        LEFT JOIN t_cruise_task_result_detail d ON a.task_result_id = d.task_result_id
-                    )
-                    LEFT JOIN t_cruise_data_result e ON d.cruise_result_id = e.cruise_result_id
-                )
-                LEFT JOIN t_cruise_point_attr j ON d.instance_id = j.instance_id
-            )
-            LEFT JOIN t_dict_business h ON e.evaluation_state = h.dict_code
-        where 1 = 1
-        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null "> and d.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-    </select>
-
     <!--巡视点结果统计-->
     <select id="cruiseStatistical" resultType="com.yjh.platform.module.task.entity.StatisticalTools" >
     select

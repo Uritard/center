@@ -204,22 +204,6 @@ public class TCruiseResultController {
         return result;
     }
 
-    @ApiOperation(value = "巡视点结果操作")
-    @RequestMapping(value = "/cruiseResultOperate", method = RequestMethod.GET)
-    public Result cruiseResultOperate(@RequestParam(value = "taskId", required = false) String taskId,
-                                      @RequestParam(value = "instanceId", required = false) Long instanceId) {
-        Result result = new Result();
-        try {
-            CruiseAudit ca = tCruiseResultService.cruiseResultOperate(taskId,instanceId);
-            result.setData(ca);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
-        }
-        return result;
-    }
     @ApiOperation(value = "人工复核")
     @RequestMapping(value = "/manualReview", method = RequestMethod.PUT)
     public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
