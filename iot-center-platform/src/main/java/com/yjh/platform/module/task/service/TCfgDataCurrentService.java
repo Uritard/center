@@ -76,7 +76,7 @@ public class TCfgDataCurrentService{
 
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<TCfgDataCurrent> list) {
+    public int batchInsert(List<TCfgDataCurrent> list){
         return this.tCfgDataCurrentDao.batchInsert(list);
     }
 
@@ -146,5 +146,7 @@ public class TCfgDataCurrentService{
         }
         return plans;
     }
+
+
 }
 

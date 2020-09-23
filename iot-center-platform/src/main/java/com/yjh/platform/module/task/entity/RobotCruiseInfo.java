@@ -17,9 +17,21 @@ public class RobotCruiseInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "机器人信息")
-    private Map<String,Object> robotInfo;
 
+    private String type="robot";
+
+    @ApiModelProperty(value ="机器人ID")
+    private Long robotId;
+    @ApiModelProperty(value = "机器人名称")
+    private String robotName;
+    @ApiModelProperty(value = "电量")
+    private String elePower;
+    @ApiModelProperty(value = "连接信号")
+    private String tranSignal;
+    @ApiModelProperty(value = "机器人类型")
+    private Integer robotPosition;
+    @ApiModelProperty(value = "机器人类型名称")
+    private String robotPositionName;
     @ApiModelProperty(value = "巡检任务完成度")
     private Float rate;
 }

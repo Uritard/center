@@ -18,11 +18,17 @@ public class CameraCruiseInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String type="camera";
+
     @ApiModelProperty(value = "摄像头信息")
-    private List<Map> CameraInfo;
+    private Integer cameraType;
+
+    private String cameraTypeName;
 
     @ApiModelProperty(value = "摄像头状态数量")
-    private Map<String,Object> cameraStatusCount;
+    private Integer cameraNotFault; //未故障
+
+    private Integer cameraFault; //故障
 
     @ApiModelProperty(value = "巡检任务完成度")
     private Float rate;

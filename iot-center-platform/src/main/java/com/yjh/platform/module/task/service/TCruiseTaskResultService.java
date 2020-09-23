@@ -17,7 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.CameraInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -53,6 +56,9 @@ public class TCruiseTaskResultService{
 
     @Autowired
     private TStdDeviceDao stdDeviceDao;
+
+    @Autowired
+    private TDictBusinessDao tDictBusinessDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -128,7 +134,7 @@ public class TCruiseTaskResultService{
     @Logs(title = "获取当前任务的巡检点全量信息 ")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseInspectResult> selectCruiseTaskResult(Long taskId) throws ParseException {
-        List<CruiseInspectResult>cruiseInspectResults=new ArrayList<>();
+        List<CruiseInspectResult> cruiseInspectResults=new ArrayList<>();
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //获取数据库键名列表
         Set<String> keyResult=redisScan("t_cruise_task_result*");
@@ -242,7 +248,7 @@ public class TCruiseTaskResultService{
 
         Long Minute=((RunningTime/(60*1000)));
         Integer cruisedCount=deviceMete.size()-deviceMeteNotComp.size();//已执行的标准测点数量
-        cruiseResultCounter.setAbnormalCount(deviceMeteAbnormal.size());
+        cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());
         cruiseResultCounter.setCruisedCount(cruisedCount);
         cruiseResultCounter.setCruiseNotCount(deviceMeteNotComp.size());
         cruiseResultCounter.setRunningTime(Minute);
@@ -251,104 +257,159 @@ public class TCruiseTaskResultService{
     }
 
 
-
     @Logs(title = "查询当前任务下机器人/摄像头的基本信息和与之关联的巡检点执行进度")
     @Transactional(rollbackFor = Exception.class)
-    public CruiseDeviceInfo selectCruiseDeviceAndCruiseAdvance(Long taskId,
-                                                   String robotPosition,
-                                                   Integer cameraType){
-        CruiseDeviceInfo cruiseDeviceInfo=new CruiseDeviceInfo();
-        Set<String> cruiseKeys=redisScan("t_cruise_task_result*");
+    public List<Object> selectCruiseDeviceAndCruiseAdvance(Long taskId) {
+        Log cLogger = LogFactory.getLog(this.getClass());
 
-        if(cameraType==null) {
-            Set<String> robotKeys = redisScan("robot_info*");
-            List<RobotCruiseInfo> cruiseInfos = new ArrayList<>();//返回参与任务每一个机器人的信息
+        Integer cameraType = Integer.valueOf(tDictBusinessDao.selectCameraTypeAndRobotPosition("camera_type", "可见光摄像机"));//可见光摄像头TypeId
+        Integer Inferad = Integer.valueOf(tDictBusinessDao.selectCameraTypeAndRobotPosition("camera_type", "红外摄像机"));//红外摄像头TypeId
+        List<Object> finalResult = new ArrayList<>();//最终结果集
 
-            for (String key : robotKeys) {
-                Map<String, Object> robotInfo = redisTemplate.opsForHash().entries(key);
-                String TaskId = taskId.toString();
-                RobotCruiseInfo robotCruiseInfo = new RobotCruiseInfo();
-                float cruisedNotCount = 0;//未执行的巡视点个数
-                float cruiseCount = 0;//该巡视设别下巡视点总个数
-                if (robotInfo.get("robotPosition").equals(robotPosition)) {//判断机器人类型
-                    for (String cKey : cruiseKeys) {
-                        Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cKey);
-                        if (cruiseInfo.get("taskId").equals(TaskId)) {
-                            CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
-                            if (robotInfo.get("inspectionId").equals(cruiseTypeInfo.getCruiseId().toString())) {
-                                robotCruiseInfo.setRobotInfo(robotInfo);
-                                cruiseCount = cruiseCount + 1;
-                                if (cruiseInfo.get("cruiseStatus").equals("1")) {
-                                    cruisedNotCount = cruisedNotCount + 1;
-                                }
-                            }
+
+        Set<String> cruiseKeys = redisScan("t_cruise_task_result*");
+        Set<String> robotKeys = redisScan("robot_info*");
+        for (String robotKey : robotKeys) {
+            Map<String, Object> robotInfo = redisTemplate.opsForHash().entries(robotKey);
+            String taskIdTemp = taskId.toString();
+            float cruisedNotCount = 0;//未执行的巡视点个数
+            float cruiseCount = 0;//该巡视设别下巡视点总个数
+            RobotCruiseInfo robotCruiseInfo = new RobotCruiseInfo();
+            for (String cruiseKey : cruiseKeys) {
+                Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
+                if (taskIdTemp.equals(cruiseInfo.get("taskId"))) {
+                    CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
+                    if (robotInfo.get("inspectionId").equals(cruiseTypeInfo.getCruiseId().toString())) {
+                        robotCruiseInfo.setElePower((robotInfo.get("elePower")).toString());
+                        robotCruiseInfo.setTranSignal((robotInfo.get("tranSignal")).toString());
+                        robotCruiseInfo.setRobotId(Long.valueOf((robotInfo.get("robotId").toString())));
+                        robotCruiseInfo.setRobotName((robotInfo.get("robotName")).toString());
+                        robotCruiseInfo.setRobotPosition(Integer.valueOf((robotInfo.get("robotPosition").toString())));
+                        robotCruiseInfo.setRobotPositionName(tDictBusinessDao.selectDictNoteByDictCode((robotInfo.get("robotPosition").toString())));
+                        cruiseCount = cruiseCount + 1;
+                        if (cruiseInfo.get("cruiseStatus").equals("1")) {
+                            cruisedNotCount = cruisedNotCount + 1;
                         }
                     }
-                    robotCruiseInfo.setRate((cruiseCount - cruisedNotCount) / cruiseCount);//已执行=总-未执行
-                    cruiseInfos.add(robotCruiseInfo);
-                    cruiseDeviceInfo.setRobotCruiseInfos(cruiseInfos);
+                }
+            }
+            robotCruiseInfo.setRate((cruiseCount - cruisedNotCount) / cruiseCount);//已执行=总-未执行
+            if (robotCruiseInfo.getRobotId() != null) {
+                finalResult.add(robotCruiseInfo);
 
+            }
+
+        }
+
+
+        Set<String> cameraKeys = redisScan("camera_info*");
+
+        float cruiseCount = 0;
+        float cruisedCount = 0;
+        float cruisedFailCount = 0;
+        int cameraFault = 0;
+        int cameraNotFault = 0;
+        CameraCruiseInfo cameraCruiseInfo = new CameraCruiseInfo();
+        for (String cameraKey : cameraKeys) {
+            Map<String, Object> cameraInfo = redisTemplate.opsForHash().entries(cameraKey);
+            String TaskId = taskId.toString();
+            String CameraType = cameraType.toString();
+            if (cameraInfo.get("cameraType").equals(CameraType)) {//从数据库或缓存中获取相机类型
+                for (String cruiseKey : cruiseKeys) {
+                    Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
+                    if (cruiseInfo.get("taskId").equals(TaskId)) {
+                        CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
+                        if (cameraInfo.get("presetId").equals(cruiseTypeInfo.getCruiseId().toString())) {
+//                                result.add(cameraInfo);
+                            cruiseCount = cruiseCount + 1;//摄像头/巡检点总数
+                            if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("0")) { //摄像头正常-巡检点正常
+                                cameraNotFault = cameraNotFault + 1;//可运行数量
+                                cruisedCount = cruisedCount + 1; //巡检点已执行个数
+                            } else if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("2")) {  //摄像头正常-巡检点异常
+                                cameraNotFault = cameraNotFault + 1;//可运行数量
+                                cruisedFailCount = cruisedFailCount + 1;//执行失败个数
+                            } else if (!cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("2")) {  //摄像头故障-巡检点异常
+                                cameraFault = cameraFault + 1;//故障数量
+                                cameraFault = cameraFault + 1;//故障数量
+                            } else if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("1")) {
+                                cameraNotFault = cameraNotFault + 1;//可运行数量
+                            } else if (!cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("1")) {
+                                cameraFault = cameraFault + 1;//故障数量
+                            }
+                        }
+
+                    }
                 }
 
             }
         }
-
-
-       else if(robotPosition==null) {
-            Set<String> cameraKeys = redisScan("camera_info*");
-            float cruiseCount = 0;
-            float cruisedCount = 0;
-            float cruisedFailCount = 0;
-            int cameraFault = 0;
-            int cameraNotFault = 0;
-            CameraCruiseInfo cameraCruiseInfo = new CameraCruiseInfo();
-            List<Map> result = new ArrayList<>();
-            Map<String, Object> cameraStatusCount = new HashMap<>();
-            for (String cameraKey : cameraKeys) {
-                Map<String, Object> cameraInfo = redisTemplate.opsForHash().entries(cameraKey);
-                String TaskId = taskId.toString();
-                String CameraType = cameraType.toString();
-                if (cameraInfo.get("cameraType").equals(CameraType)) {//从数据库或缓存中获取相机类型
-                    for (String cruiseKey : cruiseKeys) {
-                        Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
-                        if (cruiseInfo.get("taskId").equals(TaskId)) {
-                            CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
-                            if (cameraInfo.get("presetId").equals(cruiseTypeInfo.getCruiseId().toString())) {
-                                result.add(cameraInfo);
-                                cruiseCount = cruiseCount + 1;//摄像头/巡检点总数
-                                if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("0")) { //摄像头正常-巡检点正常
-                                    cameraNotFault = cameraNotFault + 1;//可运行数量
-                                    cruisedCount = cruisedCount + 1; //巡检点已执行个数
-                                } else if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("2")) {  //摄像头正常-巡检点异常
-                                    cameraNotFault = cameraNotFault + 1;//可运行数量
-                                    cruisedFailCount = cruisedFailCount + 1;//执行失败个数
-                                } else if (!cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("2")) {  //摄像头故障-巡检点异常
-                                    cameraFault = cameraFault + 1;//故障数量
-                                    cameraFault = cameraFault + 1;//故障数量
-                                } else if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("1")) {
-                                    cameraNotFault = cameraNotFault + 1;//可运行数量
-                                } else if (!cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("1")) {
-                                    cameraFault = cameraFault + 1;//故障数量
-                                }
-                            }
-
-                        }
-                    }
-
-                }
-            }
-            cameraStatusCount.put("runningNum", cameraNotFault);
-            cameraStatusCount.put("faultNum", cameraFault);
-            cameraCruiseInfo.setCameraInfo(result);
+        //防止出现NaN
+        if(cruiseCount==0&&(cruisedCount + cruisedFailCount)==0){
+            cameraCruiseInfo.setRate(Float.valueOf("0.0"));
+        }else {
             cameraCruiseInfo.setRate((cruisedCount + cruisedFailCount) / cruiseCount);
-            cameraCruiseInfo.setCameraStatusCount(cameraStatusCount);
-
-            cruiseDeviceInfo.setCameraCruiseInfo(cameraCruiseInfo);
         }
 
+        cameraCruiseInfo.setCameraNotFault(cameraNotFault);
+        cameraCruiseInfo.setCameraFault(cameraFault);
+        cameraCruiseInfo.setCameraType(cameraType);
+        cameraCruiseInfo.setCameraTypeName("可见光");
+        finalResult.add(cameraCruiseInfo);
 
 
-        return cruiseDeviceInfo;
+        float cruiseCountIn = 0;
+        float cruisedCountIn = 0;
+        float cruisedFailCountIn = 0;
+        int cameraFaultIn = 0;
+        int cameraNotFaultIn = 0;
+        CameraCruiseInfo inferadCruiseInfo = new CameraCruiseInfo();
+        for (String cameraKey : cameraKeys) {
+            Map<String, Object> cameraInfo = redisTemplate.opsForHash().entries(cameraKey);
+            String TaskId = taskId.toString();
+            String InferadS = Inferad.toString();
+            if (cameraInfo.get("cameraType").equals(InferadS)) {//从数据库或缓存中获取相机类型
+                for (String cruiseKey : cruiseKeys) {
+                    Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
+                    if (cruiseInfo.get("taskId").equals(TaskId)) {
+                        CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
+                        if (cameraInfo.get("presetId").equals(cruiseTypeInfo.getCruiseId().toString())) {
+                            cruiseCountIn = cruiseCountIn + 1;//摄像头/巡检点总数
+                            if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("0")) { //摄像头正常-巡检点正常
+                                cameraNotFaultIn = cameraNotFaultIn + 1;//可运行数量
+                                cruisedCountIn = cruisedCountIn + 1; //巡检点已执行个数
+                            } else if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("2")) {  //摄像头正常-巡检点异常
+                                cameraNotFaultIn = cameraNotFaultIn + 1;//可运行数量
+                                cruisedFailCountIn = cruisedFailCountIn + 1;//执行失败个数
+                            } else if (!cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("2")) {  //摄像头故障-巡检点异常
+                                cameraFaultIn = cameraFaultIn + 1;//故障数量
+                                cameraFaultIn = cameraFaultIn + 1;//故障数量
+                            } else if (cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("1")) {
+                                cameraNotFaultIn = cameraNotFaultIn + 1;//可运行数量
+                            } else if (!cameraInfo.get("isFault").equals("0") && cruiseInfo.get("cruiseStatus").equals("1")) {
+                                cameraFaultIn = cameraFaultIn + 1;//故障数量
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+        if(cruiseCountIn==0.0&&(cruisedCountIn + cruisedFailCountIn)==0.0){
+            inferadCruiseInfo.setRate(Float.valueOf("0.0"));
+        }else {
+            inferadCruiseInfo.setRate((cruisedCountIn + cruisedFailCountIn) / cruiseCountIn);
+        }
+        inferadCruiseInfo.setCameraNotFault(cameraNotFaultIn);
+        inferadCruiseInfo.setCameraFault(cameraFaultIn);
+        inferadCruiseInfo.setCameraType(Inferad);
+        inferadCruiseInfo.setCameraTypeName("红外");
+
+
+        finalResult.add(inferadCruiseInfo);
+
+
+        return finalResult;
 
     }
 

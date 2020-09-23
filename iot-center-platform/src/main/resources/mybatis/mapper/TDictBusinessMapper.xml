@@ -150,4 +150,12 @@
             </foreach>
     </select>
 
+    
+    <select id="selectCameraTypeAndRobotPosition" resultType="java.lang.String">
+        SELECT dict_code FROM t_dict_business WHERE col_name= #{colName,jdbcType=VARCHAR} AND dict_note=#{dictNote,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectDictNoteByDictCode" parameterType="java.lang.String" resultType="java.lang.String">
+        select dict_note FROM t_dict_business WHERE dict_code=#{dictCode,jdbcType=VARCHAR}
+    </select>
 </mapper>

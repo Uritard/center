@@ -17,7 +17,7 @@ public class CruiseResultCounter implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "异常结果个数" )
-    private Integer abnormalCount;
+    private Integer alarmCount;
 
     @ApiModelProperty(value = "已巡视结果个数")
     private Integer cruisedCount;

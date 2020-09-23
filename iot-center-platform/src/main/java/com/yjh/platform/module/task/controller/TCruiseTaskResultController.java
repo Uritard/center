@@ -204,13 +204,11 @@ public class TCruiseTaskResultController {
 
 
     @ApiOperation(value = "C-获取当前任务下的摄像头/机器人信息以及其工作的巡检点结果状态")
-    @RequestMapping(value = "/selectCameraAndCruiseResult",method = RequestMethod.GET)
-    public Result selectCruiseDeviceAndCruiseAdvance(@RequestParam Long taskId,
-                                                     @RequestParam(value = "cameraType",required = false) Integer cameraType,
-                                                     @RequestParam (value = "robotPosition",required = false)String robotPosition){
+    @RequestMapping(value = "/selectCruiseDeviceAndCruiseAdvance",method = RequestMethod.GET)
+    public Result selectCruiseDeviceAndCruiseAdvance(@RequestParam Long taskId){
         Result result=new Result();
         try{
-            result.setData(tCruiseTaskResultService.selectCruiseDeviceAndCruiseAdvance(taskId,robotPosition,cameraType));
+            result.setData(tCruiseTaskResultService.selectCruiseDeviceAndCruiseAdvance(taskId));
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);

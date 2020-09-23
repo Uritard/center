@@ -36,5 +36,7 @@ public interface TCfgUnionRuleDao {
 
     List<HashMap<String,Object>> selectForTCfgMete(String meteId);
     List<HashMap<String,Object>> selectForTCPlan(Long planId);
+    List<TCfgUnionRule> selectUnionRuleByMeteId(@Param(value ="inputParam" )String inputParam);
+
 
 }

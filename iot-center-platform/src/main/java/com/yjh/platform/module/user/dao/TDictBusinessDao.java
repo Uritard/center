@@ -30,5 +30,8 @@ public interface TDictBusinessDao {
     int batchInsert(@Param("list") List<TDictBusiness> list);
 
     List<TDictBusiness> selectQuery(@Param("colNames") List<String> colNames);
+    String selectCameraTypeAndRobotPosition(@Param(value = "colName")String colName,
+                                            @Param(value = "dictNote")String dictNote);
+    String selectDictNoteByDictCode(@Param(value = "dictCode")String dictCode);
 
 }
