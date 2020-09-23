@@ -19,7 +19,6 @@ public class TUnionTaskAttr implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @ApiModelProperty(value = "关联任务表UUID")
     private String unionId;
 

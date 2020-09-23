@@ -5,19 +5,17 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TUnionTask">
         <id column="union_id" jdbcType="VARCHAR" property="unionId" />
-        <result column="plan_id" jdbcType="BIGINT" property="planId" />
-        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
-        <result column="name" jdbcType="VARCHAR" property="name" />
-        <result column="type" jdbcType="INTEGER" property="type" />
-        <result column="if_run" jdbcType="INTEGER" property="ifRun" />
+        <result column="ruleId" jdbcType="BIGINT" property="ruleId" />
+        <result column="unionName" jdbcType="VARCHAR" property="unionName" />
+        <result column="ruleDelay" jdbcType="INTEGER" property="ruleDelay" />
         <result column="robot_id" jdbcType="BIGINT" property="robotId" />
-        <result column="date_type" jdbcType="INTEGER" property="dateType" />
         <result column="remark1" jdbcType="INTEGER" property="remark1" />
         <result column="remark2" jdbcType="INTEGER" property="remark2" />
         <result column="remark3" jdbcType="VARCHAR" property="remark3" />
-        <result column="task_type" jdbcType="INTEGER" property="taskType" />
         <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="paramValues" jdbcType="VARCHAR" property="paramValues" />
+        <result column="isFinish" jdbcType="INTEGER" property="isFinish" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -25,6 +23,12 @@
         union_id, plan_id, area_id, name, type, if_run, robot_id, date_type, remark1, remark2, remark3, task_type, start_time, create_time
     </sql>
 
+    <sql id="General">
+        a.union_id,a.rule_id,a.union_name,a.rule_delay,a.robot_id,a.remark1,
+        a.remark2,a.remark3,a.is_finish,a.start_time,a.create_time,a.param_values,
+        b.plan_id,b.rule_name,b.rule_type,b.rule_content,b.description,b.update_time,
+        d.plan_name
+    </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="unionId" parameterType="com.yjh.platform.module.task.entity.TUnionTask">
         insert into t_union_task(
@@ -110,108 +114,108 @@
     <select id="select" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTask">
         select
         a.union_id,
-        a.plan_id,
-        a.area_id,
-        a.name,
-        a.type,
-        a.if_run,
+        a.rule_id,
+        a.union_name,
+        a.rule_delay,
+        a.is_finish,
         a.robot_id,
-        a.date_type,
         a.remark1,
         a.remark2,
         a.remark3,
-        a.task_type,
+        a.param_values,
         a.start_time,
         a.create_time
         from t_union_task a
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
-        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
-        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
-        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
-        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="ruleId != null and ruleId != ''"> and a.rule_id = #{ruleId, jdbcType=BIGINT}</if>
+        <if test="unionName != null and unionName != ''"> and a.union_name = #{unionName, jdbcType=VARCHAR}</if>
+        <if test="ruleDelay != null and ruleDelay != ''"> and a.rule_delay = #{ruleDelay, ruleDelay=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=INTEGER}</if>
         <if test="remark1 != null and remark1 != ''"> and a.remark1 = #{remark1, jdbcType=INTEGER}</if>
         <if test="remark2 != null and remark2 != ''"> and a.remark2 = #{remark2, jdbcType=INTEGER}</if>
         <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
-        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
-        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=VARCHAR}</if>
+        <if test="paramValues != null and paramValues != ''"> and a.param_values = #{paramValues, jdbcType=TIMESTAMP}</if>
+        <if test="isFinish != null and isFinish != ''"> and a.is_finish = #{isFinish, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTask">
         select
         a.union_id,
-        a.plan_id,
-        a.area_id,
-        a.name,
-        a.type,
-        a.if_run,
+        a.rule_id,
+        a.union_name,
+        a.rule_delay,
+        a.is_finish,
         a.robot_id,
-        a.date_type,
         a.remark1,
         a.remark2,
         a.remark3,
-        a.task_type,
+        a.param_values,
         a.start_time,
         a.create_time
         from t_union_task a
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
-        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
-        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
-        <if test="name != null and name != ''"> and a.name = #{name, jdbcType=VARCHAR}</if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
-        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="ruleId != null and ruleId != ''"> and a.rule_id = #{ruleId, jdbcType=BIGINT}</if>
+        <if test="unionName != null and unionName != ''"> and a.union_name = #{unionName, jdbcType=VARCHAR}</if>
+        <if test="ruleDelay != null and ruleDelay != ''"> and a.rule_delay = #{ruleDelay, ruleDelay=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=INTEGER}</if>
         <if test="remark1 != null and remark1 != ''"> and a.remark1 = #{remark1, jdbcType=INTEGER}</if>
         <if test="remark2 != null and remark2 != ''"> and a.remark2 = #{remark2, jdbcType=INTEGER}</if>
         <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
-        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
-        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=VARCHAR}</if>
+        <if test="paramValues != null and paramValues != ''"> and a.param_values = #{paramValues, jdbcType=TIMESTAMP}</if>
+        <if test="isFinish != null and isFinish != ''"> and a.is_finish = #{isFinish, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">
         insert into t_union_task(
-            union_id,
-            plan_id,
-            area_id,
-            name,
-            type,
-            if_run,
-            robot_id,
-            date_type,
-            remark1,
-            remark2,
-            remark3,
-            task_type,
-            start_time,
-            create_time
+        union_id,
+        rule_id,
+        union_name,
+        rule_delay,
+        is_finish,
+        robot_id,
+        remark1,
+        remark2,
+        remark3,
+        param_values,
+        start_time,
+        create_time
         )values
         <foreach collection="list" item="TUnionTask" separator=",">
             (
                 #{TUnionTask.unionId, jdbcType=VARCHAR},
-                #{TUnionTask.planId, jdbcType=BIGINT},
-                #{TUnionTask.areaId, jdbcType=VARCHAR},
-                #{TUnionTask.name, jdbcType=VARCHAR},
-                #{TUnionTask.type, jdbcType=INTEGER},
-                #{TUnionTask.ifRun, jdbcType=INTEGER},
+                #{TUnionTask.ruleId, jdbcType=BIGINT},
+                #{TUnionTask.unionName, jdbcType=VARCHAR},
+                #{TUnionTask.ruleDelay, jdbcType=INTEGER},
+                #{TUnionTask.isFinish, jdbcType=INTEGER},
                 #{TUnionTask.robotId, jdbcType=BIGINT},
-                #{TUnionTask.dateType, jdbcType=INTEGER},
                 #{TUnionTask.remark1, jdbcType=INTEGER},
                 #{TUnionTask.remark2, jdbcType=INTEGER},
                 #{TUnionTask.remark3, jdbcType=VARCHAR},
-                #{TUnionTask.taskType, jdbcType=INTEGER},
+                #{TUnionTask.paramValues, jdbcType=VARCHAR},
                 #{TUnionTask.startTime, jdbcType=TIMESTAMP},
                 #{TUnionTask.createTime, jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
 
+    <select id="selectHistory" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTaskExpand">
+        select <include refid="General"></include>
+        from t_cfg_union_rule b,t_union_task a,t_cruise_plan d
+        where 1 = 1
+        <if test="ruleName != null and ruleName != ''"> and b.rule_name like concat('%',#{ruleName, jdbcType=VARCHAR},'%') </if>
+        and a.start_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}
+        and a.rule_id = b.rule_id
+        and b.plan_id = d.plan_id
+    </select>
 
+    <select id="historyStatistical" resultType="com.yjh.platform.module.task.entity.TUnionTaskExpand">
+
+    </select>
 
 </mapper>

@@ -64,20 +64,6 @@ public class TCruiseResultService{
         List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskId,cruiseType,state,executeTime,deviceName);
         return cruiseResultDetailList;
     }
-    @Logs(title = "巡视点结果操作", code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public CruiseAudit cruiseResultOperate(String taskId,Long instanceId) {
-        CruiseAudit ca = tCruiseResultDao.cruiseResultOperate(taskId,instanceId);
-        if (ca.getIdentifyResult() != null){
-            String identifyResult1  = tCruiseResultDao.selectByIdentifyResult(ca.getIdentifyResult());
-            ca.setIdentifyResultName(identifyResult1);
-        }
-        if (ca.getIdentifyState() != null){
-            String identifyState1 = tCruiseResultDao.selectByIdentifyState(ca.getIdentifyState());
-            ca.setIdentifyResultName(identifyState1);
-        }
-        return ca;
-    }
     @Logs(title = "人工复核", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview,String userId) {

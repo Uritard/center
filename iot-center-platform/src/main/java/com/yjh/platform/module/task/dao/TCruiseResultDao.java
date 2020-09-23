@@ -51,8 +51,6 @@ public interface TCruiseResultDao {
     List<StatisticalTools> cruiseStatistical(@Param(value = "colName1")String colName1);
     List<TaskSimpleInfo> selectTaskIsRunning();
 
-    CruiseAudit cruiseResultOperate(@Param(value = "taskId")String taskId,
-                                    @Param(value = "instanceId")Long instanceId);
     String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
 

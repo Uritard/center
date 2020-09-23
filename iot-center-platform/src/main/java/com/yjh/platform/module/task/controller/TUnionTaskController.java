@@ -1,7 +1,10 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.module.task.entity.TUnionTaskExpand;
 import com.yjh.platform.module.task.service.TUnionTaskService;
 import com.yjh.platform.module.task.entity.TUnionTask;
+
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
@@ -101,22 +104,21 @@ public class TUnionTaskController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "unionId", required = false) String unionId,
-                            @RequestParam(value = "planId", required = false) Long planId,
-                            @RequestParam(value = "areaId", required = false) String areaId,
-                            @RequestParam(value = "name", required = false) String name,
-                            @RequestParam(value = "type", required = false) Integer type,
-                            @RequestParam(value = "ifRun", required = false) Integer ifRun,
+                            @RequestParam(value = "ruleId", required = false) Long ruleId,
+                            @RequestParam(value = "unionName", required = false) String unionName,
+                            @RequestParam(value = "ruleDelay", required = false) Integer ruleDelay,
+                            @RequestParam(value = "isFinish", required = false) Integer isFinish,
                             @RequestParam(value = "robotId", required = false) Long robotId,
-                            @RequestParam(value = "dateType", required = false) Integer dateType,
                             @RequestParam(value = "remark1", required = false) Integer remark1,
                             @RequestParam(value = "remark2", required = false) Integer remark2,
                             @RequestParam(value = "remark3", required = false) String remark3,
-                            @RequestParam(value = "taskType", required = false) Integer taskType,
+                            @RequestParam(value = "paramValues", required = false) String paramValues,
                             @RequestParam(value = "startTime", required = false) Date startTime,
                             @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TUnionTask> list = tUnionTaskService.select(unionId, planId, areaId, name, type, ifRun, robotId, dateType, remark1, remark2, remark3, taskType, startTime, createTime);
+            List<TUnionTask> list = tUnionTaskService.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, remark1,
+                    remark2, remark3, paramValues, startTime, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -157,5 +159,47 @@ public class TUnionTaskController {
         }
         return result;
     }
-
+    @ApiOperation(value = "查看联动历史记录")
+    @RequestMapping(value = "/selectHistory", method = RequestMethod.GET)
+    public Result selectHistory(@RequestParam(value = "ruleName", required = false) String ruleName,
+                                @RequestParam(value = "endDate", required = false) String endDate,
+                                @RequestParam(value = "startDate", required = false) String startDate,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date endDateTemp;
+        Date startDateTemp;
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            if ("".equals(endDate) && "".equals(startDate)) {
+                endDateTemp = null;
+                startDateTemp = null;
+            } else {
+                endDateTemp = simpleDateFormat.parse(endDate);
+                startDateTemp = simpleDateFormat.parse(startDate);
+            }
+            List<TUnionTaskExpand> list = tUnionTaskService.selectHistory(ruleName,endDateTemp,startDateTemp);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "联动历史记录统计")
+    @RequestMapping(value = "/historyStatistical", method = RequestMethod.GET)
+    public Result historyStatistical() {
+        Result result = new Result();
+        try {
+            result.setData(tUnionTaskService.historyStatistical());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
 }
