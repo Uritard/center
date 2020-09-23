@@ -387,4 +387,20 @@
         select dict_note from t_dict_business where dict_code = #{identifyState,jdbcType=INTEGER}
     </select>
 
+    <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        SELECT
+				a.task_id,
+                d.evaluation_state,
+                e.dict_note as evaluation_state_name,
+				d.check_user,
+                d.check_date
+        FROM t_cruise_result a LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
+        LEFT JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
+        LEFT JOIN t_dict_business e on e.dict_code = d.evaluation_state
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=BIGINT}</if>
+        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime,jdbcType=TIMESTAMP}</if>
+
+    </select>
+
 </mapper>

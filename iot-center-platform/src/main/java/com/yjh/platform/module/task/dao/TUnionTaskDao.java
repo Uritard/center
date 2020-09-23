@@ -3,6 +3,8 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.task.entity.TUnionTask;
+import com.yjh.platform.module.task.entity.TUnionTaskAttr;
+import com.yjh.platform.module.task.entity.TUnionTaskDetail;
 import com.yjh.platform.module.task.entity.TUnionTaskExpand;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -37,4 +39,7 @@ public interface TUnionTaskDao {
                                          @Param(value = "endDateTemp")Date endDateTemp,
                                          @Param(value = "startDateTemp")Date startDateTemp);
     List<TUnionTaskExpand> historyStatistical();
+//    int insertRecord(TUnionTask tUnionTask);
+    List<TUnionTaskDetail> selectUnionDetail(@Param(value = "ruleId")Long  ruleId);
+    int insertRecordDetail(List<TUnionTaskAttr> tUnionTaskAttrList);
 }

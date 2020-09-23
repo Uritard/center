@@ -168,8 +168,8 @@ public class TUnionTaskController {
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date endDateTemp;
-        Date startDateTemp;
+        Date endDateTemp = new Date();
+        Date startDateTemp = new Date();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
@@ -181,6 +181,7 @@ public class TUnionTaskController {
                 startDateTemp = simpleDateFormat.parse(startDate);
             }
             List<TUnionTaskExpand> list = tUnionTaskService.selectHistory(ruleName,endDateTemp,startDateTemp);
+
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

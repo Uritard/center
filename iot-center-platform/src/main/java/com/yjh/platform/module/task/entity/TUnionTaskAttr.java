@@ -30,9 +30,6 @@ public class TUnionTaskAttr implements Serializable {
     @ApiModelProperty(value = "关联巡视设备部位表id")
     private String deviceCustomId;
 
-    @ApiModelProperty(value = "关联巡视点表id")
-    private Long pointTaskId;
-
     @ApiModelProperty(value = "是否支持机器人巡视")
     private Integer ifRobot;
 
@@ -42,8 +39,6 @@ public class TUnionTaskAttr implements Serializable {
     @ApiModelProperty(value = "是否支持红外巡视")
     private Integer ifInferad;
 
-    @ApiModelProperty(value = "是否支持人工巡视")
-    private Integer ifArtificial;
 
 
 }

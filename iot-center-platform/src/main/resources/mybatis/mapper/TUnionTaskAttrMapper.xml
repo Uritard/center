@@ -8,16 +8,14 @@
         <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
         <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
         <result column="device_custom_id" jdbcType="VARCHAR" property="deviceCustomId" />
-        <result column="point_task_id" jdbcType="BIGINT" property="pointTaskId" />
         <result column="if_robot" jdbcType="INTEGER" property="ifRobot" />
         <result column="if_video" jdbcType="INTEGER" property="ifVideo" />
         <result column="if_inferad" jdbcType="INTEGER" property="ifInferad" />
-        <result column="if_artificial" jdbcType="INTEGER" property="ifArtificial" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        union_id, instance_id, device_mete_id, device_custom_id, point_task_id, if_robot, if_video, if_inferad, if_artificial
+        union_id, instance_id, device_mete_id, device_custom_id, if_robot, if_video, if_inferad
     </sql>
 
 
@@ -27,21 +25,17 @@
             instance_id,
             device_mete_id,
             device_custom_id,
-            point_task_id,
             if_robot,
             if_video,
-            if_inferad,
-            if_artificial
+            if_inferad
         )values(
                 #{unionId, jdbcType=VARCHAR},
                 #{instanceId, jdbcType=BIGINT},
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceCustomId, jdbcType=VARCHAR},
-                #{pointTaskId, jdbcType=BIGINT},
                 #{ifRobot, jdbcType=INTEGER},
                 #{ifVideo, jdbcType=INTEGER},
-                #{ifInferad, jdbcType=INTEGER},
-                #{ifArtificial, jdbcType=INTEGER}
+                #{ifInferad, jdbcType=INTEGER}
         )
     </insert>
 
@@ -56,11 +50,9 @@
         <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
         <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceCustomId != null and deviceCustomId != ''">a.device_custom_id = #{deviceCustomId, jdbcType=VARCHAR},</if>
-        <if test="pointTaskId != null and pointTaskId != ''">a.point_task_id = #{pointTaskId, jdbcType=BIGINT},</if>
         <if test="ifRobot != null and ifRobot != ''">a.if_robot = #{ifRobot, jdbcType=INTEGER},</if>
         <if test="ifVideo != null and ifVideo != ''">a.if_video = #{ifVideo, jdbcType=INTEGER},</if>
         <if test="ifInferad != null and ifInferad != ''">a.if_inferad = #{ifInferad, jdbcType=INTEGER},</if>
-        <if test="ifArtificial != null and ifArtificial != ''">a.if_artificial = #{ifArtificial, jdbcType=INTEGER},</if>
     </set>
             where a.union_id = #{unionId, jdbcType=VARCHAR}
     </update>
@@ -71,11 +63,9 @@
         a.instance_id,
         a.device_mete_id,
         a.device_custom_id,
-        a.point_task_id,
         a.if_robot,
         a.if_video,
-        a.if_inferad,
-        a.if_artificial
+        a.if_inferad
         from t_union_task_attr a
         where 1 = 1
             and a.union_id = #{unionId, jdbcType=VARCHAR}
@@ -88,22 +78,18 @@
         a.instance_id,
         a.device_mete_id,
         a.device_custom_id,
-        a.point_task_id,
         a.if_robot,
         a.if_video,
-        a.if_inferad,
-        a.if_artificial
+        a.if_inferad
         from t_union_task_attr a
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceCustomId != null and deviceCustomId != ''"> and a.device_custom_id = #{deviceCustomId, jdbcType=VARCHAR}</if>
-        <if test="pointTaskId != null and pointTaskId != ''"> and a.point_task_id = #{pointTaskId, jdbcType=BIGINT}</if>
         <if test="ifRobot != null and ifRobot != ''"> and a.if_robot = #{ifRobot, jdbcType=INTEGER}</if>
         <if test="ifVideo != null and ifVideo != ''"> and a.if_video = #{ifVideo, jdbcType=INTEGER}</if>
         <if test="ifInferad != null and ifInferad != ''"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
-        <if test="ifArtificial != null and ifArtificial != ''"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TUnionTaskAttr" resultType="com.yjh.platform.module.task.entity.TUnionTaskAttr">
@@ -112,22 +98,18 @@
         a.instance_id,
         a.device_mete_id,
         a.device_custom_id,
-        a.point_task_id,
         a.if_robot,
         a.if_video,
-        a.if_inferad,
-        a.if_artificial
+        a.if_inferad
         from t_union_task_attr a
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceCustomId != null and deviceCustomId != ''"> and a.device_custom_id = #{deviceCustomId, jdbcType=VARCHAR}</if>
-        <if test="pointTaskId != null and pointTaskId != ''"> and a.point_task_id = #{pointTaskId, jdbcType=BIGINT}</if>
         <if test="ifRobot != null and ifRobot != ''"> and a.if_robot = #{ifRobot, jdbcType=INTEGER}</if>
         <if test="ifVideo != null and ifVideo != ''"> and a.if_video = #{ifVideo, jdbcType=INTEGER}</if>
         <if test="ifInferad != null and ifInferad != ''"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
-        <if test="ifArtificial != null and ifArtificial != ''"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">
@@ -136,11 +118,9 @@
             instance_id,
             device_mete_id,
             device_custom_id,
-            point_task_id,
             if_robot,
             if_video,
-            if_inferad,
-            if_artificial
+            if_inferad
         )values
         <foreach collection="list" item="TUnionTaskAttr" separator=",">
             (
@@ -148,11 +128,9 @@
                 #{TUnionTaskAttr.instanceId, jdbcType=BIGINT},
                 #{TUnionTaskAttr.deviceMeteId, jdbcType=BIGINT},
                 #{TUnionTaskAttr.deviceCustomId, jdbcType=VARCHAR},
-                #{TUnionTaskAttr.pointTaskId, jdbcType=BIGINT},
                 #{TUnionTaskAttr.ifRobot, jdbcType=INTEGER},
                 #{TUnionTaskAttr.ifVideo, jdbcType=INTEGER},
-                #{TUnionTaskAttr.ifInferad, jdbcType=INTEGER},
-                #{TUnionTaskAttr.ifArtificial, jdbcType=INTEGER}
+                #{TUnionTaskAttr.ifInferad, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

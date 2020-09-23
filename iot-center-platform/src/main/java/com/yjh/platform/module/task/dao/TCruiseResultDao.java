@@ -55,4 +55,7 @@ public interface TCruiseResultDao {
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
 
     String selectUserName(@Param(value = "userID")Integer  userID);
+
+    List<CruiseManualReview> selectManualDetail(@Param(value = "taskId")String taskId,
+                                                @Param(value = "executeTime")String executeTime);
 }

@@ -2,24 +2,21 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Sets;
-import com.yjh.platform.module.task.entity.TUnionTask;
+import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
+import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 
-import java.util.List;
-import java.util.Date;
-import java.util.Set;
+import java.net.SocketTimeoutException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.util.*;
 
-import com.yjh.platform.module.task.entity.TUnionTaskExpand;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 /**
 * @author tt
@@ -31,8 +28,9 @@ public class TUnionTaskService{
     @Autowired
     private TUnionTaskDao tUnionTaskDao;
     @Autowired
-    private RedisTemplate redisTemplate;
-
+    private TCfgUnionRuleDao  tCfgUnionRuleDao;
+    @Autowired
+    private TUnionTaskAttrDao TUnionTaskAttrDao;
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TUnionTask tUnionTask) {
@@ -66,8 +64,11 @@ public class TUnionTaskService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TUnionTask> selectByPage(TUnionTask tUnionTask) {
+    public List<TUnionTask> selectByPage(TUnionTask tUnionTask) throws ParseException{
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        int result = insertRecord(9000000005L,1,null,date);
         return tUnionTaskList;
     }
 
@@ -87,32 +88,64 @@ public class TUnionTaskService{
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskExpand> historyStatistical() {
         List<TUnionTaskExpand> tUnionTaskList = tUnionTaskDao.historyStatistical();
-        Set<String> xixihaua = redisScan("t_union_task*");
         return tUnionTaskList;
     }
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
+    @Logs(title = "联动记录存储", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int insertRecord(Long ruleId,Integer isFinish,Long robotId,Date createTime) throws ParseException {
+        if (isFinish==1){
+            //新增联合巡视预案数据
+            TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
+            TUnionTask tUnionTask = new TUnionTask();
+            tUnionTask.setUnionId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+            tUnionTask.setRuleId(ruleId);
+            tUnionTask.setUnionName(tCfgUnionRule.getRuleName()+tCfgUnionRule.getPlanId());
+            tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
+            tUnionTask.setRobotId(robotId);
+            tUnionTask.setIsFinish(1);
+            tUnionTask.setCreateTime(createTime);
 
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //计算巡视时间
+            Date startTime = new Date();
+            startTime.setSeconds(createTime.getSeconds() + tCfgUnionRule.getRuleDelay());
+            tUnionTask.setStartTime(startTime);
+            tUnionTask.setParamValues(tCfgUnionRule.getInputParam());
 
-            ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
+//            System.out.println("tUnionTask是："+tUnionTask);
+            tUnionTaskDao.insert(tUnionTask);
+
+            //新增联合巡视预案属性数据
+            List<TUnionTaskDetail> tUnionTaskDetailList = tUnionTaskDao.selectUnionDetail(ruleId);
+//            System.out.println("tUnionTaskDetailList是："+tUnionTaskDetailList);
+            List<TUnionTaskAttr> tUnionTaskAttrList = new ArrayList<>();
+            for(TUnionTaskDetail tUnionTaskDetail:tUnionTaskDetailList){
+                TUnionTaskAttr tUnionTaskAttr = new TUnionTaskAttr();
+
+                tUnionTaskAttr.setUnionId(tUnionTask.getUnionId());
+                tUnionTaskAttr.setInstanceId(tUnionTaskDetail.getInstanceId());
+                tUnionTaskAttr.setDeviceCustomId(tUnionTaskDetail.getDeviceCustomId());
+                tUnionTaskAttr.setDeviceMeteId(tUnionTaskDetail.getDeviceMeteId());
+                if(tUnionTaskDetail.getCruiseType()==228){
+                    tUnionTaskAttr.setIfRobot(1);
+                }else
+                    tUnionTaskAttr.setIfRobot(0);
+                if(tUnionTaskDetail.getCruiseType()==229){
+                    tUnionTaskAttr.setIfVideo(1);
+                }else
+                    tUnionTaskAttr.setIfVideo(0);
+                if(tUnionTaskDetail.getCruiseType()==230){
+                    tUnionTaskAttr.setIfInferad(1);
+                }else
+                    tUnionTaskAttr.setIfInferad(0);
+
+                tUnionTaskAttrList.add(tUnionTaskAttr);
             }
-
-            return keys;
-        });
+//            tUnionTaskDao.insertRecordDetail(tUnionTaskAttrList);
+            System.out.println("tUnionTaskAttrList是："+tUnionTaskAttrList);
+            TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
+        }
+        return 11111;
     }
 }
 

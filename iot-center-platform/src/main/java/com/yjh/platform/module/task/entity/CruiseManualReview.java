@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,16 +30,20 @@ public class CruiseManualReview {
     @ApiModelProperty(value = "评价状态")
     private Integer evaluationState;
     @ApiModelProperty(value = "评价状态-字典表")
-    private String evaluationState1;
+    private String evaluationStateName;
     @ApiModelProperty(value = "实际结果")
     private Integer identifyResult;
     @ApiModelProperty(value = "实际结果-字典表")
-    private String identifyResult1;
+    private String identifyResultName;
     @ApiModelProperty(value = "识别状态")
     private Integer identifyState;
     @ApiModelProperty(value = "识别状态-字典表")
-    private String identifyState1;
+    private String identifyStateName;
     @ApiModelProperty(value = "审核人")
     private String checkUser;
+    @ApiModelProperty(value = "审核时间")
+    private String checkDate;
+    @ApiModelProperty(value = "执行时间")
+    private String executeTime;
 
 }
