@@ -39,7 +39,7 @@ public class RobotAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody RobotAlarm robotAlarm) {
+    public Result add(@RequestBody RobotAlarm robotAlarm) {
         Result result = new Result();
         try {
             result.setData(robotAlarmService.insert(robotAlarm));

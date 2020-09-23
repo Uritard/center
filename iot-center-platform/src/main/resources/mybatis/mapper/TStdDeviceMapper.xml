@@ -43,7 +43,9 @@
             up_region_name,
             custom_name,
             custom_type,
-            status
+            status,
+            update_time,
+            create_time
         )values(
                 #{deviceId, jdbcType=BIGINT},
                 #{customId, jdbcType=VARCHAR},
@@ -58,7 +60,9 @@
                 #{upRegionName, jdbcType=VARCHAR},
                 #{customName, jdbcType=VARCHAR},
                 #{customType, jdbcType=INTEGER},
-                #{status, jdbcType=INTEGER}
+                #{status, jdbcType=INTEGER},
+                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP
         )
     </insert>
 
@@ -83,6 +87,7 @@
         <if test="customName != null and customName != ''">a.custom_name = #{customName, jdbcType=VARCHAR},</if>
         <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
+        a.update_time = CURRENT_TIMESTAMP(),
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>

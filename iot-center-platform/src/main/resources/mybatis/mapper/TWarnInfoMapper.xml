@@ -63,7 +63,7 @@
         )values(
                 #{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
-                #{warnTime, jdbcType=TIMESTAMP},
+                CURRENT_TIMESTAMP(),
                 #{warnType, jdbcType=INTEGER},
                 #{deviceId, jdbcType=BIGINT},
                 #{cunstomId, jdbcType=VARCHAR},
@@ -95,26 +95,26 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
         update t_warn_info a <set>
         <if test="warnId != null and warnId != ''">a.warn_id = #{warnId, jdbcType=BIGINT},</if>
-        <if test="warnLevel != null and warnLevel != ''">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+        <if test="warnLevel != null">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
         a.warn_time = #{warnTime, jdbcType=TIMESTAMP},
-        <if test="warnType != null and warnType != ''">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
+        <if test="warnType != null">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
         <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
         <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
-        <if test="confMode != null and confMode != ''">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
-        a.conf_time = #{confTime, jdbcType=TIMESTAMP},
+        <if test="confMode != null">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
+        a.conf_time = CURRENT_TIMESTAMP(),
         <if test="confUserId != null and confUserId != ''">a.conf_user_id = #{confUserId, jdbcType=VARCHAR},</if>
         <if test="confInfo != null and confInfo != ''">a.conf_info = #{confInfo, jdbcType=VARCHAR},</if>
-        <if test="ifWarnDisable != null and ifWarnDisable != ''">a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER},</if>
-        <if test="alarmSource != null and alarmSource != ''">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
-        <if test="warnSubtype != null and warnSubtype != ''">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
+        <if test="ifWarnDisable != null">a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER},</if>
+        <if test="alarmSource != null">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
+        <if test="warnSubtype != null">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
         <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
         <if test="imagePath != null and imagePath != ''">a.image_path = #{imagePath, jdbcType=VARCHAR},</if>
         <if test="videoPath != null and videoPath != ''">a.video_path = #{videoPath, jdbcType=VARCHAR},</if>
         <if test="value != null and value != ''">a.value = #{value, jdbcType=VARCHAR},</if>
-        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
-        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="defect != null">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
         <if test="outRange != null and outRange != ''">a.out_range = #{outRange, jdbcType=VARCHAR},</if>
         <if test="linkMessage != null and linkMessage != ''">a.link_message = #{linkMessage, jdbcType=VARCHAR},</if>
     </set>
@@ -180,26 +180,26 @@
         from t_warn_info a
         where 1 = 1
         <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="warnTime != null and warnTime != ''"> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
-        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="warnType != null"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="confTime != null and confTime != ''"> and a.conf_time = #{confTime, jdbcType=TIMESTAMP}</if>
         <if test="confUserId != null and confUserId != ''"> and a.conf_user_id = #{confUserId, jdbcType=VARCHAR}</if>
         <if test="confInfo != null and confInfo != ''"> and a.conf_info = #{confInfo, jdbcType=VARCHAR}</if>
-        <if test="ifWarnDisable != null and ifWarnDisable != ''"> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="warnSubtype != null and warnSubtype != ''"> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
+        <if test="ifWarnDisable != null"> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="warnSubtype != null"> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="imagePath != null and imagePath != ''"> and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
         <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
         <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
-        <if test="defect != null and defect != ''"> and a.defect = #{defect, jdbcType=INTEGER}</if>
-        <if test="defectLevel != null and defectLevel != ''"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
+        <if test="defect != null"> and a.defect = #{defect, jdbcType=INTEGER}</if>
+        <if test="defectLevel != null"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
         <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
         <if test="linkMessage != null and linkMessage != ''"> and a.link_message = #{linkMessage, jdbcType=VARCHAR}</if>
     </select>
@@ -232,26 +232,26 @@
         from t_warn_info a
         where 1 = 1
         <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="warnTime != null and warnTime != ''"> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
-        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="warnType != null"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="confTime != null and confTime != ''"> and a.conf_time = #{confTime, jdbcType=TIMESTAMP}</if>
         <if test="confUserId != null and confUserId != ''"> and a.conf_user_id = #{confUserId, jdbcType=VARCHAR}</if>
         <if test="confInfo != null and confInfo != ''"> and a.conf_info = #{confInfo, jdbcType=VARCHAR}</if>
-        <if test="ifWarnDisable != null and ifWarnDisable != ''"> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="warnSubtype != null and warnSubtype != ''"> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
+        <if test="ifWarnDisable != null"> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="warnSubtype != null"> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="imagePath != null and imagePath != ''"> and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
         <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
         <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
-        <if test="defect != null and defect != ''"> and a.defect = #{defect, jdbcType=INTEGER}</if>
-        <if test="defectLevel != null and defectLevel != ''"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
+        <if test="defect != null"> and a.defect = #{defect, jdbcType=INTEGER}</if>
+        <if test="defectLevel != null"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
         <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
         <if test="linkMessage != null and linkMessage != ''"> and a.link_message = #{linkMessage, jdbcType=VARCHAR}</if>
     </select>
@@ -311,71 +311,88 @@
         </foreach>
     </insert>
 
-    <select id="selectAllWarn" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    <select id="selectAllWarn" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         select
         a.warn_id,
         a.warn_time,
         a.value,
+        a.device_id,
         b.device_name,
         a.alarm_source,
-         a.warn_level,
-         a.conf_mode
-        from t_warn_info a, t_std_device b
+        a.warn_level,
+        a.conf_mode,
+        c.dict_note as warnLevelName,
+        d.dict_note as alarmSourceName,
+        e.dict_note as confModeName
+        from t_warn_info a
+        left join t_std_device b on a.device_id = b.device_id
+        left join t_dict_business c on a.warn_level = c.dict_code
+        left join t_dict_business d on a.alarm_source = d.dict_code
+        left join t_dict_business e on a.conf_mode = e.dict_code
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        <if test="warnType != null"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         union all(
         select
-        robot_alarm_id,
-        alarm_time,
-        alarm_info,
+        f.robot_alarm_id,
+        f.alarm_time,
+        f.alarm_info,
+        "111" as deviceId,
         "检测机器人" as deviceName,
-        "机器人本体" as alarmSource,
-        alarm_level,
-        alarm_state
-        from robot_alarm c
+        "101" as alarmSource,
+        f.alarm_level,
+        f.alarm_state,
+        c.dict_note as warnLevelName,
+        "机器人本体" as alarmSourceName,
+        e.dict_note as confModeName
+        from robot_alarm f
+        left join t_dict_business c on f.alarm_level = c.dict_code
+        left join t_dict_business e on f.alarm_state = e.dict_code
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         )
     </select>
 
-    <select id="countSixDay" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    <select id="countOnMonth" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         SELECT
-        DATE_FORMAT( warn_time, '%Y-%m-%d' ) day1,
-        count(*) count
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) time,
+        count( * ) count
         FROM
-        ( SELECT * FROM (select
+        (
+        select
         a.warn_time
-        from t_warn_info a, t_std_device b
+        from t_warn_info a
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
+        <if test="warnType != null"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         union all(
         select
-        b.alarm_time
-        from robot_alarm b
+        f.alarm_time
+        from robot_alarm f
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
-        <if test="startTime != null and endTime != null"> and b.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        )) time
-        WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
+        <if test="warnLevel != null"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        )
+        ) AS Time
+        WHERE
+        period_diff( date_format( now( ) , '%Y-%m-%d' ) , date_format( warn_time, '%Y-%m-%d' ) ) =0
         GROUP BY
-        day1;
+        time
     </select>
 
     <select id="selectByType" parameterType="java.util.HashMap" resultType="java.util.HashMap">
@@ -389,14 +406,14 @@
         a.conf_mode
         from t_warn_info a, t_std_device b
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
-        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
+        <if test="warnType!= null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
     </select>
 
     <select id="countByType" parameterType="java.util.HashMap" resultType="java.util.HashMap">
@@ -408,14 +425,14 @@
         a.warn_time
         from t_warn_info a, t_std_device b
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
-        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
+        <if test="warnType!= null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
         WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
         GROUP BY
         day1;
@@ -432,9 +449,9 @@
         alarm_state
         from robot_alarm c
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and c.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and c.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null"> and c.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="startTime != null and endTime != null"> and c.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
     </select>
 
@@ -448,9 +465,9 @@
         alarm_time
         from robot_alarm b
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and b.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and b.alarm_state = #{confMode, jdbcType=INTEGER}</if>
+        <if test="value != null"> and b.alarm_info like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="startTime != null and endTime != null"> and b.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         ) time
         WHERE period_diff(date_format(now( ),'%y%m'),date_format(alarm_time,'%y%m'))=0  ) as robot
@@ -469,14 +486,14 @@
         a.conf_mode
         from t_warn_info a, t_std_device b
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName == null or deviceName == ''">and a.device_id = b.device_id</if>
-        <if test="warnType!= null and warnType != ''">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
+        <if test="warnType!= null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>
     </select>
 
     <select id="countOthers" parameterType="java.util.HashMap" resultType="java.util.HashMap">
@@ -488,14 +505,14 @@
         a.warn_time
         from t_warn_info a, t_std_device b
         where 1=1
-        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null and confMode != ''"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null and alarmSource != ''"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null and value != ''"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName = null or deviceName = ''">and a.device_id = b.device_id</if>
-        <if test="warnType!= null and warnType != null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
+        <if test="warnType!= null">and a.warn_type = #{warnType,jdbcType=INTEGER}</if>) time
         WHERE period_diff(date_format(now( ),'%y%m'),date_format(warn_time,'%y%m'))=0 ) as robot
         GROUP BY
         day1;

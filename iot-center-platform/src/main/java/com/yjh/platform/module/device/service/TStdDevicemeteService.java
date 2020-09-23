@@ -64,21 +64,21 @@ public class TStdDevicemeteService{
     //告警规则未定
     @Logs(title = "分页查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail,List<Long> ids) {
-        if(tStdDeviceMeteDetail.getDeviceId() == null) {
-            if (ids.size() != 0) {
-                tStdDeviceMeteDetail.setIds(ids);
-            } else {
-                ids.add(tStdDeviceMeteDetail.getUpRegionId());
-                tStdDeviceMeteDetail.setIds(ids);
-            }
-        }else {
-            //ids.clear();
-            ids = new LinkedList<>();
-            ids.add(tStdDeviceMeteDetail.getDeviceId());
-            tStdDeviceMeteDetail.setIds(ids);
-            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
-        }
+    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+//        if(tStdDeviceMeteDetail.getDeviceId() == null) {
+//            if (ids.size() != 0) {
+//                tStdDeviceMeteDetail.setIds(ids);
+//            } else {
+//                ids.add(tStdDeviceMeteDetail.getUpRegionId());
+//                tStdDeviceMeteDetail.setIds(ids);
+//            }
+//        }else {
+//            //ids.clear();
+//            ids = new LinkedList<>();
+//            ids.add(tStdDeviceMeteDetail.getDeviceId());
+//            tStdDeviceMeteDetail.setIds(ids);
+//            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
+//        }
         return tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail);
     }
 

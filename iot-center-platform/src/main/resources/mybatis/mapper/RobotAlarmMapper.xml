@@ -58,8 +58,8 @@
                 #{positionStationNum, jdbcType=VARCHAR},
                 #{positionOffset, jdbcType=VARCHAR},
                 #{alarmState, jdbcType=INTEGER},
-                #{createTime, jdbcType=TIMESTAMP},
-                #{endTime, jdbcType=TIMESTAMP}
+                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP()
         )
     </insert>
 
@@ -72,19 +72,18 @@
         update robot_alarm a <set>
         <if test="robotAlarmId != null and robotAlarmId != ''">a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT},</if>
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
-        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmType != null">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmInfo != null and alarmInfo != ''">a.alarm_info = #{alarmInfo, jdbcType=VARCHAR},</if>
         a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
-        <if test="dealType != null and dealType != ''">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        <if test="dealType != null">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         <if test="dealPersonName != null and dealPersonName != ''">a.deal_person_name = #{dealPersonName, jdbcType=VARCHAR},</if>
         <if test="positionStationNum != null and positionStationNum != ''">a.position_station_num = #{positionStationNum, jdbcType=VARCHAR},</if>
         <if test="positionOffset != null and positionOffset != ''">a.position_offset = #{positionOffset, jdbcType=VARCHAR},</if>
-        <if test="alarmState != null and alarmState != ''">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
-        a.create_time = #{createTime, jdbcType=TIMESTAMP},
-        a.end_time = #{endTime, jdbcType=TIMESTAMP},
+        <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        a.end_time = CURRENT_TIMESTAMP(),
     </set>
             where a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}
     </update>
@@ -133,17 +132,17 @@
         where 1 = 1
         <if test="robotAlarmId != null and robotAlarmId != ''">a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT},</if>
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
-        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmType != null">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmInfo != null and alarmInfo != ''">a.alarm_info = #{alarmInfo, jdbcType=VARCHAR},</if>
         <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
-        <if test="dealType != null and dealType != ''">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        <if test="dealType != null">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         <if test="dealPersonName != null and dealPersonName != ''">a.deal_person_name = #{dealPersonName, jdbcType=VARCHAR},</if>
         <if test="positionStationNum != null and positionStationNum != ''">a.position_station_num = #{positionStationNum, jdbcType=VARCHAR},</if>
         <if test="positionOffset != null and positionOffset != ''">a.position_offset = #{positionOffset, jdbcType=VARCHAR},</if>
-        <if test="alarmState != null and alarmState != ''">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
     </select>
@@ -169,17 +168,17 @@
         where 1 = 1
         <if test="robotAlarmId != null and robotAlarmId != ''">a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT},</if>
         <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
-        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmType != null">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmInfo != null and alarmInfo != ''">a.alarm_info = #{alarmInfo, jdbcType=VARCHAR},</if>
         <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
-        <if test="dealType != null and dealType != ''">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        <if test="dealType != null">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         <if test="dealPersonName != null and dealPersonName != ''">a.deal_person_name = #{dealPersonName, jdbcType=VARCHAR},</if>
         <if test="positionStationNum != null and positionStationNum != ''">a.position_station_num = #{positionStationNum, jdbcType=VARCHAR},</if>
         <if test="positionOffset != null and positionOffset != ''">a.position_offset = #{positionOffset, jdbcType=VARCHAR},</if>
-        <if test="alarmState != null and alarmState != ''">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
     </select>

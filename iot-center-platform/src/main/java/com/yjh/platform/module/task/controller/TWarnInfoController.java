@@ -1,11 +1,16 @@
 package com.yjh.platform.module.task.controller;
 
+import com.google.common.base.FinalizablePhantomReference;
 import com.yjh.platform.module.task.entity.RobotAlarm;
+import com.yjh.platform.module.task.entity.TWarnInfoDetail;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.user.dao.SysUserDao;
+import com.yjh.platform.module.user.entity.SysUser;
 import io.swagger.annotations.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +25,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author czh
@@ -32,6 +39,8 @@ public class TWarnInfoController {
 
     @Autowired
     private final TWarnInfoService tWarnInfoService;
+    @Autowired
+    private  SysUserDao sysUserDao;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoController.class);
 
@@ -41,7 +50,7 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TWarnInfo tWarnInfo) {
+    public Result add(@RequestBody TWarnInfo tWarnInfo) {
         Result result = new Result();
         try {
             result.setData(tWarnInfoService.insert(tWarnInfo));
@@ -184,7 +193,7 @@ public class TWarnInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<HashMap<String,Object>> list = tWarnInfoService.selectAll(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName);
+            List<TWarnInfoDetail> list = tWarnInfoService.selectAll(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -195,9 +204,9 @@ public class TWarnInfoController {
         return result;
     }
 
-    @ApiOperation(value = "统计6天内的所有的告警数据")
-    @RequestMapping(value = "/countALLWarnInSixDay", method = RequestMethod.GET)
-    public Result countALLWarnInSixDay(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
+    @ApiOperation(value = "统计本月内的所有的告警数据")
+    @RequestMapping(value = "/countALLWarnOnMonth", method = RequestMethod.GET)
+    public Result countALLWarnOnMonth(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                                        @RequestParam(value = "confMode", required = false) Integer confMode,
                                        @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
                                        @RequestParam(value = "value", required = false) String value,
@@ -206,11 +215,32 @@ public class TWarnInfoController {
                                        @RequestParam(value = "deviceName", required = false) String deviceName){
         Result result = new Result();
         try {
-            List<HashMap<String,Integer>> list = tWarnInfoService.countSixDay(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName);
+            List<HashMap<String,Integer>> list = tWarnInfoService.countOnMonth(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("统计6天内的告警数据失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "确认，忽略")
+    @RequestMapping(value = "/updateForOk", method = RequestMethod.GET)
+    public Result updateForOk(//HttpServletRequest httpServletRequest,
+                              @RequestParam(value = "warnIds", required = false) String warnIds,
+                              @RequestParam(value = "confMode", required = false) Integer confMode){
+//HttpServletRequest httpServletRequest,
+        Result result = new Result();
+        try {
+//            Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+//            SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+//            String name = sysUser.getUserName();
+            Long userId = 1L;
+            result.setData(this.tWarnInfoService.updateForOk(userId,warnIds,confMode));
+
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("确认，忽略失败描述：", e);
         }
         return result;
     }

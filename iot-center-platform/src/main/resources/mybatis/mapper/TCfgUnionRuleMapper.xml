@@ -63,6 +63,7 @@
         <if test="ruleDelay != null">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
         <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
         <if test="inputParam != null and inputParam != ''">a.input_param = #{inputParam, jdbcType=VARCHAR},</if>
+        a.update_time =CURRENT_TIMESTAMP(),
     </set>
             where a.rule_id = #{ruleId, jdbcType=BIGINT}
     </update>
@@ -163,20 +164,36 @@
                 #{TCfgUnionRule.ruleDelay, jdbcType=INTEGER},
                 #{TCfgUnionRule.description, jdbcType=VARCHAR},
                 #{TCfgUnionRule.inputParam, jdbcType=VARCHAR},
-                #{TCfgUnionRule.createTime, jdbcType=TIMESTAMP},
-                #{TCfgUnionRule.updateTime, jdbcType=TIMESTAMP}
+                CURRENT_TIMESTAMP(),
+                CURRENT_TIMESTAMP()
             )
         </foreach>
     </insert>
 
-    <insert id="batchDelete">
+    <delete id="batchDelete">
         delete from t_cfg_union_rule
         where rule_id in (
             <foreach collection="list" item="ruleId" separator=",">
                 #{ruleId, jdbcType=BIGINT}
             </foreach>
             )
-    </insert>
+    </delete>
+
+    <select id="selectForTCfgMete" resultType="java.util.HashMap">
+            select
+            mete_id,
+            mete_name,
+            mete_kind
+            from t_cfg_mete
+    </select>
+
+    <select id="selectForTCPlan" resultType="java.util.HashMap">
+        select
+        plan_id,
+        plan_name
+        from t_cruise_plan
+    </select>
+
 
     <select id="selectUnionRuleByMeteId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCfgUnionRule">
         SELECT * FROM t_cfg_union_rule WHERE input_param LIKE concat('%',#{inputParam, jdbcType=VARCHAR},'%')

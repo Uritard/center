@@ -51,7 +51,6 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "stateZero") String stateZero,
                                 @Param(value = "stateOne") String stateOne,
                                 @Param(value = "alarmState") Integer alarmState);
-    List<Long> selectIds(@Param(value = "upRegionIds")List<Long> upRegionIds);
     List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
     int batchAdd(List<TStdDeviceMete> list);

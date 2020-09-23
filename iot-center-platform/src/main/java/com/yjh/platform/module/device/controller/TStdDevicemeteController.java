@@ -164,9 +164,8 @@ public class TStdDevicemeteController {
             if (upRegionIds.size() == 0){
                 upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
             }
-            List<Long> ids = tStdDevicemeteDao.selectIds(upRegionIds);
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,ids);
+            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

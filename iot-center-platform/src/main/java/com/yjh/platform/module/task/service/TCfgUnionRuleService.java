@@ -155,6 +155,18 @@ public class TCfgUnionRuleService{
     return this.tCfgUnionRuleDao.batchDelete(list1);
     }
 
+    @Logs(title = "查询四遥信息", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<HashMap<String,Object>> selectForTCfgMete(String meteId){
+        return this.tCfgUnionRuleDao.selectForTCfgMete(meteId);
+    }
+
+    @Logs(title = "查询预案信息", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<HashMap<String,Object>> selectForTCPlan(Long planId){
+        return this.tCfgUnionRuleDao.selectForTCPlan(planId);
+    }
+
 
 
 }

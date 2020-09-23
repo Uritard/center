@@ -171,5 +171,31 @@ public class TCfgUnionRuleController {
     return result;
     }
 
+    @ApiOperation(value = "查询四遥信息")
+    @RequestMapping(value = "/selectForTCfgMete", method = RequestMethod.GET)
+    public Result selectForTCfgMete(@RequestParam(value = "meteId", required = false) String meteId) {
+        Result result = new Result();
+        try {
+            result.setData(tCfgUnionRuleService.selectForTCfgMete(meteId));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询预案信息")
+    @RequestMapping(value = "/selectForTCPlan", method = RequestMethod.GET)
+    public Result selectForTCPlan(@RequestParam(value = "planId", required = false) Long planId) {
+        Result result = new Result();
+        try {
+            result.setData(tCfgUnionRuleService.selectForTCPlan(planId));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
 
 }

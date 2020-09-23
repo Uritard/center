@@ -6,6 +6,8 @@ import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
 import java.util.*;
 
+import com.yjh.platform.module.task.entity.TWarnInfoDetail;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -65,10 +67,11 @@ public class TWarnInfoService{
         return this.tWarnInfoDao.batchInsert(list);
     }
 
-    //在传入设备内容时，查询结果不正确，
+    //在传入设备内容时，查询结果不正确，主要是机器人部分 机器人没有自己的属性表
+    //根据设备类型过滤查询未作 设备类型不明确
     @Logs(title = "查询所有的告警", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<HashMap<String,Object>> selectAll(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime,String deviceName) {
+    public List<TWarnInfoDetail> selectAll(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime, String deviceName) {
         HashMap<String,Object> map = new HashMap<>();
         map.put("warnLevel",warnLevel);
         map.put("confMode",confMode);
@@ -81,9 +84,10 @@ public class TWarnInfoService{
     }
 
     //统计所有的告警，输入deviceName无效 原因：当不需要robot表中的数据时，无法去掉
-    @Logs(title = "统计6天内的告警数", code = "module")
+    //只能统计所有的告警 未作根据设备类型（消防，主设备）来做过滤
+    @Logs(title = "统计本月内的告警数", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<HashMap<String,Integer>> countSixDay(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime,String deviceName) {
+    public List<HashMap<String,Integer>> countOnMonth(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime,String deviceName) {
         HashMap<String,Object> map = new HashMap<>();
         map.put("warnLevel",warnLevel);
         map.put("confMode",confMode);
@@ -92,8 +96,22 @@ public class TWarnInfoService{
         map.put("startTime",startTime);
         map.put("endTime",endTime);
         map.put("deviceName",deviceName);
-        return this.tWarnInfoDao.countSixDay(map);
+        return this.tWarnInfoDao.countOnMonth(map);
     }
+
+    public int updateForOk(Long userId,String warnIds,Integer confMode){
+        String[] list = warnIds.split(",");
+        TWarnInfo tWarnInfo = new TWarnInfo();
+        int i = 0;
+        for (String item:list) {
+            tWarnInfo.setWarnId(Long.valueOf(item));
+            tWarnInfo.setConfUserId(userId.toString());
+            tWarnInfo.setConfMode(confMode);
+            i =+ this.tWarnInfoDao.update(tWarnInfo);
+        }
+        return i;
+    }
+
 
     //机器人 其他除外的设备类型
     @Logs(title = "根据设备类型来查", code = "module")

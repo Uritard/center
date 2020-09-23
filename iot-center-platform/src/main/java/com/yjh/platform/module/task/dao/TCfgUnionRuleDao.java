@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
@@ -32,5 +33,8 @@ public interface TCfgUnionRuleDao {
 
     int batchAdd(List<TCfgUnionRule> list);
     int batchDelete(List<String> list);
-    List<TCfgUnionRule> selectUnionRuleByMeteId(@Param(value = "inputParam")String inputParam);
+
+    List<HashMap<String,Object>> selectForTCfgMete(String meteId);
+    List<HashMap<String,Object>> selectForTCPlan(Long planId);
+
 }
