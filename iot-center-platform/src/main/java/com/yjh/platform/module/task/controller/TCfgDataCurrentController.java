@@ -163,7 +163,7 @@ public class TCfgDataCurrentController {
         Result result=new Result();
         try {
 
-            result.setData(tCfgDataCurrentService.unionRulescaculator(meteIds));
+            result.setData(tCfgDataCurrentService.unionRulecaculator(meteIds));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

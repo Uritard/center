@@ -229,4 +229,17 @@ public class TCruiseTaskResultController {
         }
         return  result;
     }
+    @ApiOperation(value = "B-机器人巡视画面")
+    @RequestMapping(value = "/selectRobotScreen",method = RequestMethod.GET)
+    public Result selectRobotScreen(@RequestParam Long taskId){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.selectRobotScreen(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+        return  result;
+
+    }
 }

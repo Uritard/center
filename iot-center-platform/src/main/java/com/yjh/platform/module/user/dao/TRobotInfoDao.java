@@ -2,6 +2,8 @@ package com.yjh.platform.module.user.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.apache.ibatis.annotations.Param;
@@ -60,5 +62,6 @@ public interface TRobotInfoDao {
     List<TRobotInspectionTree> batchSelectInspection();
 
     int deleteSelectedRobot(@Param(value = "robotIds") String[] robotIds);
+    List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")Long taskId);
 
 }
