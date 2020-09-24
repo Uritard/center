@@ -18,7 +18,9 @@ import java.util.*;
 
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.CameraInfo;
+import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -59,6 +61,9 @@ public class TCruiseTaskResultService{
 
     @Autowired
     private TDictBusinessDao tDictBusinessDao;
+
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -131,7 +136,7 @@ public class TCruiseTaskResultService{
         });
     }
 
-    @Logs(title = "获取当前任务的巡检点全量信息 ")
+    @Logs(title = "获取当前任务的巡检点全量信息 " ,code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseInspectResult> selectCruiseTaskResult(Long taskId) throws ParseException {
         List<CruiseInspectResult> cruiseInspectResults=new ArrayList<>();
@@ -173,7 +178,7 @@ public class TCruiseTaskResultService{
     }
 
 
-    @Logs(title = "统计获取当前任务的执行进度")
+    @Logs(title = "统计获取当前任务的执行进度", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Float> selectCruiseAdvance(Long taskId){
         Set<String> keyResult=redisScan("t_cruise_task_result*");
@@ -201,7 +206,7 @@ public class TCruiseTaskResultService{
     }
 
 
-    @Logs(title = "查询当前任务下巡检点关联的标准测点各个状态下的数量")
+    @Logs(title = "查询当前任务下巡检点关联的标准测点各个状态下的数量", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public CruiseResultCounter selectCruiseStatusCount(Long taskId) throws ParseException {
         Set<String>keyResult=redisScan("t_cruise_task_result*");
@@ -257,7 +262,7 @@ public class TCruiseTaskResultService{
     }
 
 
-    @Logs(title = "查询当前任务下机器人/摄像头的基本信息和与之关联的巡检点执行进度")
+    @Logs(title = "查询当前任务下机器人/摄像头的基本信息和与之关联的巡检点执行进度", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Object> selectCruiseDeviceAndCruiseAdvance(Long taskId) {
         Log cLogger = LogFactory.getLog(this.getClass());
@@ -416,11 +421,7 @@ public class TCruiseTaskResultService{
 
 
 
-
-
-
-
-    @Logs(title = "图片比较")//结果集仍需优化、只获取了摄像头原始图片
+    @Logs(title = "图片比较", code = "module")//结果集仍需优化、只获取了摄像头原始图片
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> PictureCompare(Long taskId, Long instanceId){
 //     List<String> pictureResult=new ArrayList<>();
@@ -443,6 +444,13 @@ public class TCruiseTaskResultService{
 //     pictureResult.add(collectPic);
 
      return map;
+    }
+
+    @Logs(title = "获取机器人巡视画面", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<CameraOfRobotInfo> selectRobotScreen(Long taskId){
+         List<CameraOfRobotInfo> cameraOfRobotInfos=tRobotInfoDao.selectRobotScreen(taskId);
+         return cameraOfRobotInfos;
     }
 }
 
