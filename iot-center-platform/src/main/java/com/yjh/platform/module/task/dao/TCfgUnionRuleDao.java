@@ -3,6 +3,8 @@ package com.yjh.platform.module.task.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
 import org.apache.ibatis.annotations.Param;
@@ -33,10 +35,8 @@ public interface TCfgUnionRuleDao {
 
     int batchAdd(List<TCfgUnionRule> list);
     int batchDelete(List<String> list);
-
-    List<HashMap<String,Object>> selectForTCfgMete(String meteId);
-    List<HashMap<String,Object>> selectForTCPlan(Long planId);
+    
     List<TCfgUnionRule> selectUnionRuleByMeteId(@Param(value ="inputParam" )String inputParam);
-
+    List<AreaInfo> selectForTCfgMete(Integer meteKind);
 
 }

@@ -281,10 +281,10 @@
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
-        <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
-        <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
-        <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
-        <if test="meteName != null and meteName != ''"> and g.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+        <if test="stateZero != null and stateZero != ''">and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
+        <if test="stateOne != null and stateOne != ''">and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
+        <if test="alarmState != null"> and a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
          order by a.device_mete_id desc
     </select>
 

@@ -171,28 +171,28 @@ public class TCfgUnionRuleController {
     return result;
     }
 
-    @ApiOperation(value = "查询四遥信息")
+    @ApiOperation(value = "查询四遥树信息")
     @RequestMapping(value = "/selectForTCfgMete", method = RequestMethod.GET)
-    public Result selectForTCfgMete(@RequestParam(value = "meteId", required = false) String meteId) {
+    public Result selectForTCfgMete() {
         Result result = new Result();
         try {
-            result.setData(tCfgUnionRuleService.selectForTCfgMete(meteId));
+            result.setData(tCfgUnionRuleService.selectForTCfgMete());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量插入失败：" + e);
+            log.error("查询四遥树信息失败：" + e);
         }
         return result;
     }
 
     @ApiOperation(value = "查询预案信息")
     @RequestMapping(value = "/selectForTCPlan", method = RequestMethod.GET)
-    public Result selectForTCPlan(@RequestParam(value = "planId", required = false) Long planId) {
+    public Result selectForTCPlan(@RequestParam(value = "planName", required = false) String planName) {
         Result result = new Result();
         try {
-            result.setData(tCfgUnionRuleService.selectForTCPlan(planId));
+            result.setData(tCfgUnionRuleService.selectForTCPlan(planName));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量插入失败：" + e);
+            log.error("查询四遥树信息失败：" + e);
         }
         return result;
     }

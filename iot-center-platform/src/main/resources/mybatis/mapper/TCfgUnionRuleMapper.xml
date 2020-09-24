@@ -179,12 +179,16 @@
             )
     </delete>
 
-    <select id="selectForTCfgMete" resultType="java.util.HashMap">
+    <select id="selectForTCfgMete" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.device.entity.AreaInfo">
             select
-            mete_id,
-            mete_name,
-            mete_kind
-            from t_cfg_mete
+            a.mete_kind as upId,
+            b.dict_note as upName,
+            a.mete_id as Id,
+            a.mete_name as label,
+            "infoType" as infoType
+            from t_cfg_mete a
+            left join t_dict_business b on a.mete_kind = b.dict_code
+            where a.mete_kind = #{meteKind, jdbcType=INTEGER}
     </select>
 
     <select id="selectForTCPlan" resultType="java.util.HashMap">
@@ -194,8 +198,4 @@
         from t_cruise_plan
     </select>
 
-
-    <select id="selectUnionRuleByMeteId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCfgUnionRule">
-        SELECT * FROM t_cfg_union_rule WHERE input_param LIKE concat('%',#{inputParam, jdbcType=VARCHAR},'%')
-    </select>
 </mapper>

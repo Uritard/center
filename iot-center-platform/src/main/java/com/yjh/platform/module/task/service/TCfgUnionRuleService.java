@@ -1,7 +1,9 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.module.device.dao.TCfgMeteDao;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgMete;
+import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 
@@ -10,6 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
+import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -26,6 +31,9 @@ public class TCfgUnionRuleService{
     private TCfgUnionRuleDao tCfgUnionRuleDao;
     @Autowired
     private TCfgMeteDao tCfgMeteDao;
+
+    @Autowired
+    private TCruisePlanDao tCruisePlanDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -73,7 +81,6 @@ public class TCfgUnionRuleService{
                 default:
                     break;
             }
-
         }
         // 此时字符串中字符已经都走过了
         // 栈中应该是空的
@@ -155,16 +162,36 @@ public class TCfgUnionRuleService{
     return this.tCfgUnionRuleDao.batchDelete(list1);
     }
 
-    @Logs(title = "查询四遥信息", code = "module")
+    @Logs(title = "查询四遥树信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<HashMap<String,Object>> selectForTCfgMete(String meteId){
-        return this.tCfgUnionRuleDao.selectForTCfgMete(meteId);
+    public List<AreaInfo> selectForTCfgMete(){
+        List<AreaInfo> list = new LinkedList<>();
+        //遥信
+        List<AreaInfo> listItem1 = this.tCfgUnionRuleDao.selectForTCfgMete(1);
+        AreaInfo areaInfoItem1 = new AreaInfo();
+        areaInfoItem1.setId(1L);
+        areaInfoItem1.setUpId(-1L);
+        areaInfoItem1.setLabel("遥信");
+        areaInfoItem1.setChildren(listItem1);
+        areaInfoItem1.setInfoType("infoType");
+        list.add(areaInfoItem1);
+        //遥测
+        List<AreaInfo> listItem2 = this.tCfgUnionRuleDao.selectForTCfgMete(2);
+        AreaInfo areaInfoItem2 = new AreaInfo();
+        areaInfoItem2.setId(2L);
+        areaInfoItem1.setUpId(-1L);
+        areaInfoItem2.setLabel("遥测");
+        areaInfoItem2.setChildren(listItem2);
+        areaInfoItem2.setInfoType("infoType");
+        list.add(areaInfoItem2);
+
+        return list;
     }
 
     @Logs(title = "查询预案信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<HashMap<String,Object>> selectForTCPlan(Long planId){
-        return this.tCfgUnionRuleDao.selectForTCPlan(planId);
+    public List<TCruisePlan> selectForTCPlan(String planName){
+        return this.tCruisePlanDao.select(null,planName,null,null,null,null);
     }
 
 

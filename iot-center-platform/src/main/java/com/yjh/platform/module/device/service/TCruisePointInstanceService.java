@@ -89,7 +89,7 @@ public class TCruisePointInstanceService{
 
     private void getConForCruisePoint(Integer length,TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem,List<TStdDeviceMeteForPointDetail> listAll){
         //机器人
-        if("228".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+        if("228".equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
             listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map = new HashMap<>();
             map.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -97,7 +97,7 @@ public class TCruisePointInstanceService{
             listAll.get(length).getRobotType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
         //视频 红外
-        if("229".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
+        if("229".equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
             listAll.get(length).getCameraType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map1 = new HashMap<>();
             map1.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -112,7 +112,7 @@ public class TCruisePointInstanceService{
 //            listAll.get(length).getInfraredType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
 //        }
         //在线监控  内容未作
-        if("231".equals((tStdDeviceMeteForPointDetailItem.getCruiseTypeName()))) {
+        if("231".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
             listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -120,7 +120,7 @@ public class TCruisePointInstanceService{
             listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
         //scada 内容未作
-        if("233".equals((tStdDeviceMeteForPointDetailItem.getCruiseTypeName()))) {
+        if("233".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
             listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());

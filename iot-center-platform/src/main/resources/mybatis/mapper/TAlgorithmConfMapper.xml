@@ -125,19 +125,10 @@
         left join t_camera_info f on f.camera_id = a.camera_id
         left join t_dict_business d on d.dict_code = e.analyse_type
         WHERE 1 = 1
-        <if test="analyseType != null and analyseType != ''"> and e.analyse_type = #{analyseType, jdbcType=BIGINT} </if>
-        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
-        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
-        <if test="configName != null and configName != ''"> and a.config_name = #{configName, jdbcType=VARCHAR}</if>
-        <if test="status != null and status != ''"> and a.status = #{status, jdbcType=INTEGER}</if>
-        <if test="ifDel != null and ifDel != ''"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
-        <if test="ifShow != null and ifShow != ''"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
-        <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
-        <if test="applyModule != null and applyModule != ''"> and a.apply_module = #{applyModule, jdbcType=INTEGER}</if>
-        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="configName != null and configName != ''"> and b.config_name like concat('%',#{configName, jdbcType=VARCHAR},'%')</if>
         <if test="cameraId != null and cameraId != ''"> and f.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="analyseType != null and analyseType != '' "> and e.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
+        <if test="presetName != null and presetName != ''"> and a.preset_name like concat('%',#{presetName, jdbcType=VARCHAR},'%')</if>
         order by a.preset_id desc
     </select>
 
