@@ -206,9 +206,69 @@
         and b.plan_id = d.plan_id
     </select>
 
-    <select id="historyStatistical" resultType="com.yjh.platform.module.task.entity.TUnionTaskExpand">
-            SELECT COUNT(start_time BETWEEN '2020-09-02 00:00:00' and '2020-09-25 23:59:59' or null)
-            from t_union_task
+    <select id="historyStatistical" resultType="java.lang.Integer">
+        select
+            COUNT(start_time BETWEEN #{beforeTime} and #{currentTime} or null)
+        from t_union_task
+    </select>
+
+    <select id="getHistoryByQuarter"  resultType="com.yjh.platform.module.task.entity.QuarterEntity">
+        select
+            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as monthOne,
+            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as monthTwo,
+            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as monthThree
+        from t_union_task
+    </select>
+
+    <select id="getHistoryByYear"  resultType="com.yjh.platform.module.task.entity.YearEntity">
+        select
+            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as monthOne,
+            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as monthTwo,
+            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as monthThree,
+            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as monthFour,
+            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as monthFive,
+            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as monthSix,
+            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as monthSeven,
+            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as monthEight,
+            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as monthNine,
+            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as monthTen,
+            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as monthEleven,
+            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as monthTwelve
+        from t_union_task
+    </select>
+    <select id="getHistoryByMonth" resultType="com.yjh.platform.module.task.entity.MonthEntity">
+        select
+            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as DayOne,
+            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as DayTwo,
+            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as DayThree,
+            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as DayFour,
+            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as DayFive,
+            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as DaySix,
+            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as DaySeven,
+            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as DayEight,
+            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as DayNine,
+            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as DayTen,
+            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as DayEleven,
+            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as DayTwelve,
+            COUNT(start_time BETWEEN #{firstTime14} and #{firstTime13} or null) as DayThirteen,
+            COUNT(start_time BETWEEN #{firstTime15} and #{firstTime14} or null) as DayFourteen,
+            COUNT(start_time BETWEEN #{firstTime16} and #{firstTime15} or null) as DayFifteen,
+            COUNT(start_time BETWEEN #{firstTime17} and #{firstTime16} or null) as DaySixteen,
+            COUNT(start_time BETWEEN #{firstTime18} and #{firstTime17} or null) as DaySeventeen,
+            COUNT(start_time BETWEEN #{firstTime19} and #{firstTime18} or null) as DayEighteen,
+            COUNT(start_time BETWEEN #{firstTime20} and #{firstTime19} or null) as DayNineteen,
+            COUNT(start_time BETWEEN #{firstTime21} and #{firstTime20} or null) as DayTwenty,
+            COUNT(start_time BETWEEN #{firstTime22} and #{firstTime21} or null) as Day21,
+            COUNT(start_time BETWEEN #{firstTime23} and #{firstTime22} or null) as Day22,
+            COUNT(start_time BETWEEN #{firstTime24} and #{firstTime23} or null) as Day23,
+            COUNT(start_time BETWEEN #{firstTime25} and #{firstTime24} or null) as Day24,
+            COUNT(start_time BETWEEN #{firstTime26} and #{firstTime25} or null) as Day25,
+            COUNT(start_time BETWEEN #{firstTime27} and #{firstTime26} or null) as Day26,
+            COUNT(start_time BETWEEN #{firstTime28} and #{firstTime27} or null) as Day27,
+            COUNT(start_time BETWEEN #{firstTime29} and #{firstTime28} or null) as Day28,
+            COUNT(start_time BETWEEN #{firstTime30} and #{firstTime29} or null) as Day29,
+            COUNT(start_time BETWEEN #{firstTime31} and #{firstTime30} or null) as Day30
+        from t_union_task
     </select>
 
     <select id="selectUnionDetail" resultType="com.yjh.platform.module.task.entity.TUnionTaskDetail">

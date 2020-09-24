@@ -5,6 +5,7 @@ import com.yjh.platform.module.task.service.TUnionTaskService;
 import com.yjh.platform.module.task.entity.TUnionTask;
 
 import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
@@ -193,10 +194,17 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动历史记录统计")
     @RequestMapping(value = "/historyStatistical", method = RequestMethod.GET)
-    public Result historyStatistical() {
+    public Result historyStatistical(@RequestParam(value = "dateMarked")String dateMarked) {
         Result result = new Result();
         try {
-            result.setData(tUnionTaskService.historyStatistical());
+            if (dateMarked.equals("近一季度")){
+                result.setData(tUnionTaskService.historyStatisticalByQuarter());
+            }else if (dateMarked.equals("近一年")){
+                result.setData(tUnionTaskService.historyStatisticalByYear());
+            }else if (dateMarked.equals("近一月")){
+                result.setData(tUnionTaskService.historyStatisticalByMonth());
+            }
+//            result.setData(tUnionTaskService.historyStatistical());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("批量插入失败：" + e);

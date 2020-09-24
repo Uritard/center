@@ -628,7 +628,44 @@ public class DateTimeUtil {
         }
         return yearDates;
     }
+    /**
+     * 获取任意时间字符串列表(时间格式：yyyy-MM-dd HH:mm:ss)
+     *
+     * @return
+     */
+    public static List<String> getYearDateList1(int mon) {
+        List<String> yearDates = new ArrayList<>();
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 定义日期实例
+        GregorianCalendar gc =new GregorianCalendar();
+        // 设置日期起始时间
+        gc.setTime(date);
 
+        for (int i = 0; i < mon; i++) {
+            String beforeTime = sdf.format(gc.getTime());
+            yearDates.add(beforeTime);
+            gc.add(GregorianCalendar.MONTH,-1);//进行当前日期月份减1
+        }
+        return yearDates;
+    }
+
+    public static List<String> getDayDateList(int dy) {
+        List<String> yearDates = new ArrayList<>();
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 定义日期实例
+        GregorianCalendar gc =new GregorianCalendar();
+        // 设置日期起始时间
+        gc.setTime(date);
+
+        for (int i = 0; i < dy; i++) {
+            String beforeTime = sdf.format(gc.getTime());
+            yearDates.add(beforeTime);
+            gc.add(GregorianCalendar.DATE,-1);//进行当前日期天数减1
+        }
+        return yearDates;
+    }
     public static boolean isValidDate(String str, String pattern) {
         boolean convertSuccess = true;
         // 指定时间格式由外部传入
