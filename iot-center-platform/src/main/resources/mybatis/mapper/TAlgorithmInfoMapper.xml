@@ -8,7 +8,7 @@
         <result column="algorithm_name" jdbcType="VARCHAR" property="algorithmName" />
         <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
         <result column="describel" jdbcType="VARCHAR" property="describel" />
-        <result column="algorithm_code" jdbcType="INTEGER" property="algorithmCode" />
+        <result column="algorithm_code" jdbcType="VARCHAR" property="algorithmCode" />
         <result column="analyse_type" jdbcType="VARCHAR" property="analyseType" />
     </resultMap>
 
@@ -29,7 +29,7 @@
                 #{algorithmName, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
                 #{describel, jdbcType=VARCHAR},
-                #{algorithmCode, jdbcType=INTEGER},
+                #{algorithmCode, jdbcType=VARCHAR},
                 #{analyseType, jdbcType=VARCHAR}
         )
     </insert>
@@ -45,7 +45,7 @@
         <if test="algorithmName != null and algorithmName != ''">a.algorithm_name = #{algorithmName, jdbcType=VARCHAR},</if>
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="describel != null and describel != ''">a.describel = #{describel, jdbcType=VARCHAR},</if>
-        <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=INTEGER},</if>
+        <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR},</if>
         <if test="analyseType != null and analyseType != ''">a.analyse_type = #{analyseType, jdbcType=VARCHAR},</if>
     </set>
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
@@ -79,7 +79,7 @@
         <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
-        <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
+        <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
     </select>
 
@@ -108,7 +108,7 @@
         <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
-        <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=INTEGER}</if>
+        <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
     </select>
 
@@ -127,7 +127,7 @@
                 #{TAlgorithmInfo.algorithmName, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.aliasName, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.describel, jdbcType=VARCHAR},
-                #{TAlgorithmInfo.algorithmCode, jdbcType=INTEGER},
+                #{TAlgorithmInfo.algorithmCode, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.analyseType, jdbcType=VARCHAR}
             )
         </foreach>

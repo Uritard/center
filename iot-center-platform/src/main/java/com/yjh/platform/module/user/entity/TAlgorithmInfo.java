@@ -30,7 +30,7 @@ public class TAlgorithmInfo implements Serializable {
     private String describel;
 
     @ApiModelProperty(value = "算法编码")
-    private Integer algorithmCode;
+    private String algorithmCode;
 
     private String analyseType;
 

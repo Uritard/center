@@ -1,11 +1,15 @@
 package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
+import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import com.yjh.platform.module.task.service.TCfgUnionRuleService;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.task.service.TCruisePlanService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,9 @@ public class TCfgUnionRuleController {
 
     @Autowired
     private final TCfgUnionRuleService tCfgUnionRuleService;
+
+    @Autowired
+    private TCruisePlanService tCruisePlanService;
 
     private Logger log = LoggerFactory.getLogger(TCfgUnionRuleController.class);
 
@@ -186,13 +193,22 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "查询预案信息")
     @RequestMapping(value = "/selectForTCPlan", method = RequestMethod.GET)
-    public Result selectForTCPlan(@RequestParam(value = "planName", required = false) String planName) {
+    public Result selectForTCPlan(@RequestParam(value = "planName", required = false) String planName,
+                                  @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                  @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
-            result.setData(tCfgUnionRuleService.selectForTCPlan(planName));
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            TCruisePlan tCruisePlan =new TCruisePlan();
+            tCruisePlan.setPlanName(planName);
+            List<TCruisePlanCount> list = tCruisePlanService.selectByPage(tCruisePlan);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询四遥树信息失败：" + e);
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("分页查询失败描述：", e);
         }
         return result;
     }

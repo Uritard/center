@@ -51,16 +51,20 @@ public class TRobotInfoController {
         try {
             String userId = request.getHeader("userId");
             tRobotInfo.setCreateBy(userId);
-            String robotIp = tRobotInfo.getRobotIp();
-            String robotPort = tRobotInfo.getRobotPort().toString();
-            if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
-                result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
-            }
-            if (!robotPort.matches("^([1-9]|[1-9]\\d{1,3}|[1-6][0-5][0-5][0-3][0-5])$")) {
-                result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
-            }
 
-            result.setData(tRobotInfoService.insert(tRobotInfo));
+            if(tRobotInfo.getRobotIp()!= null){
+                String robotIp = tRobotInfo.getRobotIp();
+                if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
+                    result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
+                }
+            }
+            if(tRobotInfo.getRobotPort()!=null){
+                String robotPort = tRobotInfo.getRobotPort().toString();
+                if (!robotPort.matches("^([1-9]|[1-9]\\d{1,3}|[1-6][0-5][0-5][0-3][0-5])$")) {
+                    result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
+                }
+            }
+           result.setData(tRobotInfoService.insert(tRobotInfo));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -207,11 +211,11 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/deleteSelectedRobot", method = RequestMethod.DELETE)
-    public Result deleteSelectedRobot(@RequestParam(value = "robotIds[]", required = true) String[] robotIds) {
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    public Result batchDelete(@RequestParam(value = "robotIds", required = true) String robotIds) {
         Result result = new Result();
         try {
-            result.setData(tRobotInfoService.deleteSelectedRobot(robotIds));
+            result.setData(tRobotInfoService.batchDelete(robotIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);

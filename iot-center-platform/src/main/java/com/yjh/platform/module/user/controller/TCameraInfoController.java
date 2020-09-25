@@ -246,4 +246,17 @@ public class TCameraInfoController {
         }
         return result;
     }
+    @ApiOperation(value = "写入缓存")
+    @RequestMapping(value = "/intoRedis", method = RequestMethod.GET)
+    public Result intoRedis(){
+        Result result = new Result();
+        try {
+            result.setData(tCameraInfoService.intoRedis());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("写入缓存失败描述：", e);
+        }
+        return result;
+    }
+
 }

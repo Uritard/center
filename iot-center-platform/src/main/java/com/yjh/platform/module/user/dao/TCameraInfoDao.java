@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,5 +55,7 @@ public interface TCameraInfoDao {
     List<CameraInfo> selectCameraByTaskId(@Param(value = "taskId")Long taskId);
     List<TCamreaPresetTree> selectCameraId();
     List<TCamreaPresetTree> batchSelectPreset();
+
+    List<HashMap<String,String>> selectForMap();
 
 }

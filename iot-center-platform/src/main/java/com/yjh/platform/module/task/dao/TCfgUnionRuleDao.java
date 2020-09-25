@@ -35,7 +35,7 @@ public interface TCfgUnionRuleDao {
 
     int batchAdd(List<TCfgUnionRule> list);
     int batchDelete(List<String> list);
-    
+
     List<TCfgUnionRule> selectUnionRuleByMeteId(@Param(value ="inputParam" )String inputParam);
     List<AreaInfo> selectForTCfgMete(Integer meteKind);
 

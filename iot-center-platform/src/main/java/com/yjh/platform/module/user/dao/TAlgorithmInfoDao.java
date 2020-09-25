@@ -21,7 +21,7 @@ public interface TAlgorithmInfoDao {
                                 @Param(value = "algorithmName") String algorithmName,
                                 @Param(value = "aliasName") String aliasName,
                                 @Param(value = "describel") String describel,
-                                @Param(value = "algorithmCode") Integer algorithmCode,
+                                @Param(value = "algorithmCode") String algorithmCode,
                                 @Param(value = "analyseType") String analyseType);
     List<TAlgorithmInfo> selectByPage(TAlgorithmInfo tAlgorithmInfo);
 

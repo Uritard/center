@@ -20,8 +20,6 @@ public interface TRobotInfoDao {
     //多表删除 t_robot_info
     int deleteByPrimaryId(Long robotId);
     //多表删除 t_cruise_plan
-    int deletePlan(Long robotId);
-    //多表删除 t_robot_inspection
     int deleteInspection(Long robotId);
     //多表删除 t_cruise_point_instance
     int deleteInstance(Long robotId);
@@ -61,7 +59,6 @@ public interface TRobotInfoDao {
     List<TRobotInspectionTree> selectInspectionTree();
     List<TRobotInspectionTree> batchSelectInspection();
 
-    int deleteSelectedRobot(@Param(value = "robotIds") String[] robotIds);
     List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")Long taskId);
 
 }

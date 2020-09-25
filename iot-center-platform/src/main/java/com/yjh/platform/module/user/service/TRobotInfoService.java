@@ -36,7 +36,7 @@ public class TRobotInfoService{
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long robotId) {
-        return this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deletePlan(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
+        return this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
     }
 
     @Logs(title = "更新", code = "module")
@@ -122,8 +122,13 @@ public class TRobotInfoService{
 
     @Logs(title = "批量删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteSelectedRobot(String[] robotIds) {
-        return this.tRobotInfoDao.deleteSelectedRobot(robotIds);
+    public int batchDelete(String robotIds) {
+        int i = 0;
+        List<String> robotIdList= Arrays.asList(robotIds.split(","));
+        for (String item: robotIdList) {
+            i = i+ this.deleteByPrimaryId(Long.valueOf(item));
+        }
+        return i;
     }
 
 }

@@ -130,7 +130,7 @@
         where 1 = 1
         <if test="ruleId != null and ruleId != ''"> and a.rule_id = #{ruleId, jdbcType=BIGINT}</if>
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
-        <if test="ruleName != null and ruleName != ''"> and a.rule_name = #{ruleName, jdbcType=VARCHAR}</if>
+        <if test="ruleName != null and ruleName != ''"> and a.rule_name like concat('%',#{ruleName, jdbcType=VARCHAR},'%') </if>
         <if test="ruleType != null and ruleType != ''"> and a.rule_type = #{ruleType, jdbcType=VARCHAR}</if>
         <if test="ruleContent != null and ruleContent != ''"> and a.rule_content = #{ruleContent, jdbcType=VARCHAR}</if>
         <if test="ruleDelay != null"> and a.rule_delay = #{ruleDelay, jdbcType=INTEGER}</if>
@@ -185,7 +185,7 @@
             b.dict_note as upName,
             a.mete_id as Id,
             a.mete_name as label,
-            "infoType" as infoType
+            "mete" as infoType
             from t_cfg_mete a
             left join t_dict_business b on a.mete_kind = b.dict_code
             where a.mete_kind = #{meteKind, jdbcType=INTEGER}

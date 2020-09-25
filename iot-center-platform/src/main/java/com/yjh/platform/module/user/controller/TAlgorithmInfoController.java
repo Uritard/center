@@ -110,7 +110,7 @@ public class TAlgorithmInfoController {
                             @RequestParam(value = "algorithmName", required = false) String algorithmName,
                             @RequestParam(value = "aliasName", required = false) String aliasName,
                             @RequestParam(value = "describel", required = false) String describel,
-                            @RequestParam(value = "algorithmCode", required = false) Integer algorithmCode,
+                            @RequestParam(value = "algorithmCode", required = false) String algorithmCode,
                             @RequestParam(value = "analyseType", required = false) String analyseType) {
         Result result = new Result();
         try {

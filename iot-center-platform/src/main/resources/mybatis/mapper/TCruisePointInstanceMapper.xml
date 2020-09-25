@@ -92,7 +92,7 @@
 
     <delete id="deleteByDeviceMeteId" parameterType="java.lang.Long">
         delete from t_cruise_point_instance
-                where deviceP_mete_id = #{DeviceMeteId, jdbcType=BIGINT}
+                where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </delete>
 
     <delete id="deleteByDeviceId" parameterType="java.lang.Long">

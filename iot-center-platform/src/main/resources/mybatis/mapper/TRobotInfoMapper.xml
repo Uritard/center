@@ -105,10 +105,7 @@
         delete from t_robot_info
                 where robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
-    <delete id="deletePlan" parameterType="java.lang.Long">
-        delete from t_cruise_plan
-                where robot_id = #{robotId, jdbcType=BIGINT}
-    </delete>
+
     <delete id="deleteInstance" parameterType="java.lang.Long">
         delete a from t_cruise_point_instance AS a,t_robot_inspection AS b
                 where b.inspection_id = a.cruise_id
@@ -361,14 +358,6 @@
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
     </select>
 
-    <!--批量删除-->
-    <delete id="deleteSelectedRobot"  parameterType="java.lang.String">
-        delete  from t_robot_info
-        where  robot_id in
-        <foreach collection="robotIds" item="robotId" open="(" separator="," close=")">
-            #{robotId, jdbcType=BIGINT}
-        </foreach>
-    </delete>
 
     <select id="selectRobotScreen" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.CameraOfRobotInfo">
             SELECT

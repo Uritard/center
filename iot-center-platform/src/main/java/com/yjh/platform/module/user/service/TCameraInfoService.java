@@ -1,17 +1,27 @@
 package com.yjh.platform.module.user.service;
 
+
+import com.yjh.platform.configuration.RedisUtil;
+import com.yjh.platform.module.user.controller.SysMenuController;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
+
+import java.io.Serializable;
 import java.util.*;
 
 
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+
 
 /**
 * @author tt
@@ -22,6 +32,10 @@ public class TCameraInfoService{
 
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private Logger log = LoggerFactory.getLogger(RedisTemplate.class);
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -135,5 +149,24 @@ public class TCameraInfoService{
         cameraPresetList.add(cameraPresetTree);
         return cameraPresetList;
     }
+
+    @Logs(title = "将cameraInfo数据放入redis", code = "cameraInfo")
+    @Transactional(rollbackFor = Exception.class)
+    public int intoRedis(){
+        //RedisUtil redisUtil= new RedisUtil();
+        List<HashMap<String,String>> list = this.tCameraInfoDao.selectForMap();
+        Map<String,String> map = new HashMap<>();
+        map.put("111","0000");
+        map.put("222","00000");
+        for (HashMap mapItem:list) {
+            StringBuilder stringBuilder = new StringBuilder("cameraInfo:");
+            //stringBuilder.append(mapItem.get("camera_id").toString()).toString(),mapItem
+            String str = stringBuilder.append(mapItem.get("camera_id")).toString();
+            redisTemplate.opsForHash().putAll(str,map);
+        }
+        return 1;
+    }
+
+
 }
 

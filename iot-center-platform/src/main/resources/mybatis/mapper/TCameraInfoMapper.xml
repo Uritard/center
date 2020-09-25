@@ -269,4 +269,10 @@
           LEFT JOIN t_camera_info b ON a.camera_id = b.camera_id
     </select>
 
+    <select id="selectForMap" resultType="java.util.HashMap">
+        select *
+        from t_camera_info
+    </select>
+
+
 </mapper>
