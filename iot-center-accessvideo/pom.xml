@@ -227,6 +227,21 @@
             <artifactId>quartz</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>com.sun.jna.examples</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/jna.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jna.examples</groupId>
+            <artifactId>com.sun.jna.examples</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/examples.jar</systemPath>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -241,6 +256,13 @@
             </plugin>
             <!-- 如果是通过parent方式继承spring-boot-starter-parent则不用此插件 <plugin> <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId> </plugin> -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

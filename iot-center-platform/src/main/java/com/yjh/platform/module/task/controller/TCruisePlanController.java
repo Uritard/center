@@ -161,8 +161,9 @@ public class TCruisePlanController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         if (Objects.equals(null,deviceIds) || Objects.equals("",deviceIds)) {
+            List<InstanceTree> list = new ArrayList<>();
             resultMap.put("count", 0);
-            resultMap.put("list", "[]");
+            resultMap.put("list", list);
             result.setData(resultMap);
             return result;
         }

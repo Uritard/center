@@ -374,9 +374,15 @@ public class SysUserController {
                 String key = Constant.account_lock_times.replace("userAccountID", map.get("lockedUserId"));
                 redisTemplate.opsForHash().putAll(key, mapCache);
             } else if (!password.equals(sysUserCurrent.getPassword())){
-                result.setData("{ code: "+ResultCodeEnum.CODE10106.getCode()+", data: \"旧密码输入错误！\" }");
+                Map<String, Object> mapResult = new HashMap<>();
+                mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10106.getName());
+                result.setData(mapResult);
             } else if (sysUserCurrent.getRoleId() != 1234){
-                result.setData("{ code: "+ResultCodeEnum.CODE10008.getCode()+", data: \"用户权限不足\" }");
+                Map<String, Object> mapResult = new HashMap<>();
+                mapResult.put("code", ResultCodeEnum.CODE10008.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10008.getName());
+                result.setData(mapResult);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -398,7 +404,11 @@ public class SysUserController {
             String oldPassword = map.get("oldPassword");
             if (sysUserCurrent.getPassword().equals(oldPassword)) {
                 result.setData(sysUserService.changePassword(userId, map));
-            } else {result.setData("{ code: "+ResultCodeEnum.CODE10106.getCode()+", data: \"旧密码输入错误！\" }");}
+            } else {
+                Map<String, Object> mapResult = new HashMap<>();
+                mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10106.getName());
+                result.setData(mapResult);}
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("用户修改密码异常:", e);
