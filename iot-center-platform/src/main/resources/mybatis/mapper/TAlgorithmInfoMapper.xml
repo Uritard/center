@@ -110,6 +110,7 @@
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
+         order by a.algorithm_id desc
     </select>
 
     <insert id="batchInsert">

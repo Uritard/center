@@ -56,6 +56,6 @@ public interface TCameraInfoDao {
     List<TCamreaPresetTree> selectCameraId();
     List<TCamreaPresetTree> batchSelectPreset();
 
-    List<HashMap<String,String>> selectForMap();
+    List<Map<String,Object>> selectForMap();
 
 }

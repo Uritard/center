@@ -1,26 +1,18 @@
 package com.yjh.platform.module.user.service;
 
-
-import com.yjh.platform.configuration.RedisUtil;
-import com.yjh.platform.module.user.controller.SysMenuController;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
-
-import java.io.Serializable;
 import java.util.*;
-
-
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
 
 /**
@@ -28,14 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 * @since 2020-07-23
 */
 @Service
-public class TCameraInfoService{
+public class TCameraInfoService {
 
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
 
-    private Logger log = LoggerFactory.getLogger(RedisTemplate.class);
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -52,7 +43,7 @@ public class TCameraInfoService{
     @Logs(title = "批量删除", code = "TCameraPreset")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedCamera(String cameraIds) {
-        List<String> list= Arrays.asList(cameraIds.split(","));
+        List<String> list = Arrays.asList(cameraIds.split(","));
         return this.tCameraInfoDao.deleteSelectedCamera(list);
     }
 
@@ -87,20 +78,20 @@ public class TCameraInfoService{
     public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId,
                                           Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,
                                           Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
-                                          String url, Integer port, Integer cameraType, Integer isControl,String latitude,
-                                          String longitude,String address) {
+                                          String url, Integer port, Integer cameraType, Integer isControl, String latitude,
+                                          String longitude, String address) {
         List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, aliasName,
-                recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,cameraIp, url,
-                port, cameraType, latitude,longitude,address,isControl);
+                recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType, cameraIp, url,
+                port, cameraType, latitude, longitude, address, isControl);
         return tCameraInfoByDictList;
     }
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo,  List<Long> upRegionIds) {
-        if(upRegionIds.size() != 0){
+    public List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo, List<Long> upRegionIds) {
+        if (upRegionIds.size() != 0) {
             tCameraInfo.setUpRegionIds(upRegionIds);
-        }else {
+        } else {
             upRegionIds.add(tCameraInfo.getUpRegionId());
             tCameraInfo.setUpRegionIds(upRegionIds);
         }
@@ -110,7 +101,7 @@ public class TCameraInfoService{
 
     @Logs(title = "查询当前任务下的摄像头信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<CameraInfo> selectCameraByTaskId(Long taskId){
+    public List<CameraInfo> selectCameraByTaskId(Long taskId) {
         return this.tCameraInfoDao.selectCameraByTaskId(taskId);
     }
 
@@ -120,11 +111,11 @@ public class TCameraInfoService{
         List<TCamreaPresetTree> cameraList = tCameraInfoDao.selectCameraId();
         List<TCamreaPresetTree> tCamreaPresetTreeList = tCameraInfoDao.batchSelectPreset();
         List<Map<String, Object>> cameraPresetTreeTemList = new ArrayList<>();
-        for (TCamreaPresetTree tCamrea:cameraList) {
+        for (TCamreaPresetTree tCamrea : cameraList) {
             Map<String, Object> cameraPresetTreeTem = new HashMap<>();
             List<Map<String, Object>> presetList = new ArrayList<>();
             Long cameraId = tCamrea.getCameraId();
-            for (TCamreaPresetTree tCamreaPresetTree:tCamreaPresetTreeList) {
+            for (TCamreaPresetTree tCamreaPresetTree : tCamreaPresetTreeList) {
                 Long cameraIdTem = tCamreaPresetTree.getCameraId();
                 if (Objects.nonNull(cameraIdTem) && Objects.equals(cameraId, cameraIdTem)) {
                     Map<String, Object> presetMap = new HashMap<>();
@@ -135,9 +126,9 @@ public class TCameraInfoService{
                 }
             }
             cameraPresetTreeTem.put("id", cameraId);
-            cameraPresetTreeTem.put("label",tCamrea.getCameraName());
+            cameraPresetTreeTem.put("label", tCamrea.getCameraName());
             cameraPresetTreeTem.put("infoType", "camera");
-            cameraPresetTreeTem.put("children",presetList);
+            cameraPresetTreeTem.put("children", presetList);
             cameraPresetTreeTemList.add(cameraPresetTreeTem);
         }
         Map<String, Object> cameraPresetTree = new HashMap<>();
@@ -150,23 +141,31 @@ public class TCameraInfoService{
         return cameraPresetList;
     }
 
+
     @Logs(title = "将cameraInfo数据放入redis", code = "cameraInfo")
     @Transactional(rollbackFor = Exception.class)
-    public int intoRedis(){
-        //RedisUtil redisUtil= new RedisUtil();
-        List<HashMap<String,String>> list = this.tCameraInfoDao.selectForMap();
-        Map<String,String> map = new HashMap<>();
-        map.put("111","0000");
-        map.put("222","00000");
-        for (HashMap mapItem:list) {
-            StringBuilder stringBuilder = new StringBuilder("cameraInfo:");
-            //stringBuilder.append(mapItem.get("camera_id").toString()).toString(),mapItem
-            String str = stringBuilder.append(mapItem.get("camera_id")).toString();
-            redisTemplate.opsForHash().putAll(str,map);
+    public int intoRedis() {
+        List<Map<String,Object>> list = this.tCameraInfoDao.selectForMap();
+            for (Map<String, Object> item : list) {
+                Map<String,Object> stringObjectMap = item;
+                Map<String,Object> map2 = new HashMap<>();
+                for (String key : stringObjectMap.keySet()) {
+                    Object s = stringObjectMap.get(key);
+                    String s2 = String.valueOf(s);
+                    System.out.println(key + ": " + s2);
+                    map2.put(key,s2);
+                }
+                String str = "cameraInfo:"+String.valueOf(item.get("camera_id"));
+                redisTemplate.opsForHash().putAll(str, map2);
+
         }
         return 1;
     }
 
 
+
+
 }
+
+
 
