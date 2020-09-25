@@ -65,9 +65,6 @@ public class TUnionTaskService{
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTask> selectByPage(TUnionTask tUnionTask) throws ParseException{
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        int result = insertRecord(9000000005L,1,null,date);
         return tUnionTaskList;
     }
 
@@ -167,8 +164,7 @@ public class TUnionTaskService{
     }
     @Logs(title = "联动记录存储", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insertRecord(Long ruleId,Integer isFinish,Long robotId,Date createTime) throws ParseException {
-        if (isFinish==1){
+    public int insertRecord(Long ruleId,Long robotId,Date createTime) {
             //新增联合巡视预案数据
             TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
             TUnionTask tUnionTask = new TUnionTask();
@@ -219,7 +215,7 @@ public class TUnionTaskService{
 //            tUnionTaskDao.insertRecordDetail(tUnionTaskAttrList);
             System.out.println("tUnionTaskAttrList是："+tUnionTaskAttrList);
             TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
-        }
+
         return 11111;
     }
 }

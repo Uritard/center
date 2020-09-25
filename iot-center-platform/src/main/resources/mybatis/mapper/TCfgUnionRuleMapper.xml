@@ -198,4 +198,7 @@
         from t_cruise_plan
     </select>
 
+    <select id="selectUnionRuleByMeteId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCfgUnionRule">
+        SELECT * FROM t_cfg_union_rule WHERE input_param LIKE concat('%',#{inputParam, jdbcType=VARCHAR},'%')
+    </select>
 </mapper>

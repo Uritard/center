@@ -1,9 +1,13 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
+import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
+import com.yjh.platform.module.task.entity.TUnionTask;
+import com.yjh.platform.module.task.service.TUnionTaskService;
 
+import java.text.ParseException;
 import java.util.*;
 
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
@@ -12,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.script.ScriptEngine;
@@ -31,6 +36,13 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TCfgUnionRuleDao tCfgUnionRuleDao;
+
+    @Autowired
+    private TUnionTaskService tUnionTaskService;
+
+    @Autowired
+    private TUnionTaskDao tUnionTaskDao;
+
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -96,8 +108,7 @@ public class TCfgDataCurrentService {
 
     @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断",code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Set<Long> unionRulecaculator(List<Long> meteIds) throws ScriptException {
-        // TODO: 2020/9/22  规则内部实时数据比较、表达式定位赋值、判断表达式是否计算完成、判断表达式结果并执行不同工作路线->返回满足触发表达式条件的规则（预案信息）
+    public Set<Long> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
         Set<Long> plans=new HashSet<>( );//满足触发条件的预案
         Log cLogger = LogFactory.getLog(this.getClass());
         //联动规则一次匹配
@@ -129,6 +140,7 @@ public class TCfgDataCurrentService {
         }
 
         //规则二次匹配与规则计算，判断表达式是否触发
+        // TODO: 2020/9/25 待完善--触发条件向巡检模块微服务发送预案信息Post方法;
         for(TCfgUnionRule rule:rules){
             String content=rule.getRuleContent().replaceAll("\\{","").replaceAll("}","").replaceAll(",","");
             for(TCfgDataCurrent current:currents){
@@ -143,12 +155,14 @@ public class TCfgDataCurrentService {
                      ScriptEngine engine=sm.getEngineByName("js");
                      String sum=engine.eval(content).toString();
                      if(sum=="true"){
+                         cLogger.info(content);//断面数据
+//                         tUnionTaskService.insertRecord(rule.getRuleId(),null,new Date());
                          try {
                              int delay=rule.getRuleDelay();
                              Thread.sleep(delay*1000);
                              cLogger.info(rule.getRuleName());
                              plans.add(rule.getPlanId());
-                         } catch (Exception e) {e.getMessage();}
+                         } catch  (Exception e) {e.getMessage();}
                          cLogger.info("执行预案");
                          cLogger.info(rule.getRuleName());
                          break;
@@ -163,9 +177,23 @@ public class TCfgDataCurrentService {
 
 
             }
+
         }
         return plans;
     }
+
+    @Logs(title = "联动记录滚动刷新",code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public Map unionRecordRoll(String unionId){
+        // TODO: 2020/9/25 功能待完善--联动记录Id-单个/多个（demo仅使用单个）;记录结果集可用新类型来装（demo临时使用Map）
+        TUnionTask tUnionTask=tUnionTaskDao.selectByPrimaryId(unionId);
+        Map<String,Object> unionRecord=new HashMap<>();
+        unionRecord.put("unionId",tUnionTask.getUnionId());
+        unionRecord.put("unionName",tUnionTask.getUnionName());
+        unionRecord.put("startTime",tUnionTask.getStartTime());
+        return unionRecord;
+    }
+
 
 }
 
