@@ -6,6 +6,7 @@ import java.util.Date;
 import com.yjh.platform.module.task.entity.InstanceTree;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.entity.TCruisePlanCount;
+import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -27,6 +28,7 @@ public interface TCruisePlanDao {
                              @Param(value = "createTime") Date createTime,
                              @Param(value = "updateTime") Date updateTime);
     List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan);
+    List<TCruisePlanCountByPage> selectByPlanPage(TCruisePlan tCruisePlan);
 
     int batchInsert(List<TCruisePlan> list);
     List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList);

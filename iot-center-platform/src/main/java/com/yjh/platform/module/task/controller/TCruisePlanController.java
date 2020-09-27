@@ -140,6 +140,26 @@ public class TCruisePlanController {
         return result;
     }
 
+    @ApiOperation(value = "分页查询")
+    @RequestMapping(value = "/selectByPlanPage", method = RequestMethod.POST)
+    public Result selectByPlanPage(@RequestBody TCruisePlan tCruisePlan,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCruisePlanCountByPage> list = tCruisePlanService.selectByPlanPage(tCruisePlan);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     public Result batchInsert(@RequestBody List<TCruisePlan> list) {
@@ -189,8 +209,8 @@ public class TCruisePlanController {
             Map<String, Object> planDetailMap = new HashMap<>();
             TCruisePlanCount tCruisePlanCount = tCruisePlanService.selectByPrimaryId(planId);
             planDetailMap.put("planName", tCruisePlanCount.getPlanName());
-            planDetailMap.put("planTypeName", tCruisePlanCount.getPlanTypeName());
-            planDetailMap.put("planType", tCruisePlanCount.getType());
+            planDetailMap.put("typeName", tCruisePlanCount.getPlanTypeName());
+            planDetailMap.put("type", tCruisePlanCount.getType());
             List<TCruisePlanAttrDetail> tCruisePlanAttrDetailList = tCruisePlanAttrService.selectByPrimaryId(planId);
             List<Long> deviceIds = new ArrayList<>();
             for (TCruisePlanAttrDetail tCruisePlanAttrDetail:tCruisePlanAttrDetailList) {

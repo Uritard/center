@@ -115,10 +115,10 @@ public class TCruiseTaskController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public Result delete(@RequestParam(value = "taskId", required = true) String taskId,
-                         @RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskDate) {
+                         @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
         try {
-            result.setData(tCruiseTaskService.deleteByPrimaryId(taskId, taskDate));
+            result.setData(tCruiseTaskService.deleteByPrimaryId(taskId, startTime));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除任务异常:", e);

@@ -116,6 +116,8 @@ public class CameraConController {
             while ((line = reader.readLine()) != null) {
                 dataBack.append(line).append('\n');
             }
+            String urlStop = "kill -9 "+dataBack.substring(9,15).replace(" ","");
+            Runtime.getRuntime().exec(urlStop);
             result.setData(dataBack.toString());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

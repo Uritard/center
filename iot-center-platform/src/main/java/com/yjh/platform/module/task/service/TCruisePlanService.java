@@ -5,14 +5,11 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
-import com.yjh.platform.module.task.entity.InstanceTree;
-import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 
 import java.util.*;
 
-import com.yjh.platform.module.task.entity.TCruisePlanAttr;
-import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import org.springframework.stereotype.Service;
@@ -44,9 +41,8 @@ public class TCruisePlanService{
             List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
             TCruisePlan tCruisePlan = new TCruisePlan();
             tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
-            Integer planType = Integer.parseInt(String.valueOf(map.get("planType")));
+            Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
             tCruisePlan.setType(planType);
-            tCruisePlan.setPlanPointTypes(String.valueOf(map.get("identifyType")));
             this.tCruisePlanDao.insert(tCruisePlan);
             List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
             Long planId = tCruisePlan.getPlanId();
@@ -129,6 +125,13 @@ public class TCruisePlanService{
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan) {
         List<TCruisePlanCount> tCruisePlanList = tCruisePlanDao.selectByPage(tCruisePlan);
+        return tCruisePlanList;
+    }
+
+    @Logs(title = "分页查询", code = "task")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruisePlanCountByPage> selectByPlanPage(TCruisePlan tCruisePlan) {
+        List<TCruisePlanCountByPage> tCruisePlanList = tCruisePlanDao.selectByPlanPage(tCruisePlan);
         return tCruisePlanList;
     }
 

@@ -11,6 +11,8 @@ import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
 import lombok.NonNull;
 import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,8 @@ public class TCruiseTaskService {
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TCruiseTaskDelDao tCruiseTaskDelDao;
+
+    private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -72,17 +76,21 @@ public class TCruiseTaskService {
 
     @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(String taskId, Date taskDate) {
+    public int deleteByPrimaryId(String taskId, String startTime) {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-        if (tCruiseTask.getIfRun()==172 && !tCruiseTask.getStartTime().equals(-1)) {
+        if (Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==172 && !startTime.equals("-1")) {
             TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
             tCruiseTaskDel.setTaskId(taskId);
-            tCruiseTaskDel.setDelTime(taskDate);
-            Date date = new Date("yyyy-MM-dd HH:mm:ss");
-            tCruiseTaskDel.setCreateTime(date);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
+            try {
+                Date taskDate = simpleDateFormat.parse(startTime);
+                tCruiseTaskDel.setDelTime(taskDate);
+            } catch (Exception e) { e.getMessage(); }
+            tCruiseTaskDel.setCreateTime(new Date());
             return tCruiseTaskDelDao.insert(tCruiseTaskDel);
         } else {
             tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
+            tCruiseTaskDelDao.deleteByPrimaryId(taskId);
             return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
         }
     }
@@ -181,27 +189,33 @@ public class TCruiseTaskService {
                 List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
                 for (Date aTimeList:timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
+                    Map<String, Object> taskCountMapDel = new HashMap<>();
                     long taskTime = aTimeList.getTime();
                     if (listDel.size()>0) {
                         for (TCruiseTaskDel tCruiseTaskDel:listDel) {
                             long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
-                            if (!Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) || taskDelTime!=taskTime) {
-                                taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
-                                taskCountMap.put("total",tCruiseTaskCount.getTotal());
-                                taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
-                                taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
-                                taskCountMap.put("type", tCruiseTaskCount.getIfRun());
-                                taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
-                                //TODO 增加redis获取任务状态，1是真
-                                if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
-                                    taskCountMap.put("taskState", "任务未开始");
-                                } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
-                                if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
-                                    taskCountMap.put("taskStatus", "-1");
-                                } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
-                                taskCountMap.put("startTime", sdfF2.format(aTimeList));
-                                listTask.add(taskCountMap);
+                            if (Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && taskDelTime==taskTime) {
+                                log.info("已删除的任务信息： "+tCruiseTaskCount.getTaskId()+" "+taskDelTime);
+                                taskCountMapDel.put("taskId", tCruiseTaskCount.getTaskId());
+                                taskCountMapDel.put("taskDelTime", taskDelTime);
                             }
+                        }
+                        if (taskCountMapDel.size()==0) {
+                            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                            taskCountMap.put("total",tCruiseTaskCount.getTotal());
+                            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                            taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                            taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                            //TODO 增加redis获取任务状态，1是真
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                                taskCountMap.put("taskState", "任务未开始");
+                            } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                                taskCountMap.put("taskStatus", "-1");
+                            } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
+                            taskCountMap.put("startTime", sdfF2.format(aTimeList));
+                            listTask.add(taskCountMap);
                         }
                     } else {
                         taskCountMap.put("type", tCruiseTaskCount.getIfRun());
