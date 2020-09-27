@@ -268,7 +268,7 @@
         select a.camera_id, b.camera_name, a.preset_id, a.preset_name from t_camera_preset a
           LEFT JOIN t_camera_info b ON a.camera_id = b.camera_id
     </select>
-    
+
     <select id="selectForMap" resultType="java.util.HashMap">
         select *
         from t_camera_info
