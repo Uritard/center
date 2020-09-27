@@ -70,7 +70,7 @@ public class TUnionTaskService{
     public List<TUnionTask> selectByPage(TUnionTask tUnionTask) {
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
 
-        int a = insertRecord(9000000037L,null,new Date(),"dghjdvfjhahjfa");
+        int a = insertRecord(9000000037L,null,new Date(),"测试用的断面数据");
         System.out.println("哈哈啊哈哈哈："+a);
         return tUnionTaskList;
     }
@@ -84,14 +84,15 @@ public class TUnionTaskService{
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskExpand> selectHistory(String ruleName,Date endDateTemp,Date startDateTemp) {
         List<TUnionTaskExpand> tUnionTaskList  = tUnionTaskDao.selectHistory(ruleName,endDateTemp,startDateTemp);
-//        for (TUnionTaskExpand tUnionTaskExpand:tUnionTaskList)
-//        {
-//            if (tUnionTaskExpand.getIsFinish() == 0){
-//                tUnionTaskExpand.setIsFinishName("失败");
-//            }
-//            tUnionTaskExpand.setIsFinishName("成功");
-//            tUnionTaskList.add(tUnionTaskExpand);
-//        }
+        System.out.println("tUnionTaskList是："+tUnionTaskList);
+        for (TUnionTaskExpand tUnionTaskExpand:tUnionTaskList)
+        {
+            if (tUnionTaskExpand.getIsFinish() == 0){
+                tUnionTaskExpand.setIsFinishName("失败");
+            }else {
+                tUnionTaskExpand.setIsFinishName("成功");
+            }
+        }
         return tUnionTaskList;
     }
     @Logs(title = "联动历史记录统计--近一周", code = "module")
@@ -111,27 +112,39 @@ public class TUnionTaskService{
 
         Map<String,Integer> map = tUnionTaskDao.getHistoryByWeek(firstTime1,firstTime2,firstTime3,firstTime4,
                 firstTime5,firstTime6,firstTime7,firstTime8);
-        System.out.println("map是："+map);
         List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
 
         Iterator<String> iter = map.keySet().iterator();
         while(iter.hasNext()){
             String key=iter.next();
-            String timeNode =  key.substring(0,7);
+            String timeNode =  key.substring(0,10);
             Number mapValue = (Number)map.get(key);
             TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
             tutHistoryStatistical.setTimeNode(timeNode);
             tutHistoryStatistical.setCount(mapValue);
             tutHistoryStatisticalList.add(tutHistoryStatistical);
         }
-        Collections.sort(tutHistoryStatisticalList,new Comparator<TutHistoryStatistical>(){
+
+        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
             @Override
             public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-                String timeNode1 =  o1.getTimeNode().substring(8,10);
-                Integer a1 = Integer.valueOf(timeNode1);
-                String timeNode2 =  o2.getTimeNode().substring(8,10);
-                Integer a2 = Integer.valueOf(timeNode2);
-                return a1 - a2;
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                Date date1 = null;
+                Date date2 = null;
+                try {
+                    date1 = simpleDateFormat.parse(o1.getTimeNode());
+                    date2 = simpleDateFormat.parse(o2.getTimeNode());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int flag = date1.compareTo(date2);
+                if (flag == -1) {
+                    flag = -1;
+                } else if (flag == 1) {
+                    flag = 1;
+                }
+                return flag;
             }
         });
         return tutHistoryStatisticalList;
@@ -171,39 +184,28 @@ public class TUnionTaskService{
             tutHistoryStatistical.setCount(mapValue);
             tutHistoryStatisticalList.add(tutHistoryStatistical);
         }
-//        Collections.sort(tutHistoryStatisticalList,new Comparator<TutHistoryStatistical>(){
-//            @Override
-//            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-//                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//                Calendar calendar = Calendar.getInstance();
-//                Calendar calendar2 = Calendar.getInstance();
-//                int flag = 0;
-//                try {
-//                    Date date1 = format.parse(o1.getTimeNode());
-//                    Date date2 = format.parse(o2.getTimeNode());
-//                    calendar.setTime(date1);
-//                    calendar2.setTime(date2);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//                int year = calendar.get(Calendar.YEAR);
-//                int month = calendar.get(Calendar.MONTH);
-//                int date = calendar.get(Calendar.DATE);
-//                int year1 = calendar2.get(Calendar.YEAR);
-//                int month1 = calendar2.get(Calendar.MONTH);
-//                int date1 = calendar2.get(Calendar.DATE);
-//                if (year > year1){
-//                    flag =  year - year1;
-//                    if (month > month1)
-//                    {
-//                        flag = month - month1;
-//                    }
-//                    if (date > date1)
-//                        flag =  date - date1;
-//                }
-//                return flag;
-//            }
-//        });
+        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
+            @Override
+            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+
+                Date date1 = null;
+                Date date2 = null;
+                try {
+                    date1 = simpleDateFormat.parse(o1.getTimeNode());
+                    date2 = simpleDateFormat.parse(o2.getTimeNode());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int flag = date1.compareTo(date2);
+                if (flag == -1) {
+                    flag = -1;
+                } else if (flag == 1) {
+                    flag = 1;
+                }
+                return flag;
+            }
+        });
         return tutHistoryStatisticalList;
     }
     @Logs(title = "联动历史记录统计--近一月", code = "module")
@@ -264,15 +266,26 @@ public class TUnionTaskService{
             tutHistoryStatistical.setCount(mapValue);
             tutHistoryStatisticalList.add(tutHistoryStatistical);
         }
-        Collections.sort(tutHistoryStatisticalList,new Comparator<TutHistoryStatistical>(){
+        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
             @Override
             public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-                String timeNode1 =  o1.getTimeNode().substring(8,10);
-                Integer a1 = Integer.valueOf(timeNode1);
-                String timeNode2 =  o2.getTimeNode().substring(8,10);
-                Integer a2 = Integer.valueOf(timeNode2);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                return a1 - a2;
+                Date date1 = null;
+                Date date2 = null;
+                try {
+                    date1 = simpleDateFormat.parse(o1.getTimeNode());
+                    date2 = simpleDateFormat.parse(o2.getTimeNode());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int flag = date1.compareTo(date2);
+                if (flag == -1) {
+                    flag = -1;
+                } else if (flag == 1) {
+                    flag = 1;
+                }
+                return flag;
             }
         });
         return tutHistoryStatisticalList;
@@ -282,7 +295,8 @@ public class TUnionTaskService{
     public int insertRecord(Long ruleId,Long robotId,Date createTime,String paramValues) {
         TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
         TUnionTask tUnionTask = new TUnionTask();
-        tUnionTask.setUnionId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        String unionId = String.valueOf(UUID.randomUUID()).replace("-", "");
+        tUnionTask.setUnionId(unionId);
         tUnionTask.setRuleId(ruleId);
         tUnionTask.setUnionName(tCfgUnionRule.getRuleName()+tCfgUnionRule.getPlanId());
         tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
@@ -300,6 +314,7 @@ public class TUnionTaskService{
 
         //新增联合巡视预案属性数据
         List<TUnionTaskDetail> tUnionTaskDetailList = tUnionTaskDao.selectUnionDetail(ruleId);
+        System.out.println("---------------------"+tUnionTaskDetailList);
         List<TUnionTaskAttr> tUnionTaskAttrList = new ArrayList<>();
         for(TUnionTaskDetail tUnionTaskDetail:tUnionTaskDetailList){
             TUnionTaskAttr tUnionTaskAttr = new TUnionTaskAttr();
@@ -323,9 +338,6 @@ public class TUnionTaskService{
 
             tUnionTaskAttrList.add(tUnionTaskAttr);
         }
-        System.out.println("tUnionTaskAttrList是："+tUnionTaskAttrList);
-        TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
-
         int result02 = TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
         return result01+result02;
     }

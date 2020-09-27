@@ -43,5 +43,8 @@ public class TUnionTaskExpand extends TUnionTask{
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "。。。。")
+    private String IsFinishName;
+
 
 }
