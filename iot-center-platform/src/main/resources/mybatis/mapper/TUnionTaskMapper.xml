@@ -80,7 +80,7 @@
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="paramValues != null and paramValues != ''">a.param_values = #{paramValues, jdbcType=VARCHAR},</if>
     </set>
-            where a.union_id = #{unionId, jdbcType=VARCHAR}
+        where a.union_id = #{unionId, jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TUnionTask">
@@ -180,18 +180,18 @@
         )values
         <foreach collection="list" item="TUnionTask" separator=",">
             (
-                #{TUnionTask.unionId, jdbcType=VARCHAR},
-                #{TUnionTask.ruleId, jdbcType=BIGINT},
-                #{TUnionTask.unionName, jdbcType=VARCHAR},
-                #{TUnionTask.ruleDelay, jdbcType=INTEGER},
-                #{TUnionTask.robotId, jdbcType=BIGINT},
-                #{TUnionTask.remark1, jdbcType=INTEGER},
-                #{TUnionTask.remark2, jdbcType=INTEGER},
-                #{TUnionTask.remark3, jdbcType=VARCHAR},
-                #{TUnionTask.isFinish, jdbcType=INTEGER},
-                #{TUnionTask.startTime, jdbcType=TIMESTAMP},
-                #{TUnionTask.createTime, jdbcType=TIMESTAMP},
-                #{TUnionTask.paramValues, jdbcType=VARCHAR}
+            #{TUnionTask.unionId, jdbcType=VARCHAR},
+            #{TUnionTask.ruleId, jdbcType=BIGINT},
+            #{TUnionTask.unionName, jdbcType=VARCHAR},
+            #{TUnionTask.ruleDelay, jdbcType=INTEGER},
+            #{TUnionTask.robotId, jdbcType=BIGINT},
+            #{TUnionTask.remark1, jdbcType=INTEGER},
+            #{TUnionTask.remark2, jdbcType=INTEGER},
+            #{TUnionTask.remark3, jdbcType=VARCHAR},
+            #{TUnionTask.isFinish, jdbcType=INTEGER},
+            #{TUnionTask.startTime, jdbcType=TIMESTAMP},
+            #{TUnionTask.createTime, jdbcType=TIMESTAMP},
+            #{TUnionTask.paramValues, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -201,85 +201,83 @@
         from t_cfg_union_rule b,t_union_task a,t_cruise_plan d
         where 1 = 1
         <if test="ruleName != null and ruleName != ''"> and b.rule_name like concat('%',#{ruleName, jdbcType=VARCHAR},'%') </if>
-        and a.create_time between #{startDateTemp,jdbcType=TIMESTAMP} and #{endDateTemp,jdbcType=TIMESTAMP}
+        <if test="startDateTemp != null " ><if test="endDateTemp != null">and a.create_time between #{startDateTemp,jdbcType=TIMESTAMP} and #{endDateTemp,jdbcType=TIMESTAMP}</if></if>
         and a.rule_id = b.rule_id
         and b.plan_id = d.plan_id
     </select>
 
-    <select id="historyStatistical" resultType="java.lang.Integer">
+    <select id="getHistoryByWeek"  resultType="java.util.Map">
         select
-            COUNT(start_time BETWEEN #{beforeTime} and #{currentTime} or null)
+            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime1},
+            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime2},
+            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime3},
+            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime4},
+            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime5},
+            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime6},
+            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime7}
         from t_union_task
     </select>
 
-    <select id="getHistoryByQuarter"  resultType="com.yjh.platform.module.task.entity.QuarterEntity">
+    <select id="getHistoryByYear"  resultType="java.util.Map">
         select
-            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as monthOne,
-            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as monthTwo,
-            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as monthThree
+            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime1},
+            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime2},
+            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime3},
+            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime4},
+            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime5},
+            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime6},
+            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime7},
+            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as #{firstTime8},
+            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as #{firstTime9},
+            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as #{firstTime10},
+            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as #{firstTime11},
+            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as #{firstTime12}
         from t_union_task
     </select>
-
-    <select id="getHistoryByYear"  resultType="com.yjh.platform.module.task.entity.YearEntity">
+    <select id="getHistoryByMonth" resultType="java.util.Map">
         select
-            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as monthOne,
-            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as monthTwo,
-            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as monthThree,
-            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as monthFour,
-            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as monthFive,
-            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as monthSix,
-            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as monthSeven,
-            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as monthEight,
-            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as monthNine,
-            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as monthTen,
-            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as monthEleven,
-            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as monthTwelve
-        from t_union_task
-    </select>
-    <select id="getHistoryByMonth" resultType="com.yjh.platform.module.task.entity.MonthEntity">
-        select
-            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as DayOne,
-            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as DayTwo,
-            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as DayThree,
-            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as DayFour,
-            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as DayFive,
-            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as DaySix,
-            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as DaySeven,
-            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as DayEight,
-            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as DayNine,
-            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as DayTen,
-            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as DayEleven,
-            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as DayTwelve,
-            COUNT(start_time BETWEEN #{firstTime14} and #{firstTime13} or null) as DayThirteen,
-            COUNT(start_time BETWEEN #{firstTime15} and #{firstTime14} or null) as DayFourteen,
-            COUNT(start_time BETWEEN #{firstTime16} and #{firstTime15} or null) as DayFifteen,
-            COUNT(start_time BETWEEN #{firstTime17} and #{firstTime16} or null) as DaySixteen,
-            COUNT(start_time BETWEEN #{firstTime18} and #{firstTime17} or null) as DaySeventeen,
-            COUNT(start_time BETWEEN #{firstTime19} and #{firstTime18} or null) as DayEighteen,
-            COUNT(start_time BETWEEN #{firstTime20} and #{firstTime19} or null) as DayNineteen,
-            COUNT(start_time BETWEEN #{firstTime21} and #{firstTime20} or null) as DayTwenty,
-            COUNT(start_time BETWEEN #{firstTime22} and #{firstTime21} or null) as Day21,
-            COUNT(start_time BETWEEN #{firstTime23} and #{firstTime22} or null) as Day22,
-            COUNT(start_time BETWEEN #{firstTime24} and #{firstTime23} or null) as Day23,
-            COUNT(start_time BETWEEN #{firstTime25} and #{firstTime24} or null) as Day24,
-            COUNT(start_time BETWEEN #{firstTime26} and #{firstTime25} or null) as Day25,
-            COUNT(start_time BETWEEN #{firstTime27} and #{firstTime26} or null) as Day26,
-            COUNT(start_time BETWEEN #{firstTime28} and #{firstTime27} or null) as Day27,
-            COUNT(start_time BETWEEN #{firstTime29} and #{firstTime28} or null) as Day28,
-            COUNT(start_time BETWEEN #{firstTime30} and #{firstTime29} or null) as Day29,
-            COUNT(start_time BETWEEN #{firstTime31} and #{firstTime30} or null) as Day30
+            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime1},
+            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime2},
+            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime3},
+            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime4},
+            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime5},
+            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime6},
+            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime7},
+            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as #{firstTime8},
+            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as #{firstTime9},
+            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as #{firstTime10},
+            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as #{firstTime11},
+            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as #{firstTime12},
+            COUNT(start_time BETWEEN #{firstTime14} and #{firstTime13} or null) as #{firstTime13},
+            COUNT(start_time BETWEEN #{firstTime15} and #{firstTime14} or null) as #{firstTime14},
+            COUNT(start_time BETWEEN #{firstTime16} and #{firstTime15} or null) as #{firstTime15},
+            COUNT(start_time BETWEEN #{firstTime17} and #{firstTime16} or null) as #{firstTime16},
+            COUNT(start_time BETWEEN #{firstTime18} and #{firstTime17} or null) as #{firstTime17},
+            COUNT(start_time BETWEEN #{firstTime19} and #{firstTime18} or null) as #{firstTime18},
+            COUNT(start_time BETWEEN #{firstTime20} and #{firstTime19} or null) as #{firstTime19},
+            COUNT(start_time BETWEEN #{firstTime21} and #{firstTime20} or null) as #{firstTime20},
+            COUNT(start_time BETWEEN #{firstTime22} and #{firstTime21} or null) as #{firstTime21},
+            COUNT(start_time BETWEEN #{firstTime23} and #{firstTime22} or null) as #{firstTime22},
+            COUNT(start_time BETWEEN #{firstTime24} and #{firstTime23} or null) as #{firstTime23},
+            COUNT(start_time BETWEEN #{firstTime25} and #{firstTime24} or null) as #{firstTime24},
+            COUNT(start_time BETWEEN #{firstTime26} and #{firstTime25} or null) as #{firstTime25},
+            COUNT(start_time BETWEEN #{firstTime27} and #{firstTime26} or null) as #{firstTime26},
+            COUNT(start_time BETWEEN #{firstTime28} and #{firstTime27} or null) as #{firstTime27},
+            COUNT(start_time BETWEEN #{firstTime29} and #{firstTime28} or null) as #{firstTime28},
+            COUNT(start_time BETWEEN #{firstTime30} and #{firstTime29} or null) as #{firstTime29},
+            COUNT(start_time BETWEEN #{firstTime31} and #{firstTime30} or null) as #{firstTime30}
         from t_union_task
     </select>
 
     <select id="selectUnionDetail" resultType="com.yjh.platform.module.task.entity.TUnionTaskDetail">
         SELECT
-            a.rule_id,
-            b.plan_id,
-            d.instance_id,
-            d.device_mete_id,
-            d.custom_id as device_custom_id,
-            d.cruise_type,
-            e.dict_note as cruise_type_name
+        a.rule_id,
+        b.plan_id,
+        d.instance_id,
+        d.device_mete_id,
+        d.custom_id as device_custom_id,
+        d.cruise_type,
+        e.dict_note as cruise_type_name
         from t_cfg_union_rule a left JOIN t_cruise_plan_attr b on a.plan_id = b.plan_id
         LEFT JOIN t_cruise_point_instance d on b.instance_id = d.instance_id
         LEFT JOIN t_dict_business e on e.dict_code = d.cruise_type
@@ -289,13 +287,13 @@
 
     <insert id="insertRecordDetail">
         insert into t_union_task_attr(
-            union_id,
-            instance_id,
-            device_mete_id,
-            device_custom_id,
-            if_robot,
-            if_video,
-            if_inferad
+        union_id,
+        instance_id,
+        device_mete_id,
+        device_custom_id,
+        if_robot,
+        if_video,
+        if_inferad
         )values
         <foreach collection="tUnionTaskAttrList" item="TUnionTaskArr" separator=",">
             (

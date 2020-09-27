@@ -6,19 +6,23 @@ import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 
+import java.lang.reflect.Field;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import lombok.SneakyThrows;
+import org.apache.poi.poifs.filesystem.Entry;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
-* @author tt
-* @since 2020-09-04
-*/
+ * @author tt
+ * @since 2020-09-04
+ */
 @Service
 public class TUnionTaskService{
 
@@ -63,8 +67,11 @@ public class TUnionTaskService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TUnionTask> selectByPage(TUnionTask tUnionTask) throws ParseException{
+    public List<TUnionTask> selectByPage(TUnionTask tUnionTask) {
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
+
+        int a = insertRecord(9000000037L,null,new Date(),"dghjdvfjhahjfa");
+        System.out.println("哈哈啊哈哈哈："+a);
         return tUnionTaskList;
     }
 
@@ -76,25 +83,62 @@ public class TUnionTaskService{
     @Logs(title = "查看联动历史记录", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskExpand> selectHistory(String ruleName,Date endDateTemp,Date startDateTemp) {
-        List<TUnionTaskExpand> tUnionTaskList = tUnionTaskDao.selectHistory(ruleName,endDateTemp,startDateTemp);
+        List<TUnionTaskExpand> tUnionTaskList  = tUnionTaskDao.selectHistory(ruleName,endDateTemp,startDateTemp);
+//        for (TUnionTaskExpand tUnionTaskExpand:tUnionTaskList)
+//        {
+//            if (tUnionTaskExpand.getIsFinish() == 0){
+//                tUnionTaskExpand.setIsFinishName("失败");
+//            }
+//            tUnionTaskExpand.setIsFinishName("成功");
+//            tUnionTaskList.add(tUnionTaskExpand);
+//        }
         return tUnionTaskList;
     }
-    @Logs(title = "联动历史记录统计--近一季度", code = "module")
+    @Logs(title = "联动历史记录统计--近一周", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public QuarterEntity historyStatisticalByQuarter() {
-        List<String> QuarterDates = dateTimeUtil.getYearDateList1(4);
+    public List<TutHistoryStatistical> historyStatisticalByWeek() {
+        List<String> weekDates = dateTimeUtil.getDayDateList(8);
 
-        String firstTime1 = QuarterDates.get(0);
-        String firstTime2 = QuarterDates.get(1);
-        String firstTime3 = QuarterDates.get(2);
-        String firstTime4 = QuarterDates.get(3);
+        String firstTime1 = weekDates.get(0);
+        String firstTime2 = weekDates.get(1);
+        String firstTime3 = weekDates.get(2);
+        String firstTime4 = weekDates.get(3);
+        String firstTime5 = weekDates.get(4);
+        String firstTime6 = weekDates.get(5);
+        String firstTime7 = weekDates.get(6);
+        String firstTime8 = weekDates.get(7);
 
-        QuarterEntity quarterEntity = tUnionTaskDao.getHistoryByQuarter(firstTime1,firstTime2,firstTime3,firstTime4);
-        return quarterEntity;
+
+        Map<String,Integer> map = tUnionTaskDao.getHistoryByWeek(firstTime1,firstTime2,firstTime3,firstTime4,
+                firstTime5,firstTime6,firstTime7,firstTime8);
+        System.out.println("map是："+map);
+        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+
+        Iterator<String> iter = map.keySet().iterator();
+        while(iter.hasNext()){
+            String key=iter.next();
+            String timeNode =  key.substring(0,7);
+            Number mapValue = (Number)map.get(key);
+            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
+            tutHistoryStatistical.setTimeNode(timeNode);
+            tutHistoryStatistical.setCount(mapValue);
+            tutHistoryStatisticalList.add(tutHistoryStatistical);
+        }
+        Collections.sort(tutHistoryStatisticalList,new Comparator<TutHistoryStatistical>(){
+            @Override
+            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+                String timeNode1 =  o1.getTimeNode().substring(8,10);
+                Integer a1 = Integer.valueOf(timeNode1);
+                String timeNode2 =  o2.getTimeNode().substring(8,10);
+                Integer a2 = Integer.valueOf(timeNode2);
+                return a1 - a2;
+            }
+        });
+        return tutHistoryStatisticalList;
     }
     @Logs(title = "联动历史记录统计--近一年", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public YearEntity historyStatisticalByYear() {
+    public List<TutHistoryStatistical> historyStatisticalByYear() {
         List<String> yearDates = dateTimeUtil.getYearDateList1(13);
 
         String firstTime1 = yearDates.get(0);
@@ -111,14 +155,60 @@ public class TUnionTaskService{
         String firstTime12 = yearDates.get(11);
         String firstTime13 = yearDates.get(12);
 
-        YearEntity quarterEntity = tUnionTaskDao.getHistoryByYear(firstTime1,firstTime2,firstTime3,firstTime4,
-                                                firstTime5,firstTime6,firstTime7,firstTime8,firstTime9,
-                                                firstTime10,firstTime11,firstTime12,firstTime13);
-        return quarterEntity;
+        Map<String,Integer> map = tUnionTaskDao.getHistoryByYear(firstTime1,firstTime2,firstTime3,firstTime4,
+                firstTime5,firstTime6,firstTime7,firstTime8,firstTime9,
+                firstTime10,firstTime11,firstTime12,firstTime13);
+        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+
+        Iterator<String> iter = map.keySet().iterator();
+        while(iter.hasNext()){
+            String key=iter.next();
+            String timeNode =  key.substring(0,7);
+            Number mapValue = (Number)map.get(key);
+
+            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
+            tutHistoryStatistical.setTimeNode(timeNode);
+            tutHistoryStatistical.setCount(mapValue);
+            tutHistoryStatisticalList.add(tutHistoryStatistical);
+        }
+//        Collections.sort(tutHistoryStatisticalList,new Comparator<TutHistoryStatistical>(){
+//            @Override
+//            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+//                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//                Calendar calendar = Calendar.getInstance();
+//                Calendar calendar2 = Calendar.getInstance();
+//                int flag = 0;
+//                try {
+//                    Date date1 = format.parse(o1.getTimeNode());
+//                    Date date2 = format.parse(o2.getTimeNode());
+//                    calendar.setTime(date1);
+//                    calendar2.setTime(date2);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//                int year = calendar.get(Calendar.YEAR);
+//                int month = calendar.get(Calendar.MONTH);
+//                int date = calendar.get(Calendar.DATE);
+//                int year1 = calendar2.get(Calendar.YEAR);
+//                int month1 = calendar2.get(Calendar.MONTH);
+//                int date1 = calendar2.get(Calendar.DATE);
+//                if (year > year1){
+//                    flag =  year - year1;
+//                    if (month > month1)
+//                    {
+//                        flag = month - month1;
+//                    }
+//                    if (date > date1)
+//                        flag =  date - date1;
+//                }
+//                return flag;
+//            }
+//        });
+        return tutHistoryStatisticalList;
     }
     @Logs(title = "联动历史记录统计--近一月", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public MonthEntity historyStatisticalByMonth() {
+    public List<TutHistoryStatistical> historyStatisticalByMonth() {
         List<String> monthDates = dateTimeUtil.getDayDateList(31);
 
         String firstTime1 = monthDates.get(0);
@@ -153,70 +243,90 @@ public class TUnionTaskService{
         String firstTime30 = monthDates.get(29);
         String firstTime31 = monthDates.get(30);
 
-        MonthEntity dayEntity = tUnionTaskDao.getHistoryByMonth(firstTime1,firstTime2,firstTime3,firstTime4,firstTime5,
-                                                            firstTime6,firstTime7,firstTime8,firstTime9,firstTime10,
-                                                            firstTime11,firstTime12,firstTime13,firstTime14,firstTime15,
-                                                            firstTime16,firstTime17,firstTime18,firstTime19,firstTime20,
-                                                            firstTime21,firstTime22,firstTime23,firstTime24,firstTime25,
-                                                            firstTime26,firstTime27,firstTime28,firstTime29,firstTime30,
-                                                            firstTime31);
-        return dayEntity;
+        Map<String,Integer> map = tUnionTaskDao.getHistoryByMonth(firstTime1,firstTime2,firstTime3,firstTime4,firstTime5,
+                firstTime6,firstTime7,firstTime8,firstTime9,firstTime10,
+                firstTime11,firstTime12,firstTime13,firstTime14,firstTime15,
+                firstTime16,firstTime17,firstTime18,firstTime19,firstTime20,
+                firstTime21,firstTime22,firstTime23,firstTime24,firstTime25,
+                firstTime26,firstTime27,firstTime28,firstTime29,firstTime30,
+                firstTime31);
+        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+
+        Iterator<String> iter = map.keySet().iterator();
+
+        while(iter.hasNext()){
+            String key=iter.next();
+            String timeNode =  key.substring(0,10);
+            Number mapValue = (Number)map.get(key);
+
+            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
+            tutHistoryStatistical.setTimeNode(timeNode);
+            tutHistoryStatistical.setCount(mapValue);
+            tutHistoryStatisticalList.add(tutHistoryStatistical);
+        }
+        Collections.sort(tutHistoryStatisticalList,new Comparator<TutHistoryStatistical>(){
+            @Override
+            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+                String timeNode1 =  o1.getTimeNode().substring(8,10);
+                Integer a1 = Integer.valueOf(timeNode1);
+                String timeNode2 =  o2.getTimeNode().substring(8,10);
+                Integer a2 = Integer.valueOf(timeNode2);
+
+                return a1 - a2;
+            }
+        });
+        return tutHistoryStatisticalList;
     }
     @Logs(title = "联动记录存储", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insertRecord(Long ruleId,Long robotId,Date createTime) {
-            //新增联合巡视预案数据
-            TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
-            TUnionTask tUnionTask = new TUnionTask();
-            tUnionTask.setUnionId(String.valueOf(UUID.randomUUID()).replace("-", ""));
-            tUnionTask.setRuleId(ruleId);
-            tUnionTask.setUnionName(tCfgUnionRule.getRuleName()+tCfgUnionRule.getPlanId());
-            tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
-            tUnionTask.setRobotId(robotId);
-            tUnionTask.setIsFinish(1);
-            tUnionTask.setCreateTime(createTime);
+    public int insertRecord(Long ruleId,Long robotId,Date createTime,String paramValues) {
+        TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
+        TUnionTask tUnionTask = new TUnionTask();
+        tUnionTask.setUnionId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        tUnionTask.setRuleId(ruleId);
+        tUnionTask.setUnionName(tCfgUnionRule.getRuleName()+tCfgUnionRule.getPlanId());
+        tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
+        tUnionTask.setRobotId(robotId);
+        tUnionTask.setIsFinish(1);
+        tUnionTask.setCreateTime(createTime);
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            //计算巡视时间
-            Date startTime = new Date();
-            startTime.setSeconds(createTime.getSeconds() + tCfgUnionRule.getRuleDelay());
-            tUnionTask.setStartTime(startTime);
-            tUnionTask.setParamValues(tCfgUnionRule.getInputParam());
+        //计算巡视时间
+        Date startTime = new Date();
+        startTime.setSeconds(createTime.getSeconds() + tCfgUnionRule.getRuleDelay());
+        tUnionTask.setStartTime(startTime);
+        tUnionTask.setParamValues(paramValues);
 
-//            System.out.println("tUnionTask是："+tUnionTask);
-            tUnionTaskDao.insert(tUnionTask);
+        int result01 = tUnionTaskDao.insert(tUnionTask);
 
-            //新增联合巡视预案属性数据
-            List<TUnionTaskDetail> tUnionTaskDetailList = tUnionTaskDao.selectUnionDetail(ruleId);
-//            System.out.println("tUnionTaskDetailList是："+tUnionTaskDetailList);
-            List<TUnionTaskAttr> tUnionTaskAttrList = new ArrayList<>();
-            for(TUnionTaskDetail tUnionTaskDetail:tUnionTaskDetailList){
-                TUnionTaskAttr tUnionTaskAttr = new TUnionTaskAttr();
+        //新增联合巡视预案属性数据
+        List<TUnionTaskDetail> tUnionTaskDetailList = tUnionTaskDao.selectUnionDetail(ruleId);
+        List<TUnionTaskAttr> tUnionTaskAttrList = new ArrayList<>();
+        for(TUnionTaskDetail tUnionTaskDetail:tUnionTaskDetailList){
+            TUnionTaskAttr tUnionTaskAttr = new TUnionTaskAttr();
 
-                tUnionTaskAttr.setUnionId(tUnionTask.getUnionId());
-                tUnionTaskAttr.setInstanceId(tUnionTaskDetail.getInstanceId());
-                tUnionTaskAttr.setDeviceCustomId(tUnionTaskDetail.getDeviceCustomId());
-                tUnionTaskAttr.setDeviceMeteId(tUnionTaskDetail.getDeviceMeteId());
-                if(tUnionTaskDetail.getCruiseType()==228){
-                    tUnionTaskAttr.setIfRobot(1);
-                }else
-                    tUnionTaskAttr.setIfRobot(0);
-                if(tUnionTaskDetail.getCruiseType()==229){
-                    tUnionTaskAttr.setIfVideo(1);
-                }else
-                    tUnionTaskAttr.setIfVideo(0);
-                if(tUnionTaskDetail.getCruiseType()==230){
-                    tUnionTaskAttr.setIfInferad(1);
-                }else
-                    tUnionTaskAttr.setIfInferad(0);
+            tUnionTaskAttr.setUnionId(tUnionTask.getUnionId());
+            tUnionTaskAttr.setInstanceId(tUnionTaskDetail.getInstanceId());
+            tUnionTaskAttr.setDeviceCustomId(tUnionTaskDetail.getDeviceCustomId());
+            tUnionTaskAttr.setDeviceMeteId(tUnionTaskDetail.getDeviceMeteId());
+            if(tUnionTaskDetail.getCruiseType()==228){
+                tUnionTaskAttr.setIfRobot(1);
+            }else
+                tUnionTaskAttr.setIfRobot(0);
+            if(tUnionTaskDetail.getCruiseType()==229){
+                tUnionTaskAttr.setIfVideo(1);
+            }else
+                tUnionTaskAttr.setIfVideo(0);
+            if(tUnionTaskDetail.getCruiseType()==230){
+                tUnionTaskAttr.setIfInferad(1);
+            }else
+                tUnionTaskAttr.setIfInferad(0);
 
-                tUnionTaskAttrList.add(tUnionTaskAttr);
-            }
-//            tUnionTaskDao.insertRecordDetail(tUnionTaskAttrList);
-            System.out.println("tUnionTaskAttrList是："+tUnionTaskAttrList);
-            TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
+            tUnionTaskAttrList.add(tUnionTaskAttr);
+        }
+        System.out.println("tUnionTaskAttrList是："+tUnionTaskAttrList);
+        TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
 
-        return 11111;
+        int result02 = TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
+        return result01+result02;
     }
 }
-

@@ -70,6 +70,28 @@ public class TCruiseResultService{
         Integer userID = Integer.valueOf(userId);
         String userName = tCruiseResultDao.selectUserName(userID);
         cruiseManualReview.setCheckUser(userName);
+
+        String taskId  = cruiseManualReview.getTaskId();
+        String executeTime = cruiseManualReview.getExecuteTime();
+        List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskId,executeTime);
+        TCruiseResult tCruiseResult = new TCruiseResult();
+        HashSet<String> has = new HashSet<>();
+        for (CruiseManualReview cMR:cruiseManualReviewList){
+            if (cMR.getEvaluationState()==257){
+                break;
+            }else {
+                has.add(cMR.getCheckUser());
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String checkUser:has){
+            sb.append(checkUser + ",");
+        }
+        String jieGuo1 = sb.toString().substring(0,sb.toString().length()-1);
+        tCruiseResult.setCheckUser(jieGuo1);
+        tCruiseResult.setCheckDate(new Date());
+        System.out.println("tCruiseResult是："+tCruiseResult);
+        tCruiseResultDao.update(tCruiseResult);
         return this.tCruiseResultDao.manualReview(cruiseManualReview);
     }
     @Logs(title = "巡视任务结果统计", code = "module")
