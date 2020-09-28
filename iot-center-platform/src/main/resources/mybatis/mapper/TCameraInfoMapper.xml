@@ -269,7 +269,7 @@
           LEFT JOIN t_camera_info b ON a.camera_id = b.camera_id
     </select>
 
-    <select id="selectForMap" resultType="java.util.HashMap">
+    <select id="selectALL" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
         select *
         from t_camera_info
     </select>

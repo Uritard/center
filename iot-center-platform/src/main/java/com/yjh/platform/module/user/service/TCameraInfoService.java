@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -142,24 +143,17 @@ public class TCameraInfoService {
     }
 
 
+
     @Logs(title = "将cameraInfo数据放入redis", code = "cameraInfo")
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
-        List<Map<String,Object>> list = this.tCameraInfoDao.selectForMap();
-            for (Map<String, Object> item : list) {
-                Map<String,Object> stringObjectMap = item;
-                Map<String,Object> map2 = new HashMap<>();
-                for (String key : stringObjectMap.keySet()) {
-                    Object s = stringObjectMap.get(key);
-                    String s2 = String.valueOf(s);
-                    System.out.println(key + ": " + s2);
-                    map2.put(key,s2);
-                }
-                String str = "cameraInfo:"+String.valueOf(item.get("camera_id"));
-                redisTemplate.opsForHash().putAll(str, map2);
-
+        List<TCameraInfo> list =tCameraInfoDao.selectALL();
+        for (TCameraInfo item:list) {
+            Map map = Object2Map.toStringMap(Object2Map.objectToMap(item,true));
+            String str = "CameraInfo:"+item.getCameraId();
+            redisTemplate.opsForHash().putAll(str, map);
         }
-        return 1;
+       return 1;
     }
 
 
