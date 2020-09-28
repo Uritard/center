@@ -445,51 +445,51 @@
     </delete>
 
     <select id="selectDeviceMete" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
-        SELECT DISTINCT
-	          b.device_mete_id AS deviceMeteId,
-	          b.device_id AS deviceId,
-	          d.mete_name AS meteName
-         FROM
-	       t_std_device c
-              LEFT JOIN (
-	                (
-		              t_cruise_point_instance a
-		             LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-	                )
-	             LEFT JOIN t_std_devicemete d ON a.device_mete_id = d.device_mete_id
-               ) ON b.device_id = c.device_id
-              WHERE
-	       a.instance_id IN (
-		   SELECT
-			instance_id
-		FROM
-			t_cruise_task_result_detail
-	    )
+         SELECT DISTINCT
+            b.device_mete_id AS "deviceMeteId",
+            b.device_id AS "deviceId",
+            b.mete_name AS "meteName"
+            FROM
+                (
+                    (
+                        t_std_device a
+                        JOIN t_std_devicemete b ON a.device_id = b.device_id
+                    )
+                    JOIN t_cruise_point_instance c ON b.device_mete_id = c.device_mete_id
+                )
+            JOIN (
+                t_cruise_task_result_detail d
+                LEFT JOIN t_cruise_data_result e ON d.cruise_result_id = e.cruise_result_id
+            ) ON c.instance_id = d.instance_id
+            ORDER BY
+                d.end_time DESC
     </select>
 
     <select id="selectDeviceMeteByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
           SELECT DISTINCT
-	          b.device_mete_id AS deviceMeteId,
-	          b.device_id AS deviceId,
-	          d.mete_name AS meteName
-         FROM
-	       t_std_device c
-              LEFT JOIN (
-	                (
-		              t_cruise_point_instance a
-		             LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-	                )
-	             LEFT JOIN t_std_devicemete d ON a.device_mete_id = d.device_mete_id
-               ) ON b.device_id = c.device_id
-          WHERE
-            a.device_id = #{deviceId,jdbcType=BIGINT}
-          and a.instance_id IN
-           (
-             SELECT instance_id FROM t_cruise_task_result_detail
-           )
+	             b.device_mete_id AS "deviceMeteId",
+                 b.device_id AS "deviceId",
+                 b.mete_name AS "meteName"
+            FROM
+                (
+                    (
+                        t_std_device a
+                        JOIN t_std_devicemete b ON a.device_id = b.device_id
+                    )
+                    JOIN t_cruise_point_instance c ON b.device_mete_id = c.device_mete_id
+                )
+            JOIN (
+                t_cruise_task_result_detail d
+                LEFT JOIN t_cruise_data_result e ON d.cruise_result_id = e.cruise_result_id
+            ) ON c.instance_id = d.instance_id
+
+            WHERE
+                b.device_id = #{deviceId,jdbcType=BIGINT}
+            ORDER BY
+                d.end_time DESC
 
     </select>
-    
+
     <select id="getdeviceMeteByPointinstance" parameterType="java.lang.Long" resultType="java.lang.Long">
         SELECT DISTINCT
 	        a.device_mete_id

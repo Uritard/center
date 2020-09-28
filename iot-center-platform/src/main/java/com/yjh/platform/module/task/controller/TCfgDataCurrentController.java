@@ -4,6 +4,8 @@ import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.service.TCfgDataCurrentService;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import io.swagger.annotations.*;
 import org.apache.commons.logging.Log;
@@ -18,9 +20,6 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 
 /**
@@ -116,6 +115,11 @@ public class TCfgDataCurrentController {
         try {
             List<TCfgDataCurrent> list = tCfgDataCurrentService.select(meteId, deviceId, cunstomId, recordTime, meteKind, regionId, meteValue, lastMeteValue);
             result.setData(list);
+            Log cLogger = LogFactory.getLog(this.getClass());
+            LocalDate localDate=LocalDate.now();
+            LocalTime localTime=LocalTime.now();
+            cLogger.info(localDate);
+            cLogger.info(localTime);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

@@ -25,9 +25,9 @@ import javax.script.ScriptException;
 
 
 /**
-* @author czh
-* @since 2020-08-25
-*/
+ * @author czh
+ * @since 2020-08-25
+ */
 @Service
 public class TCfgDataCurrentService {
 
@@ -88,52 +88,39 @@ public class TCfgDataCurrentService {
 
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<TCfgDataCurrent> list){
+    public int batchInsert(List<TCfgDataCurrent> list) {
         return this.tCfgDataCurrentDao.batchInsert(list);
     }
 
-//    @Logs(title = "联动规则一次匹配",code = "module")
-//    @Transactional(rollbackFor = Exception.class)
-//    public Set<TCfgUnionRule> unionRuleslMatch(){
-//        Set<TCfgUnionRule> result=new HashSet<>();
-//        List<Long> meteIds= tCfgDataCurrentDao.selectAllMeteId();
-//        for(Long meteId:meteIds){
-//            List<TCfgUnionRule> rules=tCfgUnionRuleDao.selectUnionRuleByMeteId(meteId.toString());
-//            for(TCfgUnionRule rule:rules){
-//                result.add(rule);
-//            }
-//        }
-//       return result;
-//    }
 
-    @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断",code = "module")
+    @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public Set<Long> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
-        Set<Long> plans=new HashSet<>( );//满足触发条件的预案
+        Set<Long> plans = new HashSet<>();//满足触发条件的预案
         Log cLogger = LogFactory.getLog(this.getClass());
         //联动规则一次匹配
-        Set<TCfgUnionRule> rules=new HashSet<>();
+        Set<TCfgUnionRule> rules = new HashSet<>();
 
-        for(Long meteId:meteIds){
-            List<TCfgUnionRule> unionrules=tCfgUnionRuleDao.selectUnionRuleByMeteId(meteId.toString());
-            for(TCfgUnionRule rule:unionrules){
+        for (Long meteId : meteIds) {
+            List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteId.toString());
+            for (TCfgUnionRule rule : unionrules) {
                 cLogger.info(rule.getInputParam());
                 rules.add(rule);
             }
         }
-        Set<Long> meteIdR=new HashSet<>();//一次匹配到的规则所涵盖的所有meteId
-        for(TCfgUnionRule rule:rules){
-            String[]currentMeteId=rule.getInputParam().split(", ");
-            for(int i=0;i<currentMeteId.length;i++){
+        Set<Long> meteIdR = new HashSet<>();//一次匹配到的规则所涵盖的所有meteId
+        for (TCfgUnionRule rule : rules) {
+            String[] currentMeteId = rule.getInputParam().split(", ");
+            for (int i = 0; i < currentMeteId.length; i++) {
                 meteIdR.add(Long.valueOf(currentMeteId[i]));
             }
         }
 
-        //实时数据加载
-        List<TCfgDataCurrent> currents=new ArrayList<>();
-        for(Long meteId:meteIdR){
-            TCfgDataCurrent currentDates=tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
-            if(currentDates!=null){
+        //根据一次匹配拿到的meteId获取实时数据
+        List<TCfgDataCurrent> currents = new ArrayList<>();
+        for (Long meteId : meteIdR) {
+            TCfgDataCurrent currentDates = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
+            if (currentDates != null) {
                 currents.add(currentDates);
             }
 
@@ -141,40 +128,41 @@ public class TCfgDataCurrentService {
 
         //规则二次匹配与规则计算，判断表达式是否触发
         // TODO: 2020/9/25 待完善--触发条件向巡检模块微服务发送预案信息Post方法;
-        for(TCfgUnionRule rule:rules){
-            String content=rule.getRuleContent().replaceAll("\\{","").replaceAll("}","").replaceAll(",","");
-            for(TCfgDataCurrent current:currents){
-                 StringBuilder stringBuilder=new StringBuilder("id:");
-                 String contentTemp=content.replaceAll((stringBuilder.append((current.getMeteId()).toString())).toString(),current.getMeteValue());
-                 content=contentTemp;
 
-                 if(content.contains("id:")){
-                     cLogger.info("未完成");
-                 }else if (content.contains("<")||content.contains(">")||content.contains("=")){
-                     ScriptEngineManager sm=new ScriptEngineManager();
-                     ScriptEngine engine=sm.getEngineByName("js");
-                     String sum=engine.eval(content).toString();
-                     if(sum=="true"){
-                         cLogger.info(content);//断面数据
-//                         tUnionTaskService.insertRecord(rule.getRuleId(),null,new Date());
-                         try {
-                             int delay=rule.getRuleDelay();
-                             Thread.sleep(delay*1000);
-                             cLogger.info(rule.getRuleName());
-                             plans.add(rule.getPlanId());
-                         } catch  (Exception e) {e.getMessage();}
-                         cLogger.info("执行预案");
-                         cLogger.info(rule.getRuleName());
-                         break;
-                     }else if(sum=="false"){
-                         cLogger.info("不满足触发条件");
-                         break;
-                     }
+        for (TCfgUnionRule rule : rules) {
+            String content = rule.getRuleContent().replaceAll("\\{", "").replaceAll("}", "").replaceAll(",", "");
+            for (TCfgDataCurrent current : currents) {
+                StringBuilder stringBuilder = new StringBuilder("id:");
+                String contentTemp = content.replaceAll((stringBuilder.append((current.getMeteId()).toString())).toString(), current.getMeteValue());
+                content = contentTemp;
 
-                 }else {
-                     cLogger.info("表达式错误");
-                 }
+                if (content.contains("id:")) {
+                    cLogger.info("未完成");
+                } else if (content.contains("<") || content.contains(">") || content.contains("=")) {
+                    ScriptEngineManager sm = new ScriptEngineManager();//字符串表达式计算
+                    ScriptEngine engine = sm.getEngineByName("js");
+                    String sum = engine.eval(content).toString();
+                    if (sum == "true") {
+                        tUnionTaskService.insertRecord(rule.getRuleId(), null, new Date(), content);
+                        try {
+                            int delay = rule.getRuleDelay();
+                            Thread.sleep(delay * 1000);
+                            cLogger.info(rule.getRuleName());
+                            plans.add(rule.getPlanId());
+                        } catch (Exception e) {
+                            e.getMessage();
+                        }
+                        cLogger.info("执行预案");
+                        cLogger.info(rule.getRuleName());
+                        break;
+                    } else if (sum == "false") {
+                        cLogger.info("不满足触发条件");
+                        break;
+                    }
 
+                } else {
+                    cLogger.info("表达式错误");
+                }
 
             }
 
@@ -182,15 +170,16 @@ public class TCfgDataCurrentService {
         return plans;
     }
 
-    @Logs(title = "联动记录滚动刷新",code = "module")
+    @Logs(title = "联动记录滚动刷新", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Map unionRecordRoll(String unionId){
+    public Map unionRecordRoll(String unionId) {
         // TODO: 2020/9/25 功能待完善--联动记录Id-单个/多个（demo仅使用单个）;记录结果集可用新类型来装（demo临时使用Map）
-        TUnionTask tUnionTask=tUnionTaskDao.selectByPrimaryId(unionId);
-        Map<String,Object> unionRecord=new HashMap<>();
-        unionRecord.put("unionId",tUnionTask.getUnionId());
-        unionRecord.put("unionName",tUnionTask.getUnionName());
-        unionRecord.put("startTime",tUnionTask.getStartTime());
+        // TODO: 2020/9/28  告警信息滚动刷新
+        TUnionTask tUnionTask = tUnionTaskDao.selectByPrimaryId(unionId);
+        Map<String, Object> unionRecord = new HashMap<>();
+        unionRecord.put("unionId", tUnionTask.getUnionId());
+        unionRecord.put("unionName", tUnionTask.getUnionName());
+        unionRecord.put("startTime", tUnionTask.getStartTime());
         return unionRecord;
     }
 

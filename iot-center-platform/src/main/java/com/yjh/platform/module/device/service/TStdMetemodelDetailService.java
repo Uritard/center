@@ -42,13 +42,6 @@ public class TStdMetemodelDetailService{
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdMeteModelDetail tStdMeteModelDetail) {
-//        List<CustomInfo> customInfoList=tStdDeviceDao.selectCustomInfoByDict();
-//       for(CustomInfo customInfo:customInfoList){
-//           if(tStdMeteModelDetail.getcustomTypeName().equals(customInfo.getcustomTypeName())){
-//               tStdMeteModelDetail.setCustomType(customInfo.getCustomType());
-//           }
-//       }
-
         return this.tStdMetemodelDetailDao.update(tStdMeteModelDetail);
     }
 

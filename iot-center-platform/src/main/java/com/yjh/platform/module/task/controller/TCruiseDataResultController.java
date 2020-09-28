@@ -182,7 +182,7 @@ public class TCruiseDataResultController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId);
+              List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfos);
             result.setData(resultMap);

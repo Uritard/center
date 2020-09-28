@@ -34,7 +34,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        model_id, mete_id, custom_id, mete_code, mete_name, mete_type,mete_kind, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
+        model_id, mete_id, custom_id, mete_name, mete_type,mete_kind, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
     </sql>
 
 

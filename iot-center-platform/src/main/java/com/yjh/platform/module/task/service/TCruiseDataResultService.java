@@ -11,6 +11,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -100,19 +102,20 @@ public class TCruiseDataResultService{
              deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
              deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
      }
+
      //按时间降序排列
-        Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
-            @Override
-            public int compare(CruiseResultAnalMeteInfo o1, CruiseResultAnalMeteInfo o2) {
-                int flag = o1.getEndTime().compareTo(o2.getEndTime());
-                if(flag == -1){
-                    flag = 1;
-                }else if(flag == 1){
-                    flag = -1;
-                }
-                return flag;
-            }
-        });
+//        Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
+//            @Override
+//            public int compare(CruiseResultAnalMeteInfo o1, CruiseResultAnalMeteInfo o2) {
+//                int flag = o1.getEndTime().compareTo(o2.getEndTime());
+//                if(flag == -1){
+//                    flag = 1;
+//                }else if(flag == 1){
+//                    flag = -1;
+//                }
+//                return flag;
+//            }
+//        });
        return cruiseResultAnalMeteInfos;
     }
 
