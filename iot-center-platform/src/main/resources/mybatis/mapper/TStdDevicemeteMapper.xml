@@ -11,7 +11,6 @@
         <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="device_type" jdbcType="INTEGER" property="deviceType" />
-        <result column="custom_type" jdbcType="INTEGER" property="customType" />
         <result column="position_type" jdbcType="VARCHAR" property="positionType" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
@@ -37,7 +36,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, custom_type, position_type, unit, alarm_note, alarm_type,
+        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, position_type, unit, alarm_note, alarm_type,
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
         mete_type, modulus, remark,state_zero,state_one,alarm_state
     </sql>
@@ -53,7 +52,6 @@
             mete_type,
             mete_name,
             device_type,
-            custom_type,
             position_type,
             unit,
             alarm_note,
@@ -81,13 +79,12 @@
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
-                #{customId, jdbcType=VARCHAR},
+                #{customType, jdbcType=VARCHAR},
                 #{meteId, jdbcType=BIGINT},
                 #{meteKind, jdbcType=INTEGER},
                 #{meteType, jdbcType=VARCHAR},
                 #{meteName, jdbcType=VARCHAR},
                 #{deviceType, jdbcType=INTEGER},
-                #{customType, jdbcType=INTEGER},
                 #{positionType, jdbcType=VARCHAR},
                 #{unit, jdbcType=VARCHAR},
                 #{alarmNote, jdbcType=VARCHAR},
@@ -128,12 +125,11 @@
         update t_std_devicemete a <set>
         <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
+        <if test="customType != null and customType != ''">a.custom_id = #{customType, jdbcType=VARCHAR},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
-        <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
@@ -168,12 +164,11 @@
         select
         a.device_mete_id,
         a.device_id,
-        a.custom_id,
+        a.custom_id as customType,
         a.mete_id,
         a.mete_kind,
         a.mete_name,
         a.device_type,
-        a.custom_type,
         a.position_type,
         a.unit,
         a.alarm_note,
@@ -203,7 +198,34 @@
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         select
-        *
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id as customType,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.mete_type,
+        a.modulus,
+        a.remark,
+        state_zero,
+        state_one,
+        alarm_state
         from t_std_devicemete a
         left join (select dict_code,dict_note as alarmLevelName from t_dict_business) g on a.alarm_level= g.dict_code
         left join(select dict_code,dict_note as alarmTypeName from t_dict_business) f on a.alarm_type= f.dict_code
@@ -213,12 +235,11 @@
         where 1=1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="customType != null and customType != ''"> and a.custom_id = #{customType, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
@@ -241,7 +262,7 @@
         <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
         <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and g.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
-        <if test="upRegionId != null and upRegionId != '' and upRegionId != 1 "> and e.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>
+<!--        <if test="upRegionId != null and upRegionId != '' and upRegionId != 1 "> and e.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>-->
     </select>
 
 
@@ -258,11 +279,10 @@
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
-        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="customType != null and customType != ''"> and a.custom_id = #{customType, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
@@ -297,7 +317,6 @@
             mete_kind,
             mete_name,
             device_type,
-            custom_type,
             position_type,
             unit,
             alarm_note,
@@ -324,12 +343,11 @@
             (
                 #{TStdDevicemete.deviceMeteId, jdbcType=BIGINT},
                 #{TStdDevicemete.deviceId, jdbcType=BIGINT},
-                #{TStdDevicemete.customId, jdbcType=VARCHAR},
+                #{TStdDevicemete.customType, jdbcType=VARCHAR},
                 #{TStdDevicemete.meteId, jdbcType=BIGINT},
                 #{TStdDevicemete.meteKind, jdbcType=INTEGER},
                 #{TStdDevicemete.meteName, jdbcType=VARCHAR},
                 #{TStdDevicemete.deviceType, jdbcType=INTEGER},
-                #{TStdDevicemete.customType, jdbcType=INTEGER},
                 #{TStdDevicemete.positionType, jdbcType=VARCHAR},
                 #{TStdDevicemete.unit, jdbcType=VARCHAR},
                 #{TStdDevicemete.alarmNote, jdbcType=VARCHAR},
@@ -358,12 +376,11 @@
     <select id="selectDevMeteByModelId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         select
         a.device_id,
-        a.custom_id,
+        a.custom_id as customType,
         c.mete_id,
         c.mete_kind,
         c.mete_name,
         b.device_type,
-        c.custom_type,
         "inside" AS position_type,
         c.unit,
         c.alarm_note,
@@ -397,19 +414,18 @@
 
     <select id="selectByDevCus" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        select * from t_std_devicemete
-       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customId,jdbcType=BIGINT}
+       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customType,jdbcType=BIGINT}
 
     </select>
 
     <select id="selectPreDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        SELECT
 	    a.device_id,
-        a.custom_id,
+        a.custom_id as cruiseType,
         b.mete_id,
         b.mete_kind,
         b.mete_name,
         a.device_type,
-        a.custom_type,
         a.position_type,
         b.unit,
         b.alarm_note,
@@ -432,7 +448,7 @@
        WHERE
 	   a.model_id = #{modelId,jdbcType=BIGINT}
        AND a.device_id = #{deviceId,jdbcType=BIGINT}
-       AND a.custom_id = #{customId,jdbcType=BIGINT}
+       AND a.custom_id = #{customType,jdbcType=BIGINT}
 
     </select>
 

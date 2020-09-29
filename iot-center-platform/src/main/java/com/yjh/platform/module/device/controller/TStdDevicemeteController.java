@@ -114,13 +114,12 @@ public class TStdDevicemeteController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                          @RequestParam(value = "deviceId", required = false) Long deviceId,
-                         @RequestParam(value = "customId", required = false) String customId,
+                         @RequestParam(value = "customType", required = false) String customType,
                          @RequestParam(value = "meteId", required = false) Long meteId,
                          @RequestParam(value = "meteKind", required = false) String meteKind,
                          @RequestParam(value = "meteType", required = false) String meteType,
                          @RequestParam(value = "meteName", required = false) String meteName,
                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
-                         @RequestParam(value = "customType", required = false) Integer customType,
                          @RequestParam(value = "positionType", required = false) String positionType,
                          @RequestParam(value = "unit", required = false) String unit,
                          @RequestParam(value = "alarmNote", required = false) String alarmNote,
@@ -143,7 +142,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmState", required = false) Integer alarmState) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind,meteType, meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customType, meteId, meteKind,meteType, meteName, deviceType,  positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -234,10 +233,10 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "设备ID与部位ID查询设备测点")
     @RequestMapping(value = "/selectByDevCus", method = RequestMethod.GET)
-    public Result selectByDevCus(@RequestParam(value = "deviceId") Long deviceId, @RequestParam(value = "customId") Long customId) {
+    public Result selectByDevCus(@RequestParam(value = "deviceId") Long deviceId, @RequestParam(value = "customType") Long customType) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> tStdDeviceMete = tStdDevicemeteService.selectByDevCus(deviceId, customId);
+            List<TStdDeviceMete> tStdDeviceMete = tStdDevicemeteService.selectByDevCus(deviceId, customType);
             result.setData(tStdDeviceMete);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -260,11 +259,11 @@ public class TStdDevicemeteController {
     @RequestMapping(value = "/selectPreDeviceMete", method = RequestMethod.GET)
     public Result selectPreDeviceMete(@RequestParam(value = "modelId") Long modelId,
                                       @RequestParam(value = "deviceId") Long deviceId,
-                                      @RequestParam(value = "customId") Long customId) {
+                                      @RequestParam(value = "customType") Long customType) {
 
         Result result = new Result();
         try {
-            List<TStdDeviceMete> tStdDeviceMete = tStdDevicemeteService.selectPreDeviceMete(modelId, deviceId, customId);
+            List<TStdDeviceMete> tStdDeviceMete = tStdDevicemeteService.selectPreDeviceMete(modelId, deviceId, customType);
             result.setData(tStdDeviceMete);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

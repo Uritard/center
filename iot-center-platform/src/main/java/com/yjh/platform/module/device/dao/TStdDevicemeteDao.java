@@ -24,13 +24,12 @@ public interface TStdDevicemeteDao {
     TStdDeviceMete selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<TStdDeviceMete> select(@Param(value = "deviceMeteId") Long deviceMeteId,
                                 @Param(value = "deviceId") Long deviceId,
-                                @Param(value = "customId") String customId,
+                                @Param(value = "customType") String customType,
                                 @Param(value = "meteId") Long meteId,
                                 @Param(value = "meteKind") String meteKind,
                                 @Param(value = "meteType") String meteType,
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "deviceType") Integer deviceType,
-                                @Param(value = "customType") Integer customType,
                                 @Param(value = "positionType") String positionType,
                                 @Param(value = "unit") String unit,
                                 @Param(value = "alarmNote") String alarmNote,
@@ -56,9 +55,9 @@ public interface TStdDevicemeteDao {
     int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);
     int deleteByDevId(@Param(value = "deviceId") Long deviceId);
-    List<TStdDeviceMete>selectByDevCus(@Param(value="deviceId")Long deviceId,@Param(value="customId")Long customId);
+    List<TStdDeviceMete>selectByDevCus(@Param(value="deviceId")Long deviceId,@Param(value="customType")Long customType);
 
-    List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customId")Long customId);
+    List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customType")Long customType);
 
     int batchDelete(@Param(value = "list") List<String> list);
 

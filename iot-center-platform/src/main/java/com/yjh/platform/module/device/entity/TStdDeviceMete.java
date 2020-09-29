@@ -30,9 +30,6 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
 
-    @ApiModelProperty(value = "部位ID")
-    private String customId;
-
     @ApiModelProperty(value = "标准测点ID")
     private Long meteId;
 

@@ -56,8 +56,8 @@ public class TStdDevicemeteService{
 
     @Logs(title = "查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId, String customId, Long meteId, String meteKind,String meteType, String meteName, Integer deviceType, Integer customType, String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark,String stateZero,String stateOne,Integer  alarmState) {
-        List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId, customId, meteId, meteKind, meteType,meteName, deviceType, customType, positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
+    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId, String customType,Long meteId, String meteKind,String meteType, String meteName, Integer deviceType,  String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark,String stateZero,String stateOne,Integer  alarmState) {
+        List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId, customType, meteId, meteKind, meteType,meteName, deviceType,  positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
         return tStdDeviceMeteList;
     }
 
@@ -110,15 +110,15 @@ public class TStdDevicemeteService{
 
     @Logs(title = "设备ID与部位ID查询设备测点", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> selectByDevCus(Long deviceId,Long customId) {
-        return this.tStdDevicemeteDao.selectByDevCus(deviceId, customId);
+    public List<TStdDeviceMete> selectByDevCus(Long deviceId,Long customType) {
+        return this.tStdDevicemeteDao.selectByDevCus(deviceId, customType);
     }
 
 
     @Logs(title = "查询生成预定义模板测点信息表",code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> selectPreDeviceMete(Long modelId,Long deviceId,Long customId){
-        return this.tStdDevicemeteDao.selectPreDeviceMete(modelId,  deviceId, customId);
+    public List<TStdDeviceMete> selectPreDeviceMete(Long modelId,Long deviceId,Long customType){
+        return this.tStdDevicemeteDao.selectPreDeviceMete(modelId,  deviceId, customType);
     }
 
 
