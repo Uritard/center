@@ -142,7 +142,11 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmState", required = false) Integer alarmState) {
         Result result = new Result();
         try {
+<<<<<<< 659eeb4b9bc2bddfc1a5072b276b3f25bde69e29
             List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customType, meteId, meteKind,meteType, meteName, deviceType,  positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
+=======
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind,meteType, meteName, deviceType, positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
+>>>>>>> 缺陷[#17762]: 选择设备新增测点，输入必填项，接口返回系统异常
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

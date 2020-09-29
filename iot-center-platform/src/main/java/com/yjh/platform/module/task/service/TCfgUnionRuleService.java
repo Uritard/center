@@ -47,6 +47,7 @@ public class TCfgUnionRuleService{
             }
         tCfgUnionRule.setInputParam(list.toString().replaceAll("\\[","")
                 .replaceAll("]",""));
+            tCfgUnionRule.setRuleType("multi");
             return this.tCfgUnionRuleDao.add(tCfgUnionRule);
     }
 

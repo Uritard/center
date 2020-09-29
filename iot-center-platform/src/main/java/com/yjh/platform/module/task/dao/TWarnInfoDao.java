@@ -44,19 +44,20 @@ public interface TWarnInfoDao {
                                 @Param(value = "defectLevel") Integer defectLevel,
                                 @Param(value = "outRange") String outRange,
                                 @Param(value = "linkMessage") String linkMessage);
-    List<TWarnInfo> selectByPage(TWarnInfo tWarnInfo);
+    List<Long> selectIds(String deviceType);
+    List<TWarnInfoDetail> selectByPageWarn(HashMap<String,Object> map);
+    List<TWarnInfoDetail> selectByPageRobot(HashMap<String,Object> map);
+    List<TWarnInfoDetail> selectByPageCfg(HashMap<String,Object> map);
+    List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
 
     int batchInsert(List<TWarnInfo> list);
-    List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
+
     List<HashMap<String,Integer>> countOnMonth(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countOnMonthByCfg(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countOnMonthByRobot(HashMap<String,Object> map);
+    List<HashMap<String,Integer>> countOnMonthByWarn(HashMap<String,Object> map);
 
 
-    List<HashMap<String,Object>> selectByType(HashMap<String,Object> map);
-    List<RobotAlarm> selectByRobot(HashMap<String,Object> map);
-    List<HashMap<String,Object>> selectOthers(HashMap<String,Object> map);
-    List<HashMap<String,Integer>> countByType(HashMap<String,Object> map);
-    List<HashMap<String,Integer>> countOthers(HashMap<String,Object> map);
-    List<HashMap<String,Integer>> countByRobot(HashMap<String,Object> map);
 
 
 }

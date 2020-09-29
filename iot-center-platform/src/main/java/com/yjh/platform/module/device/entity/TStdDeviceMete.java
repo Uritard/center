@@ -42,8 +42,6 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
 
-    @ApiModelProperty(value = "部位类型")
-    private String customType;
 
     @ApiModelProperty(value = "点号位置，inside-内部设备，outside-外部设备")
     private String positionType;
