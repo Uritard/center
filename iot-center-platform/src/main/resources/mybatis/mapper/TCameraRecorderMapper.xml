@@ -27,7 +27,7 @@
         record_id, record_name, recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
     </sql>
     <sql id="TongYong">
-        a.record_id,a.record_name,a.recorder_type,b.dict_note as recorder_type1 ,a.alias_name,a.record_ip,
+        a.record_id,a.record_name,a.recorder_type,b.dict_note as recorder_type_Name ,a.alias_name,a.record_ip,
 		a.protocol,d.dict_note as protocol_type,a.http_port,a.trans_port,a.rtsp_port,a.user_name,
         a.pwd,a.protocol_url,a.max_channel,a.hdd_size,a.buffer_day,a.time_long
     </sql>
@@ -71,7 +71,7 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete  t_camera_recorder ,t_camera_info ,t_camera_info,t_algorithm_conf,t_cruise_point_instance
+        delete  t_camera_recorder ,t_camera_info ,t_algorithm_conf,t_cruise_point_instance
         from t_camera_recorder left  join t_camera_info
         on t_camera_recorder.record_id = t_camera_info.record_id
         left join t_camera_preset

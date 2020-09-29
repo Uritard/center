@@ -4,6 +4,8 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
@@ -67,32 +69,64 @@ public class TCruiseResultService{
     @Logs(title = "人工复核", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview,String userId) {
+        //获取审核人
         Integer userID = Integer.valueOf(userId);
         String userName = tCruiseResultDao.selectUserName(userID);
         cruiseManualReview.setCheckUser(userName);
-
+        //获取审核时间
+        Date cruiseCheckDate = new Date();
+        cruiseManualReview.setCheckDate(cruiseCheckDate);
+        //审核
+        int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
+        //获取审核后的信息
         String taskId  = cruiseManualReview.getTaskId();
         String executeTime = cruiseManualReview.getExecuteTime();
         List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskId,executeTime);
-        TCruiseResult tCruiseResult = new TCruiseResult();
-        HashSet<String> has = new HashSet<>();
+        //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
+        HashSet<String> haS1 = new HashSet<>();
         for (CruiseManualReview cMR:cruiseManualReviewList){
             if (cMR.getEvaluationState()==257){
                 break;
             }else {
-                has.add(cMR.getCheckUser());
+                haS1.add(cMR.getCheckUser());
             }
         }
         StringBuilder sb = new StringBuilder();
-        for (String checkUser:has){
+        for (String checkUser:haS1){
             sb.append(checkUser + ",");
         }
-        String jieGuo1 = sb.toString().substring(0,sb.toString().length()-1);
-        tCruiseResult.setCheckUser(jieGuo1);
-        tCruiseResult.setCheckDate(new Date());
-        System.out.println("tCruiseResult是："+tCruiseResult);
-        tCruiseResultDao.update(tCruiseResult);
-        return this.tCruiseResultDao.manualReview(cruiseManualReview);
+        String checkUserName = sb.toString().substring(0,sb.toString().length()-1);
+        System.out.println("checkUserName是："+checkUserName);
+        String taskResultId = cruiseManualReview.getTaskResultId();
+        System.out.println("taskResultId是："+taskResultId);
+        Date taskCheckDate =findLastDate(cruiseManualReviewList);
+        System.out.println("checkDate："+taskCheckDate);
+        //更新任务审核人以及审核时间
+        int result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
+
+        return result1+result2;
+    }
+    @Logs(title = "寻找离现在最近的时间", code = "module")
+    public Date findLastDate(List<CruiseManualReview> list) {
+        CruiseManualReview cruiseManualReview = new CruiseManualReview();
+
+        Long dates[] = new Long[list.size()];
+
+        for (int i = 0; i < list.size(); i++) {
+            // 把date类型的时间对象转换为long类型，时间越往后，long的值就越大，
+            // 所以就依靠这个原理来判断距离现在最近的时间
+            dates[i] = list.get(i).getCheckDate().getTime();
+        }
+
+        Long maxIndex = dates[0];// 定义最大值为该数组的第一个数
+        for (int j = 0; j < dates.length; j++) {
+            if (maxIndex < dates[j]) {
+                maxIndex = dates[j];
+                // 找到了这个j
+                cruiseManualReview = list.get(j);
+            }
+        }
+        return cruiseManualReview.getCheckDate();
     }
     @Logs(title = "巡视任务结果统计", code = "module")
     @Transactional(rollbackFor = Exception.class)

@@ -93,6 +93,7 @@
         identify_result = #{identifyResult,jdbcType=INTEGER},
         evaluation_state = 256,
         check_user = #{checkUser,jdbcType=VARCHAR},
+        check_date = #{checkDate,jdbcType=TIMESTAMP},
         identify_state = #{identifyState,jdbcType=INTEGER}
         where cruise_data_id in
             (select cruise_data_id
@@ -197,19 +198,19 @@
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
         FROM
-            (
-                (
-                    (
-                        t_cruise_result a
-                        LEFT JOIN t_dict_business d ON a.c_type = d.dict_code
-                    )
-                    LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
-                )
-                LEFT JOIN (
-                    t_cruise_task_result f
-                    LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
-                ) ON a.task_result_id = f.task_result_id
-            )
+        (
+        (
+        (
+        t_cruise_result a
+        LEFT JOIN t_dict_business d ON a.c_type = d.dict_code
+        )
+        LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
+        )
+        LEFT JOIN (
+        t_cruise_task_result f
+        LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
+        ) ON a.task_result_id = f.task_result_id
+        )
         LEFT JOIN t_cruise_task b ON a.task_id = b.task_id
         where 1 = 1
         <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
@@ -242,28 +243,28 @@
         g.identify_state,
         g.person_check
         FROM
-            (
-            t_std_device d
-            LEFT JOIN t_std_device_attr e ON d.device_id = e.device_id
-            )
+        (
+        t_std_device d
+        LEFT JOIN t_std_device_attr e ON d.device_id = e.device_id
+        )
         LEFT JOIN (
-            (
-                (
-                    t_cruise_task_result_detail b
-                    LEFT JOIN t_cruise_point_attr f ON f.instance_id = b.instance_id
-                )
-                LEFT JOIN t_cruise_result a ON a.task_result_id = b.task_result_id
-            )
-            LEFT JOIN (
-                (
-                    (
-                        t_cruise_data_result g
-                        LEFT JOIN t_dict_business h ON h.dict_code = g.cruise_type
-                    )
-                    LEFT JOIN t_dict_business k ON k.dict_code = g.evaluation_state
-                )
-                LEFT JOIN t_dict_business j ON j.dict_code = g.state
-            ) ON g.cruise_result_id = b.cruise_result_id
+        (
+        (
+        t_cruise_task_result_detail b
+        LEFT JOIN t_cruise_point_attr f ON f.instance_id = b.instance_id
+        )
+        LEFT JOIN t_cruise_result a ON a.task_result_id = b.task_result_id
+        )
+        LEFT JOIN (
+        (
+        (
+        t_cruise_data_result g
+        LEFT JOIN t_dict_business h ON h.dict_code = g.cruise_type
+        )
+        LEFT JOIN t_dict_business k ON k.dict_code = g.evaluation_state
+        )
+        LEFT JOIN t_dict_business j ON j.dict_code = g.state
+        ) ON g.cruise_result_id = b.cruise_result_id
         ) ON d.device_id = b.device_id
         WHERE 1 = 1
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=BIGINT}</if>
@@ -389,11 +390,11 @@
 
     <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
         SELECT
-				a.task_id,
-                d.evaluation_state,
-                e.dict_note as evaluation_state_name,
-				d.check_user,
-                d.check_date
+        a.task_id,
+        d.evaluation_state,
+        e.dict_note as evaluation_state_name,
+        d.check_user,
+        d.check_date
         FROM t_cruise_result a LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
         LEFT JOIN t_dict_business e on e.dict_code = d.evaluation_state
@@ -402,5 +403,14 @@
         <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime,jdbcType=TIMESTAMP}</if>
 
     </select>
+
+    <update id="updateCheck">
+        update t_cruise_result a <set>
+        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
+        <if test="checkUserName != null and checkUserName != ''">a.check_user = #{checkUserName, jdbcType=VARCHAR},</if>
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP}
+    </set>
+        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+    </update>
 
 </mapper>

@@ -58,4 +58,7 @@ public interface TCruiseResultDao {
 
     List<CruiseManualReview> selectManualDetail(@Param(value = "taskId")String taskId,
                                                 @Param(value = "executeTime")String executeTime);
+    int updateCheck(@Param(value = "taskResultId")String taskResultId,
+                    @Param(value = "checkUserName")String checkUserName,
+                    @Param(value = "checkDate")Date checkDate);
 }

@@ -27,7 +27,7 @@ public class TCameraRecorderByDict {
     private String recordName;
 
     @ApiModelProperty(value = "NVR类型")
-    private String recorderType1;
+    private String recorderTypeName;
 
     @ApiModelProperty(value = "录像机类型")
     private String recorderType;

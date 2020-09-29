@@ -52,13 +52,13 @@ public class TRobotInfoController {
             String userId = request.getHeader("userId");
             tRobotInfo.setCreateBy(userId);
 
-            if(tRobotInfo.getRobotIp()!= null){
+            if(tRobotInfo.getRobotIp()!= null && !"".equals(tRobotInfo.getRobotIp())){
                 String robotIp = tRobotInfo.getRobotIp();
                 if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
                     result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
                 }
             }
-            if(tRobotInfo.getRobotPort()!=null){
+            if(tRobotInfo.getRobotPort()!=null && !"".equals(tRobotInfo.getRobotPort())){
                 String robotPort = tRobotInfo.getRobotPort().toString();
                 if (!robotPort.matches("^([1-9]|[1-9]\\d{1,3}|[1-6][0-5][0-5][0-3][0-5])$")) {
                     result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
