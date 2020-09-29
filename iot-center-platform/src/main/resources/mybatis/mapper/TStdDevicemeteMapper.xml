@@ -79,7 +79,7 @@
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
-                #{customType, jdbcType=VARCHAR},
+                #{customId, jdbcType=VARCHAR},
                 #{meteId, jdbcType=BIGINT},
                 #{meteKind, jdbcType=INTEGER},
                 #{meteType, jdbcType=VARCHAR},
@@ -125,7 +125,7 @@
         update t_std_devicemete a <set>
         <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="customType != null and customType != ''">a.custom_id = #{customType, jdbcType=VARCHAR},</if>
+        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
@@ -164,7 +164,7 @@
         select
         a.device_mete_id,
         a.device_id,
-        a.custom_id as customType,
+        a.custom_id,
         a.mete_id,
         a.mete_kind,
         a.mete_name,
@@ -200,7 +200,7 @@
         select
         a.device_mete_id,
         a.device_id,
-        a.custom_id as customType,
+        a.custom_id,
         a.mete_id,
         a.mete_kind,
         a.mete_name,
@@ -235,7 +235,7 @@
         where 1=1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="customType != null and customType != ''"> and a.custom_id = #{customType, jdbcType=VARCHAR}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
@@ -279,7 +279,7 @@
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
-        <if test="customType != null and customType != ''"> and a.custom_id = #{customType, jdbcType=VARCHAR}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
@@ -343,7 +343,7 @@
             (
                 #{TStdDevicemete.deviceMeteId, jdbcType=BIGINT},
                 #{TStdDevicemete.deviceId, jdbcType=BIGINT},
-                #{TStdDevicemete.customType, jdbcType=VARCHAR},
+                #{TStdDevicemete.customId, jdbcType=VARCHAR},
                 #{TStdDevicemete.meteId, jdbcType=BIGINT},
                 #{TStdDevicemete.meteKind, jdbcType=INTEGER},
                 #{TStdDevicemete.meteName, jdbcType=VARCHAR},
@@ -376,7 +376,7 @@
     <select id="selectDevMeteByModelId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         select
         a.device_id,
-        a.custom_id as customType,
+        a.custom_id,
         c.mete_id,
         c.mete_kind,
         c.mete_name,
@@ -414,7 +414,7 @@
 
     <select id="selectByDevCus" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        select * from t_std_devicemete
-       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customType,jdbcType=BIGINT}
+       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customId,jdbcType=BIGINT}
 
     </select>
 
@@ -448,7 +448,7 @@
        WHERE
 	   a.model_id = #{modelId,jdbcType=BIGINT}
        AND a.device_id = #{deviceId,jdbcType=BIGINT}
-       AND a.custom_id = #{customType,jdbcType=BIGINT}
+       AND a.custom_id = #{customId,jdbcType=BIGINT}
 
     </select>
 
