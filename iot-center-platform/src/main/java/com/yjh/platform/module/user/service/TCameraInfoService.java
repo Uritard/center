@@ -1,19 +1,23 @@
 package com.yjh.platform.module.user.service;
 
+
 import com.yjh.platform.common.utils.Object2Map;
+
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
+
 import java.util.*;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
+
+
 
 
 /**
@@ -143,7 +147,6 @@ public class TCameraInfoService {
     }
 
 
-
     @Logs(title = "将cameraInfo数据放入redis", code = "cameraInfo")
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
@@ -155,8 +158,6 @@ public class TCameraInfoService {
         }
        return 1;
     }
-
-
 
 
 }
