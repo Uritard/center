@@ -25,7 +25,6 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.ShortByReference;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
 import java.util.List;
@@ -4123,6 +4122,14 @@ EMAIL参数结构
     NativeLong NET_DVR_RealPlay(NativeLong lUserID, NET_DVR_CLIENTINFO lpClientInfo);
     NativeLong NET_DVR_RealPlay_V30(NativeLong lUserID, NET_DVR_CLIENTINFO lpClientInfo, FRealDataCallBack_V30 fRealDataCallBack_V30, Pointer pUser, boolean bBlocked);
     NativeLong NET_DVR_RealPlay_V40(NativeLong lUserID, NET_DVR_PREVIEWINFO lpPreviewInfo, FRealDataCallBack_V30 fRealDataCall, Pointer pUser);
+
+    //预览相关接口
+    NativeLong NET_DVR_RealPlay(int lUserID, NET_DVR_CLIENTINFO lpClientInfo);
+
+    NativeLong NET_DVR_RealPlay_V30(int lUserID, NET_DVR_CLIENTINFO lpClientInfo, FRealDataCallBack_V30 fRealDataCallBack_V30, Pointer pUser, boolean bBlocked);
+
+    boolean NET_DVR_StopRealPlay(int lRealHandle);
+
     boolean  NET_DVR_StopRealPlay(NativeLong lRealHandle);
     boolean  NET_DVR_RigisterDrawFun(NativeLong lRealHandle, FDrawFun fDrawFun, int dwUser);
     boolean  NET_DVR_SetPlayerBufNumber(NativeLong lRealHandle, int dwBufNum);

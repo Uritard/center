@@ -30,11 +30,12 @@ public class AccessVideoApplication implements CommandLineRunner {
     private String sdkPath;//sdk路径
 
     private int lUserID;//用户句柄
-    private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     //设备登录信息
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
     //设备信息
     private HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
+
+    private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
 
     public static void main(String[] args) {
         SpringApplication.run(AccessVideoApplication.class, args);

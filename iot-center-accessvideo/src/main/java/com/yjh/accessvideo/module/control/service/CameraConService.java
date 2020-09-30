@@ -35,7 +35,7 @@ public class CameraConService {
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private NativeLong m_lRealPalyHandle = new NativeLong(-1);
-    private NativeLong lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+    private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();	// play structure
 
 
@@ -103,10 +103,13 @@ public class CameraConService {
         lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
         //TODO
         String sPicFileName = filePath;
-        if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, sPicFileName)) {
-            log.error("抓图失败");
-            return false;
-        }
+        if (Objects.nonNull(Constant.maps.get("lUserID"))) {
+            lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+            if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, sPicFileName)) {
+                log.error("抓图失败");
+                return false;
+            }
+        } else {return false;}
         return true;
     }
 
@@ -127,8 +130,11 @@ public class CameraConService {
 
     private NativeLong realPlay(int lChannel) {
         m_sClientInfo.lChannel = new NativeLong(lChannel);
+        if (Objects.nonNull(Constant.maps.get("lUserID"))) {
+            lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
         return hCNetSDK.NET_DVR_RealPlay_V30(lUserIDLong,
                 m_sClientInfo, null, null, true);
+        } else { return lUserIDLong;}
     }
 
 //    NativeLong lRealHandle = new NativeLong(0);

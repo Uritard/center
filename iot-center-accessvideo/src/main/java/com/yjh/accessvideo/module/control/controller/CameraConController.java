@@ -1,27 +1,18 @@
 package com.yjh.accessvideo.module.control.controller;
 
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.examples.win32.W32API;
-import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
-import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.omg.SendingContext.RunTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.*;
-
-import java.awt.*;
-import java.io.*;
-import java.util.Map;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author tt
@@ -47,7 +38,7 @@ public class CameraConController {
                          @RequestParam(value = "channelId") int iChanNum) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum));
+            result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum+32));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -62,7 +53,7 @@ public class CameraConController {
     public Result stopRealPlay(@RequestParam(value = "channelId") int iChanNum) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.stopRealPlay(iChanNum));
+            result.setData(cameraConService.stopRealPlay(iChanNum+32));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -80,7 +71,7 @@ public class CameraConController {
                              @RequestParam(value = "iChanNum") int iChanNum) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.pTZControl(dwPTZCommand, iChanNum));
+            result.setData(cameraConService.pTZControl(dwPTZCommand, iChanNum+32));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -96,7 +87,7 @@ public class CameraConController {
                                 @RequestParam(value = "iChanNum") int iChanNum) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.capturePicture(filePath, iChanNum));
+            result.setData(cameraConService.capturePicture(filePath, iChanNum+32));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -113,7 +104,7 @@ public class CameraConController {
                                  @RequestParam(value = "iChanNum") int iChanNum) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.presetAction(iPreset, iChanNum));
+            result.setData(cameraConService.presetAction(iPreset, iChanNum+32));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

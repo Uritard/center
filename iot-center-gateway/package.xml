@@ -33,10 +33,11 @@
         <fileSet>  
             <directory>${project.basedir}/src/main/resources/</directory>  
             <outputDirectory>config</outputDirectory>
-            <!--<includes>
+            <includes>
                 <include>*.*</include>
                 <include>*.properties</include>
-            </includes> -->
+                <include>lib/*</include>
+            </includes>
         </fileSet>
         <!-- 把项目脚本，打包进zip文件的script目录 -->
 		<fileSet>  
