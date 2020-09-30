@@ -47,10 +47,7 @@ public class TCfgUnionRuleService{
             }
         tCfgUnionRule.setInputParam(list.toString().replaceAll("\\[","")
                 .replaceAll("]",""));
-<<<<<<< Updated upstream
             tCfgUnionRule.setRuleType("multi");
-=======
->>>>>>> Stashed changes
             return this.tCfgUnionRuleDao.add(tCfgUnionRule);
     }
 
