@@ -233,7 +233,7 @@
     <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
             #{deviceMeteId,jdbcType=BIGINT}
     </foreach>
-    order by a.device_mete_id desc
+    order by a.device_id desc
     </select>
 
     <select id="selectSYForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail" resultType="java.lang.String">
