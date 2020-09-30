@@ -270,6 +270,7 @@
     </select>
 
     <select id="selectALL" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+
         select *
         from t_camera_info
     </select>

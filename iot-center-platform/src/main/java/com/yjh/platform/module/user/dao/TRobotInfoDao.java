@@ -61,4 +61,5 @@ public interface TRobotInfoDao {
 
     List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")Long taskId);
 
+
 }

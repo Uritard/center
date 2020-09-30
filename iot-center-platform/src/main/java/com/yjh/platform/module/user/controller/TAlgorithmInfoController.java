@@ -48,7 +48,7 @@ public class TAlgorithmInfoController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_algorithm_name") != -1) {
-                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode());
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(),ResultCodeEnum.CREATEORUPDATEERROR.getName());
                 result.setData("算法名称重复");
             } else {
                 result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());

@@ -196,42 +196,25 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
-        a.device_mete_id,
-        a.device_id,
-        a.custom_id,
-        a.mete_id,
-        a.mete_kind,
-        a.mete_name,
-        a.device_type,
-        a.position_type,
-        a.unit,
-        a.alarm_note,
-        a.alarm_type,
-        a.up_effect,
-        a.down_effect,
-        a.alarm_level,
-        a.high_limit1,
-        a.low_limit1,
-        a.high_limit2,
-        a.low_limit2,
-        a.alarm_delay,
-        a.alarm_cnt,
-        a.threshold_abs,
-        a.threshold_per,
-        a.mete_type,
-        a.modulus,
-        a.remark,
-        state_zero,
-        state_one,
-        alarm_state
+        a.*,
+        g.dict_note as alarmLevelName,
+        f.dict_note as alarmTypeName,
+        i.dict_note as customName,
+        b.dict_note as meteTypeName,
+        d.dict_note as meteKindName,
+        e.device_name as deviceName,
+        e.up_region_id,
+        h.dict_note as unitName
         from t_std_devicemete a
-        left join (select dict_code,dict_note as alarmLevelName from t_dict_business) g on a.alarm_level= g.dict_code
-        left join(select dict_code,dict_note as alarmTypeName from t_dict_business) f on a.alarm_type= f.dict_code
-        left join(select dict_code,dict_note as meteTypeName from t_dict_business) b on a.mete_type= b.dict_code
-        left join(select dict_code,dict_note as meteKindName from t_dict_business) d on a.mete_kind= d.dict_code
-        left join(select device_id,device_name as deviceName,custom_name as customName from t_std_device) e on a.device_id = e.device_id
+        left join  t_dict_business g on a.alarm_level= g.dict_code
+        left join t_dict_business f on a.alarm_type= f.dict_code
+        left join t_dict_business b on a.mete_type= b.dict_code
+        left join t_dict_business d on a.mete_kind= d.dict_code
+        left join t_std_device e on a.device_id = e.device_id
+        left join t_dict_business h on a.unit = h.dict_code
+        left join t_dict_business i on a.custom_id = i.dict_code
         where 1=1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
@@ -268,14 +251,23 @@
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
-        *
+        a.*,
+        g.dict_note as alarmLevelName,
+        f.dict_note as alarmTypeName,
+        i.dict_note as customName,
+        b.dict_note as meteTypeName,
+        d.dict_note as meteKindName,
+        e.device_name as deviceName,
+        e.up_region_id,
+        h.dict_note as unitName
         from t_std_devicemete a
-        left join (select dict_code,dict_note as alarmLevelName from t_dict_business) g on a.alarm_level= g.dict_code
-        left join(select dict_code,dict_note as alarmTypeName from t_dict_business) f on a.alarm_type= f.dict_code
-        left join(select dict_code,dict_note as meteTypeName from t_dict_business) b on a.mete_type= b.dict_code
-        left join(select dict_code,dict_note as meteKindName from t_dict_business) d on a.mete_kind= d.dict_code
-        left join(select device_id,device_name as deviceName,custom_name as customName,up_region_id from t_std_device) e on a.device_id = e.device_id
-        left join(select dict_code,dict_note as unitName from t_dict_business) h on a.unit = h.dict_code
+        left join  t_dict_business g on a.alarm_level= g.dict_code
+        left join t_dict_business f on a.alarm_type= f.dict_code
+        left join t_dict_business b on a.mete_type= b.dict_code
+        left join t_dict_business d on a.mete_kind= d.dict_code
+        left join t_std_device e on a.device_id = e.device_id
+        left join t_dict_business h on a.unit = h.dict_code
+        left join t_dict_business i on a.custom_id = i.dict_code
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
