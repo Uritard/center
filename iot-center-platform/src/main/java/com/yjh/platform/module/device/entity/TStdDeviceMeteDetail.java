@@ -24,7 +24,9 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
 
     private String unitName;
 
-    private String customName;
+    private String customType;
+
+    private String customTypeName;
 
     private String deviceName;
 

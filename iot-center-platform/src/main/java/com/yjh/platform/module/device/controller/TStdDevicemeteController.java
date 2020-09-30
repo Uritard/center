@@ -51,10 +51,10 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TStdDeviceMete tStdDeviceMete) {
+    public Result add(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         Result result = new Result();
         try {
-            result.setData(tStdDevicemeteService.add(tStdDeviceMete));
+            result.setData(tStdDevicemeteService.add(tStdDeviceMeteDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -82,10 +82,10 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TStdDeviceMete tStdDeviceMete) {
+    public Result update(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         Result result = new Result();
         try {
-            result.setData(tStdDevicemeteService.update(tStdDeviceMete));
+            result.setData(tStdDevicemeteService.update(tStdDeviceMeteDetail));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("标准设备测点更新异常:", e);

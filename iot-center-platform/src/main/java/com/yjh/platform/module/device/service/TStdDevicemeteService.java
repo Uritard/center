@@ -32,8 +32,8 @@ public class TStdDevicemeteService{
 
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public int add(TStdDeviceMete tStdDeviceMete) {
-        return this.tStdDevicemeteDao.add(tStdDeviceMete);
+    public int add(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        return this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
     }
 
     @Logs(title = "删除", code = "device")
@@ -44,8 +44,8 @@ public class TStdDevicemeteService{
 
     @Logs(title = "更新", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public int update(TStdDeviceMete tStdDeviceMete) {
-        return this.tStdDevicemeteDao.update(tStdDeviceMete);
+    public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }
 
     @Logs(title = "主键查询", code = "device")

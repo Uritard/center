@@ -17,10 +17,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TStdDevicemeteDao {
 
-    int add(TStdDeviceMete tStdDeviceMete);
+    int add(TStdDeviceMeteDetail tStdDeviceMeteDetail);
     int deleteByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
-    int update(TStdDeviceMete tStdDeviceMete);
+    int update(TStdDeviceMeteDetail tStdDeviceMeteDetail);
     TStdDeviceMete selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<TStdDeviceMete> select(@Param(value = "deviceMeteId") Long deviceMeteId,
                                 @Param(value = "deviceId") Long deviceId,

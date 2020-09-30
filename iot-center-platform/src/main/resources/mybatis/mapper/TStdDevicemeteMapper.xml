@@ -42,7 +42,7 @@
     </sql>
 
 
-    <insert id="add" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+    <insert id="add" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         insert into t_std_devicemete(
             device_mete_id,
             device_id,
@@ -79,7 +79,7 @@
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
-                #{customId, jdbcType=VARCHAR},
+                #{customType, jdbcType=VARCHAR},
                 #{meteId, jdbcType=BIGINT},
                 #{meteKind, jdbcType=INTEGER},
                 #{meteType, jdbcType=VARCHAR},
@@ -121,11 +121,11 @@
                 where device_id = #{deviceId, jdbcType=BIGINT}
     </delete>
 
-    <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         update t_std_devicemete a <set>
         <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
+        <if test="customType != null and customType != ''">a.custom_id = #{customType, jdbcType=VARCHAR},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=VARCHAR},</if>
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
@@ -198,10 +198,37 @@
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
-        a.*,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id as customType,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.mete_type,
+        a.modulus,
+        a.remark,
+        state_zero,
+        state_one,
+        alarm_state,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
-        i.dict_note as customName,
+        i.dict_note as customTypeName,
         b.dict_note as meteTypeName,
         d.dict_note as meteKindName,
         e.device_name as deviceName,
@@ -251,10 +278,37 @@
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
-        a.*,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id as customType,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.mete_type,
+        a.modulus,
+        a.remark,
+        state_zero,
+        state_one,
+        alarm_state,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
-        i.dict_note as customName,
+        i.dict_note as customTypeName,
         b.dict_note as meteTypeName,
         d.dict_note as meteKindName,
         e.device_name as deviceName,

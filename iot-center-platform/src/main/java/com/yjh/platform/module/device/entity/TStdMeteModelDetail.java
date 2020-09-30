@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "TStdMetemodelDetail对象", description = "系统测点模版详细表")
-public class TStdMeteModelDetail extends TStdDeviceMete implements Serializable {
+public class TStdMeteModelDetail extends TStdDeviceMeteDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
