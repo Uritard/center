@@ -87,6 +87,25 @@
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
     </select>
 
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
+        select
+        a.plan_id,
+        a.plan_name,
+        a.type,
+        a.plan_point_types,
+        (select count(*) from t_cruise_plan_attr b where b.plan_id = a.plan_id) as total,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan a
+        where 1 = 1
+        <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="planName != null and planName != ''"> and a.plan_name like concat('%',#{planName, jdbcType=VARCHAR},'%') </if>
+        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
     <select id="selectByPlanPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlanCountByPage">
         select
         a.plan_id,
