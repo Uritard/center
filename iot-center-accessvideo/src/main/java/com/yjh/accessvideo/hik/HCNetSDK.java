@@ -25,6 +25,7 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.ShortByReference;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,8 +34,11 @@ import java.util.List;
 //SDK接口说明,HCNetSDK.dll
 public interface HCNetSDK extends Library {
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh/iot-center-accessvideo-1.0.0/config/library/libhcnetsdk.so",
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh_iot_center/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
             HCNetSDK.class);
+
+//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk",
+//            HCNetSDK.class);
     /***宏定义***/
     //常量
 
@@ -4417,6 +4421,9 @@ interface PlayCtrl extends Library
 {
     PlayCtrl INSTANCE = (PlayCtrl) Native.loadLibrary("PlayCtrl",
             PlayCtrl.class);
+
+//    PlayCtrl INSTANCE = (PlayCtrl) Native.loadLibrary("/home/yjh/iot-center-accessvideo-1.0.0/config/lib/libPlayCtrl.so",
+//            PlayCtrl.class);
 
     public static final int STREAME_REALTIME = 0;
     public static final int STREAME_FILE = 1;

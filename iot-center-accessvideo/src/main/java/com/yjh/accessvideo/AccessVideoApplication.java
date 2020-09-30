@@ -26,6 +26,8 @@ public class AccessVideoApplication implements CommandLineRunner {
     private String m_sPassword;//设备密码
     @Value("${nvr.server.port}")
     private Short m_port;//设备端口
+    @Value("${nvr.sdk.path}")
+    private String sdkPath;//sdk路径
 
     private int lUserID;//用户句柄
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
@@ -41,8 +43,8 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         log.info("videoAccess is running...");
-        if (!hCNetSDK.NET_DVR_Init()) { log.error("初始化失败"); return;} else { log.info("初始化成功");}
-        if (register()) {log.info("go on");}
+        if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return;} else { log.info("init success..");}
+        if (register()) {log.info("register success..");}
     }
 
     private boolean register() {
@@ -69,11 +71,30 @@ public class AccessVideoApplication implements CommandLineRunner {
         lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
 
         if (lUserID == -1) {
-            log.error("注册失败，错误号:" + hCNetSDK.NET_DVR_GetLastError());
+            log.error("register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
             return false;
         } else {
             Constant.maps.put("lUserID", lUserID);
-            log.info("注册成功");
+            //设置HCNetSDKCom组件库所在路径
+            String strPathCom = sdkPath;
+            HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
+            System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
+            struComPath.write();
+            hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
+
+            //设置libcrypto.so所在路径
+            HCNetSDK.BYTE_ARRAY ptrByteArrayCrypto = new HCNetSDK.BYTE_ARRAY(256);
+            String strPathCrypto = sdkPath+"/libcrypto.so";
+            System.arraycopy(strPathCrypto.getBytes(), 0, ptrByteArrayCrypto.byValue, 0, strPathCrypto.length());
+            ptrByteArrayCrypto.write();
+            hCNetSDK.NET_DVR_SetSDKInitCfg(3, ptrByteArrayCrypto.getPointer());
+
+            //设置libssl.so所在路径
+            HCNetSDK.BYTE_ARRAY ptrByteArraySsl = new HCNetSDK.BYTE_ARRAY(256);
+            String strPathSsl = sdkPath+"/libssl.so";
+            System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
+            ptrByteArraySsl.write();
+            hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
             return true;
         }
     }
