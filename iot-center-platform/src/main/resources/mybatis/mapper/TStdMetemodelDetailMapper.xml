@@ -69,7 +69,7 @@
         )values(
                 #{modelId, jdbcType=BIGINT},
                 #{meteId, jdbcType=BIGINT},
-                #{customType, jdbcType=VARCHAR},
+                #{customId, jdbcType=VARCHAR},
                 #{meteName, jdbcType=VARCHAR},
                 #{meteType, jdbcType=VARCHAR},
                 #{meteKind, jdbcType=INTEGER},
@@ -272,8 +272,8 @@
         LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
         AND b.col_name = "custom_type"
         )
-        LEFT JOIN t_dict_business c ON a.mete_kind = c.dict_code
-        AND c.col_name = "mete_kind"
+        LEFT JOIN t_dict_business c ON a.mete_type = c.dict_code
+        AND c.col_name = "mete_type"
         )
         LEFT JOIN (
         t_std_metemodel d
