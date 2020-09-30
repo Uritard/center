@@ -139,7 +139,7 @@ public class TStdMetemodelService {
           TStdMeteModelDetail detail=new TStdMeteModelDetail();
           detail.setModelId(modelId);
           detail.setMeteId(mete.getStdMeteId());
-          detail.setCustomTypeName("本体");
+          detail.setCustomId("101");
           detail.setMeteName(mete.getMeteName());
           detail.setMeteType(mete.getMeteType());
           detail.setMeteKind(mete.getMeteKind());//插入meteKind
@@ -226,7 +226,7 @@ public class TStdMetemodelService {
                 TStdMeteModelDetail detail=new TStdMeteModelDetail();
                 detail.setModelId(modelCreator.getModelId());
                 detail.setMeteId(mete.getStdMeteId());
-                detail.setCustomTypeName("本体");
+                detail.setCustomId("101");
                 detail.setMeteName(mete.getMeteName());
                 detail.setMeteType(mete.getMeteType());
                 detail.setMeteKind(mete.getMeteKind());//插入meteKind
@@ -263,7 +263,7 @@ public class TStdMetemodelService {
                     TStdMeteModelDetail detail=new TStdMeteModelDetail();
                     detail.setModelId(modelCreator.getModelId());
                     detail.setMeteId(mete.getStdMeteId());
-                    detail.setCustomTypeName("本体");
+                    detail.setCustomId("101");
                     detail.setMeteName(mete.getMeteName());
                     detail.setMeteType(mete.getMeteType());
                     detail.setMeteKind(mete.getMeteKind());//插入meteKind
