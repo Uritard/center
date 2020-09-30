@@ -39,6 +39,11 @@ public class TStdMeteModelDetail extends TStdDeviceMete implements Serializable 
     @ApiModelProperty(value = "信号解释")
     private String alarmExplain;
 
+    @ApiModelProperty(value = "customId前端接收替代量")
+    private String customType;
+
+    private String modelName;
+
 
 
 

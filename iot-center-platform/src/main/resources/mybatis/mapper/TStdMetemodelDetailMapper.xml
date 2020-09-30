@@ -263,7 +263,8 @@
         a.alarm_cnt,
         a.threshold_abs,
         a.threshold_per,
-        a.modulus
+        a.modulus,
+        d.model_name
         FROM
         (
         (
