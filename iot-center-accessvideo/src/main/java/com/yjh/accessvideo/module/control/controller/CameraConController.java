@@ -45,7 +45,7 @@ public class CameraConController {
                          @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum+32,livePath));
+            result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum,livePath));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class CameraConController {
                                @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.stopRealPlay(iChanNum+32));
+            result.setData(cameraConService.stopRealPlay(iChanNum));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
