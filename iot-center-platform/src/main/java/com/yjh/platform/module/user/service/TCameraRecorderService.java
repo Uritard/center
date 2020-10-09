@@ -4,6 +4,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
+import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,11 @@ public class TCameraRecorderService {
     public List<TCameraRecorderByDict> selectByPage(TCameraRecorder tCameraRecorder) {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(tCameraRecorder);
         return tCameraRecorderByDictList;
+    }
+    @Logs(title = "查询部分信息", code = "TCameraRecorder")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCameraRecorderDetail> selectIdAndName(){
+        return tCameraRecorderDao.selectIdAndName();
     }
 
     @Logs(title = "批量插入", code = "TCameraRecorder")

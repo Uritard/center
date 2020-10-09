@@ -222,6 +222,13 @@
         </foreach>
     </insert>
 
+    <select id="selectIdAndName"  resultType="com.yjh.platform.module.user.entity.TCameraRecorderDetail">
+        select
+        a.record_id,
+        a.record_name
+        from t_camera_recorder a
+    </select>
+
 
 
 </mapper>

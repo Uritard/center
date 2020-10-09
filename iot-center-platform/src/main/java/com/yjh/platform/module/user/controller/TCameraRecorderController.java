@@ -177,4 +177,17 @@ public class TCameraRecorderController {
         return result;
     }
 
+    @ApiOperation(value = "查询Id和name")
+    @RequestMapping(value = "/selectIdAndName", method = RequestMethod.GET)
+    public Result selectIdAndName() {
+        Result result = new Result();
+        try {
+            result.setData(tCameraRecorderService.selectIdAndName());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询Id和name失败：" + e);
+        }
+        return result;
+    }
+
 }

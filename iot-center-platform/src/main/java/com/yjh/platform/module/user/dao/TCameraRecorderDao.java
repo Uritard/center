@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
+import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -38,4 +39,5 @@ public interface TCameraRecorderDao {
     List<TCameraRecorderByDict> selectByPage(TCameraRecorder tCameraRecorder);
 
     int batchInsert(List<TCameraRecorder> list);
+    List<TCameraRecorderDetail> selectIdAndName();
 }
