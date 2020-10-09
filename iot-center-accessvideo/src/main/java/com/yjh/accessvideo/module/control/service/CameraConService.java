@@ -48,6 +48,7 @@ public class CameraConService {
         StringBuilder dataBack = new StringBuilder();
         try {
             String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, livePath);
+            log.info("transUrl: "+transUrl);
 //            transUrl = "/usr/bin/ffmpeg -loglevel debug -rtsp_transport tcp -i rtsp://admin:hik12345@192.168.33.2:554/Streaming/Channels/101?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/123";
             Process process=Runtime.getRuntime().exec(transUrl);
             process.waitFor();
