@@ -37,6 +37,7 @@
                 <include>*.*</include>
                 <include>*.properties</include>
                 <include>lib/*</include>
+                <include>lib/HCNetSDKCom/*</include>
             </includes>
         </fileSet>
         <!-- 把项目脚本，打包进zip文件的script目录 -->

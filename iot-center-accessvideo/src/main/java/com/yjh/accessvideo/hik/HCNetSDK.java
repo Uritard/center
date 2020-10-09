@@ -4114,6 +4114,7 @@ EMAIL参数结构
     boolean  NET_DVR_Logout_V30(NativeLong lUserID);
     int  NET_DVR_GetLastError();
     String   NET_DVR_GetErrorMsg(NativeLongByReference pErrorNo);
+    String   NET_DVR_GetErrorMsg(NativeLong pErrorNo);
     boolean  NET_DVR_SetShowMode(int dwShowType, int colorKey);
     boolean  NET_DVR_GetDVRIPByResolveSvr(String sServerIP, short wServerPort, String sDVRName, short wDVRNameLen, String sDVRSerialNumber, short wDVRSerialLen, String sGetIP);
     boolean   NET_DVR_GetDVRIPByResolveSvr_EX(String sServerIP, short wServerPort, String sDVRName, short wDVRNameLen, String sDVRSerialNumber, short wDVRSerialLen, String sGetIP, IntByReference dwPort);
@@ -4401,6 +4402,7 @@ EMAIL参数结构
 
     //启用日志文件写入接口
     boolean  NET_DVR_SetLogToFile(boolean bLogEnable, String strLogDir, boolean bAutoDel);
+    boolean NET_DVR_SetLogToFile(int nLogLevel, String strLogDir, boolean bAutoDel);
     boolean  NET_DVR_GetSDKState(NET_DVR_SDKSTATE pSDKState);
     boolean  NET_DVR_GetSDKAbility(NET_DVR_SDKABL pSDKAbl);
     boolean  NET_DVR_GetPTZProtocol(NativeLong lUserID, NET_DVR_PTZCFG pPtzcfg);

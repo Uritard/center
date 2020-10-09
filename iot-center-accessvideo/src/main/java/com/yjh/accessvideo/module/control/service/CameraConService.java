@@ -1,8 +1,10 @@
 package com.yjh.accessvideo.module.control.service;
 
 import com.sun.jna.NativeLong;
+import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.logs.Logs;
+import com.yjh.accessvideo.commons.utils.threadPool.ExecutorsUtil;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.device.dao.FormatDao;
 import com.yjh.accessvideo.module.device.entity.Format;
@@ -41,11 +43,11 @@ public class CameraConService {
 
     @Logs(title = "相机播放", code = "cameraPlay")
     @Transactional(rollbackFor = Exception.class)
-    public String startRealPlay(String cameraIp, int cameraPort, String userName, String password, int iChanNum) {
+    public String startRealPlay(String cameraIp, int cameraPort, String userName, String password, int iChanNum, int livePath) {
         String line = null;
         StringBuilder dataBack = new StringBuilder();
         try {
-            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum);
+            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, livePath);
 //            transUrl = "/usr/bin/ffmpeg -loglevel debug -rtsp_transport tcp -i rtsp://admin:hik12345@192.168.33.2:554/Streaming/Channels/101?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/123";
             Process process=Runtime.getRuntime().exec(transUrl);
             process.waitFor();
@@ -88,10 +90,13 @@ public class CameraConService {
             return "fail";
         }
         if (hCNetSDK.NET_DVR_PTZControl(m_lRealPalyHandle, dwPTZCommand, 0)) {
+            try {
+                Thread.sleep(200);
+            } catch (Exception e) {e.getMessage();}
             hCNetSDK.NET_DVR_PTZControl(m_lRealPalyHandle, dwPTZCommand, 1);
             hCNetSDK.NET_DVR_StopRealPlay(m_lRealPalyHandle);
             return "success";
-        } else { return "errorInfo: "+hCNetSDK.NET_DVR_GetLastError(); }
+        } else { return "PTZ control fail, errorInfo: "+hCNetSDK.NET_DVR_GetLastError(); }
     }
 
     @Logs(title = "相机抓图", code = "capturePicture")
@@ -99,15 +104,14 @@ public class CameraConService {
     public boolean capturePicture(String filePath, int iChanNum) {
         NativeLong iChanNumLong = new NativeLong(iChanNum);
         HCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new HCNetSDK.NET_DVR_JPEGPARA();
-        lpJpegPara.wPicSize = 5;
+        lpJpegPara.wPicSize = 0xff;
         lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
-        //TODO
-        String sPicFileName = filePath;
         if (Objects.nonNull(Constant.maps.get("lUserID"))) {
             lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
-            if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, sPicFileName)) {
-                log.error("抓图失败");
-                return false;
+            log.info("lUserIDLong: "+lUserIDLong);
+            if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath)) {
+                log.error("capture picture fail, error code: "+hCNetSDK.NET_DVR_GetLastError());
+                            return false;
             }
         } else {return false;}
         return true;
@@ -115,14 +119,14 @@ public class CameraConService {
 
     @Logs(title = "预置点调用", code = "presetAction")
     @Transactional(rollbackFor = Exception.class)
-    public boolean presetAction(int iPreset, int iChanNum) {
+    public boolean PresetAction(int iPreset, int iChanNum, int presetCmd) {
         m_lRealPalyHandle = realPlay(iChanNum);
         if (m_lRealPalyHandle.intValue() == -1) {
             log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
             return false;
         }
-        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPalyHandle, HCNetSDK.GOTO_PRESET, iPreset)) {
-            log.error("调用预置点失败，预置点：" + iPreset);
+        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPalyHandle, presetCmd, iPreset)) {
+            log.error("set presetPoint fail, presetId：" + iPreset+", error code: "+hCNetSDK.NET_DVR_GetLastError());
             return false;
         }
         return true;

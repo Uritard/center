@@ -3,16 +3,20 @@ package com.yjh.accessvideo.module.control.controller;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
+import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Random;
 
 /**
  * @author tt
@@ -28,6 +32,9 @@ public class CameraConController {
     @Autowired
     private CameraConService cameraConService;
 
+    @Value("${nvr.capture.picture}")
+    private String sdkPicturePath;//图片路径
+
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
     public Result startRealPlay(
@@ -35,10 +42,11 @@ public class CameraConController {
                          @RequestParam(value = "cameraPort") int cameraPort,
                          @RequestParam(value = "userName") String userName,
                          @RequestParam(value = "password") String password,
-                         @RequestParam(value = "channelId") int iChanNum) {
+                         @RequestParam(value = "iChanNum") int iChanNum,
+                         @RequestParam(value = "livePath") int livePath) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum+32));
+            result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum+32,livePath));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -50,7 +58,7 @@ public class CameraConController {
 
     @ApiOperation(value = "相机停止播放")
     @RequestMapping(value = "/stopRealPlay", method = RequestMethod.GET)
-    public Result stopRealPlay(@RequestParam(value = "channelId") int iChanNum) {
+    public Result stopRealPlay(@RequestParam(value = "iChanNum") int iChanNum) {
         Result result = new Result();
         try {
             result.setData(cameraConService.stopRealPlay(iChanNum+32));
@@ -58,7 +66,7 @@ public class CameraConController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("相机播放失败:", e);
+            log.error("相机停止播放失败:", e);
         }
         return result;
     }
@@ -83,11 +91,15 @@ public class CameraConController {
 
     @ApiOperation(value = "相机抓图")
     @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
-    public Result capturePicture(@RequestParam(value = "filePath") String filePath,
-                                @RequestParam(value = "iChanNum") int iChanNum) {
+    public Result capturePicture(@RequestParam(value = "iChanNum") int iChanNum) {
         Result result = new Result();
         try {
+            int max=9999,min=1;
+            int ran = (int) (Math.random()*(max-min)+min);
+            String filePath = sdkPicturePath + "/" + System.currentTimeMillis()+ ran + ".jpeg";
+            log.info("filePath: "+filePath);
             result.setData(cameraConService.capturePicture(filePath, iChanNum+32));
+            result.setMessage("filePath: "+filePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -97,19 +109,50 @@ public class CameraConController {
         return result;
     }
 
-//    8 设置预置点 9 清除预置点 39 转到预置点
-    @ApiOperation(value = "预置点调用")
-    @RequestMapping(value = "/presetAction", method = RequestMethod.GET)
-    public Result presetAction(@RequestParam(value = "iPreset") int iPreset,
-                                 @RequestParam(value = "iChanNum") int iChanNum) {
+    @ApiOperation(value = "转到预置点")
+    @RequestMapping(value = "/moveToPreset", method = RequestMethod.GET)
+    public Result moveToPreset(@RequestParam(value = "iPreset") int iPreset,
+                                @RequestParam(value = "iChanNum") int iChanNum) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.presetAction(iPreset, iChanNum+32));
+            result.setData(cameraConService.PresetAction(iPreset, iChanNum+32, HCNetSDK.GOTO_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("预置点调用失败:", e);
+            log.error("转到预置点失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "设置预置点")
+    @RequestMapping(value = "/setPreset", method = RequestMethod.GET)
+    public Result setPreset(@RequestParam(value = "iPreset") int iPreset,
+                             @RequestParam(value = "iChanNum") int iChanNum) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.PresetAction(iPreset, iChanNum+32, HCNetSDK.SET_PRESET));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("设置预置点失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "清除预置点")
+    @RequestMapping(value = "/cancelPreset", method = RequestMethod.GET)
+    public Result cancelPreset(@RequestParam(value = "iPreset") int iPreset,
+                                @RequestParam(value = "iChanNum") int iChanNum) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.PresetAction(iPreset, iChanNum+32, HCNetSDK.CLE_PRESET));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("清除预置点失败:", e);
         }
         return result;
     }
