@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Random;
-
 /**
  * @author tt
  * @since 2020-08-20
@@ -43,7 +41,8 @@ public class CameraConController {
                          @RequestParam(value = "userName") String userName,
                          @RequestParam(value = "password") String password,
                          @RequestParam(value = "iChanNum") int iChanNum,
-                         @RequestParam(value = "livePath") int livePath) {
+                         @RequestParam(value = "livePath") int livePath,
+                         @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             result.setData(cameraConService.startRealPlay(cameraIp, cameraPort, userName, password, iChanNum+32,livePath));
@@ -58,7 +57,8 @@ public class CameraConController {
 
     @ApiOperation(value = "相机停止播放")
     @RequestMapping(value = "/stopRealPlay", method = RequestMethod.GET)
-    public Result stopRealPlay(@RequestParam(value = "iChanNum") int iChanNum) {
+    public Result stopRealPlay(@RequestParam(value = "iChanNum") int iChanNum,
+                               @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             result.setData(cameraConService.stopRealPlay(iChanNum+32));
@@ -76,7 +76,8 @@ public class CameraConController {
     @ApiOperation(value = "云台控制")
     @RequestMapping(value = "/ptzControl", method = RequestMethod.GET)
     public Result ptzControl(@RequestParam(value = "dwPTZCommand") int dwPTZCommand,
-                             @RequestParam(value = "iChanNum") int iChanNum) {
+                             @RequestParam(value = "iChanNum") int iChanNum,
+                             @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             result.setData(cameraConService.pTZControl(dwPTZCommand, iChanNum+32));
@@ -91,7 +92,8 @@ public class CameraConController {
 
     @ApiOperation(value = "相机抓图")
     @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
-    public Result capturePicture(@RequestParam(value = "iChanNum") int iChanNum) {
+    public Result capturePicture(@RequestParam(value = "iChanNum") int iChanNum,
+                                 @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             int max=9999,min=1;
@@ -112,7 +114,8 @@ public class CameraConController {
     @ApiOperation(value = "转到预置点")
     @RequestMapping(value = "/moveToPreset", method = RequestMethod.GET)
     public Result moveToPreset(@RequestParam(value = "iPreset") int iPreset,
-                                @RequestParam(value = "iChanNum") int iChanNum) {
+                                @RequestParam(value = "iChanNum") int iChanNum,
+                               @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             result.setData(cameraConService.PresetAction(iPreset, iChanNum+32, HCNetSDK.GOTO_PRESET));
@@ -128,7 +131,8 @@ public class CameraConController {
     @ApiOperation(value = "设置预置点")
     @RequestMapping(value = "/setPreset", method = RequestMethod.GET)
     public Result setPreset(@RequestParam(value = "iPreset") int iPreset,
-                             @RequestParam(value = "iChanNum") int iChanNum) {
+                             @RequestParam(value = "iChanNum") int iChanNum,
+                            @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             result.setData(cameraConService.PresetAction(iPreset, iChanNum+32, HCNetSDK.SET_PRESET));
@@ -144,7 +148,8 @@ public class CameraConController {
     @ApiOperation(value = "清除预置点")
     @RequestMapping(value = "/cancelPreset", method = RequestMethod.GET)
     public Result cancelPreset(@RequestParam(value = "iPreset") int iPreset,
-                                @RequestParam(value = "iChanNum") int iChanNum) {
+                                @RequestParam(value = "iChanNum") int iChanNum,
+                               @RequestParam(value = "record_id") int record_id) {
         Result result = new Result();
         try {
             result.setData(cameraConService.PresetAction(iPreset, iChanNum+32, HCNetSDK.CLE_PRESET));
