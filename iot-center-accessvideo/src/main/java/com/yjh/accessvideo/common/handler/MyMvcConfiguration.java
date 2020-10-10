@@ -39,6 +39,8 @@ public class MyMvcConfiguration extends WebMvcConfigurationSupport {
                 .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/image")
+                .addResourceLocations("file:/home/yjh_iot_center/iot-center-accessvideo-1.0.0/picture/");
     }
 
     

@@ -22,4 +22,5 @@ public interface FormatDao {
     List<Format> selectByPage(Format format);
 
     int batchInsert(List<Format> list);
+
 }

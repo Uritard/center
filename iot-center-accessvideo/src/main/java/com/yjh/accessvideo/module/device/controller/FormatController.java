@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/format/v1")
-@Api(value = "/format", description = "测试表操作接口")
+@Api(value = "/format", description = "操作接口")
 public class FormatController {
 
     @Autowired

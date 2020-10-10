@@ -16,4 +16,6 @@ public class Constant {
     public static final String API_COUNT = "statistics:apiCount";
 
     public static Map<String, Integer> maps = new HashMap<>();
+
+    public static Map<String, String> mapsForCamera = new HashMap<>();
 }
