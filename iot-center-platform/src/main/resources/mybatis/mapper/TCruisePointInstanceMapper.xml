@@ -463,9 +463,9 @@
 
     <select id="selectInstancename" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT
-	      instance_name
+	      cruise_name
         FROM
-	     t_cruise_point_attr
+	     t_cruise_point_instance
         WHERE
 	    instance_id = #{instanceId,jdbcType=BIGINT}
     </select>

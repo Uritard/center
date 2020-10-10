@@ -507,7 +507,8 @@
     </delete>
 
     <select id="selectDeviceMete" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
-         SELECT DISTINCT
+         SELECT
+            distinct
             b.device_mete_id AS "deviceMeteId",
             b.device_id AS "deviceId",
             b.mete_name AS "meteName"
@@ -528,7 +529,8 @@
     </select>
 
     <select id="selectDeviceMeteByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
-          SELECT DISTINCT
+          SELECT
+                 distinct
 	             b.device_mete_id AS "deviceMeteId",
                  b.device_id AS "deviceId",
                  b.mete_name AS "meteName"

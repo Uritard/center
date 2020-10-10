@@ -170,11 +170,11 @@ public class TCfgDataCurrentService {
         return plans;
     }
 
-    @Logs(title = "联动记录滚动刷新", code = "module")
+    @Logs(title = "联动记录&&告警信息-滚动刷新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public Map unionRecordRoll(String unionId) {
         // TODO: 2020/9/25 功能待完善--联动记录Id-单个/多个（demo仅使用单个）;记录结果集可用新类型来装（demo临时使用Map）
-        // TODO: 2020/9/28  告警信息滚动刷新
+        // TODO: 2020/9/28  告警信息滚动刷新（信息获取->活动告警表?）（告警信息刷新方式：定时刷新or信号量变化时刷新?） show->不同告警类型下的数量与总数量or具体告警信息?
         TUnionTask tUnionTask = tUnionTaskDao.selectByPrimaryId(unionId);
         Map<String, Object> unionRecord = new HashMap<>();
         unionRecord.put("unionId", tUnionTask.getUnionId());
