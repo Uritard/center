@@ -203,6 +203,28 @@
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
 
+    <select id="selectByUnionKeys" resultType="com.yjh.platform.module.device.entity.TStdDevice">
+        select
+        a.device_id,
+        a.custom_id,
+        a.device_code,
+        a.device_name,
+        a.alias_name,
+        a.device_type,
+        a.position_type,
+        a.model_id,
+        a.region_path,
+        a.up_region_id,
+        a.up_region_name,
+        a.custom_name,
+        a.custom_type,
+        a.status,
+        a.update_time,
+        a.create_time
+        from t_std_device a
+        where a.device_id=#{deviceId, jdbcType=BIGINT} and a.custom_id = #{customId, jdbcType=VARCHAR}
+    </select>
+
     <select id="selectAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
         *
@@ -251,6 +273,7 @@
         <if test="sequencePoint != null and sequencePoint != ''"> and b.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
         <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
         <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
+        GROUP BY a.device_id
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
@@ -345,6 +368,8 @@
         <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
         <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
          order by a.device_id desc
+         GROUP BY a.device_id
+
     </select>
 
     <select id="selectRegionById" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdRegion">

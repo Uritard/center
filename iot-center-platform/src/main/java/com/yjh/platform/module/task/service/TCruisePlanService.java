@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TRobotInspection;
@@ -37,6 +38,7 @@ public class TCruisePlanService{
     @Logs(title = "新增预案", code = "task")
     @Transactional(rollbackFor = Exception.class)
     public int insert(Map<String, Object> map) {
+        System.out.println("_____________"+map+"________________");
         if (map.size()>0) {
             List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
             TCruisePlan tCruisePlan = new TCruisePlan();
@@ -75,7 +77,9 @@ public class TCruisePlanService{
                 tCruisePlanAttrList.add(tCruisePlanAttr);
             }
             return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
-        } else { return ResultCodeEnum.CODE10010.getCode(); }
+        } else if (Objects.isNull(map.get("instanceList"))){
+            return ResultCodeEnum.CODE10010.getCode();
+        } else{ return ResultCodeEnum.CODE10010.getCode(); }
     }
 
     @Logs(title = "删除", code = "task")

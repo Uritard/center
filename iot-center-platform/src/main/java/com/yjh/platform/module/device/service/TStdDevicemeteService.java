@@ -1,15 +1,14 @@
 package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import lombok.extern.java.Log;
@@ -29,10 +28,19 @@ public class TStdDevicemeteService{
     private TStdDevicemeteDao tStdDevicemeteDao;
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
 
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomId());//查看当前设备ID和部位ID下的设备信息
+        if(Objects.isNull(tStdDevice)){
+            TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
+            stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());
+            stdDevice.setCustomName(tStdDeviceMeteDetail.getCustomTypeName());
+            tStdDeviceDao.add(stdDevice);
+        }
         return this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
     }
 

@@ -41,6 +41,7 @@ public interface TStdDeviceDao {
                                 @Param(value = "updateTime") Date updateTime,
                                 @Param(value = "createTime") Date createTime);
     List<TStdDevice> selectByPage(TStdDevice tStdDevice);
+    TStdDevice selectByUnionKeys(@Param(value = "deviceId")Long deviceId,@Param("customId")String customId);
     List<TStdDeviceDetail> selectAll(@Param(value = "deviceId") Long deviceId,
                             @Param(value = "customId") String customId,
                             @Param(value = "deviceCode") String deviceCode,
