@@ -1,19 +1,11 @@
 package com.yjh.accessvideo.module.control.service;
 
 import com.sun.jna.NativeLong;
-import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.logs.Logs;
-import com.yjh.accessvideo.commons.logs.SpringBeanUtils;
-import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessvideo.commons.result.Result;
-import com.yjh.accessvideo.commons.utils.threadPool.ExecutorsUtil;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
-import com.yjh.accessvideo.module.device.dao.FormatDao;
-import com.yjh.accessvideo.module.device.entity.Format;
-import org.apache.http.entity.mime.content.FileBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -103,27 +93,23 @@ public class CameraConService {
 
             String url = "ps -ef | grep ffmpeg | grep '"+ livePath +"' | grep -v 'grep'";
             Process processForId=Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
-            log.info("4");
             processForId.waitFor();
-            log.info("5");
             BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
             String lineForId = null;
             StringBuilder dataBackForId = new StringBuilder();
             while ((lineForId = readerForId.readLine()) != null) {
                 dataBackForId.append(lineForId).append('\n');
             }
-            log.info("6");
             Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
             urlStop = "kill -9 "+processNum;
             Runtime.getRuntime().exec(urlStop);
-            log.info("7");
         } catch (Exception e) {e.getMessage();}
         return urlStop;
     }
 
     @Logs(title = "云台控制", code = "cameraControl")
     @Transactional(rollbackFor = Exception.class)
-    public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop) {
+    public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
         int iChanNum = cameraConInfo.getChannelNum()+32;
         m_lRealPalyHandle = realPlay(iChanNum);
@@ -132,14 +118,14 @@ public class CameraConService {
             return "fail";
         }
         if (dwPTZCommand==29) {
-            hCNetSDK.NET_DVR_PTZControl(m_lRealPalyHandle, dwPTZCommand, dStop);
+            hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, dStop, speed);
             return "success";
         } else {
-            if (hCNetSDK.NET_DVR_PTZControl(m_lRealPalyHandle, dwPTZCommand, 0)) {
+            if (hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, 0, speed)) {
                 try {
                     Thread.sleep(200);
                 } catch (Exception e) {e.getMessage();}
-                hCNetSDK.NET_DVR_PTZControl(m_lRealPalyHandle, dwPTZCommand, 1);
+                hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, 1, speed);
                 hCNetSDK.NET_DVR_StopRealPlay(m_lRealPalyHandle);
                 return "success";
             } else { return "PTZ control fail, errorInfo: "+hCNetSDK.NET_DVR_GetLastError(); }
@@ -149,7 +135,7 @@ public class CameraConService {
 
     @Logs(title = "相机抓图", code = "capturePicture")
     @Transactional(rollbackFor = Exception.class)
-    public FileBody capturePicture(String filePath, Long cameraId) {
+    public String capturePicture(String filePath, Long cameraId) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
         int iChanNum = cameraConInfo.getChannelNum()+32;
         NativeLong iChanNumLong = new NativeLong(iChanNum);
@@ -161,9 +147,10 @@ public class CameraConService {
             log.info("lUserIDLong: "+lUserIDLong);
             if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath)) {
                 log.error("capture picture fail, error code: "+hCNetSDK.NET_DVR_GetLastError());
+                return "capture picture fail, error code: "+hCNetSDK.NET_DVR_GetLastError();
             }
-        }
-        return new FileBody(new File(String.valueOf(filePath)));
+            return "success";
+        } else { return "userID is null"; }
     }
 
     @Logs(title = "预置点调用", code = "presetAction")
@@ -193,14 +180,5 @@ public class CameraConService {
         } else { return lUserIDLong;}
     }
 
-//    NativeLong lRealHandle = new NativeLong(0);
-//            if (hCNetSDK.NET_DVR_PTZControlWithSpeed(lRealHandle, dwPTZCommand, 0, 0)) {
-//        result.setData("success");
-//    } else {result.setData("errorInfo: "+hCNetSDK.NET_DVR_GetLastError());}
-//        NativeLong iChanNumLong = new NativeLong(iChanNum);
-//        NativeLong lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
-//        if (hCNetSDK.NET_DVR_PTZControl_Other(lUserIDLong,iChanNumLong, 23, 0)) {
-//            return "success";
-//        }
 }
 
