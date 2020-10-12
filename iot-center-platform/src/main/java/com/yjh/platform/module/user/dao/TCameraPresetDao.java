@@ -37,4 +37,6 @@ public interface TCameraPresetDao {
 
     int batchInsert(List<TCameraPreset> list);
     String selectPreImgByCruiseId(@Param(value = "instanceId")Long instanceId);
+
+    TCameraPreset selectLastOne();
 }

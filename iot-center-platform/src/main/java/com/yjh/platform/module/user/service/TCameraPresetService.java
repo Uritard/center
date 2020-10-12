@@ -87,5 +87,11 @@ public class TCameraPresetService {
         return this.tCameraPresetDao.batchInsert(list);
     }
 
+    @Logs(title = "查询最后一条记录", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public TCameraPreset selectLastOne() {
+        return this.tCameraPresetDao.selectLastOne();
+    }
+
 }
 

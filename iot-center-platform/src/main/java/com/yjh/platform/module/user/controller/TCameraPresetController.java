@@ -2,6 +2,10 @@ package com.yjh.platform.module.user.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.LogsAspect;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -11,9 +15,12 @@ import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.map.MultiValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -42,7 +49,17 @@ public class TCameraPresetController {
     public Result insert(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
-            result.setData(tCameraPresetService.insert(tCameraPreset));
+            //操作数据库
+            //result.setData(tCameraPresetService.insert(tCameraPreset));
+            //操作预置位
+            TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
+            MultiValueMap params = new MultiValueMap();
+            params.put(tCameraPreset1.getCameraId(),tCameraPreset1.getPresetId());
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                String restult1 = serviceRestTemplate.getForObject(Constant.SET_PRESET_URL,String.class,params);
+            }
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -57,7 +74,20 @@ public class TCameraPresetController {
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
-            result.setData(tCameraPresetService.deleteByPrimaryId(presetId));
+            //操作预置位
+            TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(presetId);
+            MultiValueMap params = new MultiValueMap();
+            params.put(tCameraPreset.getCameraId(),tCameraPreset.getPresetId());
+            System.out.println("params是："+params);
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                System.out.println("url是："+Constant.CANCEL_PRESET_URL);
+                String restult1 = serviceRestTemplate.getForObject(Constant.CANCEL_PRESET_URL,String.class,params);
+                System.out.println("restult1是："+restult1);
+
+            }
+            //操作数据库
+//            result.setData(tCameraPresetService.deleteByPrimaryId(presetId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);

@@ -264,4 +264,7 @@
 	    )
 </select>
 
+    <select id="selectLastOne" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+         select * from test_limit order by id DESC limit 1;
+    </select>
 </mapper>
