@@ -23,7 +23,8 @@ public class MyMvcConfiguration extends WebMvcConfigurationSupport {
                 //.excludePathPatterns("/configuration/ui/**")
                 .excludePathPatterns("/swagger-resources/**")
                 .excludePathPatterns("/webjars/**")
-                .excludePathPatterns("/swagger-ui.html/**");
+                .excludePathPatterns("/swagger-ui.html/**")
+                .excludePathPatterns("/image/**");
     }
     /**
      * 配置静态访问资源
@@ -39,7 +40,7 @@ public class MyMvcConfiguration extends WebMvcConfigurationSupport {
                 .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
-        registry.addResourceHandler("/image")
+        registry.addResourceHandler("/image/**")
                 .addResourceLocations("file:/home/yjh_iot_center/iot-center-accessvideo-1.0.0/picture/");
     }
 

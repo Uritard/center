@@ -7,21 +7,21 @@ import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.http.entity.mime.content.FileBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +38,9 @@ public class CameraConController {
 
     @Autowired
     private CameraConService cameraConService;
+
+    @Value("${server.port}")
+    private String serverPort;//服务端口
 
     @Value("${nvr.capture.picture}")
     private String sdkPicturePath;//图片路径
@@ -79,10 +82,11 @@ public class CameraConController {
     @RequestMapping(value = "/ptzControl", method = RequestMethod.GET)
     public Result ptzControl(@RequestParam(value = "dwPTZCommand") int dwPTZCommand,
                              @RequestParam(value = "cameraId") Long cameraId,
-                             @RequestParam(value = "dStop") int dStop) {
+                             @RequestParam(value = "dStop") int dStop,
+                             @RequestParam(value = "speed") int speed) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.pTZControl(dwPTZCommand, cameraId, dStop));
+            result.setData(cameraConService.pTZControl(dwPTZCommand, cameraId, dStop, speed));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -93,27 +97,53 @@ public class CameraConController {
     }
 
     @ApiOperation(value = "相机抓图")
-    @RequestMapping(value = "/capturePicture", method = RequestMethod.GET, produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public BufferedImage capturePicture(@RequestParam(value = "cameraId") Long cameraId) {
+    @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
+    public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
             int max=9999,min=1;
             int ran = (int) (Math.random()*(max-min)+min);
-            String filePath = sdkPicturePath + "/" + System.currentTimeMillis()+ ran + ".jpeg";
+            SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
+            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpeg";
+            String filePath = sdkPicturePath + filePathTem;
             log.info("filePath: "+filePath);
-            cameraConService.capturePicture(filePath, cameraId);
-//            resultMap.put("filePath: ", filePath);
-            Thread.sleep(2000);
-            FileInputStream inputStream = new FileInputStream(new File(filePath));
-            return ImageIO.read(inputStream);
-//            result.setData(resultMap);
+            String message = cameraConService.capturePicture(filePath, cameraId);
+            String urlPath = "http://" +getLocalIp()+":"+serverPort+"/image"+filePathTem;
+            resultMap.put("urlPath", urlPath);
+            result.setData(resultMap);
+            result.setMessage(message);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("相机抓图失败:", e);
         }
-        return null;
+        return result;
+    }
+
+    @ApiOperation(value = "预置位抓图")
+    @RequestMapping(value = "/capturePresetPicture", method = RequestMethod.GET)
+    public Result capturePresetPicture(@RequestParam(value = "presetId") Long presetId,
+                                 @RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            String filePathTem = "/" + presetId + ".jpeg";
+            String filePath = sdkPicturePath + filePathTem;
+            log.info("filePath: "+filePath);
+            String message = cameraConService.capturePicture(filePath, cameraId);
+            String urlPath = "http://" +getLocalIp()+":"+serverPort+"/image"+filePathTem;
+            resultMap.put("urlPath", urlPath);
+            result.setData(resultMap);
+            result.setMessage(message);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机抓图失败:", e);
+        }
+        return result;
     }
 
     @ApiOperation(value = "转到预置点")
@@ -162,6 +192,31 @@ public class CameraConController {
             log.error("清除预置点失败:", e);
         }
         return result;
+    }
+
+    private static String getLocalIp() throws SocketException {
+        String ip = "";
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                String name = intf.getName();
+                if (!name.contains("docker") && !name.contains("lo")) {
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress()) {
+                            String ipaddress = inetAddress.getHostAddress();
+                            if (!ipaddress.contains("::") && !ipaddress.contains("0:0:") && !ipaddress.contains("fe80")) {
+                                ip = ipaddress;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ip = "127.0.0.1";
+            ex.getMessage();
+        }
+        return ip;
     }
 
 }
