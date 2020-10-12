@@ -201,6 +201,12 @@
         </if>
     </select>
 
+    <select id="selectInstanceId" parameterType="java.lang.String" resultType="java.lang.Long">
+        select a.instance_id
+        from t_cruise_task_attr a
+        where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
+
 
 
 </mapper>

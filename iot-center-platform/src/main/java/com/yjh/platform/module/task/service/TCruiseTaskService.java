@@ -1,6 +1,9 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.quartz.JobManager;
+import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -70,8 +73,32 @@ public class TCruiseTaskService {
             tCruiseTaskAttrList.add(tCruiseTaskAttr);
         }
         //TODO 增加定时器任务
+
         this.tCruiseTaskDao.insert(tCruiseTask);
-        return this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
+        this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
+        //开启定时任务
+        QuartzTask quartzTask = new QuartzTask();
+        quartzTask.setJobName(tCruiseTask.getTaskName());
+        quartzTask.setJobGroup("qh111");
+        if(tCruiseTask.getDateType()== null){
+            //立即执行
+            quartzTask.setCronExpression(tCruiseTask.getDateType());
+            JobManager jobManager = new JobManager();
+            try {
+                Constant.taskId=tCruiseTask.getTaskId();
+                jobManager.addCruiseTaskJobNow(quartzTask);
+            } catch (Exception e) { e.getMessage(); }
+        }else{
+            //定时或周期
+            quartzTask.setCronExpression(tCruiseTask.getDateType());
+            JobManager jobManager = new JobManager();
+            try {
+                Constant.taskId=tCruiseTask.getTaskId();
+                jobManager.addCruiseTaskJob(quartzTask);
+            } catch (Exception e) { e.getMessage(); }
+        }
+
+        return 000000000;
     }
 
     @Logs(title = "删除", code = "module")

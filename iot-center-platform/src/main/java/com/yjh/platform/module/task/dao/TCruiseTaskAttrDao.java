@@ -32,4 +32,5 @@ public interface TCruiseTaskAttrDao {
 
     int batchInsert(@Param("list") List<TCruiseTaskAttr> list);
     List<TCruisePointInstance> batchSelect(@Param("instanceList") List<Long> instanceList);
+    List<Long> selectInstanceId(@Param(value = "taskId") String taskId);
 }

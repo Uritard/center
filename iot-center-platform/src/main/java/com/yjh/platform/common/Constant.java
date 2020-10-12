@@ -10,4 +10,6 @@ public class Constant {
 
 //    public static final String CANCEL_PRESET_URL = "http://iot-center-accessvideo/camera/v1/cancelPreset";
 
+    public static String taskId;
+
 }
