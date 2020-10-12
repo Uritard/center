@@ -28,18 +28,17 @@ import java.net.InetSocketAddress;
 @EnableFeignClients 
 public class PlatformApplication  implements CommandLineRunner {
 
-    @Autowired
-    private JobManager jobManager;
+
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
     }
 
     @Override
     public void run(String... strings) throws Exception {
-        QuartzTask quartzTask = new QuartzTask();
-        quartzTask.setJobName("PlatformScheduler");
-        quartzTask.setJobGroup("Platform");
-        jobManager.addJob(quartzTask);
+//        QuartzTask quartzTask = new QuartzTask();
+//        quartzTask.setJobName("PlatformScheduler");
+//        quartzTask.setJobGroup("Platform");
+//        jobManager.addJob(quartzTask);
     }
 
     @Bean
