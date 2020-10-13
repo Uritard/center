@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.platform.module.task.entity.RobotAlarm;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -57,7 +58,17 @@ public interface TWarnInfoDao {
     List<HashMap<String,Integer>> countOnMonthByRobot(HashMap<String,Object> map);
     List<HashMap<String,Integer>> countOnMonthByWarn(HashMap<String,Object> map);
 
-
+    Map<String,Integer> countOnWeek(@Param(value = "firstTime1")String firstTime1,
+                                    @Param(value = "firstTime2")String firstTime2,
+                                    @Param(value = "firstTime3")String firstTime3,
+                                    @Param(value = "firstTime4")String firstTime4,
+                                    @Param(value = "firstTime5")String firstTime5,
+                                    @Param(value = "firstTime6")String firstTime6,
+                                    @Param(value = "firstTime7")String firstTime7,
+                                    @Param(value = "firstTime8")String firstTime8);
+    Map<String, Integer> countByDeviceType();
+    Map<String, Integer> countByDeviceType2();
+    Map<String, Integer> countByDeviceType3();
 
 
 }

@@ -265,30 +265,28 @@
         where device_type = {#deviceType,jdbcType=INTEGER}
     </select>
     <select id="selectByPageWarn" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
-        a.warn_id,
-        a.warn_time,
-        a.value,
-        a.device_id,
-        b.device_name,
-        a.alarm_source,
-        a.warn_level,
-        a.conf_mode,
-        c.dict_note as warnLevelName,
-        d.dict_note as alarmSourceName,
-        e.dict_note as confModeName
+        SELECT
+            a.warn_id,
+            a.warn_time as alarm_time,
+            a.device_id,
+            b.device_name,
+            a.warn_level as alarm_level,
+            c.dict_note as alarm_level_name,
+            a.conf_mode,
+            e.dict_note as conf_mode_name,
+            a.alarm_source,
+            d.dict_note as alarm_source_name
         from t_warn_info a
         left join t_std_device b on a.device_id = b.device_id
         left join t_dict_business c on a.warn_level = c.dict_code
         left join t_dict_business d on a.alarm_source = d.dict_code
         left join t_dict_business e on a.conf_mode = e.dict_code
-        where 1=1
-        <if test="warnLevel != null"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        where 1 = 1
+        <if test="warnLevel != null"> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
         <if test="confMode != null"> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="alarmSource != null"> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="value != null"> and a.value like concat("%",#{value, jdbcType=INTEGER},"%")</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and a.warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="warnType != null"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="list != null"> and a.device_id in
             <foreach collection="list" item="deviceId" separator="," open="(" close=")">
                 #{deviceId,jdbcType=BIGINT}
@@ -321,78 +319,90 @@
     </select>
     <select id="selectByPageCfg" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         select
-		h.alarm_no as warn_id,
-		h.alarm_time as warn_time,
-		h.alarm_desc as value,
-		b.device_id as deviceId,
-		b.device_name as deviceName,
-		h.alarm_level as warn_level,
-		c.dict_note as warnLevelName,
-		from t_cfg_alarm_history h
-		left join t_std_device b on h.device_id = b.device_id
+        h.alarm_no as warn_id,
+        h.alarm_time,
+        b.device_id,
+        b.device_name,
+        h.alarm_level,
+        c.dict_note as alarm_level_name,
+        h.is_clear as conf_mode,
+        e.dict_note as conf_mode_name
+        from t_cfg_alarm_current h
+        left join t_std_device b on h.device_id = b.device_id
+        left join t_dict_business e on h.is_clear  = e.dict_code
         left join t_dict_business c on h.alarm_level  = c.dict_code
 		where 1=1
-        <if test="warnLevel != null"> and h.alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="value != null"> and h.alarm_desc like concat("%",#{value, jdbcType=INTEGER},"%")</if>
+        <if test="warnLevel != null"> and h.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and h.is_clear = #{confMode, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''"> and b.device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and h.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="warnType != null"> and h.warn_type = #{warnType, jdbcType=INTEGER}</if>
+
     </select>
     <select id="selectAllWarn" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
-        select
+        SELECT * FROM
+        (
+        SELECT
         a.warn_id,
-        a.warn_time,
-        a.value,
+        a.warn_time as alarm_time,
         a.device_id,
         b.device_name,
-        a.alarm_source,
-        a.warn_level,
+        a.warn_level as alarm_level,
+        c.dict_note as alarm_level_name,
         a.conf_mode,
-        c.dict_note as warnLevelName,
-        d.dict_note as alarmSourceName,
-        e.dict_note as confModeName
+        e.dict_note as conf_mode_name,
+        a.alarm_source,
+        d.dict_note as alarm_source_name
         from t_warn_info a
         left join t_std_device b on a.device_id = b.device_id
         left join t_dict_business c on a.warn_level = c.dict_code
         left join t_dict_business d on a.alarm_source = d.dict_code
         left join t_dict_business e on a.conf_mode = e.dict_code
-        where 1=1
+        where 1 = 1
+        union all(
+        select
+        h.alarm_no as warn_id,
+        h.alarm_time,
+        b.device_id,
+        b.device_name,
+        h.alarm_level,
+        c.dict_note as alarm_level_name,
+        h.is_clear as conf_mode,
+        e.dict_note as conf_mode_name,
+        282 as alarm_source,
+        '主辅设备' as alarm_source_name
+        from t_cfg_alarm_current h
+        left join t_std_device b on h.device_id = b.device_id
+        left join t_dict_business e on h.is_clear  = e.dict_code
+        left join t_dict_business c on h.alarm_level  = c.dict_code
+        where 1 = 1
+        )
         union all(
         select
         f.robot_alarm_id,
         f.alarm_time,
-        f.alarm_info,
         f.robot_id as deviceId,
-        g.robot_name as deviceName,
-        f.robot_id as alarmSource,
+        g.robot_name as device_name,
         f.alarm_level,
-        f.alarm_state,
-		c.dict_note as warnLevelName,
-        g.robot_name as alarmSourceName,
-        e.dict_note as confModeName
+        c.dict_note as alarm_level_name,
+        f.alarm_state as conf_mode,
+        e.dict_note as conf_mode_name,
+        279 as alarm_source,
+        '机器人' as alarm_source_name
         from robot_alarm f
         left join t_dict_business c on f.alarm_level = c.dict_code
         left join t_dict_business e on f.alarm_state = e.dict_code
         left join t_robot_info g on f.robot_id = g.robot_id
-        where 1=1
+        where 1 = 1
+        )
+        ) big_table
+        where 1 = 1
+        <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null"> and alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''"> and device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
+        <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
 
-        )union all(
-		select
-		h.alarm_no as warn_id,
-		h.alarm_time as warn_time,
-		h.alarm_desc as value,
-		b.device_id as deviceId,
-		b.device_name as deviceName,
-		null as alarmSource,
-		h.alarm_level as warn_level,
-		null as confMode,
-		c.dict_note as warnLevelName,
-		null as alaemSourceName,
-		null as confModeName
-		from t_cfg_alarm_history h
-		left join t_std_device b on h.device_id = b.device_id
-        left join t_dict_business c on h.alarm_level  = c.dict_code
-		where 1=1
-		)
+
     </select>
 
     <select id="countOnMonth" parameterType="java.util.HashMap" resultType="java.util.HashMap">
@@ -432,6 +442,39 @@
         period_diff( date_format( now( ) , '%Y-%m-%d' ) , date_format( warn_time, '%Y-%m-%d' ) ) =0
         GROUP BY
         time
+    </select>
+    <select id="countOnWeek"  resultType="java.util.Map">
+        select
+            COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime1},
+            COUNT(alarm_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime2},
+            COUNT(alarm_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime3},
+            COUNT(alarm_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime4},
+            COUNT(alarm_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime5},
+            COUNT(alarm_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime6},
+            COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime7}
+        from robot_alarm
+    </select>
+    <select id="countByDeviceType" resultType="java.util.Map">
+        SELECT
+            count( a.device_id in (select device_id from t_std_device where device_type = 193) or null) as '空调',
+            count( a.device_id in (select device_id from t_std_device where device_type = 194) or null) as '风机',
+            count( a.device_id in (select device_id from t_std_device where device_type = 195) or null) as '温湿度',
+            count( a.device_id in (select device_id from t_std_device where device_type = 196) or null) as '新风系统',
+            count( a.device_id in (select device_id from t_std_device where device_type = 197) or null) as '水暖系统'
+        FROM
+             t_warn_info a
+    </select>
+    <select id="countByDeviceType2" resultType="java.util.Map">
+        SELECT
+            count( b.robot_alarm_id or null) as '机器人'
+        FROM
+            robot_alarm b
+    </select>
+    <select id="countByDeviceType3" resultType="java.util.Map">
+        SELECT
+	        count( d.alarm_no or null) as '主辅设备'
+        FROM
+            t_cfg_alarm_current d
     </select>
     <select id="countOnMonthByCfg" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         SELECT
