@@ -64,10 +64,15 @@ public class TStdDevicemeteService{
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());
         if(Objects.isNull(tStdDevice)){
+            //新增没有 修改的部位 的设备
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
             stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());
             stdDevice.setCustomName(tStdDeviceMeteDetail.getCustomTypeName());
             tStdDeviceDao.add(stdDevice);
+
+            //删除之前部位的设备
+            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+            tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());
         }
         return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }

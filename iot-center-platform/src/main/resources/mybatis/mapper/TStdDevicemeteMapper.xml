@@ -197,7 +197,7 @@
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
-        select
+        select DISTINCT
         a.device_mete_id,
         a.device_id,
         a.custom_id as customType,
@@ -285,7 +285,7 @@
         AND custom_id = #{customId,jdbcType=VARCHAR}
     </select>
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
-        select
+        select DISTINCT
         a.device_mete_id,
         a.device_id,
         a.custom_id as customType,
@@ -469,8 +469,8 @@
     <select id="selectByDevCus" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        select * from t_std_devicemete
        WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customId,jdbcType=BIGINT}
-
     </select>
+
 
     <select id="selectPreDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        SELECT
