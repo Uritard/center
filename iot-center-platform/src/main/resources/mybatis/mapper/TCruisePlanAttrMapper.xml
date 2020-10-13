@@ -85,7 +85,7 @@
         select
         a.plan_id,
         a.instance_id,
-        b.cruise_name,
+        CONCAT(IFNULL(h.mete_name, ''), IFNULL(f.inspection_name, ''), IFNULL(g.preset_name, '')) AS b.cruise_name,
         b.device_id,
         d.device_name,
         b.custom_id,
@@ -107,6 +107,9 @@
         LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        left join t_robot_inspection f on f.inspection_id = a.cruise_id
+        left join t_camera_preset g on a.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = a.device_mete_id
         where 1 = 1
             and a.plan_id = #{planId, jdbcType=BIGINT}
     </select>

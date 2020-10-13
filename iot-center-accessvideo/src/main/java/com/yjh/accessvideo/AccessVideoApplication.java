@@ -2,6 +2,7 @@ package com.yjh.accessvideo;
 
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -37,6 +38,8 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
 
+    private NettyClient nettyClient = new NettyClient();
+
     public static void main(String[] args) {
         SpringApplication.run(AccessVideoApplication.class, args);
     }
@@ -47,6 +50,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return;} else { log.info("init success..");}
         hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/iot-center-accessvideo-1.0.0",false);
         if (register()) {log.info("register success..");}
+//        nettyClient.start();
     }
 
     private boolean register() {
