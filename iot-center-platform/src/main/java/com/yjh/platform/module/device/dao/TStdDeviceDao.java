@@ -22,6 +22,7 @@ public interface TStdDeviceDao {
 
     int add(TStdDevice tStdDevice);
     int deleteByPrimaryId(@Param(value = "deviceId") Long deviceId);
+    int deleteByUnionKeys(@Param(value = "deviceId")Long deviceId,@Param("customId")String customId);
     int update(TStdDevice tStdDevice);
     TStdDevice selectByPrimaryId(@Param(value = "deviceId") Long deviceId);
     List<TStdDevice> select(@Param(value = "deviceId") Long deviceId,

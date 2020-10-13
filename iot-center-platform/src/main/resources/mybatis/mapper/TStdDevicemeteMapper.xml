@@ -275,7 +275,15 @@
 <!--        <if test="upRegionId != null and upRegionId != '' and upRegionId != 1 "> and e.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>-->
     </select>
 
-
+    <select id="selectDeviceMeteByDeviceCustom" resultType="java.lang.Long">
+        SELECT
+	      device_mete_id
+        FROM
+	     t_std_devicemete
+        WHERE
+	     device_id = #{deviceId,jdbcType=BIGINT}
+        AND custom_id = #{customId,jdbcType=VARCHAR}
+    </select>
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         select
         a.device_mete_id,

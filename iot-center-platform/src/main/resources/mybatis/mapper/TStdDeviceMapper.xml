@@ -71,6 +71,12 @@
                 where device_id = #{deviceId, jdbcType=BIGINT}
     </delete>
 
+    <delete id="deleteByUnionKeys">
+        delete from  t_std_device
+                where device_id=#{deviceId,jdbcType=BIGINT}
+                and custom_id=#{customId,jdbcType=VARCHAR}
+    </delete>
+
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDevice">
         update t_std_device a <set>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>

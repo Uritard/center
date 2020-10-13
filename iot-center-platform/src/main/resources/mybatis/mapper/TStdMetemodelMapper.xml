@@ -150,7 +150,7 @@
 
 
 
-    <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.DeviceTypeTree">
+    <select id="selectDevice" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.DeviceTypeTree">
         SELECT DISTINCT
 	      dict_code as ID,
 	      dict_note as Label
@@ -158,16 +158,18 @@
 	        t_dict_business
         WHERE
 	      col_name="device_type"
+        <if test="deviceType != null and deviceType != ''"> and dict_code = #{deviceType, jdbcType=VARCHAR}</if>
 
     </select>
 
-    <select id="selectModel" resultType="com.yjh.platform.module.device.entity.MeteModel">
+    <select id="selectModel" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.device.entity.MeteModel">
        SELECT
 	     a.device_type,
 	     a.model_id as ID,
 	     a.model_name as Label
        FROM
 	     t_std_metemodel a
+	  <if test="deviceType !=null">where a.device_type=#{deviceType,jdbcType=INTEGER}</if>
     </select>
 
 

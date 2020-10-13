@@ -199,10 +199,10 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "查询设备类型-模板树")
     @RequestMapping(value = "/selectDeviceTypeModelTree",method = RequestMethod.GET)
-    public Result selectDeviceTypeModelTree(){
+    public Result selectDeviceTypeModelTree(@RequestParam(value = "deviceType",required = false)String deviceType){
         Result result=new Result();
         try{
-            result.setData(tStdMetemodelService.selectDeviceTypeModelTree());
+            result.setData(tStdMetemodelService.selectDeviceTypeModelTree(deviceType));
 
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

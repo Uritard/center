@@ -31,6 +31,6 @@ public interface TStdMetemodelDao {
 
     int batchDelete(@Param(value = "list")List<String> list);
 
-    List<DeviceTypeTree> selectDevice();
-    List<MeteModel> selectModel();
+    List<DeviceTypeTree> selectDevice(@Param("deviceType")String deviceType);
+    List<MeteModel> selectModel(@Param("deviceType")Integer deviceType);
 }

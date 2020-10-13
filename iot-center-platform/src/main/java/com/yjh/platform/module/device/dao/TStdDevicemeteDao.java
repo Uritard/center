@@ -52,6 +52,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "alarmState") Integer alarmState);
     List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
+    Long selectDeviceMeteByDeviceCustom(@Param("deviceId")Long deviceId,@Param("customId")String customId);
     int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);
     int deleteByDevId(@Param(value = "deviceId") Long deviceId);

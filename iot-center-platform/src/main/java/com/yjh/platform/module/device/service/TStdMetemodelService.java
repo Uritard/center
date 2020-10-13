@@ -104,9 +104,12 @@ public class TStdMetemodelService {
 
     @Logs(title = "查询设备类型-模板树", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<DeviceTypeTree> selectDeviceTypeModelTree() {
-        List<MeteModel> list1 = tStdMetemodelDao.selectModel();
-        List<DeviceTypeTree> list2 = tStdMetemodelDao.selectDevice();
+    public List<DeviceTypeTree> selectDeviceTypeModelTree(String deviceType) {
+        List<MeteModel> list1=new ArrayList<>();
+        if(deviceType==null || deviceType==""){
+             list1 = tStdMetemodelDao.selectModel(null);
+        }else { list1 = tStdMetemodelDao.selectModel(Integer.valueOf(deviceType));}
+        List<DeviceTypeTree> list2 = tStdMetemodelDao.selectDevice(deviceType);
         for (int i = 0; i < list2.size(); i++) {
             List<MeteModel> list=new ArrayList<>();
             for (int j = 0; j < list1.size(); j++) {

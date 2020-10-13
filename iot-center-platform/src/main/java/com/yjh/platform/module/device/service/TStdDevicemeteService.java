@@ -34,6 +34,7 @@ public class TStdDevicemeteService{
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        //若插入的测点中的deviceId、customId存在于device表中，则不更新device表；否则进行更新
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomId());//查看当前设备ID和部位ID下的设备信息
         if(Objects.isNull(tStdDevice)){
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
@@ -47,12 +48,27 @@ public class TStdDevicemeteService{
     @Logs(title = "删除", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceMeteId) {
-        return this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId)+tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);
+        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
+        Long deviceId=tStdDeviceMete.getDeviceId();
+        String customId=tStdDeviceMete.getCustomId();
+        this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);
+
+        if(Objects.isNull(tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId))){
+            tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+        }
+        return tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);
     }
 
     @Logs(title = "更新", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());
+        if(Objects.isNull(tStdDevice)){
+            TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
+            stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());
+            stdDevice.setCustomName(tStdDeviceMeteDetail.getCustomTypeName());
+            tStdDeviceDao.add(stdDevice);
+        }
         return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }
 
