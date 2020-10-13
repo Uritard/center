@@ -207,6 +207,12 @@
         where a.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 
-
+    <delete id="deleteByInstanceId" parameterType="java.lang.Long">
+        delete from t_cruise_task_attr
+                where instance_id in
+                <foreach collection="list" item="instanceId" separator="," open="(" close=")">
+                    #{instanceId,jdbcType=BIGINT}
+                </foreach>
+    </delete>
 
 </mapper>

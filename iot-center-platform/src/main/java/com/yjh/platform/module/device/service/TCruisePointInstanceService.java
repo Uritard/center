@@ -5,13 +5,16 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
-import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+
 import java.util.*;
 
+import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
+import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
+import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.task.entity.TCruisePlanAttr;
+import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
@@ -36,7 +39,10 @@ public class TCruisePointInstanceService{
     private TCruisePointInstanceDao tCruisePointInstanceDao;
 
     @Autowired
-    private TDictBusinessDao tDictBusinessDao;
+    private TCruiseTaskAttrDao tCruiseTaskAttrDao;
+
+    @Autowired
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
 
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
@@ -46,6 +52,9 @@ public class TCruisePointInstanceService{
 
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
+
+    @Autowired
+    private TCruisePointAttrDao tCruisePointAttrDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -267,6 +276,7 @@ public class TCruisePointInstanceService{
     @Transactional(rollbackFor = Exception.class)
     public int instanceUpdate(TCruisePointInstanceDetail tCruisePointInstanceDetail){
 
+        //删除已有的巡检点
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setDeviceMeteId(tCruisePointInstanceDetail.getDeviceMeteId());
         tCruisePointInstance.setDeviceId(tCruisePointInstanceDetail.getDeviceId());
@@ -278,20 +288,26 @@ public class TCruisePointInstanceService{
         TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
         tCruisePointInstance.setStationId(tStdRegion.getStationId());
         tCruisePointInstance.setStationName(tStdRegion.getStationName());
+        List<Long> haveList = this.tCruisePointInstanceDao.selectHave(tCruisePointInstance);
         this.delete(tCruisePointInstance);
         Integer cruiseType = tCruisePointInstanceDetail.getCruiseType();
         int result = -1;
+        //巡检点配置
         if (tCruisePointInstanceDetail.getIds().size()!=0){
             for (Long id:tCruisePointInstanceDetail.getIds()) {
+                haveList.remove(id);
+                TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
                 if(cruiseType == 229){//视频
                     TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                     tCruisePointInstance.setCruiseId(id);
                     tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+                    tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
                 }
                 if(cruiseType == 228){//机器人
                     TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
                     tCruisePointInstance.setCruiseId(id);
                     tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
+                    tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tRobotInspection.getInspectionName());
                 }
 //                if(cruiseType == 230){//红外
 //                    TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
@@ -299,13 +315,19 @@ public class TCruisePointInstanceService{
 //                    tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
 //                }
                 if(cruiseType == 232){//声纹
-                    TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(id);
-                    tCruisePointInstance.setCruiseName(tStdDevice.getDeviceName());
+//                    TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(id);
+//                    tCruisePointInstance.setCruiseName(tStdDevice.getDeviceName());
                 }
                 //231 在线监控 232 声纹
+                //新增配置号的巡检点
                 result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
+                tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+                tCruisePointAttrDao.add(tCruisePointAttr);
             }
         }
+        //删除关联表的巡检实例
+        tCruisePlanAttrDao.deleteByInstanceId(haveList);
+        tCruiseTaskAttrDao.deleteByInstanceId(haveList);
         return result;
     }
 

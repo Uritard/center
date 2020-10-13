@@ -72,33 +72,41 @@ public class TCruiseTaskService {
             tCruiseTaskAttr.setPointTaskId(String.valueOf(tCruisePointInstance.getCruiseId()));
             tCruiseTaskAttrList.add(tCruiseTaskAttr);
         }
-        //TODO 增加定时器任务
-
         this.tCruiseTaskDao.insert(tCruiseTask);
         this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
         //开启定时任务
+        Constant.taskId = tCruiseTask.getTaskId();
         QuartzTask quartzTask = new QuartzTask();
         quartzTask.setJobName(tCruiseTask.getTaskName());
         quartzTask.setJobGroup("qh111");
         if(tCruiseTask.getDateType()== null){
-            //立即执行
-            quartzTask.setCronExpression(tCruiseTask.getDateType());
-            JobManager jobManager = new JobManager();
-            try {
-                Constant.taskId=tCruiseTask.getTaskId();
-                jobManager.addCruiseTaskJobNow(quartzTask);
-            } catch (Exception e) { e.getMessage(); }
+            if(tCruiseTask.getIfRun() == 173){
+                //立即执行
+                quartzTask.setCronExpression(tCruiseTask.getDateType());
+                JobManager jobManager = new JobManager();
+                try {
+                    jobManager.addCruiseTaskJobNow(quartzTask, tCruiseTask.getTaskId());
+                } catch (Exception e) { e.getMessage(); }
+            }else {
+                //定时
+                quartzTask.setStartTime(tCruiseTask.getStartTime());
+                JobManager jobManager = new JobManager();
+                try {
+                    jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
+                } catch (Exception e) { e.getMessage(); }
+
+            }
+
         }else{
-            //定时或周期
+            //周期
             quartzTask.setCronExpression(tCruiseTask.getDateType());
             JobManager jobManager = new JobManager();
             try {
-                Constant.taskId=tCruiseTask.getTaskId();
-                jobManager.addCruiseTaskJob(quartzTask);
+                jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
             } catch (Exception e) { e.getMessage(); }
         }
 
-        return 000000000;
+        return 1;
     }
 
     @Logs(title = "删除", code = "module")
