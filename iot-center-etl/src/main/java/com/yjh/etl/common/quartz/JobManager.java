@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+
 @Service
 public class JobManager {
     // 日志模块
@@ -64,18 +66,24 @@ public class JobManager {
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
 
         if (scheduler.checkExists(jobKey) && scheduler.checkExists(triggerKey)) {
-            logger.error("OC Access DataQuery Job already exist");
+            logger.error("ETL Job already exist");
             return "false";
         }
         logger.info("dataUploadInterval :" + dataUploadInterval);
         //创建一个jobDetail的实例，将该实例与HelloJob Class绑定
         JobDetail jobDetail = JobBuilder.newJob(DeviceDataJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).build();
+
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger()
+                .withIdentity("trigger3", "group1")
+                .withSchedule(cronSchedule(quartzTask.getCronExpression()))
+                .build();
+
         //创建一个Trigger触发器的实例，定义该job立即执行，并且每2秒执行一次，一直执行
-        SimpleTrigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).startNow()
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInSeconds(Integer.parseInt(dataUploadInterval)).repeatForever()).build();
-        scheduler.scheduleJob(jobDetail, trigger);
+//        SimpleTrigger trigger = TriggerBuilder.newTrigger()
+//                .withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).startNow()
+//                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+//                        .withIntervalInSeconds(Integer.parseInt(dataUploadInterval)).repeatForever()).build();
+        scheduler.scheduleJob(jobDetail, cronTrigger);
         return "success";
     }
 

@@ -85,6 +85,7 @@ public class TCruisePlanService{
     @Logs(title = "删除", code = "task")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long planId) {
+        tCruisePlanAttrDao.deleteByPrimaryId(planId);
         return this.tCruisePlanDao.deleteByPrimaryId(planId);
     }
 

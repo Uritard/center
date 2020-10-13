@@ -107,8 +107,9 @@ public class FormatController {
         Result result = new Result();
         try {
             QuartzTask quartzTask = new QuartzTask();
-            quartzTask.setJobName("ETLScheduler");
-            quartzTask.setJobGroup("ETL");
+            quartzTask.setCronExpression("0 0 10,11,12,13,14,15,16,17,18,19,20,21 ? * *");
+            quartzTask.setJobName("tttest007");
+            quartzTask.setJobGroup("tt");
             jobManager.addJob(quartzTask);
             result.setData("success");
         } catch (Exception e) {
