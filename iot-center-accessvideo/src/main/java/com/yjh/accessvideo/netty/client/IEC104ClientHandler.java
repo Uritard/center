@@ -32,6 +32,8 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
     public int getChangeDataNum() { return changeDataNum; }
     public void setChangeDataNum(int changeDataNum) { this.changeDataNum = changeDataNum; }
 
+    public IEC104ClientHandler() { }
+
     public IEC104ClientHandler(String gatewayName, int changeDataNum) {
         this.gatewayName = gatewayName;
         this.changeDataNum = changeDataNum;

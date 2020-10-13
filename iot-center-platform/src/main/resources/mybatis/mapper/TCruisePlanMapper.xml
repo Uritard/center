@@ -150,7 +150,7 @@
 
     <select id="findInstanceTree" resultType="com.yjh.platform.module.task.entity.InstanceTree">
         select a.device_id, a.instance_id, a.device_mete_id, a.station_id, a.custom_id, a.station_name, a.cruise_id, a.cruise_name, b.device_name,b.custom_name,
-            CONCAT(IFNULL(j.mete_name, ''), IFNULL(d.inspection_name, ''), IFNULL(f.preset_name, '')) AS instance_name,e.robot_name,
+            CONCAT(IFNULL(j.mete_name, ''), '(', IFNULL(d.inspection_name, ''), IFNULL(f.preset_name, ''), ')') AS instance_name,e.robot_name,
             g.camera_name,h.camera_name as inferad_name,i.dict_note AS cruise_type_name,a.identify_type from t_cruise_point_instance a
 	        left join t_std_device b on a.device_id = b.device_id
 	        left join t_cruise_point_attr c on a.instance_id = c.instance_id
