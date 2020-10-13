@@ -40,45 +40,48 @@ public class TCruisePlanService{
     public int insert(Map<String, Object> map) {
         System.out.println("_____________"+map+"________________");
         if (map.size()>0) {
-            List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
-            TCruisePlan tCruisePlan = new TCruisePlan();
-            tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
-            Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
-            tCruisePlan.setType(planType);
-            this.tCruisePlanDao.insert(tCruisePlan);
-            List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
-            Long planId = tCruisePlan.getPlanId();
-            for (Map<String, Object> instanceMap:InstanceMapList) {
-                TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
-                tCruisePlanAttr.setPlanId(planId);
-                Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
-                tCruisePlanAttr.setInstanceId(instanceId);
-                if (Objects.nonNull(instanceMap.get("cruiseType"))) {
-                    Integer cruiseType = Integer.parseInt(String.valueOf(instanceMap.get("cruiseType")));
-                    tCruisePlanAttr.setPointType(cruiseType);
-                }
-                if (Objects.nonNull(tCruisePlanAttr.getPointType())) {
-                    switch (tCruisePlanAttr.getPointType()) {
-                        case 228:
-                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(instanceId);
-                            tCruisePlanAttr.setRobotId(tRobotInspection.getRobotId());
-                            tCruisePlanAttr.setPosition(String.valueOf(instanceMap.get("cruiseId")));
-                            break;
-                        case 229:
-                        case 230:
-                            Long cruiseAlgorithmId = Long.valueOf(String.valueOf(instanceMap.get("cruiseId")));
-                            TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
-                            tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
-                            break;
-                        default:
-                            break;
+            if (Objects.isNull(map.get("instanceList"))){
+                return ResultCodeEnum.CODE10010.getCode();
+            }else {
+                List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
+                TCruisePlan tCruisePlan = new TCruisePlan();
+                tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
+                Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
+                tCruisePlan.setType(planType);
+                this.tCruisePlanDao.insert(tCruisePlan);
+                List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
+                Long planId = tCruisePlan.getPlanId();
+                for (Map<String, Object> instanceMap:InstanceMapList) {
+                    TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
+                    tCruisePlanAttr.setPlanId(planId);
+                    Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
+                    tCruisePlanAttr.setInstanceId(instanceId);
+                    if (Objects.nonNull(instanceMap.get("cruiseType"))) {
+                        Integer cruiseType = Integer.parseInt(String.valueOf(instanceMap.get("cruiseType")));
+                        tCruisePlanAttr.setPointType(cruiseType);
                     }
+                    if (Objects.nonNull(tCruisePlanAttr.getPointType())) {
+                        switch (tCruisePlanAttr.getPointType()) {
+                            case 228:
+                                TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(instanceId);
+                                tCruisePlanAttr.setRobotId(tRobotInspection.getRobotId());
+                                tCruisePlanAttr.setPosition(String.valueOf(instanceMap.get("cruiseId")));
+                                break;
+                            case 229:
+                            case 230:
+                                Long cruiseAlgorithmId = Long.valueOf(String.valueOf(instanceMap.get("cruiseId")));
+                                TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
+                                tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    tCruisePlanAttrList.add(tCruisePlanAttr);
                 }
-                tCruisePlanAttrList.add(tCruisePlanAttr);
+                return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
             }
-            return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
-        } else if (Objects.isNull(map.get("instanceList"))){
-            return ResultCodeEnum.CODE10010.getCode();
+
         } else{ return ResultCodeEnum.CODE10010.getCode(); }
     }
 
