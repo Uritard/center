@@ -87,21 +87,22 @@ public class TStdDeviceService{
         tStdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
         tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
         this.tStdDeviceDao.add(tStdDevice);
+        Long deivceIdUnique=tStdDevice.getDeviceId();
+        System.out.print("*******************"+deivceIdUnique+"****************");
 
         List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());//根据模板ID查询测点模板
         for (TStdMeteModelDetail tStdMeteModelDetailItem: tStdMeteModelDetailList) {
-            tStdMeteModelDetailItem.setDeviceId(tStdDevice.getDeviceId());//测点模板结合设备ID形成标准测点
+            tStdMeteModelDetailItem.setDeviceId(deivceIdUnique);//测点模板结合设备ID形成标准测点
             tStdDevicemeteDao.add(tStdMeteModelDetailItem);
             if(Objects.isNull(tStdDeviceDao.selectByUnionKeys(tStdMeteModelDetailItem.getDeviceId(),tStdMeteModelDetailItem.getCustomType()))){//device表中没有新增设备的测点部位
                 TStdDevice stdDevice=new TStdDevice();
-                stdDevice.setDeviceId(tStdDevice.getDeviceId());
+                stdDevice.setDeviceId(deivceIdUnique);
                 stdDevice.setAliasName(tStdDeviceDetail.getAliasName());
                 stdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
                 stdDevice.setCustomId(tStdMeteModelDetailItem.getCustomType());
                 stdDevice.setCustomName(tStdMeteModelDetailItem.getCustomTypeName());
                 stdDevice.setCustomType(tStdDeviceDetail.getCustomType());
                 stdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
-                stdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
                 stdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
                 stdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
                 stdDevice.setModelId(tStdDeviceDetail.getModelId());
@@ -112,6 +113,7 @@ public class TStdDeviceService{
                 stdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
                 stdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
                 tStdDeviceDao.add(stdDevice);
+                System.out.print("*******"+stdDevice+"**********");
             }
 
 
@@ -185,7 +187,6 @@ public class TStdDeviceService{
 //                stdDevice.setCustomName(list.get(0).getDictNote());
                     stdDevice.setCustomType(tStdDeviceDetail.getCustomType());
                     stdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
-                    stdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
                     stdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
                     stdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
                     stdDevice.setModelId(tStdDeviceDetail.getModelId());
