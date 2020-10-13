@@ -164,7 +164,7 @@
         where 1 = 1 AND a.device_id IN
         <foreach collection="deviceIdList" item="deviceId" index="no" open="(" separator="," close=")">
             #{deviceId, jdbcType=BIGINT}
-        </foreach> ORDER BY device_id
+        </foreach> ORDER BY a.device_id, a.custom_id
     </select>
 
 </mapper>
