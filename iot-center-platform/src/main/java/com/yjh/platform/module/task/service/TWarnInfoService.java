@@ -8,7 +8,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -62,9 +61,9 @@ public class TWarnInfoService {
         return this.tWarnInfoDao.batchInsert(list);
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "查询所有告警", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfoDetail> selectByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName) {
+    public List<TWarnInfoDetail> selectWarnByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("warnLevel", warnLevel);
         map.put("confMode", confMode);
@@ -74,12 +73,20 @@ public class TWarnInfoService {
         map.put("deviceName", deviceName);
         return tWarnInfoDao.selectAllWarn(map);
     }
-
-    //统计所有的告警，输入deviceName无效 原因：当不需要robot表中的数据时，无法去掉
-    //只能统计所有的告警 未作根据设备类型（消防，主设备）来做过滤
+    @Logs(title = "查询所有缺陷", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TDefectInfo> selectDefectByPage(Integer confMode,Integer defectType, Date startTime, Date endTime, String deviceName) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("confMode", confMode);
+        map.put("defectType", defectType);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("deviceName", deviceName);
+        return tWarnInfoDao.selectAllDefect(map);
+    }
     @Logs(title = "统计本周内的告警数", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> countOnWeek(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime, String deviceName, Integer deviceType) {
+    public List<TutHistoryStatistical> countOnWeek() {
         List<String> weekDates = dateTimeUtil.getDayDateList(8);
 
         String firstTime1 = weekDates.get(0);
@@ -127,71 +134,53 @@ public class TWarnInfoService {
                 return flag;
             }
         });
-//        HashMap<String,Object> map = new HashMap<>();
-//        map.put("warnLevel",warnLevel);
-//        map.put("confMode",confMode);
-//        map.put("alarmSource",alarmSource);
-//        map.put("value",value);
-//        map.put("startTime",startTime);
-//        map.put("endTime",endTime);
-//        map.put("deviceName",deviceName);
-//        if(map.get("alarmSource") != null){
-//            if(deviceType != null) {
-//                List<Long> list = tWarnInfoDao.selectIds(String.valueOf(deviceType));
-//                map.put("list", list);
-//                return tWarnInfoDao.countOnMonthByWarn(map);
-//            }else {
-//                return tWarnInfoDao.countOnMonthByWarn(map);
-//            }
-//        }else if(false){//条件不足 未作
-//            if(false){//条件不足 未作
-//                return tWarnInfoDao.countOnMonthByRobot(map);
-//            }
-//            return tWarnInfoDao.countOnMonthByCfg(map);
-//        }
-//        //if (map.get() == "机器人")
-//        return tWarnInfoDao.countOnMonth(map);
         return tutHistoryStatisticalList;
     }
 
     @Logs(title = "根据设备类型统计告警数据", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<DevicetypeDetail> countByDeviceType(){
-        Map<String, Integer> map1 = tWarnInfoDao.countByDeviceType();
-        Map<String, Integer> map2 = tWarnInfoDao.countByDeviceType2();
-        Map<String, Integer> map3 = tWarnInfoDao.countByDeviceType3();
-        List<DevicetypeDetail> devicetypeDetailList = new ArrayList<>();
-        Iterator<String> iter = map1.keySet().iterator();
+    public List<TJContentInfoDetail> countByDeviceType(){
+        List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType();
+        System.out.println("tjContentInfoList是："+tjContentInfoList);
+        return tjContentInfoList;
+}
+    @Logs(title = "根据告警处理状态统计告警个数-饼图", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TJContentInfo> countConfMode() {
+        Map<String, Integer> map = tWarnInfoDao.countConfMode();
+        List<TJContentInfo> tjContentInfoList = new ArrayList<>();
+        Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
             String key = iter.next();
-            Number mapValue =  (Number)map1.get(key);
-            DevicetypeDetail devicetypeDetail = new DevicetypeDetail();
-            devicetypeDetail.setCount(mapValue);
-            devicetypeDetail.setDeviceTypeName(key);
-            devicetypeDetailList.add(devicetypeDetail);
+            Number mapValue =  (Number)map.get(key);
+            TJContentInfo tjContentInfo = new TJContentInfo();
+            tjContentInfo.setCount(mapValue);
+            tjContentInfo.setTJContent(key);
+            tjContentInfoList.add(tjContentInfo);
         }
-        Iterator<String> iter2 = map2.keySet().iterator();
-        while (iter2.hasNext()) {
-            String key = iter2.next();
-            Number mapValue =  (Number)map2.get(key);
-            DevicetypeDetail devicetypeDetail = new DevicetypeDetail();
-            devicetypeDetail.setCount(mapValue);
-            devicetypeDetail.setDeviceTypeName(key);
-            devicetypeDetailList.add(devicetypeDetail);
+        return tjContentInfoList;
+    }
+    @Logs(title = "根据告警来源统计告警数据", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TJContentInfo> countByAlarmSource() {
+        Map<String, Integer> map = tWarnInfoDao.countByAlarmSource();
+        List<TJContentInfo> tjContentInfoList = new ArrayList<>();
+        Iterator<String> iter = map.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            Number mapValue =  (Number)map.get(key);
+            TJContentInfo tjContentInfo = new TJContentInfo();
+            tjContentInfo.setCount(mapValue);
+            tjContentInfo.setTJContent(key);
+            tjContentInfoList.add(tjContentInfo);
         }
-        Iterator<String> iter3 = map3.keySet().iterator();
-        while (iter3.hasNext()) {
-            String key = iter3.next();
-            Number mapValue =  (Number)map3.get(key);
-            DevicetypeDetail devicetypeDetail = new DevicetypeDetail();
-            devicetypeDetail.setCount(mapValue);
-            devicetypeDetail.setDeviceTypeName(key);
-            devicetypeDetailList.add(devicetypeDetail);
-        }
-        System.out.println("devicetypeDetailList是："+devicetypeDetailList);
-        return devicetypeDetailList;
-}
-
+        return tjContentInfoList;
+    }
+    @Logs(title = "查看告警处理情况", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TWarnInfoDetail> selectAlarmProcessByPage(Long warnId) {
+        return tWarnInfoDao.selectAlarmProcessByPage(warnId);
+    }
     //count未确定
     public int updateForOk(Long userId,String warnIds,Integer confMode){
         String[] list = warnIds.split(",");

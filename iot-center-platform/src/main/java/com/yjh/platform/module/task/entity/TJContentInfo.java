@@ -11,15 +11,17 @@ import java.io.Serializable;
 /**
  * @author YC
  * @date 2020/10/13 - 19:33
- */@Data
+ */
+@Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TWarnInfoDetail对象", description = "告警信息表扩展")
-public class DevicetypeDetail implements Serializable {
+@ApiModel(value = "TJContentInfo对象", description = "统计信息表")
+public class TJContentInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "设备类型")
-    private String deviceTypeName;
+    @ApiModelProperty(value = "统计内容名称")
+    private String tJContent;
     @ApiModelProperty(value = "告警个数")
     private Number count;
+
 }

@@ -21,6 +21,9 @@ import java.util.Date;
 public class TWarnInfoDetail implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "告警Id")
+    private long warnId;
+
     @ApiModelProperty(value = "告警时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date alarmTime;
@@ -46,6 +49,18 @@ public class TWarnInfoDetail implements Serializable {
     private String deviceName;
 
     @ApiModelProperty(value = "告警内容")
-    private String content;
+    private String warnContent;
+
+    @ApiModelProperty(value = "告警图片")
+    private String imagePath;
+
+    @ApiModelProperty(value = "处理方法")
+    private String dealInfo;
+
+    @ApiModelProperty(value = "告警点位")
+    private Long stdMeteId;
+    @ApiModelProperty(value = "告警点位名称")
+    private String stdMeteName;
+
 
 }

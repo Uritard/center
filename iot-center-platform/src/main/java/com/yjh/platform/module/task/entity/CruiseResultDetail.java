@@ -18,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "CruiseResultDetail对象", description = "巡视点结果详情")
-public class CruiseResultDetail {
+public class                CruiseResultDetail {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "实物编码")
@@ -78,6 +78,10 @@ public class CruiseResultDetail {
 
     @ApiModelProperty(value = "人工校核结果")
     private String personCheck;
+
+    @ApiModelProperty(value = "巡检分析图片")
+    private String picpath;
+
 
 
 

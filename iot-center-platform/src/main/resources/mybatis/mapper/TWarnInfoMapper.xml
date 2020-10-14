@@ -338,12 +338,14 @@
         <if test="startTime != null and endTime != null"> and h.alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
 
     </select>
+<!--查询所有告警-->
     <select id="selectAllWarn" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT * FROM
         (
         SELECT
         a.warn_id,
         a.warn_time as alarm_time,
+        a.warn_content,
         a.device_id,
         b.device_name,
         a.warn_level as alarm_level,
@@ -360,26 +362,28 @@
         where 1 = 1
         union all(
         select
-        h.alarm_no as warn_id,
+        h.camera_alarm_id as warn_id,
         h.alarm_time,
-        b.device_id,
-        b.device_name,
+        h.alarm_name as warn_content,
+        h.camera_id,
+        b.camera_name,
         h.alarm_level,
         c.dict_note as alarm_level_name,
-        h.is_clear as conf_mode,
+        h.alarm_state as conf_mode,
         e.dict_note as conf_mode_name,
-        282 as alarm_source,
-        '主辅设备' as alarm_source_name
-        from t_cfg_alarm_current h
-        left join t_std_device b on h.device_id = b.device_id
-        left join t_dict_business e on h.is_clear  = e.dict_code
+        888 as alarm_source,
+        'visual' as alarm_source_name
+        from t_camera_alarm h
+        left join t_camera_info b on h.camera_id = b.camera_id
+        left join t_dict_business e on h.alarm_state  = e.dict_code
         left join t_dict_business c on h.alarm_level  = c.dict_code
         where 1 = 1
         )
         union all(
         select
-        f.robot_alarm_id,
+        f.robot_alarm_id as warn_id,
         f.alarm_time,
+        f.alarm_name as warn_content,
         f.robot_id as deviceId,
         g.robot_name as device_name,
         f.alarm_level,
@@ -388,7 +392,7 @@
         e.dict_note as conf_mode_name,
         279 as alarm_source,
         '机器人' as alarm_source_name
-        from robot_alarm f
+        from t_robot_alarm f
         left join t_dict_business c on f.alarm_level = c.dict_code
         left join t_dict_business e on f.alarm_state = e.dict_code
         left join t_robot_info g on f.robot_id = g.robot_id
@@ -398,13 +402,10 @@
         where 1 = 1
         <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null"> and alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_id in (select device_id from t_std_device where device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%"))</if>
         <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
 
-
     </select>
-
     <select id="countOnMonth" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         SELECT
         DATE_FORMAT( warn_time, '%Y-%m-%d' ) time,
@@ -443,6 +444,7 @@
         GROUP BY
         time
     </select>
+<!--统计本周内的告警数-->
     <select id="countOnWeek"  resultType="java.util.Map">
         select
             COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime1},
@@ -454,28 +456,75 @@
             COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime7}
         from robot_alarm
     </select>
-    <select id="countByDeviceType" resultType="java.util.Map">
-        SELECT
-            count( a.device_id in (select device_id from t_std_device where device_type = 193) or null) as '空调',
-            count( a.device_id in (select device_id from t_std_device where device_type = 194) or null) as '风机',
-            count( a.device_id in (select device_id from t_std_device where device_type = 195) or null) as '温湿度',
-            count( a.device_id in (select device_id from t_std_device where device_type = 196) or null) as '新风系统',
-            count( a.device_id in (select device_id from t_std_device where device_type = 197) or null) as '水暖系统'
-        FROM
-             t_warn_info a
+<!--根据设备类型统计告警数据-->
+    <select id="countByDeviceType" resultType="com.yjh.platform.module.task.entity.TJContentInfoDetail">
+        select
+            dict_code as device_type,
+            dict_note as device_type_name,
+            (select COUNT(*)
+                from t_std_device a,t_warn_info b
+                where a.device_id = b.device_id
+                and device_type = dict_code
+            ) as "count"
+        from t_dict_business
+        where dict_code in
+            (
+                select dict_code
+                from t_dict_business
+                where col_name = 'device_type'
+            )
+        ORDER BY dict_code
     </select>
-    <select id="countByDeviceType2" resultType="java.util.Map">
-        SELECT
-            count( b.robot_alarm_id or null) as '机器人'
-        FROM
-            robot_alarm b
+<!--查看告警处理情况-->
+    <select id="selectAlarmProcessByPage" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+
     </select>
-    <select id="countByDeviceType3" resultType="java.util.Map">
-        SELECT
-	        count( d.alarm_no or null) as '主辅设备'
+<!--查询所有缺陷-->
+    <select id="selectAllDefect" parameterType="java.util.Map" resultType="com.yjh.platform.module.task.entity.TDefectInfo">
+        select
+            a.defect_id,
+            a.defect_time,
+            a.device_id,
+            b.device_name,
+            a.defect_type,
+            a.deal_info,
+            a.conf_mode,
+            d.dict_note as conf_mode_name,
+            a.deal_time
         FROM
-            t_cfg_alarm_current d
+            t_defect_info a
+        LEFT JOIN t_std_device b on a.device_id = b.device_id
+        LEFT JOIN t_dict_business d on d.dict_code = a.conf_mode
     </select>
+<!--根据告警来源统计告警数据-->
+    <select id="countByAlarmSource" resultType="java.util.Map">
+       SELECT
+            a.countNum as '主设备',
+            b.countNum as '机器人',
+            d.countNum as '摄像机',
+            (a.countNum+b.countNum+d.countNum) as '总告警数'
+        FROM(
+            (select count(*) as countNum from t_warn_info ) a,
+            (select count(*) as countNum from t_robot_alarm ) b,
+            (select count(*) as countNum from t_camera_alarm) d
+        )
+    </select>
+<!--根据告警处理状态统计告警个数-->
+    <select id="countConfMode" resultType="java.util.Map">
+        SELECT
+            a.processed+b.processed+d.processed as '已处理',
+            e.untreated+f.untreated+g.untreated as '未处理'
+        FROM
+        (
+            (select count(conf_mode = 275 or null) as processed from t_warn_info ) a,
+            (select count(alarm_state = 275 or null) as processed from t_robot_alarm ) b,
+            (select count(alarm_state = 275 or null) as processed from t_camera_alarm) d,
+            (select count(conf_mode = 276 or null) as untreated from t_warn_info ) e,
+            (select count(alarm_state = 276 or null) as untreated from t_robot_alarm ) f,
+            (select count(alarm_state = 276 or null) as untreated from t_camera_alarm) g
+        )
+    </select>
+
     <select id="countOnMonthByCfg" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         SELECT
         DATE_FORMAT( alarm_time, '%Y-%m-%d' ) time,

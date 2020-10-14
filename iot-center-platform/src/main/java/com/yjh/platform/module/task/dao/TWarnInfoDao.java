@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Map;
 
-import com.yjh.platform.module.task.entity.RobotAlarm;
-import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.module.task.entity.TWarnInfoDetail;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -66,9 +64,11 @@ public interface TWarnInfoDao {
                                     @Param(value = "firstTime6")String firstTime6,
                                     @Param(value = "firstTime7")String firstTime7,
                                     @Param(value = "firstTime8")String firstTime8);
-    Map<String, Integer> countByDeviceType();
-    Map<String, Integer> countByDeviceType2();
-    Map<String, Integer> countByDeviceType3();
+    List<TJContentInfoDetail>  countByDeviceType();
+    List<TDefectInfo> selectAllDefect(HashMap<String,Object> map);
+    Map<String, Integer> countByAlarmSource();
+    Map<String, Integer> countConfMode();
+    List<TWarnInfoDetail> selectAlarmProcessByPage(Long warnId);
 
 
 }

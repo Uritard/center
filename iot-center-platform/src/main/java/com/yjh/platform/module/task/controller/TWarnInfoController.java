@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.controller;
 
-import com.google.common.base.FinalizablePhantomReference;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Date;
 
 import com.yjh.platform.module.user.dao.SysUserDao;
-import com.yjh.platform.module.user.entity.SysUser;
 import io.swagger.annotations.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +21,6 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -158,12 +154,12 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "查询所有告警")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    public Result selectByPage(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
+    @RequestMapping(value = "/selectWarnByPage", method = RequestMethod.GET)
+    public Result selectWarnByPage(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                             @RequestParam(value = "confMode", required = false) Integer confMode,
                             @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
                             @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
-                            @RequestParam(value = "edTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
+                            @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                             @RequestParam(value = "deviceName", required = false) String deviceName,
                             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                             @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
@@ -171,7 +167,7 @@ public class TWarnInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TWarnInfoDetail> list = tWarnInfoService.selectByPage(warnLevel, confMode, alarmSource,startTime,endTime,deviceName);
+            List<TWarnInfoDetail> list = tWarnInfoService.selectWarnByPage(warnLevel, confMode, alarmSource,startTime,endTime,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -182,19 +178,12 @@ public class TWarnInfoController {
         return result;
     }
 
-    @ApiOperation(value = "统计近一周的所有告警数据")
+    @ApiOperation(value = "统计近一周的所有告警个数-折线图")
     @RequestMapping(value = "/countOnWeek", method = RequestMethod.GET)
-    public Result countOnWeek(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
-                                      @RequestParam(value = "confMode", required = false) Integer confMode,
-                                      @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
-                                      @RequestParam(value = "value", required = false) String value,
-                                      @RequestParam(value = "startTime", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
-                                      @RequestParam(value = "edTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
-                                      @RequestParam(value = "deviceName", required = false) String deviceName,
-                                      @RequestParam(value = "deviceType", required = false) Integer deviceType){
+    public Result countOnWeek(){
         Result result = new Result();
         try {
-            List<TutHistoryStatistical> list = tWarnInfoService.countOnWeek(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName,deviceType);
+            List<TutHistoryStatistical> list = tWarnInfoService.countOnWeek();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -202,16 +191,80 @@ public class TWarnInfoController {
         }
         return result;
     }
-    @ApiOperation(value = "根据设备类型统计告警数据")
-    @RequestMapping(value = "/countByDeviceType", method = RequestMethod.GET)
-    public Result countByDeviceType(){
+    @ApiOperation(value = "根据告警处理状态统计告警个数-饼图")
+    @RequestMapping(value = "/countConfMode", method = RequestMethod.GET)
+    public Result countConfMode(){
         Result result = new Result();
         try {
-            List<DevicetypeDetail> list = tWarnInfoService.countByDeviceType();
+            List<TJContentInfo> list = tWarnInfoService.countConfMode();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据设备类型统计告警个数-柱图")
+    @RequestMapping(value = "/countByDeviceType", method = RequestMethod.GET)
+    public Result countByDeviceType(){
+        Result result = new Result();
+        try {
+            List<TJContentInfoDetail> list = tWarnInfoService.countByDeviceType();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据告警来源统计告警个数")
+    @RequestMapping(value = "/countByAlarmSource", method = RequestMethod.GET)
+    public Result countByAlarmSource(){
+        Result result = new Result();
+        try {
+            List<TJContentInfo> list = tWarnInfoService.countByAlarmSource();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "查看告警处理情况")
+    @RequestMapping(value = "/selectAlarmProcessByPage", method = RequestMethod.GET)
+    public Result selectAlarmProcessByPage(@RequestParam(value = "warnId") Long warnId,
+                                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                           @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize){
+        Result result = new Result();
+        try {
+            List<TWarnInfoDetail> list = tWarnInfoService.selectAlarmProcessByPage(warnId);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "查询所有缺陷")
+    @RequestMapping(value = "/selectDefectByPage", method = RequestMethod.GET)
+    public Result selectDefectByPage(@RequestParam(value = "defectLevel", required = false) Integer confMode,
+                                     @RequestParam(value = "defectLevel", required = false) Integer defectType,
+                                     @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
+                                     @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
+                                     @RequestParam(value = "deviceName", required = false) String deviceName,
+                                     @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TDefectInfo> list = tWarnInfoService.selectDefectByPage(confMode,defectType,startTime,endTime,deviceName);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询所有告警失败描述：", e);
         }
         return result;
     }
