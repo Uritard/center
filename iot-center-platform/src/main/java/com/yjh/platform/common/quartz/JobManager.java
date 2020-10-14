@@ -100,6 +100,7 @@ public class JobManager {
 //        logger.info("dataUploadInterval :" + dataUploadInterval);
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", taskId).build();
+        taskMap.put("taskId",taskId);
         taskMap.put("jobName",quartzTask.getJobName());
         taskMap.put("jobGroupName",quartzTask.getJobGroup());
         String str = quartzTask.getJobName()+System.currentTimeMillis();
@@ -151,6 +152,7 @@ public class JobManager {
         }
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", taskId).build();
+        taskMap.put("taskId",taskId);
         taskMap.put("jobName",quartzTask.getJobName());
         taskMap.put("jobGroupName",quartzTask.getJobGroup());
         String str = quartzTask.getJobName()+System.currentTimeMillis();
