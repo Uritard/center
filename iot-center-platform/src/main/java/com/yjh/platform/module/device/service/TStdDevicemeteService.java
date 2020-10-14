@@ -39,7 +39,7 @@ public class TStdDevicemeteService{
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         //若插入的测点中的deviceId、customId存在于device表中，则不更新device表；否则进行更新
-        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomId());//查看当前设备ID和部位ID下的设备信息
+        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查看当前设备ID和部位ID下的设备信息
         if(Objects.isNull(tStdDevice)){
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
             stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());

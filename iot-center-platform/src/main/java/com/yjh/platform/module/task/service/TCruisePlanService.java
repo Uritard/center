@@ -40,7 +40,8 @@ public class TCruisePlanService{
     public int insert(Map<String, Object> map) {
         System.out.println("_____________"+map+"________________");
         if (map.size()>0) {
-            if (Objects.isNull(map.get("instanceList"))){
+            List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
+            if (InstanceMapList.size()==0){
                 return ResultCodeEnum.CODE10010.getCode();
             }else {
                 List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
@@ -49,7 +50,6 @@ public class TCruisePlanService{
                 Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
                 tCruisePlan.setType(planType);
                 this.tCruisePlanDao.insert(tCruisePlan);
-                List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
                 Long planId = tCruisePlan.getPlanId();
                 for (Map<String, Object> instanceMap:InstanceMapList) {
                     TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();

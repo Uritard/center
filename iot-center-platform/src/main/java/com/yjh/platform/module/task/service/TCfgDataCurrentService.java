@@ -1,16 +1,15 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
+import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
-import com.yjh.platform.module.task.entity.TCfgDataCurrent;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
-import com.yjh.platform.module.task.entity.TUnionTask;
 import com.yjh.platform.module.task.service.TUnionTaskService;
 
 import java.text.ParseException;
 import java.util.*;
 
-import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
@@ -42,6 +41,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TUnionTaskDao tUnionTaskDao;
+
+    @Autowired
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
 
 
     @Logs(title = "插入", code = "module")
@@ -167,6 +169,8 @@ public class TCfgDataCurrentService {
             }
 
         }
+        TCruiseTask tCruiseTask=new TCruiseTask();
+
         return plans;
     }
 
