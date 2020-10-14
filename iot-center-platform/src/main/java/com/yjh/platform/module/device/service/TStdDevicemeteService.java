@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class TStdDevicemeteService{
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TDictBusinessDao tDictBusinessDao;
 
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
@@ -68,7 +72,8 @@ public class TStdDevicemeteService{
             //新增没有 修改的部位 的设备
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
             stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());
-            stdDevice.setCustomName(tStdDeviceMeteDetail.getCustomTypeName());
+            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
+            stdDevice.setCustomName(list.get(0).getDictNote());
             tStdDeviceDao.add(stdDevice);
 
 
