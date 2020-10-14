@@ -2,6 +2,7 @@ package com.yjh.etl.common.quartz;
 
 import com.yjh.etl.module.device.entity.QuartzTask;
 import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ public class JobManager {
     private Scheduler scheduler;
     @Value("${data.period.upload.interval}")
     private String dataUploadInterval;
+
+    private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
     /**
      * 任务是否存在
      *
@@ -85,6 +88,20 @@ public class JobManager {
 //                        .withIntervalInSeconds(Integer.parseInt(dataUploadInterval)).repeatForever()).build();
         scheduler.scheduleJob(jobDetail, cronTrigger);
         return "success";
+    }
+
+    public static void removeJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName) {
+        try {
+            Scheduler sched = schedulerFactory.getScheduler();
+            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
+            sched.pauseTrigger(triggerKey);// 停止触发器
+            sched.unscheduleJob(triggerKey);// 移除触发器
+            sched.deleteJob(JobKey.jobKey(jobName, jobGroupName));// 删除任务
+            sched.shutdown();
+            logger.info("sched is shutdown: "+sched.isShutdown());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

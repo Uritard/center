@@ -27,6 +27,7 @@ public class DeviceDataJob extends QuartzJobBean {
     public void executeInternal(JobExecutionContext context) {
         try {
             log.info("正在进行定时任务");
+            log.info("time"+context.getFireTime());
             log.info("完成定时任务执行");
         } catch (Exception e) {
             log.error("定时任务异常" + e);

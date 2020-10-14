@@ -106,11 +106,12 @@ public class FormatController {
     public Result select() {
         Result result = new Result();
         try {
-            QuartzTask quartzTask = new QuartzTask();
-            quartzTask.setCronExpression("0 0 10,11,12,13,14,15,16,17,18,19,20,21 ? * *");
-            quartzTask.setJobName("tttest007");
-            quartzTask.setJobGroup("tt");
-            jobManager.addJob(quartzTask);
+//            QuartzTask quartzTask = new QuartzTask();
+//            quartzTask.setCronExpression("0 * * * * ?");
+//            quartzTask.setJobName("tttest007");
+//            quartzTask.setJobGroup("tt");
+//            jobManager.addJob(quartzTask);
+            jobManager.removeJob("tttest007", "tt", "trigger3", "group1");
             result.setData("success");
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
