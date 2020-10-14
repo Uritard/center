@@ -65,5 +65,6 @@ public interface TStdDevicemeteDao {
     List<CruiseResultAnalMeteInfo> selectDeviceMete();
    //通过巡检点Id查询标准测点
     Long getdeviceMeteByPointinstance(@Param(value = "instanceId")Long instanceId);
+    List<Long> selectByDevId(@Param(value = "deviceId")Long deviceId);
 
 }

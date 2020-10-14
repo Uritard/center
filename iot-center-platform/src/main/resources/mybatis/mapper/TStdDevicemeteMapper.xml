@@ -571,4 +571,9 @@
         WHERE
 	         b.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
+    <select id="selectByDevId" resultType="java.lang.Long">
+        select a.device_mete_id
+        from t_std_devicemete a
+        where a.device_id = #{deviceId,jdbcType=BIGINT}
+    </select>
 </mapper>

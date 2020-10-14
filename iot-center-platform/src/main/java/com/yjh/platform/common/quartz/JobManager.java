@@ -1,5 +1,6 @@
 package com.yjh.platform.common.quartz;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -11,6 +12,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 
@@ -87,22 +89,27 @@ public class JobManager {
      *新建一个周期巡视任务
      */
     public String addCruiseTaskJob(QuartzTask quartzTask, String taskId) throws Exception {
+        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        logger.info("jobKey: "+jobKey+"  triggerKey: "+triggerKey);
 
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
             logger.error("OC Access DataQuery Job already exist");
             return "false";
         }
-        logger.info("dataUploadInterval :" + dataUploadInterval);
+//        logger.info("dataUploadInterval :" + dataUploadInterval);
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", taskId).build();
+        taskMap.put("jobName",quartzTask.getJobName());
+        taskMap.put("jobGroupName",quartzTask.getJobGroup());
+        String str = quartzTask.getJobName()+System.currentTimeMillis();
+        taskMap.put("triggerName",str);
+        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
+        Constant.taskMap.add(taskMap);
         CronTrigger cronTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
+                .withIdentity(str, quartzTask.getJobGroup())
                 .withSchedule(cronSchedule(quartzTask.getCronExpression()))
                 .build();
-
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, cronTrigger);
         return "success";
     }
@@ -113,13 +120,10 @@ public class JobManager {
     public String addCruiseTaskJobNow(QuartzTask quartzTask, String taskId) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        logger.info("jobKey: "+jobKey+"  triggerKey: "+triggerKey);
-
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
             logger.error("OC Access DataQuery Job already exist");
             return "false";
         }
-        logger.info("dataUploadInterval :" + dataUploadInterval);
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", taskId).build();
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
@@ -131,7 +135,6 @@ public class JobManager {
                                 .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
                 .build();
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
-        logger.info("ok了");
         return "success";
     }
 
@@ -139,19 +142,23 @@ public class JobManager {
      *新建一个定时巡视任务
      */
     public String addCruiseTaskJobAtTime(QuartzTask quartzTask, String taskId) throws Exception {
+        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        logger.info("jobKey: "+jobKey+"  triggerKey: "+triggerKey);
-
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
             logger.error("OC Access DataQuery Job already exist");
             return "false";
         }
-        logger.info("dataUploadInterval :" + dataUploadInterval);
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", taskId).build();
+        taskMap.put("jobName",quartzTask.getJobName());
+        taskMap.put("jobGroupName",quartzTask.getJobGroup());
+        String str = quartzTask.getJobName()+System.currentTimeMillis();
+        taskMap.put("triggerName",str);
+        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
+        Constant.taskMap.add(taskMap);
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
+                .withIdentity(str, quartzTask.getJobGroup())
                 .startAt(quartzTask.getStartTime())
                 .withSchedule(
                         SimpleScheduleBuilder.simpleSchedule()
@@ -161,4 +168,21 @@ public class JobManager {
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
         return "success";
     }
+    /**
+     *删除周期巡视任务
+     */
+    public static void removeJob(String jobName, String jobGroupName,String triggerName, String triggerGroupName) {
+        try {
+            Scheduler sched = StaticContextAccessor.getBean(Scheduler.class);
+            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
+            sched.pauseTrigger(triggerKey);// 停止触发器
+            sched.unscheduleJob(triggerKey);// 移除触发器
+            sched.deleteJob(JobKey.jobKey(jobName, jobGroupName));// 删除任务
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
 }

@@ -1,5 +1,9 @@
 package com.yjh.platform.common;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Constant {
 
     public static final String account_lock_times = "account_lock_times:userAccountID";
@@ -12,4 +16,5 @@ public class Constant {
 
     public static String taskId;
 
+    public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
 }

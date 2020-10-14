@@ -24,6 +24,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author tt
@@ -94,12 +95,11 @@ public class TCruiseTaskService {
                 try {
                     jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
                 } catch (Exception e) { e.getMessage(); }
-
             }
-
         }else{
             //周期
             quartzTask.setCronExpression(tCruiseTask.getDateType());
+            log.info("quartzTask: "+quartzTask.getCronExpression());
             JobManager jobManager = new JobManager();
             try {
                 jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
@@ -124,10 +124,23 @@ public class TCruiseTaskService {
             tCruiseTaskDel.setCreateTime(new Date());
             return tCruiseTaskDelDao.insert(tCruiseTaskDel);
         } else {
+            if(Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==174){
+                //删除定时任务
+                for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
+                    //找到任务Id
+                    if(mapItem.get("taskId") == taskId){
+                        //删除定时任务
+                        JobManager.removeJob(mapItem.get("jonName").toString(),mapItem.get("jobGroupName").toString(),mapItem.get("triggerName").toString(),mapItem.get("triggerGroupName").toString());
+                        Constant.taskMap.remove(mapItem);
+                    }
+                }
+            }
             tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
             tCruiseTaskDelDao.deleteByPrimaryId(taskId);
             return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
         }
+        //删除周期的任务
+
     }
 
     @Logs(title = "更新", code = "module")

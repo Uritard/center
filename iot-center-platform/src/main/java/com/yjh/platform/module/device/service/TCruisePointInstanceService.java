@@ -295,7 +295,10 @@ public class TCruisePointInstanceService{
         //巡检点配置
         if (tCruisePointInstanceDetail.getIds().size()!=0){
             for (Long id:tCruisePointInstanceDetail.getIds()) {
-                haveList.remove(id);
+                if(haveList != null && haveList.size()>0){
+                    haveList.remove(id);
+                }
+                
                 TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
                 if(cruiseType == 229){//视频
                     TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
@@ -326,8 +329,10 @@ public class TCruisePointInstanceService{
             }
         }
         //删除关联表的巡检实例
-        tCruisePlanAttrDao.deleteByInstanceId(haveList);
-        tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+        if(haveList != null && haveList.size()>0){
+            tCruisePlanAttrDao.deleteByInstanceId(haveList);
+            tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+        }
         return result;
     }
 

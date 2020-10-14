@@ -13,6 +13,8 @@ import java.util.*;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
+import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,11 @@ public class TStdDevicemeteService{
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TDictBusinessDao tDictBusinessDao;
+    @Autowired
+    private TCruiseTaskAttrDao tCruiseTaskAttrDao;
+    @Autowired
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
+
 
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
@@ -56,12 +63,19 @@ public class TStdDevicemeteService{
         Long deviceId=tStdDeviceMete.getDeviceId();
         String customId=tStdDeviceMete.getCustomId();
         this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);
-
-        System.out.print(tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)+"*****************");
         if(Objects.isNull(tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId))){
             tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
         }
-        return tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);
+        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
+        tCruisePointInstance.setDeviceMeteId(deviceMeteId);
+        List<Long> haveList = tCruisePointInstanceDao.selectHave(tCruisePointInstance);
+        tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);//删除巡检点
+        //删除关联的表
+        if(haveList != null && haveList.size()>0){
+            tCruisePlanAttrDao.deleteByInstanceId(haveList);
+            tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+        }
+        return this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);//删除测点
     }
 
     @Logs(title = "更新", code = "device")

@@ -38,6 +38,8 @@ public class TStdDeviceService{
     private TStdMetemodelDetailDao tStdMetemodelDetailDao;
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TStdDevicemeteService tStdDevicemeteService;
 
 
 
@@ -88,8 +90,6 @@ public class TStdDeviceService{
         tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
         this.tStdDeviceDao.add(tStdDevice);
         Long deivceIdUnique=tStdDevice.getDeviceId();
-        System.out.print("*******************"+deivceIdUnique+"****************");
-
         List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());//根据模板ID查询测点模板
         for (TStdMeteModelDetail tStdMeteModelDetailItem: tStdMeteModelDetailList) {
             tStdMeteModelDetailItem.setDeviceId(deivceIdUnique);//测点模板结合设备ID形成标准测点
@@ -113,7 +113,6 @@ public class TStdDeviceService{
                 stdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
                 stdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
                 tStdDeviceDao.add(stdDevice);
-                System.out.print("*******"+stdDevice+"**********");
             }
 
 
@@ -154,8 +153,12 @@ public class TStdDeviceService{
     @Logs(title = "删除设备及属性", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryIdALL(Long deviceId) {
-        return this.tStdDeviceDao.deleteByPrimaryId(deviceId)+tStdDeviceAttrDao.deleteByPrimaryId(deviceId)
-                +this.tStdDevicemeteDao.deleteByDeviceId(deviceId)+tCruisePointInstanceDao.deleteByDeviceId(deviceId);
+                tStdDeviceAttrDao.deleteByPrimaryId(deviceId);//删除属性
+                List<Long> devList = tStdDevicemeteDao.selectByDevId(deviceId);
+        for (Long item: devList) {
+            tStdDevicemeteService.deleteByPrimaryId(item);
+        }
+        return this.tStdDeviceDao.deleteByPrimaryId(deviceId);//删除设备
     }
 
     @Logs(title = "更新", code = "module")

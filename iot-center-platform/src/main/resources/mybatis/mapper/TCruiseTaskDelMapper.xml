@@ -60,8 +60,8 @@
         from t_cruise_task_del a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        <if test="delTime != null and delTime != ''"> and a.del_time = #{delTime, jdbcType=TIMESTAMP}</if>
-        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="delTime != null"> and a.del_time = #{delTime, jdbcType=TIMESTAMP}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskDel" resultType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
