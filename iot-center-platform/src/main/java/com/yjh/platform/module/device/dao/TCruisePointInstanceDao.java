@@ -67,6 +67,10 @@ public interface TCruisePointInstanceDao {
 
     //查询巡检类型
     CruiseTypeInfo selectCruiseCommonInfoByInstanceId(@Param(value = "instanceId")Long instanceId);
-    List<Long> selectHave(TCruisePointInstance tCruisePointInstance);
+    List<Long> selectCruiseId(TCruisePointInstanceDetail tCruisePointInstanceDetail);
+    List<Long> selectInstanceId(@Param(value = "ids")List<Long> ids,
+                          @Param(value = "deviceMeteId") Long deviceMeteId);
     List<TCruisePointInstance> selectForTask(@Param(value = "list")List<Long> list);
+
+    int deleteByInstanceId(@Param(value = "list")List<Long> list);
 }

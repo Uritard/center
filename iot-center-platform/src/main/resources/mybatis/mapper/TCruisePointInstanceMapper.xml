@@ -493,12 +493,30 @@
         </foreach>
      </select>
 
-    <select id="selectHave" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance" resultType="java.lang.Long">
+    <select id="selectCruiseId" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="java.lang.Long">
         select a.cruise_id
         from t_cruise_point_instance a
         where 1=1
-        <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}
-        </if><if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
     </select>
+
+    <select id="selectInstanceId"  parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="java.lang.Long">
+        select a.instance_id
+        from t_cruise_point_instance a
+        where 1=1
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        and a.cruise_id in
+        <foreach collection="ids" item="cruiseId" separator="," open="(" close=")">
+            #{cruiseId,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+    <delete id="deleteByInstanceId" parameterType="java.lang.Long">
+        delete from t_cruise_point_instance
+                where instance_id in
+        <foreach collection="list" item="instanceId" separator="," open="(" close=")">
+            #{instanceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
 </mapper>

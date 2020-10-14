@@ -576,4 +576,10 @@
         from t_std_devicemete a
         where a.device_id = #{deviceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectHave" resultType="java.lang.Long">
+        select a.instance_id
+        from t_cruise_point_instance a
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </select>
 </mapper>
