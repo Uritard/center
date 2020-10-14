@@ -61,58 +61,68 @@ public class TStdDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public int addALL(TStdDeviceDetail tStdDeviceDetail) {
 
+        TStdDevice tStdDevice = new TStdDevice();
+        tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
+        tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+        if(tStdDevice.getCustomId() == null){
+            //不传 设为本体，根据字典表查，暂定为101
+            tStdDevice.setCustomId("101");
+            List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
+            tStdDevice.setCustomName(list.get(0).getDictNote());
+        }else{
+            tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceDetail.getCustomId(),null,null,null,null,null);
+            tStdDevice.setCustomName(list.get(0).getDictNote());
+        }
+        tStdDevice.setCustomType(tStdDeviceDetail.getCustomType());
+        tStdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
+        tStdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
+        tStdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
+        tStdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
+        tStdDevice.setModelId(tStdDeviceDetail.getModelId());
+        tStdDevice.setPositionType(tStdDeviceDetail.getPositionType());
+        tStdDevice.setRegionPath(tStdDeviceDetail.getRegionPath());
+        tStdDevice.setStatus(tStdDeviceDetail.getStatus());
+        tStdDevice.setUpdateTime(tStdDeviceDetail.getUpdateTime());
+        tStdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
+        tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
+        this.tStdDeviceDao.add(tStdDevice);
+        Long deivceIdUnique=tStdDevice.getDeviceId();
+        System.out.print("*******************"+deivceIdUnique+"****************");
+
         List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());//根据模板ID查询测点模板
         for (TStdMeteModelDetail tStdMeteModelDetailItem: tStdMeteModelDetailList) {
-            tStdMeteModelDetailItem.setDeviceId(tStdDeviceDetail.getDeviceId());//测点模板结合设备ID形成标准测点
+            tStdMeteModelDetailItem.setDeviceId(deivceIdUnique);//测点模板结合设备ID形成标准测点
             tStdDevicemeteDao.add(tStdMeteModelDetailItem);
-
-            if(Objects.isNull(tStdDeviceDao.selectByUnionKeys(tStdMeteModelDetailItem.getDeviceId(),tStdMeteModelDetailItem.getCustomType()))){
-                TStdDevice tStdDevice = new TStdDevice();
-                tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
-                //tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
-                // TODO: 2020/10/12 customId OR  customType
-                tStdDevice.setCustomId(tStdMeteModelDetailItem.getCustomType());
-                tStdDevice.setCustomName(tStdMeteModelDetailItem.getCustomTypeName());
-//            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdMeteModelDetailItem.getCustomType(),null,null,null,null,null);
-//            tStdDevice.setCustomName(list.get(0).getDictNote());
-//            if(tStdDevice.getCustomId() == null){
-//                //不传 设为本体，根据字典表查，暂定为101
-//                tStdDevice.setCustomId("101");
-//                List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
-//                tStdDevice.setCustomName(list.get(0).getDictNote());
-//            }else{
-//                tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
-//                List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceDetail.getCustomId(),null,null,null,null,null);
-//                tStdDevice.setCustomName(list.get(0).getDictNote());
-//            }
-                tStdDevice.setCustomType(tStdDeviceDetail.getCustomType());
-                tStdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
-                tStdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
-                tStdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
-                tStdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
-                tStdDevice.setModelId(tStdDeviceDetail.getModelId());
-                tStdDevice.setPositionType(tStdDeviceDetail.getPositionType());
-                tStdDevice.setRegionPath(tStdDeviceDetail.getRegionPath());
-                tStdDevice.setStatus(tStdDeviceDetail.getStatus());
-                tStdDevice.setUpdateTime(tStdDeviceDetail.getUpdateTime());
-                tStdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
-                tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
-                tStdDeviceDao.add(tStdDevice);
+            if(Objects.isNull(tStdDeviceDao.selectByUnionKeys(tStdMeteModelDetailItem.getDeviceId(),tStdMeteModelDetailItem.getCustomType()))){//device表中没有新增设备的测点部位
+                TStdDevice stdDevice=new TStdDevice();
+                stdDevice.setDeviceId(deivceIdUnique);
+                stdDevice.setAliasName(tStdDeviceDetail.getAliasName());
+                stdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
+                stdDevice.setCustomId(tStdMeteModelDetailItem.getCustomType());
+                stdDevice.setCustomName(tStdMeteModelDetailItem.getCustomTypeName());
+                stdDevice.setCustomType(tStdDeviceDetail.getCustomType());
+                stdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
+                stdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
+                stdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
+                stdDevice.setModelId(tStdDeviceDetail.getModelId());
+                stdDevice.setPositionType(tStdDeviceDetail.getPositionType());
+                stdDevice.setRegionPath(tStdDeviceDetail.getRegionPath());
+                stdDevice.setStatus(tStdDeviceDetail.getStatus());
+                stdDevice.setUpdateTime(tStdDeviceDetail.getUpdateTime());
+                stdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
+                stdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
+                tStdDeviceDao.add(stdDevice);
+                System.out.print("*******"+stdDevice+"**********");
             }
-
 
 
         }
 
-
-
-
-
-
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
         tStdDeviceAttr.setRealCode(tStdDeviceDetail.getRealCode());
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
-        tStdDeviceAttr.setDeviceId(Long.valueOf(tStdDeviceDetail.getDeviceId()));
+        tStdDeviceAttr.setDeviceId(tStdDevice.getDeviceId());
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
         tStdDeviceAttr.setDisableDate(tStdDeviceDetail.getDisableDate());
         tStdDeviceAttr.setIp(tStdDeviceDetail.getIp());
@@ -177,7 +187,6 @@ public class TStdDeviceService{
 //                stdDevice.setCustomName(list.get(0).getDictNote());
                     stdDevice.setCustomType(tStdDeviceDetail.getCustomType());
                     stdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
-                    stdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
                     stdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
                     stdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
                     stdDevice.setModelId(tStdDeviceDetail.getModelId());

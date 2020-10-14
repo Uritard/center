@@ -84,9 +84,9 @@ public class JobManager {
     }
 
     /**
-     *新建一个定时巡视任务
+     *新建一个周期巡视任务
      */
-    public String addCruiseTaskJob(QuartzTask quartzTask) throws Exception {
+    public String addCruiseTaskJob(QuartzTask quartzTask, String taskId) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         logger.info("jobKey: "+jobKey+"  triggerKey: "+triggerKey);
@@ -96,9 +96,10 @@ public class JobManager {
             return "false";
         }
         logger.info("dataUploadInterval :" + dataUploadInterval);
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).build();
+        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
+                usingJobData("taskId", taskId).build();
         CronTrigger cronTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup())
+                .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
                 .withSchedule(cronSchedule(quartzTask.getCronExpression()))
                 .build();
 
@@ -109,7 +110,7 @@ public class JobManager {
     /**
      *新建一个立即巡视任务
      */
-    public String addCruiseTaskJobNow(QuartzTask quartzTask) throws Exception {
+    public String addCruiseTaskJobNow(QuartzTask quartzTask, String taskId) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         logger.info("jobKey: "+jobKey+"  triggerKey: "+triggerKey);
@@ -119,16 +120,44 @@ public class JobManager {
             return "false";
         }
         logger.info("dataUploadInterval :" + dataUploadInterval);
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).build();
+        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
+                usingJobData("taskId", taskId).build();
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
-                .withIdentity("trigger3", "group1")
+                .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
                 .startAt(new Date())
                 .withSchedule(
                         SimpleScheduleBuilder.simpleSchedule()
                                 .withIntervalInSeconds(3)
                                 .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
                 .build();
+        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
+        logger.info("ok了");
+        return "success";
+    }
 
+    /**
+     *新建一个定时巡视任务
+     */
+    public String addCruiseTaskJobAtTime(QuartzTask quartzTask, String taskId) throws Exception {
+        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        logger.info("jobKey: "+jobKey+"  triggerKey: "+triggerKey);
+
+        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
+            logger.error("OC Access DataQuery Job already exist");
+            return "false";
+        }
+        logger.info("dataUploadInterval :" + dataUploadInterval);
+        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
+                usingJobData("taskId", taskId).build();
+        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
+                .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
+                .startAt(quartzTask.getStartTime())
+                .withSchedule(
+                        SimpleScheduleBuilder.simpleSchedule()
+                                .withIntervalInSeconds(3)
+                                .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
+                .build();
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
         return "success";
     }

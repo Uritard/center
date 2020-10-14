@@ -34,4 +34,5 @@ public interface TCruisePlanAttrDao {
     List<TCruisePlanAttr> selectByPage(TCruisePlanAttr tCruisePlanAttr);
 
     int batchInsert(@Param(value = "tCruisePlanAttrList") List<TCruisePlanAttr> tCruisePlanAttrList);
+    int deleteByInstanceId(@Param(value = "list") List<Long> list);
 }

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TCruisePointAttrDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TCruisePointAttr">
+        <id column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="instance_name" jdbcType="VARCHAR" property="instanceName" />
+        <result column="attr_name" jdbcType="VARCHAR" property="attrName" />
+        <result column="attr_value" jdbcType="VARCHAR" property="attrValue" />
+        <result column="remark1" jdbcType="VARCHAR" property="remark1" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        instance_id, instance_name, attr_name, attr_value, remark1
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="instanceId" parameterType="com.yjh.platform.module.device.entity.TCruisePointAttr">
+        insert into t_cruise_point_attr(
+            instance_id,
+            instance_name,
+            attr_name,
+            attr_value,
+            remark1
+        )values(
+                #{instanceId, jdbcType=BIGINT},
+                #{instanceName, jdbcType=VARCHAR},
+                #{attrName, jdbcType=VARCHAR},
+                #{attrValue, jdbcType=VARCHAR},
+                #{remark1, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cruise_point_attr
+                where instance_id = #{instanceId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruisePointAttr">
+        update t_cruise_point_attr a <set>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="instanceName != null and instanceName != ''">a.instance_name = #{instanceName, jdbcType=VARCHAR},</if>
+        <if test="attrName != null and attrName != ''">a.attr_name = #{attrName, jdbcType=VARCHAR},</if>
+        <if test="attrValue != null and attrValue != ''">a.attr_value = #{attrValue, jdbcType=VARCHAR},</if>
+        <if test="remark1 != null and remark1 != ''">a.remark1 = #{remark1, jdbcType=VARCHAR},</if>
+    </set>
+            where a.instance_id = #{instanceId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TCruisePointAttr">
+        select
+        a.instance_id,
+        a.instance_name,
+        a.attr_name,
+        a.attr_value,
+        a.remark1
+        from t_cruise_point_attr a
+        where 1 = 1
+            and a.instance_id = #{instanceId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TCruisePointAttr" resultType="com.yjh.platform.module.device.entity.TCruisePointAttr">
+        select
+        a.instance_id,
+        a.instance_name,
+        a.attr_name,
+        a.attr_value,
+        a.remark1
+        from t_cruise_point_attr a
+        where 1 = 1
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="instanceName != null and instanceName != ''"> and a.instance_name = #{instanceName, jdbcType=VARCHAR}</if>
+        <if test="attrName != null and attrName != ''"> and a.attr_name = #{attrName, jdbcType=VARCHAR}</if>
+        <if test="attrValue != null and attrValue != ''"> and a.attr_value = #{attrValue, jdbcType=VARCHAR}</if>
+        <if test="remark1 != null and remark1 != ''"> and a.remark1 = #{remark1, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruisePointAttr" resultType="com.yjh.platform.module.device.entity.TCruisePointAttr">
+        select
+        a.instance_id,
+        a.instance_name,
+        a.attr_name,
+        a.attr_value,
+        a.remark1
+        from t_cruise_point_attr a
+        where 1 = 1
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="instanceName != null and instanceName != ''"> and a.instance_name = #{instanceName, jdbcType=VARCHAR}</if>
+        <if test="attrName != null and attrName != ''"> and a.attr_name = #{attrName, jdbcType=VARCHAR}</if>
+        <if test="attrValue != null and attrValue != ''"> and a.attr_value = #{attrValue, jdbcType=VARCHAR}</if>
+        <if test="remark1 != null and remark1 != ''"> and a.remark1 = #{remark1, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_cruise_point_attr(
+            instance_id,
+            instance_name,
+            attr_name,
+            attr_value,
+            remark1
+        )values
+        <foreach collection="list" item="TCruisePointAttr" separator=",">
+            (
+                #{TCruisePointAttr.instanceId, jdbcType=BIGINT},
+                #{TCruisePointAttr.instanceName, jdbcType=VARCHAR},
+                #{TCruisePointAttr.attrName, jdbcType=VARCHAR},
+                #{TCruisePointAttr.attrValue, jdbcType=VARCHAR},
+                #{TCruisePointAttr.remark1, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_cruise_point_attr
+        where instance_id in (
+            <foreach collection="list" item="instanceId" separator=",">
+                #{instanceId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+    <delete id="deleteByInstanceId" parameterType="java.lang.Long">
+        delete from t_cruise_point_attr
+        where instance_id in (
+        <foreach collection="list" item="instanceId" separator=",">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </delete>
+
+</mapper>

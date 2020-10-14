@@ -1,10 +1,9 @@
 package com.yjh.platform.module.task.controller;
 
 import com.google.common.base.FinalizablePhantomReference;
-import com.yjh.platform.module.task.entity.RobotAlarm;
-import com.yjh.platform.module.task.entity.TWarnInfoDetail;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
-import com.yjh.platform.module.task.entity.TWarnInfo;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
@@ -163,18 +162,16 @@ public class TWarnInfoController {
     public Result selectByPage(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                             @RequestParam(value = "confMode", required = false) Integer confMode,
                             @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
-                            @RequestParam(value = "value", required = false) String value,
-                            @RequestParam(value = "startTime", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
+                            @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                             @RequestParam(value = "edTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                             @RequestParam(value = "deviceName", required = false) String deviceName,
-                            @RequestParam(value = "deviceType", required = false) Integer deviceType,
                             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                             @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TWarnInfoDetail> list = tWarnInfoService.selectByPage(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName,deviceType);
+            List<TWarnInfoDetail> list = tWarnInfoService.selectByPage(warnLevel, confMode, alarmSource,startTime,endTime,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -185,9 +182,9 @@ public class TWarnInfoController {
         return result;
     }
 
-    @ApiOperation(value = "统计本月内的所有的告警数据")
-    @RequestMapping(value = "/count", method = RequestMethod.GET)
-    public Result count(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
+    @ApiOperation(value = "统计近一周的所有告警数据")
+    @RequestMapping(value = "/countOnWeek", method = RequestMethod.GET)
+    public Result countOnWeek(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                                       @RequestParam(value = "confMode", required = false) Integer confMode,
                                       @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
                                       @RequestParam(value = "value", required = false) String value,
@@ -197,15 +194,27 @@ public class TWarnInfoController {
                                       @RequestParam(value = "deviceType", required = false) Integer deviceType){
         Result result = new Result();
         try {
-            List<HashMap<String,Integer>> list = tWarnInfoService.countOnMonth(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName,deviceType);
+            List<TutHistoryStatistical> list = tWarnInfoService.countOnWeek(warnLevel, confMode, alarmSource, value,startTime,endTime,deviceName,deviceType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("统计6天内的告警数据失败描述：", e);
+            log.error("统计告警数据失败描述：", e);
         }
         return result;
     }
-
+    @ApiOperation(value = "根据设备类型统计告警数据")
+    @RequestMapping(value = "/countByDeviceType", method = RequestMethod.GET)
+    public Result countByDeviceType(){
+        Result result = new Result();
+        try {
+            List<DevicetypeDetail> list = tWarnInfoService.countByDeviceType();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "确认，忽略")
     @RequestMapping(value = "/updateForOk", method = RequestMethod.GET)
     public Result updateForOk(//HttpServletRequest httpServletRequest,

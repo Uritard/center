@@ -234,7 +234,7 @@
     <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
             #{deviceMeteId,jdbcType=BIGINT}
     </foreach>
-    order by a.device_id desc
+    order by a.device_id,custom_id desc
     </select>
 
     <select id="selectSYForCruiseByPage" parameterType="com.yjh.platform.module.device.entity.TCfgMeteForPointDetail" resultType="java.lang.String">
@@ -492,4 +492,12 @@
             #{instanceId, jdbcType=BIGINT}
         </foreach>
      </select>
+
+    <select id="selectHave" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance" resultType="java.lang.Long">
+        select a.cruise_id
+        from t_cruise_point_instance a
+        where 1=1
+        <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+    </select>
 </mapper>

@@ -25,5 +25,6 @@ public class TCruisePointInstanceDetail extends TCruisePointInstance{
 
     private List<Long> ids;
 
+    private String meteName;
 
 }

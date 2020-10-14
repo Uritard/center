@@ -59,7 +59,6 @@ public interface TStdDevicemeteDao {
     List<TStdDeviceMete>selectByDevCus(@Param(value="deviceId")Long deviceId,@Param(value="customType")Long customType);
 
     List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customType")Long customType);
-
     int batchDelete(@Param(value = "list") List<String> list);
 
     List<CruiseResultAnalMeteInfo> selectDeviceMeteByDeviceId(@Param(value = "deviceId")Long deviceId);
