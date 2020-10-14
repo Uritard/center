@@ -362,15 +362,19 @@
 
     <select id="selectByPageAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
-        <include refid="All"/>
+        <include refid="All"/>,
+        e.dict_note as deviceModelName,
+        f.dict_note as deviceVendorName,
+        g.dict_note as voltageLevelName,
+        d.model_name as modelName,
+        h.dict_note as deviceTypeName
         from t_std_device a
-        left join (select * from t_std_device_attr
-        left join (select dict_code as code1 ,dict_note as deviceModelName from t_dict_business) e on device_model = e.code1
-        left join (select dict_code as code2,dict_note as deviceVendorName from t_dict_business) f on device_vendor=f.code2
-        left join (select dict_code as code3,dict_note as voltageLevelName from t_dict_business) g on voltage_level=g.code3
-        ) b on a.device_id = b.device_id
-        left join (select model_id ,model_name as modelName from t_std_metemodel) d on d.model_id=a.model_id
-        left join (select dict_code as code4,dict_note as deviceTypeName from t_dict_business) h on h.code4 = a.device_type
+        left join t_std_device_attr b on a.device_id = b.device_id
+        left join t_dict_business e on device_model = e.dict_code
+        left join t_dict_business f on device_vendor=f.dict_code
+        left join t_dict_business g on voltage_level=g.dict_code
+        left join t_std_metemodel d on d.model_id=a.model_id
+        left join t_dict_business h on h.dict_code = a.device_type
         where 1=1
         <if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
         and a.up_region_id in

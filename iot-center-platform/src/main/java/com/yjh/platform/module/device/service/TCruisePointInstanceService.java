@@ -275,8 +275,6 @@ public class TCruisePointInstanceService{
     @Logs(title = "巡检点关联配置",code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int instanceUpdate(TCruisePointInstanceDetail tCruisePointInstanceDetail){
-
-        //删除已有的巡检点
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setDeviceMeteId(tCruisePointInstanceDetail.getDeviceMeteId());
         tCruisePointInstance.setDeviceId(tCruisePointInstanceDetail.getDeviceId());
@@ -288,50 +286,84 @@ public class TCruisePointInstanceService{
         TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
         tCruisePointInstance.setStationId(tStdRegion.getStationId());
         tCruisePointInstance.setStationName(tStdRegion.getStationName());
-        List<Long> haveList = this.tCruisePointInstanceDao.selectHave(tCruisePointInstance);
-        this.delete(tCruisePointInstance);
+        List<Long> cruiseIdList = tCruisePointInstanceDao.selectCruiseId(tCruisePointInstanceDetail);//已经有了的巡检点
         Integer cruiseType = tCruisePointInstanceDetail.getCruiseType();
         int result = -1;
         //巡检点配置
         if (tCruisePointInstanceDetail.getIds().size()!=0){
             for (Long id:tCruisePointInstanceDetail.getIds()) {
-                if(haveList != null && haveList.size()>0){
-                    haveList.remove(id);
-                }
-                
-                TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
-                if(cruiseType == 229){//视频
-                    TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-                    tCruisePointInstance.setCruiseId(id);
-                    tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                    tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
-                }
-                if(cruiseType == 228){//机器人
-                    TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
-                    tCruisePointInstance.setCruiseId(id);
-                    tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
-                    tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tRobotInspection.getInspectionName());
-                }
+                if(cruiseIdList != null && cruiseIdList.size()>0){
+                    if(cruiseIdList.contains(id)){
+                        cruiseIdList.remove(id);
+                        continue;
+                    }else {
+                        TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
+                        if(cruiseType == 229){//视频
+                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
+                            tCruisePointInstance.setCruiseId(id);
+                            tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
+                        }
+                        if(cruiseType == 228){//机器人
+                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+                            tCruisePointInstance.setCruiseId(id);
+                            tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
+                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tRobotInspection.getInspectionName());
+                        }
 //                if(cruiseType == 230){//红外
 //                    TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
 //                    tCruisePointInstance.setCruiseId(id);
 //                    tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
 //                }
-                if(cruiseType == 232){//声纹
+                        if(cruiseType == 232){//声纹
 //                    TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(id);
 //                    tCruisePointInstance.setCruiseName(tStdDevice.getDeviceName());
+                        }
+                        //231 在线监控 232 声纹
+                        //新增配置号的巡检点
+                        result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
+                        tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+                        tCruisePointAttrDao.add(tCruisePointAttr);
+                    }
+                }else {
+                    TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
+                    if(cruiseType == 229){//视频
+                        TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
+                        tCruisePointInstance.setCruiseId(id);
+                        tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
+                    }
+                    if(cruiseType == 228){//机器人
+                        TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+                        tCruisePointInstance.setCruiseId(id);
+                        tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
+                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tRobotInspection.getInspectionName());
+                    }
+//                if(cruiseType == 230){//红外
+//                    TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
+//                    tCruisePointInstance.setCruiseId(id);
+//                    tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+//                }
+//                    if(cruiseType == 232){//声纹
+//                    TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(id);
+//                    tCruisePointInstance.setCruiseName(tStdDevice.getDeviceName());
+//                    }
+                    //231 在线监控 232 声纹
+                    //新增配置号的巡检点
+                    result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
+                    tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+                    tCruisePointAttrDao.add(tCruisePointAttr);
                 }
-                //231 在线监控 232 声纹
-                //新增配置号的巡检点
-                result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
-                tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
-                tCruisePointAttrDao.add(tCruisePointAttr);
+
             }
         }
         //删除关联表的巡检实例
-        if(haveList != null && haveList.size()>0){
-            tCruisePlanAttrDao.deleteByInstanceId(haveList);
-            tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+        if(cruiseIdList != null && cruiseIdList.size()>0){
+            List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
+            tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
+            tCruisePointAttrDao.deleteByInstanceId(instanceIdList);
+            tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
+            tCruiseTaskAttrDao.deleteByInstanceId(instanceIdList);
         }
         return result;
     }

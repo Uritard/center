@@ -67,8 +67,8 @@ public class TStdDevicemeteService{
             tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
         }
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-        tCruisePointInstance.setDeviceMeteId(deviceMeteId);
-        List<Long> haveList = tCruisePointInstanceDao.selectHave(tCruisePointInstance);
+        //tCruisePointInstance.setDeviceMeteId(deviceMeteId);
+        List<Long> haveList = tStdDevicemeteDao.selectHave(deviceMeteId);
         tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);//删除巡检点
         //删除关联的表
         if(haveList != null && haveList.size()>0){
