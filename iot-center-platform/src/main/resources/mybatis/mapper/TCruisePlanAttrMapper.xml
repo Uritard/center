@@ -111,7 +111,7 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         where 1 = 1
-            and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY a.device_id, a.custom_id
+            and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
