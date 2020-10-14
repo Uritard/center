@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.netty.client;
 
+import com.yjh.accessvideo.common.Constant;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -26,7 +27,7 @@ public class NettyClient {
 
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
-    public void start(InetSocketAddress remoteAddress, String gatewayName, int changeDataNum) throws InterruptedException{
+    public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2) throws InterruptedException{
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap()
@@ -36,29 +37,49 @@ public class NettyClient {
             .option(ChannelOption.TCP_NODELAY, true)
             .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
             .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-            .handler(new IEC104ClientChannelInitializer(gatewayName, changeDataNum) {
+            .handler(new IEC104ClientChannelInitializer() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline p = ch.pipeline();
-                    p.addLast(new IEC104ClientHandler(gatewayName, changeDataNum));
+                    p.addLast(new IEC104ClientHandler());
                 }
             });
-            //ChannelFuture future = b.connect(remoteAddress).sync();
-            //future.channel().closeFuture().sync();
+            ChannelFuture future = b.connect(remoteAddress1).sync();
+            future.channel().closeFuture().sync();
 
-            //多网关连接
-            List<Channel> channels = new ArrayList<>();
-            for(int i=1; i<=500; i++) {
-                ChannelFuture future = b.connect(remoteAddress).sync();
-                channels.add(future.channel());
-            }
+            ChannelFuture future2 = b.connect(remoteAddress2).sync();
+            future2.channel().closeFuture().sync();
+
+
 
         } finally {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     while (!exit) {
-                        log.info("连接服务端失败，5s重连1次，第"+"次");
+                        Constant.connectTimeCounts = Constant.connectTimeCounts+1;
+                        if (Constant.connectTimeCounts<=5) {
+                            try {
+                                log.info("连接服务端失败，5s重连1次，第"+Constant.connectTimeCounts+"次");
+                                TimeUnit.SECONDS.sleep(5);
+                                start(remoteAddress1, remoteAddress2);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        } else if (5<Constant.connectTimeCounts && Constant.connectTimeCounts<=10){
+                            try {
+                                log.info("连接服务端失败，60s重连1次，第"+Constant.connectTimeCounts+"次");
+                                TimeUnit.SECONDS.sleep(60);
+                                start(remoteAddress1, remoteAddress2);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        } else if (Constant.connectTimeCounts>10){
+                            log.error("连接服务端失败！");
+                            exit = true;
+                            group.shutdownGracefully();
+                            break;
+                        }
                     }
                 }
             });

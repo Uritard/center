@@ -10,6 +10,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+import java.net.InetSocketAddress;
+
 
 /**
  * Created by tt on 2019/7/31
@@ -29,6 +31,13 @@ public class AccessVideoApplication implements CommandLineRunner {
     private Short m_port;//设备端口
     @Value("${nvr.sdk.path}")
     private String sdkPath;//sdk路径
+
+    @Value("${netty.recognize.port}")
+    private int recognizePort;//识别算法端口
+    @Value("${netty.ai.port}")
+    private int aiPort;//缺陷算法端口
+    @Value("${netty.server.url}")
+    private String serverUrl;//算法服务端IP
 
     private int lUserID;//用户句柄
     //设备登录信息
@@ -50,7 +59,9 @@ public class AccessVideoApplication implements CommandLineRunner {
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return;} else { log.info("init success..");}
         hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/iot-center-accessvideo-1.0.0",false);
         if (register()) {log.info("register success..");}
-//        nettyClient.start();
+        InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
+        InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
+        nettyClient.start(remoteAddress1, remoteAddress2);
     }
 
     private boolean register() {

@@ -12,6 +12,8 @@ public class IEC104ClientChannelInitializer extends ChannelInitializer<SocketCha
     private String gatewayName;
     private int changeDataNum;
 
+    public IEC104ClientChannelInitializer() { }
+
     public IEC104ClientChannelInitializer(String gatewayName, int changeDataNum) {
         this.gatewayName = gatewayName;
         this.changeDataNum = changeDataNum;
