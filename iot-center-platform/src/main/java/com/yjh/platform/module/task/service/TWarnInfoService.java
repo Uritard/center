@@ -1,12 +1,13 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.module.task.entity.RobotAlarm;
-import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.yjh.platform.module.task.entity.TWarnInfoDetail;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 * @since 2020-08-24
 */
 @Service
-public class TWarnInfoService{
+public class TWarnInfoService {
 
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    private DateTimeUtil dateTimeUtil;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -60,68 +62,135 @@ public class TWarnInfoService{
         return this.tWarnInfoDao.batchInsert(list);
     }
 
-    //在传入设备内容时，查询结果不正确，主要是机器人部分 机器人没有自己的属性表
-    //根据设备类型过滤查询未作 设备类型不明确
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfoDetail> selectByPage(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime, String deviceName,Integer deviceType) {
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("warnLevel",warnLevel);
-        map.put("confMode",confMode);
-        map.put("alarmSource",alarmSource);
-        map.put("value",value);
-        map.put("startTime",startTime);
-        map.put("endTime",endTime);
-        map.put("deviceName",deviceName);
-        if(map.get("alarmSource") != null){
-            if(deviceType != null) {
-                List<Long> list = tWarnInfoDao.selectIds(String.valueOf(deviceType));
-                map.put("list", list);
-                return tWarnInfoDao.selectByPageWarn(map);
-            }else {
-                return tWarnInfoDao.selectByPageWarn(map);
-            }
-        }else if(false){//条件不足 未作
-            if(false){//条件不足 未作
-                return tWarnInfoDao.selectByPageRobot(map);
-            }
-            return tWarnInfoDao.selectByPageCfg(map);
-        }
-        //if (map.get() == "机器人")
+    public List<TWarnInfoDetail> selectByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("warnLevel", warnLevel);
+        map.put("confMode", confMode);
+        map.put("alarmSource", alarmSource);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("deviceName", deviceName);
         return tWarnInfoDao.selectAllWarn(map);
-
     }
 
     //统计所有的告警，输入deviceName无效 原因：当不需要robot表中的数据时，无法去掉
     //只能统计所有的告警 未作根据设备类型（消防，主设备）来做过滤
-    @Logs(title = "统计本月内的告警数", code = "module")
+    @Logs(title = "统计本周内的告警数", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<HashMap<String,Integer>> countOnMonth(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime,String deviceName,Integer deviceType) {
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("warnLevel",warnLevel);
-        map.put("confMode",confMode);
-        map.put("alarmSource",alarmSource);
-        map.put("value",value);
-        map.put("startTime",startTime);
-        map.put("endTime",endTime);
-        map.put("deviceName",deviceName);
-        if(map.get("alarmSource") != null){
-            if(deviceType != null) {
-                List<Long> list = tWarnInfoDao.selectIds(String.valueOf(deviceType));
-                map.put("list", list);
-                return tWarnInfoDao.countOnMonthByWarn(map);
-            }else {
-                return tWarnInfoDao.countOnMonthByWarn(map);
-            }
-        }else if(false){//条件不足 未作
-            if(false){//条件不足 未作
-                return tWarnInfoDao.countOnMonthByRobot(map);
-            }
-            return tWarnInfoDao.countOnMonthByCfg(map);
+    public List<TutHistoryStatistical> countOnWeek(Integer warnLevel, Integer confMode, Integer alarmSource, String value, Date startTime, Date endTime, String deviceName, Integer deviceType) {
+        List<String> weekDates = dateTimeUtil.getDayDateList(8);
+
+        String firstTime1 = weekDates.get(0);
+        String firstTime2 = weekDates.get(1);
+        String firstTime3 = weekDates.get(2);
+        String firstTime4 = weekDates.get(3);
+        String firstTime5 = weekDates.get(4);
+        String firstTime6 = weekDates.get(5);
+        String firstTime7 = weekDates.get(6);
+        String firstTime8 = weekDates.get(7);
+
+        Map<String, Integer> map1 = tWarnInfoDao.countOnWeek(firstTime1, firstTime2, firstTime3, firstTime4,
+                firstTime5, firstTime6, firstTime7, firstTime8);
+        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+
+        Iterator<String> iter = map1.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            String timeNode = key.substring(0, 10);
+            Number mapValue = (Number) map1.get(key);
+            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
+            tutHistoryStatistical.setTimeNode(timeNode);
+            tutHistoryStatistical.setCount(mapValue);
+            tutHistoryStatisticalList.add(tutHistoryStatistical);
         }
-        //if (map.get() == "机器人")
-        return tWarnInfoDao.countOnMonth(map);
+        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
+            @Override
+            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                Date date1 = null;
+                Date date2 = null;
+                try {
+                    date1 = simpleDateFormat.parse(o1.getTimeNode());
+                    date2 = simpleDateFormat.parse(o2.getTimeNode());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int flag = date1.compareTo(date2);
+                if (flag == -1) {
+                    flag = -1;
+                } else if (flag == 1) {
+                    flag = 1;
+                }
+                return flag;
+            }
+        });
+//        HashMap<String,Object> map = new HashMap<>();
+//        map.put("warnLevel",warnLevel);
+//        map.put("confMode",confMode);
+//        map.put("alarmSource",alarmSource);
+//        map.put("value",value);
+//        map.put("startTime",startTime);
+//        map.put("endTime",endTime);
+//        map.put("deviceName",deviceName);
+//        if(map.get("alarmSource") != null){
+//            if(deviceType != null) {
+//                List<Long> list = tWarnInfoDao.selectIds(String.valueOf(deviceType));
+//                map.put("list", list);
+//                return tWarnInfoDao.countOnMonthByWarn(map);
+//            }else {
+//                return tWarnInfoDao.countOnMonthByWarn(map);
+//            }
+//        }else if(false){//条件不足 未作
+//            if(false){//条件不足 未作
+//                return tWarnInfoDao.countOnMonthByRobot(map);
+//            }
+//            return tWarnInfoDao.countOnMonthByCfg(map);
+//        }
+//        //if (map.get() == "机器人")
+//        return tWarnInfoDao.countOnMonth(map);
+        return tutHistoryStatisticalList;
     }
+
+    @Logs(title = "根据设备类型统计告警数据", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<DevicetypeDetail> countByDeviceType(){
+        Map<String, Integer> map1 = tWarnInfoDao.countByDeviceType();
+        Map<String, Integer> map2 = tWarnInfoDao.countByDeviceType2();
+        Map<String, Integer> map3 = tWarnInfoDao.countByDeviceType3();
+        List<DevicetypeDetail> devicetypeDetailList = new ArrayList<>();
+        Iterator<String> iter = map1.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            Number mapValue =  (Number)map1.get(key);
+            DevicetypeDetail devicetypeDetail = new DevicetypeDetail();
+            devicetypeDetail.setCount(mapValue);
+            devicetypeDetail.setDeviceTypeName(key);
+            devicetypeDetailList.add(devicetypeDetail);
+        }
+        Iterator<String> iter2 = map2.keySet().iterator();
+        while (iter2.hasNext()) {
+            String key = iter2.next();
+            Number mapValue =  (Number)map2.get(key);
+            DevicetypeDetail devicetypeDetail = new DevicetypeDetail();
+            devicetypeDetail.setCount(mapValue);
+            devicetypeDetail.setDeviceTypeName(key);
+            devicetypeDetailList.add(devicetypeDetail);
+        }
+        Iterator<String> iter3 = map3.keySet().iterator();
+        while (iter3.hasNext()) {
+            String key = iter3.next();
+            Number mapValue =  (Number)map3.get(key);
+            DevicetypeDetail devicetypeDetail = new DevicetypeDetail();
+            devicetypeDetail.setCount(mapValue);
+            devicetypeDetail.setDeviceTypeName(key);
+            devicetypeDetailList.add(devicetypeDetail);
+        }
+        System.out.println("devicetypeDetailList是："+devicetypeDetailList);
+        return devicetypeDetailList;
+}
 
     //count未确定
     public int updateForOk(Long userId,String warnIds,Integer confMode){
