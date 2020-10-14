@@ -159,6 +159,7 @@ public class TCruisePlanService{
                 deviceIdList.add(deviceId);
             }
         }
+//        System.out.print("&&&&&&&&&&&&*"+deviceIdList+"*****************");
         List<InstanceTree> instanceTreeList = tCruisePlanDao.findInstanceTree(deviceIdList);
         return instanceTreeList;
     }

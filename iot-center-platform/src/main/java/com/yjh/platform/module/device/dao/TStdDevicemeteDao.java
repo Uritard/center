@@ -52,11 +52,11 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "alarmState") Integer alarmState);
     List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
-    Long selectDeviceMeteByDeviceCustom(@Param("deviceId")Long deviceId,@Param("customId")String customId);
+    List<Long> selectDeviceMeteByDeviceCustom(@Param("deviceId")Long deviceId,@Param("customId")String customId);
     int batchAdd(List<TStdDeviceMete> list);
     List<TStdDeviceMete> selectDevMeteByModelId(@Param(value = "modelId") Long modelId);
     int deleteByDevId(@Param(value = "deviceId") Long deviceId);
-    List<TStdDeviceMete>selectByDevCus(@Param(value="deviceId")Long deviceId,@Param(value="customType")Long customType);
+    List<TStdDeviceMete>selectByDevCus(@Param(value="deviceId")Long deviceId,@Param(value="customId")String customId);
 
     List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customType")Long customType);
     int batchDelete(@Param(value = "list") List<String> list);

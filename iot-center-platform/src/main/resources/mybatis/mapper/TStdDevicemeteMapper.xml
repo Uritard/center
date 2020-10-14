@@ -468,7 +468,7 @@
 
     <select id="selectByDevCus" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        select * from t_std_devicemete
-       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customId,jdbcType=BIGINT}
+       WHERE device_id=#{deviceId,jdbcType=BIGINT} AND custom_id=#{customId,jdbcType=VARCHAR}
     </select>
 
 

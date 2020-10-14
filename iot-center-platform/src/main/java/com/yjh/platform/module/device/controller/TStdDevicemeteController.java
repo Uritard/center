@@ -233,7 +233,7 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "设备ID与部位ID查询设备测点")
     @RequestMapping(value = "/selectByDevCus", method = RequestMethod.GET)
-    public Result selectByDevCus(@RequestParam(value = "deviceId") Long deviceId, @RequestParam(value = "customType") Long customType) {
+    public Result selectByDevCus(@RequestParam(value = "deviceId") Long deviceId, @RequestParam(value = "customType") String customType) {
         Result result = new Result();
         try {
             List<TStdDeviceMete> tStdDeviceMete = tStdDevicemeteService.selectByDevCus(deviceId, customType);

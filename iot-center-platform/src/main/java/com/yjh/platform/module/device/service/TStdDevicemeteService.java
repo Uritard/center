@@ -53,6 +53,7 @@ public class TStdDevicemeteService{
         String customId=tStdDeviceMete.getCustomId();
         this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);
 
+        System.out.print(tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)+"*****************");
         if(Objects.isNull(tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId))){
             tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
         }
@@ -62,7 +63,7 @@ public class TStdDevicemeteService{
     @Logs(title = "更新", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
-        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());
+        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在
         if(Objects.isNull(tStdDevice)){
             //新增没有 修改的部位 的设备
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
@@ -70,9 +71,12 @@ public class TStdDevicemeteService{
             stdDevice.setCustomName(tStdDeviceMeteDetail.getCustomTypeName());
             tStdDeviceDao.add(stdDevice);
 
-            //删除之前部位的设备
-            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
-            tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());
+
+            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());//查询修改之前该标准测点的信息
+            List<TStdDeviceMete> tStdDeviceMetes=tStdDevicemeteDao.selectByDevCus(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());
+            if(tStdDeviceMetes.size()<=1){ //如果不存在其他 相同deviceId和customId的测点就删除该设备、否则保留
+                tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());  //删除之前部位的设备
+            }
         }
         return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }
@@ -140,7 +144,7 @@ public class TStdDevicemeteService{
 
     @Logs(title = "设备ID与部位ID查询设备测点", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> selectByDevCus(Long deviceId,Long customType) {
+    public List<TStdDeviceMete> selectByDevCus(Long deviceId,String customType) {
         return this.tStdDevicemeteDao.selectByDevCus(deviceId, customType);
     }
 
