@@ -50,7 +50,8 @@ public class TStdDevicemeteService{
         if(Objects.isNull(tStdDevice)){
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
             stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());
-            stdDevice.setCustomName(tStdDeviceMeteDetail.getCustomTypeName());
+            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
+            stdDevice.setCustomName(list.get(0).getDictNote());
             tStdDeviceDao.add(stdDevice);
         }
         return this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
@@ -63,7 +64,8 @@ public class TStdDevicemeteService{
         Long deviceId=tStdDeviceMete.getDeviceId();
         String customId=tStdDeviceMete.getCustomId();
         this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);
-        if(Objects.isNull(tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId))){
+
+        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){
             tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
         }
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
@@ -178,11 +180,22 @@ public class TStdDevicemeteService{
     @Logs(title = "批量删除", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String list) {
+        int deleteCount=0;
         List<String> list1= Arrays.asList(list.split(","));
         for (String item:list1) {
-            tCruisePointInstanceDao.deleteByDeviceMeteId(Long.valueOf(item));
+            tCruisePointInstanceDao.deleteByDeviceMeteId(Long.valueOf(item));//遍历删除巡视点
+
+            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));
+            Long deviceId=tStdDeviceMete.getDeviceId();
+            String customId=tStdDeviceMete.getCustomId();
+            deleteCount=tStdDevicemeteDao.deleteByPrimaryId(Long.valueOf(item))+deleteCount;
+
+            if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){
+                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+            }
+
         }
-        return this.tStdDevicemeteDao.batchDelete(list1);
+        return deleteCount;//批量删除标准测点
     }
 
 
