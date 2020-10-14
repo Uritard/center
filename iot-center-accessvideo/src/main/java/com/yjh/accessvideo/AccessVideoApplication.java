@@ -57,11 +57,11 @@ public class AccessVideoApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         log.info("videoAccess is running...");
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return;} else { log.info("init success..");}
-        hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/iot-center-accessvideo-1.0.0",false);
+        hCNetSDK.NET_DVR_SetLogToFile(1,"/home/yjh_iot_center/iot-center-accessvideo-1.0.0",false);
         if (register()) {log.info("register success..");}
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2);
+//        nettyClient.start(remoteAddress1, remoteAddress2);
     }
 
     private boolean register() {

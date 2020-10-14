@@ -42,8 +42,11 @@ public class CameraConController {
     @Value("${server.port}")
     private String serverPort;//服务端口
 
-    @Value("${nvr.capture.picture}")
-    private String sdkPicturePath;//图片路径
+    @Value("${nvr.capture.result}")
+    private String captureResultPath;//结果路径
+
+    @Value("${nvr.capture.Preset}")
+    private String capturePresetPath;//预置位路径
 
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
@@ -106,7 +109,7 @@ public class CameraConController {
             int ran = (int) (Math.random()*(max-min)+min);
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
             String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpeg";
-            String filePath = sdkPicturePath + filePathTem;
+            String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
             String urlPath = "http://" +getLocalIp()+":"+serverPort+"/image"+filePathTem;
@@ -130,7 +133,7 @@ public class CameraConController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             String filePathTem = "/" + presetId + ".jpeg";
-            String filePath = sdkPicturePath + filePathTem;
+            String filePath = capturePresetPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
             String urlPath = "http://" +getLocalIp()+":"+serverPort+"/image"+filePathTem;

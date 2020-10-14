@@ -85,11 +85,18 @@
         SELECT
         a.plan_id,
         a.instance_id,
-        CONCAT(IFNULL(h.mete_name, ''), '(', IFNULL(f.inspection_name, ''), IFNULL(g.preset_name, ''), ')') AS cruise_name,
+        (CASE
+		 WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+		 WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+		 WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+		 WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+		 WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+		 WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+		END) AS instance_name,
         b.device_id,
         d.device_name,
         b.custom_id,
-        d.custom_name,
+        i.dict_note,
         b.cruise_type,
         e.dict_note AS cruise_type_name,
         a.point_type,
@@ -110,6 +117,7 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where 1 = 1
             and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id
     </select>

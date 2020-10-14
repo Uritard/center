@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import static com.yjh.accessvideo.common.Constant.TYPET3;
+
 /**
  * Created by tt on 2019/7/31.
  */
@@ -24,6 +26,7 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
     private byte[] bufBytes = new byte[1024 * 512];
     private int bufdateLen;
     private long hisT3 = System.currentTimeMillis();
+    private long hisTtimeout;
     private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
@@ -46,7 +49,6 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
         sendStartRegister(ctx);
         Thread.sleep(3000);
-        sendStartConfrim(ctx);
         this.ctx = ctx;
         isThreadStart = true;
         //启动心跳检测
@@ -96,10 +98,6 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
                         //收到总召命令，发送数据
                         log.info("发送总召数据");
                         byte[] bytesYX1 = new byte[141];
-                        break;
-                    case 0x2E:
-                        //收到遥控命令，发送返校信息
-                        sendController(ctx, bufBytes);
                         break;
                     default:
                         log.info("未知数据类型: " + bufBytes[6]);
@@ -170,15 +168,27 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
 
     public void ProcSend() {
         try {
-            // 发送跳变数据
-            sendChangeData(ctx);
+            // 心跳报文(客户端,服务端均可发起测试);
+            if (isTimeout(TYPET3, hisT3, false)) {
+                SendHeartBeat(ctx);
+                hisT3 = hisTtimeout = System.currentTimeMillis();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private void istimeout(byte type, long hisTime, boolean set) {
+    private boolean isTimeout(byte type, long value, boolean set) {
+        if (type == TYPET3) {
+            //log.info("commandSend:68 04 43 00 00 00 "+System.currentTimeMillis() + ":" + value +":" +(System.currentTimeMillis() - value));
+            if ((System.currentTimeMillis() - value) > T3) {
+                if (set) hisT3 = System.currentTimeMillis();
+                return true;
+            } else {
+                return false;
+            }
+        } else return false;
     }
 
     @Override
@@ -187,48 +197,32 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private void sendBytes(ChannelHandlerContext ctx, byte[] bytes) {
+    private void sendBytes(ChannelHandlerContext ctx, String msg) {
         ByteBuf byteBuf = ctx.alloc().buffer();
-        byteBuf.writeBytes(bytes);
-        StringBuilder Str = new StringBuilder();
-        for (byte byteitem : bytes) {
-            Str.append(String.format("%02x ", byteitem));
-        }
-        log.info("客户端发送报文:" + Str);
-        ctx.pipeline().writeAndFlush(byteBuf);
+        byteBuf.writeBytes(byteBuf);
+        log.info("客户端发送报文:" + msg);
+        ctx.pipeline().writeAndFlush(msg);
         log.info("客户端发送报文成功！");
         if (byteBuf.refCnt() >= 1) {
             ReferenceCountUtil.release(ctx);
         }
     }
 
-    private void sendString(ChannelHandlerContext ctx, String message) {
-        log.info("客户端发送报文:" + message);
-        ctx.channel().writeAndFlush(message);
+    private void sendString(ChannelHandlerContext ctx, String msg) {
+        log.info("客户端发送报文:" + msg);
+        ctx.channel().writeAndFlush(msg);
         log.info("客户端发送报文成功！");
     }
 
     private void sendStartRegister(ChannelHandlerContext ctx) {
-        byte[] bytesRegister = new byte[gatewayName.length()+15];
-        bytesRegister[0] = 0x69;
-        String bytesLength = ByteUtil.intToHex(gatewayName.length()+13);
-        bytesRegister[1] = ByteUtil.toByteArray(bytesLength)[0];
-        for (int i=0;i<13;i++) {bytesRegister[i+2]=0x00;}
-        byte[] gatewayNameHex = ByteUtil.toByteArray(ByteUtil.stringToHex(gatewayName));
-        for (int i=13;i<gatewayName.length()+13;i++) {bytesRegister[i+2]=gatewayNameHex[i-13];}
-        sendBytes(ctx, bytesRegister);
+        // 发送json字符串
+        String registerMsg = "{\"MsgType\":\"00\",\"MsgData\":{\"DesNode\": \"ServerSocket\",\n\"SrcNode\": \"ClientSocket\"}}\n";
+        sendString(ctx, registerMsg);
     }
 
-    private void sendStartConfrim(ChannelHandlerContext ctx) {
-        byte[] bytesStartConfirm = new byte[6];
-        bytesStartConfirm[0] = 0x68;
-        bytesStartConfirm[1] = 0x04;
-        bytesStartConfirm[2] = 0x0B;
-        bytesStartConfirm[3] = 0x00;
-        bytesStartConfirm[4] = 0x00;
-        bytesStartConfirm[5] = 0x00;
-        sendBytes(ctx, bytesStartConfirm);
-        log.info("启动激活确认发送成功！");
+    private void SendHeartBeat(ChannelHandlerContext ctx) {
+        String registerMsg = "{\"MsgType\":\"05\",\"MsgData\":{\"DesNode\": \"ServerSocket\",\n\"SrcNode\": \"ClientSocket\"}}\n";
+        sendString(ctx, registerMsg);
     }
 
     private void sendChangeData (ChannelHandlerContext ctx) throws Exception {
@@ -269,15 +263,6 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
             }
             log.info("跳变数据发送成功！");
         }
-    }
-
-    private void sendController(ChannelHandlerContext ctx, byte[] bytes) {
-        byte[] bytes1 = new byte[16];
-        int CallBackTemInt = ByteUtil.byte2Int(bytes[13])+2;
-        bytes[13] = ByteUtil.int2Byte(CallBackTemInt)[0];
-        System.arraycopy(bytes,0,bytes1,0,16);
-        sendBytes(ctx, bytes1);
-        log.info("遥控反校成功！");
     }
 
     public int nextInt(int min, int max) throws Exception {
