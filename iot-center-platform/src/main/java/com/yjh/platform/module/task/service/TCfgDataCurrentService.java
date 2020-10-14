@@ -1,10 +1,7 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
-import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
-import com.yjh.platform.module.task.dao.TUnionTaskDao;
+import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.service.TUnionTaskService;
 
 import java.text.ParseException;
@@ -43,7 +40,10 @@ public class TCfgDataCurrentService {
     private TUnionTaskDao tUnionTaskDao;
 
     @Autowired
-    private TCruisePlanAttrDao tCruisePlanAttrDao;
+    private TCruisePlanDao tCruisePlanDao;
+
+    @Autowired
+    private TCruiseTaskService tCruiseTaskService;
 
 
     @Logs(title = "插入", code = "module")
@@ -97,7 +97,7 @@ public class TCfgDataCurrentService {
 
     @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Set<Long> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
+    public List<TCruiseTask> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
         Set<Long> plans = new HashSet<>();//满足触发条件的预案
         Log cLogger = LogFactory.getLog(this.getClass());
         //联动规则一次匹配
@@ -169,9 +169,19 @@ public class TCfgDataCurrentService {
             }
 
         }
+        List<TCruiseTask>tCruiseTasks=new ArrayList<>();
+        for(Long plan:plans){
         TCruiseTask tCruiseTask=new TCruiseTask();
-
-        return plans;
+        TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
+        tCruiseTask.setPlanId(tCruisePlan.getPlanId());
+        tCruiseTask.setTaskName(tCruisePlan.getPlanName());
+        tCruiseTask.setIfRun(173);
+        tCruiseTaskService.insert(tCruiseTask);
+        cLogger.info("联动开始执行");
+        tCruiseTasks.add(tCruiseTask);
+        }
+//        return plans;
+        return tCruiseTasks;
     }
 
     @Logs(title = "联动记录&&告警信息-滚动刷新", code = "module")

@@ -46,6 +46,9 @@ public class TCruisePlanController {
         Result result = new Result();
         try {
             result.setData(tCruisePlanService.insert(map));
+            if(result.getData().equals(ResultCodeEnum.CODE10010.getCode())){
+                result.setCode(ResultCodeEnum.CODE10010.getCode(),ResultCodeEnum.CODE10010.getName());
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
