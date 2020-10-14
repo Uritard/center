@@ -149,7 +149,7 @@
     </insert>
 
     <select id="findInstanceTree" resultType="com.yjh.platform.module.task.entity.InstanceTree">
-        SELECT a.device_id, a.instance_id, a.device_mete_id, a.station_id, a.custom_id, a.station_name, a.cruise_id, a.cruise_name, b.device_name,k.dict_note,
+        SELECT a.device_id, a.instance_id, a.device_mete_id, a.station_id, a.custom_id, a.station_name, a.cruise_id, a.cruise_name, b.device_name,k.dict_note AS custom_name,
           (CASE
             WHEN ISNULL(j.mete_name) AND ISNULL(d.inspection_name) AND ISNULL(f.preset_name) THEN ''
             WHEN ISNULL(j.mete_name) AND ISNULL(d.inspection_name) THEN f.preset_name

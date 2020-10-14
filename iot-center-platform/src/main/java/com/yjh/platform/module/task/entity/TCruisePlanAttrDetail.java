@@ -32,6 +32,9 @@ public class TCruisePlanAttrDetail implements Serializable {
     @ApiModelProperty(value = "关联巡检点定义实例表名称")
     private String cruiseName;
 
+    @ApiModelProperty(value = "关联巡检点定义实例表名称")
+    private String instanceName;
+
     @ApiModelProperty(value = "设备id")
     private Long deviceId;
 

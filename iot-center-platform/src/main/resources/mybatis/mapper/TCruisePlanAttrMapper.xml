@@ -96,7 +96,7 @@
         b.device_id,
         d.device_name,
         b.custom_id,
-        i.dict_note,
+        i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name,
         a.point_type,
