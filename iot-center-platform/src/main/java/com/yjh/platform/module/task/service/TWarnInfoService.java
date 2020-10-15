@@ -1,27 +1,29 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.module.task.entity.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
-* @author czh
-* @since 2020-08-24
+* @author tt
+* @since 2020-10-15
 */
 @Service
-public class TWarnInfoService {
+public class TWarnInfoService{
 
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+
     private DateTimeUtil dateTimeUtil;
 
     @Logs(title = "插入", code = "module")
@@ -50,8 +52,15 @@ public class TWarnInfoService {
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfo> select(Long warnId, Integer warnLevel, Date warnTime, Integer warnType, Long deviceId, String cunstomId, Long instanceId, Long stdMeteId, Integer confMode, Date confTime, String confUserId, String confInfo, Integer ifWarnDisable, Integer alarmSource, Integer warnSubtype, String deviceCode, String imagePath, String videoPath, String value, Integer defect, Integer defectLevel, String outRange, String linkMessage) {
-        List<TWarnInfo> tWarnInfoList = tWarnInfoDao.select(warnId, warnLevel, warnTime, warnType, deviceId, cunstomId, instanceId, stdMeteId, confMode, confTime, confUserId, confInfo, ifWarnDisable, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, defect, defectLevel, outRange, linkMessage);
+    public List<TWarnInfo> select(Long warnId, Integer warnLevel, Date warnTime, Integer warnType, String warnName, String warnContent, Long deviceId, String cunstomId, Long instanceId, Long stdMeteId, Integer confMode, Integer isWarn, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, Integer ifWarnDisable, Integer alarmSource, Integer warnSubtype, String deviceCode, String imagePath, String videoPath, String value, String outRange, String linkMessage) {
+        List<TWarnInfo> tWarnInfoList = tWarnInfoDao.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, ifWarnDisable, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, linkMessage);
+        return tWarnInfoList;
+    }
+
+    @Logs(title = "分页查询", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TWarnInfo> selectByPage(TWarnInfo tWarnInfo) {
+        List<TWarnInfo> tWarnInfoList = tWarnInfoDao.selectByPage(tWarnInfo);
         return tWarnInfoList;
     }
 
@@ -60,7 +69,6 @@ public class TWarnInfoService {
     public int batchInsert(List<TWarnInfo> list) {
         return this.tWarnInfoDao.batchInsert(list);
     }
-
     @Logs(title = "查询所有告警", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfoDetail> selectWarnByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName) {
@@ -73,20 +81,32 @@ public class TWarnInfoService {
         map.put("deviceName", deviceName);
         return tWarnInfoDao.selectAllWarn(map);
     }
-    @Logs(title = "查询所有缺陷", code = "module")
+    @Logs(title = "根据告警来源统计告警数据", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TDefectInfo> selectDefectByPage(Integer confMode,Integer defectType, Date startTime, Date endTime, String deviceName) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("confMode", confMode);
-        map.put("defectType", defectType);
-        map.put("startTime", startTime);
-        map.put("endTime", endTime);
-        map.put("deviceName", deviceName);
-        return tWarnInfoDao.selectAllDefect(map);
+    public List<TJContentInfo> countByAlarmSource() {
+        Map<String, Integer> map = tWarnInfoDao.countByAlarmSource();
+        List<TJContentInfo> tjContentInfoList = new ArrayList<>();
+        Iterator<String> iter = map.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            Number mapValue =  (Number)map.get(key);
+            TJContentInfo tjContentInfo = new TJContentInfo();
+            tjContentInfo.setCount(mapValue);
+            tjContentInfo.setTJContent(key);
+            tjContentInfoList.add(tjContentInfo);
+        }
+        return tjContentInfoList;
     }
-    @Logs(title = "统计本周内的告警数", code = "module")
+    @Logs(title = "根据设备类型统计告警数据", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> countOnWeek() {
+    public List<TJContentInfoDetail> countByDeviceType(){
+        List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType();
+        System.out.println("tjContentInfoList是："+tjContentInfoList);
+        return tjContentInfoList;
+    }
+    @Logs(title = "统计近一周的所有告警个数", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TutHistoryStatistical> countWarnOnWeek() {
         List<String> weekDates = dateTimeUtil.getDayDateList(8);
 
         String firstTime1 = weekDates.get(0);
@@ -98,7 +118,7 @@ public class TWarnInfoService {
         String firstTime7 = weekDates.get(6);
         String firstTime8 = weekDates.get(7);
 
-        Map<String, Integer> map1 = tWarnInfoDao.countOnWeek(firstTime1, firstTime2, firstTime3, firstTime4,
+        Map<String, Integer> map1 = tWarnInfoDao.countWarnOnWeek(firstTime1, firstTime2, firstTime3, firstTime4,
                 firstTime5, firstTime6, firstTime7, firstTime8);
         List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
 
@@ -136,18 +156,10 @@ public class TWarnInfoService {
         });
         return tutHistoryStatisticalList;
     }
-
-    @Logs(title = "根据设备类型统计告警数据", code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public List<TJContentInfoDetail> countByDeviceType(){
-        List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType();
-        System.out.println("tjContentInfoList是："+tjContentInfoList);
-        return tjContentInfoList;
-}
     @Logs(title = "根据告警处理状态统计告警个数-饼图", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TJContentInfo> countConfMode() {
-        Map<String, Integer> map = tWarnInfoDao.countConfMode();
+    public List<TJContentInfo> countWarnConfMode() {
+        Map<String, Integer> map = tWarnInfoDao.countWarnConfMode();
         List<TJContentInfo> tjContentInfoList = new ArrayList<>();
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
@@ -159,41 +171,30 @@ public class TWarnInfoService {
             tjContentInfoList.add(tjContentInfo);
         }
         return tjContentInfoList;
-    }
-    @Logs(title = "根据告警来源统计告警数据", code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public List<TJContentInfo> countByAlarmSource() {
-        Map<String, Integer> map = tWarnInfoDao.countByAlarmSource();
-        List<TJContentInfo> tjContentInfoList = new ArrayList<>();
-        Iterator<String> iter = map.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = iter.next();
-            Number mapValue =  (Number)map.get(key);
-            TJContentInfo tjContentInfo = new TJContentInfo();
-            tjContentInfo.setCount(mapValue);
-            tjContentInfo.setTJContent(key);
-            tjContentInfoList.add(tjContentInfo);
-        }
-        return tjContentInfoList;
-    }
-    @Logs(title = "查看告警处理情况", code = "module")
-    @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfoDetail> selectAlarmProcessByPage(Long warnId) {
-        return tWarnInfoDao.selectAlarmProcessByPage(warnId);
-    }
-    //count未确定
-    public int updateForOk(Long userId,String warnIds,Integer confMode){
-        String[] list = warnIds.split(",");
-        TWarnInfo tWarnInfo = new TWarnInfo();
-        int i = 0;
-        for (String item:list) {
-            tWarnInfo.setWarnId(Long.valueOf(item));
-            tWarnInfo.setConfUserId(userId.toString());
-            tWarnInfo.setConfMode(confMode);
-            i =+ this.tWarnInfoDao.update(tWarnInfo);
-        }
-        return i;
     }
 
+    @Logs(title = "查看告警处理情况", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TWarnInfoDetail> selectAlarmProcess(Long warnId) {
+        return tWarnInfoDao.selectAlarmProcess(warnId);
+    }
+    @Logs(title = "进行告警处理", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int alarmProcess(Long warnId,Integer alarmSource,Integer dealType,String dealInfo) {
+        int jieGuo = 0;
+        if (alarmSource == 279 ) {
+//             jieGuo = tWarnInfoDao.alarmProcessRobot(warnId, dealType, dealInfo);
+        }else if (alarmSource == 888)
+        {
+//            jieGuo = tWarnInfoDao.alarmProcessCamera(warnId, dealType, dealInfo);
+        }else{
+            TWarnInfo tWarnInfo = new TWarnInfo();
+            tWarnInfo.setWarnId(warnId);
+            tWarnInfo.setDealInfo(dealInfo);
+            tWarnInfo.setDealType(dealType);
+            jieGuo = tWarnInfoDao.update(tWarnInfo);
+        }
+        return jieGuo;
+    }
 }
 

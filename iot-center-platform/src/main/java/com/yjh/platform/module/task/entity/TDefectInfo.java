@@ -1,6 +1,8 @@
 package com.yjh.platform.module.task.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,41 +13,92 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author YC
- * @date 2020/10/14 - 21:13
+ * @author tt
+ * @since 2020-10-15
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TutHistoryStatistical对象", description = "历史统计")
+@ApiModel(value = "TDefectInfo对象", description = "缺陷信息表")
 public class TDefectInfo implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "缺陷id")
+
+    @ApiModelProperty(value = "缺陷ID")
+    @TableId(value = "defect_id", type = IdType.AUTO)
     private Long defectId;
 
-    @ApiModelProperty(value = "缺陷时间",example = "2018-10-01 12:18:48")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "缺陷等级")
+    private Integer defectLevel;
+
+    @ApiModelProperty(value = "缺陷时间")
     private Date defectTime;
 
     @ApiModelProperty(value = "缺陷类型")
     private Integer defectType;
-    @ApiModelProperty(value = "缺陷类型-字典表")
-    private String defectTypeName;
 
-    @ApiModelProperty(value = "处理状态")
+    @ApiModelProperty(value = "缺陷名称")
+    private String defectName;
+
+    @ApiModelProperty(value = "缺陷内容")
+    private String defectContent;
+
+    @ApiModelProperty(value = "设备Id")
+    private Long deviceId;
+
+    @ApiModelProperty(value = "部位ID")
+    private String cunstomId;
+
+    @ApiModelProperty(value = "巡检点ID")
+    private Long instanceId;
+
+    @ApiModelProperty(value = "标准测点ID")
+    private Long stdMeteId;
+
+    @ApiModelProperty(value = "缺陷状态：1未处理 2已处理 3已确认 4已忽略")
     private Integer confMode;
-    @ApiModelProperty(value = "处理状态-字典表")
-    private String confModeName;
 
-    @ApiModelProperty(value = "设备id")
-    private Integer deviceId;
-    @ApiModelProperty(value = "缺陷主设备")
-    private String deviceName;
+    @ApiModelProperty(value = "是否缺陷")
+    private Integer isDefect;
+
+    @ApiModelProperty(value = "处理方式：0自动，1手动")
+    private Integer dealType;
 
     @ApiModelProperty(value = "处理意见")
     private String dealInfo;
-    @ApiModelProperty(value = "确认时间",example = "2018-10-01 12:18:48")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+
+    @ApiModelProperty(value = "确认人ID")
+    private String dealPersonId;
+
+    @ApiModelProperty(value = "确认时间")
     private Date dealTime;
+
+    @ApiModelProperty(value = "是否缺陷抑制")
+    private Integer ifDefectDisable;
+
+    @ApiModelProperty(value = "缺陷来源")
+    private Integer alarmSource;
+
+    @ApiModelProperty(value = "缺陷子类型")
+    private Integer defectSubtype;
+
+    @ApiModelProperty(value = "设备编码")
+    private String deviceCode;
+
+    @ApiModelProperty(value = "图片地址")
+    private String imagePath;
+
+    @ApiModelProperty(value = "视频地址")
+    private String videoPath;
+
+    @TableField("VALUE")
+    private String value;
+
+    private String outRange;
+
+    @ApiModelProperty(value = "联动信息")
+    private String linkMessage;
+
+
 }

@@ -652,12 +652,17 @@ public class DateTimeUtil {
 
     public static List<String> getDayDateList(int dy) {
         List<String> yearDates = new ArrayList<>();
-        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date zero = calendar.getTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 定义日期实例
         GregorianCalendar gc =new GregorianCalendar();
         // 设置日期起始时间
-        gc.setTime(date);
+        gc.setTime(zero);
 
         for (int i = 0; i < dy; i++) {
             String beforeTime = sdf.format(gc.getTime());

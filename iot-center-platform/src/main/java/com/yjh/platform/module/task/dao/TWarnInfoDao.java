@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Date;
 import java.util.Map;
 
-import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.TJContentInfoDetail;
+import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.entity.TWarnInfoDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author czh
- * @since 2020-08-24
+ * @author tt
+ * @since 2020-10-15
  */
 @Repository
 public interface TWarnInfoDao {
@@ -24,14 +26,18 @@ public interface TWarnInfoDao {
                                 @Param(value = "warnLevel") Integer warnLevel,
                                 @Param(value = "warnTime") Date warnTime,
                                 @Param(value = "warnType") Integer warnType,
+                                @Param(value = "warnName") String warnName,
+                                @Param(value = "warnContent") String warnContent,
                                 @Param(value = "deviceId") Long deviceId,
                                 @Param(value = "cunstomId") String cunstomId,
                                 @Param(value = "instanceId") Long instanceId,
                                 @Param(value = "stdMeteId") Long stdMeteId,
                                 @Param(value = "confMode") Integer confMode,
-                                @Param(value = "confTime") Date confTime,
-                                @Param(value = "confUserId") String confUserId,
-                                @Param(value = "confInfo") String confInfo,
+                                @Param(value = "isWarn") Integer isWarn,
+                                @Param(value = "dealType") Integer dealType,
+                                @Param(value = "dealInfo") String dealInfo,
+                                @Param(value = "dealPersonId") String dealPersonId,
+                                @Param(value = "dealTime") Date dealTime,
                                 @Param(value = "ifWarnDisable") Integer ifWarnDisable,
                                 @Param(value = "alarmSource") Integer alarmSource,
                                 @Param(value = "warnSubtype") Integer warnSubtype,
@@ -39,36 +45,22 @@ public interface TWarnInfoDao {
                                 @Param(value = "imagePath") String imagePath,
                                 @Param(value = "videoPath") String videoPath,
                                 @Param(value = "value") String value,
-                                @Param(value = "defect") Integer defect,
-                                @Param(value = "defectLevel") Integer defectLevel,
                                 @Param(value = "outRange") String outRange,
                                 @Param(value = "linkMessage") String linkMessage);
-    List<Long> selectIds(String deviceType);
-    List<TWarnInfoDetail> selectByPageWarn(HashMap<String,Object> map);
-    List<TWarnInfoDetail> selectByPageRobot(HashMap<String,Object> map);
-    List<TWarnInfoDetail> selectByPageCfg(HashMap<String,Object> map);
-    List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
+    List<TWarnInfo> selectByPage(TWarnInfo tWarnInfo);
 
     int batchInsert(List<TWarnInfo> list);
-
-    List<HashMap<String,Integer>> countOnMonth(HashMap<String,Object> map);
-    List<HashMap<String,Integer>> countOnMonthByCfg(HashMap<String,Object> map);
-    List<HashMap<String,Integer>> countOnMonthByRobot(HashMap<String,Object> map);
-    List<HashMap<String,Integer>> countOnMonthByWarn(HashMap<String,Object> map);
-
-    Map<String,Integer> countOnWeek(@Param(value = "firstTime1")String firstTime1,
-                                    @Param(value = "firstTime2")String firstTime2,
-                                    @Param(value = "firstTime3")String firstTime3,
-                                    @Param(value = "firstTime4")String firstTime4,
-                                    @Param(value = "firstTime5")String firstTime5,
-                                    @Param(value = "firstTime6")String firstTime6,
-                                    @Param(value = "firstTime7")String firstTime7,
-                                    @Param(value = "firstTime8")String firstTime8);
-    List<TJContentInfoDetail>  countByDeviceType();
-    List<TDefectInfo> selectAllDefect(HashMap<String,Object> map);
+    List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
     Map<String, Integer> countByAlarmSource();
-    Map<String, Integer> countConfMode();
-    List<TWarnInfoDetail> selectAlarmProcessByPage(Long warnId);
-
-
+    List<TJContentInfoDetail>  countByDeviceType();
+    Map<String,Integer> countWarnOnWeek(@Param(value = "firstTime1")String firstTime1,
+                                        @Param(value = "firstTime2")String firstTime2,
+                                        @Param(value = "firstTime3")String firstTime3,
+                                        @Param(value = "firstTime4")String firstTime4,
+                                        @Param(value = "firstTime5")String firstTime5,
+                                        @Param(value = "firstTime6")String firstTime6,
+                                        @Param(value = "firstTime7")String firstTime7,
+                                        @Param(value = "firstTime8")String firstTime8);
+    Map<String, Integer> countWarnConfMode();
+    List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
 }

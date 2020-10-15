@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,8 +11,8 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * @author czh
- * @since 2020-08-24
+ * @author tt
+ * @since 2020-10-15
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -32,12 +30,17 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "告警等级")
     private Integer warnLevel;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "告警时间")
     private Date warnTime;
 
     @ApiModelProperty(value = "告警类型")
     private Integer warnType;
+
+    @ApiModelProperty(value = "告警名称")
+    private String warnName;
+
+    @ApiModelProperty(value = "告警内容")
+    private String warnContent;
 
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
@@ -45,22 +48,29 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "部位ID")
     private String cunstomId;
 
+    @ApiModelProperty(value = "巡检点ID")
     private Long instanceId;
 
+    @ApiModelProperty(value = "标准测点ID")
     private Long stdMeteId;
 
     @ApiModelProperty(value = "告警状态：1未处理 2已处理 3已确认 4已忽略")
     private Integer confMode;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @ApiModelProperty(value = "确认时间")
-    private Date confTime;
+    @ApiModelProperty(value = "是否告警")
+    private Integer isWarn;
 
-    @ApiModelProperty(value = "确认人")
-    private String confUserId;
+    @ApiModelProperty(value = "处理方式：0自动，1手动")
+    private Integer dealType;
 
     @ApiModelProperty(value = "处理意见")
-    private String confInfo;
+    private String dealInfo;
+
+    @ApiModelProperty(value = "确认人ID")
+    private String dealPersonId;
+
+    @ApiModelProperty(value = "确认时间")
+    private Date dealTime;
 
     @ApiModelProperty(value = "是否告警抑制")
     private Integer ifWarnDisable;
@@ -81,12 +91,6 @@ public class TWarnInfo implements Serializable {
     private String videoPath;
 
     private String value;
-
-    @ApiModelProperty(value = "是否缺陷（0：是，1：否）")
-    private Integer defect;
-
-    @ApiModelProperty(value = "缺陷等级：0-一级，1-二级，2-三级")
-    private Integer defectLevel;
 
     private String outRange;
 

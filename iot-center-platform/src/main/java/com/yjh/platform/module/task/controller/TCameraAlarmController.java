@@ -1,0 +1,166 @@
+package com.yjh.platform.module.task.controller;
+
+import com.yjh.platform.module.task.entity.TCameraAlarm;
+import com.yjh.platform.module.task.service.TCameraAlarmService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Date;
+import io.swagger.annotations.*;
+import com.github.pagehelper.PageInfo;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yjh.platform.common.result.Result;
+import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.Page;
+import java.util.Map;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.result.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.mysql.jdbc.StringUtils;
+
+
+/**
+ * @author tt
+ * @since 2020-10-15
+ */
+@RestController
+@RequestMapping("/t-camera-alarm/v1")
+@Api(value = "/t-camera-alarm", description = "可视设备本体告警表操作接口")
+public class TCameraAlarmController {
+
+    @Autowired
+    private final TCameraAlarmService tCameraAlarmService;
+
+    private Logger log = LoggerFactory.getLogger(TCameraAlarmController.class);
+
+    public TCameraAlarmController(TCameraAlarmService tCameraAlarmService) {
+        this.tCameraAlarmService = tCameraAlarmService;
+    }
+
+    @ApiOperation(value = "插入")
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public Result insert(@RequestBody TCameraAlarm tCameraAlarm) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraAlarmService.insert(tCameraAlarm));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除")
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public Result delete(@RequestParam(value = "cameraAlarmId", required = true) Long cameraAlarmId) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraAlarmService.deleteByPrimaryId(cameraAlarmId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "更新")
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    public Result update(@RequestBody TCameraAlarm tCameraAlarm) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraAlarmService.update(tCameraAlarm));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "主键查询")
+    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    public Result selectByPrimaryId(@RequestParam(value = "cameraAlarmId", required = true) Long cameraAlarmId) {
+        Result result = new Result();
+        try {
+            TCameraAlarm tCameraAlarm = tCameraAlarmService.selectByPrimaryId(cameraAlarmId);
+            result.setData(tCameraAlarm);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询")
+    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    public Result select(@RequestParam(value = "cameraAlarmId", required = false) Long cameraAlarmId,
+                            @RequestParam(value = "alarmName", required = false) String alarmName,
+                            @RequestParam(value = "cameraId", required = false) Long cameraId,
+                            @RequestParam(value = "stationId", required = false) String stationId,
+                            @RequestParam(value = "alarmType", required = false) Integer alarmType,
+                            @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
+                            @RequestParam(value = "alarmInfo", required = false) String alarmInfo,
+                            @RequestParam(value = "alarmTime", required = false) Date alarmTime,
+                            @RequestParam(value = "isAlarm", required = false) Integer isAlarm,
+                            @RequestParam(value = "dealType", required = false) Integer dealType,
+                            @RequestParam(value = "dealInfo", required = false) String dealInfo,
+                            @RequestParam(value = "dealPersonId", required = false) String dealPersonId,
+                            @RequestParam(value = "dealTime", required = false) Date dealTime,
+                            @RequestParam(value = "alarmState", required = false) Integer alarmState,
+                            @RequestParam(value = "createTime", required = false) Date createTime,
+                            @RequestParam(value = "endTime", required = false) Date endTime) {
+        Result result = new Result();
+        try {
+            List<TCameraAlarm> list = tCameraAlarmService.select(cameraAlarmId, alarmName, cameraId, stationId, alarmType, alarmLevel, alarmInfo, alarmTime, isAlarm, dealType, dealInfo, dealPersonId, dealTime, alarmState, createTime, endTime);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "分页查询")
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    public Result selectByPage(@RequestBody TCameraAlarm tCameraAlarm,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCameraAlarm> list = tCameraAlarmService.selectByPage(tCameraAlarm);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "批量插入")
+    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    public Result batchInsert(@RequestBody List<TCameraAlarm> list) {
+        Result result = new Result();
+        try {
+        result.setData(tCameraAlarmService.batchInsert(list));
+        } catch (Exception e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
+}
