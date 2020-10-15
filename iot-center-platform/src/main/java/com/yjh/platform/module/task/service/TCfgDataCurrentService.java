@@ -169,6 +169,7 @@ public class TCfgDataCurrentService {
             }
 
         }
+        //将满足条件的联动规则预案生成任务并执行
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
         for(Long plan:plans){
         TCruiseTask tCruiseTask=new TCruiseTask();
@@ -176,7 +177,7 @@ public class TCfgDataCurrentService {
         tCruiseTask.setPlanId(tCruisePlan.getPlanId());
         tCruiseTask.setTaskName(tCruisePlan.getPlanName());
         tCruiseTask.setIfRun(173);
-        tCruiseTaskService.insert(tCruiseTask);
+        tCruiseTaskService.insert(tCruiseTask);//执行联动任务
         cLogger.info("联动开始执行");
         tCruiseTasks.add(tCruiseTask);
         }

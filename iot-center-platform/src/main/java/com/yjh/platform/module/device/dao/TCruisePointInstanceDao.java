@@ -59,10 +59,10 @@ public interface TCruisePointInstanceDao {
     TStdRegion selectTSRegionForStation();
     TDictBusiness selectTDBusinessForUnitName(String dictCode);
     //统计当前任务下的巡检点数量
-    int selectCruiseCount(@Param(value = "taskId")Long taskId);
+    int selectCruiseCount(@Param(value = "taskId")String taskId);
 
     //根据巡检点类型查询巡检点数量
-    List<CruiseCountOfType> selectCruiseCountByType(@Param(value = "taskId")Long taskId);
+    List<CruiseCountOfType> selectCruiseCountByType(@Param(value = "taskId")String taskId);
     String selectInstancename(@Param("instanceId")Long instanceId);
 
     //查询巡检类型

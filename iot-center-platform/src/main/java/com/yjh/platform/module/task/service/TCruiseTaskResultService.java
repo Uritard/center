@@ -139,7 +139,7 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "获取当前任务的巡检点全量信息 ", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseInspectResult> selectCruiseTaskResult(Long taskId) throws ParseException {
+    public List<CruiseInspectResult> selectCruiseTaskResult(String taskId) throws ParseException {
         List<CruiseInspectResult> cruiseInspectResults = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //获取数据库键名列表
@@ -183,7 +183,7 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "统计获取当前任务的执行进度", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Float> selectCruiseAdvance(Long taskId) {
+    public Map<String, Float> selectCruiseAdvance(String taskId) {
         Set<String> keyResult = redisScan("t_cruise_task_result*");
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
@@ -217,7 +217,7 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "查询当前任务下巡检点关联的标准测点各个状态下的数量", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public CruiseResultCounter selectCruiseStatusCount(Long taskId) throws ParseException {
+    public CruiseResultCounter selectCruiseStatusCount(String taskId) throws ParseException {
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
         String cruiseNotExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未执行");
@@ -279,7 +279,7 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "查询当前任务下机器人/摄像头的基本信息和与之关联的巡检点执行进度", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Object> selectCruiseDeviceAndCruiseAdvance(Long taskId) {
+    public List<Object> selectCruiseDeviceAndCruiseAdvance(String taskId) {
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
         String cruiseNotExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未执行");
@@ -495,7 +495,7 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "图片比较", code = "module")//结果集仍需优化、只获取了摄像头原始图片
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, String> PictureCompare(Long taskId, Long instanceId) {
+    public Map<String, String> PictureCompare(String taskId, Long instanceId) {
 //     List<String> pictureResult=new ArrayList<>();
         String collectPic = null;
         String preImg = tCameraPresetDao.selectPreImgByCruiseId(instanceId);
@@ -521,9 +521,25 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "获取机器人巡视画面", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CameraOfRobotInfo> selectRobotScreen(Long taskId) {
+    public List<CameraOfRobotInfo> selectRobotScreen(String taskId) {
         List<CameraOfRobotInfo> cameraOfRobotInfos = tRobotInfoDao.selectRobotScreen(taskId);
         return cameraOfRobotInfos;
     }
+
+    @Logs(title = "获取摄像头缓存信息", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> cameraInfoByRedis(){
+        Set<String> cruiseKeys = redisScan("t_cruise_task_result*");
+        for(String cruiseKey:cruiseKeys){
+            Map<String,Object>cruiseInfo=redisTemplate.opsForHash().entries(cruiseKey);
+            CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
+            cruiseTypeInfo.getCruiseId().toString();
+
+        }
+        Map<String,Object> cameraInfo=redisTemplate.opsForHash().entries("camera_info:21000000015");
+        System.out.print(cameraInfo.getClass());
+        return  cameraInfo;
+    }
+
 }
 

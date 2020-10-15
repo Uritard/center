@@ -3,6 +3,8 @@ package com.yjh.platform.module.task.controller;
 import com.yjh.platform.module.task.entity.CruiseResultCounter;
 import com.yjh.platform.module.task.service.TCruiseTaskResultService;
 import com.yjh.platform.module.task.entity.TCruiseTaskResult;
+
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
@@ -159,7 +161,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
     @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.GET)
-    public Result selectCurrentCruiseTaskResult(@RequestParam Long taskId){
+    public Result selectCurrentCruiseTaskResult(@RequestParam String taskId){
         Result result=new Result();
         try {
             result.setData(tCruiseTaskResultService.selectCruiseTaskResult(taskId));
@@ -175,7 +177,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取巡检任务进度")
     @RequestMapping(value = "selectCruiseAdvance",method = RequestMethod.GET)
-    public Result selectCruiseAdvance(@RequestParam Long taskId){
+    public Result selectCruiseAdvance(@RequestParam String taskId){
         Result result=new Result();
        try{
            result.setData(tCruiseTaskResultService.selectCruiseAdvance(taskId));
@@ -189,7 +191,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间")
     @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
-    public Result selectCruiseStatusCount(@RequestParam Long taskId){
+    public Result selectCruiseStatusCount(@RequestParam String taskId){
         Result result=new Result();
         try{
             result.setData(tCruiseTaskResultService.selectCruiseStatusCount(taskId));
@@ -205,7 +207,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "C-获取当前任务下的摄像头/机器人信息以及其工作的巡检点结果状态")
     @RequestMapping(value = "/selectCruiseDeviceAndCruiseAdvance",method = RequestMethod.GET)
-    public Result selectCruiseDeviceAndCruiseAdvance(@RequestParam Long taskId){
+    public Result selectCruiseDeviceAndCruiseAdvance(@RequestParam String taskId){
         Result result=new Result();
         try{
             result.setData(tCruiseTaskResultService.selectCruiseDeviceAndCruiseAdvance(taskId));
@@ -218,7 +220,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-巡视结果图片比对")
     @RequestMapping(value = "/PictureCompare",method = RequestMethod.GET)
-    public Result PictureCompare(@RequestParam(value = "taskId")Long taskId,
+    public Result PictureCompare(@RequestParam(value = "taskId")String taskId,
                                  @RequestParam(value = "instanceId")Long instanceId){
         Result result=new Result();
         try{
@@ -231,10 +233,30 @@ public class TCruiseTaskResultController {
     }
     @ApiOperation(value = "B-机器人巡视画面")
     @RequestMapping(value = "/selectRobotScreen",method = RequestMethod.GET)
-    public Result selectRobotScreen(@RequestParam Long taskId){
+    public Result selectRobotScreen(@RequestParam String taskId){
         Result result=new Result();
         try{
             result.setData(tCruiseTaskResultService.selectRobotScreen(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
+        return  result;
+
+    }
+
+    @ApiOperation(value = "读取缓存中的任务下巡视点绑定的摄像头信息")
+    @RequestMapping(value = "/cameraInfoByRedis",method = RequestMethod.GET)
+    public Result cameraInfoByRedis(){
+        Result result=new Result();
+        try{
+            result.setData(tCruiseTaskResultService.cameraInfoByRedis());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
+            String taskDate = simpleDateFormat.format(new Date());
+            Date date = null;
+            try {
+                date = simpleDateFormat.parse(taskDate);
+            } catch (Exception e) { e.getMessage(); }
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);

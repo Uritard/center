@@ -59,7 +59,7 @@ public interface TRobotInfoDao {
     List<TRobotInspectionTree> selectInspectionTree();
     List<TRobotInspectionTree> batchSelectInspection();
 
-    List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")Long taskId);
+    List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")String taskId);
 
 
 }

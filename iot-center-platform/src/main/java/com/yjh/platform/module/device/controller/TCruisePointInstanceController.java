@@ -229,7 +229,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-统计当前任务下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCount",method = RequestMethod.GET)
-    public  Result selectCruiseCount(@RequestParam Long taskId){
+    public  Result selectCruiseCount(@RequestParam  String taskId){
         Result result=new Result();
         try {
             result.setData(tCruisePointInstanceService.selectCruiseCount(taskId));
@@ -242,7 +242,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-查询各种巡检类型下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCountByType",method = RequestMethod.GET)
-    public Result selectCruiseCountByType(@RequestParam Long taskId){
+    public Result selectCruiseCountByType(@RequestParam String taskId){
         Result result=new Result();
         try {
            result.setData(tCruisePointInstanceService.selectCruiseCountByType(taskId));
