@@ -20,7 +20,7 @@ public interface TCruiseTaskResultDetailDao {
     List<TCruiseTaskResultDetail> select(@Param(value = "cruiseResultId") String cruiseResultId,
                                 @Param(value = "taskResultId") String taskResultId,
                                 @Param(value = "deviceId") Long deviceId,
-                                @Param(value = "cruiseId") Long cruiseId,
+                                @Param(value = "instanceId") Long instanceId,
                                 @Param(value = "cruiseTime") Date cruiseTime,
                                 @Param(value = "endTime") Date endTime,
                                 @Param(value = "cruiseStatus") Integer cruiseStatus,

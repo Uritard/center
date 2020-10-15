@@ -45,7 +45,7 @@
         update t_cruise_plan a <set>
         <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
         <if test="planName != null and planName != ''">a.plan_name = #{planName, jdbcType=VARCHAR},</if>
-        <if test="type != null and type != ''">a.type = #{type, jdbcType=INTEGER},</if>
+        <if test="type != null">a.type = #{type, jdbcType=INTEGER},</if>
         <if test="planPointTypes != null and planPointTypes != ''">a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
@@ -81,7 +81,7 @@
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="planName != null and planName != ''"> and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
@@ -100,7 +100,7 @@
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="planName != null and planName != ''"> and a.plan_name like concat('%',#{planName, jdbcType=VARCHAR},'%') </if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
@@ -121,7 +121,7 @@
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="planName != null and planName != ''"> and a.plan_name like concat('%',#{planName, jdbcType=VARCHAR},'%') </if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>

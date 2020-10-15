@@ -31,7 +31,7 @@ public class TCruiseTaskResultDetail implements Serializable {
     private Long deviceId;
 
     @ApiModelProperty(value = "巡检点ID")
-    private Long cruiseId;
+    private Long instanceId;
 
     @ApiModelProperty(value = "巡检时间")
     private Date cruiseTime;

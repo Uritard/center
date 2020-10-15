@@ -47,8 +47,8 @@ public class TCruiseTaskResultDetailService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTaskResultDetail> select(String cruiseResultId, String taskResultId, Long deviceId, Long cruiseId, Date cruiseTime, Date endTime, Integer cruiseStatus, String remark) {
-        List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList = tCruiseTaskResultDetailDao.select(cruiseResultId, taskResultId, deviceId, cruiseId, cruiseTime, endTime, cruiseStatus, remark);
+    public List<TCruiseTaskResultDetail> select(String cruiseResultId, String taskResultId, Long deviceId, Long instanceId, Date cruiseTime, Date endTime, Integer cruiseStatus, String remark) {
+        List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList = tCruiseTaskResultDetailDao.select(cruiseResultId, taskResultId, deviceId, instanceId, cruiseTime, endTime, cruiseStatus, remark);
         return tCruiseTaskResultDetailList;
     }
 

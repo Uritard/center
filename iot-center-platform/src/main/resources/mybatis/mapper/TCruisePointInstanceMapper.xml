@@ -484,8 +484,7 @@
     </select>
 
     <select id="selectForTask"  resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
-        select a.cruise_type,
-               a.cruise_id
+        select a.*
         from t_cruise_point_instance a
         where a.instance_id in
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">

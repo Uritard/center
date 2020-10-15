@@ -115,7 +115,7 @@ public class TCruiseDataResultController {
     public Result select(@RequestParam(value = "cruiseDataId", required = false) Long cruiseDataId,
                          @RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
                          @RequestParam(value = "cruiseId", required = false) Long cruiseId,
-                         @RequestParam(value = "pointType", required = false) Integer pointType,
+                         @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                          @RequestParam(value = "resultDesc", required = false) String resultDesc,
                          @RequestParam(value = "resultNum", required = false) String resultNum,
                          @RequestParam(value = "modifyNum", required = false) String modifyNum,
@@ -130,7 +130,7 @@ public class TCruiseDataResultController {
                          @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, pointType, resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
+            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseType, resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

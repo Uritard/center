@@ -66,10 +66,10 @@
         update t_cruise_plan_attr a <set>
         <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
         <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="pointType != null and pointType != ''">a.point_type = #{pointType, jdbcType=INTEGER},</if>
+        <if test="pointType != null">a.point_type = #{pointType, jdbcType=INTEGER},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
         <if test="cruiseRegionIds != null and cruiseRegionIds != ''">a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR},</if>
-        <if test="exceptionType != null and exceptionType != ''">a.exception_type = #{exceptionType, jdbcType=INTEGER},</if>
+        <if test="exceptionType != null">a.exception_type = #{exceptionType, jdbcType=INTEGER},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="position != null and position != ''">a.position = #{position, jdbcType=VARCHAR},</if>
         <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
@@ -141,10 +141,10 @@
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="pointType != null and pointType != ''"> and a.point_type = #{pointType, jdbcType=INTEGER}</if>
+        <if test="pointType != null"> and a.point_type = #{pointType, jdbcType=INTEGER}</if>
         <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
         <if test="cruiseRegionIds != null and cruiseRegionIds != ''"> and a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR}</if>
-        <if test="exceptionType != null and exceptionType != ''"> and a.exception_type = #{exceptionType, jdbcType=INTEGER}</if>
+        <if test="exceptionType != null"> and a.exception_type = #{exceptionType, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="position != null and position != ''"> and a.position = #{position, jdbcType=VARCHAR}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
@@ -173,10 +173,10 @@
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="pointType != null and pointType != ''"> and a.point_type = #{pointType, jdbcType=INTEGER}</if>
+        <if test="pointType != null"> and a.point_type = #{pointType, jdbcType=INTEGER}</if>
         <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
         <if test="cruiseRegionIds != null and cruiseRegionIds != ''"> and a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR}</if>
-        <if test="exceptionType != null and exceptionType != ''"> and a.exception_type = #{exceptionType, jdbcType=INTEGER}</if>
+        <if test="exceptionType != null"> and a.exception_type = #{exceptionType, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="position != null and position != ''"> and a.position = #{position, jdbcType=VARCHAR}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>

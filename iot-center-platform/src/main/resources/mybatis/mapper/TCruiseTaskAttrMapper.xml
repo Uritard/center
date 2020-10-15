@@ -61,10 +61,10 @@
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
         <if test="pointTaskId != null and pointTaskId != ''">a.point_task_id = #{pointTaskId, jdbcType=VARCHAR},</if>
-        <if test="ifRobot != null and ifRobot != ''">a.if_robot = #{ifRobot, jdbcType=INTEGER},</if>
-        <if test="ifVideo != null and ifVideo != ''">a.if_video = #{ifVideo, jdbcType=INTEGER},</if>
-        <if test="ifInferad != null and ifInferad != ''">a.if_inferad = #{ifInferad, jdbcType=INTEGER},</if>
-        <if test="ifArtificial != null and ifArtificial != ''">a.if_artificial = #{ifArtificial, jdbcType=INTEGER},</if>
+        <if test="ifRobot != null">a.if_robot = #{ifRobot, jdbcType=INTEGER},</if>
+        <if test="ifVideo != null">a.if_video = #{ifVideo, jdbcType=INTEGER},</if>
+        <if test="ifInferad != null">a.if_inferad = #{ifInferad, jdbcType=INTEGER},</if>
+        <if test="ifArtificial != null">a.if_artificial = #{ifArtificial, jdbcType=INTEGER},</if>
     </set>
             where a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>
@@ -107,10 +107,10 @@
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="pointTaskId != null and pointTaskId != ''"> and a.point_task_id = #{pointTaskId, jdbcType=VARCHAR}</if>
-        <if test="ifRobot != null and ifRobot != ''"> and a.if_robot = #{ifRobot, jdbcType=INTEGER}</if>
-        <if test="ifVideo != null and ifVideo != ''"> and a.if_video = #{ifVideo, jdbcType=INTEGER}</if>
-        <if test="ifInferad != null and ifInferad != ''"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
-        <if test="ifArtificial != null and ifArtificial != ''"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
+        <if test="ifRobot != null"> and a.if_robot = #{ifRobot, jdbcType=INTEGER}</if>
+        <if test="ifVideo != null"> and a.if_video = #{ifVideo, jdbcType=INTEGER}</if>
+        <if test="ifInferad != null"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
+        <if test="ifArtificial != null"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskAttr" resultType="com.yjh.platform.module.task.entity.TCruiseTaskAttr">
@@ -133,10 +133,10 @@
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="pointTaskId != null and pointTaskId != ''"> and a.point_task_id = #{pointTaskId, jdbcType=VARCHAR}</if>
-        <if test="ifRobot != null and ifRobot != ''"> and a.if_robot = #{ifRobot, jdbcType=INTEGER}</if>
-        <if test="ifVideo != null and ifVideo != ''"> and a.if_video = #{ifVideo, jdbcType=INTEGER}</if>
-        <if test="ifInferad != null and ifInferad != ''"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
-        <if test="ifArtificial != null and ifArtificial != ''"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
+        <if test="ifRobot != null"> and a.if_robot = #{ifRobot, jdbcType=INTEGER}</if>
+        <if test="ifVideo != null"> and a.if_video = #{ifVideo, jdbcType=INTEGER}</if>
+        <if test="ifInferad != null"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
+        <if test="ifArtificial != null"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">

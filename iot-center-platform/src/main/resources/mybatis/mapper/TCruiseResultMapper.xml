@@ -120,11 +120,11 @@
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="cType != null and cType != ''">a.c_type = #{cType, jdbcType=INTEGER},</if>
-        <if test="cState != null and cState != ''">a.c_state = #{cState, jdbcType=INTEGER},</if>
-        <if test="modifyState != null and modifyState != ''">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
-        <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
-        <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
+        <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
+        <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+        <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+        <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
         <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP},
         <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
@@ -181,11 +181,11 @@
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="cType != null and cType != ''">a.c_type = #{cType, jdbcType=INTEGER},</if>
-        <if test="cState != null and cState != ''">a.c_state = #{cState, jdbcType=INTEGER},</if>
-        <if test="modifyState != null and modifyState != ''">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
-        <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
-        <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
+        <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
+        <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+        <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+        <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
         <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
         <if test="checkDate != null and checkDate != ''">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
         <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>

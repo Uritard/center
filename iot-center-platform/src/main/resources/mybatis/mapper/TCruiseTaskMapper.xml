@@ -62,11 +62,11 @@
         <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
         <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="type != null and type != ''">a.type = #{type, jdbcType=INTEGER},</if>
-        <if test="ifRun != null and ifRun != ''">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
+        <if test="type != null">a.type = #{type, jdbcType=INTEGER},</if>
+        <if test="ifRun != null">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="dateType != null and dateType != ''">a.date_type = #{dateType, jdbcType=VARCHAR},</if>
-        <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="taskType != null">a.task_type = #{taskType, jdbcType=INTEGER},</if>
         <if test="startTime != null and startTime != ''">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
     </set>
@@ -111,11 +111,11 @@
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
-        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="ifRun != null"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=VARCHAR}</if>
-        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="taskType != null"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
@@ -139,11 +139,11 @@
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
         <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
-        <if test="type != null and type != ''"> and a.type = #{type, jdbcType=INTEGER}</if>
-        <if test="ifRun != null and ifRun != ''"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
+        <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
+        <if test="ifRun != null"> and a.if_run = #{ifRun, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=VARCHAR}</if>
-        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="taskType != null"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>

@@ -7,7 +7,7 @@
         <id column="cruise_result_id" jdbcType="VARCHAR" property="cruiseResultId" />
         <result column="task_result_id" jdbcType="VARCHAR" property="taskResultId" />
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
-        <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
         <result column="cruise_time" jdbcType="TIMESTAMP" property="cruiseTime" />
         <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
         <result column="cruise_status" jdbcType="INTEGER" property="cruiseStatus" />
@@ -16,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        cruise_result_id, task_result_id, device_id, cruise_id, cruise_time, end_time, cruise_status, remark
+        cruise_result_id, task_result_id, device_id, instance_id, cruise_time, end_time, cruise_status, remark
     </sql>
 
 
@@ -25,7 +25,7 @@
             cruise_result_id,
             task_result_id,
             device_id,
-            cruise_id,
+            instance_id,
             cruise_time,
             end_time,
             cruise_status,
@@ -34,7 +34,7 @@
                 #{cruiseResultId, jdbcType=VARCHAR},
                 #{taskResultId, jdbcType=VARCHAR},
                 #{deviceId, jdbcType=BIGINT},
-                #{cruiseId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
                 #{cruiseTime, jdbcType=TIMESTAMP},
                 #{endTime, jdbcType=TIMESTAMP},
                 #{cruiseStatus, jdbcType=INTEGER},
@@ -52,10 +52,10 @@
         <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
         a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP},
         a.end_time = #{endTime, jdbcType=TIMESTAMP},
-        <if test="cruiseStatus != null and cruiseStatus != ''">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseStatus != null">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR}
@@ -66,7 +66,7 @@
         a.cruise_result_id,
         a.task_result_id,
         a.device_id,
-        a.cruise_id,
+        a.instance_id,
         a.cruise_time,
         a.end_time,
         a.cruise_status,
@@ -82,7 +82,7 @@
         a.cruise_result_id,
         a.task_result_id,
         a.device_id,
-        a.cruise_id,
+        a.instance_id,
         a.cruise_time,
         a.end_time,
         a.cruise_status,
@@ -92,10 +92,10 @@
         <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
         <if test="cruiseTime != null and cruiseTime != ''">a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP},</if>
         <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
-        <if test="cruiseStatus != null and cruiseStatus != ''">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseStatus != null">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
@@ -104,7 +104,7 @@
         a.cruise_result_id,
         a.task_result_id,
         a.device_id,
-        a.cruise_id,
+        a.instance_id,
         a.cruise_time,
         a.end_time,
         a.cruise_status,
@@ -114,10 +114,10 @@
         <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
         <if test="cruiseTime != null and cruiseTime != ''">a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP},</if>
         <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
-        <if test="cruiseStatus != null and cruiseStatus != ''">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseStatus != null">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
@@ -126,7 +126,7 @@
             cruise_result_id,
             task_result_id,
             device_id,
-            cruise_id,
+            instance_id,
             cruise_time,
             end_time,
             cruise_status,
@@ -137,7 +137,7 @@
                 #{TCruiseTaskResultDetail.cruiseResultId, jdbcType=VARCHAR},
                 #{TCruiseTaskResultDetail.taskResultId, jdbcType=VARCHAR},
                 #{TCruiseTaskResultDetail.deviceId, jdbcType=BIGINT},
-                #{TCruiseTaskResultDetail.cruiseId, jdbcType=BIGINT},
+                #{TCruiseTaskResultDetail.instanceId, jdbcType=BIGINT},
                 #{TCruiseTaskResultDetail.cruiseTime, jdbcType=TIMESTAMP},
                 #{TCruiseTaskResultDetail.endTime, jdbcType=TIMESTAMP},
                 #{TCruiseTaskResultDetail.cruiseStatus, jdbcType=INTEGER},

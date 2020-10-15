@@ -24,7 +24,7 @@ public interface TCruiseDataResultDao {
     List<TCruiseDataResult> select(@Param(value = "cruiseDataId") Long cruiseDataId,
                                 @Param(value = "cruiseResultId") String cruiseResultId,
                                 @Param(value = "cruiseId") Long cruiseId,
-                                @Param(value = "pointType") Integer pointType,
+                                @Param(value = "cruiseType") Integer cruiseType,
                                 @Param(value = "resultDesc") String resultDesc,
                                 @Param(value = "resultNum") String resultNum,
                                 @Param(value = "modifyNum") String modifyNum,
