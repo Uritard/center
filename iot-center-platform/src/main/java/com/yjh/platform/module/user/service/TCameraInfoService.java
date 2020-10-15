@@ -3,13 +3,12 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.utils.Object2Map;
 
-import com.yjh.platform.module.user.entity.CameraInfo;
-import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 
 import java.util.*;
-import com.yjh.platform.module.user.entity.TCameraInfoByDict;
-import com.yjh.platform.module.user.entity.TCamreaPresetTree;
+
 import org.springframework.data.redis.core.RedisTemplate;
 
 import org.springframework.stereotype.Service;
@@ -31,6 +30,8 @@ public class TCameraInfoService {
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TCameraPresetDao tCameraPresetDao;
 
 
     @Logs(title = "插入", code = "module")
@@ -150,10 +151,16 @@ public class TCameraInfoService {
     @Logs(title = "将cameraInfo数据放入redis", code = "cameraInfo")
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
-        List<TCameraInfo> list =tCameraInfoDao.selectALL();
-        for (TCameraInfo item:list) {
+        List<TCameraPreset> list =tCameraPresetDao.selectAll();
+        for (TCameraPreset item:list) {
+            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(item.getCameraId());
             Map map = Object2Map.toStringMap(Object2Map.objectToMap(item,true));
-            String str = "CameraInfo:"+item.getCameraId();
+            if(tCameraInfo != null){
+                Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCameraInfo,true));
+                map.putAll(map2);
+            }
+
+            String str = "camera_info:"+item.getPresetId();
             redisTemplate.opsForHash().putAll(str, map);
         }
        return 1;

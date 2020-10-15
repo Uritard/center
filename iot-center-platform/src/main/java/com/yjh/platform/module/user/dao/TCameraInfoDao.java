@@ -56,7 +56,5 @@ public interface TCameraInfoDao {
     List<TCamreaPresetTree> selectCameraId();
     List<TCamreaPresetTree> batchSelectPreset();
 
-    List<TCameraInfo> selectALL();
-
-
+    TCameraInfo selectCamera(@Param(value = "cameraId") Long cameraId);
 }
