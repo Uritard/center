@@ -54,12 +54,12 @@
         update t_cruise_task_result a <set>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
-        <if test="taskAlarm != null and taskAlarm != ''">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
+        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
         <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
         a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},
-        <if test="taskStatus != null and taskStatus != ''">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
@@ -97,12 +97,12 @@
         where 1 = 1
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
-        <if test="taskAlarm != null and taskAlarm != ''">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
+        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
         <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
         <if test="cruiseTaskTime != null and cruiseTaskTime != ''">a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},</if>
-        <if test="taskStatus != null and taskStatus != ''">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
@@ -121,12 +121,12 @@
         where 1 = 1
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
-        <if test="taskAlarm != null and taskAlarm != ''">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
+        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
         <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
         <if test="cruiseTaskTime != null and cruiseTaskTime != ''">a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},</if>
-        <if test="taskStatus != null and taskStatus != ''">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 

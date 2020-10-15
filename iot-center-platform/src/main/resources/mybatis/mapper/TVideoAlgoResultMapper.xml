@@ -95,7 +95,7 @@
         <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
         <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
         <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
-        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null ">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
         <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
         <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>
@@ -167,7 +167,7 @@
         <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
         <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
         <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
-        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null ">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
         <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
         <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>
@@ -211,7 +211,7 @@
         <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
         <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
         <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
-        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null ">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
         <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
         <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>

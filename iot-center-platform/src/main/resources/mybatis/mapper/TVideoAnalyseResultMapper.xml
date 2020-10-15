@@ -57,10 +57,10 @@
         <if test="analyseConfId != null and analyseConfId != ''">a.analyse_conf_id = #{analyseConfId, jdbcType=VARCHAR},</if>
         <if test="algorithmResult != null and algorithmResult != ''">a.algorithm_result = #{algorithmResult, jdbcType=VARCHAR},</if>
         <if test="algorithmPicture != null and algorithmPicture != ''">a.algorithm_picture = #{algorithmPicture, jdbcType=VARCHAR},</if>
-        <if test="algorithmStatus != null and algorithmStatus != ''">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
+        <if test="algorithmStatus != null ">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
         <if test="resultRate != null and resultRate != ''">a.result_rate = #{resultRate, jdbcType=VARCHAR},</if>
         <if test="resultDescribe != null and resultDescribe != ''">a.result_describe = #{resultDescribe, jdbcType=VARCHAR},</if>
-        <if test="reserver != null and reserver != ''">a.reserver = #{reserver, jdbcType=INTEGER},</if>
+        <if test="reserver != null ">a.reserver = #{reserver, jdbcType=INTEGER},</if>
     </set>
             where a.algorithm_result_id = #{algorithmResultId, jdbcType=BIGINT}
     </update>
@@ -100,10 +100,10 @@
         <if test="analyseConfId != null and analyseConfId != ''">a.analyse_conf_id = #{analyseConfId, jdbcType=VARCHAR},</if>
         <if test="algorithmResult != null and algorithmResult != ''">a.algorithm_result = #{algorithmResult, jdbcType=VARCHAR},</if>
         <if test="algorithmPicture != null and algorithmPicture != ''">a.algorithm_picture = #{algorithmPicture, jdbcType=VARCHAR},</if>
-        <if test="algorithmStatus != null and algorithmStatus != ''">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
+        <if test="algorithmStatus != null ">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
         <if test="resultRate != null and resultRate != ''">a.result_rate = #{resultRate, jdbcType=VARCHAR},</if>
         <if test="resultDescribe != null and resultDescribe != ''">a.result_describe = #{resultDescribe, jdbcType=VARCHAR},</if>
-        <if test="reserver != null and reserver != ''">a.reserver = #{reserver, jdbcType=INTEGER}</if>
+        <if test="reserver != null ">a.reserver = #{reserver, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TVideoAnalyseResult" resultType="com.yjh.platform.module.task.entity.TVideoAnalyseResult">
@@ -124,10 +124,10 @@
         <if test="analyseConfId != null and analyseConfId != ''">a.analyse_conf_id = #{analyseConfId, jdbcType=VARCHAR},</if>
         <if test="algorithmResult != null and algorithmResult != ''">a.algorithm_result = #{algorithmResult, jdbcType=VARCHAR},</if>
         <if test="algorithmPicture != null and algorithmPicture != ''">a.algorithm_picture = #{algorithmPicture, jdbcType=VARCHAR},</if>
-        <if test="algorithmStatus != null and algorithmStatus != ''">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
+        <if test="algorithmStatus != null ">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
         <if test="resultRate != null and resultRate != ''">a.result_rate = #{resultRate, jdbcType=VARCHAR},</if>
         <if test="resultDescribe != null and resultDescribe != ''">a.result_describe = #{resultDescribe, jdbcType=VARCHAR},</if>
-        <if test="reserver != null and reserver != ''">a.reserver = #{reserver, jdbcType=INTEGER}</if>
+        <if test="reserver != null ">a.reserver = #{reserver, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">

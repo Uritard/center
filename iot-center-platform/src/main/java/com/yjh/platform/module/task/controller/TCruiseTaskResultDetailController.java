@@ -103,14 +103,14 @@ public class TCruiseTaskResultDetailController {
     public Result select(@RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
                             @RequestParam(value = "taskResultId", required = false) String taskResultId,
                             @RequestParam(value = "deviceId", required = false) Long deviceId,
-                            @RequestParam(value = "cruiseId", required = false) Long cruiseId,
+                            @RequestParam(value = "instanceId", required = false) Long instanceId,
                             @RequestParam(value = "cruiseTime", required = false) Date cruiseTime,
                             @RequestParam(value = "endTime", required = false) Date endTime,
                             @RequestParam(value = "cruiseStatus", required = false) Integer cruiseStatus,
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TCruiseTaskResultDetail> list = tCruiseTaskResultDetailService.select(cruiseResultId, taskResultId, deviceId, cruiseId, cruiseTime, endTime, cruiseStatus, remark);
+            List<TCruiseTaskResultDetail> list = tCruiseTaskResultDetailService.select(cruiseResultId, taskResultId, deviceId, instanceId, cruiseTime, endTime, cruiseStatus, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

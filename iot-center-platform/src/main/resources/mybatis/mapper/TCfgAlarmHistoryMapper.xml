@@ -93,17 +93,17 @@
         <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmValue != null and alarmValue != ''">a.alarm_value = #{alarmValue, jdbcType=VARCHAR},</if>
         <if test="alarmDesc != null and alarmDesc != ''">a.alarm_desc = #{alarmDesc, jdbcType=VARCHAR},</if>
         a.clear_time = #{clearTime, jdbcType=TIMESTAMP},
         <if test="clearValue != null and clearValue != ''">a.clear_value = #{clearValue, jdbcType=DECIMAL},</if>
-        <if test="confirmState != null and confirmState != ''">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        <if test="confirmState != null">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
         <if test="confirmPeople != null and confirmPeople != ''">a.confirm_people = #{confirmPeople, jdbcType=VARCHAR},</if>
         a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},
         <if test="confirmRemark != null and confirmRemark != ''">a.confirm_remark = #{confirmRemark, jdbcType=VARCHAR},</if>
-        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
-        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="defect != null">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
         <if test="forceClearReason != null and forceClearReason != ''">a.force_clear_reason = #{forceClearReason, jdbcType=VARCHAR},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="isClear != null and isClear != ''">a.is_clear = #{isClear, jdbcType=VARCHAR},</if>
@@ -172,17 +172,17 @@
         <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmValue != null and alarmValue != ''">a.alarm_value = #{alarmValue, jdbcType=VARCHAR},</if>
         <if test="alarmDesc != null and alarmDesc != ''">a.alarm_desc = #{alarmDesc, jdbcType=VARCHAR},</if>
         <if test="clearTime != null and clearTime != ''">a.clear_time = #{clearTime, jdbcType=TIMESTAMP},</if>
         <if test="clearValue != null and clearValue != ''">a.clear_value = #{clearValue, jdbcType=DECIMAL},</if>
-        <if test="confirmState != null and confirmState != ''">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        <if test="confirmState != null">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
         <if test="confirmPeople != null and confirmPeople != ''">a.confirm_people = #{confirmPeople, jdbcType=VARCHAR},</if>
         <if test="confirmTime != null and confirmTime != ''">a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},</if>
         <if test="confirmRemark != null and confirmRemark != ''">a.confirm_remark = #{confirmRemark, jdbcType=VARCHAR},</if>
-        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
-        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="defect != null">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
         <if test="forceClearReason != null and forceClearReason != ''">a.force_clear_reason = #{forceClearReason, jdbcType=VARCHAR},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="isClear != null and isClear != ''">a.is_clear = #{isClear, jdbcType=VARCHAR},</if>
@@ -220,17 +220,17 @@
         <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
         <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="alarmTime != null and alarmTime != ''">a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},</if>
-        <if test="alarmLevel != null and alarmLevel != ''">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmValue != null and alarmValue != ''">a.alarm_value = #{alarmValue, jdbcType=VARCHAR},</if>
         <if test="alarmDesc != null and alarmDesc != ''">a.alarm_desc = #{alarmDesc, jdbcType=VARCHAR},</if>
         <if test="clearTime != null and clearTime != ''">a.clear_time = #{clearTime, jdbcType=TIMESTAMP},</if>
         <if test="clearValue != null and clearValue != ''">a.clear_value = #{clearValue, jdbcType=DECIMAL},</if>
-        <if test="confirmState != null and confirmState != ''">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        <if test="confirmState != null">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
         <if test="confirmPeople != null and confirmPeople != ''">a.confirm_people = #{confirmPeople, jdbcType=VARCHAR},</if>
         <if test="confirmTime != null and confirmTime != ''">a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},</if>
         <if test="confirmRemark != null and confirmRemark != ''">a.confirm_remark = #{confirmRemark, jdbcType=VARCHAR},</if>
-        <if test="defect != null and defect != ''">a.defect = #{defect, jdbcType=INTEGER},</if>
-        <if test="defectLevel != null and defectLevel != ''">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        <if test="defect != null">a.defect = #{defect, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
         <if test="forceClearReason != null and forceClearReason != ''">a.force_clear_reason = #{forceClearReason, jdbcType=VARCHAR},</if>
         <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
         <if test="isClear != null and isClear != ''">a.is_clear = #{isClear, jdbcType=VARCHAR},</if>
