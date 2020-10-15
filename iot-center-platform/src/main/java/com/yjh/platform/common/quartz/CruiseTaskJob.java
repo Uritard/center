@@ -83,6 +83,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             //不需要执行任务
             log.info(taskDate+"此时间任务不需要执行");
         }else {
+            //todo 通知智能巡视》巡视监控界面有新任务来了
             log.info(taskDate+"需要执行的任务");
             try {
                 log.info("正在进行任务");
@@ -111,7 +112,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
                 Integer taskAbnormasl = 0;//异常数量
-
                 log.info("开始巡检");
                 List<TCruiseTaskResultDetail> resultDetailList = new LinkedList<>();//详细
                 List<TCruiseDataResult> dataResultList = new LinkedList<>();//巡检数据
@@ -129,7 +129,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseDataResult.setCruiseId(item.getInstanceId());
                     //一次循环 一个巡检点
                     if (228 == item.getCruiseType()) {//todo 机器人
-                         }
+                    }
                     if (229 == item.getCruiseType()) {
                         tCruiseDataResult.setCruiseType(229);
                         //视频
@@ -161,16 +161,20 @@ public class CruiseTaskJob extends QuartzJobBean {
                     }
                     if (232 == item.getCruiseType()) {//todo scala
                     }
+                    tCruiseTaskResultDetail.setEndTime(new Date());
                     resultDetailList.add(tCruiseTaskResultDetail);
                     Map map = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                     String str = "t_cruise_task_result:"+tCruiseTaskResultDetail.getCruiseResultId();
                     dataResultList.add(tCruiseDataResult);
                     Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                     map.putAll(map2);
+                    map.put("taskId",taskId);
+                    map.put("startTime",date);
                     redisTemplate.opsForHash().putAll(str, map);
                     taskCount--;//一个巡检点结束
                     tCruiseResult.setTaskWait(taskCount);
                     tCruiseResultDao.update(tCruiseResult);
+                    //Thread.sleep(10);
                 }
                 //任务结束生成结果，
                 //todo 结果的状态未作处理

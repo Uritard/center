@@ -267,4 +267,8 @@
     <select id="selectLastOne" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
          select * from t_camera_preset order by preset_id DESC limit 1;
     </select>
+
+    <select id="selectAll" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select * from t_camera_preset
+    </select>
 </mapper>

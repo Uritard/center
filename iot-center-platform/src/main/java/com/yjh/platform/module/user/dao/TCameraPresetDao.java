@@ -39,4 +39,6 @@ public interface TCameraPresetDao {
     String selectPreImgByCruiseId(@Param(value = "instanceId")Long instanceId);
 
     TCameraPreset selectLastOne();
+
+    List<TCameraPreset>selectAll();
 }
