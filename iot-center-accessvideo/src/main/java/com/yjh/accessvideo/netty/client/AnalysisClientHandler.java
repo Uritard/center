@@ -17,9 +17,9 @@ import static com.yjh.accessvideo.common.Constant.TYPET3;
 /**
  * Created by tt on 2019/7/31.
  */
-public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
+public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
-    private Logger log = LoggerFactory.getLogger(IEC104ClientHandler.class);
+    private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
     private String gatewayName;
 
@@ -35,15 +35,15 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
     public int getChangeDataNum() { return changeDataNum; }
     public void setChangeDataNum(int changeDataNum) { this.changeDataNum = changeDataNum; }
 
-    public IEC104ClientHandler() { }
+    public AnalysisClientHandler() { }
 
-    public IEC104ClientHandler(String gatewayName, int changeDataNum) {
+    public AnalysisClientHandler(String gatewayName, int changeDataNum) {
         this.gatewayName = gatewayName;
         this.changeDataNum = changeDataNum;
     }
 
-    private static Map<Object, IEC104ClientHandler> iec104ClientHandlerMap = new HashMap<>();
-    public static Map<Object, IEC104ClientHandler> getIec104ClientHandlerMap() { return iec104ClientHandlerMap; }
+    private static Map<Object, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
+    public static Map<Object, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
@@ -57,7 +57,7 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
         Thread thread = new Thread(heartBeatThread);
         thread.setDaemon(true);
         thread.start();
-        if (iec104ClientHandlerMap.get(gatewayName) == null) { iec104ClientHandlerMap.put(gatewayName, this); }
+        if (analysisClientHandlerHashMap.get(gatewayName) == null) { analysisClientHandlerHashMap.put(gatewayName, this); }
         log.info("客户端注册成功");
     }
 
@@ -68,7 +68,7 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
         ctx.flush();
         super.channelInactive(ctx);
         isThreadStart = false;
-        iec104ClientHandlerMap.remove(gatewayName);
+        analysisClientHandlerHashMap.remove(gatewayName);
         log.error("服务端断开连接！");
     }
 
@@ -216,12 +216,12 @@ public class IEC104ClientHandler extends ChannelInboundHandlerAdapter {
 
     private void sendStartRegister(ChannelHandlerContext ctx) {
         // 发送json字符串
-        String registerMsg = "{\"MsgType\":\"00\",\"MsgData\":{\"DesNode\": \"ServerSocket\",\n\"SrcNode\": \"ClientSocket\"}}\n";
+        String registerMsg = "{\n\"msgType\": \"3\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\",\n\"registerKey\": \"yijiahe\"\n}\n}\n";
         sendString(ctx, registerMsg);
     }
 
     private void SendHeartBeat(ChannelHandlerContext ctx) {
-        String registerMsg = "{\"MsgType\":\"05\",\"MsgData\":{\"DesNode\": \"ServerSocket\",\n\"SrcNode\": \"ClientSocket\"}}\n";
+        String registerMsg = "{\n\"msgType\": \"5\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\"\n}\n}\n";
         sendString(ctx, registerMsg);
     }
 

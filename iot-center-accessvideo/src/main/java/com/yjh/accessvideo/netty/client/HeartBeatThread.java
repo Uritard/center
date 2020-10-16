@@ -3,21 +3,21 @@ package com.yjh.accessvideo.netty.client;
 @lombok.extern.slf4j.Slf4j
 public class HeartBeatThread implements Runnable {
 
-    private IEC104ClientHandler iec104ClientHandler;
+    private AnalysisClientHandler analysisClientHandler;
 
     private volatile boolean isThreadStart;
 
-    public HeartBeatThread(IEC104ClientHandler iec104ClientHandler, boolean isThreadStart) {
+    public HeartBeatThread(AnalysisClientHandler analysisClientHandler, boolean isThreadStart) {
         this.isThreadStart = isThreadStart;
-        this.iec104ClientHandler = iec104ClientHandler;
+        this.analysisClientHandler = analysisClientHandler;
     }
 
     @Override
     public void run() {
         while (isThreadStart) {
             try {
-                iec104ClientHandler.ProcSend();
-                if (!iec104ClientHandler.isThreadStart) {
+                analysisClientHandler.ProcSend();
+                if (!analysisClientHandler.isThreadStart) {
                     isThreadStart = false;
                     log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
                     log.info("Thread stop success!");
