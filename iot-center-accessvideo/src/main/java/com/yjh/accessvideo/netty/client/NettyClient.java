@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,11 +35,11 @@ public class NettyClient {
             .option(ChannelOption.TCP_NODELAY, true)
             .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
             .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-            .handler(new IEC104ClientChannelInitializer() {
+            .handler(new AnalysisClientChannelInitializer() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline p = ch.pipeline();
-                    p.addLast(new IEC104ClientHandler());
+                    p.addLast(new AnalysisClientHandler());
                 }
             });
             ChannelFuture future = b.connect(remoteAddress1).sync();
