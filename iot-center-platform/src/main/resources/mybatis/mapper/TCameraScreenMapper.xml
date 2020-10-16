@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TCameraScreenDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraScreen">
+        <id column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="screen_num" jdbcType="INTEGER" property="screenNum" />
+        <result column="camera_ids" jdbcType="VARCHAR" property="cameraIds" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, screen_num, camera_ids, create_time
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="userId" parameterType="com.yjh.platform.module.user.entity.TCameraScreen">
+        insert into t_camera_screen(
+            user_id,
+            screen_num,
+            camera_ids
+        )values(
+                #{userId, jdbcType=BIGINT},
+                #{screenNum, jdbcType=INTEGER},
+                #{cameraIds, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_camera_screen
+                where user_id = #{userId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraScreen">
+        update t_camera_screen a <set>
+        <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
+        <if test="screenNum != null">a.screen_num = #{screenNum, jdbcType=INTEGER},</if>
+        <if test="cameraIds != null and cameraIds != ''">a.camera_ids = #{cameraIds, jdbcType=VARCHAR},</if>
+    </set>
+            where a.user_id = #{userId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraScreen">
+        select
+        a.user_id,
+        a.screen_num,
+        a.camera_ids,
+        a.create_time
+        from t_camera_screen a
+        where 1 = 1
+            and a.user_id = #{userId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraScreen" resultType="com.yjh.platform.module.user.entity.TCameraScreen">
+        select
+        a.user_id,
+        a.screen_num,
+        a.camera_ids,
+        a.create_time
+        from t_camera_screen a
+        where 1 = 1
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="screenNum != null and screenNum != ''"> and a.screen_num = #{screenNum, jdbcType=INTEGER}</if>
+        <if test="cameraIds != null and cameraIds != ''"> and a.camera_ids = #{cameraIds, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraScreen" resultType="com.yjh.platform.module.user.entity.TCameraScreen">
+        select
+        a.user_id,
+        a.screen_num,
+        a.camera_ids,
+        a.create_time
+        from t_camera_screen a
+        where 1 = 1
+        <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="screenNum != null and screenNum != ''"> and a.screen_num = #{screenNum, jdbcType=INTEGER}</if>
+        <if test="cameraIds != null and cameraIds != ''"> and a.camera_ids = #{cameraIds, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_camera_screen(
+            user_id,
+            screen_num,
+            camera_ids,
+            create_time
+        )values
+        <foreach collection="list" item="TCameraScreen" separator=",">
+            (
+                #{TCameraScreen.userId, jdbcType=BIGINT},
+                #{TCameraScreen.screenNum, jdbcType=INTEGER},
+                #{TCameraScreen.cameraIds, jdbcType=VARCHAR},
+                #{TCameraScreen.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_camera_screen
+        where user_id in (
+            <foreach collection="list" item="userId" separator=",">
+                #{userId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+</mapper>

@@ -1,0 +1,168 @@
+package com.yjh.platform.module.user.controller;
+
+import com.yjh.platform.module.user.service.TCameraScreenService;
+import com.yjh.platform.module.user.entity.TCameraScreen;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Date;
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yjh.platform.common.result.Result;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.Page;
+import java.util.Map;
+
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.result.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+/**
+ * @author lqh
+ * @since 2020-10-16
+ */
+@RestController
+@RequestMapping("/tCameraScreen/v1")
+@Api(value = "/tCameraScreen", description = "分屏配置表操作接口")
+public class TCameraScreenController {
+
+    @Autowired
+    private final TCameraScreenService tCameraScreenService;
+
+    private Logger log = LoggerFactory.getLogger(TCameraScreenController.class);
+
+    public TCameraScreenController(TCameraScreenService tCameraScreenService) {
+        this.tCameraScreenService = tCameraScreenService;
+    }
+
+    @ApiOperation(value = "插入")
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public Result add(@RequestBody TCameraScreen tCameraScreen) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraScreenService.add(tCameraScreen));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除")
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraScreenService.deleteByPrimaryId(userId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "更新")
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    public Result update(@RequestBody TCameraScreen tCameraScreen) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraScreenService.update(tCameraScreen));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "主键查询")
+    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    public Result selectByPrimaryId(@RequestParam(value = "userId", required = true) Long userId) {
+        Result result = new Result();
+        try {
+            TCameraScreen tCameraScreen = tCameraScreenService.selectByPrimaryId(userId);
+            result.setData(tCameraScreen);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询")
+    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    public Result select(@RequestParam(value = "userId", required = false) Long userId,
+                            @RequestParam(value = "screenNum", required = false) Integer screenNum,
+                            @RequestParam(value = "cameraIds", required = false) String cameraIds,
+                            @RequestParam(value = "createTime", required = false) Date createTime) {
+        Result result = new Result();
+        try {
+            List<TCameraScreen> list = tCameraScreenService.select(userId, screenNum, cameraIds, createTime);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "分页查询")
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    public Result selectByPage(@RequestBody TCameraScreen tCameraScreen,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCameraScreen> list = tCameraScreenService.selectByPage(tCameraScreen);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "批量插入")
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TCameraScreen> list) {
+        Result result = new Result();
+        try {
+        result.setData(tCameraScreenService.batchAdd(list));
+        } catch (Exception e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    public Result batchDelete(@RequestParam(value = "userIds") String userIds) {
+    Result result = new Result();
+    try {
+        result.setData(tCameraScreenService.batchDelete(userIds));
+    } catch (BusinessException e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量删除失败：" + e);
+    }catch (Exception e) {
+        result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量删除错误:", e);
+    }
+    return result;
+    }
+
+
+}

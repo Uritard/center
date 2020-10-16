@@ -284,4 +284,17 @@ public class TCameraPresetController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询预置位树")
+    @RequestMapping(value = "/selectPresetTree", method = RequestMethod.GET)
+    public Result selectPresetTree(@RequestParam(value = "cameraId", required = false) Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.selectPresetTree(cameraId));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
 }

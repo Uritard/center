@@ -113,16 +113,22 @@ public class TCruiseTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskId, String startTime) {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-        if (Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==172 && !startTime.equals("-1")) {
-            TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
-            tCruiseTaskDel.setTaskId(taskId);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
-            try {
-                Date taskDate = simpleDateFormat.parse(startTime);
-                tCruiseTaskDel.setDelTime(taskDate);
-            } catch (Exception e) { e.getMessage(); }
-            tCruiseTaskDel.setCreateTime(new Date());
-            return tCruiseTaskDelDao.insert(tCruiseTaskDel);
+        if (Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==172 ) {
+            if(!startTime.equals("-1")){
+                TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
+                tCruiseTaskDel.setTaskId(taskId);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
+                try {
+                    Date taskDate = simpleDateFormat.parse(startTime);
+                    tCruiseTaskDel.setDelTime(taskDate);
+                } catch (Exception e) { e.getMessage(); }
+                tCruiseTaskDel.setCreateTime(new Date());
+                return tCruiseTaskDelDao.insert(tCruiseTaskDel);
+            }else {
+                //删除整个周期任务
+                return  1;
+            }
+
         } else {
             if(Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==174){
                 //删除定时任务
