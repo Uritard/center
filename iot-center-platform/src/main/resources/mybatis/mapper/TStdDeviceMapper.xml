@@ -45,6 +45,7 @@
         a.update_time ,
         a.create_time ,
         b.device_model,
+        b.used_time,
         b.pms_type,
         b.pms_id,
         b.device_vendor,

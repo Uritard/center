@@ -112,16 +112,18 @@ public class TCameraPresetService {
         camera.setLabel(tCameraInfo.getCameraName());
         camera.setInfoType("infoType");
         List<AreaInfo> child = new LinkedList<>();
-        for (TCameraPreset item:presetList) {
-            AreaInfo preset = new AreaInfo();
-            preset.setUpId(cameraId);
-            preset.setId(item.getPresetId());
-            preset.setLabel(item.getPresetName());
-            preset.setInfoType("infoType");
-            preset.setUpName(tCameraInfo.getCameraName());
-            child.add(preset);
+        if(presetList != null && presetList.size()>0){
+            for (TCameraPreset item:presetList) {
+                AreaInfo preset = new AreaInfo();
+                preset.setUpId(cameraId);
+                preset.setId(item.getPresetId());
+                preset.setLabel(item.getPresetName());
+                preset.setInfoType("infoType");
+                preset.setUpName(tCameraInfo.getCameraName());
+                child.add(preset);
+            }
+            camera.setChildren(child);
         }
-        camera.setChildren(child);
         return camera;
     }
 
