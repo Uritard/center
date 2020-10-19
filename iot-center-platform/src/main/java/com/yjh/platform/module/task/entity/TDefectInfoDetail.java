@@ -39,12 +39,12 @@ public class TDefectInfoDetail implements Serializable {
     private String confModeName;
 
     @ApiModelProperty(value = "设备id")
-    private Integer deviceId;
+    private Long deviceId;
     @ApiModelProperty(value = "缺陷主设备")
     private String deviceName;
 
     @ApiModelProperty(value = "缺陷点位id")
-    private Integer stdMeteId;
+    private Long stdMeteId;
     @ApiModelProperty(value = "缺陷点位名称")
     private String meteName;
 

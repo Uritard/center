@@ -27,8 +27,8 @@ import com.mysql.jdbc.StringUtils;
  * @since 2020-10-15
  */
 @RestController
-@RequestMapping("/t-camera-alarm/v1")
-@Api(value = "/t-camera-alarm", description = "可视设备本体告警表操作接口")
+@RequestMapping("/tCameraAlarm/v1")
+@Api(value = "/tCameraAlarm", description = "可视设备本体告警表操作接口")
 public class TCameraAlarmController {
 
     @Autowired

@@ -431,7 +431,11 @@
         <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-
+        AND (CASE
+        WHEN #{alarmSource} = 888 THEN alarm_source = 888
+        WHEN #{alarmSource} = 279 THEN alarm_source = 279
+        WHEN #{alarmSource} != 279 and #{alarmSource} != 888 THEN alarm_source != 888 and alarm_source != 279
+        END)
     </select>
     <!--根据告警来源统计告警数据-->
     <select id="countByAlarmSource" resultType="java.util.Map">
