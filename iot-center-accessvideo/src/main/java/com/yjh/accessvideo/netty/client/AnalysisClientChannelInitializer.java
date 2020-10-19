@@ -9,14 +9,14 @@ import io.netty.channel.socket.SocketChannel;
  */
 public class AnalysisClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    private String gatewayName;
-    private int changeDataNum;
+    private int remotePort1;
+    private int remotePort2;
 
     public AnalysisClientChannelInitializer() { }
 
-    public AnalysisClientChannelInitializer(String gatewayName, int changeDataNum) {
-        this.gatewayName = gatewayName;
-        this.changeDataNum = changeDataNum;
+    public AnalysisClientChannelInitializer(int remotePort1, int remotePort2) {
+        this.remotePort1 = remotePort1;
+        this.remotePort2 = remotePort2;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class AnalysisClientChannelInitializer extends ChannelInitializer<SocketC
         ChannelPipeline p = socketChannel.pipeline();
         //p.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
         //p.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        p.addLast(new AnalysisClientHandler(gatewayName, changeDataNum));
+        p.addLast(new AnalysisClientHandler(remotePort1, remotePort2));
     }
 }
