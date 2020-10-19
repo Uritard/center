@@ -94,7 +94,7 @@
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
     </set>
-            where a.robot_alarm_id = #{robotAlarmId, jdbcType=Long}
+            where a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TRobotAlarm">
