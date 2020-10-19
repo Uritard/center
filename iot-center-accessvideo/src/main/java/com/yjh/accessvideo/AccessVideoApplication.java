@@ -35,7 +35,6 @@ public class AccessVideoApplication implements CommandLineRunner {
     private String sdkLogPath;//sdk日志路径
     @Value("${nvr.log.level}")
     private int logLevel;//sdk日志等级
-    private String test = Constant.sdkPath = sdkPath;
 
     @Value("${netty.recognize.port}")
     private int recognizePort;//识别算法端口
@@ -67,7 +66,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         if (register()) {log.info("register success..");}
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2);
+//        nettyClient.start(remoteAddress1, remoteAddress2);
     }
 
     private boolean register() {

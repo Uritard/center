@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.netty.client;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static com.yjh.accessvideo.common.Constant.TYPET3;
 
@@ -24,26 +24,20 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private String gatewayName;
 
     private byte[] bufBytes = new byte[1024 * 512];
-    private int bufdateLen;
     private long hisT3 = System.currentTimeMillis();
-    private long hisTtimeout;
     private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
+    private int remotePort1;
+    private int remotePort2;
 
-    private int changeDataNum;
-    public int getChangeDataNum() { return changeDataNum; }
-    public void setChangeDataNum(int changeDataNum) { this.changeDataNum = changeDataNum; }
-
-    public AnalysisClientHandler() { }
-
-    public AnalysisClientHandler(String gatewayName, int changeDataNum) {
-        this.gatewayName = gatewayName;
-        this.changeDataNum = changeDataNum;
+    public AnalysisClientHandler(int remotePort1, int remotePort2) {
+        this.remotePort1 = remotePort1;
+        this.remotePort2 = remotePort2;
     }
 
-    private static Map<Object, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
-    public static Map<Object, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }
+    private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
+    public static Map<Integer, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
@@ -57,7 +51,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         Thread thread = new Thread(heartBeatThread);
         thread.setDaemon(true);
         thread.start();
-        if (analysisClientHandlerHashMap.get(gatewayName) == null) { analysisClientHandlerHashMap.put(gatewayName, this); }
+        if (analysisClientHandlerHashMap.get(remotePort1) == null) { analysisClientHandlerHashMap.put(remotePort1, this); }
         log.info("客户端注册成功");
     }
 
@@ -77,93 +71,29 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
-        System.arraycopy(bytes, 0, bufBytes, bufdateLen, bytes.length);
-        bufdateLen = bytes.length + bufdateLen;
-        handlerData();
+        try {
+            String body = new String(bytes, "UTF-8");
+            log.info("接收服务端数据:"+body);
+            handlerData(body);
+        } catch (Exception e) { e.getMessage(); }
+
         ReferenceCountUtil.release(byteBuf);
     }
 
-    private void handlerData() {
-        while (FrameCallBack(bufBytes, bufdateLen)) {
-            if (bufBytes[1] == 0x04) {
-                if (bufBytes[2]==0x43 && bufBytes[3]==0x00 && bufBytes[4]==0x00 && bufBytes[5]==0x00 ) {
-                    //心跳计时
-                    hisT3 = System.currentTimeMillis();
-                }
-                System.arraycopy(bufBytes, 6, bufBytes, 0, bufdateLen - 6);
-                bufdateLen = bufdateLen - 6;
-            } else {
-                switch (bufBytes[6]) {
-                    case 0x64:
-                        //收到总召命令，发送数据
-                        log.info("发送总召数据");
-                        byte[] bytesYX1 = new byte[141];
-                        break;
-                    default:
-                        log.info("未知数据类型: " + bufBytes[6]);
-                }
-                //粘包去除已处理数据，正常包清除缓存
-                if ((bufdateLen - (bufBytes[1] + 2)) > 0) {
-                    System.arraycopy(bufBytes, bufBytes[1] + 2, bufBytes, 0, bufdateLen - bufBytes[1] - 2);
-                    bufdateLen -= (bufBytes[1] + 2);
-                } else {
-                    bufBytes = new byte[1024 * 512];
-                    bufdateLen = 0;
-                }
+    private void handlerData(String body) {
+        while (body.length()>0) {
+            //TODO 具体转化逻辑
+            switch (bufBytes[6]) {
+                case 0x64:
+                    //收到总召命令，发送数据
+                    log.info("发送总召数据");
+                    byte[] bytesYX1 = new byte[141];
+                    break;
+                default:
+                    log.info("未知数据类型: " + bufBytes[6]);
             }
         }
 
-    }
-
-    //拆包
-    private boolean FrameCallBack(byte[] bytes, int nLength) {
-        while (nLength >= 5) {
-            if ( nLength==0x06 ) {
-                if ( bytes[0]==0x68 && bytes[1]==0x04 ) {
-                    StringBuffer Str = new StringBuffer();
-                    int dataLength = ByteUtil.byte2Int(bytes[1]) + 2;
-                    for (int i = 0; i < dataLength; i++) {
-                        Str.append(String.format("%02x ", bufBytes[i]));
-                    }
-                    log.info("收到服务端消息: " + Str);
-                    return true;
-                } else {
-                    //挪位直到第一个为68
-                    if (bufdateLen > 0) {
-                        System.arraycopy(bufBytes, 1, bufBytes, 0, --bufdateLen);
-                    } else { bufdateLen = 0; }
-                    return false;
-                }
-            } else {
-                if ( bytes[0]==0x68 ) {
-                    if (nLength < (ByteUtil.byte2Int(bytes[1]) + 2)) {
-                        return false;
-                    } else if (nLength == (ByteUtil.byte2Int(bytes[1]) + 2)) {
-                        StringBuffer Str = new StringBuffer();
-                        int dataLength = ByteUtil.byte2Int(bytes[1]) + 2;
-                        for (int i = 0; i < dataLength; i++) {
-                            Str.append(String.format("%02x ", bufBytes[i]));
-                        }
-                        log.info("收到服务端消息: " + Str);
-                        return true;
-                    } else if (nLength > (ByteUtil.byte2Int(bytes[1]) + 2)) {
-                        StringBuilder Str = new StringBuilder();
-                        for (int i = 0; i < nLength; i++) {
-                            Str.append(String.format("%02x ", bufBytes[i]));
-                        }
-                        log.info("收到服务端长消息: " + Str);
-                        return true;
-                    }
-                } else {
-                    //挪位直到第一个为68
-                    if (bufdateLen > 0) {
-                        System.arraycopy(bufBytes, 1, bufBytes, 0, --bufdateLen);
-                    } else { bufdateLen = 0; }
-                    return false;
-                }
-            }
-        }
-        return false;
     }
 
     public void ProcSend() {
@@ -171,7 +101,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             // 心跳报文(客户端,服务端均可发起测试);
             if (isTimeout(TYPET3, hisT3, false)) {
                 SendHeartBeat(ctx);
-                hisT3 = hisTtimeout = System.currentTimeMillis();
+                hisT3 = System.currentTimeMillis();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,21 +127,15 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private void sendBytes(ChannelHandlerContext ctx, String msg) {
+    public void sendString(ChannelHandlerContext ctx, String msg) {
         ByteBuf byteBuf = ctx.alloc().buffer();
-        byteBuf.writeBytes(byteBuf);
+        byteBuf.writeBytes(msg.getBytes());
         log.info("客户端发送报文:" + msg);
-        ctx.pipeline().writeAndFlush(msg);
+        ctx.channel().writeAndFlush(byteBuf);
         log.info("客户端发送报文成功！");
         if (byteBuf.refCnt() >= 1) {
             ReferenceCountUtil.release(ctx);
         }
-    }
-
-    private void sendString(ChannelHandlerContext ctx, String msg) {
-        log.info("客户端发送报文:" + msg);
-        ctx.channel().writeAndFlush(msg);
-        log.info("客户端发送报文成功！");
     }
 
     private void sendStartRegister(ChannelHandlerContext ctx) {
@@ -225,51 +149,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         sendString(ctx, registerMsg);
     }
 
-    private void sendChangeData (ChannelHandlerContext ctx) throws Exception {
-        log.info("跳变数据上送量： "+changeDataNum);
-        for (int num=0;num<changeDataNum;num++) {
-            byte[] bytesChangeData = new byte[20];
-            bytesChangeData[0] = 0x68;
-            bytesChangeData[1] = 0x12;
-            bytesChangeData[2] = (byte) 0xa2;
-            bytesChangeData[3] = (byte) 0xfc;
-            bytesChangeData[4] = (byte) 0xe8;
-            bytesChangeData[5] = 0x12;
-            bytesChangeData[6] = 0x0d;
-            bytesChangeData[7] = 0x01;
-            bytesChangeData[8] = 0x01;
-            bytesChangeData[9] = 0x00;
-            bytesChangeData[10] = 0x00;
-            bytesChangeData[11] = 0x00;
-            bytesChangeData[12] = 0x01;
-            bytesChangeData[13] = 0x40;
-            bytesChangeData[14] = 0x00;
-            bytesChangeData[15] = ByteUtil.int2Byte(nextInt(0,15))[0];
-            bytesChangeData[16] = ByteUtil.int2Byte(nextInt(0,15))[0];
-            bytesChangeData[17] = ByteUtil.int2Byte(nextInt(0,15))[0];
-            bytesChangeData[18] = ByteUtil.int2Byte(nextInt(0,3))[0];
-            bytesChangeData[19] = 0x00;
-            StringBuffer Str = new StringBuffer();
-            int dataLength = ByteUtil.byte2Int(bytesChangeData[1]) + 2;
-            for (int i = 0; i < dataLength; i++) {
-                Str.append(String.format("%02x ", bytesChangeData[i]));
-            }
-            log.info("客户端发送跳变数据: " + Str);
-            ByteBuf byteBuf = ctx.alloc().buffer();
-            byteBuf.writeBytes(bytesChangeData);
-            ctx.pipeline().writeAndFlush(byteBuf);
-            if (byteBuf.refCnt() >= 1) {
-                ReferenceCountUtil.release(ctx);
-            }
-            log.info("跳变数据发送成功！");
-        }
+    public void sendDataReguest(JSONObject analysisObject) {
+        String msg = analysisObject.toString();
+        sendString(ctx, msg);
     }
-
-    public int nextInt(int min, int max) throws Exception {
-        if (max < min) { throw new Exception("min < max"); }
-        if (min == max) { return min; }
-        return min + ((max - min)*new Random().nextInt());
-    }
-
 
 }

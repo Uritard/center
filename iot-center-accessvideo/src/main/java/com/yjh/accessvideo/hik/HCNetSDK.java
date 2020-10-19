@@ -35,11 +35,11 @@ import java.util.List;
 //SDK接口说明,HCNetSDK.dll
 public interface HCNetSDK extends Library {
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(Constant.sdkPath+"/libhcnetsdk.so",
-            HCNetSDK.class);
-
-//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
+//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(Constant.sdkPath+"/libhcnetsdk.so",
 //            HCNetSDK.class);
+
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh_iot_center/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
+            HCNetSDK.class);
 
 //    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk",
 //            HCNetSDK.class);

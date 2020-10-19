@@ -39,14 +39,14 @@ public class NettyClient {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline p = ch.pipeline();
-                    p.addLast(new AnalysisClientHandler());
+                    p.addLast(new AnalysisClientHandler(remoteAddress1.getPort(), remoteAddress2.getPort()));
                 }
             });
             ChannelFuture future = b.connect(remoteAddress1).sync();
             future.channel().closeFuture().sync();
 
-//            ChannelFuture future2 = b.connect(remoteAddress2).sync();
-//            future2.channel().closeFuture().sync();
+            ChannelFuture future2 = b.connect(remoteAddress2).sync();
+            future2.channel().closeFuture().sync();
 
 
 

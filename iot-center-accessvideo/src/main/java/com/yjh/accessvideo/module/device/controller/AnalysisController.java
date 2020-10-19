@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,12 +34,17 @@ public class AnalysisController {
         this.analysisService = analysisService;
     }
 
+    @Value("${netty.recognize.port}")
+    private int recognizePort;//识别算法端口
+    @Value("${netty.ai.port}")
+    private int aiPort;//缺陷算法端口
+
     @ApiOperation(value = "算法接口")
     @RequestMapping(value = "/algorithm", method = RequestMethod.POST)
     public Result feignAlgorithm(@RequestBody List<Analysis> analysisList) {
         Result result = new Result();
         try {
-            result.setData(analysisService.feignAlgorithm(analysisList));
+            result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -53,7 +59,7 @@ public class AnalysisController {
     public Result feignDefect(@RequestBody List<Analysis> analysisList) {
         Result result = new Result();
         try {
-            result.setData(analysisService.feignDefect(analysisList));
+            result.setData(analysisService.feignDefect(analysisList, aiPort));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
