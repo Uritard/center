@@ -18,6 +18,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author lqh
@@ -70,10 +72,11 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TCameraScreen tCameraScreen) {
+    public Result update(HttpServletRequest request,@RequestBody TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.update(tCameraScreen));
+            String userId = request.getHeader("userId");
+            result.setData(tCameraScreenService.update(tCameraScreen,userId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
@@ -86,11 +89,11 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "userId", required = true) Long userId) {
+    public Result selectByPrimaryId(HttpServletRequest request) {
         Result result = new Result();
         try {
-            TCameraScreen tCameraScreen = tCameraScreenService.selectByPrimaryId(userId);
-            result.setData(tCameraScreen);
+            String userId = request.getHeader("userId");
+            result.setData(tCameraScreenService.selectByPrimaryId(Long.parseLong("10001")));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -101,7 +104,7 @@ public class TCameraScreenController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "userId", required = false) Long userId,
-                            @RequestParam(value = "screenNum", required = false) Integer screenNum,
+                            @RequestParam(value = "screenNum", required = false) String screenNum,
                             @RequestParam(value = "cameraIds", required = false) String cameraIds,
                             @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();

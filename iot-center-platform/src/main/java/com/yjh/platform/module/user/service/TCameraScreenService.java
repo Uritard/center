@@ -1,12 +1,17 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import com.yjh.platform.module.user.entity.Camera;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraScreen;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Date;
 import java.util.Arrays;
 
+import com.yjh.platform.module.user.entity.TCameraScreenDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -21,6 +26,8 @@ public class TCameraScreenService{
 
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
+    @Autowired
+    private TCameraInfoDao tCameraInfoDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -36,24 +43,49 @@ public class TCameraScreenService{
 
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int update(TCameraScreen tCameraScreen) {
-        TCameraScreen ifSave =this.tCameraScreenDao.selectByPrimaryId(tCameraScreen.getUserId());
+    public Date update(TCameraScreen tCameraScreen,String userId) {
+        Long user = Long.parseLong(userId);
+        tCameraScreen.setUserId(user);
+        TCameraScreen ifSave =this.tCameraScreenDao.selectByPrimaryId(user);
         if(ifSave != null){
-            return this.tCameraScreenDao.update(tCameraScreen);
+            this.tCameraScreenDao.update(tCameraScreen);
+            return tCameraScreen.getCreateTime();
         }else {
-            return this.tCameraScreenDao.add(tCameraScreen);
+            this.tCameraScreenDao.update(tCameraScreen);
+            return tCameraScreen.getCreateTime();
         }
     }
 
     @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public TCameraScreen selectByPrimaryId(Long userId) {
-        return this.tCameraScreenDao.selectByPrimaryId(userId);
+    public TCameraScreenDetail selectByPrimaryId(Long userId) {
+        TCameraScreenDetail tCameraScreenDetail = this.tCameraScreenDao.selectByPrimaryId(userId);
+        if(tCameraScreenDetail == null){
+            return null;
+        }
+        List<Object> cameraList = new LinkedList<>();
+        String[] strList = tCameraScreenDetail.getCameraIds().split(",");
+        for (String item: strList) {
+            if(item.equals("")){
+                Camera camera = new Camera();
+               camera.setCameraId("");
+               camera.setCameraName("");
+                cameraList.add(camera);
+            }else {
+                Camera camera = new Camera();
+                TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.parseLong(item));
+                camera.setCameraId(tCameraInfo.getCameraId().toString());
+                camera.setCameraName(tCameraInfo.getCameraName());
+                cameraList.add(camera);
+            }
+        }
+        tCameraScreenDetail.setCameraList(cameraList);
+        return tCameraScreenDetail;
     }
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraScreen> select(Long userId, Integer screenNum, String cameraIds, Date createTime) {
+    public List<TCameraScreen> select(Long userId, String screenNum, String cameraIds, Date createTime) {
         List<TCameraScreen> tCameraScreenList = tCameraScreenDao.select(userId, screenNum, cameraIds, createTime);
         return tCameraScreenList;
     }

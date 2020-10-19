@@ -110,7 +110,7 @@
        SELECT a.device_id as deviceId,a.device_name as deviceName,b.mete_name as meteName,b.mete_kind as meteKind,b.mete_code as meteCode,b.mete_explain_type as meteExplainType,d.isshield as isShield,h.dict_note as meteKindName
 	   FROM t_dict_business h,t_cfg_device a,t_cfg_mete b,t_cfg_telemeter d
 	   WHERE
-        a.device_id = d.device_id and  b.mete_id = d.mete_id and h.dict_code = b.mete_kind
+        a.device_id = d.device_id and  b.mete_id = d.mete_id and h.dict_code = b.mete_kind and h.col_name = 'mete_kind'
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="meteKind != null and meteKind != ''"> and h.dict_code = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>
@@ -118,7 +118,7 @@
         SELECT a.device_id as deviceId,a.device_name as deviceName,b.mete_name as meteName,b.mete_kind as meteKind,b.mete_code as meteCode,b.mete_explain_type as meteExplainType,e.isshield as isShield,h.dict_note as meteKindName
         FROM t_dict_business h,t_cfg_device a,t_cfg_mete b,t_cfg_telesignal e
         WHERE
-        a.device_id = e.device_id and  b.mete_id = e.mete_id and h.dict_code = b.mete_kind
+        a.device_id = e.device_id and  b.mete_id = e.mete_id and h.dict_code = b.mete_kind and h.col_name = 'mete_kind'
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="meteKind != null and meteKind != ''"> and h.dict_code = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>
@@ -127,7 +127,7 @@
         SELECT a.device_id as deviceId,a.device_name as deviceName,b.mete_name as meteName,b.mete_kind as meteKind,b.mete_code as meteCode,b.mete_explain_type as meteExplainType,'null' as isShield,h.dict_note as meteKindName
         FROM t_dict_business h,t_cfg_device a,t_cfg_mete b,t_cfg_teleadjust f
         WHERE
-        a.device_id = f.device_id and  b.mete_id = f.mete_id and h.dict_code = b.mete_kind
+        a.device_id = f.device_id and  b.mete_id = f.mete_id and h.dict_code = b.mete_kind and h.col_name = 'mete_kind'
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="meteKind != null and meteKind != ''"> and h.dict_code= #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>
@@ -135,7 +135,7 @@
         SELECT a.device_id as deviceId,a.device_name as deviceName,b.mete_name as meteName,b.mete_kind as meteKind,b.mete_code as meteCode,b.mete_explain_type as meteExplainType,'null' as isShield,h.dict_note as meteKindName
         FROM t_dict_business h,t_cfg_device a,t_cfg_mete b,t_cfg_telecontrol g
         WHERE
-        a.device_id = g.device_id and  b.mete_id = g.mete_id and h.dict_code = b.mete_kind
+        a.device_id = g.device_id and  b.mete_id = g.mete_id and h.dict_code = b.mete_kind and h.col_name = 'mete_kind'
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="meteKind != null and meteKind != ''"> and h.dict_code = #{meteKind, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%')</if>

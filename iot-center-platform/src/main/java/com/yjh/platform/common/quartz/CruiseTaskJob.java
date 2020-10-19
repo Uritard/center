@@ -8,12 +8,14 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
+import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.entity.TCameraInfo;
-import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.*;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -21,7 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.text.ParseException;
@@ -53,6 +59,10 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruiseDataResultDao tCruiseDataResultDao;
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
+    @Autowired
+    private TAlgorithmConfDao tAlgorithmConfDao;
+    @Autowired
+    private TAlgorithmInfoDao tAlgorithmInfoDao;
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(DeviceDataJob.class);
 
@@ -60,9 +70,9 @@ public class CruiseTaskJob extends QuartzJobBean {
     private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePicture?cameraId={cameraId}";
     //相机转到预置位
     private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPreset?presetId={presetId}&cameraId={cameraId}";
-    //http://iot-center-accessvideo/camera/v1/moveToPreset?presetId={presetId}
+    //算法接口
+    private static final String ANALYSIS_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
 
-    //    @Scheduled(fixedRate = 20000)
 
     /**
      * 巡视任务类
@@ -143,15 +153,31 @@ public class CruiseTaskJob extends QuartzJobBean {
                         //2.抓图
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
-                        String url = picture(map2);
-                        if(url == null){
+                        String picUrl = picture(map2);
+                        if(picUrl == null){
                             //抓图失败 任务失败
                             tCruiseTaskResultDetail.setCruiseStatus(254);
                             tCruiseDataResult.setState(250);
                         }else {
-                            //抓图成功
+                            //抓图成功 算法分析
+                            Analysis analysis = new Analysis();
+                            analysis.setTaskId(taskId);
+                            analysis.setInstanceId(item.getInstanceId());
+                            analysis.setPicPath(picUrl);
+                            TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
+                            TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
+                            analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                            analysis.setPicModelPath(picUrl);
+                            List<Analysis> analysisList = new ArrayList<>();
+                            analysisList.add(analysis);
+                            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                            analysisMap.put("list",analysisList);
+//                            Map<String,Object> analysisMap = new HashMap<>();
+//                            map.put("analysis",analysisList);
+                            analysis(analysisMap);
+                            //todo 获取算法分析的结果
                             tCruiseTaskResultDetail.setCruiseStatus(252);
-                            tCruiseDataResult.setPicpath(url);
+                            tCruiseDataResult.setPicpath(picUrl);
 
                         }
                     }
@@ -169,7 +195,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                     map.putAll(map2);
                     map.put("taskId",taskId);
-                    map.put("startTime",date);
+                    map.put("startTime",simpleDateFormat.format(date));
                     redisTemplate.opsForHash().putAll(str, map);
                     taskCount--;//一个巡检点结束
                     tCruiseResult.setTaskWait(taskCount);
@@ -216,6 +242,24 @@ public class CruiseTaskJob extends QuartzJobBean {
             if (null != serviceRestTemplate) {
                 serviceRestTemplate.getForObject(MOVE_URL, String.class,map);
             }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+    //算法分析
+    private void analysis(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ANALYSIS_URL, analysisMap, String.class);
+            }
+//            HttpHeaders headers = new HttpHeaders();
+//            //定义请求参数类型，这里用json所以是MediaType.APPLICATION_JSON
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//            HttpEntity<Map<String, Object>> request = new HttpEntity<>(analysisMap, headers);
+//            if (null != serviceRestTemplate) {
+//                serviceRestTemplate.postForEntity(ANALYSIS_URL, request, String.class);
+//            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

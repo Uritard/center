@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraScreen">
         <id column="user_id" jdbcType="BIGINT" property="userId" />
-        <result column="screen_num" jdbcType="INTEGER" property="screenNum" />
+        <result column="screen_num" jdbcType="VARCHAR" property="screenNum" />
         <result column="camera_ids" jdbcType="VARCHAR" property="cameraIds" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
@@ -23,7 +23,7 @@
             camera_ids
         )values(
                 #{userId, jdbcType=BIGINT},
-                #{screenNum, jdbcType=INTEGER},
+                #{screenNum, jdbcType=VARCHAR},
                 #{cameraIds, jdbcType=VARCHAR}
         )
     </insert>
@@ -36,13 +36,13 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraScreen">
         update t_camera_screen a <set>
         <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
-        <if test="screenNum != null">a.screen_num = #{screenNum, jdbcType=INTEGER},</if>
+        <if test="screenNum != null and screenNum != ''">a.screen_num = #{screenNum, jdbcType=VARCHAR},</if>
         <if test="cameraIds != null and cameraIds != ''">a.camera_ids = #{cameraIds, jdbcType=VARCHAR},</if>
     </set>
             where a.user_id = #{userId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraScreen">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraScreenDetail">
         select
         a.user_id,
         a.screen_num,
@@ -63,7 +63,7 @@
         from t_camera_screen a
         where 1 = 1
         <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
-        <if test="screenNum != null and screenNum != ''"> and a.screen_num = #{screenNum, jdbcType=INTEGER}</if>
+        <if test="screenNum != null and screenNum != ''"> and a.screen_num = #{screenNum, jdbcType=VARCHAR}</if>
         <if test="cameraIds != null and cameraIds != ''"> and a.camera_ids = #{cameraIds, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
@@ -77,7 +77,7 @@
         from t_camera_screen a
         where 1 = 1
         <if test="userId != null and userId != ''"> and a.user_id = #{userId, jdbcType=BIGINT}</if>
-        <if test="screenNum != null and screenNum != ''"> and a.screen_num = #{screenNum, jdbcType=INTEGER}</if>
+        <if test="screenNum != null and screenNum != ''"> and a.screen_num = #{screenNum, jdbcType=VARCHAR}</if>
         <if test="cameraIds != null and cameraIds != ''"> and a.camera_ids = #{cameraIds, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
@@ -92,7 +92,7 @@
         <foreach collection="list" item="TCameraScreen" separator=",">
             (
                 #{TCameraScreen.userId, jdbcType=BIGINT},
-                #{TCameraScreen.screenNum, jdbcType=INTEGER},
+                #{TCameraScreen.screenNum, jdbcType=VARCHAR},
                 #{TCameraScreen.cameraIds, jdbcType=VARCHAR},
                 #{TCameraScreen.createTime, jdbcType=TIMESTAMP}
             )

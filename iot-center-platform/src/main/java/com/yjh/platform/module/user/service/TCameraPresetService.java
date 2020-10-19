@@ -103,7 +103,8 @@ public class TCameraPresetService {
 
     @Logs(title = "获得预置位树", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public AreaInfo selectPresetTree(Long cameraId) {
+    public List<AreaInfo> selectPresetTree(Long cameraId) {
+        List<AreaInfo> tree = new LinkedList<>();
         TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(cameraId);
         if(tCameraInfo == null){
             return null;
@@ -113,7 +114,7 @@ public class TCameraPresetService {
         camera.setUpId(-1L);
         camera.setId(cameraId);
         camera.setLabel(tCameraInfo.getCameraName());
-        camera.setInfoType("infoType");
+        camera.setInfoType("camera");
         List<AreaInfo> child = new LinkedList<>();
         if(presetList != null && presetList.size()>0){
             for (TCameraPreset item:presetList) {
@@ -121,13 +122,14 @@ public class TCameraPresetService {
                 preset.setUpId(cameraId);
                 preset.setId(item.getPresetId());
                 preset.setLabel(item.getPresetName());
-                preset.setInfoType("infoType");
+                preset.setInfoType("preset");
                 preset.setUpName(tCameraInfo.getCameraName());
                 child.add(preset);
             }
             camera.setChildren(child);
         }
-        return camera;
+        tree.add(camera);
+        return tree;
     }
 
 }

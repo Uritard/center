@@ -25,7 +25,7 @@ public class TCameraScreen implements Serializable {
 
     private Long userId;
 
-    private Integer screenNum;
+    private String screenNum;
 
     private String cameraIds;
 
