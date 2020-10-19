@@ -52,7 +52,9 @@
         a.std_mete_id,
         f.mete_name,
         a.image_path,
-        a.deal_info
+        a.deal_info,
+        a.deal_type,
+        g.dict_note as deal_type_name
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
@@ -60,6 +62,7 @@
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
         LEFT JOIN t_std_mete f on f.std_mete_id = a.std_mete_id
+        LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
         WHERE
         1 = 1
         UNION ALL
@@ -79,12 +82,15 @@
         001 as std_mete_id,
         '无' as mete_name,
         '无' as image_path,
-        h.deal_info
+        h.deal_info,
+        h.deal_type,
+        g.dict_note as deal_type_name
         FROM
         t_camera_alarm h
         LEFT JOIN t_camera_info b ON h.camera_id = b.camera_id
         LEFT JOIN t_dict_business e ON h.alarm_state = e.dict_code
         LEFT JOIN t_dict_business c ON h.alarm_level = c.dict_code
+		LEFT JOIN t_dict_business g on h.deal_type = g.dict_code
         WHERE
         1 = 1
         )
@@ -105,12 +111,15 @@
         002 as std_mete_id,
         '无' as mete_name,
         '无' as image_path,
-        f.deal_info
+        f.deal_info,
+		f.deal_type,
+		h.dict_note as deal_type_name
         FROM
         t_robot_alarm f
         LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
         LEFT JOIN t_dict_business e ON f.alarm_state = e.dict_code
         LEFT JOIN t_robot_info g ON f.robot_id = g.robot_id
+		LEFT JOIN t_dict_business h on f.deal_type = h.dict_code
         WHERE
         1 = 1
         )
@@ -458,15 +467,38 @@
     </select>
     <!--统计本周内的告警数-->
     <select id="countWarnOnWeek"  resultType="java.util.Map">
-        select
-            COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime1},
-            COUNT(alarm_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime2},
-            COUNT(alarm_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime3},
-            COUNT(alarm_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime4},
-            COUNT(alarm_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime5},
-            COUNT(alarm_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime6},
-            COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime7}
-        from robot_alarm
+        SELECT
+            (A.counts+H.counts+O.counts) AS #{firstTime2},
+            (B.counts+I.counts+P.counts) AS #{firstTime3},
+            (V.counts+J.counts+Q.counts) AS #{firstTime4},
+            (D.counts+K.counts+R.counts) AS #{firstTime5},
+            (E.counts+L.counts+S.counts) AS #{firstTime6},
+            (F.counts+M.counts+T.counts) AS #{firstTime7},
+            (G.counts+N.counts+U.counts) AS #{firstTime8}
+        FROM
+        (
+            (SELECT COUNT(warn_time BETWEEN #{firstTime2} and #{firstTime1} or null) as counts from t_warn_info) A,
+            (SELECT COUNT(warn_time BETWEEN #{firstTime3} and #{firstTime2} or null) as counts from t_warn_info) B,
+            (SELECT COUNT(warn_time BETWEEN #{firstTime4} and #{firstTime3} or null) as counts from t_warn_info) V,
+            (SELECT COUNT(warn_time BETWEEN #{firstTime5} and #{firstTime4} or null) as counts from t_warn_info) D,
+            (SELECT COUNT(warn_time BETWEEN #{firstTime6} and #{firstTime5} or null) as counts from t_warn_info) E,
+            (SELECT COUNT(warn_time BETWEEN #{firstTime7} and #{firstTime6} or null) as counts from t_warn_info) F,
+            (SELECT COUNT(warn_time BETWEEN #{firstTime8} and #{firstTime7} or null) as counts from t_warn_info) G,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as counts from t_robot_alarm) H,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime3} and #{firstTime2} or null) as counts from t_robot_alarm) I,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime4} and #{firstTime3} or null) as counts from t_robot_alarm) J,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime5} and #{firstTime4} or null) as counts from t_robot_alarm) K,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime6} and #{firstTime5} or null) as counts from t_robot_alarm) L,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime7} and #{firstTime6} or null) as counts from t_robot_alarm) M,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as counts from t_robot_alarm) N,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as counts from t_camera_alarm) O,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime3} and #{firstTime2} or null) as counts from t_camera_alarm) P,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime4} and #{firstTime3} or null) as counts from t_camera_alarm) Q,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime5} and #{firstTime4} or null) as counts from t_camera_alarm) R,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime6} and #{firstTime5} or null) as counts from t_camera_alarm) S,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime7} and #{firstTime6} or null) as counts from t_camera_alarm) T,
+            (SELECT COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as counts from t_camera_alarm) U
+        )
     </select>
     <!--根据告警处理状态统计告警个数-->
     <select id="countWarnConfMode" resultType="java.util.Map">

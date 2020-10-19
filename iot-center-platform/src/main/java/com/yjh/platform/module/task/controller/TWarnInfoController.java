@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
  * @since 2020-10-15
  */
 @RestController
-@RequestMapping("/t-warn-info/v1")
-@Api(value = "/t-warn-info", description = "告警信息表操作接口")
+@RequestMapping("/tWarnInfo/v1")
+@Api(value = "/tWarnInfo", description = "告警信息表操作接口")
 public class TWarnInfoController {
 
     @Autowired

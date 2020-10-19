@@ -1,6 +1,9 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.task.dao.RobotAlarmDao;
+import com.yjh.platform.module.task.dao.TCameraAlarmDao;
+import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
 import java.text.ParseException;
@@ -23,6 +26,10 @@ public class TWarnInfoService{
 
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    @Autowired
+    private TCameraAlarmDao tCameraAlarmDao;
+    @Autowired
+    private TRobotAlarmDao tRobotAlarmDao;
 
     private DateTimeUtil dateTimeUtil;
 
@@ -183,10 +190,18 @@ public class TWarnInfoService{
     public int alarmProcess(Long warnId,Integer alarmSource,Integer dealType,String dealInfo) {
         int jieGuo = 0;
         if (alarmSource == 279 ) {
-//             jieGuo = tWarnInfoDao.alarmProcessRobot(warnId, dealType, dealInfo);
+            TRobotAlarm tRobotAlarm = new TRobotAlarm();
+            tRobotAlarm.setRobotAlarmId(warnId);
+            tRobotAlarm.setDealInfo(dealInfo);
+            tRobotAlarm.setDealType(dealType);
+            jieGuo = tRobotAlarmDao.update(tRobotAlarm);
         }else if (alarmSource == 888)
         {
-//            jieGuo = tWarnInfoDao.alarmProcessCamera(warnId, dealType, dealInfo);
+            TCameraAlarm tCameraAlarm = new TCameraAlarm();
+            tCameraAlarm.setCameraAlarmId(warnId);
+            tCameraAlarm.setDealInfo(dealInfo);
+            tCameraAlarm.setDealType(dealType);
+            jieGuo = tCameraAlarmDao.update(tCameraAlarm);
         }else{
             TWarnInfo tWarnInfo = new TWarnInfo();
             tWarnInfo.setWarnId(warnId);
