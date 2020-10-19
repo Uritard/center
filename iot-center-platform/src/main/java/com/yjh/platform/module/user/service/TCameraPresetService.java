@@ -105,6 +105,9 @@ public class TCameraPresetService {
     @Transactional(rollbackFor = Exception.class)
     public AreaInfo selectPresetTree(Long cameraId) {
         TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(cameraId);
+        if(tCameraInfo == null){
+            return null;
+        }
         List<TCameraPreset> presetList = tCameraPresetDao.selectByCameraId(cameraId);
         AreaInfo camera = new AreaInfo();
         camera.setUpId(-1L);
