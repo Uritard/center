@@ -25,6 +25,8 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.ShortByReference;
+import com.yjh.accessvideo.common.Constant;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,8 +35,11 @@ import java.util.List;
 //SDK接口说明,HCNetSDK.dll
 public interface HCNetSDK extends Library {
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh_iot_center/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(Constant.sdkPath+"/libhcnetsdk.so",
             HCNetSDK.class);
+
+//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
+//            HCNetSDK.class);
 
 //    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk",
 //            HCNetSDK.class);

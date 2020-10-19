@@ -13,4 +13,6 @@ public class Constant {
 
     //心跳报文
     public static final byte TYPET3 = 0x03;
+
+    public static String sdkPath;//sdk路径
 }

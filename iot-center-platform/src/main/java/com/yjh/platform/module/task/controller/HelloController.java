@@ -18,9 +18,9 @@ public class HelloController {
     @PostMapping("/admin")
     @ResponseBody
     public String sayHello(@ApiParam(value = "ceshi ",required = true) @RequestParam String name){
-        WebSocketServer.sendMessage(name+"hello！");
+        WebSocketServer.sendMsg(name+"hello！");
         JSONObject jsonObject = JSONObject.fromObject(WebSocketResult.builder().type("1").info(name +"  很好!").build());
-        WebSocketServer.sendMessage(jsonObject.toString());
+        WebSocketServer.sendMsg(jsonObject.toString());
         return name +"你好!";
     }
 

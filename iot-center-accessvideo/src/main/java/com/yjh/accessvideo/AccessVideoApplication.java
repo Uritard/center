@@ -31,6 +31,11 @@ public class AccessVideoApplication implements CommandLineRunner {
     private Short m_port;//设备端口
     @Value("${nvr.sdk.path}")
     private String sdkPath;//sdk路径
+    @Value("${nvr.log.path}")
+    private String sdkLogPath;//sdk日志路径
+    @Value("${nvr.log.level}")
+    private int logLevel;//sdk日志等级
+    private String test = Constant.sdkPath = sdkPath;
 
     @Value("${netty.recognize.port}")
     private int recognizePort;//识别算法端口
@@ -56,12 +61,13 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         log.info("videoAccess is running...");
+        log.info(Constant.sdkPath);
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return;} else { log.info("init success..");}
-        hCNetSDK.NET_DVR_SetLogToFile(1,"/home/yjh_iot_center/iot-center-accessvideo-1.0.0",false);
+        hCNetSDK.NET_DVR_SetLogToFile(logLevel,sdkLogPath,false);
         if (register()) {log.info("register success..");}
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-//        nettyClient.start(remoteAddress1, remoteAddress2);
+        nettyClient.start(remoteAddress1, remoteAddress2);
     }
 
     private boolean register() {
