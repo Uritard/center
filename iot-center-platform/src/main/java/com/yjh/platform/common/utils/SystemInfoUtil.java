@@ -1,5 +1,8 @@
 package com.yjh.platform.common.utils;
 
+import com.yjh.platform.common.quartz.CruiseTaskJob;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.*;
 
@@ -8,6 +11,8 @@ import java.util.*;
  * @since 2020/10/20
  */
 public class SystemInfoUtil {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SystemInfoUtil.class);
 
         /**
          * 获取cpu使用情况
@@ -58,10 +63,10 @@ public class SystemInfoUtil {
                 in = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 String str = null;
                 String[] strArray = null;
-                //str = in.readLine();
-                while ((str = in.readLine()) != null) {
+                str = in.readLine();
+                if ((str = in.readLine()) != null) {
                     strArray = str.split("\\s+");
-                    System.out.println(str+"--------");
+                    log.info(str+"--------");
                     map.put("total",strArray[2]);
                     map.put("used",strArray[3]);
                     map.put("free",strArray[4]);
@@ -93,6 +98,7 @@ public class SystemInfoUtil {
                 while ((str = in.readLine()) != null) {
                     if(i > 3){
                         strArray = str.split("\\s+");
+                        log.info(str+"--------");
                         Map<String,Object> map = new HashMap<>();
                         map.put("Pid",strArray[3]);
                         map.put("read",strArray[4]);

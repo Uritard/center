@@ -65,7 +65,7 @@ public class CruiseTaskJob extends QuartzJobBean {
     @Autowired
     private TAlgorithmInfoDao tAlgorithmInfoDao;
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(DeviceDataJob.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CruiseTaskJob.class);
 
     //相机抓图
     private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePicture?cameraId={cameraId}";
