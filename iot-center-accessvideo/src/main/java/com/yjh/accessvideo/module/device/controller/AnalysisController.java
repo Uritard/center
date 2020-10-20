@@ -11,9 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,9 +43,10 @@ public class AnalysisController {
 
     @ApiOperation(value = "算法接口")
     @RequestMapping(value = "/algorithm", method = RequestMethod.POST)
-    public Result feignAlgorithm(@RequestBody List<Analysis> analysisList) {
+    public Result feignAlgorithm(@RequestBody Map<String, List<Analysis>> analysisMap) {
         Result result = new Result();
         try {
+            List<Analysis> analysisList = analysisMap.get("list");
             result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -56,9 +59,10 @@ public class AnalysisController {
 
     @ApiOperation(value = "缺陷接口")
     @RequestMapping(value = "/defect", method = RequestMethod.POST)
-    public Result feignDefect(@RequestBody List<Analysis> analysisList) {
+    public Result feignDefect(@RequestBody Map<String, List<Analysis>> analysisMap) {
         Result result = new Result();
         try {
+            List<Analysis> analysisList = analysisMap.get("list");
             result.setData(analysisService.feignDefect(analysisList, aiPort));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

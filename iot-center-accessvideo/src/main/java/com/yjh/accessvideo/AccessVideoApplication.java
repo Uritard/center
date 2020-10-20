@@ -66,7 +66,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         if (register()) {log.info("register success..");}
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-//        nettyClient.start(remoteAddress1, remoteAddress2);
+        nettyClient.start(remoteAddress1, remoteAddress2);
     }
 
     private boolean register() {
