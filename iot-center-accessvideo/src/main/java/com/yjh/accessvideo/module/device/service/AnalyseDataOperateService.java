@@ -15,90 +15,112 @@ public class AnalyseDataOperateService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
 
-    @Logs(title = "告警信息插入",code = "Analysis")
+    @Logs(title = "告警信息插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int insertWarnInfo(TWarnInfo tWarnInfo){
-       return this.analyseDataOperateDao.insertWarnInfo(tWarnInfo);
+    public int insertWarnInfo(TWarnInfo tWarnInfo) {
+        return this.analyseDataOperateDao.insertWarnInfo(tWarnInfo);
     }
 
-    @Logs(title = "告警信息批量插入",code = "Analysis")
+    @Logs(title = "告警信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertWarnInfo(List<TWarnInfo> list){
+    public int batchInsertWarnInfo(List<TWarnInfo> list) {
         return this.analyseDataOperateDao.batchInsertWarnInfo(list);
     }
 
-    @Logs(title = "算法结果插入",code = "Analysis")
+    @Logs(title = "算法结果插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int insertVideoAnalyseResult(TVideoAnalyseResult tVideoAnalyseResult){
+    public int insertVideoAnalyseResult(TVideoAnalyseResult tVideoAnalyseResult) {
         return this.analyseDataOperateDao.insertVideoAnalyseResult(tVideoAnalyseResult);
     }
 
-    @Logs(title = "算法结果批量插入",code = "Analysis")
+    @Logs(title = "算法结果批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertVideoAnalyseResult(List<TVideoAnalyseResult> list){
+    public int batchInsertVideoAnalyseResult(List<TVideoAnalyseResult> list) {
         return this.analyseDataOperateDao.batchInsertVideoAnalyseResult(list);
     }
 
-    @Logs(title = "任务结果信息插入",code = "Analysis")
+    @Logs(title = "任务结果信息插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseResult(TCruiseResult tCruiseResult){
+    public int insertCruiseResult(TCruiseResult tCruiseResult) {
         return this.analyseDataOperateDao.insertCruiseResult(tCruiseResult);
     }
 
-    @Logs(title = "任务结果信息批量插入",code = "Analysis")
+    @Logs(title = "任务结果信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertCruiseResult(List<TCruiseResult> list){
+    public int batchInsertCruiseResult(List<TCruiseResult> list) {
         return this.analyseDataOperateDao.batchInsertCruiseResult(list);
     }
 
-    @Logs(title = "巡视点-任务结果信息插入",code = "Analysis")
+    @Logs(title = "巡视点-任务结果信息插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
+    public int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.analyseDataOperateDao.insertCruiseTaskResult(tCruiseTaskResult);
     }
 
-    @Logs(title = "巡视点-任务结果信息批量插入",code = "Analysis")
+    @Logs(title = "巡视点-任务结果信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertCruiseTaskResult(List<TCruiseTaskResult> list){
+    public int batchInsertCruiseTaskResult(List<TCruiseTaskResult> list) {
         return this.analyseDataOperateDao.batchInsertCruiseTaskResult(list);
     }
 
-    @Logs(title = "巡视点详细结果信息插入",code = "Analysis")
+    @Logs(title = "巡视点详细结果信息插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail){
-        return this.analyseDataOperateDao.insertCruiseTaskResultDetail( tCruiseTaskResultDetail);
+    public int insertCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail) {
+        return this.analyseDataOperateDao.insertCruiseTaskResultDetail(tCruiseTaskResultDetail);
     }
 
-    @Logs(title = "巡视点详细结果信息批量插入",code = "Analysis")
+    @Logs(title = "巡视点详细结果信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail>list){
+    public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> list) {
         return this.analyseDataOperateDao.batchInsertCruiseTaskResultDetail(list);
     }
 
-    @Logs(title = "巡视数据结果信息插入",code = "Analysis")
+    @Logs(title = "巡视数据结果信息插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseDataResult(TCruiseDataResult tCruiseDataResult){
+    public int insertCruiseDataResult(TCruiseDataResult tCruiseDataResult) {
         return this.analyseDataOperateDao.insertCruiseDataResult(tCruiseDataResult);
     }
 
-    @Logs(title = "巡视数据结果信息批量插入",code = "Analysis")
+    @Logs(title = "巡视数据结果信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertCruiseDataResult(List<TCruiseDataResult>list){
+    public int batchInsertCruiseDataResult(List<TCruiseDataResult> list) {
         return this.analyseDataOperateDao.batchInsertCruiseDataResult(list);
     }
 
-    @Logs(title = "标准测点信息查询",code = "Analysis")
+    @Logs(title = "标准测点信息查询", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public TStdDevicemete selectByPrimaryIdDeviceMete(Long deviceMeteId){
+    public TStdDevicemete selectByPrimaryIdDeviceMete(Long deviceMeteId) {
         return this.analyseDataOperateDao.selectByPrimaryIdDeviceMete(deviceMeteId);
     }
 
-    @Logs(title = "根据巡视点ID查询标准测点信息",code = "Analysis")
+    @Logs(title = "根据巡视点ID查询标准测点信息", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public TStdDevicemete selectDeviceMeteByInstanceId(Long instanceId){
+    public TStdDevicemete selectDeviceMeteByInstanceId(Long instanceId) {
         return this.analyseDataOperateDao.selectDeviceMeteByInstanceId(instanceId);
     }
 
+    @Logs(title = "告警判断", code = "Analysis")
+    @Transactional(rollbackFor = Exception.class)
+    public boolean warnJudgement(Float value,
+                                 Float highLimit1,
+                                 Float lowLimit1,
+                                 Float highLimit2,
+                                 Float lowLimit2,
+                                 Float highLimit3,
+                                 Float lowLimit3,
+                                 Float highLimit4,
+                                 Float lowLimit4) {
+        if (value > highLimit1 || value < lowLimit1) {
+            return true;
+        } else if (value > highLimit2 || value < lowLimit2) {
+            return true;
+        } else if (value > highLimit3 || value < lowLimit3) {
+            return true;
+        } else if (value > highLimit4 || value < lowLimit4) {
+            return true;
+        }
+        return false;
+    }
 
 }
 

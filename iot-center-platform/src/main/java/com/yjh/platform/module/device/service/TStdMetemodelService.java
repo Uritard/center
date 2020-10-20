@@ -129,7 +129,7 @@ public class TStdMetemodelService {
 
   @Logs(title = "新建模板联合新增",code = "module")
   @Transactional(rollbackFor = Exception.class)
-  public int addModel(ModelCreator modelCreator){
+  public Long addModel(ModelCreator modelCreator){
         TStdMeteModel m=new TStdMeteModel();
         m.setDeviceType(modelCreator.getDeviceType());
         m.setModelName(modelCreator.getModelName());
@@ -170,7 +170,7 @@ public class TStdMetemodelService {
           tStdMetemodelDetailDao.add(detail);
 
       }
-        return 1;
+        return m.getModelId();
   }
 
     @Logs(title = "查询当前模板信息",code = "module")

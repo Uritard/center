@@ -3,6 +3,10 @@ package com.yjh.accessvideo.netty.client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
+import com.yjh.accessvideo.module.device.entity.TStdDevicemete;
+import com.yjh.accessvideo.module.device.entity.TWarnInfo;
+import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
+import com.yjh.accessvideo.module.device.service.AnalysisService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -24,6 +28,10 @@ import static com.yjh.accessvideo.common.Constant.TYPET3;
 public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     private  RedisTemplate redisTemplate;
+
+    @Autowired
+    private AnalyseDataOperateService analyseDataOperateService;
+
     private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
     private long hisT3 = System.currentTimeMillis();
@@ -92,50 +100,78 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             while (iterator.hasNext()){
                 Map.Entry entry=(Map.Entry)iterator.next();
                 JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());//遍历每一个结果子集
-                String anlyseType=jsonObjectResult.get("anlyseType").toString();
-                Map anlyseResult=new HashMap();
-                anlyseResult.put("taskId",jsonObjectResult.get("taskId"));
-                anlyseResult.put("instanceId",jsonObjectResult.get("instanceId"));
-                anlyseResult.put("anlyseType",jsonObjectResult.get("anlyseType"));
-                anlyseResult.put("resultValue",jsonObjectResult.get("resultValue"));
-                String name="AnlyseResult"+jsonObjectResult.get("instanceId").toString();
-                redisTemplate.opsForHash().putAll(name,anlyseResult);
-                log.info("数据：",entry);
-                switch (anlyseType){
-                    case "1":
-                    case "2":
-                    case "3":
-                    case "4":
-                    case "5":
-                    case "6":
-                    case "7":
-                    case "8":
-                    case "9":
-                    case "10":
-                    case "11":
-                    case "12":
-                    case "13":
-                    case "14":
-                    case "15":
-                    case "16":
-                    case "17":
-                    case "18":
-                    case "19":
-                    case "20":
-                    case "21":
-                    case "22":
-                    case "23":
-                    case "24":
-                    case "25":
-                    case "26":
-                    case "27":
+                String analyseType=jsonObjectResult.get("analyseType").toString();
+                log.info("数据：",jsonObjectResult);//打印resultInfo
+                Map analyseResult=new HashMap();
+                analyseResult.put("taskId",jsonObjectResult.get("taskId"));
+                analyseResult.put("instanceId",jsonObjectResult.get("instanceId"));
+                analyseResult.put("analyseType",jsonObjectResult.get("analyseType"));
+                analyseResult.put("resultValue",jsonObjectResult.get("resultValue"));//获取到所有算法分析返回数据
+//                String name="analyseResult"+jsonObjectResult.get("instanceId").toString();
+//                redisTemplate.opsForHash().putAll(name,analyseResult); //数据放入缓存
 
-                        break;
-                    default:
-                        log.info("");
+                String remoteAdds = ctx.channel().remoteAddress().toString();
+                int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
+
+                if(remotePort==13668){
+                    TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                    Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
+                    if(analyseDataOperateService.warnJudgement(resultValue,
+                            tStdDevicemete.getHighLimit1(),
+                            tStdDevicemete.getLowLimit1(),
+                            tStdDevicemete.getHighLimit2(),
+                            tStdDevicemete.getLowLimit2(),
+                            tStdDevicemete.getHighLimit3(),
+                            tStdDevicemete.getLowLimit3(),
+                            tStdDevicemete.getHighLimit4(),
+                            tStdDevicemete.getLowLimit4())){
+                        // TODO: 2020/10/20 组装TWarnInfo数据并插库
+                        TWarnInfo tWarnInfo=new TWarnInfo();
 
 
+                    }
                 }
+
+
+
+
+
+
+//                switch (analyseType){
+//                    case "1":
+//                    case "2":
+//                    case "3":
+//                    case "4":
+//                    case "5":
+//                    case "6":
+//                    case "7":
+//                    case "8":
+//                    case "9":
+//                    case "10":
+//                    case "11":
+//                    case "12":
+//                    case "13":
+//                    case "14":
+//                    case "15":
+//                    case "16":
+//                    case "17":
+//                    case "18":
+//                    case "19":
+//                    case "20":
+//                    case "21":
+//                    case "22":
+//                    case "23":
+//                    case "24":
+//                    case "25":
+//                    case "26":
+//                    case "27":
+//
+//                        break;
+//                    default:
+//                        log.info("");
+//
+//
+//                }
 
             }
 
