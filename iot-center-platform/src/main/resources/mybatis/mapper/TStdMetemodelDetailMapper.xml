@@ -241,6 +241,7 @@
         c.dict_note AS "meteTypeName",
         d.device_type AS "deviceType",
         e.dict_note AS "deviceTypeName",
+        f.dict_note AS "meteKindName",
         a.mete_name,
         a.mete_type,
         a.mete_kind,
@@ -266,7 +267,7 @@
         a.modulus,
         d.model_name
         FROM
-        (
+        ((
         (
         t_std_metemodel_detail a
         LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
@@ -274,7 +275,7 @@
         )
         LEFT JOIN t_dict_business c ON a.mete_type = c.dict_code
         AND c.col_name = "mete_type"
-        )
+        )LEFT JOIN t_dict_business f on a.mete_kind=f.dict_code and  f.col_name="mete_kind")
         LEFT JOIN (
         t_std_metemodel d
         LEFT JOIN t_dict_business e ON d.device_type = e.dict_code

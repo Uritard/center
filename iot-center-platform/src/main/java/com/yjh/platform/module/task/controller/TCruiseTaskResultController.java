@@ -251,12 +251,12 @@ public class TCruiseTaskResultController {
         Result result=new Result();
         try{
             result.setData(tCruiseTaskResultService.cameraInfoByRedis());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
-            String taskDate = simpleDateFormat.format(new Date());
-            Date date = null;
-            try {
-                date = simpleDateFormat.parse(taskDate);
-            } catch (Exception e) { e.getMessage(); }
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
+//            String taskDate = simpleDateFormat.format(new Date());
+//            Date date = null;
+//            try {
+//                date = simpleDateFormat.parse(taskDate);
+//            } catch (Exception e) { e.getMessage(); }
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);

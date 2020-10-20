@@ -21,7 +21,7 @@
         <!-- 把项目相关的说明文件，打包进zip文件的根目录 -->  
         <fileSet>  
             <directory>${project.basedir}</directory>  
-            <outputDirectory>/</outputDirectory>  
+            <outputDirectory>./</outputDirectory>
             <includes>  
                 <include>README*</include>  
                 <include>LICENSE*</include>  

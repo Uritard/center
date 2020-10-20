@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.netty.client;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import io.netty.buffer.ByteBuf;
@@ -8,8 +9,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.yjh.accessvideo.common.Constant.TYPET3;
@@ -18,7 +22,8 @@ import static com.yjh.accessvideo.common.Constant.TYPET3;
  * Created by tt on 2019/7/31.
  */
 public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
-
+    @Autowired
+    private  RedisTemplate redisTemplate;
     private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
     private String gatewayName;
@@ -83,15 +88,62 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private void handlerData(String body) {
         while (body.length()>0) {
             //TODO 具体转化逻辑
-            switch (bufBytes[6]) {
-                case 0x64:
-                    //收到总召命令，发送数据
-                    log.info("发送总召数据");
-                    byte[] bytesYX1 = new byte[141];
-                    break;
-                default:
-                    log.info("未知数据类型: " + bufBytes[6]);
+            JSONObject jsonObject= JSON.parseObject(body);//全量返回结果集
+            String data=jsonObject.get("Data").toString();
+            JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
+
+            Iterator iterator=jsonObjectData.entrySet().iterator();
+            while (iterator.hasNext()){
+                Map.Entry entry=(Map.Entry)iterator.next();
+                JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());//遍历每一个结果子集
+                String anlyseType=jsonObjectResult.get("anlyseType").toString();
+                Map anlyseResult=new HashMap();
+                anlyseResult.put("taskId",jsonObjectResult.get("taskId"));
+                anlyseResult.put("instanceId",jsonObjectResult.get("instanceId"));
+                anlyseResult.put("anlyseType",jsonObjectResult.get("anlyseType"));
+                anlyseResult.put("resultValue",jsonObjectResult.get("resultValue"));
+                String name="AnlyseResult"+jsonObjectResult.get("instanceId").toString();
+                redisTemplate.opsForHash().putAll(name,anlyseResult);
+                log.info("数据：",entry);
+                switch (anlyseType){
+                    case "1":
+                    case "2":
+                    case "3":
+                    case "4":
+                    case "5":
+                    case "6":
+                    case "7":
+                    case "8":
+                    case "9":
+                    case "10":
+                    case "11":
+                    case "12":
+                    case "13":
+                    case "14":
+                    case "15":
+                    case "16":
+                    case "17":
+                    case "18":
+                    case "19":
+                    case "20":
+                    case "21":
+                    case "22":
+                    case "23":
+                    case "24":
+                    case "25":
+                    case "26":
+                    case "27":
+
+                        break;
+                    default:
+                        log.info("");
+
+
+                }
+
             }
+
+
         }
 
     }
