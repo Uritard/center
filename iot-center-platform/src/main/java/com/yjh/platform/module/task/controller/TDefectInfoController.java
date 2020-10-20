@@ -38,7 +38,6 @@ public class TDefectInfoController {
     public TDefectInfoController(TDefectInfoService tDefectInfoService) {
         this.tDefectInfoService = tDefectInfoService;
     }
-
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TDefectInfo tDefectInfo) {

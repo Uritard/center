@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.ReportManageDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TDefectInfo">
+        <id column="defect_id" jdbcType="BIGINT" property="defectId" />
+        <result column="defect_level" jdbcType="INTEGER" property="defectLevel" />
+        <result column="defect_time" jdbcType="TIMESTAMP" property="defectTime" />
+        <result column="defect_type" jdbcType="INTEGER" property="defectType" />
+        <result column="defect_name" jdbcType="VARCHAR" property="defectName" />
+        <result column="defect_content" jdbcType="VARCHAR" property="defectContent" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="std_mete_id" jdbcType="BIGINT" property="stdMeteId" />
+        <result column="conf_mode" jdbcType="INTEGER" property="confMode" />
+        <result column="is_defect" jdbcType="INTEGER" property="isDefect" />
+        <result column="deal_type" jdbcType="INTEGER" property="dealType" />
+        <result column="deal_info" jdbcType="VARCHAR" property="dealInfo" />
+        <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId" />
+        <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
+        <result column="if_defect_disable" jdbcType="INTEGER" property="ifDefectDisable" />
+        <result column="alarm_source" jdbcType="INTEGER" property="alarmSource" />
+        <result column="defect_subtype" jdbcType="INTEGER" property="defectSubtype" />
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+        <result column="image_path" jdbcType="VARCHAR" property="imagePath" />
+        <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
+        <result column="VALUE" jdbcType="VARCHAR" property="value" />
+        <result column="out_range" jdbcType="VARCHAR" property="outRange" />
+        <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
+    </resultMap>
+
+    <select id="selectAll" resultType="com.yjh.platform.module.task.entity.TestReportMange">
+        select
+        a.defect_level,
+        a.defect_time,
+        a.defect_content,
+        a.conf_mode,
+        a.deal_type,
+        a.deal_info,
+        a.deal_time,
+        a.image_path,
+        a.video_path
+        from t_defect_info a
+        where 1 = 1
+    </select>
+
+</mapper>

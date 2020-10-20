@@ -39,8 +39,8 @@ public class CameraConController {
     @Autowired
     private CameraConService cameraConService;
 
-    @Value("${server.port}")
-    private String serverPort;//服务端口
+    @Value("${nginx.picture.reflact}")
+    private String capturePath;//图片路径
 
     @Value("${nvr.capture.result}")
     private String captureResultPath;//结果路径
@@ -112,7 +112,7 @@ public class CameraConController {
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
-            String urlPath = "http://" +getLocalIp()+":"+serverPort+"/image"+filePathTem;
+            String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
             result.setData(resultMap);
             result.setMessage(message);
@@ -136,7 +136,7 @@ public class CameraConController {
             String filePath = capturePresetPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
-            String urlPath = "http://" +getLocalIp()+":"+serverPort+"/image"+filePathTem;
+            String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
             result.setData(resultMap);
             result.setMessage(message);

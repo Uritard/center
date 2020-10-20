@@ -2,7 +2,6 @@ package com.yjh.platform.module.task.dao;
 
 import com.yjh.platform.module.task.entity.TDefectInfo;
 import com.yjh.platform.module.task.entity.TDefectInfoDetail;
-import com.yjh.platform.module.task.entity.TWarnInfoDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -23,30 +22,30 @@ public interface TDefectInfoDao {
     int update(TDefectInfo tDefectInfo);
     TDefectInfo selectByPrimaryId(@Param(value = "defectId") Long defectId);
     List<TDefectInfo> select(@Param(value = "defectId") Long defectId,
-                                @Param(value = "defectLevel") Integer defectLevel,
-                                @Param(value = "defectTime") Date defectTime,
-                                @Param(value = "defectType") Integer defectType,
-                                @Param(value = "defectName") String defectName,
-                                @Param(value = "defectContent") String defectContent,
-                                @Param(value = "deviceId") Long deviceId,
-                                @Param(value = "cunstomId") String cunstomId,
-                                @Param(value = "instanceId") Long instanceId,
-                                @Param(value = "stdMeteId") Long stdMeteId,
-                                @Param(value = "confMode") Integer confMode,
-                                @Param(value = "isDefect") Integer isDefect,
-                                @Param(value = "dealType") Integer dealType,
-                                @Param(value = "dealInfo") String dealInfo,
-                                @Param(value = "dealPersonId") String dealPersonId,
-                                @Param(value = "dealTime") Date dealTime,
-                                @Param(value = "ifDefectDisable") Integer ifDefectDisable,
-                                @Param(value = "alarmSource") Integer alarmSource,
-                                @Param(value = "defectSubtype") Integer defectSubtype,
-                                @Param(value = "deviceCode") String deviceCode,
-                                @Param(value = "imagePath") String imagePath,
-                                @Param(value = "videoPath") String videoPath,
-                                @Param(value = "value") String value,
-                                @Param(value = "outRange") String outRange,
-                                @Param(value = "linkMessage") String linkMessage);
+                             @Param(value = "defectLevel") Integer defectLevel,
+                             @Param(value = "defectTime") Date defectTime,
+                             @Param(value = "defectType") Integer defectType,
+                             @Param(value = "defectName") String defectName,
+                             @Param(value = "defectContent") String defectContent,
+                             @Param(value = "deviceId") Long deviceId,
+                             @Param(value = "cunstomId") String cunstomId,
+                             @Param(value = "instanceId") Long instanceId,
+                             @Param(value = "stdMeteId") Long stdMeteId,
+                             @Param(value = "confMode") Integer confMode,
+                             @Param(value = "isDefect") Integer isDefect,
+                             @Param(value = "dealType") Integer dealType,
+                             @Param(value = "dealInfo") String dealInfo,
+                             @Param(value = "dealPersonId") String dealPersonId,
+                             @Param(value = "dealTime") Date dealTime,
+                             @Param(value = "ifDefectDisable") Integer ifDefectDisable,
+                             @Param(value = "alarmSource") Integer alarmSource,
+                             @Param(value = "defectSubtype") Integer defectSubtype,
+                             @Param(value = "deviceCode") String deviceCode,
+                             @Param(value = "imagePath") String imagePath,
+                             @Param(value = "videoPath") String videoPath,
+                             @Param(value = "value") String value,
+                             @Param(value = "outRange") String outRange,
+                             @Param(value = "linkMessage") String linkMessage);
     List<TDefectInfo> selectByPage(TDefectInfo tDefectInfo);
 
     int batchInsert(List<TDefectInfo> list);
