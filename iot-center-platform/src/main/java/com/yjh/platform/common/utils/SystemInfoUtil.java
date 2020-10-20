@@ -25,13 +25,14 @@ public class SystemInfoUtil {
                 int i = 1;
                 String[] strArray = null;
                 while ((str = in.readLine()) != null) {
+                    //if (str.indexOf(" R ") != -1 && str.indexOf("top") == -1) {// 只分析正在运行的进程
                     if(i > 7){
-                        strArray = str.split(" ");
+                        strArray = str.split("\\s+");
                         Map<String,Object> map = new HashMap<>();
-                        map.put("Pid",strArray[0]);
-                        map.put("Command",strArray[11]);
-                        map.put("State",strArray[7]);
-                        map.put("cpu",strArray[9]);
+                        map.put("Pid",strArray[1]);
+                        map.put("Command",strArray[12]);
+                        map.put("State",strArray[8]);
+                        map.put("cpu",strArray[10]);
                         result.add(map);
                     }
                    i++;
@@ -57,12 +58,12 @@ public class SystemInfoUtil {
                 in = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 String str = null;
                 String[] strArray = null;
-                str = in.readLine();
+                //str = in.readLine();
                 while ((str = in.readLine()) != null) {
-                    strArray = str.split(" ");
-                    map.put("total",strArray[0]);
-                    map.put("used",strArray[1]);
-                    map.put("free",strArray[2]);
+                    strArray = str.split("\\s+");
+                    map.put("total",strArray[2]);
+                    map.put("used",strArray[3]);
+                    map.put("free",strArray[4]);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -90,11 +91,11 @@ public class SystemInfoUtil {
                 int i = 1;
                 while ((str = in.readLine()) != null) {
                     if(i > 3){
-                        strArray = str.split(" ");
+                        strArray = str.split("\\s+");
                         Map<String,Object> map = new HashMap<>();
-                        map.put("Pid",strArray[2]);
-                        map.put("read",strArray[3]);
-                        map.put("write",strArray[4]);
+                        map.put("Pid",strArray[3]);
+                        map.put("read",strArray[4]);
+                        map.put("write",strArray[5]);
                         map.put("all",Long.parseLong(strArray[2])+Long.parseLong(strArray[3]));
                         result.add(map);
                     }
