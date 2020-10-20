@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -94,6 +95,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             log.info(taskDate+"此时间任务不需要执行");
         }else {
             //todo 通知智能巡视》巡视监控界面有新任务来了
+            WebSocketServer.sendMsg("你该刷新了");
             log.info(taskDate+"需要执行的任务");
             try {
                 log.info("正在进行任务");
@@ -201,6 +203,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseResult.setTaskWait(taskCount);
                     tCruiseResultDao.update(tCruiseResult);
                     //Thread.sleep(10);
+                    WebSocketServer.sendMsg("你咋还不刷新了");
                 }
                 //任务结束生成结果，
                 //todo 结果的状态未作处理
