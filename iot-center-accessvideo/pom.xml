@@ -248,12 +248,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/examples.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>com.yjh</groupId>
-            <artifactId>iot-center-platform</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
 
     </dependencies>
 

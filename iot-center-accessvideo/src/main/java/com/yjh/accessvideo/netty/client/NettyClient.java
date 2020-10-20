@@ -28,7 +28,7 @@ public class NettyClient {
     public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2) throws InterruptedException{
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            Bootstrap b = new Bootstrap()
+            Bootstrap bootstrap = new Bootstrap()
             .group(group)
             .channel(NioSocketChannel.class)
             .option(ChannelOption.SO_KEEPALIVE, true)
@@ -42,10 +42,9 @@ public class NettyClient {
                     p.addLast(new AnalysisClientHandler(remoteAddress1.getPort(), remoteAddress2.getPort()));
                 }
             });
-            ChannelFuture future = b.connect(remoteAddress1).sync();
-            future.channel().closeFuture().sync();
-
-            ChannelFuture future2 = b.connect(remoteAddress2).sync();
+//            ChannelFuture future = bootstrap.connect(remoteAddress1).sync();
+            ChannelFuture future2 = bootstrap.connect(remoteAddress2).sync();
+//            future.channel().closeFuture().sync();
             future2.channel().closeFuture().sync();
 
 

@@ -56,8 +56,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         Thread thread = new Thread(heartBeatThread);
         thread.setDaemon(true);
         thread.start();
-        if (analysisClientHandlerHashMap.get(remotePort1) == null) { analysisClientHandlerHashMap.put(remotePort1, this); }
-        log.info("客户端注册成功");
+        String remoteAdds = ctx.channel().remoteAddress().toString();
+        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));
+        if (analysisClientHandlerHashMap.get(remotePort) == null) { analysisClientHandlerHashMap.put(remotePort, this); }
+        log.info("客户端注册成功: "+ctx.channel().remoteAddress());
+        log.info("analysisClientHandlerHashMap: "+analysisClientHandlerHashMap);
     }
 
     @Override
@@ -67,8 +70,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         ctx.flush();
         super.channelInactive(ctx);
         isThreadStart = false;
-        analysisClientHandlerHashMap.remove(gatewayName);
+        String remoteAdds = ctx.channel().remoteAddress().toString();
+        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));
+        analysisClientHandlerHashMap.remove(remotePort);
         log.error("服务端断开连接！");
+        log.info("analysisClientHandlerHashMap: "+analysisClientHandlerHashMap);
     }
 
     @Override

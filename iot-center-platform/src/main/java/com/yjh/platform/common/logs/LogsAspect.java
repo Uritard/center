@@ -63,8 +63,8 @@ public class LogsAspect {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
             request = servletRequestAttributes.getRequest();
-            userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             userId = request.getHeader("userId");
+            userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             ip = IPUtil.getRemoteIP(request);
         }
         Object result = null;
