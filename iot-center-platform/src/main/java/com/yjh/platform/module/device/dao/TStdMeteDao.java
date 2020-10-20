@@ -28,7 +28,7 @@ public interface TStdMeteDao {
                                 @Param(value = "alarmType") String alarmType,
                                 @Param(value = "unit") String unit,
                                 @Param(value = "upEffect") Float upEffect,
-                                @Param(value = "lowEffect") Float lowEffect,
+                                @Param(value = "downEffect") Float lowEffect,
                                 @Param(value = "alarmLevel") Integer alarmLevel,
                                 @Param(value = "alarmLimit") Integer alarmLimit,
                                 @Param(value = "highLimit1") Float highLimit1,

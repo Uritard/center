@@ -151,7 +151,7 @@ public class TStdMetemodelService {
           detail.setAlarmExplain(mete.getAlarmExplain());
           detail.setAlarmType(mete.getAlarmType());
           detail.setUpEffect(mete.getUpEffect());
-          detail.setDownEffect(mete.getLowEffect());
+          detail.setDownEffect(mete.getDownEffect());
           detail.setAlarmLevel(mete.getAlarmLevel());
           detail.setHighLimit1(mete.getHighLimit1());
           detail.setLowLimit1(mete.getLowLimit1());
@@ -238,7 +238,7 @@ public class TStdMetemodelService {
                 detail.setAlarmExplain(mete.getAlarmExplain());
                 detail.setAlarmType(mete.getAlarmType());
                 detail.setUpEffect(mete.getUpEffect());
-                detail.setDownEffect(mete.getLowEffect());
+                detail.setDownEffect(mete.getDownEffect());
                 detail.setAlarmLevel(mete.getAlarmLevel());
                 detail.setHighLimit1(mete.getHighLimit1());
                 detail.setLowLimit1(mete.getLowLimit1());
@@ -275,7 +275,7 @@ public class TStdMetemodelService {
                     detail.setAlarmExplain(mete.getAlarmExplain());
                     detail.setAlarmType(mete.getAlarmType());
                     detail.setUpEffect(mete.getUpEffect());
-                    detail.setDownEffect(mete.getLowEffect());
+                    detail.setDownEffect(mete.getDownEffect());
                     detail.setAlarmLevel(mete.getAlarmLevel());
                     detail.setHighLimit1(mete.getHighLimit1());
                     detail.setLowLimit1(mete.getLowLimit1());

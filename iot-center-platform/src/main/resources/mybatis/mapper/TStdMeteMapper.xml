@@ -14,7 +14,7 @@
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="up_effect" jdbcType="REAL" property="upEffect" />
-        <result column="low_effect" jdbcType="REAL" property="lowEffect" />
+        <result column="down_effect" jdbcType="REAL" property="downEffect" />
         <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
         <result column="alarm_limit" jdbcType="INTEGER" property="alarmLimit" />
         <result column="high_limit1" jdbcType="REAL" property="highLimit1" />
@@ -36,7 +36,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
 
-        std_mete_id, device_type,  mete_type, mete_kind, mete_name, alarm_note, alarm_explain, alarm_type, unit, up_effect, low_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
+        std_mete_id, device_type,  mete_type, mete_kind, mete_name, alarm_note, alarm_explain, alarm_type, unit, up_effect, down_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
 
     </sql>
 
@@ -53,7 +53,7 @@
             alarm_type,
             unit,
             up_effect,
-            low_effect,
+            down_effect,
             alarm_level,
             alarm_limit,
             high_limit1,
@@ -81,7 +81,7 @@
                 #{alarmType, jdbcType=VARCHAR},
                 #{unit, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
-                #{lowEffect, jdbcType=REAL},
+                #{downEffect, jdbcType=REAL},
                 #{alarmLevel, jdbcType=INTEGER},
                 #{alarmLimit, jdbcType=INTEGER},
                 #{highLimit1, jdbcType=REAL},

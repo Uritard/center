@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao">
+
+    <resultMap id="warnInfo" type="com.yjh.accessvideo.module.device.entity.TWarnInfo">
+        <id column="warn_id" jdbcType="BIGINT" property="warnId" />
+        <result column="warn_level" jdbcType="INTEGER" property="warnLevel" />
+        <result column="warn_time" jdbcType="TIMESTAMP" property="warnTime" />
+        <result column="warn_type" jdbcType="INTEGER" property="warnType" />
+        <result column="warn_name" jdbcType="VARCHAR" property="warnName" />
+        <result column="warn_content" jdbcType="VARCHAR" property="warnContent" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="std_mete_id" jdbcType="BIGINT" property="stdMeteId" />
+        <result column="conf_mode" jdbcType="INTEGER" property="confMode" />
+        <result column="is_warn" jdbcType="INTEGER" property="isWarn" />
+        <result column="deal_type" jdbcType="INTEGER" property="dealType" />
+        <result column="deal_info" jdbcType="VARCHAR" property="dealInfo" />
+        <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId" />
+        <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
+        <result column="if_warn_disable" jdbcType="INTEGER" property="ifWarnDisable" />
+        <result column="alarm_source" jdbcType="INTEGER" property="alarmSource" />
+        <result column="warn_subtype" jdbcType="INTEGER" property="warnSubtype" />
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+        <result column="image_path" jdbcType="VARCHAR" property="imagePath" />
+        <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
+        <result column="value" jdbcType="VARCHAR" property="value" />
+        <result column="out_range" jdbcType="VARCHAR" property="outRange" />
+        <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
+    </resultMap>
+
+    <resultMap id="videoAnalyseResult" type="com.yjh.accessvideo.module.device.entity.TVideoAnalyseResult">
+        <id column="algorithm_result_id" jdbcType="BIGINT" property="algorithmResultId" />
+        <result column="analyse_time" jdbcType="TIMESTAMP" property="analyseTime" />
+        <result column="analyse_conf_id" jdbcType="VARCHAR" property="analyseConfId" />
+        <result column="algorithm_result" jdbcType="VARCHAR" property="algorithmResult" />
+        <result column="algorithm_picture" jdbcType="VARCHAR" property="algorithmPicture" />
+        <result column="algorithm_status" jdbcType="INTEGER" property="algorithmStatus" />
+        <result column="result_rate" jdbcType="VARCHAR" property="resultRate" />
+        <result column="result_describe" jdbcType="VARCHAR" property="resultDescribe" />
+        <result column="reserver" jdbcType="INTEGER" property="reserver" />
+    </resultMap>
+
+    <resultMap id="cruiseResult" type="com.yjh.accessvideo.module.device.entity.TCruiseResult">
+        <id column="task_result_id" jdbcType="VARCHAR" property="taskResultId" />
+        <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="c_type" jdbcType="INTEGER" property="cType" />
+        <result column="c_state" jdbcType="INTEGER" property="cState" />
+        <result column="modify_state" jdbcType="INTEGER" property="modifyState" />
+        <result column="task_count" jdbcType="INTEGER" property="taskCount" />
+        <result column="task_wait" jdbcType="INTEGER" property="taskWait" />
+        <result column="check_user" jdbcType="VARCHAR" property="checkUser" />
+        <result column="check_date" jdbcType="TIMESTAMP" property="checkDate" />
+        <result column="weather" jdbcType="VARCHAR" property="weather" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="execute_time" jdbcType="TIMESTAMP" property="executeTime" />
+        <result column="task_code" jdbcType="VARCHAR" property="taskCode" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <resultMap id="cruiseTaskResult" type="com.yjh.accessvideo.module.device.entity.TCruiseTaskResult">
+        <id column="task_result_id" jdbcType="VARCHAR" property="taskResultId" />
+        <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="task_abnormal" jdbcType="INTEGER" property="taskAbnormal" />
+        <result column="task_alarm" jdbcType="INTEGER" property="taskAlarm" />
+        <result column="run_execute" jdbcType="VARCHAR" property="runExecute" />
+        <result column="cruise_task_time" jdbcType="TIMESTAMP" property="cruiseTaskTime" />
+        <result column="task_status" jdbcType="INTEGER" property="taskStatus" />
+        <result column="cruise_result" jdbcType="INTEGER" property="cruiseResult" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <resultMap id="cruiseTaskResultDetail" type="com.yjh.accessvideo.module.device.entity.TCruiseTaskResultDetail">
+        <id column="cruise_result_id" jdbcType="VARCHAR" property="cruiseResultId" />
+        <result column="task_result_id" jdbcType="VARCHAR" property="taskResultId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="cruise_time" jdbcType="TIMESTAMP" property="cruiseTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="cruise_status" jdbcType="INTEGER" property="cruiseStatus" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <resultMap id="cruiseDataResult" type="com.yjh.accessvideo.module.device.entity.TCruiseDataResult">
+        <id column="cruise_data_id" jdbcType="BIGINT" property="cruiseDataId" />
+        <result column="cruise_result_id" jdbcType="VARCHAR" property="cruiseResultId" />
+        <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+        <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
+        <result column="result_desc" jdbcType="VARCHAR" property="resultDesc" />
+        <result column="result_num" jdbcType="VARCHAR" property="resultNum" />
+        <result column="modify_num" jdbcType="VARCHAR" property="modifyNum" />
+        <result column="picpath" jdbcType="VARCHAR" property="picpath" />
+        <result column="person_check" jdbcType="VARCHAR" property="personCheck" />
+        <result column="origpic" jdbcType="VARCHAR" property="origpic" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="evaluation_state" jdbcType="INTEGER" property="evaluationState" />
+        <result column="identify_state" jdbcType="INTEGER" property="identifyState" />
+        <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="check_user" jdbcType="VARCHAR" property="checkUser" />
+        <result column="check_date" jdbcType="TIMESTAMP" property="checkDate" />
+    </resultMap>
+
+    <resultMap id="stdDeviceMete" type="com.yjh.accessvideo.module.device.entity.TStdDevicemete">
+        <id column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="mete_id" jdbcType="BIGINT" property="meteId" />
+        <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
+        <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
+        <result column="device_type" jdbcType="INTEGER" property="deviceType" />
+        <result column="position_type" jdbcType="VARCHAR" property="positionType" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+        <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
+        <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
+        <result column="up_effect" jdbcType="REAL" property="upEffect" />
+        <result column="down_effect" jdbcType="REAL" property="downEffect" />
+        <result column="state_zero" jdbcType="VARCHAR" property="stateZero" />
+        <result column="state_one" jdbcType="VARCHAR" property="stateOne" />
+        <result column="alarm_state" jdbcType="INTEGER" property="alarmState" />
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
+        <result column="high_limit1" jdbcType="REAL" property="highLimit1" />
+        <result column="low_limit1" jdbcType="REAL" property="lowLimit1" />
+        <result column="high_limit2" jdbcType="REAL" property="highLimit2" />
+        <result column="low_limit2" jdbcType="REAL" property="lowLimit2" />
+        <result column="high_limit3" jdbcType="REAL" property="highLimit3" />
+        <result column="low_limit3" jdbcType="REAL" property="lowLimit3" />
+        <result column="high_limit4" jdbcType="REAL" property="highLimit4" />
+        <result column="low_limit4" jdbcType="REAL" property="lowLimit4" />
+        <result column="alarm_delay" jdbcType="INTEGER" property="alarmDelay" />
+        <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt" />
+        <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs" />
+        <result column="threshold_per" jdbcType="NUMERIC" property="thresholdPer" />
+        <result column="modulus" jdbcType="INTEGER" property="modulus" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+
+
+
+    <insert id="insertWarnInfo" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.accessvideo.module.device.entity.TWarnInfo">
+        insert into t_warn_info(
+            warn_id,
+            warn_level,
+            warn_time,
+            warn_type,
+            warn_name,
+            warn_content,
+            device_id,
+            cunstom_id,
+            instance_id,
+            std_mete_id,
+            conf_mode,
+            is_warn,
+            deal_type,
+            deal_info,
+            deal_person_id,
+            deal_time,
+            if_warn_disable,
+            alarm_source,
+            warn_subtype,
+            device_code,
+            image_path,
+            video_path,
+            value,
+            out_range,
+            link_message
+        )values(
+                #{warnId, jdbcType=BIGINT},
+                #{warnLevel, jdbcType=INTEGER},
+                #{warnTime, jdbcType=TIMESTAMP},
+                #{warnType, jdbcType=INTEGER},
+                #{warnName, jdbcType=VARCHAR},
+                #{warnContent, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{cunstomId, jdbcType=VARCHAR},
+                #{instanceId, jdbcType=BIGINT},
+                #{stdMeteId, jdbcType=BIGINT},
+                #{confMode, jdbcType=INTEGER},
+                #{isWarn, jdbcType=INTEGER},
+                #{dealType, jdbcType=INTEGER},
+                #{dealInfo, jdbcType=VARCHAR},
+                #{dealPersonId, jdbcType=VARCHAR},
+                #{dealTime, jdbcType=TIMESTAMP},
+                #{ifWarnDisable, jdbcType=INTEGER},
+                #{alarmSource, jdbcType=INTEGER},
+                #{warnSubtype, jdbcType=INTEGER},
+                #{deviceCode, jdbcType=VARCHAR},
+                #{imagePath, jdbcType=VARCHAR},
+                #{videoPath, jdbcType=VARCHAR},
+                #{value, jdbcType=VARCHAR},
+                #{outRange, jdbcType=VARCHAR},
+                #{linkMessage, jdbcType=VARCHAR}
+        )
+    </insert>
+
+
+    <insert id="batchInsertWarnInfo">
+        insert into t_warn_info(
+        warn_id,
+        warn_level,
+        warn_time,
+        warn_type,
+        warn_name,
+        warn_content,
+        device_id,
+        cunstom_id,
+        instance_id,
+        std_mete_id,
+        conf_mode,
+        is_warn,
+        deal_type,
+        deal_info,
+        deal_person_id,
+        deal_time,
+        if_warn_disable,
+        alarm_source,
+        warn_subtype,
+        device_code,
+        image_path,
+        video_path,
+        value,
+        out_range,
+        link_message
+        )values
+        <foreach collection="list" item="TWarnInfo" separator=",">
+            (
+            #{TWarnInfo.warnId, jdbcType=BIGINT},
+            #{TWarnInfo.warnLevel, jdbcType=INTEGER},
+            #{TWarnInfo.warnTime, jdbcType=TIMESTAMP},
+            #{TWarnInfo.warnType, jdbcType=INTEGER},
+            #{TWarnInfo.warnName, jdbcType=VARCHAR},
+            #{TWarnInfo.warnContent, jdbcType=VARCHAR},
+            #{TWarnInfo.deviceId, jdbcType=BIGINT},
+            #{TWarnInfo.cunstomId, jdbcType=VARCHAR},
+            #{TWarnInfo.instanceId, jdbcType=BIGINT},
+            #{TWarnInfo.stdMeteId, jdbcType=BIGINT},
+            #{TWarnInfo.confMode, jdbcType=INTEGER},
+            #{TWarnInfo.isWarn, jdbcType=INTEGER},
+            #{TWarnInfo.dealType, jdbcType=INTEGER},
+            #{TWarnInfo.dealInfo, jdbcType=VARCHAR},
+            #{TWarnInfo.dealPersonId, jdbcType=VARCHAR},
+            #{TWarnInfo.dealTime, jdbcType=TIMESTAMP},
+            #{TWarnInfo.ifWarnDisable, jdbcType=INTEGER},
+            #{TWarnInfo.alarmSource, jdbcType=INTEGER},
+            #{TWarnInfo.warnSubtype, jdbcType=INTEGER},
+            #{TWarnInfo.deviceCode, jdbcType=VARCHAR},
+            #{TWarnInfo.imagePath, jdbcType=VARCHAR},
+            #{TWarnInfo.videoPath, jdbcType=VARCHAR},
+            #{TWarnInfo.value, jdbcType=VARCHAR},
+            #{TWarnInfo.outRange, jdbcType=VARCHAR},
+            #{TWarnInfo.linkMessage, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="insertVideoAnalyseResult" useGeneratedKeys="true" keyProperty="algorithmResultId" parameterType="com.yjh.accessvideo.module.device.entity.TVideoAnalyseResult">
+        insert into t_video_analyse_result(
+            algorithm_result_id,
+            analyse_time,
+            analyse_conf_id,
+            algorithm_result,
+            algorithm_picture,
+            algorithm_status,
+            result_rate,
+            result_describe,
+            reserver
+        )values(
+                #{algorithmResultId, jdbcType=BIGINT},
+                #{analyseTime, jdbcType=TIMESTAMP},
+                #{analyseConfId, jdbcType=VARCHAR},
+                #{algorithmResult, jdbcType=VARCHAR},
+                #{algorithmPicture, jdbcType=VARCHAR},
+                #{algorithmStatus, jdbcType=INTEGER},
+                #{resultRate, jdbcType=VARCHAR},
+                #{resultDescribe, jdbcType=VARCHAR},
+                #{reserver, jdbcType=INTEGER}
+        )
+    </insert>
+
+
+    <insert id="batchInsertVideoAnalyseResult">
+        insert into t_video_analyse_result(
+        algorithm_result_id,
+        analyse_time,
+        analyse_conf_id,
+        algorithm_result,
+        algorithm_picture,
+        algorithm_status,
+        result_rate,
+        result_describe,
+        reserver
+        )values
+        <foreach collection="list" item="TVideoAnalyseResult" separator=",">
+            (
+            #{TVideoAnalyseResult.algorithmResultId, jdbcType=BIGINT},
+            #{TVideoAnalyseResult.analyseTime, jdbcType=TIMESTAMP},
+            #{TVideoAnalyseResult.analyseConfId, jdbcType=VARCHAR},
+            #{TVideoAnalyseResult.algorithmResult, jdbcType=VARCHAR},
+            #{TVideoAnalyseResult.algorithmPicture, jdbcType=VARCHAR},
+            #{TVideoAnalyseResult.algorithmStatus, jdbcType=INTEGER},
+            #{TVideoAnalyseResult.resultRate, jdbcType=VARCHAR},
+            #{TVideoAnalyseResult.resultDescribe, jdbcType=VARCHAR},
+            #{TVideoAnalyseResult.reserver, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="insertCruiseResult" useGeneratedKeys="true" keyProperty="taskResultId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseResult">
+        insert into t_cruise_result(
+            task_result_id,
+            task_id,
+            area_id,
+            c_type,
+            c_state,
+            modify_state,
+            task_count,
+            task_wait,
+            check_user,
+            check_date,
+            weather,
+            create_time,
+            execute_time,
+            task_code,
+            remark
+        )values(
+                #{taskResultId, jdbcType=VARCHAR},
+                #{taskId, jdbcType=VARCHAR},
+                #{areaId, jdbcType=VARCHAR},
+                #{cType, jdbcType=INTEGER},
+                #{cState, jdbcType=INTEGER},
+                #{modifyState, jdbcType=INTEGER},
+                #{taskCount, jdbcType=INTEGER},
+                #{taskWait, jdbcType=INTEGER},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{weather, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{executeTime, jdbcType=TIMESTAMP},
+                #{taskCode, jdbcType=VARCHAR},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="batchInsertCruiseResult">
+        insert into t_cruise_result(
+        task_result_id,
+        task_id,
+        area_id,
+        c_type,
+        c_state,
+        modify_state,
+        task_count,
+        task_wait,
+        check_user,
+        check_date,
+        weather,
+        create_time,
+        execute_time,
+        task_code,
+        remark
+        )values
+        <foreach collection="list" item="TCruiseResult" separator=",">
+            (
+            #{TCruiseResult.taskResultId, jdbcType=VARCHAR},
+            #{TCruiseResult.taskId, jdbcType=VARCHAR},
+            #{TCruiseResult.areaId, jdbcType=VARCHAR},
+            #{TCruiseResult.cType, jdbcType=INTEGER},
+            #{TCruiseResult.cState, jdbcType=INTEGER},
+            #{TCruiseResult.modifyState, jdbcType=INTEGER},
+            #{TCruiseResult.taskCount, jdbcType=INTEGER},
+            #{TCruiseResult.taskWait, jdbcType=INTEGER},
+            #{TCruiseResult.checkUser, jdbcType=VARCHAR},
+            #{TCruiseResult.checkDate, jdbcType=TIMESTAMP},
+            #{TCruiseResult.weather, jdbcType=VARCHAR},
+            #{TCruiseResult.createTime, jdbcType=TIMESTAMP},
+            #{TCruiseResult.executeTime, jdbcType=TIMESTAMP},
+            #{TCruiseResult.taskCode, jdbcType=VARCHAR},
+            #{TCruiseResult.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertCruiseTaskResult" useGeneratedKeys="true" keyProperty="taskResultId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResult">
+        insert into t_cruise_task_result(
+            task_result_id,
+            task_id,
+            task_abnormal,
+            task_alarm,
+            run_execute,
+            cruise_task_time,
+            task_status,
+            cruise_result,
+            remark
+        )values(
+                #{taskResultId, jdbcType=VARCHAR},
+                #{taskId, jdbcType=VARCHAR},
+                #{taskAbnormal, jdbcType=INTEGER},
+                #{taskAlarm, jdbcType=INTEGER},
+                #{runExecute, jdbcType=VARCHAR},
+                #{cruiseTaskTime, jdbcType=TIMESTAMP},
+                #{taskStatus, jdbcType=INTEGER},
+                #{cruiseResult, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="batchInsertCruiseTaskResult">
+        insert into t_cruise_task_result(
+        task_result_id,
+        task_id,
+        task_abnormal,
+        task_alarm,
+        run_execute,
+        cruise_task_time,
+        task_status,
+        cruise_result,
+        remark
+        )values
+        <foreach collection="list" item="TCruiseTaskResult" separator=",">
+            (
+            #{TCruiseTaskResult.taskResultId, jdbcType=VARCHAR},
+            #{TCruiseTaskResult.taskId, jdbcType=VARCHAR},
+            #{TCruiseTaskResult.taskAbnormal, jdbcType=INTEGER},
+            #{TCruiseTaskResult.taskAlarm, jdbcType=INTEGER},
+            #{TCruiseTaskResult.runExecute, jdbcType=VARCHAR},
+            #{TCruiseTaskResult.cruiseTaskTime, jdbcType=TIMESTAMP},
+            #{TCruiseTaskResult.taskStatus, jdbcType=INTEGER},
+            #{TCruiseTaskResult.cruiseResult, jdbcType=INTEGER},
+            #{TCruiseTaskResult.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertCruiseTaskResultDetail" useGeneratedKeys="true" keyProperty="cruiseResultId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResultDetail">
+        insert into t_cruise_task_result_detail(
+            cruise_result_id,
+            task_result_id,
+            device_id,
+            instance_id,
+            cruise_time,
+            end_time,
+            cruise_status,
+            remark
+        )values(
+                #{cruiseResultId, jdbcType=VARCHAR},
+                #{taskResultId, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
+                #{cruiseTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP},
+                #{cruiseStatus, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="batchInsertCruiseTaskResultDetail">
+        insert into t_cruise_task_result_detail(
+        cruise_result_id,
+        task_result_id,
+        device_id,
+        instance_id,
+        cruise_time,
+        end_time,
+        cruise_status,
+        remark
+        )values
+        <foreach collection="list" item="TCruiseTaskResultDetail" separator=",">
+            (
+            #{TCruiseTaskResultDetail.cruiseResultId, jdbcType=VARCHAR},
+            #{TCruiseTaskResultDetail.taskResultId, jdbcType=VARCHAR},
+            #{TCruiseTaskResultDetail.deviceId, jdbcType=BIGINT},
+            #{TCruiseTaskResultDetail.instanceId, jdbcType=BIGINT},
+            #{TCruiseTaskResultDetail.cruiseTime, jdbcType=TIMESTAMP},
+            #{TCruiseTaskResultDetail.endTime, jdbcType=TIMESTAMP},
+            #{TCruiseTaskResultDetail.cruiseStatus, jdbcType=INTEGER},
+            #{TCruiseTaskResultDetail.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="insertCruiseDataResult" useGeneratedKeys="true" keyProperty="cruiseDataId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseDataResult">
+        insert into t_cruise_data_result(
+            cruise_data_id,
+            cruise_result_id,
+            cruise_id,
+            cruise_type,
+            result_desc,
+            result_num,
+            modify_num,
+            picpath,
+            person_check,
+            origpic,
+            state,
+            evaluation_state,
+            identify_state,
+            identify_result,
+            createtime,
+            remark,
+            check_user,
+            check_date
+        )values(
+                #{cruiseDataId, jdbcType=BIGINT},
+                #{cruiseResultId, jdbcType=VARCHAR},
+                #{cruiseId, jdbcType=BIGINT},
+                #{cruiseType, jdbcType=INTEGER},
+                #{resultDesc, jdbcType=VARCHAR},
+                #{resultNum, jdbcType=VARCHAR},
+                #{modifyNum, jdbcType=VARCHAR},
+                #{picpath, jdbcType=VARCHAR},
+                #{personCheck, jdbcType=VARCHAR},
+                #{origpic, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{evaluationState, jdbcType=INTEGER},
+                #{identifyState, jdbcType=INTEGER},
+                #{identifyResult, jdbcType=INTEGER},
+                #{createtime, jdbcType=TIMESTAMP},
+                #{remark, jdbcType=VARCHAR},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <insert id="batchInsertCruiseDataResult">
+        insert into t_cruise_data_result(
+        cruise_data_id,
+        cruise_result_id,
+        cruise_id,
+        cruise_type,
+        result_desc,
+        result_num,
+        modify_num,
+        picpath,
+        person_check,
+        origpic,
+        state,
+        evaluation_state,
+        identify_state,
+        identify_result,
+        createtime,
+        remark,
+        check_user,
+        check_date
+        )values
+        <foreach collection="list" item="TCruiseDataResult" separator=",">
+            (
+            #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseResultId, jdbcType=VARCHAR},
+            #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseType, jdbcType=INTEGER},
+            #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
+            #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
+            #{TCruiseDataResult.state, jdbcType=INTEGER},
+            #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
+            #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
+            #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
+            #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.remark, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="selectByPrimaryIdDeviceMete" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.device.entity.TStdDevicemete">
+        select
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_type,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus,
+        a.remark
+        from t_std_devicemete a
+        where 1 = 1
+            and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="selectDeviceMeteByInstanceId" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.device.entity.TStdDevicemete">
+        select
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_type,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus,
+        a.remark
+        from t_cruise_point_instance b left join t_std_devicemete a
+        on b.device_mete_id=a.device_mete_id
+        where b.instance_id=#{instanceId,jdbcType=BIGINT}
+    </select>
+</mapper>

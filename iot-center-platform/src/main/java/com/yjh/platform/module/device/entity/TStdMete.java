@@ -56,7 +56,7 @@ public class TStdMete implements Serializable {
     private Float upEffect;
 
     @ApiModelProperty(value = "有效下限")
-    private Float lowEffect;
+    private Float downEffect;
 
     @ApiModelProperty(value = "告警级别")
     private Integer alarmLevel;
