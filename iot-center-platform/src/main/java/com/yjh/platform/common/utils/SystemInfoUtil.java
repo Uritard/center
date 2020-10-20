@@ -2,6 +2,7 @@ package com.yjh.platform.common.utils;
 
 import com.yjh.platform.common.quartz.CruiseTaskJob;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.theme.CookieThemeResolver;
 
 import java.io.*;
 import java.util.*;
@@ -67,9 +68,10 @@ public class SystemInfoUtil {
                 if ((str = in.readLine()) != null) {
                     strArray = str.split("\\s+");
                     log.info(str+"--------");
-                    map.put("total",strArray[2]);
-                    map.put("used",strArray[3]);
-                    map.put("free",strArray[4]);
+                    map.put("total",strArray[1]);
+                    map.put("used",strArray[2]);
+                    map.put("free",strArray[3]);
+                    map.put("other",Long.parseLong(strArray[1])-Long.parseLong(strArray[2])-Long.parseLong(strArray[3]));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,14 +98,14 @@ public class SystemInfoUtil {
                 String[] strArray = null;
                 int i = 1;
                 while ((str = in.readLine()) != null) {
+                    log.info(str+"--------"+i);
                     if(i > 3){
                         strArray = str.split("\\s+");
-                        log.info(str+"--------");
                         Map<String,Object> map = new HashMap<>();
-                        map.put("Pid",strArray[3]);
-                        map.put("read",strArray[4]);
-                        map.put("write",strArray[5]);
-                        map.put("all",Long.parseLong(strArray[2])+Long.parseLong(strArray[3]));
+                        map.put("Pid",strArray[2]);
+                        map.put("read",strArray[3]);
+                        map.put("write",strArray[4]);
+                        map.put("all",Double.valueOf(strArray[3])+Double.valueOf(strArray[4]));
                         result.add(map);
                     }
                     i++;
