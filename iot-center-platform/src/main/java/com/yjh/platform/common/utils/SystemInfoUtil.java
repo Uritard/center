@@ -61,6 +61,7 @@ public class SystemInfoUtil {
                 //str = in.readLine();
                 while ((str = in.readLine()) != null) {
                     strArray = str.split("\\s+");
+                    System.out.println(str+"--------");
                     map.put("total",strArray[2]);
                     map.put("used",strArray[3]);
                     map.put("free",strArray[4]);
@@ -82,7 +83,7 @@ public class SystemInfoUtil {
         public List<Map<String,Object>> getDeskUsage() throws Exception {
             List<Map<String,Object>> result = new LinkedList<>();
             Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec("iotop -oP");//df -hl 查看硬盘空间
+            Process p = rt.exec("pidstat -d");//df -hl 查看硬盘空间
             BufferedReader in = null;
             try {
                 in = new BufferedReader(new InputStreamReader(p.getInputStream()));
