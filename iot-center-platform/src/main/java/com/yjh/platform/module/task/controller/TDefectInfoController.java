@@ -26,8 +26,8 @@ import java.util.Map;
  * @since 2020-10-15
  */
 @RestController
-@RequestMapping("/t-defect-info/v1")
-@Api(value = "/t-defect-info", description = "缺陷信息表操作接口")
+@RequestMapping("/tDefectInfo/v1")
+@Api(value = "/tDefectInfo", description = "缺陷信息表操作接口")
 public class TDefectInfoController {
 
     @Autowired
