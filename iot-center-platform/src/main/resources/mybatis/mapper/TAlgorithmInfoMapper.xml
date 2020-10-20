@@ -10,11 +10,12 @@
         <result column="describel" jdbcType="VARCHAR" property="describel" />
         <result column="algorithm_code" jdbcType="VARCHAR" property="algorithmCode" />
         <result column="analyse_type" jdbcType="VARCHAR" property="analyseType" />
+        <result column="is_ai" jdbcType="INTEGER" property="isAi" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        algorithm_id, algorithm_name, alias_name, describel, algorithm_code, analyse_type
+        algorithm_id, algorithm_name, alias_name, describel, algorithm_code, analyse_type,is_ai
     </sql>
 
 
@@ -24,13 +25,15 @@
             alias_name,
             describel,
             algorithm_code,
-            analyse_type
+            analyse_type,
+            is_ai
         )values(
                 #{algorithmName, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
                 #{describel, jdbcType=VARCHAR},
                 #{algorithmCode, jdbcType=VARCHAR},
-                #{analyseType, jdbcType=VARCHAR}
+                #{analyseType, jdbcType=VARCHAR},
+                #{isAi, jdbcType=INTEGER}
         )
     </insert>
 
@@ -47,6 +50,7 @@
         <if test="describel != null and describel != ''">a.describel = #{describel, jdbcType=VARCHAR},</if>
         <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR},</if>
         <if test="analyseType != null and analyseType != ''">a.analyse_type = #{analyseType, jdbcType=VARCHAR},</if>
+        <if test="isAi != null ">a.is_ai = #{isAi, jdbcType=INTEGER},</if>
     </set>
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </update>
@@ -58,7 +62,8 @@
         a.alias_name,
         a.describel,
         a.algorithm_code,
-        a.analyse_type
+        a.analyse_type,
+        a.is_ai
         from t_algorithm_info a
         where 1 = 1
             and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
@@ -72,7 +77,8 @@
         a.alias_name,
         a.describel,
         a.algorithm_code,
-        a.analyse_type
+        a.analyse_type,
+        a.is_ai
         from t_algorithm_info a
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
@@ -81,6 +87,7 @@
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
+        <if test="isAi != null"> and a.is_ai = #{isAi, jdbcType=INTEGER}</if>
     </select>
 
     <resultMap id="algorithmInfoMap" type="java.util.HashMap">
@@ -90,6 +97,7 @@
         <result property="describel" column="describel"/>
         <result property="algorithmCode" column="algorithm_code"/>
         <result property="analyseType" column="analyse_type"/>
+        <result property="isAi" column="is_ai"/>
         <result property="analyseTypeName" column="dict_note"/>
     </resultMap>
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultMap="algorithmInfoMap">
@@ -100,6 +108,7 @@
         a.describel,
         a.algorithm_code,
         a.analyse_type,
+        a.is_ai,
         b.dict_note
         from t_algorithm_info a
         LEFT JOIN t_dict_business b ON b.dict_code = a.analyse_type
@@ -110,6 +119,7 @@
         <if test="describel != null and describel != ''"> and a.describel = #{describel, jdbcType=VARCHAR}</if>
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
+        <if test="isAi != null"> and a.is_ai = #{isAi, jdbcType=INTEGER}</if>
          order by a.algorithm_id desc
     </select>
 
@@ -120,7 +130,8 @@
             alias_name,
             describel,
             algorithm_code,
-            analyse_type
+            analyse_type,
+            is_ai
         )values
         <foreach collection="list" item="TAlgorithmInfo" separator=",">
             (
@@ -129,7 +140,8 @@
                 #{TAlgorithmInfo.aliasName, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.describel, jdbcType=VARCHAR},
                 #{TAlgorithmInfo.algorithmCode, jdbcType=VARCHAR},
-                #{TAlgorithmInfo.analyseType, jdbcType=VARCHAR}
+                #{TAlgorithmInfo.analyseType, jdbcType=VARCHAR},
+            #{TAlgorithmInfo.isAi, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

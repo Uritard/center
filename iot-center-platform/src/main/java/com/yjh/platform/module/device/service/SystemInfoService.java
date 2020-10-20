@@ -21,17 +21,17 @@ public class SystemInfoService {
 
     @Logs(title = "获取内存信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public Map getMemory() throws Exception {
+    public List<String> getMemory() throws Exception {
         return systemInfoUtil.getMemUsage();
     }
     @Logs(title = "获取cpu信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,Object>> getCPU() throws Exception {
+    public List<String> getCPU() throws Exception {
         return systemInfoUtil.getcpuUsage();
     }
     @Logs(title = "获取磁盘信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,Object>> getSwap() throws Exception {
+    public List<String> getSwap() throws Exception {
         return systemInfoUtil.getDeskUsage();
     }
 }

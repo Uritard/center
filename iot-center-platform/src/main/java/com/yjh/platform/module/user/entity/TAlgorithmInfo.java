@@ -34,5 +34,7 @@ public class TAlgorithmInfo implements Serializable {
 
     private String analyseType;
 
+    private int isAi;
+
 
 }

@@ -137,6 +137,15 @@ public class TCruisePointInstanceService{
             listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
     }
+    private int isIn(List<TStdDeviceMeteForPointDetail> listAll,Long deviceMeteId){
+        int i = -1;
+        for (int j = 0; j < listAll.size(); j++) {
+            if(listAll.get(j).getDeviceMeteId().equals(deviceMeteId)){
+                return j;
+            }
+        }
+        return i;
+    }
     @Logs(title = "巡检点分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,int pageSize) {
@@ -155,8 +164,8 @@ public class TCruisePointInstanceService{
                 }
                 list.remove(0);
                 for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
-                    int length = listAll.size() - 1;
-                    if (tStdDeviceMeteForPointDetailItem.getDeviceMeteId().equals(listAll.get(length).getDeviceMeteId())) {
+                    int length = isIn(listAll,tStdDeviceMeteForPointDetailItem.getDeviceMeteId());
+                    if (length != -1) {
                         getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
                     } else {
                         listAll.add(tStdDeviceMeteForPointDetailItem);

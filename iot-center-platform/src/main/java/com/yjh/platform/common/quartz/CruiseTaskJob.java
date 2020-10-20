@@ -72,9 +72,9 @@ public class CruiseTaskJob extends QuartzJobBean {
     //相机转到预置位
     private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPreset?presetId={presetId}&cameraId={cameraId}";
     //算法接口
-    private static final String ANALYSIS_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
-
-
+    private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
+    //缺陷接口
+    private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     /**
      * 巡视任务类
      * @param context
@@ -174,9 +174,11 @@ public class CruiseTaskJob extends QuartzJobBean {
                             analysisList.add(analysis);
                             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
                             analysisMap.put("list",analysisList);
-//                            Map<String,Object> analysisMap = new HashMap<>();
-//                            map.put("analysis",analysisList);
-                            analysis(analysisMap);
+                            if(tAlgorithmInfo.getIsAi() == 1){//0-算法 1-缺陷
+                                analysis(analysisMap);
+                            }else {
+                                defect(analysisMap);
+                            }
                             //todo 获取算法分析的结果
                             tCruiseTaskResultDetail.setCruiseStatus(252);
                             tCruiseDataResult.setPicpath(picUrl);
@@ -254,15 +256,19 @@ public class CruiseTaskJob extends QuartzJobBean {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(ANALYSIS_URL, analysisMap, String.class);
+                serviceRestTemplate.postForObject(ALGORITHM_URL, analysisMap, String.class);
             }
-//            HttpHeaders headers = new HttpHeaders();
-//            //定义请求参数类型，这里用json所以是MediaType.APPLICATION_JSON
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//            HttpEntity<Map<String, Object>> request = new HttpEntity<>(analysisMap, headers);
-//            if (null != serviceRestTemplate) {
-//                serviceRestTemplate.postForEntity(ANALYSIS_URL, request, String.class);
-//            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+    //缺陷分析
+    private void defect(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(DEFECT_URL, analysisMap, String.class);
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
