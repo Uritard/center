@@ -26,20 +26,10 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private  RedisTemplate redisTemplate;
     private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
-    private String gatewayName;
-
-    private byte[] bufBytes = new byte[1024 * 512];
     private long hisT3 = System.currentTimeMillis();
     private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
-    private int remotePort1;
-    private int remotePort2;
-
-    public AnalysisClientHandler(int remotePort1, int remotePort2) {
-        this.remotePort1 = remotePort1;
-        this.remotePort2 = remotePort2;
-    }
 
     private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
     public static Map<Integer, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }

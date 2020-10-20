@@ -21,66 +21,68 @@ import java.util.concurrent.TimeUnit;
 public class NettyClient {
 
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
-    private volatile boolean exit = false;
-
-    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2) throws InterruptedException{
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
-            .group(group)
-            .channel(NioSocketChannel.class)
-            .option(ChannelOption.SO_KEEPALIVE, true)
-            .option(ChannelOption.TCP_NODELAY, true)
-            .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
-            .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-            .handler(new AnalysisClientChannelInitializer() {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ChannelPipeline p = ch.pipeline();
-                    p.addLast(new AnalysisClientHandler(remoteAddress1.getPort(), remoteAddress2.getPort()));
-                }
-            });
-//            ChannelFuture future = bootstrap.connect(remoteAddress1).sync();
-            ChannelFuture future2 = bootstrap.connect(remoteAddress2).sync();
-//            future.channel().closeFuture().sync();
-            future2.channel().closeFuture().sync();
-
-
-
-        } finally {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (!exit) {
-                        Constant.connectTimeCounts = Constant.connectTimeCounts+1;
-                        if (Constant.connectTimeCounts<=5) {
-                            try {
-                                log.info("连接服务端失败，5s重连1次，第"+Constant.connectTimeCounts+"次");
-                                TimeUnit.SECONDS.sleep(5);
-                                start(remoteAddress1, remoteAddress2);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        } else if (5<Constant.connectTimeCounts && Constant.connectTimeCounts<=10){
-                            try {
-                                log.info("连接服务端失败，60s重连1次，第"+Constant.connectTimeCounts+"次");
-                                TimeUnit.SECONDS.sleep(60);
-                                start(remoteAddress1, remoteAddress2);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        } else if (Constant.connectTimeCounts>10){
-                            log.error("连接服务端失败！");
-                            exit = true;
-                            group.shutdownGracefully();
-                            break;
+                    .group(group)
+                    .channel(NioSocketChannel.class)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .handler(new AnalysisClientChannelInitializer() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline p = ch.pipeline();
+                            p.addLast(new AnalysisClientHandler());
                         }
-                    }
-                }
+                    });
+
+            bootstrap.connect(remoteAddress1).addListener((ChannelFuture futureListener) -> {
+                log.info("连接客户端1");
+                final EventLoop eventLoop = futureListener.channel().eventLoop();
+                if (!futureListener.isSuccess()) {
+                    log.info("与"+remoteAddress1+"连接失败!");
+                    //10秒后重连
+                    eventLoop.schedule(() -> doConnect(bootstrap, remoteAddress1), 10, TimeUnit.SECONDS);
+                } else { log.info("与"+remoteAddress1+"连接成功!"); }
             });
-        }
+            bootstrap.connect(remoteAddress2).addListener((ChannelFuture futureListener) -> {
+                log.info("连接客户端2");
+                final EventLoop eventLoop = futureListener.channel().eventLoop();
+                if (!futureListener.isSuccess()) {
+                    log.info("和"+remoteAddress2+"连接失败!");
+                    //10秒后重连
+                    eventLoop.schedule(() -> doConnect(bootstrap, remoteAddress2), 10, TimeUnit.SECONDS);
+                } else { log.info("与"+remoteAddress2+"连接成功!"); }
+            });
+
+//            ChannelFuture future = bootstrap.connect(remoteAddress1).sync();
+//            ChannelFuture future2 = bootstrap.connect(remoteAddress2).sync();
+//            future.channel().closeFuture().sync();
+//            future2.channel().closeFuture().sync();
+        } catch (Exception e) {e.getMessage();}
+    }
+
+    /**
+     * 重新连接tcp服务端
+     */
+    private static void doConnect(Bootstrap bootstrap, InetSocketAddress remoteAddress) {
+        try {
+            if (bootstrap != null) {
+                bootstrap.remoteAddress(remoteAddress);
+                ChannelFuture f = bootstrap.connect().addListener((ChannelFuture futureListener) -> {
+                    final EventLoop eventLoop = futureListener.channel().eventLoop();
+                    if (!futureListener.isSuccess()) {
+                        //连接tcp服务器不成功 10后重连
+                        log.info(remoteAddress + "服务器断线-----与服务端断开连接!在30s之后准备尝试重连!");
+                        eventLoop.schedule(() -> doConnect(bootstrap, remoteAddress), 30, TimeUnit.SECONDS);
+                    }
+                });
+            }
+        } catch (Exception e) { log.info("客户端连接失败!" + e.getMessage()); }
     }
 
 }
