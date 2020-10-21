@@ -34,12 +34,10 @@ public class SystemInfoService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getCPU() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getCpuUsage();
-        log.info("数据：    "+result.size());
         List<Map<String,String>> result2 = new LinkedList<>();
         for (Map<String,String> item: result) {
             if (0 != Double.parseDouble(item.get("cpu"))){
                 if("top".equals(item.get("command"))){
-                    log.info("top 不算----");
                     continue;
                 }
                 result2.add(item);

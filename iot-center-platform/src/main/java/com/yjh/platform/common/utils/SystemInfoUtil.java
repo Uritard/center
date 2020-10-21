@@ -20,7 +20,7 @@ public class SystemInfoUtil {
          * @return
          * @throws Exception
          */
-       public List<Map<String,String>> getCpuUsage() throws Exception {
+        public List<Map<String,String>> getCpuUsage() throws Exception {
             List<Map<String,String>> result = new ArrayList<>();
             Runtime rt = Runtime.getRuntime();
             Process p = rt.exec("top -b -n 1");// 调用系统的“top"命令
@@ -31,22 +31,23 @@ public class SystemInfoUtil {
                 int i = 1;
                 String[] strArray = null;
                 while ((str = in.readLine()) != null) {
-                    log.info("行数————————————————————  "+i);
-                    log.info(str);
                     if(i > 7){
                         strArray = str.split("\\s+");
+                        if("".equals(strArray[0])){
+                            strArray= Arrays.copyOfRange(strArray,1,(strArray.length-1));
+                        }
                         Map<String,String> map = new HashMap<>();
-                        map.put("pid",strArray[1]);
-                        map.put("command",strArray[12]);
-                        map.put("state",strArray[8]);
-                        map.put("cpu",strArray[9]);
+                        map.put("pid",strArray[0]);
+                        map.put("command",strArray[11]);
+                        map.put("state",strArray[7]);
+                        map.put("cpu",strArray[8]);
                         result.add(map);
                     }
                    i++;
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("获取cpu信息错误:", e);
             } finally {
                 in.close();
             }
@@ -69,7 +70,6 @@ public class SystemInfoUtil {
                 str = in.readLine();
                 if ((str = in.readLine()) != null) {
                     strArray = str.split("\\s+");
-                    log.info(str+"--------");
                     map.put("total",strArray[1]);
                     map.put("used",strArray[2]);
                     map.put("free",strArray[3]);
@@ -77,7 +77,7 @@ public class SystemInfoUtil {
                     map.put("other",other.toString());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("获取内存信息错误:", e);
             } finally {
                 in.close();
             }
@@ -114,7 +114,7 @@ public class SystemInfoUtil {
                     i++;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("获取硬盘信息错误:", e);
             } finally {
                 in.close();
             }
