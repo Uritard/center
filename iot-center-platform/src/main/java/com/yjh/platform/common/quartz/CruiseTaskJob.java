@@ -123,7 +123,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResult.setTaskStatus(239);
                 tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
-                Integer taskAbnormasl = 0;//异常数量
+                //Integer taskAbnormasl = 0;//异常数量
                 log.info("开始巡检");
                 List<TCruiseTaskResultDetail> resultDetailList = new LinkedList<>();//详细
                 List<TCruiseDataResult> dataResultList = new LinkedList<>();//巡检数据
@@ -161,26 +161,27 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetail.setCruiseStatus(254);
                             tCruiseDataResult.setState(250);
                         }else {
-                            //抓图成功 算法分析
-                            Analysis analysis = new Analysis();
-                            analysis.setTaskId(taskId);
-                            analysis.setInstanceId(item.getInstanceId());
-                            analysis.setPicPath(picUrl);
                             TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
-                            TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
-                            analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                            analysis.setPicModelPath(picUrl);
-                            List<Analysis> analysisList = new ArrayList<>();
-                            analysisList.add(analysis);
-                            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-                            analysisMap.put("list",analysisList);
-                            if(tAlgorithmInfo.getIsAi() == 1){//0-算法 1-缺陷
-                                analysis(analysisMap);
-                            }else {
-                                defect(analysisMap);
+                            if(tAlgorithmConf != null){//摄像头配置了算法
+                                //抓图成功 算法分析
+                                Analysis analysis = new Analysis();
+                                analysis.setTaskId(taskId);
+                                analysis.setInstanceId(item.getInstanceId());
+                                analysis.setPicPath(picUrl);
+                                TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
+                                analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                                analysis.setPicModelPath(picUrl);
+                                List<Analysis> analysisList = new ArrayList<>();
+                                analysisList.add(analysis);
+                                Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                                analysisMap.put("list",analysisList);
+                                if(tAlgorithmInfo.getIsAi() == 1){//0-算法 1-缺陷
+                                    analysis(analysisMap);
+                                }else {
+                                    defect(analysisMap);
+                                }
                             }
                             //todo 获取算法分析的结果
-                            tCruiseTaskResultDetail.setCruiseStatus(252);
                             tCruiseDataResult.setPicpath(picUrl);
 
                         }
@@ -192,10 +193,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                     if (232 == item.getCruiseType()) {//todo scala
                     }
                     tCruiseTaskResultDetail.setEndTime(new Date());
-                    resultDetailList.add(tCruiseTaskResultDetail);
+                    //resultDetailList.add(tCruiseTaskResultDetail);
                     Map map = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                     String str = "t_cruise_task_result:"+tCruiseTaskResultDetail.getCruiseResultId();
-                    dataResultList.add(tCruiseDataResult);
+                    //dataResultList.add(tCruiseDataResult);
                     Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                     map.putAll(map2);
                     map.put("taskId",taskId);
@@ -205,7 +206,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseResult.setTaskWait(taskCount);
                     tCruiseResultDao.update(tCruiseResult);
                     //Thread.sleep(10);
-                    WebSocketServer.sendMsg("你咋还不刷新了");
+                    WebSocketServer.sendMsg("你咋还不刷新");
                 }
                 //任务结束生成结果，
                 //todo 结果的状态未作处理
@@ -213,11 +214,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseResult.setTaskWait(0);
                 tCruiseResultDao.update(tCruiseResult);
                 tCruiseTaskResult.setTaskStatus(240);
-                tCruiseTaskResult.setTaskAbnormal(taskAbnormasl);
-                if (taskAbnormasl>0){tCruiseTaskResult.setCruiseResult(1);}else{tCruiseTaskResult.setCruiseResult(0);}
+                //tCruiseTaskResult.setTaskAbnormal(taskAbnormasl);
+                //if (taskAbnormasl>0){tCruiseTaskResult.setCruiseResult(1);}else{tCruiseTaskResult.setCruiseResult(0);}
                 tCruiseTaskResultDao.update(tCruiseTaskResult);
-                tCruiseTaskResultDetailDao.batchInsert(resultDetailList);
-                tCruiseDataResultDao.batchInsert(dataResultList);
                 log.info("完成任务执行");
             } catch (Exception e) {
                 log.error("定时任务异常" + e);
@@ -251,7 +250,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             log.error(e.getMessage(), e);
         }
     }
-    //算法分析
+    //表记分析
     private void analysis(Map<String, List<Analysis>> analysisMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);

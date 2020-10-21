@@ -29,7 +29,7 @@ public class SystemInfoService {
     public List<Map<String,String>> getCPU() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getCpuUsage();
         for (Map<String,String> item: result) {
-            if (0L == Long.parseLong(item.get("cpu"))){
+            if (0 == Double.parseDouble(item.get("cpu"))){
                     result.remove(item);
             }
         }
@@ -40,7 +40,7 @@ public class SystemInfoService {
     public List<Map<String,String>> getSwap() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getDeskUsage();
         for (Map<String,String> item: result) {
-            if (0L == Long.parseLong(item.get("all"))){
+            if (0 == Double.parseDouble(item.get("all"))){
                 result.remove(item);
             }
         }
