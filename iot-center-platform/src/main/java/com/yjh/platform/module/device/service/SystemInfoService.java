@@ -2,6 +2,9 @@ package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.SystemInfoUtil;
+import com.yjh.platform.module.device.controller.SystemInfoController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,8 @@ public class SystemInfoService {
 
     SystemInfoUtil systemInfoUtil = new SystemInfoUtil();
 
+    private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
+
     @Logs(title = "获取内存信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> getMemory() throws Exception {
@@ -29,10 +34,12 @@ public class SystemInfoService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getCPU() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getCpuUsage();
+        log.info("数据：    "+result.size());
         List<Map<String,String>> result2 = new LinkedList<>();
         for (Map<String,String> item: result) {
             if (0 != Double.parseDouble(item.get("cpu"))){
-                if("top".equals(item.get("Command"))){
+                if("top".equals(item.get("command"))){
+                    log.info("top 不算----");
                     continue;
                 }
                 result2.add(item);

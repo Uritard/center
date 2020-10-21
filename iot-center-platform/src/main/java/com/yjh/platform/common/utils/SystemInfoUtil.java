@@ -34,9 +34,9 @@ public class SystemInfoUtil {
                     if(i > 7){
                         strArray = str.split("\\s+");
                         Map<String,String> map = new HashMap<>();
-                        map.put("Pid",strArray[1]);
-                        map.put("Command",strArray[12]);
-                        map.put("State",strArray[8]);
+                        map.put("pid",strArray[1]);
+                        map.put("command",strArray[12]);
+                        map.put("state",strArray[8]);
                         map.put("cpu",strArray[10]);
                         result.add(map);
                     }
@@ -101,7 +101,7 @@ public class SystemInfoUtil {
                     if(i > 3){
                         strArray = str.split("\\s+");
                         Map<String,String> map = new HashMap<>();
-                        map.put("Pid",strArray[2]);
+                        map.put("pid",strArray[2]);
                         map.put("read",strArray[3]);
                         map.put("write",strArray[4]);
                         Double all = Double.valueOf(strArray[3])+Double.valueOf(strArray[4]);

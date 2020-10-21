@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/systemInfo/v1")
-@Api(value = "/systemInfo", description = "系统信息")
+@Api(value = "/systemInfo", description = "系统监控")
 public class SystemInfoController {
 
     @Autowired
     private SystemInfoService systemInfoService;
 
-    private Logger log = LoggerFactory.getLogger(TCfgDeviceController.class);
+    private Logger log = LoggerFactory.getLogger(SystemInfoController.class);
 
     public SystemInfoController(SystemInfoService systemInfoService) {
         this.systemInfoService = systemInfoService;
