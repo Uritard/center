@@ -34,7 +34,7 @@ public class SystemInfoUtil {
                     if(i > 7){
                         strArray = str.split("\\s+");
                         if("".equals(strArray[0])){
-                            strArray= Arrays.copyOfRange(strArray,1,(strArray.length-1));
+                            strArray= Arrays.copyOfRange(strArray,1,strArray.length);
                         }
                         Map<String,String> map = new HashMap<>();
                         map.put("pid",strArray[0]);
