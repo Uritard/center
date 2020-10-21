@@ -31,6 +31,8 @@ public class SystemInfoUtil {
                 int i = 1;
                 String[] strArray = null;
                 while ((str = in.readLine()) != null) {
+                    log.info("行数————————————————————  "+i);
+                    log.info(str);
                     if(i > 7){
                         strArray = str.split("\\s+");
                         Map<String,String> map = new HashMap<>();
@@ -42,7 +44,7 @@ public class SystemInfoUtil {
                     }
                    i++;
                 }
-                log.info("行数————————————————————  "+i);
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
