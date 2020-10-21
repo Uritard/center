@@ -37,11 +37,12 @@ public class SystemInfoUtil {
                         map.put("pid",strArray[1]);
                         map.put("command",strArray[12]);
                         map.put("state",strArray[8]);
-                        map.put("cpu",strArray[10]);
+                        map.put("cpu",strArray[9]);
                         result.add(map);
                     }
                    i++;
                 }
+                log.info("行数————————————————————  "+i);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
