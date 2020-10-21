@@ -31,9 +31,6 @@ public class SystemInfoUtil {
                 int i = 1;
                 String[] strArray = null;
                 while ((str = in.readLine()) != null) {
-                    if ( str.indexOf("top") == -1) {// 只分析正在运行的进程
-                        continue;
-                    }
                     if(i > 7){
                         strArray = str.split("\\s+");
                         Map<String,String> map = new HashMap<>();
@@ -101,7 +98,6 @@ public class SystemInfoUtil {
                 String[] strArray = null;
                 int i = 1;
                 while ((str = in.readLine()) != null) {
-                    log.info(str+"--------"+i);
                     if(i > 3){
                         strArray = str.split("\\s+");
                         Map<String,String> map = new HashMap<>();

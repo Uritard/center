@@ -5,6 +5,7 @@ import com.yjh.platform.common.utils.SystemInfoUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,22 +29,27 @@ public class SystemInfoService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getCPU() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getCpuUsage();
+        List<Map<String,String>> result2 = new LinkedList<>();
         for (Map<String,String> item: result) {
-            if (0 == Double.parseDouble(item.get("cpu"))){
-                    result.remove(item);
+            if (0 != Double.parseDouble(item.get("cpu"))){
+                if("top".equals(item.get("Command"))){
+                    continue;
+                }
+                result2.add(item);
             }
         }
-        return result;
+        return result2;
     }
     @Logs(title = "获取磁盘信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getSwap() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getDeskUsage();
+        List<Map<String,String>> result2 = new LinkedList<>();
         for (Map<String,String> item: result) {
-            if (0 == Double.parseDouble(item.get("all"))){
-                result.remove(item);
+            if (0 != Double.parseDouble(item.get("all"))){
+                result2.add(item);
             }
         }
-        return result;
+        return result2;
     }
 }
