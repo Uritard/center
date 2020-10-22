@@ -1,18 +1,35 @@
 package com.yjh.platform.module.task.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.quartz.CruiseTaskJob;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.websocket.WebSocketResult;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.REException;
+
+import java.util.HashMap;
 
 
 @RestController
 @Api("HelloController")
 @RequestMapping("/hello")
 public class HelloController {
+
+    private Logger log = LoggerFactory.getLogger(HelloController.class);
+
+    //相机抓图
+    private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePicture?cameraId={cameraId}";
+    //相机转到预置位
+    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPreset?presetId={presetId}&cameraId={cameraId}";
 
     @ApiOperation("说hello")
     @PostMapping("/admin")
@@ -23,6 +40,5 @@ public class HelloController {
         WebSocketServer.sendMsg(jsonObject.toString());
         return name +"你好!";
     }
-
 
 }

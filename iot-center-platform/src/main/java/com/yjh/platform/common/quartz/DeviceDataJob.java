@@ -1,5 +1,7 @@
 package com.yjh.platform.common.quartz;
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -8,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution

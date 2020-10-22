@@ -2,6 +2,7 @@ package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.rabbitmq.tools.json.JSONUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -94,8 +95,11 @@ public class CruiseTaskJob extends QuartzJobBean {
             //不需要执行任务
             log.info(taskDate+"此时间任务不需要执行");
         }else {
-            //todo 通知智能巡视》巡视监控界面有新任务来了
-            WebSocketServer.sendMsg("你该刷新了");
+            Map<String,Object> jasonMap=new HashMap<>();
+            jasonMap.put("type","newTask");
+            jasonMap.put("taskId",taskId);
+            String json=JSON.toJSONString(jasonMap);
+            WebSocketServer.sendMsg(json);
             log.info(taskDate+"需要执行的任务");
             try {
                 log.info("正在进行任务");
@@ -125,8 +129,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
                 //Integer taskAbnormasl = 0;//异常数量
                 log.info("开始巡检");
-                List<TCruiseTaskResultDetail> resultDetailList = new LinkedList<>();//详细
-                List<TCruiseDataResult> dataResultList = new LinkedList<>();//巡检数据
+//                List<TCruiseTaskResultDetail> resultDetailList = new LinkedList<>();//详细
+//                List<TCruiseDataResult> dataResultList = new LinkedList<>();//巡检数据
                 for (TCruisePointInstance item : instancesList) {
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                     tCruiseTaskResultDetail.setCruiseResultId(uuid+item.getInstanceId().toString());
@@ -152,6 +156,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         map.put("cameraId", tCameraPreset.getCameraId());
                         log.info(map.toString());
                         move(map);
+                        Thread.sleep(10000);
                         //2.抓图
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
@@ -170,7 +175,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 analysis.setPicPath(picUrl);
                                 TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                                 analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                                analysis.setPicModelPath(picUrl);
+                                analysis.setPicModelPath(picUrl);//模板图片暂时没有
                                 List<Analysis> analysisList = new ArrayList<>();
                                 analysisList.add(analysis);
                                 Map<String, List<Analysis>> analysisMap  = new HashMap<>();
@@ -205,8 +210,11 @@ public class CruiseTaskJob extends QuartzJobBean {
                     taskCount--;//一个巡检点结束
                     tCruiseResult.setTaskWait(taskCount);
                     tCruiseResultDao.update(tCruiseResult);
-                    //Thread.sleep(10);
-                    WebSocketServer.sendMsg("你咋还不刷新");
+                    Map<String,Object> jasonMap2=new HashMap<>();
+                    jasonMap.put("type","finishedOneInstance");
+                    jasonMap.put("taskId",taskId);
+                    String json2=JSON.toJSONString(jasonMap2);
+                    WebSocketServer.sendMsg(json2);
                 }
                 //任务结束生成结果，
                 //todo 结果的状态未作处理
@@ -225,7 +233,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
     }
     //相机抓图
-    private String picture(HashMap map) {
+    private static String picture(HashMap map) {
         String url = null;
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
@@ -240,7 +248,7 @@ public class CruiseTaskJob extends QuartzJobBean {
         return url;
     }
     //相机转到预置位
-    private void move(HashMap<String,Object> map) {
+    private static void move(HashMap<String,Object> map) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {

@@ -68,7 +68,7 @@ public class JobManager {
     public String addJob(QuartzTask quartzTask) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        if (scheduler.checkExists(jobKey) && scheduler.checkExists(triggerKey)) {
+        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
             logger.error("OC Access DataQuery Job already exist");
             return "false";
         }
@@ -80,8 +80,8 @@ public class JobManager {
         SimpleTrigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).startNow()
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInSeconds(Integer.parseInt(dataUploadInterval)).repeatForever()).build();
-        scheduler.scheduleJob(jobDetail, trigger);
+                        .withIntervalInSeconds(5).repeatForever()).build();
+        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, trigger);
         return "success";
     }
 

@@ -112,10 +112,11 @@ public class TAlgorithmInfoController {
                             @RequestParam(value = "describel", required = false) String describel,
                             @RequestParam(value = "algorithmCode", required = false) String algorithmCode,
                             @RequestParam(value = "analyseType", required = false) String analyseType,
-                            @RequestParam(value = "isAi", required = false) int isAi) {
+                            @RequestParam(value = "isAi", required = false) Integer isAi) {
         Result result = new Result();
         try {
-            List<TAlgorithmInfo> list = tAlgorithmInfoService.select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType,isAi);
+            List<TAlgorithmInfo> list = tAlgorithmInfoService.
+                    select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType,isAi);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

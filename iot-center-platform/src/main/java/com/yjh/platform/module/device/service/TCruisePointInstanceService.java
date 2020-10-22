@@ -163,14 +163,16 @@ public class TCruisePointInstanceService{
                     getConForCruisePoint(0, list.get(0), listAll);
                 }
                 list.remove(0);
+                int size = 0;
                 for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
                     int length = isIn(listAll,tStdDeviceMeteForPointDetailItem.getDeviceMeteId());
                     if (length != -1) {
                         getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
                     } else {
                         listAll.add(tStdDeviceMeteForPointDetailItem);
-                        getConForCruisePoint(length + 1, tStdDeviceMeteForPointDetailItem, listAll);
+                        getConForCruisePoint(listAll.size()-1, tStdDeviceMeteForPointDetailItem, listAll);
                     }
+                    size++;
                 }
             }
             resultMap.put("list", listAll);

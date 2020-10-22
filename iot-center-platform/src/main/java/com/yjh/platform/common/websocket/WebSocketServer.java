@@ -83,6 +83,9 @@ public class WebSocketServer {
         //可以群发消息
         //消息保存到数据库、redis
         if(StringUtils.isNotBlank(message)){
+            if("ping".equals(message)){
+                return;
+            }
             try {
                 //解析发送的报文
                 JSONObject jsonObject = JSON.parseObject(message);

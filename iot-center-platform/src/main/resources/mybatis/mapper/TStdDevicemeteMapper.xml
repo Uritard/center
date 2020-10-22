@@ -331,7 +331,7 @@
         left join t_dict_business f on a.alarm_type= f.dict_code
         left join t_dict_business b on a.mete_type= b.dict_code
         left join t_dict_business d on a.mete_kind= d.dict_code and d.col_name="mete_kind"
-        left join t_std_device e on a.device_id = e.device_id
+        left join t_std_device e on a.device_id = e.device_id and a.custom_id = e.custom_id
         left join t_dict_business h on a.unit = h.dict_code
         left join t_dict_business i on a.custom_id = i.dict_code
         where 1=1

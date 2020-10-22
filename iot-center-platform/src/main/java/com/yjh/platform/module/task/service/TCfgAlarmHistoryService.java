@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.TCfgAlarmHistoryResultInfo;
+import com.yjh.platform.module.task.entity.TUnionTaskAttr;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -55,8 +57,10 @@ public class TCfgAlarmHistoryService{
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgAlarmHistory> selectByPage(TCfgAlarmHistory tCfgAlarmHistory) {
-        List<TCfgAlarmHistory> tCfgAlarmHistoryList = tCfgAlarmHistoryDao.selectByPage(tCfgAlarmHistory);
+    public List<TCfgAlarmHistory> selectByPage(Long alarmNo, Long deviceId, String cunstomId, Long meteId, Date alarmTime, Integer alarmLevel, String alarmValue, String alarmDesc, Date clearTime, BigDecimal clearValue, Integer confirmState, String confirmPeople, Date confirmTime, String confirmRemark, Integer defect, Integer defectLevel, String forceClearReason, String meteCode, String isClear, String showType, Date updateTime) {
+        List<TCfgAlarmHistory> tCfgAlarmHistoryList = tCfgAlarmHistoryDao.selectByPage(alarmNo, deviceId, cunstomId, meteId, alarmTime, alarmLevel, alarmValue, alarmDesc,
+                clearTime, clearValue, confirmState, confirmPeople, confirmTime, confirmRemark, defect, defectLevel, forceClearReason, meteCode,
+                isClear, showType, updateTime);
         return tCfgAlarmHistoryList;
     }
 
@@ -64,6 +68,12 @@ public class TCfgAlarmHistoryService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgAlarmHistory> list) {
         return this.tCfgAlarmHistoryDao.batchInsert(list);
+    }
+
+    @Logs(title = "查询联动详细结果", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCfgAlarmHistoryResultInfo> selectUnionCruiseResult(String unionId) {
+        return tCfgAlarmHistoryDao.selectUnionCruiseResult(unionId);
     }
 
 }

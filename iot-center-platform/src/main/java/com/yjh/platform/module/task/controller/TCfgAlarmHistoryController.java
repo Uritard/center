@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.module.task.entity.TCfgAlarmHistoryResultInfo;
 import com.yjh.platform.module.task.service.TCfgAlarmHistoryService;
 import com.yjh.platform.module.task.entity.TCfgAlarmHistory;
 
@@ -125,7 +126,9 @@ public class TCfgAlarmHistoryController {
                             @RequestParam(value = "updateTime", required = false) Date updateTime) {
         Result result = new Result();
         try {
-            List<TCfgAlarmHistory> list = tCfgAlarmHistoryService.select(alarmNo, deviceId, cunstomId, meteId, alarmTime, alarmLevel, alarmValue, alarmDesc, clearTime, clearValue, confirmState, confirmPeople, confirmTime, confirmRemark, defect, defectLevel, forceClearReason, meteCode, isClear, showType, updateTime);
+            List<TCfgAlarmHistory> list = tCfgAlarmHistoryService.select(alarmNo, deviceId, cunstomId, meteId, alarmTime, alarmLevel, alarmValue, alarmDesc,
+                    clearTime, clearValue, confirmState, confirmPeople, confirmTime, confirmRemark, defect, defectLevel, forceClearReason, meteCode,
+                    isClear, showType, updateTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -135,15 +138,37 @@ public class TCfgAlarmHistoryController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCfgAlarmHistory tCfgAlarmHistory,
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    public Result selectByPage(@RequestParam(value = "alarmNo", required = false) Long alarmNo,
+                               @RequestParam(value = "deviceId", required = false) Long deviceId,
+                               @RequestParam(value = "cunstomId", required = false) String cunstomId,
+                               @RequestParam(value = "meteId", required = false) Long meteId,
+                               @RequestParam(value = "alarmTime", required = false) Date alarmTime,
+                               @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
+                               @RequestParam(value = "alarmValue", required = false) String alarmValue,
+                               @RequestParam(value = "alarmDesc", required = false) String alarmDesc,
+                               @RequestParam(value = "clearTime", required = false) Date clearTime,
+                               @RequestParam(value = "clearValue", required = false) BigDecimal clearValue,
+                               @RequestParam(value = "confirmState", required = false) Integer confirmState,
+                               @RequestParam(value = "confirmPeople", required = false) String confirmPeople,
+                               @RequestParam(value = "confirmTime", required = false) Date confirmTime,
+                               @RequestParam(value = "confirmRemark", required = false) String confirmRemark,
+                               @RequestParam(value = "defect", required = false) Integer defect,
+                               @RequestParam(value = "defectLevel", required = false) Integer defectLevel,
+                               @RequestParam(value = "forceClearReason", required = false) String forceClearReason,
+                               @RequestParam(value = "meteCode", required = false) String meteCode,
+                               @RequestParam(value = "isClear", required = false) String isClear,
+                               @RequestParam(value = "showType", required = false) String showType,
+                               @RequestParam(value = "updateTime", required = false) Date updateTime,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCfgAlarmHistory> list = tCfgAlarmHistoryService.selectByPage(tCfgAlarmHistory);
+            List<TCfgAlarmHistory> list = tCfgAlarmHistoryService.selectByPage(alarmNo, deviceId, cunstomId, meteId, alarmTime, alarmLevel, alarmValue, alarmDesc,
+                    clearTime, clearValue, confirmState, confirmPeople, confirmTime, confirmRemark, defect, defectLevel, forceClearReason, meteCode,
+                    isClear, showType, updateTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -163,6 +188,27 @@ public class TCfgAlarmHistoryController {
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "查询联动详细结果")
+    @RequestMapping(value = "/selectUnionCruiseResult", method = RequestMethod.GET)
+    public Result selectUnionCruiseResult(@RequestParam(value = "unionId", required = false) String  unionId,
+                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                          @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TCfgAlarmHistoryResultInfo> list = tCfgAlarmHistoryService.selectUnionCruiseResult(unionId);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }

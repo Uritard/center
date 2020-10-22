@@ -190,7 +190,7 @@
         <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmHistory" resultType="com.yjh.platform.module.task.entity.TCfgAlarmHistory">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmHistory" resultType="com.yjh.platform.module.task.entity.TCfgAlarmHistoryDetail">
         select
         a.alarm_no,
         a.device_id,
@@ -212,8 +212,20 @@
         a.mete_code,
         a.is_clear,
         a.show_type,
-        a.update_time
+        a.update_time,
+        b.union_id,
+        c.task_abnormal,
+        c.cruise_task_time,
+        c.cruise_result,
+        d.dict_note as alarmLevelName,
+        e.dict_note as confirmStateName,
+        f.dict_note as defectLevelName
         from t_cfg_alarm_history a
+        left join t_union_task_attr b on a.mete_id = b.device_mete_id
+        left join t_cruise_task_result c on b.union_id = task_id
+        left join t_dict_business d on a.alarm_level = d.dict_code and d.col_name = "alarm_level"
+        left join t_dict_business e on a.confirm_state = e.dict_code and e.col_name = "conf_mode"
+        left join t_dict_business f on a.defect_level = f.dict_code and f.col_name = "defect_level"
         where 1 = 1
         <if test="alarmNo != null and alarmNo != ''">a.alarm_no = #{alarmNo, jdbcType=BIGINT},</if>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
@@ -289,6 +301,23 @@
         </foreach>
     </insert>
 
+    <select id="selectUnionCruiseResult"  resultType="com.yjh.platform.module.task.entity.TCfgAlarmHistoryResultInfo">
+        select a.task_id,
+               c.cruise_time,
+               c.end_time,
+               c.device_id,
+               e.device_name,
+               d.*,
+               f.dict_note as stateName
+        from t_cruise_task a
+        left join t_cruise_task_result b on a.task_id =b.task_id
+        left join t_cruise_task_result_detail c on b.task_result_id = c.task_result_id
+        left join t_cruise_data_result d on c.cruise_result_id = d.cruise_result_id
+        left join t_cfg_device e on c.device_id = e.device_id
+        left join t_dict_business f on d.state = f.dict_code and f.col_name = "data_state"
+        where 1=1
+        and a.task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
 
 
 </mapper>

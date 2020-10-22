@@ -46,7 +46,7 @@ public class TAlgorithmInfoService{
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TAlgorithmInfo> select(Long algorithmId, String algorithmName, String aliasName, String describel, String algorithmCode, String analyseType,int isAi) {
+    public List<TAlgorithmInfo> select(Long algorithmId, String algorithmName, String aliasName, String describel, String algorithmCode, String analyseType,Integer isAi) {
         if("-1".equals(analyseType)){
             analyseType = null;
         }
