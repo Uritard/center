@@ -118,16 +118,14 @@ public class CameraConService {
             return "fail";
         }
         if (dwPTZCommand==29) {
-            hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, dStop, speed);
-            return "success";
+            return hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, dStop, speed);
         } else {
             if (hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, 0, speed)) {
                 try {
                     Thread.sleep(200);
                 } catch (Exception e) {e.getMessage();}
                 hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, 1, speed);
-                hCNetSDK.NET_DVR_StopRealPlay(m_lRealPalyHandle);
-                return "success";
+                return hCNetSDK.NET_DVR_StopRealPlay(m_lRealPalyHandle);
             } else { return "PTZ control fail, errorInfo: "+hCNetSDK.NET_DVR_GetLastError(); }
         }
 
