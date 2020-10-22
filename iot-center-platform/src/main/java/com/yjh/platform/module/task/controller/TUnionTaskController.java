@@ -188,7 +188,7 @@ public class TUnionTaskController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("查看失败描述：", e);
         }
         return result;
     }
@@ -207,7 +207,7 @@ public class TUnionTaskController {
 //            result.setData(tUnionTaskService.historyStatistical());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量插入失败：" + e);
+            log.error("统计失败：" + e);
         }
         return result;
     }

@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -32,6 +33,7 @@ public class TDefectInfo implements Serializable {
     @ApiModelProperty(value = "缺陷等级")
     private Integer defectLevel;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "缺陷时间")
     private Date defectTime;
 
@@ -71,6 +73,7 @@ public class TDefectInfo implements Serializable {
     @ApiModelProperty(value = "确认人ID")
     private String dealPersonId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "确认时间")
     private Date dealTime;
 

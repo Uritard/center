@@ -3,7 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.EasyPoiUtil;
+import com.yjh.platform.module.task.entity.ReportForms;
 import com.yjh.platform.module.task.entity.TestReportMange;
 import com.yjh.platform.module.task.service.ReportManageService;
 import io.swagger.annotations.Api;
@@ -11,12 +11,15 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YC
@@ -38,10 +41,13 @@ public class ReportManageController {
 
     @ApiOperation(value = "生成报表")
     @RequestMapping(value = "/reportGenerate", method = RequestMethod.GET)
-    public Result reportGenerate() {
+    public Result reportGenerate(@RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
+                                 @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
+                                 @RequestParam(value="deviceIds", required = false)String deviceIds,
+                                 @RequestParam(value="reportName", required = false)String reportName) {
         Result result = new Result();
         try {
-            List<TestReportMange> list = reportManageService.selectAll();
+            List<Map<String, Object>> list = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName);
             result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -56,9 +62,9 @@ public class ReportManageController {
     public Result reportDownload() {
         Result result = new Result();
         try {
-            List<TestReportMange> list = reportManageService.selectAll();
-            EasyPoiUtil.exportExcel(list,"XXX报告单", "啥也不是","testFile", TestReportMange.class, true, true);
-            result.setData(list);
+//            List<TestReportMange> list = reportManageService.selectAll(startTime,endTime,deviceIds);
+//            EasyPoiUtil.exportExcel(list,"XXX报告单", "啥也不是","testFile", TestReportMange.class, true, true);
+//            result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -67,12 +73,14 @@ public class ReportManageController {
         }
         return result;
     }
-    @ApiOperation(value = "报表查询")
+    @ApiOperation(value = "查询报表生成记录")
     @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
-    public Result reportSelect() {
+    public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
+                               @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
+                               @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime) {
         Result result = new Result();
         try {
-            List<TestReportMange> list = reportManageService.selectAll();
+            List<ReportForms> list = reportManageService.reportSelect(reportName,startTime,endTime);
             result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -82,13 +90,13 @@ public class ReportManageController {
         }
         return result;
     }
-    @ApiOperation(value = "报表删除")
+    @ApiOperation(value = "删除报表")
     @RequestMapping(value = "/reportDelete", method = RequestMethod.GET)
     public Result reportDelete() {
         Result result = new Result();
         try {
-            List<TestReportMange> list = reportManageService.selectAll();
-            result.setData(list);
+//            List<TestReportMange> list = reportManageService.selectAll();
+//            result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
