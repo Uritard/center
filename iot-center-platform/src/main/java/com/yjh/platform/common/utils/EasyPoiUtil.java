@@ -5,10 +5,10 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -18,37 +18,42 @@ import java.util.List;
 public class EasyPoiUtil {
 
     public static void exportExcel(List<?> list, String title, String sheetName, String fileName,
-                                   Class<?> pojoClass, boolean isCreateHeader, boolean isNeedSignature ,
-                                   HttpServletResponse response)  {
+                                   Class<?> pojoClass, boolean isCreateHeader, boolean isNeedSignature ) {
         ExportParams exportParams = new ExportParams(title, sheetName);
-        System.out.println("<----------exportParams---------->:"+exportParams);
-
         exportParams.setCreateHeadRows(isCreateHeader);
 
         Workbook workbook = ExcelExportUtil.exportExcel(exportParams, pojoClass, list);
-        System.out.println("<----------workbook---------->:"+workbook);
-        //如果需页底要有签名，则需要合并单元格并为其设置样式和签名模板内容
+        //页底签名
         if (isNeedSignature) {
             Sheet sheet = workbook.getSheet(sheetName);
             int lastRowNum = sheet.getLastRowNum();
             short lastCellNum = sheet.getRow(2).getLastCellNum();
-            CellRangeAddress rangeAddress = new CellRangeAddress(lastRowNum+1 , lastRowNum+2 , 0, lastCellNum-1);
+            //合并单元格
+            CellRangeAddress rangeAddress = new CellRangeAddress(lastRowNum + 1,lastRowNum + 2, 0, lastCellNum - 1);
             sheet.addMergedRegion(rangeAddress);
+            //创建一个签名单元格
             Cell signatureCell = sheet.createRow(lastRowNum + 1).createCell(0);
-            CellStyle signatureCellStyle = workbook.createCellStyle();
-            signatureCellStyle.setAlignment(HorizontalAlignment.RIGHT);
-            signatureCell.setCellStyle(signatureCellStyle);
-            signatureCell.setCellValue("签名：             日期:               ");
+            //创建单元格并设置样式
+            CellStyle style = workbook.createCellStyle();
+            style.setAlignment(HorizontalAlignment.RIGHT);
+            style.setVerticalAlignment(VerticalAlignment.CENTER);
+            signatureCell.setCellStyle(style);
+            signatureCell.setCellValue("签名： 嬴政 日期:  公元前221年   ");
         }
+        OutputStream out = null;//创建输出流
         try {
-            workbook.write(response.getOutputStream());
+            File file = new File("../templateFile");
+            file.createNewFile();
+            FileOutputStream fileOutputStream = new FileOutputStream(fileName+".xls");
+            workbook.write(fileOutputStream);
+            System.out.println("<----------导出Excel成功---------->");
+            fileOutputStream.flush();
+            fileOutputStream.close();
         } catch (IOException e) {
-            System.out.println("导出Excel异常");
+            e.printStackTrace();
+            System.out.println("---------->导出Excel异常---------->");
         }
-
-//        Runtime.getRuntime().exec(transUrl);
-
-
     }
+//        Runtime.getRuntime().exec(transUrl);
 
 }

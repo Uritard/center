@@ -36,13 +36,12 @@ public class ReportManageController {
         this.reportManageService = reportManageService;
     }
 
-    @ApiOperation(value = "报表下载")
-    @RequestMapping(value = "/reportDownload", method = RequestMethod.GET)
-    public Result reportDownload(HttpServletResponse response) {
+    @ApiOperation(value = "生成报表")
+    @RequestMapping(value = "/reportGenerate", method = RequestMethod.GET)
+    public Result reportGenerate() {
         Result result = new Result();
         try {
             List<TestReportMange> list = reportManageService.selectAll();
-            EasyPoiUtil.exportExcel(list,"测试标题", "啥也不是","测试文件", TestReportMange.class, true, true,response);
             result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -52,6 +51,50 @@ public class ReportManageController {
         }
         return result;
     }
-
-
+    @ApiOperation(value = "下载报表")
+    @RequestMapping(value = "/reportDownload", method = RequestMethod.GET)
+    public Result reportDownload() {
+        Result result = new Result();
+        try {
+            List<TestReportMange> list = reportManageService.selectAll();
+            EasyPoiUtil.exportExcel(list,"XXX报告单", "啥也不是","testFile", TestReportMange.class, true, true);
+            result.setData(list);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "报表查询")
+    @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
+    public Result reportSelect() {
+        Result result = new Result();
+        try {
+            List<TestReportMange> list = reportManageService.selectAll();
+            result.setData(list);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "报表删除")
+    @RequestMapping(value = "/reportDelete", method = RequestMethod.GET)
+    public Result reportDelete() {
+        Result result = new Result();
+        try {
+            List<TestReportMange> list = reportManageService.selectAll();
+            result.setData(list);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加错误:", e);
+        }
+        return result;
+    }
 }

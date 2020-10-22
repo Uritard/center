@@ -36,7 +36,7 @@
         warn_id, warn_level, warn_time, warn_type, warn_name, warn_content, device_id, cunstom_id, instance_id, std_mete_id, conf_mode, is_warn, deal_type, deal_info, deal_person_id, deal_time, if_warn_disable, alarm_source, warn_subtype, device_code, image_path, video_path, value, out_range, link_message
     </sql>
     <sql id="TongYong">
-        (
+       (
         SELECT
         a.warn_id,
         a.warn_time AS alarm_time,
@@ -54,7 +54,10 @@
         a.image_path,
         a.deal_info,
         a.deal_type,
-        g.dict_note as deal_type_name
+        g.dict_note as deal_type_name,
+        a.deal_person_id,
+        h.user_name as deal_person_name,
+        a.deal_time
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
@@ -63,6 +66,7 @@
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
         LEFT JOIN t_std_mete f on f.std_mete_id = a.std_mete_id
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
+        LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
         UNION ALL
@@ -84,13 +88,17 @@
         '无' as image_path,
         h.deal_info,
         h.deal_type,
-        g.dict_note as deal_type_name
+        g.dict_note as deal_type_name,
+        h.deal_person_id,
+        j.user_name as deal_person_name,
+        h.deal_time
         FROM
         t_camera_alarm h
         LEFT JOIN t_camera_info b ON h.camera_id = b.camera_id
         LEFT JOIN t_dict_business e ON h.alarm_state = e.dict_code
         LEFT JOIN t_dict_business c ON h.alarm_level = c.dict_code
 		LEFT JOIN t_dict_business g on h.deal_type = g.dict_code
+        LEFT JOIN sys_user j ON j.user_id = h.deal_person_id
         WHERE
         1 = 1
         )
@@ -113,13 +121,17 @@
         '无' as image_path,
         f.deal_info,
 		f.deal_type,
-		h.dict_note as deal_type_name
+		h.dict_note as deal_type_name,
+        f.deal_person_id,
+        k.user_name as deal_person_name,
+        f.deal_time
         FROM
         t_robot_alarm f
         LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
         LEFT JOIN t_dict_business e ON f.alarm_state = e.dict_code
         LEFT JOIN t_robot_info g ON f.robot_id = g.robot_id
 		LEFT JOIN t_dict_business h on f.deal_type = h.dict_code
+        LEFT JOIN sys_user k ON k.user_id = f.deal_person_id
         WHERE
         1 = 1
         )
@@ -431,11 +443,12 @@
         <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="alarmSource != null">
         AND (CASE
-        WHEN #{alarmSource} = 888 THEN alarm_source = 888
-        WHEN #{alarmSource} = 279 THEN alarm_source = 279
-        WHEN #{alarmSource} != 279 and #{alarmSource} != 888 THEN alarm_source != 888 and alarm_source != 279
-        END)
+        WHEN #{alarmSource, jdbcType=INTEGER} = 888 THEN alarm_source = 888
+        WHEN #{alarmSource, jdbcType=INTEGER} = 279 THEN alarm_source = 279
+        WHEN #{alarmSource, jdbcType=INTEGER} != 279 and #{alarmSource, jdbcType=INTEGER} != 888 THEN alarm_source != 888 and alarm_source != 279
+            END)</if>
     </select>
     <!--根据告警来源统计告警数据-->
     <select id="countByAlarmSource" resultType="java.util.Map">
@@ -469,8 +482,8 @@
             )
         ORDER BY dict_code
     </select>
-    <!--统计本周内的告警数-->
-    <select id="countWarnOnWeek"  resultType="java.util.Map">
+    <!--统计本月内的告警数-->
+    <select id="countWarnOnMonth"  resultType="java.util.Map">
         SELECT
             (A.counts+H.counts+O.counts) AS #{firstTime2},
             (B.counts+I.counts+P.counts) AS #{firstTime3},

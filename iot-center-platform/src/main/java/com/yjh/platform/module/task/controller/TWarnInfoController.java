@@ -218,12 +218,12 @@ public class TWarnInfoController {
         }
         return result;
     }
-    @ApiOperation(value = "统计近一周的所有告警个数-折线图")
-    @RequestMapping(value = "/countWarnOnWeek", method = RequestMethod.GET)
-    public Result countWarnOnWeek(){
+    @ApiOperation(value = "统计近一月的所有告警个数-折线图")
+    @RequestMapping(value = "/countWarnOnMonth", method = RequestMethod.GET)
+    public Result countWarnOnMonth(){
         Result result = new Result();
         try {
-            List<TutHistoryStatistical> list = tWarnInfoService.countWarnOnWeek();
+            List<TutHistoryStatistical> list = tWarnInfoService.countWarnOnMonth();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -126,7 +126,7 @@
         <if test="outRange != null and outRange != ''">a.out_range = #{outRange, jdbcType=VARCHAR},</if>
         <if test="linkMessage != null and linkMessage != ''">a.link_message = #{linkMessage, jdbcType=VARCHAR},</if>
     </set>
-            where a.defect_id = #{defectId, jdbcType=BIGINT}
+        where a.defect_id = #{defectId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TDefectInfo">
@@ -276,59 +276,59 @@
 
     <insert id="batchInsert">
         insert into t_defect_info(
-            defect_id,
-            defect_level,
-            defect_time,
-            defect_type,
-            defect_name,
-            defect_content,
-            device_id,
-            cunstom_id,
-            instance_id,
-            std_mete_id,
-            conf_mode,
-            is_defect,
-            deal_type,
-            deal_info,
-            deal_person_id,
-            deal_time,
-            if_defect_disable,
-            alarm_source,
-            defect_subtype,
-            device_code,
-            image_path,
-            video_path,
-            VALUE,
-            out_range,
-            link_message
+        defect_id,
+        defect_level,
+        defect_time,
+        defect_type,
+        defect_name,
+        defect_content,
+        device_id,
+        cunstom_id,
+        instance_id,
+        std_mete_id,
+        conf_mode,
+        is_defect,
+        deal_type,
+        deal_info,
+        deal_person_id,
+        deal_time,
+        if_defect_disable,
+        alarm_source,
+        defect_subtype,
+        device_code,
+        image_path,
+        video_path,
+        VALUE,
+        out_range,
+        link_message
         )values
         <foreach collection="list" item="TDefectInfo" separator=",">
             (
-                #{TDefectInfo.defectId, jdbcType=BIGINT},
-                #{TDefectInfo.defectLevel, jdbcType=INTEGER},
-                #{TDefectInfo.defectTime, jdbcType=TIMESTAMP},
-                #{TDefectInfo.defectType, jdbcType=INTEGER},
-                #{TDefectInfo.defectName, jdbcType=VARCHAR},
-                #{TDefectInfo.defectContent, jdbcType=VARCHAR},
-                #{TDefectInfo.deviceId, jdbcType=BIGINT},
-                #{TDefectInfo.cunstomId, jdbcType=VARCHAR},
-                #{TDefectInfo.instanceId, jdbcType=BIGINT},
-                #{TDefectInfo.stdMeteId, jdbcType=BIGINT},
-                #{TDefectInfo.confMode, jdbcType=INTEGER},
-                #{TDefectInfo.isDefect, jdbcType=INTEGER},
-                #{TDefectInfo.dealType, jdbcType=INTEGER},
-                #{TDefectInfo.dealInfo, jdbcType=VARCHAR},
-                #{TDefectInfo.dealPersonId, jdbcType=VARCHAR},
-                #{TDefectInfo.dealTime, jdbcType=TIMESTAMP},
-                #{TDefectInfo.ifDefectDisable, jdbcType=INTEGER},
-                #{TDefectInfo.alarmSource, jdbcType=INTEGER},
-                #{TDefectInfo.defectSubtype, jdbcType=INTEGER},
-                #{TDefectInfo.deviceCode, jdbcType=VARCHAR},
-                #{TDefectInfo.imagePath, jdbcType=String},
-                #{TDefectInfo.videoPath, jdbcType=VARCHAR},
-                #{TDefectInfo.value, jdbcType=VARCHAR},
-                #{TDefectInfo.outRange, jdbcType=VARCHAR},
-                #{TDefectInfo.linkMessage, jdbcType=VARCHAR}
+            #{TDefectInfo.defectId, jdbcType=BIGINT},
+            #{TDefectInfo.defectLevel, jdbcType=INTEGER},
+            #{TDefectInfo.defectTime, jdbcType=TIMESTAMP},
+            #{TDefectInfo.defectType, jdbcType=INTEGER},
+            #{TDefectInfo.defectName, jdbcType=VARCHAR},
+            #{TDefectInfo.defectContent, jdbcType=VARCHAR},
+            #{TDefectInfo.deviceId, jdbcType=BIGINT},
+            #{TDefectInfo.cunstomId, jdbcType=VARCHAR},
+            #{TDefectInfo.instanceId, jdbcType=BIGINT},
+            #{TDefectInfo.stdMeteId, jdbcType=BIGINT},
+            #{TDefectInfo.confMode, jdbcType=INTEGER},
+            #{TDefectInfo.isDefect, jdbcType=INTEGER},
+            #{TDefectInfo.dealType, jdbcType=INTEGER},
+            #{TDefectInfo.dealInfo, jdbcType=VARCHAR},
+            #{TDefectInfo.dealPersonId, jdbcType=VARCHAR},
+            #{TDefectInfo.dealTime, jdbcType=TIMESTAMP},
+            #{TDefectInfo.ifDefectDisable, jdbcType=INTEGER},
+            #{TDefectInfo.alarmSource, jdbcType=INTEGER},
+            #{TDefectInfo.defectSubtype, jdbcType=INTEGER},
+            #{TDefectInfo.deviceCode, jdbcType=VARCHAR},
+            #{TDefectInfo.imagePath, jdbcType=String},
+            #{TDefectInfo.videoPath, jdbcType=VARCHAR},
+            #{TDefectInfo.value, jdbcType=VARCHAR},
+            #{TDefectInfo.outRange, jdbcType=VARCHAR},
+            #{TDefectInfo.linkMessage, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -350,7 +350,10 @@
         a.image_path,
         a.deal_info,
         a.deal_type,
-        g.dict_note as deal_type_name
+        g.dict_note as deal_type_name,
+        a.deal_person_id,
+        h.user_name as deal_person_name,
+        a.defect_content
         FROM
         t_defect_info a
         LEFT JOIN	t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
@@ -358,6 +361,7 @@
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
+        LEFT JOIN sys_user h on a.deal_person_id = h.user_id
         WHERE 1 = 1
         <if test="deviceName != null and deviceName != ''"> and  device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="defectType != null "> and defect_type = #{defectType, jdbcType=INTEGER}</if>
@@ -413,28 +417,32 @@
     <!--查看缺陷处理情况-->
     <select id="selectDefectProcess" resultType="com.yjh.platform.module.task.entity.TDefectInfoDetail">
         SELECT
-            a.defect_id,
-            a.device_id,
-            b.device_name,
-            a.std_mete_id,
-            d.mete_name,
-            a.defect_time,
-            a.deal_time,
-            a.defect_type,
-            e.dict_note as defect_type_name,
-            a.conf_mode,
-            f.dict_note as conf_mode_name,
-            a.image_path,
-            a.deal_info,
-            a.deal_type,
-            g.dict_note as deal_type_name
+        a.defect_id,
+        a.device_id,
+        b.device_name,
+        a.std_mete_id,
+        d.mete_name,
+        a.defect_time,
+        a.deal_time,
+        a.defect_type,
+        e.dict_note as defect_type_name,
+        a.conf_mode,
+        f.dict_note as conf_mode_name,
+        a.image_path,
+        a.deal_info,
+        a.deal_type,
+        g.dict_note as deal_type_name,
+        a.deal_person_id,
+        h.user_name as deal_person_name,
+        a.defect_content
         FROM
-            t_defect_info a
+        t_defect_info a
         LEFT JOIN	t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_std_mete d on a.std_mete_id = d.std_mete_id
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
+        LEFT JOIN sys_user h on a.deal_person_id = h.user_id
         WHERE 1 = 1
         <if test="defectId != null and defectId != ''"> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
     </select>

@@ -53,7 +53,7 @@ public interface TWarnInfoDao {
     List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
     Map<String, Integer> countByAlarmSource();
     List<TJContentInfoDetail>  countByDeviceType();
-    Map<String,Integer> countWarnOnWeek(@Param(value = "firstTime1")String firstTime1,
+    Map<String,Integer> countWarnOnMonth(@Param(value = "firstTime1")String firstTime1,
                                         @Param(value = "firstTime2")String firstTime2,
                                         @Param(value = "firstTime3")String firstTime3,
                                         @Param(value = "firstTime4")String firstTime4,

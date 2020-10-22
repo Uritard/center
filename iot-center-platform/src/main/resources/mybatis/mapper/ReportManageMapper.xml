@@ -34,15 +34,21 @@
     <select id="selectAll" resultType="com.yjh.platform.module.task.entity.TestReportMange">
         select
         a.defect_level,
+        c.dict_note as defect_level_name,
         a.defect_time,
         a.defect_content,
         a.conf_mode,
+        d.dict_note as conf_mode_name,
         a.deal_type,
+        b.dict_note as deal_type_name,
         a.deal_info,
         a.deal_time,
         a.image_path,
         a.video_path
         from t_defect_info a
+        LEFT JOIN t_dict_business b on a.deal_type = b.dict_code
+        LEFT JOIN t_dict_business c on a.defect_level = c.dict_code
+        LEFT JOIN t_dict_business d on a.conf_mode = d.dict_code
         where 1 = 1
     </select>
 

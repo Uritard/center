@@ -66,5 +66,13 @@ public class TWarnInfoDetail implements Serializable {
     @ApiModelProperty(value = "告警点位名称")
     private String meteName;
 
+    @ApiModelProperty(value = "处理人id")
+    private String dealPersonId;
+    @ApiModelProperty(value = "处理人名称")
+    private String dealPersonName;
+
+    @ApiModelProperty(value = "处理时间",example = "2018-10-01 12:18:48")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date dealTime;
 
 }

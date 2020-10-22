@@ -62,4 +62,11 @@ public class TDefectInfoDetail implements Serializable {
     @ApiModelProperty(value = "处理方法-字典表")
     private String dealTypeName;
 
+    @ApiModelProperty(value = "处理人id")
+    private String dealPersonId;
+    @ApiModelProperty(value = "处理人名称")
+    private String dealPersonName;
+    @ApiModelProperty(value = "缺陷内容")
+    private String defectContent;
+
 }

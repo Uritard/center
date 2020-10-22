@@ -21,23 +21,29 @@ public class TestReportMange implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Excel(name = "缺陷等级", orderNum = "1",width = 20)
+    @Excel(name = "啥也不是", orderNum = "1",width = 20)
     private Integer defectLevel;
-    @Excel(name = "缺陷时间", orderNum = "2",width = 20)
+    @Excel(name = "啥也不是", orderNum = "2",width = 20)
+    private String defectLevelName;
+    @Excel(name = "啥也不是",format  = "yyyy-MM-dd HH:mm:ss", orderNum = "3",width = 20)
     private Date defectTime;
-    @Excel(name = "缺陷内容", orderNum = "3",width = 20)
+    @Excel(name = "啥也不是", orderNum = "4",width = 20)
     private String defectContent;
-    @Excel(name = "缺陷状态", orderNum = "4",width = 20)
+    @Excel(name = "啥也不是", orderNum = "5",width = 20)
     private Integer confMode;
-    @Excel(name = "处理方式", orderNum = "5",width = 20)
+    @Excel(name = "啥也不是", orderNum = "6",width = 20)
+    private String confModeName;
+    @Excel(name = "啥也不是", orderNum = "7",width = 20)
     private Integer dealType;
-    @Excel(name = "处理意见", orderNum = "6",width = 20)
+    @Excel(name = "啥也不是", orderNum = "8",width = 20)
+    private String dealTypeName;
+    @Excel(name = "啥也不是", orderNum = "9",width = 20)
     private String dealInfo;
-    @Excel(name = "确认时间", orderNum = "7",width = 20)
+    @Excel(name = "啥也不是",format  = "yyyy-MM-dd HH:mm:ss", orderNum = "10",width = 20)
     private Date dealTime;
-    @Excel(name = "图片地址", orderNum = "8",width = 20)
+    @Excel(name = "啥也不是", orderNum = "11",width = 20)
     private String imagePath;
-    @Excel(name = "视频地址", orderNum = "9",width = 20)
+    @Excel(name = "啥也不是", orderNum = "12",width = 20)
     private String videoPath;
 
 }

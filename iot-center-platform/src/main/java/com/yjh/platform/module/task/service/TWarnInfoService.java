@@ -111,9 +111,9 @@ public class TWarnInfoService{
         System.out.println("tjContentInfoList是："+tjContentInfoList);
         return tjContentInfoList;
     }
-    @Logs(title = "统计近一周的所有告警个数", code = "module")
+    @Logs(title = "统计近一月的所有告警个数", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> countWarnOnWeek() {
+    public List<TutHistoryStatistical> countWarnOnMonth() {
         List<String> weekDates = dateTimeUtil.getDayDateList(8);
 
         String firstTime1 = weekDates.get(0);
@@ -125,7 +125,7 @@ public class TWarnInfoService{
         String firstTime7 = weekDates.get(6);
         String firstTime8 = weekDates.get(7);
 
-        Map<String, Integer> map1 = tWarnInfoDao.countWarnOnWeek(firstTime1, firstTime2, firstTime3, firstTime4,
+        Map<String, Integer> map1 = tWarnInfoDao.countWarnOnMonth(firstTime1, firstTime2, firstTime3, firstTime4,
                 firstTime5, firstTime6, firstTime7, firstTime8);
         List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
 
