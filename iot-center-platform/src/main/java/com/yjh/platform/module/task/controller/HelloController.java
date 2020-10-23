@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.REException;
 
@@ -31,6 +32,12 @@ public class HelloController {
     //相机转到预置位
     private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPreset?presetId={presetId}&cameraId={cameraId}";
 
+    @Value("${picModelPath.dir}")
+    private String picModelPath;
+    //等待相机转到预置位时间
+    @Value("${waitTime}")
+    private Long waitTime;
+
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
@@ -40,5 +47,8 @@ public class HelloController {
         WebSocketServer.sendMsg(jsonObject.toString());
         return name +"你好!";
     }
+
+
+
 
 }

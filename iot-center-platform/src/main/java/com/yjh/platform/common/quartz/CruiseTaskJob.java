@@ -23,6 +23,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -76,6 +77,12 @@ public class CruiseTaskJob extends QuartzJobBean {
     private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+    //模板图片路径
+    @Value("${picModelPath.dir}")
+    private String picModelPath;
+    //等待相机转到预置位时间
+    @Value("${waitTime}")
+    private Long waitTime;
     /**
      * 巡视任务类
      * @param context
@@ -95,13 +102,14 @@ public class CruiseTaskJob extends QuartzJobBean {
             //不需要执行任务
             log.info(taskDate+"此时间任务不需要执行");
         }else {
-            Map<String,Object> jasonMap=new HashMap<>();
-            jasonMap.put("type","newTask");
-            jasonMap.put("taskId",taskId);
-            String json=JSON.toJSONString(jasonMap);
-            WebSocketServer.sendMsg(json);
-            log.info(taskDate+"需要执行的任务");
             try {
+                //Thread.sleep(10000);
+                Map<String,Object> jasonMap=new HashMap<>();
+                jasonMap.put("type","newTask");
+                jasonMap.put("taskId",taskId);
+                String json=JSON.toJSONString(jasonMap);
+                WebSocketServer.sendMsg(json);
+                log.info(taskDate+"需要执行的任务");
                 log.info("正在进行任务");
                 //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
                 String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
@@ -156,7 +164,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         map.put("cameraId", tCameraPreset.getCameraId());
                         log.info(map.toString());
                         move(map);
-                        Thread.sleep(10000);
+                        Thread.sleep(waitTime);//等待摄像头转到预置位
                         //2.抓图
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
@@ -175,7 +183,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 analysis.setPicPath(picUrl);
                                 TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                                 analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                                analysis.setPicModelPath(picUrl);//模板图片暂时没有
+                                analysis.setPicModelPath(System.getProperty(picModelPath));//模板图片暂时没有
                                 List<Analysis> analysisList = new ArrayList<>();
                                 analysisList.add(analysis);
                                 Map<String, List<Analysis>> analysisMap  = new HashMap<>();
