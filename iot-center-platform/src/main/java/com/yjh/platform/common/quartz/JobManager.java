@@ -112,6 +112,7 @@ public class JobManager {
                 .withSchedule(cronSchedule(quartzTask.getCronExpression()))
                 .build();
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, cronTrigger);
+        logger.info("周期任务创建成功");
         return "success";
     }
 
@@ -129,13 +130,14 @@ public class JobManager {
                 usingJobData("taskId", taskId).build();
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
                 .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
-                .startNow()
+                .startAt(new Date())
                 .withSchedule(
                         SimpleScheduleBuilder.simpleSchedule()
                                 .withIntervalInSeconds(3)
                                 .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
                 .build();
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
+        logger.info("立即任务创建成功");
         return "success";
     }
 
@@ -168,6 +170,7 @@ public class JobManager {
                                 .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
                 .build();
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
+        logger.info("定时任务创建成功");
         return "success";
     }
     /**
@@ -175,11 +178,11 @@ public class JobManager {
      */
     public static void removeJob(String jobName, String jobGroupName,String triggerName, String triggerGroupName) {
         try {
-            Scheduler sched = StaticContextAccessor.getBean(Scheduler.class);
+            //Scheduler sched = StaticContextAccessor.getBean(Scheduler.class);
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
-            sched.pauseTrigger(triggerKey);// 停止触发器
-            sched.unscheduleJob(triggerKey);// 移除触发器
-            sched.deleteJob(JobKey.jobKey(jobName, jobGroupName));// 删除任务
+            StaticContextAccessor.getBean(Scheduler.class).pauseTrigger(triggerKey);// 停止触发器
+            StaticContextAccessor.getBean(Scheduler.class).unscheduleJob(triggerKey);// 移除触发器
+            StaticContextAccessor.getBean(Scheduler.class).deleteJob(JobKey.jobKey(jobName, jobGroupName));// 删除任务
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

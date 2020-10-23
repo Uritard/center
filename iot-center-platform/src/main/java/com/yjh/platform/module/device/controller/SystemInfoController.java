@@ -56,7 +56,7 @@ public class SystemInfoController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("获取内存信息错误:", e);
+            log.error("获取cpu信息错误:", e);
         }
         return result;
     }
@@ -71,10 +71,41 @@ public class SystemInfoController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("获取内存信息错误:", e);
+            log.error("获取磁盘信息错误:", e);
         }
         return result;
     }
+
+    @ApiOperation(value = "获取cpu利用率")
+    @RequestMapping(value = "/getCpuOnUse", method = RequestMethod.GET)
+    public Result getCpuOnUse() {
+        Result result = new Result();
+        try {
+            result.setData(systemInfoService.getCpuOnUse());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取cpu利用率错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取硬盘利用率")
+    @RequestMapping(value = "/getDeskOnUse", method = RequestMethod.GET)
+    public Result getDeskOnUse() {
+        Result result = new Result();
+        try {
+            result.setData(systemInfoService.getDeskOnUse());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取硬盘利用率错误:", e);
+        }
+        return result;
+    }
+
 
 
 }

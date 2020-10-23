@@ -88,6 +88,7 @@ public class CruiseTaskJob extends QuartzJobBean {
      * @param context
      */
     public void executeInternal(JobExecutionContext context) {
+        try {
         //判断任务是否需要执行
         String taskId = context.getMergedJobDataMap().getString("taskId");
         SimpleDateFormat  simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
@@ -102,7 +103,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             //不需要执行任务
             log.info(taskDate+"此时间任务不需要执行");
         }else {
-            try {
+
                 //Thread.sleep(10000);
                 Map<String,Object> jasonMap=new HashMap<>();
                 jasonMap.put("type","newTask");
@@ -111,7 +112,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 log.info("发送给前端的消息：   "+json);
                 WebSocketServer.sendMsg(json);
                 log.info(taskDate+"需要执行的任务");
-                log.info("正在进行任务");
+                log.info("开始进行任务" +new Date());
                 //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
                 String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
                 TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
@@ -137,7 +138,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
                 //Integer taskAbnormasl = 0;//异常数量
-                log.info("开始巡检");
+                log.info("开始巡检"+new Date());
 //                List<TCruiseTaskResultDetail> resultDetailList = new LinkedList<>();//详细
 //                List<TCruiseDataResult> dataResultList = new LinkedList<>();//巡检数据
                 for (TCruisePointInstance item : instancesList) {
@@ -156,6 +157,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     if (228 == item.getCruiseType()) {//todo 机器人
                     }
                     if (229 == item.getCruiseType()) {
+                        log.info("巡检点开始巡检"+new Date());
                         tCruiseDataResult.setCruiseType(229);
                         //视频
                         TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
@@ -196,7 +198,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     defect(analysisMap);
                                 }
                             }
-                            //todo 获取算法分析的结果
                             tCruiseDataResult.setPicpath(picUrl);
 
                         }
@@ -236,11 +237,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                 //tCruiseTaskResult.setTaskAbnormal(taskAbnormasl);
                 //if (taskAbnormasl>0){tCruiseTaskResult.setCruiseResult(1);}else{tCruiseTaskResult.setCruiseResult(0);}
                 tCruiseTaskResultDao.update(tCruiseTaskResult);
-                log.info("完成任务执行");
-            } catch (Exception e) {
-                log.error("定时任务异常" + e);
+                log.info("完成任务执行"+new Date());
             }
+        } catch (Exception e) {
+            log.error("定时任务异常" + e);
         }
+
 
     }
     //相机抓图

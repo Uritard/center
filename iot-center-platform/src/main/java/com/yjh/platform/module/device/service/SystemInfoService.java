@@ -57,4 +57,16 @@ public class SystemInfoService {
         }
         return result2;
     }
+
+    @Logs(title = "获取cpu利用率", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public double getCpuOnUse() throws Exception {
+        return systemInfoUtil.getCpuOnUse();
+    }
+
+    @Logs(title = "获取硬盘利用率", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> getDeskOnUse() throws Exception {
+        return systemInfoUtil.getDeskOnUse();
+    }
 }

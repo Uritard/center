@@ -121,6 +121,76 @@ public class SystemInfoUtil {
             return result;
         }
 
-
-
+    /**
+     * 获取cpu使用百分比
+     *
+     * @return
+     * @throws Exception
+     */
+    public double getCpuOnUse() throws Exception {
+        Map<String,String> map = new HashMap<>();
+        Runtime rt = Runtime.getRuntime();
+        Process p = rt.exec("top -b -n 1");// 调用系统的“top"命令
+        BufferedReader in = null;
+        double re = -1;
+        try {
+            in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String str = null;
+            int i = 1;
+            String[] strArray = null;
+            while ((str = in.readLine()) != null) {
+                if(i == 3){
+                    strArray = str.split("\\s+");
+                    if("".equals(strArray[0])){
+                        strArray= Arrays.copyOfRange(strArray,1,strArray.length);
+                    }
+                    return Double.parseDouble(strArray[1]);
+                }
+                i++;
+            }
+        } catch (Exception e) {
+            log.error("获取cpu使用百分比:", e);
+        } finally {
+            in.close();
+        }
+        return re;
     }
+
+    /**
+     * 获取磁盘利用率
+     *
+     * @return
+     * @throws Exception
+     */
+    public Map<String,Object> getDeskOnUse() throws Exception {
+        Map<String,Object> map = new HashMap<>();
+        Runtime rt = Runtime.getRuntime();
+        Process p = rt.exec("df");// 调用系统的“df"命令
+        double all = 0;
+        double use = 0;
+        double re = 0;
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String str = null;
+            String[] strArray = null;
+            str = in.readLine();
+            while ((str = in.readLine()) != null) {
+                strArray = str.split("\\s+");
+                all = all + Double.parseDouble(strArray[1]);
+                use = use + Double.parseDouble(strArray[2]);
+
+            }
+            map.put("all",all);
+            map.put("use",use);
+        } catch (Exception e) {
+            log.error("获取磁盘利用率:", e);
+        } finally {
+            in.close();
+        }
+        return map;
+    }
+
+
+
+}
