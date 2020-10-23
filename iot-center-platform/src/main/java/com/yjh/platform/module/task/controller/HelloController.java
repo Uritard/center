@@ -3,6 +3,8 @@ package com.yjh.platform.module.task.controller;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.CruiseTaskJob;
+import com.yjh.platform.common.quartz.JobManager;
+import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.websocket.WebSocketResult;
@@ -49,6 +51,15 @@ public class HelloController {
     }
 
 
-
-
+    @ApiOperation("说hello")
+    @PostMapping("/test")
+    @ResponseBody
+    public String test(@RequestParam String name)throws Exception{
+        QuartzTask quartzTask = new QuartzTask();
+        quartzTask.setJobName(name);
+        quartzTask.setJobGroup("qh111");
+        JobManager jobManager = new JobManager();
+        jobManager.addJob(quartzTask);
+        return "ok";
+    }
 }

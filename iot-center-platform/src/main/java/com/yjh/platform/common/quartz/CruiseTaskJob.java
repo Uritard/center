@@ -221,10 +221,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseResult.setTaskWait(taskCount);
                     tCruiseResultDao.update(tCruiseResult);
                     Map<String,Object> jasonMap2=new HashMap<>();
-                    jasonMap.put("type","finishedOneInstance");
-                    jasonMap.put("taskId",taskId);
+                    jasonMap2.put("type","finishedOneInstance");
+                    jasonMap2.put("taskId",taskId);
                     String json2=JSON.toJSONString(jasonMap2);
-                    log.info("发送给前端的消息：   "+json);
+                    log.info("发送给前端的消息：   "+json2);
                     WebSocketServer.sendMsg(json2);
                 }
                 //任务结束生成结果，
