@@ -129,7 +129,7 @@ public class JobManager {
                 usingJobData("taskId", taskId).build();
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
                 .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
-                .startAt(new Date())
+                .startNow()
                 .withSchedule(
                         SimpleScheduleBuilder.simpleSchedule()
                                 .withIntervalInSeconds(3)

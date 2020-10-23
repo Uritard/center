@@ -108,6 +108,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 jasonMap.put("type","newTask");
                 jasonMap.put("taskId",taskId);
                 String json=JSON.toJSONString(jasonMap);
+                log.info("发送给前端的消息：   "+json);
                 WebSocketServer.sendMsg(json);
                 log.info(taskDate+"需要执行的任务");
                 log.info("正在进行任务");
@@ -169,6 +170,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
                         String picUrl = picture(map2);
+                        //String picUrl = "66666";
                         if(picUrl == null){
                             //抓图失败 任务失败
                             tCruiseTaskResultDetail.setCruiseStatus(254);
@@ -222,6 +224,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     jasonMap.put("type","finishedOneInstance");
                     jasonMap.put("taskId",taskId);
                     String json2=JSON.toJSONString(jasonMap2);
+                    log.info("发送给前端的消息：   "+json);
                     WebSocketServer.sendMsg(json2);
                 }
                 //任务结束生成结果，
