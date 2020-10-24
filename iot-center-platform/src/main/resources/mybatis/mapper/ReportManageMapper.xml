@@ -31,38 +31,27 @@
         <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
     </resultMap>
 
-    <select id="selectHHH" resultType="java.util.Map">
-        select
-        a.defect_level,
-        a.defect_time,
-        a.conf_mode,
-        a.deal_type,
-        a.deal_info,
-        a.image_path
-        from t_defect_info a
-        where 1 = 1
-    </select>
     <select id="reportGenerate" resultType="java.util.Map">
         select
-         a.device_id,
-         b.device_mete_id,
-         d.instance_id,
-         e.cruise_result_id,
-         f.state,
-         f.identify_result as 'jieGuo',
-         a.device_name ,
-         (CASE
-            WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
-            WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
-            WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
-            WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
-            WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
-            WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
-            END) AS instance_name,
-            h.dict_note as identify_result,
-         f.picpath,
-         g.dict_note as cruise_result,
-         e.cruise_time
+        a.device_id,
+        b.device_mete_id,
+        d.instance_id,
+        e.cruise_result_id,
+        f.state,
+        f.identify_result as 'jieGuo',
+        a.device_name ,
+        (CASE
+        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
+        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
+        WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
+        WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
+        WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
+        WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
+        END) AS instance_name,
+        h.dict_note as identify_result,
+        f.picpath,
+        g.dict_note as cruise_result,
+        e.cruise_time
         FROM
         t_std_device a,
         t_std_devicemete b,
@@ -78,6 +67,8 @@
         and e.instance_id = d.instance_id and e.cruise_result_id = f.cruise_result_id
         and g.dict_code = f.state
         and h.dict_code = f.identify_result
+        <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
+
     </select>
 
 </mapper>

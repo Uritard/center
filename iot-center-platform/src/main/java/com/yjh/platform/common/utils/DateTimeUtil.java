@@ -1171,4 +1171,38 @@ public class DateTimeUtil {
         Date time=cal.getTime();
         return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
     }
+    //将yyyyMMddHHmmss格式时间的字符串转为yyyy-MM-dd HH:mm:ss格式时间的字符串
+    public static String changeTime1(String cTime){
+        if (cTime == null || cTime == ""){
+            return "";
+        }else {
+            SimpleDateFormat sf1 = new SimpleDateFormat("yyyyMMddHHmmss");
+            SimpleDateFormat sf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String changedTime = null;
+            try {
+                Date date = sf1.parse(cTime);
+                changedTime = sf2.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return changedTime;
+        }
+    }
+    //将yyyy-MM-dd HH:mm:ss格式时间的字符串转为yyyyMMddHHmmss格式时间的字符串
+    public static String changeTime2(String cTime){
+        if (cTime == null || cTime == ""){
+            return "";
+        }else {
+            SimpleDateFormat sf1 = new SimpleDateFormat("yyyyMMddHHmmss");
+            SimpleDateFormat sf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String changedTime = null;
+            try {
+                Date date = sf2.parse(cTime);
+                changedTime = sf1.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return changedTime;
+        }
+    }
 }
