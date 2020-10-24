@@ -172,7 +172,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
                         String picUrl = picture(map2);
-                        //String picUrl = "66666";
+                        //String picUrl = "home/yjh/iot-picture/model-picture/Template/Infrared/2AFE48DF21F64F78AB57396F6DCCAC06/bigi_0.jpg";
                         if(picUrl == null){
                             //抓图失败 任务失败
                             tCruiseTaskResultDetail.setCruiseStatus(254);
@@ -187,7 +187,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 analysis.setPicPath(picUrl);
                                 TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                                 analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                                analysis.setPicModelPath(System.getProperty(picModelPath));//模板图片暂时没有
+                                analysis.setPicModelPath(picModelPath);//模板图片暂时没有
                                 List<Analysis> analysisList = new ArrayList<>();
                                 analysisList.add(analysis);
                                 Map<String, List<Analysis>> analysisMap  = new HashMap<>();
@@ -218,25 +218,25 @@ public class CruiseTaskJob extends QuartzJobBean {
                     map.put("taskId",taskId);
                     map.put("startTime",simpleDateFormat.format(date));
                     redisTemplate.opsForHash().putAll(str, map);
-                    taskCount--;//一个巡检点结束
-                    tCruiseResult.setTaskWait(taskCount);
-                    tCruiseResultDao.update(tCruiseResult);
-                    Map<String,Object> jasonMap2=new HashMap<>();
-                    jasonMap2.put("type","finishedOneInstance");
-                    jasonMap2.put("taskId",taskId);
-                    String json2=JSON.toJSONString(jasonMap2);
-                    log.info("发送给前端的消息：   "+json2);
-                    WebSocketServer.sendMsg(json2);
+                    //taskCount--;//一个巡检点结束
+                    //tCruiseResult.setTaskWait(taskCount);
+                    //tCruiseResultDao.update(tCruiseResult);
+//                    Map<String,Object> jasonMap2=new HashMap<>();
+//                    jasonMap2.put("type","finishedOneInstance");
+//                    jasonMap2.put("taskId",taskId);
+//                    String json2=JSON.toJSONString(jasonMap2);
+//                    log.info("发送给前端的消息：   "+json2);
+//                    WebSocketServer.sendMsg(json2);
                 }
                 //任务结束生成结果，
                 //todo 结果的状态未作处理
-                tCruiseResult.setCState(240);
-                tCruiseResult.setTaskWait(0);
-                tCruiseResultDao.update(tCruiseResult);
-                tCruiseTaskResult.setTaskStatus(240);
+                //tCruiseResult.setCState(240);
+                //tCruiseResult.setTaskWait(0);
+                //tCruiseResultDao.update(tCruiseResult);
+                //tCruiseTaskResult.setTaskStatus(240);
                 //tCruiseTaskResult.setTaskAbnormal(taskAbnormasl);
                 //if (taskAbnormasl>0){tCruiseTaskResult.setCruiseResult(1);}else{tCruiseTaskResult.setCruiseResult(0);}
-                tCruiseTaskResultDao.update(tCruiseTaskResult);
+                //tCruiseTaskResultDao.update(tCruiseTaskResult);
                 log.info("完成任务执行"+new Date());
             }
         } catch (Exception e) {
