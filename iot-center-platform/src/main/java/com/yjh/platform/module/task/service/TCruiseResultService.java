@@ -62,8 +62,8 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultDetail> selectCruiseByPage( String taskId,Integer cruiseType,Integer state,String executeTime,String deviceName ) {
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskId,cruiseType,state,executeTime,deviceName);
+    public List<CruiseResultDetail> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer state,String deviceName ) {
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,state,deviceName);
         return cruiseResultDetailList;
     }
     @Logs(title = "人工复核", code = "module")
@@ -79,9 +79,8 @@ public class TCruiseResultService{
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
         //获取审核后的信息
-        String taskId  = cruiseManualReview.getTaskId();
-        String executeTime = cruiseManualReview.getExecuteTime();
-        List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskId,executeTime);
+        String taskResultId1  = cruiseManualReview.getTaskResultId();
+        List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskResultId1);
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
         HashSet<String> haS1 = new HashSet<>();
         for (CruiseManualReview cMR:cruiseManualReviewList){
@@ -96,11 +95,11 @@ public class TCruiseResultService{
             sb.append(checkUser + ",");
         }
         String checkUserName = sb.toString().substring(0,sb.toString().length()-1);
-        System.out.println("checkUserName是："+checkUserName);
+//        System.out.println("checkUserName是："+checkUserName);
         String taskResultId = cruiseManualReview.getTaskResultId();
-        System.out.println("taskResultId是："+taskResultId);
+//        System.out.println("taskResultId是："+taskResultId);
         Date taskCheckDate =findLastDate(cruiseManualReviewList);
-        System.out.println("checkDate："+taskCheckDate);
+//        System.out.println("checkDate："+taskCheckDate);
         //更新任务审核人以及审核时间
         int result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
 
