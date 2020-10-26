@@ -2,8 +2,6 @@ package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.rabbitmq.tools.json.JSONUtil;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -26,14 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -54,12 +45,6 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruiseTaskDelDao tCruiseTaskDelDao;
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
-    @Autowired
-    private TCruiseTaskResultDao tCruiseTaskResultDao;
-    @Autowired
-    private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
-    @Autowired
-    private TCruiseDataResultDao tCruiseDataResultDao;
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
     @Autowired
@@ -128,26 +113,17 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseResult.setCState(239);//正在执行
                 tCruiseResult.setTaskCount(taskCount);
                 tCruiseResult.setTaskWait(taskCount);
-                tCruiseResult.setExecuteTime(date);
+                tCruiseResult.setCreateTime(date);
+                tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
                 tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
-                //任务状态
-                TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-                tCruiseTaskResult.setTaskResultId(uuid);
-                tCruiseTaskResult.setTaskId(taskId);
-                tCruiseTaskResult.setTaskStatus(239);
-                tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
-                tCruiseTaskResultDao.insert(tCruiseTaskResult);
-                //Integer taskAbnormasl = 0;//异常数量
                 log.info("开始巡检"+new Date());
-//                List<TCruiseTaskResultDetail> resultDetailList = new LinkedList<>();//详细
-//                List<TCruiseDataResult> dataResultList = new LinkedList<>();//巡检数据
                 for (TCruisePointInstance item : instancesList) {
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                     tCruiseTaskResultDetail.setCruiseResultId(uuid+item.getInstanceId().toString());
                     tCruiseTaskResultDetail.setTaskResultId(uuid);
                     tCruiseTaskResultDetail.setDeviceId(item.getDeviceId());
                     tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
-                    tCruiseTaskResultDetail.setCruiseTime(new Date());
+                    tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
                     tCruiseTaskResultDetail.setCruiseStatus(252);
 
                     TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
@@ -172,7 +148,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
                         String picUrl = picture(map2);
-                        //String picUrl = "home/yjh/iot-picture/model-picture/Template/Infrared/2AFE48DF21F64F78AB57396F6DCCAC06/bigi_0.jpg";
                         if(picUrl == null){
                             //抓图失败 任务失败
                             tCruiseTaskResultDetail.setCruiseStatus(254);
@@ -208,25 +183,15 @@ public class CruiseTaskJob extends QuartzJobBean {
                     }
                     if (232 == item.getCruiseType()) {//todo scala
                     }
-                    tCruiseTaskResultDetail.setEndTime(new Date());
-                    //resultDetailList.add(tCruiseTaskResultDetail);
+                    tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
                     Map map = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                    String str = "t_cruise_task_result:"+tCruiseTaskResultDetail.getCruiseResultId();
-                    //dataResultList.add(tCruiseDataResult);
+                    String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
                     Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                     map.putAll(map2);
                     map.put("taskId",taskId);
                     map.put("startTime",simpleDateFormat.format(date));
+                    map.put("if_run",tCruiseTask.getIfRun().toString());
                     redisTemplate.opsForHash().putAll(str, map);
-                    //taskCount--;//一个巡检点结束
-                    //tCruiseResult.setTaskWait(taskCount);
-                    //tCruiseResultDao.update(tCruiseResult);
-//                    Map<String,Object> jasonMap2=new HashMap<>();
-//                    jasonMap2.put("type","finishedOneInstance");
-//                    jasonMap2.put("taskId",taskId);
-//                    String json2=JSON.toJSONString(jasonMap2);
-//                    log.info("发送给前端的消息：   "+json2);
-//                    WebSocketServer.sendMsg(json2);
                 }
                 //任务结束生成结果，
                 //todo 结果的状态未作处理
