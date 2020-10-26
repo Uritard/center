@@ -6,16 +6,16 @@
     </formats>  
   
     <!-- Adds dependencies to zip package under lib directory -->  
-    <dependencySets>  
-        <dependencySet>  
-            <!-- 
-               不使用项目的artifact，第三方jar不要解压，打包进zip文件的lib目录 
-           -->  
-            <useProjectArtifact>false</useProjectArtifact>  
-            <outputDirectory>lib</outputDirectory>  
-            <unpack>false</unpack>  
-        </dependencySet>  
-    </dependencySets>  
+    <!--<dependencySets>  -->
+        <!--<dependencySet>  -->
+            <!--&lt;!&ndash; -->
+               <!--不使用项目的artifact，第三方jar不要解压，打包进zip文件的lib目录 -->
+           <!--&ndash;&gt;  -->
+            <!--<useProjectArtifact>false</useProjectArtifact>  -->
+            <!--<outputDirectory>lib</outputDirectory>  -->
+            <!--<unpack>false</unpack>  -->
+        <!--</dependencySet>  -->
+    <!--</dependencySets>  -->
   
     <fileSets>  
         <!-- 把项目相关的说明文件，打包进zip文件的根目录 -->  
