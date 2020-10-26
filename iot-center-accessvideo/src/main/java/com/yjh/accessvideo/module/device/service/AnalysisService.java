@@ -23,9 +23,10 @@ public class AnalysisService {
 
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
-        JSONArray pictureInfoArray = new JSONArray();
-        analysisObject.put("msgID", 123567);
-        analysisObject.put("msgType", 1);
+        JSONObject pictureInfo = new JSONObject();
+//        JSONArray pictureInfoArray = new JSONArray();
+        analysisObject.put("msgID", "123567");
+        analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
         int i=1;
@@ -39,11 +40,11 @@ public class AnalysisService {
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureDataObject.put("instanceId", analysis.getInstanceId());
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-                pictureInfoArray.add(pictureInfoObject);
+//                pictureInfoArray.add(pictureInfoObject);
+                msgDataObject.put("data", pictureInfoObject);
             }
             i++;
         }
-        msgDataObject.put("data", pictureInfoArray);
         analysisObject.put("msgData", msgDataObject);
         AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
         return "success";
@@ -54,9 +55,10 @@ public class AnalysisService {
     public String feignDefect(List<Analysis> analysisList, int aiPort) {
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
-        JSONArray pictureInfoArray = new JSONArray();
-        analysisObject.put("msgID", 123567);
-        analysisObject.put("msgType", 1);
+        JSONObject pictureInfo = new JSONObject();
+//        JSONArray pictureInfoArray = new JSONArray();
+        analysisObject.put("msgID", "123567");
+        analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
         int i=1;
@@ -70,11 +72,10 @@ public class AnalysisService {
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                 pictureDataObject.put("instanceId", analysis.getInstanceId());
-                pictureInfoArray.add(pictureInfoObject);
+                msgDataObject.put("data", pictureInfoObject);
             }
             i++;
         }
-        msgDataObject.put("data", pictureInfoArray);
         analysisObject.put("msgData", msgDataObject);
         AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
         return "success";
