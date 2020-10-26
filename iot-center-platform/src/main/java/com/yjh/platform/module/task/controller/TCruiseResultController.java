@@ -182,10 +182,9 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "分页查询--任务结果详细")
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
-    public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
+    public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "state", required = false) Integer state,
-                                     @RequestParam(value = "executeTime", required = false) String executeTime,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
@@ -193,7 +192,7 @@ public class TCruiseResultController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskId,cruiseType,state,executeTime,deviceName);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,state,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

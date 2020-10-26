@@ -37,10 +37,9 @@ public interface TCruiseResultDao {
     List<TCruiseResultExpand> selectTaskByPage(@Param(value = "taskName") String taskName,
                                                @Param(value = "cType") Integer cType,
                                                @Param(value = "cState") Integer cState);
-    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId") String taskId,
+    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "state") Integer state,
-                                                @Param(value = "executeTime") String executeTime,
                                                 @Param(value = "deviceName") String deviceName);
 
     int manualReview(CruiseManualReview cruiseManualReview);
@@ -56,8 +55,7 @@ public interface TCruiseResultDao {
 
     String selectUserName(@Param(value = "userID")Integer  userID);
 
-    List<CruiseManualReview> selectManualDetail(@Param(value = "taskId")String taskId,
-                                                @Param(value = "executeTime")String executeTime);
+    List<CruiseManualReview> selectManualDetail(@Param(value = "taskResultId")String taskResultId);
     int updateCheck(@Param(value = "taskResultId")String taskResultId,
                     @Param(value = "checkUserName")String checkUserName,
                     @Param(value = "checkDate")Date checkDate);

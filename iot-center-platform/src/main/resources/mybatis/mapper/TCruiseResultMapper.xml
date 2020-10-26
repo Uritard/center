@@ -35,9 +35,8 @@
         a.c_state,
         e.dict_note as task_state,
         a.task_count,
-        g.cruise_status,
-        COUNT(g.cruise_status = 252 or null) as cruise_data_state1,
-        COUNT(g.cruise_status = 253 or null) as cruise_data_state2,
+        COUNT(a.task_count-a.task_wait or null) as cruise_data_state1,
+	    COUNT(a.task_wait or null) as cruise_data_state2,
         f.task_abnormal,
         a.execute_time,
         a.check_user,
@@ -95,19 +94,7 @@
         check_user = #{checkUser,jdbcType=VARCHAR},
         check_date = #{checkDate,jdbcType=TIMESTAMP},
         identify_state = #{identifyState,jdbcType=INTEGER}
-        where cruise_data_id in
-            (select cruise_data_id
-                from
-                    (select cruise_data_id
-                        FROM
-                            t_cruise_result a,
-                            t_cruise_task_result_detail d,
-                            t_cruise_data_result e
-                        where  a.task_id = #{taskId,jdbcType =VARCHAR }
-                        and d.instance_id = #{instanceId,jdbcType = BIGINT}
-                        and a.task_result_id = d.task_result_id
-                        and e.cruise_result_id = d.cruise_result_id) t1)
-
+        where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
     </update>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">
@@ -197,27 +184,19 @@
 
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
-        FROM
-        (
-        (
-        (
-        t_cruise_result a
+        FROM t_cruise_result a
         LEFT JOIN t_dict_business d ON a.c_type = d.dict_code
-        )
-        LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
-        )
-        LEFT JOIN (
-        t_cruise_task_result f
-        LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
-        ) ON a.task_result_id = f.task_result_id
-        )
         LEFT JOIN t_cruise_task b ON a.task_id = b.task_id
+        LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
+        LEFT JOIN t_cruise_task_result f ON a.task_result_id = f.task_result_id
+        LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
         where 1 = 1
         <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
         <if test="cType != null and cType != -1">and a.c_type = #{cType, jdbcType=INTEGER}</if>
         <if test="cState != null and cState != -1">and a.c_state = #{cState, jdbcType=INTEGER}</if>
-
-        GROUP BY a.task_result_id
+        and a.c_state != 239 and a.c_state != 241 and e.col_name='task_state'
+        GROUP BY task_result_id
+        order by a.execute_time desc
     </select>
 
     <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
@@ -264,8 +243,7 @@
         LEFT JOIN t_robot_inspection m ON m.inspection_id = e.cruise_id
         LEFT JOIN t_std_devicemete n ON n.device_mete_id = e.device_mete_id
         WHERE 1 = 1
-        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=BIGINT}</if>
-        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime,jdbcType=TIMESTAMP}</if>
+        <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
         <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
 
@@ -396,14 +374,12 @@
         LEFT JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
         LEFT JOIN t_dict_business e on e.dict_code = d.evaluation_state
         WHERE 1 = 1
-        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=BIGINT}</if>
-        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime,jdbcType=TIMESTAMP}</if>
+        <if test="taskResultId != null ">and a.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
     </select>
 
     <update id="updateCheck">
         update t_cruise_result a <set>
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="checkUserName != null and checkUserName != ''">a.check_user = #{checkUserName, jdbcType=VARCHAR},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP}
     </set>

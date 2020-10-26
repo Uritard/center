@@ -23,6 +23,8 @@ import java.util.Map;
 public class CruiseManualReview {
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "巡视点数据id")
+    private Long cruiseDataId;
     @ApiModelProperty(value = "巡检任务id")
     private String taskResultId;
     @ApiModelProperty(value = "巡检任务id")

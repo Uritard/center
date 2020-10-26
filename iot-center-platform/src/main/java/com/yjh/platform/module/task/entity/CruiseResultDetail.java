@@ -18,11 +18,15 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "CruiseResultDetail对象", description = "巡视点结果详情")
-public class                CruiseResultDetail {
+public class CruiseResultDetail {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "实物编码")
     private String realCode;
+    @ApiModelProperty(value = "巡视点数据id")
+    private Long cruiseDataId;
+    @ApiModelProperty(value = "巡视任务结果id")
+    private String cruiseResultId;
     @ApiModelProperty(value = "巡检任务id")
     private String taskId;
 
