@@ -111,7 +111,7 @@
         a.is_ai,
         b.dict_note
         from t_algorithm_info a
-        LEFT JOIN t_dict_business b ON b.dict_code = a.analyse_type and b.col_name = "analyse_type"
+        LEFT JOIN t_dict_business b ON b.dict_code = a.analyse_type and (b.col_name = "analyse_type" or b.col_name ="defect_type")
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
         <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
