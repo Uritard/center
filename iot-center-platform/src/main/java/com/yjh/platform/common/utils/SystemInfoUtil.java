@@ -23,7 +23,7 @@ public class SystemInfoUtil {
         public List<Map<String,String>> getCpuUsage() throws Exception {
             List<Map<String,String>> result = new ArrayList<>();
             Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec("top -b -n 1");// 调用系统的“top"命令
+            Process p = rt.exec("top -n 1");// 调用系统的“top"命令
             BufferedReader in = null;
             try {
                 in = new BufferedReader(new InputStreamReader(p.getInputStream()));

@@ -116,6 +116,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseResult.setCreateTime(date);
                 tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
                 tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
+
                 log.info("开始巡检"+new Date());
                 for (TCruisePointInstance item : instancesList) {
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -123,7 +124,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTaskResultDetail.setTaskResultId(uuid);
                     tCruiseTaskResultDetail.setDeviceId(item.getDeviceId());
                     tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
-                    tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
+                    //tCruiseTaskResultDetail.setCruiseTime(new Date());
+                    String cruiseTime = simpleDateFormat.format(new Date());
                     tCruiseTaskResultDetail.setCruiseStatus(252);
 
                     TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
@@ -183,7 +185,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                     }
                     if (232 == item.getCruiseType()) {//todo scala
                     }
-                    tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
                     Map map = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                     String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
                     Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
@@ -191,6 +192,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                     map.put("taskId",taskId);
                     map.put("startTime",simpleDateFormat.format(date));
                     map.put("if_run",tCruiseTask.getIfRun().toString());
+                    map.put("endTime",simpleDateFormat.format(new Date()));
+                    map.put("cruiseTime",cruiseTime);
+
                     redisTemplate.opsForHash().putAll(str, map);
                 }
                 //任务结束生成结果，

@@ -1,26 +1,35 @@
 package com.yjh.accessvideo.netty.client;
 
+
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Sets;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
-import com.yjh.accessvideo.module.device.entity.TStdDevicemete;
-import com.yjh.accessvideo.module.device.entity.TWarnInfo;
+import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.module.device.service.AnalysisService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.yjh.accessvideo.common.Constant.TYPET3;
+import static com.yjh.accessvideo.common.Constant.instanceIds;
 
 /**
  * Created by tt on 2019/7/31.
@@ -49,11 +58,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         this.ctx = ctx;
         isThreadStart = true;
         //启动心跳检测
-        HeartBeatThread heartBeatThread = new HeartBeatThread(this, true);
+//        HeartBeatThread heartBeatThread = new HeartBeatThread(this, true);
         //new Thread(dataDealThread).start();
-        Thread thread = new Thread(heartBeatThread);
-        thread.setDaemon(true);
-        thread.start();
+//        Thread thread = new Thread(heartBeatThread);
+//        thread.setDaemon(true);
+//        thread.start();
         String remoteAdds = ctx.channel().remoteAddress().toString();
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));
         if (analysisClientHandlerHashMap.get(remotePort) == null) { analysisClientHandlerHashMap.put(remotePort, this); }
@@ -89,95 +98,176 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         ReferenceCountUtil.release(byteBuf);
     }
 
-    private void handlerData(String body) {
-        while (body.length()>0) {
-            //TODO 具体转化逻辑
-            JSONObject jsonObject= JSON.parseObject(body);//全量返回结果集
-            String data=jsonObject.get("Data").toString();
-            JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
+    private void handlerData(String body) throws ParseException {
+        //TODO 具体转化逻辑
+        JSONObject jsonObject=JSON.parseObject(body);
+        log.info("JSON对象1："+jsonObject);
+        switch (jsonObject.get("msgType").toString()){
+            case "2":
+                String data=jsonObject.get("data").toString();
+                JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
+                log.info("原生数据****："+jsonObjectData);
+                Iterator iterator=jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
+                while (iterator.hasNext()){
+                    Map.Entry entry=(Map.Entry)iterator.next();
+                    //遍历每一个结果子集
+                    JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());
+                    String analyseType=jsonObjectResult.get("analyseType").toString();
+                    log.info("数据****："+jsonObjectResult);//打印resultInfo
 
-            Iterator iterator=jsonObjectData.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry entry=(Map.Entry)iterator.next();
-                JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());//遍历每一个结果子集
-                String analyseType=jsonObjectResult.get("analyseType").toString();
-                log.info("数据：",jsonObjectResult);//打印resultInfo
-                Map analyseResult=new HashMap();
-                analyseResult.put("taskId",jsonObjectResult.get("taskId"));
-                analyseResult.put("instanceId",jsonObjectResult.get("instanceId"));
-                analyseResult.put("analyseType",jsonObjectResult.get("analyseType"));
-                analyseResult.put("resultValue",jsonObjectResult.get("resultValue"));//获取到所有算法分析返回数据
-//                String name="analyseResult"+jsonObjectResult.get("instanceId").toString();
-//                redisTemplate.opsForHash().putAll(name,analyseResult); //数据放入缓存
 
-                String remoteAdds = ctx.channel().remoteAddress().toString();
-                int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
+                    //redis数据键名由taskId+instanceId命名
+                    // TODO: 2020/10/25 下任务时插redis库名需改
+                    String redisName=jsonObjectResult.get("taskId").toString()+jsonObjectResult.get("instanceId").toString();
+                    Map<String,Object> cruiseResult=redisTemplate.opsForHash().entries("t_cruise_task_result:"+redisName);//读redis
+                    Map<String,String> cruiseResultMap=new HashMap<>();//修改redis的巡检点结果map
+                    cruiseResultMap.put("resultNum",jsonObjectResult.get("resultValue").toString());
+                    cruiseResultMap.put("state",analyseDataOperateService.selectDictCode("data_state","正常"));
+                    redisTemplate.opsForHash().putAll("t_cruise_task_result:"+redisName,cruiseResultMap);//修改redis
+                    // TODO: 2020/10/25 webSocket通知前端调用巡视监控的接口
+                    //判断该任务下的巡视点是否均已执行完成
 
-                if(remotePort==13668){
-                    TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
-                    Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
-                    if(analyseDataOperateService.warnJudgement(resultValue,
-                            tStdDevicemete.getHighLimit1(),
-                            tStdDevicemete.getLowLimit1(),
-                            tStdDevicemete.getHighLimit2(),
-                            tStdDevicemete.getLowLimit2(),
-                            tStdDevicemete.getHighLimit3(),
-                            tStdDevicemete.getLowLimit3(),
-                            tStdDevicemete.getHighLimit4(),
-                            tStdDevicemete.getLowLimit4())){
-                        // TODO: 2020/10/20 组装TWarnInfo数据并插库
-                        TWarnInfo tWarnInfo=new TWarnInfo();
+                    //当前任务下所有的巡视点
+                    if(instanceIds.size()==0){
+                        for(TCruisePointInstance tCruisePointInstance1:analyseDataOperateService.selectCruiseByTask(jsonObjectResult.get("taskId").toString())){
+                            instanceIds.add(tCruisePointInstance1.getInstanceId().toString());
+                        }
+                    }
+                    instanceIds.remove(jsonObjectResult.get("instanceId"));//当一个巡视点有值时，从总巡视点集中删除
+                    //所有巡视点都有了结果
+                    if(instanceIds.size()==0){
+                        // TODO: 2020/10/25 修改任务状态为已完成
+                        Set<String> cruiseKeys=redisScan("t_cruise_task_result:"+(jsonObjectResult.get("taskId").toString()));
+                        for(String cruiseKey:cruiseKeys){
+                            Map<String,Object> cruiseWorkedMap=redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
+                            //创建四张结果表对象
+
+                            //TCR
+                            TCruiseResult tCruiseResult=analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseWorkedMap.get("taskResultId").toString());
+                            tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
+                            tCruiseResult.setTaskWait(0);
+                            analyseDataOperateService.updateCruiseResult(tCruiseResult);
+
+                            //TCTR
+                            // TODO: 2020/10/26 插表
+//                                TCruiseTaskResult tCruiseTaskResult=analyseDataOperateService.selectByPrimaryIdCruiseTaskResult(cruiseWorkedMap.get("taskResultId").toString());
+//                                tCruiseTaskResult.setTaskStatus(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
+//                                analyseDataOperateService.updateCruiseTaskResult(tCruiseTaskResult);
+
+                            TCruiseTaskResult tCruiseTaskResult=new TCruiseTaskResult();
+                            tCruiseTaskResult.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
+                            tCruiseTaskResult.setTaskId(cruiseWorkedMap.get("taskId").toString());
+//                                tCruiseTaskResult.setTaskAbnormal();
+//                                tCruiseTaskResult.getTaskAlarm();
+//                                tCruiseTaskResult.getRunExecute();//ifRun
+//                                tCruiseTaskResult.setCruiseTaskTime();
+                            analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+
+                            //TCTRD
+                            TCruiseTaskResultDetail tCruiseTaskResultDetail=new TCruiseTaskResultDetail();
+                            tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
+                            tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
+                            tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
+                            tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
+                            tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
+                            tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
+                            tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
+                            analyseDataOperateService.insertCruiseTaskResultDetail(tCruiseTaskResultDetail);
+
+                            //TCDR
+                            TCruiseDataResult tCruiseDataResult=new TCruiseDataResult();
+                            tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                            tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
+                            tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
+                            tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
+                            tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
+                            tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
+                            tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
+                            tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
+                            tCruiseDataResult.setIdentifyState(Integer.valueOf(cruiseWorkedMap.get("identifyState").toString()));
+                            tCruiseDataResult.setIdentifyResult(Integer.valueOf(cruiseWorkedMap.get("identifyResult").toString()));
+                            tCruiseDataResult.setCreatetime(new Date());
+                            tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
+                            analyseDataOperateService.insertCruiseDataResult(tCruiseDataResult);
+                        }
 
 
                     }
+
+
+
+                    //告警处理
+                    String remoteAdds = ctx.channel().remoteAddress().toString();
+                    int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
+                    //告警判断并组合数据插库
+                    switch (remotePort){
+                        //表计识别算法结果处理
+                        case 13668:
+                            TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                            TCruisePointInstance tCruisePointInstance=analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                            Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
+                            int warnRule=analyseDataOperateService.warnJudgement(resultValue,
+                                    tStdDevicemete.getHighLimit1(),
+                                    tStdDevicemete.getLowLimit1(),
+                                    tStdDevicemete.getHighLimit2(),
+                                    tStdDevicemete.getLowLimit2());
+                            if(warnRule>0){
+                                // TODO: 2020/10/20 组装TWarnInfo数据并插库
+                                TWarnInfo tWarnInfo=new TWarnInfo();
+                                tWarnInfo.setWarnLevel(tStdDevicemete.getAlarmLevel());
+                                tWarnInfo.setWarnTime(new Date());//时间尚未格式化
+                                tWarnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmType()));
+                                switch (warnRule){
+                                    case 1:
+                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"过高");
+                                        tWarnInfo.setOutRange(String.valueOf(resultValue-tStdDevicemete.getHighLimit1()));//实际量超出上下限的差值
+                                    case 2:
+                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"过低");
+                                        tWarnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit1()-resultValue));
+                                    case 3:
+                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"超高");
+                                        tWarnInfo.setOutRange(String.valueOf(resultValue-tStdDevicemete.getHighLimit2()));
+                                    case 4:
+                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"超低");
+                                        tWarnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit2()-resultValue));
+                                        break;
+                                }
+                                tWarnInfo.setWarnContent(tWarnInfo.getWarnName());
+                                tWarnInfo.setDeviceId(tCruisePointInstance.getDeviceId());//设备ID
+                                tWarnInfo.setCunstomId(tCruisePointInstance.getCustomId());//部位ID
+                                tWarnInfo.setInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));//巡视点ID
+                                tWarnInfo.setStdMeteId(tCruisePointInstance.getDeviceMeteId());//标准测点ID
+                                tWarnInfo.setConfMode(276);//未处理
+                                switch (tCruisePointInstance.getCruiseTypeName()){
+                                    case("机器人"):
+                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","机器人")));//判断巡视点的巡视方式再决定
+                                    case ("视频"):
+                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","可见光")));//判断巡视点的巡视方式再决定
+                                    case ("红外"):
+                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","红外")));//判断巡视点的巡视方式再决定
+                                        break;
+                                }
+                                tWarnInfo.setDeviceCode(tCruisePointInstance.getDeviceCode());//设备编码
+//                        tWarnInfo.setImagePath();//该巡视点所拍摄的图片
+//                        tWarnInfo.setValue(jsonObjectResult.get("resultValue").toString());//resultValue
+//                        tWarnInfo.setLinkMessage();//若该巡视点属于联动任务，则赋值
+                                analyseDataOperateService.insertWarnInfo(tWarnInfo);//组装完成的告警信息插库
+
+                            }
+                            //缺陷识别算法结果处理
+                        case 13669:
+
+                            break;
+                    }
+
+
                 }
 
 
 
-
-
-
-//                switch (analyseType){
-//                    case "1":
-//                    case "2":
-//                    case "3":
-//                    case "4":
-//                    case "5":
-//                    case "6":
-//                    case "7":
-//                    case "8":
-//                    case "9":
-//                    case "10":
-//                    case "11":
-//                    case "12":
-//                    case "13":
-//                    case "14":
-//                    case "15":
-//                    case "16":
-//                    case "17":
-//                    case "18":
-//                    case "19":
-//                    case "20":
-//                    case "21":
-//                    case "22":
-//                    case "23":
-//                    case "24":
-//                    case "25":
-//                    case "26":
-//                    case "27":
-//
-//                        break;
-//                    default:
-//                        log.info("");
-//
-//
-//                }
-
-            }
-
-
         }
-
     }
 
     public void ProcSend() {
@@ -226,6 +316,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         // 发送json字符串
         String registerMsg = "{\n\"msgType\": \"3\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\",\n\"registerKey\": \"yijiahe\"\n}\n}\n";
         sendString(ctx, registerMsg);
+        // TODO: 2020/10/22
+        //  String registerMsg = "发送假数据";
+        //        sendString(ctx, registerMsg);
     }
 
     private void SendHeartBeat(ChannelHandlerContext ctx) {
@@ -236,6 +329,32 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     public void sendDataReguest(JSONObject analysisObject) {
         String msg = analysisObject.toString();
         sendString(ctx, msg);
+    }
+
+    //读批量redis
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
     }
 
 }

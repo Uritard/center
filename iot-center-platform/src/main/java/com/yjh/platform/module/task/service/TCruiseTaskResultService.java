@@ -151,8 +151,7 @@ public class TCruiseTaskResultService {
             String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
             if (TaskId.equals(value)) {
                 CruiseInspectResult cruiseInspectResult = new CruiseInspectResult();
-                //todo 增加websocket
-                cruiseInspectResult.setCruiseResultName(resultMap.get("cruiseResultName").toString());//巡检结果名称
+//                cruiseInspectResult.setCruiseResultName(resultMap.get("cruiseResultName").toString());//巡检结果名称
                 cruiseInspectResult.setInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));//instanceId
                 cruiseInspectResult.setDeviceId(Long.valueOf(resultMap.get("deviceId").toString()));//设备ID
                 TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(Long.valueOf(resultMap.get("deviceId").toString()));
@@ -162,13 +161,12 @@ public class TCruiseTaskResultService {
                 CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
                 cruiseInspectResult.setCruiseType(cruiseTypeInfo.getCruiseType());//巡视方式
                 cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
+                cruiseInspectResult.setCruiseResult(resultMap.get("resultNum").toString());//巡检结果
                 //Integer和Date类型判空
-                if (resultMap.get("cruiseResult").equals("") && resultMap.get("endTime").equals("")) {
-                    cruiseInspectResult.setCruiseResult(null);
+                if (resultMap.get("endTime").equals("")) {
                     cruiseInspectResult.setEndTime(null);
                 } else {
-                    // TODO: 2020/10/9 巡视结果是否为该巡视点完成后采集到的数据
-                    cruiseInspectResult.setCruiseResult(Integer.valueOf(resultMap.get("cruiseResult").toString()));//巡检结果
+//                    // TODO: 2020/10/9 巡视结果是否为该巡视点完成后采集到的数据
                     cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));//巡检时间
                 }
 
@@ -210,7 +208,11 @@ public class TCruiseTaskResultService {
             }
         }
         Map<String, Float> Rate = new HashMap<>();
-        Rate.put("rate", cruiseComCount / cruiseCount);
+        if(cruiseComCount==0 || cruiseComCount==0){
+            Rate.put("rate",Float.valueOf("0"));
+        }else {
+            Rate.put("rate", cruiseComCount / cruiseCount);
+        }
         return Rate;
     }
 
@@ -245,7 +247,7 @@ public class TCruiseTaskResultService {
         }
 
         //计算运行时间
-        Set<String> keyResult1 = redisScan("TaskExcutedTime*");
+        Set<String> keyResult1 = redisScan("t_cruise_task_result*");
         String startTime = "yyyy-mm-dd HH:mm:ss";
         //获取任务开始时间
         for (String keys : keyResult1) {
@@ -254,7 +256,7 @@ public class TCruiseTaskResultService {
             String value = (mapResult.get("taskId")).toString();
             String TaskId = taskId.toString();
             if (TaskId.equals(value)) {
-                startTime = mapResult.get("excutedTime").toString();
+                startTime = mapResult.get("startTime").toString();
             }
 
         }

@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.module.device.service;
 
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.commons.logs.Logs;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Random;
 
 /**
 * @author tt
@@ -25,7 +27,8 @@ public class AnalysisService {
         JSONObject msgDataObject = new JSONObject();
         JSONObject pictureInfo = new JSONObject();
 //        JSONArray pictureInfoArray = new JSONArray();
-        analysisObject.put("msgID", "123567");
+
+        analysisObject.put("msgID", "123456789");
         analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
@@ -34,7 +37,7 @@ public class AnalysisService {
             if (analysis.getIsAi()==0) {
                 JSONObject pictureInfoObject = new JSONObject();
                 JSONObject pictureDataObject = new JSONObject();
-                pictureDataObject.put("anlyseType", analysis.getAnalyseType());
+                pictureDataObject.put("analyseType", analysis.getAnalyseType());
                 pictureDataObject.put("imagePath", analysis.getPicPath());
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
                 pictureDataObject.put("taskId", analysis.getTaskId());
@@ -66,7 +69,7 @@ public class AnalysisService {
             if (analysis.getIsAi()==1) {
                 JSONObject pictureDataObject = new JSONObject();
                 JSONObject pictureInfoObject = new JSONObject();
-                pictureDataObject.put("anlyseType", analysis.getAnalyseType());
+                pictureDataObject.put("analyseType", analysis.getAnalyseType());
                 pictureDataObject.put("imagePath", analysis.getPicPath());
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
                 pictureDataObject.put("taskId", analysis.getTaskId());

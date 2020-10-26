@@ -90,8 +90,10 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "视频地址")
     private String videoPath;
 
+    @ApiModelProperty(value = "实际表计识别值")
     private String value;
 
+    @ApiModelProperty(value = "预警值超限差值")
     private String outRange;
 
     @ApiModelProperty(value = "联动信息")

@@ -1,6 +1,8 @@
 package com.yjh.accessvideo.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Constant {
@@ -15,4 +17,6 @@ public class Constant {
     public static final byte TYPET3 = 0x03;
 
     public static String sdkPath;//sdk路径
+
+    public static List<String> instanceIds=new ArrayList<>();
 }

@@ -39,28 +39,35 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.batchInsertVideoAnalyseResult(list);
     }
 
-    @Logs(title = "任务结果信息插入", code = "Analysis")
-    @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseResult(TCruiseResult tCruiseResult) {
-        return this.analyseDataOperateDao.insertCruiseResult(tCruiseResult);
+    @Logs(title = "巡视任务结果单查",code = "Analysis")
+    @Transactional(rollbackFor =Exception.class)
+    public TCruiseResult selectByPrimaryIdCruiseResult(String taskResultId){
+        return this.analyseDataOperateDao.selectByPrimaryIdCruiseResult(taskResultId);
     }
 
-    @Logs(title = "任务结果信息批量插入", code = "Analysis")
+    @Logs(title = "巡视任务结果修改",code = "")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertCruiseResult(List<TCruiseResult> list) {
-        return this.analyseDataOperateDao.batchInsertCruiseResult(list);
+    public int updateCruiseResult(TCruiseResult tCruiseResult){
+        return this.analyseDataOperateDao.updateCruiseResult(tCruiseResult);
     }
 
-    @Logs(title = "巡视点-任务结果信息插入", code = "Analysis")
+
+    @Logs(title = "任务-巡视点状态结果单查",code = "")
     @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
+    public TCruiseTaskResult selectByPrimaryIdCruiseTaskResult(String taskResultId){
+        return this.analyseDataOperateDao.selectByPrimaryIdCruiseTaskResult(taskResultId);
+    }
+
+    @Logs(title ="任务-巡视点状态结构更新",code = "")
+    @Transactional(rollbackFor = Exception.class)
+    public int updateCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
+        return this.analyseDataOperateDao.updateCruiseTaskResult(tCruiseTaskResult);
+    }
+
+    @Logs(title = "任务-巡视点状态结构新增插入",code = "")
+    @Transactional(rollbackFor = Exception.class)
+    public int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
         return this.analyseDataOperateDao.insertCruiseTaskResult(tCruiseTaskResult);
-    }
-
-    @Logs(title = "巡视点-任务结果信息批量插入", code = "Analysis")
-    @Transactional(rollbackFor = Exception.class)
-    public int batchInsertCruiseTaskResult(List<TCruiseTaskResult> list) {
-        return this.analyseDataOperateDao.batchInsertCruiseTaskResult(list);
     }
 
     @Logs(title = "巡视点详细结果信息插入", code = "Analysis")
@@ -99,27 +106,42 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.selectDeviceMeteByInstanceId(instanceId);
     }
 
+    @Logs(title = "根据巡视点ID查询巡视点信息",code = "Analysis")
+    @Transactional(rollbackFor = Exception.class)
+    public TCruisePointInstance selectPointInstance(Long instanceId){
+        return  this.analyseDataOperateDao.selectPointInstance(instanceId);
+    }
+
+    @Logs(title = "查询字典码",code = "Analysis")
+    @Transactional(rollbackFor = Exception.class)
+    public String selectDictCode(String colName,String dictNote){
+        return this.analyseDataOperateDao.selectDictCode(colName,dictNote);
+    }
+
+    @Logs(title = "查询任务下所有巡视点",code = "Analysis")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruisePointInstance> selectCruiseByTask(String taskId){
+        return this.analyseDataOperateDao.selectCruiseByTaskId(taskId);
+    }
+
     @Logs(title = "告警判断", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public boolean warnJudgement(Float value,
+    public int warnJudgement(Float value,
                                  Float highLimit1,
                                  Float lowLimit1,
                                  Float highLimit2,
-                                 Float lowLimit2,
-                                 Float highLimit3,
-                                 Float lowLimit3,
-                                 Float highLimit4,
-                                 Float lowLimit4) {
-        if (value > highLimit1 || value < lowLimit1) {
-            return true;
-        } else if (value > highLimit2 || value < lowLimit2) {
-            return true;
-        } else if (value > highLimit3 || value < lowLimit3) {
-            return true;
-        } else if (value > highLimit4 || value < lowLimit4) {
-            return true;
-        }
-        return false;
+                                 Float lowLimit2) {
+        if(value>highLimit1 && value<highLimit2){
+            return 1; //过高
+        }else if(value<lowLimit1 && value>lowLimit2){
+            return 2; //过低
+        }else if(value>highLimit2){
+            return 3; //超高
+        }else if (value<lowLimit2){
+            return 4; //超低
+        }else
+            return 0;
+
     }
 
 }

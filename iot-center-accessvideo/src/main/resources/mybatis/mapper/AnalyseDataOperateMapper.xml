@@ -139,6 +139,15 @@
         <result column="remark" jdbcType="VARCHAR" property="remark" />
     </resultMap>
 
+    <resultMap id="cruisePointInstanceInfo" type="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
+        <id column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
+    </resultMap>
+
 
 
 
@@ -259,6 +268,7 @@
     </insert>
 
 
+
     <insert id="insertVideoAnalyseResult" useGeneratedKeys="true" keyProperty="algorithmResultId" parameterType="com.yjh.accessvideo.module.device.entity.TVideoAnalyseResult">
         insert into t_video_analyse_result(
             algorithm_result_id,
@@ -312,80 +322,54 @@
     </insert>
 
 
-    <insert id="insertCruiseResult" useGeneratedKeys="true" keyProperty="taskResultId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseResult">
-        insert into t_cruise_result(
-            task_result_id,
-            task_id,
-            area_id,
-            c_type,
-            c_state,
-            modify_state,
-            task_count,
-            task_wait,
-            check_user,
-            check_date,
-            weather,
-            create_time,
-            execute_time,
-            task_code,
-            remark
-        )values(
-                #{taskResultId, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR},
-                #{areaId, jdbcType=VARCHAR},
-                #{cType, jdbcType=INTEGER},
-                #{cState, jdbcType=INTEGER},
-                #{modifyState, jdbcType=INTEGER},
-                #{taskCount, jdbcType=INTEGER},
-                #{taskWait, jdbcType=INTEGER},
-                #{checkUser, jdbcType=VARCHAR},
-                #{checkDate, jdbcType=TIMESTAMP},
-                #{weather, jdbcType=VARCHAR},
-                #{createTime, jdbcType=TIMESTAMP},
-                #{executeTime, jdbcType=TIMESTAMP},
-                #{taskCode, jdbcType=VARCHAR},
-                #{remark, jdbcType=VARCHAR}
-        )
-    </insert>
 
-    <insert id="batchInsertCruiseResult">
-        insert into t_cruise_result(
-        task_result_id,
-        task_id,
-        area_id,
-        c_type,
-        c_state,
-        modify_state,
-        task_count,
-        task_wait,
-        check_user,
-        check_date,
-        weather,
-        create_time,
-        execute_time,
-        task_code,
-        remark
-        )values
-        <foreach collection="list" item="TCruiseResult" separator=",">
-            (
-            #{TCruiseResult.taskResultId, jdbcType=VARCHAR},
-            #{TCruiseResult.taskId, jdbcType=VARCHAR},
-            #{TCruiseResult.areaId, jdbcType=VARCHAR},
-            #{TCruiseResult.cType, jdbcType=INTEGER},
-            #{TCruiseResult.cState, jdbcType=INTEGER},
-            #{TCruiseResult.modifyState, jdbcType=INTEGER},
-            #{TCruiseResult.taskCount, jdbcType=INTEGER},
-            #{TCruiseResult.taskWait, jdbcType=INTEGER},
-            #{TCruiseResult.checkUser, jdbcType=VARCHAR},
-            #{TCruiseResult.checkDate, jdbcType=TIMESTAMP},
-            #{TCruiseResult.weather, jdbcType=VARCHAR},
-            #{TCruiseResult.createTime, jdbcType=TIMESTAMP},
-            #{TCruiseResult.executeTime, jdbcType=TIMESTAMP},
-            #{TCruiseResult.taskCode, jdbcType=VARCHAR},
-            #{TCruiseResult.remark, jdbcType=VARCHAR}
-            )
-        </foreach>
-    </insert>
+
+
+    <select id="selectByPrimaryIdCruiseResult" parameterType="java.lang.String" resultType="com.yjh.accessvideo.module.device.entity.TCruiseResult">
+        select
+        a.task_result_id,
+        a.task_id,
+        a.area_id,
+        a.c_type,
+        a.c_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.execute_time,
+        a.task_code,
+        a.remark
+        from t_cruise_result a
+        where 1 = 1
+            and a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+
+
+    <update id="updateCruiseResult" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseResult">
+        update t_cruise_result a <set>
+        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
+        <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
+        <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+        <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+        <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
+        a.create_time = #{createTime, jdbcType=TIMESTAMP},
+        a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
+        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+    </update>
 
     <insert id="insertCruiseTaskResult" useGeneratedKeys="true" keyProperty="taskResultId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResult">
         insert into t_cruise_task_result(
@@ -411,32 +395,44 @@
         )
     </insert>
 
-    <insert id="batchInsertCruiseTaskResult">
-        insert into t_cruise_task_result(
-        task_result_id,
-        task_id,
-        task_abnormal,
-        task_alarm,
-        run_execute,
-        cruise_task_time,
-        task_status,
-        cruise_result,
-        remark
-        )values
-        <foreach collection="list" item="TCruiseTaskResult" separator=",">
-            (
-            #{TCruiseTaskResult.taskResultId, jdbcType=VARCHAR},
-            #{TCruiseTaskResult.taskId, jdbcType=VARCHAR},
-            #{TCruiseTaskResult.taskAbnormal, jdbcType=INTEGER},
-            #{TCruiseTaskResult.taskAlarm, jdbcType=INTEGER},
-            #{TCruiseTaskResult.runExecute, jdbcType=VARCHAR},
-            #{TCruiseTaskResult.cruiseTaskTime, jdbcType=TIMESTAMP},
-            #{TCruiseTaskResult.taskStatus, jdbcType=INTEGER},
-            #{TCruiseTaskResult.cruiseResult, jdbcType=INTEGER},
-            #{TCruiseTaskResult.remark, jdbcType=VARCHAR}
-            )
-        </foreach>
-    </insert>
+
+
+    <select id="selectByPrimaryIdCruiseTaskResult" parameterType="java.lang.String" resultType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResult">
+        select
+        a.task_result_id,
+        a.task_id,
+        a.task_abnormal,
+        a.task_alarm,
+        a.run_execute,
+        a.cruise_task_time,
+        a.task_status,
+        a.cruise_result,
+        a.remark
+        from t_cruise_task_result a
+        where 1 = 1
+            and a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+
+    <update id="updateCruiseTaskResult" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResult">
+        update t_cruise_task_result a <set>
+        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
+        <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
+        a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},
+        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+    </update>
+
+
+
+
 
     <insert id="insertCruiseTaskResultDetail" useGeneratedKeys="true" keyProperty="cruiseResultId" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResultDetail">
         insert into t_cruise_task_result_detail(
@@ -652,4 +648,43 @@
         on b.device_mete_id=a.device_mete_id
         where b.instance_id=#{instanceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectPointInstance" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
+      SELECT
+        a.instance_id,
+        a.device_id,
+        b.device_code,
+        a.custom_id,
+        a.device_mete_id,
+        a.cruise_type,
+        c.dict_note AS 'cruiseTypeName'
+        FROM
+        t_cruise_point_instance a LEFT JOIN t_std_device b
+        ON a.device_id=b.device_id
+        LEFT JOIN t_dict_business c ON a.cruise_type=c.dict_code
+        WHERE a.instance_id=#{instanceId,jdbcType=BIGINT}
+
+    </select>
+    
+    <select id="selectDictCode"  resultType="java.lang.String">
+       SELECT
+	    dict_code
+       FROM
+	   t_dict_business
+       WHERE
+	   col_name = #{colName,jdbcType=VARCHAR}
+      AND dict_note = #{dictNote,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCruiseByTaskId" parameterType="java.lang.String" resultType="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
+        SELECT
+	       b.instance_id
+        FROM
+	       t_cruise_task a
+        LEFT JOIN t_cruise_plan_attr b ON a.plan_id = b.plan_id
+        WHERE
+	        a.task_id =#{taskId,jdbcType=VARCHAR}
+    </select>
+
+
 </mapper>

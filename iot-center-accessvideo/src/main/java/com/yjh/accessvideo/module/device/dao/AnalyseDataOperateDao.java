@@ -15,11 +15,12 @@ public interface AnalyseDataOperateDao {
     int insertVideoAnalyseResult(TVideoAnalyseResult tVideoAnalyseResult);
     int batchInsertVideoAnalyseResult(List<TVideoAnalyseResult> list);
 
-    int insertCruiseResult(TCruiseResult tCruiseResult);
-    int batchInsertCruiseResult(List<TCruiseResult> list);
+    TCruiseResult selectByPrimaryIdCruiseResult(@Param(value = "taskResultId")String taskResultId);
+    int updateCruiseResult(TCruiseResult tCruiseResult);
 
+    TCruiseTaskResult selectByPrimaryIdCruiseTaskResult(@Param(value = "taskResultId")String taskResultId);
+    int updateCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
     int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
-    int batchInsertCruiseTaskResult(List<TCruiseTaskResult> list);
 
     int insertCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail);
     int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> list);
@@ -29,6 +30,10 @@ public interface AnalyseDataOperateDao {
 
     TStdDevicemete selectByPrimaryIdDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
     TStdDevicemete selectDeviceMeteByInstanceId(@Param(value = "instanceId")Long instanceId);
+
+    TCruisePointInstance selectPointInstance(@Param(value = "instanceId")Long instanceId);
+    String selectDictCode(@Param(value = "colName")String colName,@Param(value = "dictNote")String dictNote);
+    List<TCruisePointInstance> selectCruiseByTaskId(@Param(value = "taskId")String taskId);
 
 
 }
