@@ -537,7 +537,7 @@
                 LEFT JOIN t_cruise_data_result e ON d.cruise_result_id = e.cruise_result_id
             ) ON c.instance_id = d.instance_id
             ORDER BY
-                d.end_time DESC
+                d.end_time,b.device_id,b.device_mete_id DESC
     </select>
 
     <select id="selectDeviceMeteByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
@@ -562,7 +562,7 @@
             WHERE
                 b.device_id = #{deviceId,jdbcType=BIGINT}
             ORDER BY
-                d.end_time DESC
+                d.end_time,d.device_id,b.device_mete_id DESC
 
     </select>
 
