@@ -133,6 +133,7 @@ public class RunAtNowTask implements Runnable{
     @Override
     public void run() {
         try {
+            Thread.sleep(5000);
             String taskId = tCruiseTask.getTaskId();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
             String taskDate = simpleDateFormat.format(tCruiseTask.getStartTime());

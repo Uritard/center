@@ -110,7 +110,6 @@ public class TCruiseTaskService {
         this.tCruiseTaskDao.insert(tCruiseTask);
         this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
         //开启定时任务
-        Constant.taskId = tCruiseTask.getTaskId();
         QuartzTask quartzTask = new QuartzTask();
         quartzTask.setJobName(tCruiseTask.getTaskName());
         quartzTask.setJobGroup("qh111");
