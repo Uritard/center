@@ -204,6 +204,8 @@
         a.task_id,
         b.device_id,
         d.device_name,
+        g.cruise_data_id,
+        g.cruise_result_id,
         b.instance_id,
         e.cruise_id,
         e.custom_id,
@@ -250,8 +252,7 @@
         <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
         <if test="state != null and state != -1 "> and g.state = #{state, jdbcType=INTEGER}</if>
-
-
+        ORDER BY cruise_time DESC
     </select>
 
     <insert id="batchInsert">

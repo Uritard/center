@@ -483,6 +483,36 @@
         ORDER BY dict_code
     </select>
     <!--统计本月内的告警数-->
+    <select id="countWarnOnMonth1" resultType="com.yjh.platform.module.task.entity.TutHistoryStatistical">
+        SELECT
+        DATE_FORMAT( warn_time, '%Y-%m-%d' ) as time_node,
+        count( * ) as count
+        FROM
+        (
+        select
+        a.warn_time
+        from t_warn_info a
+        where 1=1
+
+        union all(
+        select
+        f.alarm_time
+        from t_robot_alarm f
+        where 1=1
+
+        )union all(
+        select
+        h.alarm_time
+        from  t_camera_alarm h
+        where 1=1
+        )
+        ) AS Time
+        WHERE
+        period_diff( date_format( now( ) , '%Y-%m-%d' ) , date_format( warn_time, '%Y-%m-%d' ) ) =0
+        and DATE_FORMAT( warn_time, '%Y-%m-%d' ) BETWEEN #{firstTime8} and #{firstTime1}
+        GROUP BY
+        time_node
+    </select>
     <select id="countWarnOnMonth"  resultType="java.util.Map">
         SELECT
             (A.counts+H.counts+O.counts) AS #{firstTime2},

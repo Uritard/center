@@ -665,7 +665,9 @@ public class DateTimeUtil {
         calendar.set(Calendar.SECOND, 0);
         calendar.add(calendar.DATE,1);
         Date zero = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
         // 定义日期实例
         GregorianCalendar gc =new GregorianCalendar();
         // 设置日期起始时间
