@@ -126,7 +126,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
                     //tCruiseTaskResultDetail.setCruiseTime(new Date());
                     String cruiseTime = simpleDateFormat.format(new Date());
-                    tCruiseTaskResultDetail.setCruiseStatus(252);
+                    tCruiseTaskResultDetail.setCruiseStatus(253);
 
                     TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                     tCruiseDataResult.setCruiseResultId(uuid+item.getInstanceId().toString());

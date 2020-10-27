@@ -6,6 +6,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -33,19 +34,18 @@ import java.util.*;
  */
 public class RunAtNowTask implements Runnable{
 
-    @Autowired
-    RedisTemplate redisTemplate;
-    @Autowired
+
+    private RedisTemplate redisTemplate;
+
     private TCruisePointInstanceDao tCruisePointInstanceDao;
-    @Autowired
+
     private TCameraPresetDao tCameraPresetDao;
-    @Autowired
+
     private TCruiseResultDao tCruiseResultDao;
-    @Autowired
+
     private TAlgorithmConfDao tAlgorithmConfDao;
-    @Autowired
     private TAlgorithmInfoDao tAlgorithmInfoDao;
-    @Autowired
+
     private TCruiseTaskAttrDao tCruiseTaskAttrDao;
 
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
@@ -59,15 +59,24 @@ public class RunAtNowTask implements Runnable{
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     //模板图片路径
-    @Value("${spring.picModelPath.dir}")
     private String picModelPath;
     //等待相机转到预置位时间
-    @Value("${spring.move.waitTime}")
     private Long waitTime;
 
     private TCruiseTask tCruiseTask;
-    public RunAtNowTask(TCruiseTask tCruiseTask) {
+    public RunAtNowTask(TCruiseTask tCruiseTask,Long waitTime ,String picModelPath,RedisTemplate redisTemplate,TCruisePointInstanceDao tCruisePointInstanceDao,
+                        TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
+                        TAlgorithmInfoDao tAlgorithmInfoDao,TCruiseTaskAttrDao tCruiseTaskAttrDao) {
         this.tCruiseTask = tCruiseTask;
+        this.waitTime = waitTime;
+        this.picModelPath = picModelPath;
+        this.redisTemplate = redisTemplate;
+        this.tCruisePointInstanceDao = tCruisePointInstanceDao;
+        this.tCameraPresetDao = tCameraPresetDao;
+        this.tCruiseResultDao = tCruiseResultDao;
+        this.tAlgorithmConfDao =tAlgorithmConfDao;
+        this.tAlgorithmInfoDao =tAlgorithmInfoDao;
+        this.tCruiseTaskAttrDao = tCruiseTaskAttrDao;
     }
 
     //相机抓图
@@ -167,7 +176,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
                 //tCruiseTaskResultDetail.setCruiseTime(new Date());
                 String cruiseTime = simpleDateFormat.format(new Date());
-                tCruiseTaskResultDetail.setCruiseStatus(252);
+                tCruiseTaskResultDetail.setCruiseStatus(253);
 
                 TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                 tCruiseDataResult.setCruiseResultId(uuid+item.getInstanceId().toString());

@@ -57,6 +57,24 @@ public class TCruiseTaskService {
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TCruiseTaskDelDao tCruiseTaskDelDao;
+    @Autowired
+    RedisTemplate redisTemplate;
+    @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private  TCameraPresetDao tCameraPresetDao;
+    @Autowired
+    private TCruiseResultDao tCruiseResultDao;
+    @Autowired
+    private TAlgorithmConfDao tAlgorithmConfDao;
+    @Autowired
+    private TAlgorithmInfoDao tAlgorithmInfoDao;
+    //模板图片路径
+    @Value("${spring.picModelPath.dir}")
+    private String picModelPath;
+    //等待相机转到预置位时间
+    @Value("${spring.move.waitTime}")
+    private Long waitTime;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
@@ -100,7 +118,8 @@ public class TCruiseTaskService {
             if(tCruiseTask.getIfRun() == 173){
                 //立即执行
                 try {
-                    RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask);
+                    RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
+                            tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
