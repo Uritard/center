@@ -2,13 +2,16 @@ package com.yjh.accessvideo;
 
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.InetSocketAddress;
 
@@ -21,6 +24,10 @@ import java.net.InetSocketAddress;
 @Slf4j
 public class AccessVideoApplication implements CommandLineRunner {
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private AnalyseDataOperateService analyseDataOperateService;
     @Value("${nvr.server.ip}")
     private String m_sDeviceIP;//已登录设备的IP地址
     @Value("${nvr.server.username}")
@@ -66,7 +73,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         if (register()) {log.info("register success..");}
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2);
+        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService);
     }
 
     private boolean register() {

@@ -18,5 +18,5 @@ public class Constant {
 
     public static String sdkPath;//sdk路径
 
-    public static List<String> instanceIds=new ArrayList<>();
+    public static List<Long> instanceIds=new ArrayList<>();
 }

@@ -21,6 +21,7 @@ import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
+import com.yjh.platform.module.task.entity.CruiseInspectResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -161,7 +162,7 @@ public class TCruiseTaskResultService {
                 CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
                 cruiseInspectResult.setCruiseType(cruiseTypeInfo.getCruiseType());//巡视方式
                 cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
-                cruiseInspectResult.setCruiseResult(resultMap.get("resultNum").toString());//巡检结果
+                cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());//巡检结果
                 //Integer和Date类型判空
                 if (resultMap.get("endTime").equals("")) {
                     cruiseInspectResult.setEndTime(null);
