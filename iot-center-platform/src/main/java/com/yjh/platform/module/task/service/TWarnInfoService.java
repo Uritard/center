@@ -1,16 +1,12 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.module.task.dao.RobotAlarmDao;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.github.pagehelper.PageHelper;
 import com.yjh.platform.module.task.entity.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,42 +121,58 @@ public class TWarnInfoService{
         String firstTime7 = weekDates.get(6);
         String firstTime8 = weekDates.get(7);
 
-        Map<String, Integer> map1 = tWarnInfoDao.countWarnOnMonth(firstTime1, firstTime2, firstTime3, firstTime4,
-                firstTime5, firstTime6, firstTime7, firstTime8);
+        List<TutHistoryStatistical> list = tWarnInfoDao.countWarnOnMonth1(firstTime1,firstTime8);
+        System.out.println("<------------list------------>"+list);
+        System.out.println("<------------weekDates------------>"+weekDates);
+
+        for (int i = 0;i < weekDates.size();i++){
+            int flag = 0;
+            for (int j = 0;j < list.size();j++){
+                if (weekDates.get(i).equals(list.get(j).getTimeNode())){
+                    flag++;
+                }
+            }
+            if (flag == 0){
+                System.out.println("没有的时间是："+weekDates.get(i));
+
+            }
+        }
+//        Map<String, Integer> map1 = tWarnInfoDao.countWarnOnMonth(firstTime1, firstTime2, firstTime3, firstTime4,
+//                firstTime5, firstTime6, firstTime7, firstTime8);
         List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
 
-        Iterator<String> iter = map1.keySet().iterator();
-        while (iter.hasNext()) {
-            String key = iter.next();
-            String timeNode = key.substring(0, 10);
-            Number mapValue = (Number) map1.get(key);
-            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
-            tutHistoryStatistical.setTimeNode(timeNode);
-            tutHistoryStatistical.setCount(mapValue);
-            tutHistoryStatisticalList.add(tutHistoryStatistical);
-        }
-        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
-            @Override
-            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                Date date1 = null;
-                Date date2 = null;
-                try {
-                    date1 = simpleDateFormat.parse(o1.getTimeNode());
-                    date2 = simpleDateFormat.parse(o2.getTimeNode());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                int flag = date1.compareTo(date2);
-                if (flag == -1) {
-                    flag = -1;
-                } else if (flag == 1) {
-                    flag = 1;
-                }
-                return flag;
-            }
-        });
+//        Iterator<String> iter = map1.keySet().iterator();
+//        while (iter.hasNext()) {
+//            String key = iter.next();
+//            String timeNode = key.substring(0, 10);
+//            Number mapValue = (Number) map1.get(key);
+//            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
+//            tutHistoryStatistical.setTimeNode(timeNode);
+//            tutHistoryStatistical.setCount(mapValue);
+//            tutHistoryStatisticalList.add(tutHistoryStatistical);
+//        }
+//        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
+//            @Override
+//            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//
+//                Date date1 = null;
+//                Date date2 = null;
+//                try {
+//                    date1 = simpleDateFormat.parse(o1.getTimeNode());
+//                    date2 = simpleDateFormat.parse(o2.getTimeNode());
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//                int flag = date1.compareTo(date2);
+//                if (flag == -1) {
+//                    flag = -1;
+//                } else if (flag == 1) {
+//                    flag = 1;
+//                }
+//                return flag;
+//            }
+//        });
         return tutHistoryStatisticalList;
     }
     @Logs(title = "根据告警处理状态统计告警个数-饼图", code = "module")

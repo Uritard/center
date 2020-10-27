@@ -95,20 +95,15 @@ public class TCruiseResultService{
             sb.append(checkUser + ",");
         }
         String checkUserName = sb.toString().substring(0,sb.toString().length()-1);
-//        System.out.println("checkUserName是："+checkUserName);
         String taskResultId = cruiseManualReview.getTaskResultId();
-//        System.out.println("taskResultId是："+taskResultId);
         Date taskCheckDate =findLastDate(cruiseManualReviewList);
-//        System.out.println("checkDate："+taskCheckDate);
         //更新任务审核人以及审核时间
         int result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
-
         return result1+result2;
     }
     @Logs(title = "寻找离现在最近的时间", code = "module")
     public Date findLastDate(List<CruiseManualReview> list) {
         CruiseManualReview cruiseManualReview = new CruiseManualReview();
-
         Long dates[] = new Long[list.size()];
 
         for (int i = 0; i < list.size(); i++) {
@@ -116,13 +111,14 @@ public class TCruiseResultService{
             // 所以就依靠这个原理来判断距离现在最近的时间
             dates[i] = list.get(i).getCheckDate().getTime();
         }
-
         Long maxIndex = dates[0];// 定义最大值为该数组的第一个数
         for (int j = 0; j < dates.length; j++) {
             if (maxIndex < dates[j]) {
                 maxIndex = dates[j];
-                // 找到了这个j
                 cruiseManualReview = list.get(j);
+            } else {
+                // 找到了这个j
+                cruiseManualReview = list.get(0);
             }
         }
         return cruiseManualReview.getCheckDate();

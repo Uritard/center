@@ -92,12 +92,13 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         try {
             String body = new String(bytes, "UTF-8");
             log.info("接收服务端数据:"+body);
-            handlerData(body);
+            handlerData1(body);
         } catch (Exception e) { e.getMessage(); }
 
         ReferenceCountUtil.release(byteBuf);
     }
 
+<<<<<<< Updated upstream
     private void handlerData(String body) throws ParseException {
         //TODO 具体转化逻辑
         JSONObject jsonObject=JSON.parseObject(body);
@@ -192,6 +193,63 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
                             analyseDataOperateService.insertCruiseDataResult(tCruiseDataResult);
                         }
+=======
+//测试
+    public void handlerData1(String body){
+        while (body.length()>0){
+            JSONObject jsonObject= JSON.parseObject(body);
+            switch (jsonObject.get("msgType").toString()){
+                case "2":
+                    String data=jsonObject.get("data").toString();
+                    JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
+                    log.info("原生数据****："+jsonObjectData);
+
+
+                    break;
+            }
+        }
+
+    }
+
+    private void handlerData(String body) {
+        while (body.length()>0) {
+            //TODO 具体转化逻辑
+            JSONObject jsonObject= JSON.parseObject(body);//全量返回结果集
+            String data=jsonObject.get("Data").toString();
+            JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
+
+            Iterator iterator=jsonObjectData.entrySet().iterator();
+            while (iterator.hasNext()){
+                Map.Entry entry=(Map.Entry)iterator.next();
+                JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());//遍历每一个结果子集
+                String analyseType=jsonObjectResult.get("analyseType").toString();
+                log.info("数据：",jsonObjectResult);//打印resultInfo
+                Map analyseResult=new HashMap();
+                analyseResult.put("taskId",jsonObjectResult.get("taskId"));
+                analyseResult.put("instanceId",jsonObjectResult.get("instanceId"));
+                analyseResult.put("analyseType",jsonObjectResult.get("analyseType"));
+                analyseResult.put("resultValue",jsonObjectResult.get("resultValue"));//获取到所有算法分析返回数据
+//                String name="analyseResult"+jsonObjectResult.get("instanceId").toString();
+//                redisTemplate.opsForHash().putAll(name,analyseResult); //数据放入缓存
+
+                String remoteAdds = ctx.channel().remoteAddress().toString();
+                int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
+
+                if(remotePort==13668){
+                    TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                    Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
+                    if(analyseDataOperateService.warnJudgement(resultValue,
+                            tStdDevicemete.getHighLimit1(),
+                            tStdDevicemete.getLowLimit1(),
+                            tStdDevicemete.getHighLimit2(),
+                            tStdDevicemete.getLowLimit2(),
+                            tStdDevicemete.getHighLimit3(),
+                            tStdDevicemete.getLowLimit3(),
+                            tStdDevicemete.getHighLimit4(),
+                            tStdDevicemete.getLowLimit4())){
+                        // TODO: 2020/10/20 组装TWarnInfo数据并插库
+                        TWarnInfo tWarnInfo=new TWarnInfo();
+>>>>>>> Stashed changes
 
 
                     }
