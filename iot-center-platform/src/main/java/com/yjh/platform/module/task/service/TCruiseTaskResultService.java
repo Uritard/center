@@ -8,6 +8,7 @@ import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.task.controller.HelloController;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 
@@ -24,6 +25,8 @@ import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
 import com.yjh.platform.module.task.entity.CruiseInspectResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -66,7 +69,7 @@ public class TCruiseTaskResultService {
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
 
-
+    private Logger log = LoggerFactory.getLogger(HelloController.class);
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTaskResult tCruiseTaskResult) {
@@ -147,8 +150,8 @@ public class TCruiseTaskResultService {
         Set<String> keyResult = redisScan("t_cruise_task_result*");
         for (String key : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);//循环每个键名取相应的键值对数据
-            Object values = resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
-            String value = values.toString();
+
+            String value = resultMap.get("taskId").toString();//取出每条数据的key值为“taskId”的value值
             String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
             if (TaskId.equals(value)) {
                 CruiseInspectResult cruiseInspectResult = new CruiseInspectResult();
@@ -156,12 +159,25 @@ public class TCruiseTaskResultService {
                 cruiseInspectResult.setInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));//instanceId
                 cruiseInspectResult.setDeviceId(Long.valueOf(resultMap.get("deviceId").toString()));//设备ID
                 TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(Long.valueOf(resultMap.get("deviceId").toString()));
-                cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());//设备名称
+                if(tStdDevice.equals(null)){
+                    cruiseInspectResult.setDeviceName("");
+                }else {
+                    cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());//设备名称
+                }
                 // instanceName为表中的cruiseName
-                cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstancename(Long.valueOf(resultMap.get("cruiseId").toString())));//巡检点名称
+                if(tCruisePointInstanceDao.selectInstancename(Long.valueOf(resultMap.get("cruiseId").toString())).equals(null)){
+                    cruiseInspectResult.setInstanceName("");
+                }else {
+                    cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstancename(Long.valueOf(resultMap.get("cruiseId").toString())));//巡检点名称
+                }
                 CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
-                cruiseInspectResult.setCruiseType(cruiseTypeInfo.getCruiseType());//巡视方式
-                cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
+                if(cruiseTypeInfo.equals(null)){
+                    cruiseInspectResult.setCruiseType(null);
+                    cruiseInspectResult.setCruiseTypeName(null);
+                }else {
+                    cruiseInspectResult.setCruiseType(cruiseTypeInfo.getCruiseType());//巡视方式
+                    cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
+                }
                 cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());//巡检结果
                 //Integer和Date类型判空
                 if (resultMap.get("endTime").equals("")) {
@@ -175,7 +191,6 @@ public class TCruiseTaskResultService {
             }
 
         }
-
         return cruiseInspectResults;
     }
 
@@ -238,11 +253,23 @@ public class TCruiseTaskResultService {
             String TaskId = taskId.toString();
             Long a = Long.valueOf(resultMap.get("cruiseId").toString());
             if (TaskId.equals(value)) {
-                deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                if(tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)){
+                    deviceMete.add(null);
+                }else {
+                    deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                }
                 if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
-                    deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                    if(tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)){
+                        deviceMeteAbnormal.add(null);
+                    }else {
+                        deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                    }
                 } else if (resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) {
-                    deviceMeteNotComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                    if(tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)){
+                        deviceMeteNotComp.add(null);
+                    }else {
+                        deviceMeteNotComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                    }
                 }
             }
         }
