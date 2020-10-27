@@ -1,6 +1,7 @@
 package com.yjh.accessvideo.netty.client;
 
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -9,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -22,7 +24,7 @@ public class NettyClient {
 
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
 
-    public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2) throws InterruptedException{
+    public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService) throws InterruptedException{
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -32,11 +34,11 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new AnalysisClientChannelInitializer() {
+                    .handler(new AnalysisClientChannelInitializer(redisTemplate,analyseDataOperateService) {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
-                            p.addLast(new AnalysisClientHandler());
+                            p.addLast(new AnalysisClientHandler(redisTemplate,analyseDataOperateService));
                         }
                     });
 

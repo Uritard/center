@@ -5,7 +5,9 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
+import com.yjh.accessvideo.common.websocket.WebSocketServer;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
+import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.module.device.service.AnalysisService;
@@ -35,11 +37,12 @@ import static com.yjh.accessvideo.common.Constant.instanceIds;
  * Created by tt on 2019/7/31.
  */
 public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
-    @Autowired
     private  RedisTemplate redisTemplate;
-
-    @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
+    public AnalysisClientHandler (RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService) {
+        this.redisTemplate = redisTemplate;
+        this.analyseDataOperateService=analyseDataOperateService;
+    }
 
     private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
@@ -47,6 +50,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
+
+
 
     private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
     public static Map<Integer, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }
@@ -92,49 +97,69 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         try {
             String body = new String(bytes, "UTF-8");
             log.info("接收服务端数据:"+body);
-            handlerData1(body);
+            handlerData(body);
         } catch (Exception e) { e.getMessage(); }
 
         ReferenceCountUtil.release(byteBuf);
     }
 
-<<<<<<< Updated upstream
     private void handlerData(String body) throws ParseException {
         //TODO 具体转化逻辑
         JSONObject jsonObject=JSON.parseObject(body);
         log.info("JSON对象1："+jsonObject);
         switch (jsonObject.get("msgType").toString()){
             case "2":
-                String data=jsonObject.get("data").toString();
-                JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
+                JSONObject jsonObjectData=JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
                 log.info("原生数据****："+jsonObjectData);
                 Iterator iterator=jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
                 while (iterator.hasNext()){
                     Map.Entry entry=(Map.Entry)iterator.next();
                     //遍历每一个结果子集
                     JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());
-                    String analyseType=jsonObjectResult.get("analyseType").toString();
                     log.info("数据****："+jsonObjectResult);//打印resultInfo
-
+//                    String analyseType=jsonObjectResult.get("analyseType").toString();
+//                    log.info(analyseType);
+//                    String taskId=jsonObjectResult.get("taskId").toString();
+//                    log.info(taskId);
+//                    String resultValue1=jsonObjectResult.get("resultValue").toString();
+//                    log.info(resultValue1);
+//                    String instanceId=jsonObjectResult.get("instanceId").toString();
+//                    log.info(instanceId);
 
                     //redis数据键名由taskId+instanceId命名
                     // TODO: 2020/10/25 下任务时插redis库名需改
                     String redisName=jsonObjectResult.get("taskId").toString()+jsonObjectResult.get("instanceId").toString();
-                    Map<String,Object> cruiseResult=redisTemplate.opsForHash().entries("t_cruise_task_result:"+redisName);//读redis
+                    log.info("template:"+ redisTemplate);
+                    log.info("redisName:"+redisName);
+                    Map<String,Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:"+redisName);//读redis
+                    log.info("读取到的redis："+cruiseResult);
                     Map<String,String> cruiseResultMap=new HashMap<>();//修改redis的巡检点结果map
                     cruiseResultMap.put("resultNum",jsonObjectResult.get("resultValue").toString());
                     cruiseResultMap.put("state",analyseDataOperateService.selectDictCode("data_state","正常"));
+                    cruiseResultMap.put("cruiseStatus",analyseDataOperateService.selectDictCode("cruise_data_state","已执行"));
                     redisTemplate.opsForHash().putAll("t_cruise_task_result:"+redisName,cruiseResultMap);//修改redis
-                    // TODO: 2020/10/25 webSocket通知前端调用巡视监控的接口
+                    // webSocket通知前端调用巡视监控的接口
+                    Map<String,Object> jasonMap=new HashMap<>();
+                    jasonMap.put("type","newTask");
+                    jasonMap.put("taskId",cruiseResult.get("taskId").toString());
+                    String json=JSON.toJSONString(jasonMap);
+                    log.info("发送给前端的消息："+json);
+                    WebSocketServer.sendMsg(json);
+
+
+                    
+
                     //判断该任务下的巡视点是否均已执行完成
 
                     //当前任务下所有的巡视点
                     if(instanceIds.size()==0){
                         for(TCruisePointInstance tCruisePointInstance1:analyseDataOperateService.selectCruiseByTask(jsonObjectResult.get("taskId").toString())){
-                            instanceIds.add(tCruisePointInstance1.getInstanceId().toString());
+                            instanceIds.add(tCruisePointInstance1.getInstanceId());
                         }
                     }
-                    instanceIds.remove(jsonObjectResult.get("instanceId"));//当一个巡视点有值时，从总巡视点集中删除
+                    log.info("instanceIds:"+instanceIds);
+                    instanceIds.remove(Long.valueOf(jsonObjectResult.get("instanceId").toString()));//当一个巡视点有值时，从总巡视点集中删除
+                    log.info("instanceIds删除后:"+instanceIds);
                     //所有巡视点都有了结果
                     if(instanceIds.size()==0){
                         // TODO: 2020/10/25 修改任务状态为已完成
@@ -151,16 +176,13 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
                             //TCTR
                             // TODO: 2020/10/26 插表
-//                                TCruiseTaskResult tCruiseTaskResult=analyseDataOperateService.selectByPrimaryIdCruiseTaskResult(cruiseWorkedMap.get("taskResultId").toString());
-//                                tCruiseTaskResult.setTaskStatus(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
-//                                analyseDataOperateService.updateCruiseTaskResult(tCruiseTaskResult);
 
                             TCruiseTaskResult tCruiseTaskResult=new TCruiseTaskResult();
                             tCruiseTaskResult.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
                             tCruiseTaskResult.setTaskId(cruiseWorkedMap.get("taskId").toString());
 //                                tCruiseTaskResult.setTaskAbnormal();
 //                                tCruiseTaskResult.getTaskAlarm();
-//                                tCruiseTaskResult.getRunExecute();//ifRun
+                            tCruiseTaskResult.setRunExecute(cruiseWorkedMap.get("ifRun").toString());
 //                                tCruiseTaskResult.setCruiseTaskTime();
                             analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
 
@@ -193,64 +215,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
                             analyseDataOperateService.insertCruiseDataResult(tCruiseDataResult);
                         }
-=======
-//测试
-    public void handlerData1(String body){
-        while (body.length()>0){
-            JSONObject jsonObject= JSON.parseObject(body);
-            switch (jsonObject.get("msgType").toString()){
-                case "2":
-                    String data=jsonObject.get("data").toString();
-                    JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
-                    log.info("原生数据****："+jsonObjectData);
-
-
-                    break;
-            }
-        }
-
-    }
-
-    private void handlerData(String body) {
-        while (body.length()>0) {
-            //TODO 具体转化逻辑
-            JSONObject jsonObject= JSON.parseObject(body);//全量返回结果集
-            String data=jsonObject.get("Data").toString();
-            JSONObject jsonObjectData=JSON.parseObject(data);//全量数据结果集
-
-            Iterator iterator=jsonObjectData.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry entry=(Map.Entry)iterator.next();
-                JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());//遍历每一个结果子集
-                String analyseType=jsonObjectResult.get("analyseType").toString();
-                log.info("数据：",jsonObjectResult);//打印resultInfo
-                Map analyseResult=new HashMap();
-                analyseResult.put("taskId",jsonObjectResult.get("taskId"));
-                analyseResult.put("instanceId",jsonObjectResult.get("instanceId"));
-                analyseResult.put("analyseType",jsonObjectResult.get("analyseType"));
-                analyseResult.put("resultValue",jsonObjectResult.get("resultValue"));//获取到所有算法分析返回数据
-//                String name="analyseResult"+jsonObjectResult.get("instanceId").toString();
-//                redisTemplate.opsForHash().putAll(name,analyseResult); //数据放入缓存
-
-                String remoteAdds = ctx.channel().remoteAddress().toString();
-                int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
-
-                if(remotePort==13668){
-                    TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
-                    Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
-                    if(analyseDataOperateService.warnJudgement(resultValue,
-                            tStdDevicemete.getHighLimit1(),
-                            tStdDevicemete.getLowLimit1(),
-                            tStdDevicemete.getHighLimit2(),
-                            tStdDevicemete.getLowLimit2(),
-                            tStdDevicemete.getHighLimit3(),
-                            tStdDevicemete.getLowLimit3(),
-                            tStdDevicemete.getHighLimit4(),
-                            tStdDevicemete.getLowLimit4())){
-                        // TODO: 2020/10/20 组装TWarnInfo数据并插库
-                        TWarnInfo tWarnInfo=new TWarnInfo();
->>>>>>> Stashed changes
-
 
                     }
 
