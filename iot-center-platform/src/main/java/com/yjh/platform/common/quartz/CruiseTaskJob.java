@@ -63,10 +63,10 @@ public class CruiseTaskJob extends QuartzJobBean {
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     //模板图片路径
-    @Value("${picModelPath.dir}")
+    @Value("${spring.picModelPath.dir}")
     private String picModelPath;
     //等待相机转到预置位时间
-    @Value("${waitTime}")
+    @Value("${spring.move.waitTime}")
     private Long waitTime;
     /**
      * 巡视任务类

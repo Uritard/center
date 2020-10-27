@@ -50,11 +50,6 @@ public class HelloController {
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
 
-    @Value("${picModelPath.dir}")
-    private String picModelPath;
-    //等待相机转到预置位时间
-    @Value("${waitTime}")
-    private Long waitTime;
 
     @ApiOperation("说hello")
     @PostMapping("/admin")

@@ -69,7 +69,7 @@ public class JobManager {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error("OC Access DataQuery Job already exist");
+            logger.error(" Job already exist");
             return "false";
         }
         logger.info("dataUploadInterval :" + dataUploadInterval);
@@ -94,7 +94,7 @@ public class JobManager {
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
 
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error("OC Access DataQuery Job already exist");
+            logger.error(" Job already exist");
             return "false";
         }
 //        logger.info("dataUploadInterval :" + dataUploadInterval);
@@ -123,7 +123,7 @@ public class JobManager {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error("OC Access DataQuery Job already exist");
+            logger.error(" Job already exist");
             return "false";
         }
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
@@ -149,7 +149,7 @@ public class JobManager {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error("OC Access DataQuery Job already exist");
+            logger.error(" Job already exist");
             return "false";
         }
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
