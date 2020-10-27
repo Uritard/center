@@ -482,8 +482,8 @@
             )
         ORDER BY dict_code
     </select>
-    <!--统计本月内的告警数-->
-    <select id="countWarnOnMonth1" resultType="com.yjh.platform.module.task.entity.TutHistoryStatistical">
+    <!--统计近一月内的告警数-->
+    <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
         DATE_FORMAT( warn_time, '%Y-%m-%d' ) as time_node,
         count( * ) as count
@@ -508,45 +508,12 @@
         )
         ) AS Time
         WHERE
-        period_diff( date_format( now( ) , '%Y-%m-%d' ) , date_format( warn_time, '%Y-%m-%d' ) ) =0
-        and DATE_FORMAT( warn_time, '%Y-%m-%d' ) BETWEEN #{firstTime8} and #{firstTime1}
+        period_diff( date_format( now( ) , '%Y-%m-%d %H:%i:%S' ) , date_format( warn_time, '%Y-%m-%d %H:%i:%S' ) ) =0
+        and DATE_FORMAT( warn_time, '%Y-%m-%d %H:%i:%S' ) BETWEEN #{startTime} and #{endTime}
         GROUP BY
         time_node
     </select>
-    <select id="countWarnOnMonth"  resultType="java.util.Map">
-        SELECT
-            (A.counts+H.counts+O.counts) AS #{firstTime2},
-            (B.counts+I.counts+P.counts) AS #{firstTime3},
-            (V.counts+J.counts+Q.counts) AS #{firstTime4},
-            (D.counts+K.counts+R.counts) AS #{firstTime5},
-            (E.counts+L.counts+S.counts) AS #{firstTime6},
-            (F.counts+M.counts+T.counts) AS #{firstTime7},
-            (G.counts+N.counts+U.counts) AS #{firstTime8}
-        FROM
-        (
-            (SELECT COUNT(warn_time BETWEEN #{firstTime2} and #{firstTime1} or null) as counts from t_warn_info) A,
-            (SELECT COUNT(warn_time BETWEEN #{firstTime3} and #{firstTime2} or null) as counts from t_warn_info) B,
-            (SELECT COUNT(warn_time BETWEEN #{firstTime4} and #{firstTime3} or null) as counts from t_warn_info) V,
-            (SELECT COUNT(warn_time BETWEEN #{firstTime5} and #{firstTime4} or null) as counts from t_warn_info) D,
-            (SELECT COUNT(warn_time BETWEEN #{firstTime6} and #{firstTime5} or null) as counts from t_warn_info) E,
-            (SELECT COUNT(warn_time BETWEEN #{firstTime7} and #{firstTime6} or null) as counts from t_warn_info) F,
-            (SELECT COUNT(warn_time BETWEEN #{firstTime8} and #{firstTime7} or null) as counts from t_warn_info) G,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as counts from t_robot_alarm) H,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime3} and #{firstTime2} or null) as counts from t_robot_alarm) I,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime4} and #{firstTime3} or null) as counts from t_robot_alarm) J,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime5} and #{firstTime4} or null) as counts from t_robot_alarm) K,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime6} and #{firstTime5} or null) as counts from t_robot_alarm) L,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime7} and #{firstTime6} or null) as counts from t_robot_alarm) M,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as counts from t_robot_alarm) N,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime2} and #{firstTime1} or null) as counts from t_camera_alarm) O,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime3} and #{firstTime2} or null) as counts from t_camera_alarm) P,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime4} and #{firstTime3} or null) as counts from t_camera_alarm) Q,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime5} and #{firstTime4} or null) as counts from t_camera_alarm) R,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime6} and #{firstTime5} or null) as counts from t_camera_alarm) S,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime7} and #{firstTime6} or null) as counts from t_camera_alarm) T,
-            (SELECT COUNT(alarm_time BETWEEN #{firstTime8} and #{firstTime7} or null) as counts from t_camera_alarm) U
-        )
-    </select>
+
     <!--根据告警处理状态统计告警个数-->
     <select id="countWarnConfMode" resultType="java.util.Map">
         SELECT

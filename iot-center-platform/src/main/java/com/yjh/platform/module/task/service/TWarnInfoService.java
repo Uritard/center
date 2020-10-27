@@ -5,6 +5,8 @@ import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.task.entity.*;
@@ -109,71 +111,53 @@ public class TWarnInfoService{
     }
     @Logs(title = "统计近一月的所有告警个数", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> countWarnOnMonth() {
-        List<String> weekDates = dateTimeUtil.getDayDateList(8);
+    public List<WarnStatistical> countWarnOnMonth() {
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        String firstTime1 = monthDates.get(0);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        List<WarnStatistical> list = tWarnInfoDao.countWarnOnMonth(startTime,endTime);
+        List<WarnStatistical> list1 = new ArrayList<>();
 
-        String firstTime1 = weekDates.get(0);
-        String firstTime2 = weekDates.get(1);
-        String firstTime3 = weekDates.get(2);
-        String firstTime4 = weekDates.get(3);
-        String firstTime5 = weekDates.get(4);
-        String firstTime6 = weekDates.get(5);
-        String firstTime7 = weekDates.get(6);
-        String firstTime8 = weekDates.get(7);
-
-        List<TutHistoryStatistical> list = tWarnInfoDao.countWarnOnMonth1(firstTime1,firstTime8);
-        System.out.println("<------------list------------>"+list);
-        System.out.println("<------------weekDates------------>"+weekDates);
-
-        for (int i = 0;i < weekDates.size();i++){
+        for (int i = 0;i < monthDates.size();i++){
             int flag = 0;
             for (int j = 0;j < list.size();j++){
-                if (weekDates.get(i).equals(list.get(j).getTimeNode())){
+                if (monthDates.get(i).substring(0, 10).equals(list.get(j).getTimeNode())){
                     flag++;
                 }
             }
             if (flag == 0){
-                System.out.println("没有的时间是："+weekDates.get(i));
-
+                WarnStatistical ws = new WarnStatistical();
+                ws.setCount(0);
+                ws.setTimeNode(monthDates.get(i).substring(0, 10));
+                list1.add(ws);
             }
         }
-//        Map<String, Integer> map1 = tWarnInfoDao.countWarnOnMonth(firstTime1, firstTime2, firstTime3, firstTime4,
-//                firstTime5, firstTime6, firstTime7, firstTime8);
-        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+        list.addAll(list1);
+        Collections.sort(list, new Comparator<WarnStatistical>() {
+            @Override
+            public int compare(WarnStatistical o1, WarnStatistical o2) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-//        Iterator<String> iter = map1.keySet().iterator();
-//        while (iter.hasNext()) {
-//            String key = iter.next();
-//            String timeNode = key.substring(0, 10);
-//            Number mapValue = (Number) map1.get(key);
-//            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
-//            tutHistoryStatistical.setTimeNode(timeNode);
-//            tutHistoryStatistical.setCount(mapValue);
-//            tutHistoryStatisticalList.add(tutHistoryStatistical);
-//        }
-//        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
-//            @Override
-//            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//
-//                Date date1 = null;
-//                Date date2 = null;
-//                try {
-//                    date1 = simpleDateFormat.parse(o1.getTimeNode());
-//                    date2 = simpleDateFormat.parse(o2.getTimeNode());
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//                int flag = date1.compareTo(date2);
-//                if (flag == -1) {
-//                    flag = -1;
-//                } else if (flag == 1) {
-//                    flag = 1;
-//                }
-//                return flag;
-//            }
-//        });
-        return tutHistoryStatisticalList;
+                Date date1 = null;
+                Date date2 = null;
+                try {
+                    date1 = simpleDateFormat.parse(o1.getTimeNode());
+                    date2 = simpleDateFormat.parse(o2.getTimeNode());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int flag = date1.compareTo(date2);
+                if (flag == -1) {
+                    flag = -1;
+                } else if (flag == 1) {
+                    flag = 1;
+                }
+                return flag;
+            }
+        });
+        return list;
     }
     @Logs(title = "根据告警处理状态统计告警个数-饼图", code = "module")
     @Transactional(rollbackFor = Exception.class)

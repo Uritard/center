@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Map;
 
-import com.yjh.platform.module.task.entity.TJContentInfoDetail;
-import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.module.task.entity.TWarnInfoDetail;
-import com.yjh.platform.module.task.entity.TutHistoryStatistical;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -54,16 +51,8 @@ public interface TWarnInfoDao {
     List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
     Map<String, Integer> countByAlarmSource();
     List<TJContentInfoDetail>  countByDeviceType();
-    Map<String,Integer> countWarnOnMonth(@Param(value = "firstTime1")String firstTime1,
-                                        @Param(value = "firstTime2")String firstTime2,
-                                        @Param(value = "firstTime3")String firstTime3,
-                                        @Param(value = "firstTime4")String firstTime4,
-                                        @Param(value = "firstTime5")String firstTime5,
-                                        @Param(value = "firstTime6")String firstTime6,
-                                        @Param(value = "firstTime7")String firstTime7,
-                                        @Param(value = "firstTime8")String firstTime8);
     Map<String, Integer> countWarnConfMode();
     List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
-    List<TutHistoryStatistical> countWarnOnMonth1(@Param(value = "firstTime1")String firstTime1,
-                                                  @Param(value = "firstTime8")String firstTime2);
+    List<WarnStatistical> countWarnOnMonth(@Param(value = "startTime")String startTime,
+                                            @Param(value = "endTime")String endTime);
 }

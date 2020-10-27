@@ -210,65 +210,33 @@ public class TUnionTaskService{
     }
     @Logs(title = "联动历史记录统计--近一月", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> historyStatisticalByMonth() {
-        List<String> monthDates = dateTimeUtil.getDayDateList(31);
-
+    public List<WarnStatistical> historyStatisticalByMonth() {
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
-        String firstTime2 = monthDates.get(1);
-        String firstTime3 = monthDates.get(2);
-        String firstTime4 = monthDates.get(3);
-        String firstTime5 = monthDates.get(4);
-        String firstTime6 = monthDates.get(5);
-        String firstTime7 = monthDates.get(6);
-        String firstTime8 = monthDates.get(7);
-        String firstTime9 = monthDates.get(8);
-        String firstTime10 = monthDates.get(9);
-        String firstTime11 = monthDates.get(10);
-        String firstTime12 = monthDates.get(11);
-        String firstTime13 = monthDates.get(12);
-        String firstTime14 = monthDates.get(13);
-        String firstTime15 = monthDates.get(14);
-        String firstTime16 = monthDates.get(15);
-        String firstTime17 = monthDates.get(16);
-        String firstTime18 = monthDates.get(17);
-        String firstTime19 = monthDates.get(18);
-        String firstTime20 = monthDates.get(19);
-        String firstTime21 = monthDates.get(20);
-        String firstTime22 = monthDates.get(21);
-        String firstTime23 = monthDates.get(22);
-        String firstTime24 = monthDates.get(23);
-        String firstTime25 = monthDates.get(24);
-        String firstTime26 = monthDates.get(25);
-        String firstTime27 = monthDates.get(26);
-        String firstTime28 = monthDates.get(27);
-        String firstTime29 = monthDates.get(28);
-        String firstTime30 = monthDates.get(29);
-        String firstTime31 = monthDates.get(30);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        List<WarnStatistical> list = tUnionTaskDao.getHistoryByMonth(startTime,endTime);
+        List<WarnStatistical> list1 = new ArrayList<>();
 
-        Map<String,Integer> map = tUnionTaskDao.getHistoryByMonth(firstTime1,firstTime2,firstTime3,firstTime4,firstTime5,
-                firstTime6,firstTime7,firstTime8,firstTime9,firstTime10,
-                firstTime11,firstTime12,firstTime13,firstTime14,firstTime15,
-                firstTime16,firstTime17,firstTime18,firstTime19,firstTime20,
-                firstTime21,firstTime22,firstTime23,firstTime24,firstTime25,
-                firstTime26,firstTime27,firstTime28,firstTime29,firstTime30,
-                firstTime31);
-        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
-
-        Iterator<String> iter = map.keySet().iterator();
-
-        while(iter.hasNext()){
-            String key=iter.next();
-            String timeNode =  key.substring(0,10);
-            Number mapValue = (Number)map.get(key);
-
-            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
-            tutHistoryStatistical.setTimeNode(timeNode);
-            tutHistoryStatistical.setCount(mapValue);
-            tutHistoryStatisticalList.add(tutHistoryStatistical);
+        for (int i = 0;i < monthDates.size();i++){
+            int flag = 0;
+            for (int j = 0;j < list.size();j++){
+                if (monthDates.get(i).substring(0, 10).equals(list.get(j).getTimeNode())){
+                    flag++;
+                }
+            }
+            if (flag == 0){
+                WarnStatistical ws = new WarnStatistical();
+                ws.setCount(0);
+                ws.setTimeNode(monthDates.get(i).substring(0, 10));
+                list1.add(ws);
+            }
         }
-        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
+        list.addAll(list1);
+        Collections.sort(list, new Comparator<WarnStatistical>() {
             @Override
-            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
+            public int compare(WarnStatistical o1, WarnStatistical o2) {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
                 Date date1 = null;
@@ -288,7 +256,7 @@ public class TUnionTaskService{
                 return flag;
             }
         });
-        return tutHistoryStatisticalList;
+        return list;
     }
     @Logs(title = "联动记录存储", code = "module")
     @Transactional(rollbackFor = Exception.class)

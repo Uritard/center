@@ -234,39 +234,22 @@
             COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as #{firstTime13}
         from t_union_task
     </select>
-    <select id="getHistoryByMonth" resultType="java.util.Map">
+    <select id="getHistoryByMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        DATE_FORMAT( start_time, '%Y-%m-%d' ) as time_node,
+        count( * ) as count
+        FROM
+        (
         select
-            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime2},
-            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime3},
-            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime4},
-            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime5},
-            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime6},
-            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime7},
-            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime8},
-            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as #{firstTime9},
-            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as #{firstTime10},
-            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as #{firstTime11},
-            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as #{firstTime12},
-            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as #{firstTime13},
-            COUNT(start_time BETWEEN #{firstTime14} and #{firstTime13} or null) as #{firstTime14},
-            COUNT(start_time BETWEEN #{firstTime15} and #{firstTime14} or null) as #{firstTime15},
-            COUNT(start_time BETWEEN #{firstTime16} and #{firstTime15} or null) as #{firstTime16},
-            COUNT(start_time BETWEEN #{firstTime17} and #{firstTime16} or null) as #{firstTime17},
-            COUNT(start_time BETWEEN #{firstTime18} and #{firstTime17} or null) as #{firstTime18},
-            COUNT(start_time BETWEEN #{firstTime19} and #{firstTime18} or null) as #{firstTime19},
-            COUNT(start_time BETWEEN #{firstTime20} and #{firstTime19} or null) as #{firstTime20},
-            COUNT(start_time BETWEEN #{firstTime21} and #{firstTime20} or null) as #{firstTime21},
-            COUNT(start_time BETWEEN #{firstTime22} and #{firstTime21} or null) as #{firstTime22},
-            COUNT(start_time BETWEEN #{firstTime23} and #{firstTime22} or null) as #{firstTime23},
-            COUNT(start_time BETWEEN #{firstTime24} and #{firstTime23} or null) as #{firstTime24},
-            COUNT(start_time BETWEEN #{firstTime25} and #{firstTime24} or null) as #{firstTime25},
-            COUNT(start_time BETWEEN #{firstTime26} and #{firstTime25} or null) as #{firstTime26},
-            COUNT(start_time BETWEEN #{firstTime27} and #{firstTime26} or null) as #{firstTime27},
-            COUNT(start_time BETWEEN #{firstTime28} and #{firstTime27} or null) as #{firstTime28},
-            COUNT(start_time BETWEEN #{firstTime29} and #{firstTime28} or null) as #{firstTime29},
-            COUNT(start_time BETWEEN #{firstTime30} and #{firstTime29} or null) as #{firstTime30},
-            COUNT(start_time BETWEEN #{firstTime31} and #{firstTime30} or null) as #{firstTime31}
-        from t_union_task
+        a.start_time
+        from t_union_task a
+        where 1=1
+				) AS Time
+				WHERE
+        period_diff( date_format( now( ) , '%Y-%m-%d %H:%i:%S' ) , date_format( start_time, '%Y-%m-%d %H:%i:%S' ) ) =0
+        and DATE_FORMAT( start_time, '%Y-%m-%d %H:%i:%S' ) BETWEEN #{startTime} and #{endTime}
+        GROUP BY
+        time_node
     </select>
 
     <select id="selectUnionDetail" resultType="com.yjh.platform.module.task.entity.TUnionTaskDetail">

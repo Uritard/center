@@ -223,7 +223,7 @@ public class TWarnInfoController {
     public Result countWarnOnMonth(){
         Result result = new Result();
         try {
-            List<TutHistoryStatistical> list = tWarnInfoService.countWarnOnMonth();
+            List<WarnStatistical> list = tWarnInfoService.countWarnOnMonth();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

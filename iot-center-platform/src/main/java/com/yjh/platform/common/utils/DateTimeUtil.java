@@ -663,10 +663,9 @@ public class DateTimeUtil {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        calendar.add(calendar.DATE,1);
+//        calendar.add(calendar.DATE,1);
         Date zero = calendar.getTime();
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         // 定义日期实例
         GregorianCalendar gc =new GregorianCalendar();
@@ -679,6 +678,18 @@ public class DateTimeUtil {
             gc.add(GregorianCalendar.DATE,-1);//进行当前日期天数减1
         }
         return yearDates;
+    }
+    //获取前一天23:59:59
+    public static String getDayBefore(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.add(Calendar.DAY_OF_MONTH,-1);
+        Date dd = calendar.getTime();
+        String time = format(dd);
+        return time;
     }
     public static boolean isValidDate(String str, String pattern) {
         boolean convertSuccess = true;

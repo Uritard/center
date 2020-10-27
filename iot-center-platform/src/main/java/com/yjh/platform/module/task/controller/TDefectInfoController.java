@@ -197,7 +197,7 @@ public class TDefectInfoController {
     public Result countDefectOnMonth(){
         Result result = new Result();
         try {
-            List<TutHistoryStatistical> list = tDefectInfoService.countDefectOnMonth();
+            List<WarnStatistical> list = tDefectInfoService.countDefectOnMonth();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
