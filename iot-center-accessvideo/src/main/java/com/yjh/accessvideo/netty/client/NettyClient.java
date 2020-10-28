@@ -21,13 +21,11 @@ public class NettyClient {
 
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
 
-    private EventLoopGroup group = new NioEventLoopGroup();
-    private Bootstrap bootstrap = new Bootstrap();
-
     public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService) throws InterruptedException{
 
         try {
-            bootstrap
+            EventLoopGroup group = new NioEventLoopGroup();
+            Bootstrap bootstrap = new Bootstrap()
                     .group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_KEEPALIVE, true)
@@ -48,7 +46,7 @@ public class NettyClient {
                 if (!futureListener.isSuccess()) {
                     log.info("和服务端1："+remoteAddress1+"连接失败!");
                     //10秒后重连
-                    eventLoop.schedule(() -> doConnect(remoteAddress1), 10, TimeUnit.SECONDS);
+                    eventLoop.schedule(() -> doConnect(remoteAddress1, bootstrap), 10, TimeUnit.SECONDS);
                 } else { log.info("和服务端1："+remoteAddress1+"连接成功!"); }
             });
             bootstrap.connect(remoteAddress2).addListener((ChannelFuture futureListener) -> {
@@ -57,14 +55,14 @@ public class NettyClient {
                 if (!futureListener.isSuccess()) {
                     log.info("和服务端2："+remoteAddress2+"连接失败!");
                     //10秒后重连
-                    eventLoop.schedule(() -> doConnect(remoteAddress2), 10, TimeUnit.SECONDS);
+                    eventLoop.schedule(() -> doConnect(remoteAddress2, bootstrap), 10, TimeUnit.SECONDS);
                 } else { log.info("和服务端2："+remoteAddress2+"连接成功!"); }
             });
         } catch (Exception e) {e.getMessage();}
     }
 
     //重新连接tcp服务端
-    private void doConnect(InetSocketAddress remoteAddress) {
+    public void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
         try {
             if (bootstrap != null) {
                 bootstrap.remoteAddress(remoteAddress);
@@ -73,7 +71,7 @@ public class NettyClient {
                     if (!futureListener.isSuccess()) {
                         //重连
                         log.info("与服务端"+remoteAddress + "连接失败!准备尝试重连!");
-                        eventLoop.schedule(() -> doConnect(remoteAddress), 60, TimeUnit.SECONDS);
+                        eventLoop.schedule(() -> doConnect(remoteAddress, bootstrap), 60, TimeUnit.SECONDS);
                     }
                 });
             }

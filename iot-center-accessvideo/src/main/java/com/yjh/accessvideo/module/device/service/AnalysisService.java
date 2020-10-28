@@ -41,7 +41,7 @@ public class AnalysisService {
                 pictureDataObject.put("imagePath", analysis.getPicPath());
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
                 pictureDataObject.put("taskId", analysis.getTaskId());
-                pictureDataObject.put("instanceId", analysis.getInstanceId());
+                pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
 //                pictureInfoArray.add(pictureInfoObject);
                 msgDataObject.put("data", pictureInfoObject);
@@ -74,7 +74,7 @@ public class AnalysisService {
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-                pictureDataObject.put("instanceId", analysis.getInstanceId());
+                pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                 msgDataObject.put("data", pictureInfoObject);
             }
             i++;

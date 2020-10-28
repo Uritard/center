@@ -11,6 +11,7 @@ import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.module.device.service.AnalysisService;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -26,6 +27,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,6 +46,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
+    @Autowired
+    private NettyClient nettyClient;
 
     private  RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
@@ -85,17 +89,13 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         analysisClientHandlerHashMap.remove(remotePort);
         log.error("服务端主动断开连接！");
         log.info("analysisClientHandlerHashMap: "+analysisClientHandlerHashMap);
-
+        String serverUrl = remoteAdds.substring(0, remoteAdds.indexOf(":"));
+        log.info("serverUrl: "+serverUrl.substring(1));
+        InetSocketAddress remoteAddress = new InetSocketAddress(serverUrl.substring(1), remotePort);
         //使用过程中断线重连
-//        (ChannelFuture futureListener) -> {
-//            log.info("主动连接服务端"+ctx.channel().remoteAddress());
-//            final EventLoop eventLoop = futureListener.channel().eventLoop();
-//            if (!futureListener.isSuccess()) {
-//                log.info("和服务端"+ctx.channel().remoteAddress()+"连接失败!");
-//                //10秒后重连
-//                eventLoop.schedule(() -> doConnect(bootstrap, ctx.channel().remoteAddress()), 60, TimeUnit.SECONDS);
-//            } else { log.info("与"+ctx.channel().remoteAddress()+"连接成功!"); }
-//        };
+        log.info("nettyClient: "+nettyClient);
+        nettyClient.doConnect(remoteAddress, new Bootstrap());
+        super.channelInactive(ctx);
     }
 
     @Override
