@@ -42,6 +42,9 @@ public class CameraConController {
     @Value("${nginx.picture.reflact}")
     private String capturePath;//图片路径
 
+    @Value("${nginx.picture.preset}")
+    private String capturePathPreset;//预置位图片路径
+
     @Value("${nvr.capture.result}")
     private String captureResultPath;//结果路径
 
@@ -108,12 +111,14 @@ public class CameraConController {
             int max=9999,min=1;
             int ran = (int) (Math.random()*(max-min)+min);
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpeg";
+            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
             String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
+            String url = "chmod 777 "+ filePath;
+            Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
         } catch (BusinessException b) {
@@ -132,12 +137,14 @@ public class CameraConController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            String filePathTem = "/" + presetId + ".jpeg";
+            String filePathTem = "/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
-            String urlPath = capturePath+filePathTem;
+            String urlPath = capturePathPreset+filePathTem;
             resultMap.put("urlPath", urlPath);
+            String url = "chmod 777 "+ filePath;
+            Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
         } catch (BusinessException b) {

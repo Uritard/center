@@ -37,12 +37,6 @@ import static com.yjh.accessvideo.common.Constant.instanceIds;
  * Created by tt on 2019/7/31.
  */
 public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
-    private  RedisTemplate redisTemplate;
-    private AnalyseDataOperateService analyseDataOperateService;
-    public AnalysisClientHandler (RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService) {
-        this.redisTemplate = redisTemplate;
-        this.analyseDataOperateService=analyseDataOperateService;
-    }
 
     private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
@@ -51,7 +45,12 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
 
-
+    private  RedisTemplate redisTemplate;
+    private AnalyseDataOperateService analyseDataOperateService;
+    public AnalysisClientHandler (RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService) {
+        this.redisTemplate = redisTemplate;
+        this.analyseDataOperateService=analyseDataOperateService;
+    }
 
     private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
     public static Map<Integer, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }
@@ -64,7 +63,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         isThreadStart = true;
         //启动心跳检测
 //        HeartBeatThread heartBeatThread = new HeartBeatThread(this, true);
-        //new Thread(dataDealThread).start();
 //        Thread thread = new Thread(heartBeatThread);
 //        thread.setDaemon(true);
 //        thread.start();
@@ -85,8 +83,19 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         String remoteAdds = ctx.channel().remoteAddress().toString();
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));
         analysisClientHandlerHashMap.remove(remotePort);
-        log.error("服务端断开连接！");
+        log.error("服务端主动断开连接！");
         log.info("analysisClientHandlerHashMap: "+analysisClientHandlerHashMap);
+
+        //使用过程中断线重连
+//        (ChannelFuture futureListener) -> {
+//            log.info("主动连接服务端"+ctx.channel().remoteAddress());
+//            final EventLoop eventLoop = futureListener.channel().eventLoop();
+//            if (!futureListener.isSuccess()) {
+//                log.info("和服务端"+ctx.channel().remoteAddress()+"连接失败!");
+//                //10秒后重连
+//                eventLoop.schedule(() -> doConnect(bootstrap, ctx.channel().remoteAddress()), 60, TimeUnit.SECONDS);
+//            } else { log.info("与"+ctx.channel().remoteAddress()+"连接成功!"); }
+//        };
     }
 
     @Override

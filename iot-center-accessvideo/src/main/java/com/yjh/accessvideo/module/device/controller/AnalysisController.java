@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -45,6 +46,10 @@ public class AnalysisController {
     public Result feignAlgorithm(@RequestBody Map<String, List<Analysis>> analysisMap) {
         Result result = new Result();
         try {
+            if (Objects.isNull(analysisMap.get("list"))) {
+                result.setMessage("参数为空");
+                return result;
+            }
             List<Analysis> analysisList = analysisMap.get("list");
             result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
         } catch (BusinessException b) {
@@ -61,6 +66,10 @@ public class AnalysisController {
     public Result feignDefect(@RequestBody Map<String, List<Analysis>> analysisMap) {
         Result result = new Result();
         try {
+            if (Objects.isNull(analysisMap.get("list"))) {
+                result.setMessage("参数为空");
+                return result;
+            }
             List<Analysis> analysisList = analysisMap.get("list");
             result.setData(analysisService.feignDefect(analysisList, aiPort));
         } catch (BusinessException b) {
