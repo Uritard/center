@@ -1,5 +1,7 @@
 package com.yjh.accessvideo.common;
 
+import io.netty.bootstrap.Bootstrap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,4 +21,6 @@ public class Constant {
     public static String sdkPath;//sdk路径
 
     public static List<Long> instanceIds=new ArrayList<>();
+
+    public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
 }

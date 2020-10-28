@@ -5,6 +5,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.websocket.WebSocketServer;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
@@ -13,8 +14,10 @@ import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.module.device.service.AnalysisService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.EventLoop;
 import io.netty.util.ReferenceCountUtil;
 import io.swagger.models.auth.In;
 import org.slf4j.Logger;
@@ -31,6 +34,7 @@ import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.yjh.accessvideo.common.Constant.TYPET3;
 import static com.yjh.accessvideo.common.Constant.instanceIds;
@@ -46,8 +50,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
-    @Autowired
-    private NettyClient nettyClient;
 
     private  RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
@@ -93,9 +95,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         log.info("serverUrl: "+serverUrl.substring(1));
         InetSocketAddress remoteAddress = new InetSocketAddress(serverUrl.substring(1), remotePort);
         //使用过程中断线重连
-        log.info("nettyClient: "+nettyClient);
-        nettyClient.doConnect(remoteAddress, new Bootstrap());
-        super.channelInactive(ctx);
+        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) { doConnect(remoteAddress, Constant.bootstrapHashMap.get(1)); }
     }
 
     @Override
@@ -156,7 +156,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                     WebSocketServer.sendMsg(json);
 
 
-                    
+
 
                     //判断该任务下的巡视点是否均已执行完成
 
@@ -172,7 +172,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                     //所有巡视点都有了结果
                     if(instanceIds.size()==0){
                         // TODO: 2020/10/25 修改任务状态为已完成
-                     log.info("TCR开始");
+                        log.info("TCR开始");
                         //TCR
                         TCruiseResult tCruiseResult=analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
                         tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
@@ -388,6 +388,23 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
             return keys;
         });
+    }
+
+    //重新连接tcp服务端
+    private void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
+        try {
+            if (bootstrap != null) {
+                bootstrap.remoteAddress(remoteAddress);
+                ChannelFuture f = bootstrap.connect().addListener((ChannelFuture futureListener) -> {
+                    final EventLoop eventLoop = futureListener.channel().eventLoop();
+                    if (!futureListener.isSuccess()) {
+                        //重连
+                        log.info("与服务端"+remoteAddress + "连接失败!主动尝试重连!");
+                        eventLoop.schedule(() -> doConnect(remoteAddress, bootstrap), 60, TimeUnit.SECONDS);
+                    }
+                });
+            }
+        } catch (Exception e) { log.info("------主动连接服务端连接失败------" + e.getMessage()); }
     }
 
 }

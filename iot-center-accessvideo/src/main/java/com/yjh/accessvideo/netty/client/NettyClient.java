@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.netty.client;
 
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -23,8 +24,8 @@ public class NettyClient {
 
     public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService) throws InterruptedException{
 
+        EventLoopGroup group = new NioEventLoopGroup();
         try {
-            EventLoopGroup group = new NioEventLoopGroup();
             Bootstrap bootstrap = new Bootstrap()
                     .group(group)
                     .channel(NioSocketChannel.class)
@@ -40,6 +41,7 @@ public class NettyClient {
                         }
                     });
 
+            Constant.bootstrapHashMap.put(1, bootstrap);
             bootstrap.connect(remoteAddress1).addListener((ChannelFuture futureListener) -> {
                 log.info("连接服务端1");
                 final EventLoop eventLoop = futureListener.channel().eventLoop();
@@ -62,7 +64,7 @@ public class NettyClient {
     }
 
     //重新连接tcp服务端
-    public void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
+    private void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
         try {
             if (bootstrap != null) {
                 bootstrap.remoteAddress(remoteAddress);
