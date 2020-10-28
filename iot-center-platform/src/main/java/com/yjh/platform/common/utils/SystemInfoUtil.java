@@ -23,7 +23,7 @@ public class SystemInfoUtil {
         public List<Map<String,String>> getCpuUsage() throws Exception {
             List<Map<String,String>> result = new ArrayList<>();
             Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec("top -n 1");// 调用系统的“top"命令
+            Process p = rt.exec("top -bn 1");// 调用系统的“top"命令
             BufferedReader in = null;
             try {
                 in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -104,9 +104,9 @@ public class SystemInfoUtil {
                     if(i > 3){
                         strArray = str.split("\\s+");
                         Map<String,String> map = new HashMap<>();
-                        map.put("pid",strArray[2]);
-                        map.put("read",strArray[3]);
-                        map.put("write",strArray[4]);
+                        map.put("pid",strArray[3]);
+                        map.put("read",strArray[4]);
+                        map.put("write",strArray[5]);
                         Double all = Double.valueOf(strArray[3])+Double.valueOf(strArray[4]);
                         map.put("all",all.toString());
                         result.add(map);
