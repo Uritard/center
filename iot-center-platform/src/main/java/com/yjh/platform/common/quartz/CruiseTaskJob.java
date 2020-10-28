@@ -169,7 +169,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 analysisList.add(analysis);
                                 Map<String, List<Analysis>> analysisMap  = new HashMap<>();
                                 analysisMap.put("list",analysisList);
-                                if(tAlgorithmInfo.getIsAi() == 1){//0-算法 1-缺陷
+                                if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
                                     analysis(analysisMap);
                                 }else {
                                     defect(analysisMap);
