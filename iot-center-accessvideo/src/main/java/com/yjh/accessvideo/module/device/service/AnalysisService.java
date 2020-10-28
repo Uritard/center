@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.netty.client.AnalysisClientHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,16 +21,21 @@ import java.util.Random;
 @Service
 public class AnalysisService {
 
+    private Logger log = LoggerFactory.getLogger(AnalysisService.class);
+
+    private static long algorithmMsgId = 100000001;
+    private static long defectMsgId = 200000001;
+
     @Logs(title = "算法调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public String feignAlgorithm(List<Analysis> analysisList, int recognizePort) {
 
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
-        JSONObject pictureInfo = new JSONObject();
-//        JSONArray pictureInfoArray = new JSONArray();
 
-        analysisObject.put("msgID", "123456789");
+        algorithmMsgId = algorithmMsgId+1;
+        analysisObject.put("msgID", String.valueOf(algorithmMsgId));
+        log.info("algorithmMsgId: "+algorithmMsgId);
         analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
@@ -43,7 +50,6 @@ public class AnalysisService {
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-//                pictureInfoArray.add(pictureInfoObject);
                 msgDataObject.put("data", pictureInfoObject);
             }
             i++;
@@ -58,9 +64,9 @@ public class AnalysisService {
     public String feignDefect(List<Analysis> analysisList, int aiPort) {
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
-        JSONObject pictureInfo = new JSONObject();
-//        JSONArray pictureInfoArray = new JSONArray();
-        analysisObject.put("msgID", "123567");
+        defectMsgId = defectMsgId+1;
+        analysisObject.put("msgID", String.valueOf(defectMsgId));
+        log.info("defectMsgId: "+defectMsgId);
         analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
