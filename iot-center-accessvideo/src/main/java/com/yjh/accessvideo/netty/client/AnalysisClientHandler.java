@@ -172,21 +172,22 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                     //所有巡视点都有了结果
                     if(instanceIds.size()==0){
                         // TODO: 2020/10/25 修改任务状态为已完成
-
+                     log.info("TCR开始");
                         //TCR
                         TCruiseResult tCruiseResult=analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
                         tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
                         tCruiseResult.setTaskWait(0);
                         analyseDataOperateService.updateCruiseResult(tCruiseResult);
 
+                        log.info("TCTR开始");
                         //TCTR
 
                         TCruiseTaskResult tCruiseTaskResult=new TCruiseTaskResult();
                         tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
                         tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
-//                                tCruiseTaskResult.setTaskAbnormal();
-//                                tCruiseTaskResult.getTaskAlarm();
-                        tCruiseTaskResult.setRunExecute(cruiseResult.get("ifRun").toString());
+                        tCruiseTaskResult.setTaskAbnormal(0);
+                        tCruiseTaskResult.setTaskAlarm(0);
+                        tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
 //                                tCruiseTaskResult.setCruiseTaskTime();
                         analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
 
@@ -196,8 +197,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             Map<String,Object> cruiseWorkedMap=redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
                             //创建四张结果表对象
 
-
-
+                            log.info("TCTRD开始");
                             //TCTRD
                             TCruiseTaskResultDetail tCruiseTaskResultDetail=new TCruiseTaskResultDetail();
                             tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
@@ -211,6 +211,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
                             analyseDataOperateService.insertCruiseTaskResultDetail(tCruiseTaskResultDetail);
 
+                            log.info("TCDR开始");
                             //TCDR
                             TCruiseDataResult tCruiseDataResult=new TCruiseDataResult();
                             tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
@@ -221,8 +222,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
                             tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
                             tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
-                            tCruiseDataResult.setIdentifyState(Integer.valueOf(cruiseWorkedMap.get("identifyState").toString()));
-                            tCruiseDataResult.setIdentifyResult(Integer.valueOf(cruiseWorkedMap.get("identifyResult").toString()));
                             tCruiseDataResult.setCreatetime(new Date());
                             tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
                             analyseDataOperateService.insertCruiseDataResult(tCruiseDataResult);

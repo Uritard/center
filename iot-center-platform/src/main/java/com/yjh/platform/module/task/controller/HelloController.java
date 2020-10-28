@@ -48,10 +48,6 @@ public class HelloController {
     private Logger log = LoggerFactory.getLogger(HelloController.class);
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private TCruiseResultService tCruiseResultService;
-    @Autowired
-    private TCruiseTaskResultService tCruiseTaskResultService;
 
     //相机抓图
     private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePicture?cameraId={cameraId}";
@@ -84,10 +80,10 @@ public class HelloController {
         Analysis analysis = new Analysis();
         analysis.setTaskId("9000009");
         analysis.setInstanceId(1001L);
-        analysis.setPicPath("http://192.168.9.37:10086/imgs/resultImg/271020202122487395006.jpg");//相机拍摄图片
+        analysis.setPicPath("/home/yjh/iot-picture/resultImg/281020201444030724895.jpg");//相机拍摄图片
         //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
         analysis.setAnalyseType("1");
-        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/Template/BigImg/21000000096");//模板图片
+        analysis.setPicModelPath("/home/yjh/iot-picture/sync/Template/BigImg/21000000096");//模板图片
         List<Analysis> analysisList = new ArrayList<>();
         analysisList.add(analysis);
         Map<String, List<Analysis>> analysisMap = new HashMap<>();
