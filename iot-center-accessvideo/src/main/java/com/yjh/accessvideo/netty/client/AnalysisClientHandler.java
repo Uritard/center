@@ -172,28 +172,31 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                     //所有巡视点都有了结果
                     if(instanceIds.size()==0){
                         // TODO: 2020/10/25 修改任务状态为已完成
+
+                        //TCR
+                        TCruiseResult tCruiseResult=analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
+                        tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
+                        tCruiseResult.setTaskWait(0);
+                        analyseDataOperateService.updateCruiseResult(tCruiseResult);
+
+                        //TCTR
+
+                        TCruiseTaskResult tCruiseTaskResult=new TCruiseTaskResult();
+                        tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
+                        tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
+//                                tCruiseTaskResult.setTaskAbnormal();
+//                                tCruiseTaskResult.getTaskAlarm();
+                        tCruiseTaskResult.setRunExecute(cruiseResult.get("ifRun").toString());
+//                                tCruiseTaskResult.setCruiseTaskTime();
+                        analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+
+
                         Set<String> cruiseKeys=redisScan("t_cruise_task_result:"+(jsonObjectResult.get("taskId").toString()));
                         for(String cruiseKey:cruiseKeys){
                             Map<String,Object> cruiseWorkedMap=redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
                             //创建四张结果表对象
 
-                            //TCR
-                            TCruiseResult tCruiseResult=analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseWorkedMap.get("taskResultId").toString());
-                            tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
-                            tCruiseResult.setTaskWait(0);
-                            analyseDataOperateService.updateCruiseResult(tCruiseResult);
 
-                            //TCTR
-                            // TODO: 2020/10/26 插表
-
-                            TCruiseTaskResult tCruiseTaskResult=new TCruiseTaskResult();
-                            tCruiseTaskResult.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
-                            tCruiseTaskResult.setTaskId(cruiseWorkedMap.get("taskId").toString());
-//                                tCruiseTaskResult.setTaskAbnormal();
-//                                tCruiseTaskResult.getTaskAlarm();
-                            tCruiseTaskResult.setRunExecute(cruiseWorkedMap.get("ifRun").toString());
-//                                tCruiseTaskResult.setCruiseTaskTime();
-                            analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
 
                             //TCTRD
                             TCruiseTaskResultDetail tCruiseTaskResultDetail=new TCruiseTaskResultDetail();
@@ -229,71 +232,71 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
 
 
-                    //告警处理
-                    String remoteAdds = ctx.channel().remoteAddress().toString();
-                    int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
-                    //告警判断并组合数据插库
-                    switch (remotePort){
-                        //表计识别算法结果处理
-                        case 13668:
-                            TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
-                            TCruisePointInstance tCruisePointInstance=analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
-                            Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
-                            int warnRule=analyseDataOperateService.warnJudgement(resultValue,
-                                    tStdDevicemete.getHighLimit1(),
-                                    tStdDevicemete.getLowLimit1(),
-                                    tStdDevicemete.getHighLimit2(),
-                                    tStdDevicemete.getLowLimit2());
-                            if(warnRule>0){
-                                // TODO: 2020/10/20 组装TWarnInfo数据并插库
-                                TWarnInfo tWarnInfo=new TWarnInfo();
-                                tWarnInfo.setWarnLevel(tStdDevicemete.getAlarmLevel());
-                                tWarnInfo.setWarnTime(new Date());//时间尚未格式化
-                                tWarnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmType()));
-                                switch (warnRule){
-                                    case 1:
-                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"过高");
-                                        tWarnInfo.setOutRange(String.valueOf(resultValue-tStdDevicemete.getHighLimit1()));//实际量超出上下限的差值
-                                    case 2:
-                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"过低");
-                                        tWarnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit1()-resultValue));
-                                    case 3:
-                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"超高");
-                                        tWarnInfo.setOutRange(String.valueOf(resultValue-tStdDevicemete.getHighLimit2()));
-                                    case 4:
-                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"超低");
-                                        tWarnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit2()-resultValue));
-                                        break;
-                                }
-                                tWarnInfo.setWarnContent(tWarnInfo.getWarnName());
-                                tWarnInfo.setDeviceId(tCruisePointInstance.getDeviceId());//设备ID
-                                tWarnInfo.setCunstomId(tCruisePointInstance.getCustomId());//部位ID
-                                tWarnInfo.setInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));//巡视点ID
-                                tWarnInfo.setStdMeteId(tCruisePointInstance.getDeviceMeteId());//标准测点ID
-                                tWarnInfo.setConfMode(276);//未处理
-                                switch (tCruisePointInstance.getCruiseTypeName()){
-                                    case("机器人"):
-                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","机器人")));//判断巡视点的巡视方式再决定
-                                    case ("视频"):
-                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","可见光")));//判断巡视点的巡视方式再决定
-                                    case ("红外"):
-                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","红外")));//判断巡视点的巡视方式再决定
-                                        break;
-                                }
-                                tWarnInfo.setDeviceCode(tCruisePointInstance.getDeviceCode());//设备编码
-//                        tWarnInfo.setImagePath();//该巡视点所拍摄的图片
-//                        tWarnInfo.setValue(jsonObjectResult.get("resultValue").toString());//resultValue
-//                        tWarnInfo.setLinkMessage();//若该巡视点属于联动任务，则赋值
-                                analyseDataOperateService.insertWarnInfo(tWarnInfo);//组装完成的告警信息插库
-
-                            }
-                            //缺陷识别算法结果处理
-                        case 13669:
-
-                            break;
-                    }
-
-
+//                    //告警处理
+//                    String remoteAdds = ctx.channel().remoteAddress().toString();
+//                    int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));//Port:13668-表计识别,Port:13669-缺陷识别
+//                    //告警判断并组合数据插库
+//                    switch (remotePort){
+//                        //表计识别算法结果处理
+//                        case 13668:
+//                            TStdDevicemete tStdDevicemete=analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+//                            TCruisePointInstance tCruisePointInstance=analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+//                            Float resultValue=Float.valueOf(jsonObjectResult.get("resultValue").toString());
+//                            int warnRule=analyseDataOperateService.warnJudgement(resultValue,
+//                                    tStdDevicemete.getHighLimit1(),
+//                                    tStdDevicemete.getLowLimit1(),
+//                                    tStdDevicemete.getHighLimit2(),
+//                                    tStdDevicemete.getLowLimit2());
+//                            if(warnRule>0){
+//                                // TODO: 2020/10/20 组装TWarnInfo数据并插库
+//                                TWarnInfo tWarnInfo=new TWarnInfo();
+//                                tWarnInfo.setWarnLevel(tStdDevicemete.getAlarmLevel());
+//                                tWarnInfo.setWarnTime(new Date());//时间尚未格式化
+//                                tWarnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmType()));
+//                                switch (warnRule){
+//                                    case 1:
+//                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"过高");
+//                                        tWarnInfo.setOutRange(String.valueOf(resultValue-tStdDevicemete.getHighLimit1()));//实际量超出上下限的差值
+//                                    case 2:
+//                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"过低");
+//                                        tWarnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit1()-resultValue));
+//                                    case 3:
+//                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"超高");
+//                                        tWarnInfo.setOutRange(String.valueOf(resultValue-tStdDevicemete.getHighLimit2()));
+//                                    case 4:
+//                                        tWarnInfo.setWarnName(tStdDevicemete.getMeteName()+"超低");
+//                                        tWarnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit2()-resultValue));
+//                                        break;
+//                                }
+//                                tWarnInfo.setWarnContent(tWarnInfo.getWarnName());
+//                                tWarnInfo.setDeviceId(tCruisePointInstance.getDeviceId());//设备ID
+//                                tWarnInfo.setCunstomId(tCruisePointInstance.getCustomId());//部位ID
+//                                tWarnInfo.setInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));//巡视点ID
+//                                tWarnInfo.setStdMeteId(tCruisePointInstance.getDeviceMeteId());//标准测点ID
+//                                tWarnInfo.setConfMode(276);//未处理
+//                                switch (tCruisePointInstance.getCruiseTypeName()){
+//                                    case("机器人"):
+//                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","机器人")));//判断巡视点的巡视方式再决定
+//                                    case ("视频"):
+//                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","可见光")));//判断巡视点的巡视方式再决定
+//                                    case ("红外"):
+//                                        tWarnInfo.setAlarmSource(Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_source","红外")));//判断巡视点的巡视方式再决定
+//                                        break;
+//                                }
+//                                tWarnInfo.setDeviceCode(tCruisePointInstance.getDeviceCode());//设备编码
+////                        tWarnInfo.setImagePath();//该巡视点所拍摄的图片
+////                        tWarnInfo.setValue(jsonObjectResult.get("resultValue").toString());//resultValue
+////                        tWarnInfo.setLinkMessage();//若该巡视点属于联动任务，则赋值
+//                                analyseDataOperateService.insertWarnInfo(tWarnInfo);//组装完成的告警信息插库
+//
+//                            }
+//                            //缺陷识别算法结果处理
+//                        case 13669:
+//
+//                            break;
+//                    }
+//
+//
                 }
 
 

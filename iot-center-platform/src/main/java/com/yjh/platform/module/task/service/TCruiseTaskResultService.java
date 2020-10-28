@@ -533,19 +533,16 @@ public class TCruiseTaskResultService {
         Set<String> cruiseKeys = redisScan("t_cruise_task_result*");
         for (String key : cruiseKeys) {
             Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(key);
-            String TaskId = taskId.toString();
+            String TaskId = taskId;
             String InstanceId = instanceId.toString();
             if (cruiseInfo.get("taskId").equals(TaskId) && cruiseInfo.get("cruiseId").equals(InstanceId)) {
-                Object collectedPic = cruiseInfo.get("collectPic");
+                Object collectedPic = cruiseInfo.get("picpath");
                 collectPic = collectedPic.toString();
             }
         }
         Map<String, String> map = new HashMap<>();
         map.put("preImg", preImg);
         map.put("collectPic", collectPic);
-//     pictureResult.add(preImg);
-//     pictureResult.add(collectPic);
-
         return map;
     }
 
