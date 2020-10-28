@@ -63,6 +63,7 @@ public class CameraConService {
             }
             log.info("Constant.maps: "+Constant.maps);
             String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, livePath);
+            log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+livePath);
             Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
