@@ -64,12 +64,17 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public String sayHello(@ApiParam(value = "ceshi ", required = true) @RequestParam String name) {
-        WebSocketServer.sendMsg(name + "hello！");
-        JSONObject jsonObject = JSONObject.fromObject(WebSocketResult.builder().type("1").info(name + "  很好!").build());
-        WebSocketServer.sendMsg(jsonObject.toString());
-        log.info("转换时间：" + Math.random() * 100);
-        return name + "你好!";
+    public String sayHello(@ApiParam(value = "ceshi ",required = true) @RequestParam String name){
+        Map<String,String> mapForAbnormal = new HashMap<>();
+        mapForAbnormal.put("all","10");
+        mapForAbnormal.put("abnormal","0");
+        mapForAbnormal.put("normal","0");
+        String strForCountAbnormal = "countForAbnormal:"+10086;
+        redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+
+        Map<String,String> map  = redisTemplate.opsForHash().entries("countForAbnormal:10086");
+        return map.get("all")+"-----"+map.get("abnormal")+"-----" +map.get("normal") ;
+
     }
 
 

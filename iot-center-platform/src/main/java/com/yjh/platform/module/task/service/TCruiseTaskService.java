@@ -69,6 +69,12 @@ public class TCruiseTaskService {
     private TAlgorithmConfDao tAlgorithmConfDao;
     @Autowired
     private TAlgorithmInfoDao tAlgorithmInfoDao;
+    @Autowired
+    private TCruiseTaskResultDao tCruiseTaskResultDao;
+    @Autowired
+    private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
+    @Autowired
+    private TCruiseDataResultDao tCruiseDataResultDao;
     //模板图片路径
     @Value("${spring.picModelPath.dir}")
     private String picModelPath;
@@ -118,7 +124,8 @@ public class TCruiseTaskService {
                 //立即执行
                 try {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
-                            tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao);
+                            tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao,
+                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
