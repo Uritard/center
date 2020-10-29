@@ -276,32 +276,26 @@ public class TCruiseTaskResultService {
 
         //计算运行时间
         Set<String> keyResult1 = redisScan("t_cruise_task_result*");
-        String startTime = "yyyy-MM-dd HH:mm:ss";
         //获取任务开始时间
         for (String keys : keyResult1) {
             Map<String, Object> mapResult = redisTemplate.opsForHash().entries(keys);
 
-            String value = (mapResult.get("taskId")).toString();
-            String TaskId = taskId.toString();
-            if (TaskId.equals(value)) {
-                startTime = mapResult.get("startTime").toString();
+            String value = mapResult.get("taskId").toString();
+            if (taskId.equals(value)) {
+                String startTime = mapResult.get("startTime").toString();
+                //将两个时间字符串转为日期类型
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date d1 = simpleDateFormat.parse(startTime);
+                Date d2 = new Date("yyyy-MM-dd HH:mm:ss");
+                cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
             }
-
         }
-        //获取当前实时时间
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String nowTime = simpleDateFormat.format(date);
-        Date d1 = simpleDateFormat.parse(startTime);
-        Date d2 = simpleDateFormat.parse(nowTime);//将两个时间字符串转为日期类型
-        Long RunningTime = d2.getTime() - d1.getTime();//计算时间差
 
-        Long Minute = ((RunningTime / (60 * 1000)));
         Integer cruisedCount = deviceMete.size() - deviceMeteNotComp.size();//已执行的标准测点数量
         cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());
         cruiseResultCounter.setCruisedCount(cruisedCount);
         cruiseResultCounter.setCruiseNotCount(deviceMeteNotComp.size());
-        cruiseResultCounter.setRunningTime(Minute);
+
 
         return cruiseResultCounter;
     }
