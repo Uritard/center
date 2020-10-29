@@ -307,7 +307,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         try {
             // 心跳报文(客户端,服务端均可发起测试);
             if (isTimeout(TYPET3, hisT3, false)) {
-                SendHeartBeat(ctx);
+//                SendHeartBeat();
                 hisT3 = System.currentTimeMillis();
             }
         } catch (Exception e) {
@@ -354,8 +354,10 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         //        sendString(ctx, registerMsg);
     }
 
-    private void SendHeartBeat(ChannelHandlerContext ctx) {
-        String registerMsg = "{\n\"msgType\": \"5\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\"\n}\n}\n";
+    public void SendHeartBeat(Analysis analysis) {
+        String instanceId = analysis.getInstanceId().toString();
+        String taskId = analysis.getTaskId();
+        String registerMsg = "{\n\"msgType\": \"5\", \n\"msgData\": {\n\"instanceId\": "+"\""+instanceId+"\", \n\"taskId\": \""+taskId+"\"\n}\n}\n";
         sendString(ctx, registerMsg);
     }
 

@@ -32,6 +32,7 @@ public class AnalysisService {
 
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
+        if (analysisList.get(0).getInstanceId() == -1) { AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0)); }
 
         algorithmMsgId = algorithmMsgId+1;
         analysisObject.put("msgID", String.valueOf(algorithmMsgId));
