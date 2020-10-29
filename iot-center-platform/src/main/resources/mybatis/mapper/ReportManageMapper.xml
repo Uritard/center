@@ -31,7 +31,7 @@
         <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
     </resultMap>
 
-    <select id="reportGenerate" resultType="java.util.Map">
+    <select id="reportGenerate" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         select
         a.device_id,
         b.device_mete_id,

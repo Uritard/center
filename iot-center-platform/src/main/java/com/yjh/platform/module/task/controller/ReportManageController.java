@@ -4,8 +4,8 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.ReportForms;
+import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
 import com.yjh.platform.module.task.service.ReportManageService;
-import com.yjh.platform.module.user.entity.TCameraInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -18,10 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author YC
@@ -53,7 +51,7 @@ public class ReportManageController {
                                  @RequestParam(value="reportType")String reportType) {
         Result result = new Result();
         try {
-            List<Map<String, Object>> list = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportPath);
+            List<TCruiseDataResultDetail> list = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportPath);
             result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

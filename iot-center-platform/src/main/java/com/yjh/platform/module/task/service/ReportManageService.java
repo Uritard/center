@@ -1,17 +1,16 @@
 package com.yjh.platform.module.task.service;
 
-import cn.afterturn.easypoi.entity.ImageEntity;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.EasyPoiUtil;
+import com.yjh.platform.common.utils.Report.ReportDataRepo;
+import com.yjh.platform.common.utils.Report.ReportHelper;
 import com.yjh.platform.module.task.dao.ReportManageDao;
-import com.yjh.platform.module.task.entity.ReportForms;
+import com.yjh.platform.module.task.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -26,26 +25,46 @@ public class ReportManageService {
     private ReportManageDao reportManageDao;
     @Logs(title = "生成报表", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType,String reportPath) {
+    public List<TCruiseDataResultDetail> reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType,String reportPath) {
 //        List<String> list = Arrays.asList(deviceIdList.split(","));
-//        List<TestReportMange> resultList = reportManageDao.reportGenerate(startTime,endTime,list,reportName);
 
-        List<Map<String, Object>> reportResultList =  reportManageDao.reportGenerate(startTime,endTime);//获取报表所需信息
+        //巡检记录报表对象
+        ReportData recordData = new ReportData();
+        //1.总体情况
+        TaskVO taskVO = new TaskVO();
+        taskVO.setCruiseDate(new Date());
+        recordData.setTaskVO(taskVO);
+        //2.分项预览
+        List<CheckPointType> cpTypeItems = new ArrayList<>();
+        recordData.setCpTypeItems(cpTypeItems);
+        //3.环境监测
+        List<EnvironmentResult> evnRecordList = new ArrayList<>();
+        recordData.setEvnRecordList(evnRecordList);
+        //4.关联设备
+        List<RelationDevice> rcpRecordList = new ArrayList<>();
+        recordData.setRcpRecordList(rcpRecordList);
+        //5.明细，一次巡检任务的所有测点巡检结果详情
+        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.reportGenerate(startTime,endTime);
+        recordData.setTCDRDList(tCDRDList);
+        System.out.println("<--------recordData------->:"+recordData);
 
-//        ImageEntity image1 = new ImageEntity();
-//        image1.setUrl("D:/timg.jpg");
-//        for (int i = 0;i <= reportResultList.size()-1;i++){
-//            reportResultList.get(i).put("picpath",image1);
-//            byte[] imageFromNetByUrl = EasyPoiUtil.getImageFromNetByUrl((String) reportResultList.get(i).get("picpath"));
-//            reportResultList.get(i).put("picpath",imageFromNetByUrl);
-//        }
         SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();
         String nowTime = f.format(date);
 
-        EasyPoiUtil.exportExcel(reportResultList, "巡检记录报表",reportName+"-"+nowTime+"-"+reportType,  true,reportPath);
+        String fileName = reportName+"-"+nowTime+"-"+reportType;//报表名称
+        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName+".xlsx";
+        File file = new File(reportPath2);
 
-        return reportResultList;
+        ContentData contentData = ReportDataRepo.getData(recordData);
+        System.out.println("<--------contentData------->:"+contentData);
+
+        ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+                contentData.getElements(), file);
+
+//        DownloadUtil.downloadFile(reportPath, file.getName(), response, request);
+
+        return tCDRDList;
     }
     @Logs(title = "下载报表", code = "module")
     @Transactional(rollbackFor = Exception.class)

@@ -1,11 +1,11 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author YC
@@ -13,6 +13,6 @@ import java.util.Map;
  */
 @Repository
 public interface ReportManageDao {
-    List<Map<String, Object>> reportGenerate(@Param(value = "startTime")Date startTime,
-                                             @Param(value = "endTime")Date endTime);
+    List<TCruiseDataResultDetail> reportGenerate(@Param(value = "startTime")Date startTime,
+                                                 @Param(value = "endTime")Date endTime);
 }
