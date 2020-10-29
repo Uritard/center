@@ -137,7 +137,7 @@ public class CameraConController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            String filePathTem = "/" + presetId + ".jpg";
+            String filePathTem = "/presetId/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);

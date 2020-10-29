@@ -53,6 +53,7 @@ public class CameraConService {
             String cameraIp = cameraConInfo.getRecordIp();
             int cameraPort = cameraConInfo.getRtspPort();
             int iChanNum = cameraConInfo.getChannelNum();
+            int cameraType = cameraConInfo.getCameraType();
             int livePath;
             if (Constant.maps.get("livePath") != null) {
                 livePath = Constant.maps.get("livePath")+1;
@@ -62,7 +63,10 @@ public class CameraConService {
                 Constant.maps.put("livePath", 123);
             }
             log.info("Constant.maps: "+Constant.maps);
-            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, livePath);
+            String transUrl = "";
+            if (cameraType==0) {
+                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
+            } else if (cameraType==1) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);}
             log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+livePath);
             Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
