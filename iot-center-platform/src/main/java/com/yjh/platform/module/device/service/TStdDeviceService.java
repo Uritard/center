@@ -205,6 +205,35 @@ public class TStdDeviceService{
             }
 //        }
 
+        if(tStdDeviceDetail.getModelId() == null){
+            TStdDevice tStdDevice = new TStdDevice();
+            tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
+            tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+            if(tStdDevice.getCustomId() == null){
+                //不传 设为本体，根据字典表查，暂定为101
+                tStdDevice.setCustomId("101");
+                List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
+                tStdDevice.setCustomName(list.get(0).getDictNote());
+            }else{
+                tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+                List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceDetail.getCustomId(),null,null,null,null,null);
+                tStdDevice.setCustomName(list.get(0).getDictNote());
+            }
+            tStdDevice.setCustomType(tStdDeviceDetail.getCustomType());
+            tStdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
+            tStdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
+            tStdDevice.setDeviceName(tStdDeviceDetail.getDeviceName());
+            tStdDevice.setDeviceType(tStdDeviceDetail.getDeviceType());
+            tStdDevice.setModelId(tStdDeviceDetail.getModelId());
+            tStdDevice.setPositionType(tStdDeviceDetail.getPositionType());
+            tStdDevice.setRegionPath(tStdDeviceDetail.getRegionPath());
+            tStdDevice.setStatus(tStdDeviceDetail.getStatus());
+            tStdDevice.setUpdateTime(tStdDeviceDetail.getUpdateTime());
+            tStdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
+            tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
+            this.tStdDeviceDao.add(tStdDevice);
+        }
+
 
 
 
