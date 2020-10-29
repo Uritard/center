@@ -276,7 +276,7 @@ public class TCruiseTaskResultService {
 
         //计算运行时间
         Set<String> keyResult1 = redisScan("t_cruise_task_result*");
-        String startTime = "yyyy-mm-dd HH:mm:ss";
+        String startTime = "yyyy-MM-dd HH:mm:ss";
         //获取任务开始时间
         for (String keys : keyResult1) {
             Map<String, Object> mapResult = redisTemplate.opsForHash().entries(keys);
