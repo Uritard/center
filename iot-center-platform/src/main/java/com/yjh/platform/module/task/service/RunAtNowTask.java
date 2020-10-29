@@ -231,7 +231,7 @@ public class RunAtNowTask implements Runnable{
                     if(absPath == null){
                         //抓图失败 任务失败
                         taskAbnormal = taskAbnormal+1;
-                        tCruiseResult = tCruiseResultDao.selectByPrimaryId(taskId);
+                        tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
                         Integer taskWait = tCruiseResult.getTaskWait()-1;
                         if(taskWait == 0 ){
                             tCruiseResult.setCState(240);
@@ -269,7 +269,7 @@ public class RunAtNowTask implements Runnable{
                         TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
                         if(tAlgorithmConf != null){//摄像头配置了算法
                             tCruiseDataResult.setPicpath(urlPath);
-                            tCruiseDataResult.setOrigpic(picModelPath+"/"+item.getCruiseId());
+                            tCruiseDataResult.setOrigpic(absPath);
                             Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                             String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
 
@@ -301,7 +301,7 @@ public class RunAtNowTask implements Runnable{
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
                             tCruiseDataResult.setPicpath(urlPath);
-                            tCruiseDataResult.setOrigpic(picModelPath+"/"+item.getCruiseId());
+                            tCruiseDataResult.setOrigpic(absPath);
                             List<Analysis> analysisList = new ArrayList<>();
                             analysisList.add(analysis);
                             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
@@ -313,7 +313,7 @@ public class RunAtNowTask implements Runnable{
                             }
                         }else {
                             normal = normal+1;
-                            tCruiseResult = tCruiseResultDao.selectByPrimaryId(taskId);
+                            tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
                                 tCruiseResult.setCState(240);
@@ -322,6 +322,7 @@ public class RunAtNowTask implements Runnable{
                             tCruiseResultDao.update(tCruiseResult);
 
                             tCruiseDataResult.setPicpath(urlPath);
+                            tCruiseDataResult.setOrigpic(absPath);
                             tCruiseDataResult.setState(247);
                             tCruiseDataResult.setIdentifyResult(261);
                             tCruiseDataResultDao.insert(tCruiseDataResult);
