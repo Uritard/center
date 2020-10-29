@@ -5,9 +5,8 @@ import com.yjh.platform.module.task.service.TCruiseTaskResultService;
 import com.yjh.platform.module.task.entity.TCruiseTaskResult;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
+
 import io.swagger.annotations.*;
 
 
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
@@ -194,7 +192,10 @@ public class TCruiseTaskResultController {
     public Result selectCruiseStatusCount(@RequestParam String taskId){
         Result result=new Result();
         try{
-            result.setData(tCruiseTaskResultService.selectCruiseStatusCount(taskId));
+            CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(taskId);
+            if (Objects.nonNull(cruiseResultCounter)) {
+                result.setData(cruiseResultCounter);
+            } else {result.setMessage("巡检结果还未返回结果");}
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);
