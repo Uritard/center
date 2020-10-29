@@ -63,11 +63,11 @@ public class CameraConService {
                 Constant.maps.put("livePath", 123);
             }
             log.info("Constant.maps: "+Constant.maps);
+            log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+cameraType+" "+livePath);
             String transUrl = "";
-            if (cameraType==0) {
+            if (cameraType==205) {
                 transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
-            } else if (cameraType==1) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);}
-            log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+livePath);
+            } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
             Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];

@@ -28,7 +28,7 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "通道号")
     private Integer channelNum;
 
-    @ApiModelProperty(value = "摄像机类型，0-可见光，1-红外")
+    @ApiModelProperty(value = "摄像机类型，205-可见光，206-红外")
     private Integer cameraType;
 
     @ApiModelProperty(value = "预置位id")
