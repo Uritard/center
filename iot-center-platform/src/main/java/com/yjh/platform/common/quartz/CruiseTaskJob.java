@@ -320,8 +320,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
             }else {
-                mapForAbnormal.put("abnormal","0");
-                mapForAbnormal.put("normal","0");
+                mapForAbnormal.put("abnormal",taskAbnormal.toString());
+                mapForAbnormal.put("normal",normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
             //任务结束生成结果，
