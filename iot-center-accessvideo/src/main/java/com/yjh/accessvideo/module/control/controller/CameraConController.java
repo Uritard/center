@@ -117,6 +117,7 @@ public class CameraConController {
             String message = cameraConService.capturePicture(filePath, cameraId);
             String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
+            resultMap.put("absPath", filePath);
             String url = "chmod 777 "+ filePath;
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
