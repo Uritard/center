@@ -1,12 +1,9 @@
-package com.yjh.Manager.module.service;
+package com.yjh.logs.module.log.service;
 
 import com.alibaba.fastjson.JSON;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.shared.Application;
 import com.netflix.eureka.EurekaServerContextHolder;
-import com.yjh.Manager.logs.Logs;
-import com.yjh.Manager.module.dao.TCfgAccessDao;
-import com.yjh.Manager.module.entity.TCfgAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
-* @author tt
-* @since 2020-08-17
-*/
+ * @author tt
+ * @since 2020-08-17
+ */
 @Service
 public class ManagerService {
 
@@ -29,7 +26,6 @@ public class ManagerService {
     @Autowired
     private DiscoveryClient discoveryClient;
 
-//    @Logs(title = "查询服务状态", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Map> select() {
         List<Application> sortedApplications = EurekaServerContextHolder.getInstance().getServerContext().getRegistry().getSortedApplications();
@@ -85,4 +81,5 @@ public class ManagerService {
     }
 
 }
+
 
