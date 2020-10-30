@@ -24,6 +24,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @Description
@@ -63,8 +64,13 @@ public class LogsAspect {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
             request = servletRequestAttributes.getRequest();
-            userId = request.getHeader("userId");
-            userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
+            if (Objects.nonNull(request.getHeader("userId"))) {
+                userId = request.getHeader("userId");
+                userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
+            } else {
+                userName = request.getParameter("userName");
+            }
+
             ip = IPUtil.getRemoteIP(request);
         }
         Object result = null;

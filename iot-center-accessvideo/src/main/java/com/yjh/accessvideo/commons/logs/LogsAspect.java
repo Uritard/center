@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,6 +24,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @Description
@@ -37,6 +39,8 @@ public class LogsAspect {
     private static final String LOG_URL = "http://iot-center-logs/sysLogs/v1/add";
     @Autowired
     private LogsConfig logsConfig;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @LoadBalanced
     @Bean(name = "serviceRestTemplate")
@@ -60,8 +64,13 @@ public class LogsAspect {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
             request = servletRequestAttributes.getRequest();
-            userName = request.getHeader("userName");
-            userId = request.getHeader("userId");
+            if (Objects.nonNull(request.getHeader("userId"))) {
+                userId = request.getHeader("userId");
+                userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
+            } else {
+                userName = request.getParameter("userName");
+            }
+
             ip = IPUtil.getRemoteIP(request);
         }
         Object result = null;
