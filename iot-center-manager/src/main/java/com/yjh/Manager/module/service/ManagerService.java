@@ -1,4 +1,4 @@
-package com.yjh.logs.module.log.service;
+package com.yjh.Manager.module.service;
 
 import com.alibaba.fastjson.JSON;
 import com.netflix.appinfo.InstanceInfo;
@@ -81,5 +81,4 @@ public class ManagerService {
     }
 
 }
-
 

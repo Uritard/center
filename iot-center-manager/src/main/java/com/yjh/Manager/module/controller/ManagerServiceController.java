@@ -1,8 +1,8 @@
-package com.yjh.logs.module.log.controller;
+package com.yjh.Manager.module.controller;
 
-import com.yjh.logs.commons.result.Result;
-import com.yjh.logs.commons.result.ResultCodeEnum;
-import com.yjh.logs.module.log.service.ManagerService;
+import com.yjh.Manager.common.result.Result;
+import com.yjh.Manager.common.result.ResultCodeEnum;
+import com.yjh.Manager.module.service.ManagerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -45,3 +45,4 @@ public class ManagerServiceController {
     }
 
 }
+
