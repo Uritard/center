@@ -37,7 +37,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.yjh.accessvideo.common.Constant.TYPET3;
-import static com.yjh.accessvideo.common.Constant.instanceIds;
+import static com.yjh.accessvideo.common.Constant.TASKID;
+import static com.yjh.accessvideo.common.Constant.INSTANCEID;
+import static com.yjh.accessvideo.common.Constant.ABNORMAL;
+import static com.yjh.accessvideo.common.Constant.NORMAL;
+import static com.yjh.accessvideo.common.Constant.cruiseKeys;
+
 
 /**
  * Created by tt on 2019/7/31.
@@ -51,15 +56,19 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
 
-    private  RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
-    public AnalysisClientHandler (RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService) {
+
+    public AnalysisClientHandler(RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService) {
         this.redisTemplate = redisTemplate;
-        this.analyseDataOperateService=analyseDataOperateService;
+        this.analyseDataOperateService = analyseDataOperateService;
     }
 
     private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
-    public static Map<Integer, AnalysisClientHandler> getAnalysisClientHandlerHashMap() { return analysisClientHandlerHashMap; }
+
+    public static Map<Integer, AnalysisClientHandler> getAnalysisClientHandlerHashMap() {
+        return analysisClientHandlerHashMap;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
@@ -73,10 +82,12 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //        thread.setDaemon(true);
 //        thread.start();
         String remoteAdds = ctx.channel().remoteAddress().toString();
-        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));
-        if (analysisClientHandlerHashMap.get(remotePort) == null) { analysisClientHandlerHashMap.put(remotePort, this); }
-        log.info("客户端注册成功: "+ctx.channel().remoteAddress());
-        log.info("analysisClientHandlerHashMap: "+analysisClientHandlerHashMap);
+        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
+        if (analysisClientHandlerHashMap.get(remotePort) == null) {
+            analysisClientHandlerHashMap.put(remotePort, this);
+        }
+        log.info("客户端注册成功: " + ctx.channel().remoteAddress());
+        log.info("analysisClientHandlerHashMap: " + analysisClientHandlerHashMap);
     }
 
     @Override
@@ -87,15 +98,17 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         super.channelInactive(ctx);
         isThreadStart = false;
         String remoteAdds = ctx.channel().remoteAddress().toString();
-        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":")+1));
+        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
         analysisClientHandlerHashMap.remove(remotePort);
         log.error("服务端主动断开连接！");
-        log.info("analysisClientHandlerHashMap: "+analysisClientHandlerHashMap);
+        log.info("analysisClientHandlerHashMap: " + analysisClientHandlerHashMap);
         String serverUrl = remoteAdds.substring(0, remoteAdds.indexOf(":"));
-        log.info("serverUrl: "+serverUrl.substring(1));
+        log.info("serverUrl: " + serverUrl.substring(1));
         InetSocketAddress remoteAddress = new InetSocketAddress(serverUrl.substring(1), remotePort);
         //使用过程中断线重连
-        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) { doConnect(remoteAddress, Constant.bootstrapHashMap.get(1)); }
+        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
+            doConnect(remoteAddress, Constant.bootstrapHashMap.get(1));
+        }
     }
 
     @Override
@@ -105,27 +118,40 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         byteBuf.readBytes(bytes);
         try {
             String body = new String(bytes, "UTF-8");
-            log.info("接收服务端数据:"+body);
+            log.info("接收服务端数据:" + body);
             handlerData(body);
-        } catch (Exception e) { e.getMessage(); }
+        } catch (Exception e) {
+            e.getMessage();
+        }
 
         ReferenceCountUtil.release(byteBuf);
     }
 
     private void handlerData(String body) throws ParseException {
         //TODO 具体转化逻辑
-        JSONObject jsonObject=JSON.parseObject(body);
-        log.info("JSON对象1："+jsonObject);
-        switch (jsonObject.get("msgType").toString()){
-            case "2":
-                JSONObject jsonObjectData=JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
-                log.info("原生数据****："+jsonObjectData);
-                Iterator iterator=jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
-                while (iterator.hasNext()){
-                    Map.Entry entry=(Map.Entry)iterator.next();
-                    //遍历每一个结果子集
-                    JSONObject jsonObjectResult=JSON.parseObject(entry.getValue().toString());
-                    log.info("数据****："+jsonObjectResult);//打印resultInfo
+        JSONObject jsonObject = JSON.parseObject(body);
+        log.info("JSON对象1：" + jsonObject);
+        if (jsonObject.get("msgType").toString().equals("2")) {
+            JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
+            log.info("原生数据****：" + jsonObjectData);
+            Iterator iterator = jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                //遍历每一个结果子集
+                JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
+                log.info("数据****：" + jsonObjectResult);//打印resultInfo
+                //初始化TASKID和INSTANCEID
+
+
+                TASKID=jsonObjectResult.get("taskId").toString();
+                INSTANCEID=jsonObjectResult.get("instanceId").toString();
+                String name="t_cruise_task_result:"+TASKID+INSTANCEID;
+                log.info("keyName"+name);
+                cruiseKeys.add(name);
+
+
+
+                log.info("数据初始化");
 //                    String analyseType=jsonObjectResult.get("analyseType").toString();
 //                    log.info(analyseType);
 //                    String taskId=jsonObjectResult.get("taskId").toString();
@@ -135,99 +161,34 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //                    String instanceId=jsonObjectResult.get("instanceId").toString();
 //                    log.info(instanceId);
 
-                    //redis数据键名由taskId+instanceId命名
-                    // TODO: 2020/10/25 下任务时插redis库名需改
-                    String redisName=jsonObjectResult.get("taskId").toString()+jsonObjectResult.get("instanceId").toString();
-                    log.info("template:"+ redisTemplate);
-                    log.info("redisName:"+redisName);
-                    Map<String,Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:"+redisName);//读redis
-                    log.info("读取到的redis："+cruiseResult);
-                    Map<String,String> cruiseResultMap=new HashMap<>();//修改redis的巡检点结果map
-                    cruiseResultMap.put("resultNum",jsonObjectResult.get("resultValue").toString());
-                    cruiseResultMap.put("state",analyseDataOperateService.selectDictCode("data_state","正常"));
-                    cruiseResultMap.put("cruiseStatus",analyseDataOperateService.selectDictCode("cruise_data_state","已执行"));
-                    redisTemplate.opsForHash().putAll("t_cruise_task_result:"+redisName,cruiseResultMap);//修改redis
-                    // webSocket通知前端调用巡视监控的接口
-                    Map<String,Object> jasonMap=new HashMap<>();
-                    jasonMap.put("type","newTask");
-                    jasonMap.put("taskId",cruiseResult.get("taskId").toString());
-                    String json=JSON.toJSONString(jasonMap);
-                    log.info("发送给前端的消息："+json);
-                    WebSocketServer.sendMsg(json);
+                //redis数据键名由taskId+instanceId命名
+                log.info("数据Redis业务开启");
+                // TODO: 2020/10/25 下任务时插redis库名需改
+                String redisName = jsonObjectResult.get("taskId").toString() + jsonObjectResult.get("instanceId").toString();
+                log.info("template:" + redisTemplate);
+                log.info("redisName:" + redisName);
+                Map<String, Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:" + redisName);//读redis
+                log.info("读取到的redis：" + cruiseResult);
+                Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
+                cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
+                cruiseResultMap.put("state", analyseDataOperateService.selectDictCode("data_state", "正常"));
+                cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
+                redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
+                NORMAL=NORMAL+1;
+                // webSocket通知前端调用巡视监控的接口
+                Map<String, Object> jasonMap = new HashMap<>();
+                jasonMap.put("type", "newTask");
+                jasonMap.put("taskId", cruiseResult.get("taskId").toString());
+                String json = JSON.toJSONString(jasonMap);
+                log.info("发送给前端的消息：" + json);
+                WebSocketServer.sendMsg(json);
 
+                
+                //修改缓存中任务算法巡视点List
+                redisTemplate.opsForList().remove(cruiseResult.get("taskId").toString(),0,cruiseResult.get("instanceId").toString());
+                redisTemplate.opsForList().rightPush(cruiseResult.get("taskId").toString(),"0");
 
-
-
-                    //判断该任务下的巡视点是否均已执行完成
-
-                    //当前任务下所有的巡视点
-                    if(instanceIds.size()==0){
-                        for(TCruisePointInstance tCruisePointInstance1:analyseDataOperateService.selectCruiseByTask(jsonObjectResult.get("taskId").toString())){
-                            instanceIds.add(tCruisePointInstance1.getInstanceId());
-                        }
-                    }
-                    log.info("instanceIds:"+instanceIds);
-                    instanceIds.remove(Long.valueOf(jsonObjectResult.get("instanceId").toString()));//当一个巡视点有值时，从总巡视点集中删除
-                    log.info("instanceIds删除后:"+instanceIds);
-                    //所有巡视点都有了结果
-                    if(instanceIds.size()==0){
-                        // TODO: 2020/10/25 修改任务状态为已完成
-                        log.info("TCR开始");
-                        //TCR
-                        TCruiseResult tCruiseResult=analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
-                        tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state","执行完成").toString()));
-                        tCruiseResult.setTaskWait(0);
-                        analyseDataOperateService.updateCruiseResult(tCruiseResult);
-
-                        log.info("TCTR开始");
-                        //TCTR
-
-                        TCruiseTaskResult tCruiseTaskResult=new TCruiseTaskResult();
-                        tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
-                        tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
-                        tCruiseTaskResult.setTaskAbnormal(0);
-                        tCruiseTaskResult.setTaskAlarm(0);
-                        tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
-//                                tCruiseTaskResult.setCruiseTaskTime();
-                        analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
-
-
-                        Set<String> cruiseKeys=redisScan("t_cruise_task_result:"+(jsonObjectResult.get("taskId").toString()));
-                        for(String cruiseKey:cruiseKeys){
-                            Map<String,Object> cruiseWorkedMap=redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
-                            //创建四张结果表对象
-
-                            log.info("TCTRD开始");
-                            //TCTRD
-                            TCruiseTaskResultDetail tCruiseTaskResultDetail=new TCruiseTaskResultDetail();
-                            tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
-                            tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
-                            tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
-                            tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
-                            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
-                            tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
-                            tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
-                            tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
-                            analyseDataOperateService.insertCruiseTaskResultDetail(tCruiseTaskResultDetail);
-
-                            log.info("TCDR开始");
-                            //TCDR
-                            TCruiseDataResult tCruiseDataResult=new TCruiseDataResult();
-                            tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
-                            tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
-                            tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
-                            tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
-                            tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
-                            tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
-                            tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
-                            tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
-                            tCruiseDataResult.setCreatetime(new Date());
-                            tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString()+cruiseWorkedMap.get("instanceId").toString());
-                            analyseDataOperateService.insertCruiseDataResult(tCruiseDataResult);
-                        }
-
-                    }
+                log.info("RedisList修改成功");
 
 
 
@@ -296,11 +257,174 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //                    }
 //
 //
-                }
+            }
+
+        }else if(jsonObject.get("msgType").toString().equals("6")){ //任务结束后发来的心跳信息
+            String taskId=JSON.parseObject(jsonObject.get("msgData").toString()).get("taskId").toString();
+            redisTemplate.opsForList().leftPush(taskId,"-1");
+            log.info("心跳处理结束"+taskId);
+        }
+
+        if(redisTemplate.opsForList().index(TASKID,0).equals("-1") && redisTemplate.opsForList().index(TASKID,1).equals("0")){
+
+            Map<String,Object> cruiseResult=redisTemplate.opsForHash().entries("t_cruise_task_result:"+TASKID+INSTANCEID);
+           //TCR开始
+            log.info("TCR开始");
+            TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
+            tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
+            tCruiseResult.setTaskWait(0);
+            analyseDataOperateService.updateCruiseResult(tCruiseResult);
+
+            // TODO: 2020/10/29 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作
+//            // TODO: 2020/10/29 修改异常点数缓存
+            String strForCountAbnormal = "countForAbnormal:"+TASKID;
+            Map<String,Object>abnormalCount=redisTemplate.opsForHash().entries(strForCountAbnormal);
+            Integer total=Integer.valueOf(abnormalCount.get("all").toString());
+            Integer abnormal=Integer.valueOf(abnormalCount.get("abnormal").toString());
+            Integer normal=Integer.valueOf(abnormalCount.get("normal").toString());
+            if(abnormal+ABNORMAL+normal+NORMAL==total){
+                //TCTR开始
+                log.info("TCTR开始");
+            TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
+            tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
+            tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
+            tCruiseTaskResult.setTaskAbnormal(abnormal+ABNORMAL);
+            tCruiseTaskResult.setTaskAlarm(0);
+            tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
+//                                tCruiseTaskResult.setCruiseTaskTime();
+            analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+            }else {
+                Map<String,String> mapForAbnormal = new HashMap<>();
+                Integer totAbnormal=abnormal+ABNORMAL;
+                Integer totNormal=normal+NORMAL;
+                mapForAbnormal.put("abnormal",totAbnormal.toString());
+                mapForAbnormal.put("normal",totNormal.toString());
+                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+            }
+            ABNORMAL=0;
+            NORMAL=0;
 
 
+            List<TCruiseTaskResultDetail> detailList=new ArrayList<>();//TCTRD List对象
+            List<TCruiseDataResult> dataList=new ArrayList<>();//TCDR List对象
+//            Set<String>cruiseKeys=redisScan("t_cruise_task_result:"+TASKID);
+            for(String cruiseKey:cruiseKeys){
+                Map<String, Object> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
+                //TCTRD
+                log.info("TCTRD开始");
+                TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+                tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
+                tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
+                tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
+                tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
+                tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
+                tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
+                detailList.add(tCruiseTaskResultDetail);
+
+                //TCDR
+                log.info("TCRD开始");
+                TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
+                tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
+                tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
+                tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
+                tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
+                tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
+                tCruiseDataResult.setEvaluationState(Integer.valueOf(analyseDataOperateService.selectDictCode("evaluation_state","未审核")));
+                tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
+                tCruiseDataResult.setCreatetime(new Date());
+                tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+                dataList.add(tCruiseDataResult);
+            }
+            //批量插入两表
+            log.info("cruisekeys:"+cruiseKeys);
+            log.info("两表开始插入");
+            analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
+            analyseDataOperateService.batchInsertCruiseDataResult(dataList);
+            log.info("两表结束插入");
+            cruiseKeys.clear();
 
         }
+
+
+
+
+        //判断该任务下的巡视点是否均已执行完成
+
+        //当前任务下所有的巡视点
+//        if (instanceIds.size() == 0) {
+//            for (TCruisePointInstance tCruisePointInstance1 : analyseDataOperateService.selectCruiseByTask(jsonObjectResult.get("taskId").toString())) {
+//                instanceIds.add(tCruisePointInstance1.getInstanceId());
+//            }
+//        }
+//        log.info("instanceIds:" + instanceIds);
+//        instanceIds.remove(Long.valueOf(jsonObjectResult.get("instanceId").toString()));//当一个巡视点有值时，从总巡视点集中删除
+//        log.info("instanceIds删除后:" + instanceIds);
+        //所有巡视点都有了结果
+//        if (instanceIds.size() == 0) {
+//            // TODO: 2020/10/25 修改任务状态为已完成
+//            log.info("TCR开始");
+//            //TCR
+//            TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
+//            tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
+//            tCruiseResult.setTaskWait(0);
+//            analyseDataOperateService.updateCruiseResult(tCruiseResult);
+//
+//            log.info("TCTR开始");
+//            //TCTR
+//
+//            TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
+//            tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
+//            tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
+//            tCruiseTaskResult.setTaskAbnormal(0);
+//            tCruiseTaskResult.setTaskAlarm(0);
+//            tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
+////                                tCruiseTaskResult.setCruiseTaskTime();
+//            analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+//
+//
+//            Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + (jsonObjectResult.get("taskId").toString()));
+//            for (String cruiseKey : cruiseKeys) {
+//                Map<String, Object> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
+//                //创建四张结果表对象
+//
+//                log.info("TCTRD开始");
+//                //TCTRD
+//                TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+//                tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+//                tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
+//                tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
+//                tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
+//                tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
+//                tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
+//                tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
+//                analyseDataOperateService.insertCruiseTaskResultDetail(tCruiseTaskResultDetail);
+//
+//                log.info("TCDR开始");
+//                //TCDR
+//                TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+//                tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+//                tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
+//                tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
+//                tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
+//                tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
+//                tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
+//                tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
+//                tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
+//                tCruiseDataResult.setCreatetime(new Date());
+//                tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+//                analyseDataOperateService.insertCruiseDataResult(tCruiseDataResult);
+//            }
+//
+//        }
+
+
     }
 
     public void ProcSend() {
@@ -354,10 +478,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         //        sendString(ctx, registerMsg);
     }
 
-    public void SendHeartBeat(Analysis analysis) {
+    public void SendHeartBeat(Analysis analysis) throws InterruptedException {
         String instanceId = analysis.getInstanceId().toString();
         String taskId = analysis.getTaskId();
-        String registerMsg = "{\n\"msgType\": \"5\", \n\"msgData\": {\n\"instanceId\": "+"\""+instanceId+"\", \n\"taskId\": \""+taskId+"\"\n}\n}\n";
+        Thread.sleep(3000);
+        String registerMsg = "{\n\"msgType\": \"5\", \n\"msgData\": {\n\"instanceId\": " + "\"" + instanceId + "\", \n\"taskId\": \"" + taskId + "\"\n}\n}\n";
         sendString(ctx, registerMsg);
     }
 
@@ -401,12 +526,14 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                     final EventLoop eventLoop = futureListener.channel().eventLoop();
                     if (!futureListener.isSuccess()) {
                         //重连
-                        log.info("与服务端"+remoteAddress + "连接失败!主动尝试重连!");
+                        log.info("与服务端" + remoteAddress + "连接失败!主动尝试重连!");
                         eventLoop.schedule(() -> doConnect(remoteAddress, bootstrap), 60, TimeUnit.SECONDS);
                     }
                 });
             }
-        } catch (Exception e) { log.info("------主动连接服务端连接失败------" + e.getMessage()); }
+        } catch (Exception e) {
+            log.info("------主动连接服务端连接失败------" + e.getMessage());
+        }
     }
 
 }

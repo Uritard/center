@@ -28,35 +28,39 @@ public class AnalysisService {
 
     @Logs(title = "算法调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public String feignAlgorithm(List<Analysis> analysisList, int recognizePort) {
+    public String feignAlgorithm(List<Analysis> analysisList, int recognizePort) throws InterruptedException {
 
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
-        if (analysisList.get(0).getInstanceId() == -1) { AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0)); }
-
-        algorithmMsgId = algorithmMsgId+1;
-        analysisObject.put("msgID", String.valueOf(algorithmMsgId));
-        log.info("algorithmMsgId: "+algorithmMsgId);
-        analysisObject.put("msgType", "1");
-        msgDataObject.put("desNode", "serverSocket");
-        msgDataObject.put("srcNode", "clientSocket001");
-        int i=1;
-        for (Analysis analysis: analysisList) {
-            if (analysis.getIsAi()==0) {
-                JSONObject pictureInfoObject = new JSONObject();
-                JSONObject pictureDataObject = new JSONObject();
-                pictureDataObject.put("analyseType", analysis.getAnalyseType());
-                pictureDataObject.put("imagePath", analysis.getPicPath());
-                pictureDataObject.put("modelPath", analysis.getPicModelPath());
-                pictureDataObject.put("taskId", analysis.getTaskId());
-                pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-                msgDataObject.put("data", pictureInfoObject);
+        log.info("任务结束心跳发送");
+        if (analysisList.get(0).getInstanceId() == -1) {
+            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0));
+        } else {
+            algorithmMsgId = algorithmMsgId+1;
+            analysisObject.put("msgID", String.valueOf(algorithmMsgId));
+            log.info("algorithmMsgId: "+algorithmMsgId);
+            analysisObject.put("msgType", "1");
+            msgDataObject.put("desNode", "serverSocket");
+            msgDataObject.put("srcNode", "clientSocket001");
+            int i=1;
+            for (Analysis analysis: analysisList) {
+                if (analysis.getIsAi()==0) {
+                    JSONObject pictureInfoObject = new JSONObject();
+                    JSONObject pictureDataObject = new JSONObject();
+                    pictureDataObject.put("analyseType", analysis.getAnalyseType());
+                    pictureDataObject.put("imagePath", analysis.getPicPath());
+                    pictureDataObject.put("modelPath", analysis.getPicModelPath());
+                    pictureDataObject.put("taskId", analysis.getTaskId());
+                    pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                    pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
+                    msgDataObject.put("data", pictureInfoObject);
+                }
+                i++;
             }
-            i++;
+            analysisObject.put("msgData", msgDataObject);
+            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
         }
-        analysisObject.put("msgData", msgDataObject);
-        AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
+        log.info("analysisList.get(0).getInstanceId():"+analysisList.get(0).getInstanceId());
         return "success";
     }
 

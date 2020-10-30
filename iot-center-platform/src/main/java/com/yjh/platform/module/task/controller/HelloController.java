@@ -64,17 +64,31 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public String sayHello(@ApiParam(value = "ceshi ",required = true) @RequestParam String name){
-        Map<String,String> mapForAbnormal = new HashMap<>();
-        mapForAbnormal.put("all","10");
-        mapForAbnormal.put("abnormal","0");
-        mapForAbnormal.put("normal","0");
-        String strForCountAbnormal = "countForAbnormal:"+10086;
-        redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+    public String sayHello(@ApiParam(value = "ceshi ", required = true) @RequestParam String name,@ApiParam(value = "ceshi ", required = true)@RequestParam String name2) {
+        WebSocketServer.sendMsg(name + "hello！");
+        JSONObject jsonObject = JSONObject.fromObject(WebSocketResult.builder().type("1").info(name + "  很好!").build());
+        WebSocketServer.sendMsg(jsonObject.toString());
+        log.info("转换时间：" + Math.random() * 100);
 
-        Map<String,String> map  = redisTemplate.opsForHash().entries("countForAbnormal:10086");
-        return map.get("all")+"-----"+map.get("abnormal")+"-----" +map.get("normal") ;
+//       log.info("RedisList:"+redisTemplate.opsForList().leftPushIfPresent("AnalysisList：9000001","1000003"));
+//       redisTemplate.opsForList().leftPushAll("AnalysisList：9000001","1000003");
+//       redisTemplate.opsForList().remove("AnalysisList：9000001",0,"1000003");
 
+        if(name2.equals("2")){
+            log.info("1"+name2);
+            redisTemplate.opsForList().remove("AnalysisList：9000001", 0, "1000001");
+            redisTemplate.opsForList().rightPush("AnalysisList：9000001","0");
+        }else if(name2.equals("6")){
+            log.info("2"+name2);
+            redisTemplate.opsForList().leftPush("AnalysisList：9000001","-1");
+        }
+        if (redisTemplate.opsForList().index("AnalysisList：9000001", 0).equals("-1") && redisTemplate.opsForList().index("AnalysisList：9000001",1).equals("0")) {
+            log.info("执行数据操作");
+        }
+//
+//        String str="{\n\"msgType\": \"5\", \n\"msgData\": {\n\"instanceId\": " + "\"" + 111 + "\", \n\"taskId\": \"" + 222 + "\"\n}\n}\n";
+//        log.info("JsonObject:"+ JSON.parseObject(JSON.parseObject(str).get("msgData").toString()).get("taskId").toString());
+        return name + "你好!";
     }
 
 

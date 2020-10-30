@@ -2,10 +2,7 @@ package com.yjh.accessvideo.common;
 
 import io.netty.bootstrap.Bootstrap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Constant {
 
@@ -20,7 +17,11 @@ public class Constant {
 
     public static String sdkPath;//sdk路径
 
-    public static List<Long> instanceIds=new ArrayList<>();
+    public static String TASKID="";
+    public static String INSTANCEID="";
+    public static Integer ABNORMAL=0;
+    public static Integer NORMAL=0;
+    public static Set<String> cruiseKeys=new HashSet<>();
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
 }
