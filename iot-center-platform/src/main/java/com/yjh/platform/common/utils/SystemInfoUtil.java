@@ -13,7 +13,6 @@ public class SystemInfoUtil {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(SystemInfoUtil.class);
 
-    private static final String SERVICE_URL = "http://iot-center-manager/tCfgAccess/v1/select";
 
         /**
          * 获取cpu使用情况

@@ -106,6 +106,21 @@ public class SystemInfoController {
         return result;
     }
 
+    @ApiOperation(value = "获取关键服务")
+    @RequestMapping(value = "/getServices", method = RequestMethod.GET)
+    public Result getServices() {
+        Result result = new Result();
+        try {
+            result.setData(systemInfoService.getServices());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取关键服务错误:", e);
+        }
+        return result;
+    }
+
 
 
 }
