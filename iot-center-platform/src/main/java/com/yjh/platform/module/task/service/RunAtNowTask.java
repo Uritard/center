@@ -326,6 +326,8 @@ public class RunAtNowTask implements Runnable{
                             tCruiseDataResult.setOrigpic(absPath);
                             tCruiseDataResult.setState(247);
                             tCruiseDataResult.setIdentifyResult(261);
+                            tCruiseDataResult.setResultNum("已拍照");
+                            tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResultDao.insert(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(252);
                             tCruiseTaskResultDetail.setEndTime(new Date());

@@ -250,8 +250,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                             TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
-                            tCruiseDataResult.setPicpath(urlPath);
-                            tCruiseDataResult.setOrigpic(absPath);
                             List<Analysis> analysisList = new ArrayList<>();
                             analysisList.add(analysis);
                             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
@@ -276,6 +274,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseDataResult.setOrigpic(absPath);
                             tCruiseDataResult.setState(247);
                             tCruiseDataResult.setIdentifyResult(261);
+                            tCruiseDataResult.setResultNum("已拍照");
+                            tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResultDao.insert(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(252);
                             tCruiseTaskResultDetail.setEndTime(new Date());
