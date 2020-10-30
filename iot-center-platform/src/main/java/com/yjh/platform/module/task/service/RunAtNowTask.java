@@ -306,6 +306,7 @@ public class RunAtNowTask implements Runnable{
                             analysisList.add(analysis);
                             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
                             analysisMap.put("list",analysisList);
+                            log.info("算法信息：    "+analysisMap);
                             if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
                                 analysis(analysisMap);
                             }else {
@@ -387,6 +388,7 @@ public class RunAtNowTask implements Runnable{
             analysisList.add(analysis);
             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
             analysisMap.put("list",analysisList);
+            log.info("算法信息：    "+analysisMap);
             analysis(analysisMap);
             //todo 结果的状态未作处理
             //tCruiseResult.setCState(240);

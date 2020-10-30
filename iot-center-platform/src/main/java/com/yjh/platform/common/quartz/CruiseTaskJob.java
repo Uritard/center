@@ -96,33 +96,33 @@ public class CruiseTaskJob extends QuartzJobBean {
             log.info(taskDate+"此时间任务不需要执行");
         }else {
 
-                //Thread.sleep(10000);
-                Map<String,Object> jasonMap=new HashMap<>();
-                jasonMap.put("type","newTask");
-                jasonMap.put("taskId",taskId);
-                String json=JSON.toJSONString(jasonMap);
-                log.info("发送给前端的消息：   "+json);
-                WebSocketServer.sendMsg(json);
-                log.info(taskDate+"需要执行的任务");
-                log.info("开始进行任务" +new Date());
-                //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
-                String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
-                TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
-                List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(taskId);//获取此任务下的巡检点数量
-                Integer taskCount = instanceIdList.size();
-                List<TCruisePointInstance> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
-                //开始任务
-                TCruiseResult tCruiseResult = new TCruiseResult();
-                tCruiseResult.setTaskResultId(uuid);
-                tCruiseResult.setTaskId(taskId);
-                tCruiseResult.setAreaId(tCruiseTask.getAreaId());
-                tCruiseResult.setCType(tCruiseTask.getType());
-                tCruiseResult.setCState(239);//正在执行
-                tCruiseResult.setTaskCount(taskCount);
-                tCruiseResult.setTaskWait(taskCount);
-                tCruiseResult.setCreateTime(date);
-                tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
-                tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
+            //Thread.sleep(10000);
+            Map<String,Object> jasonMap=new HashMap<>();
+            jasonMap.put("type","newTask");
+            jasonMap.put("taskId",taskId);
+            String json=JSON.toJSONString(jasonMap);
+            log.info("发送给前端的消息：   "+json);
+            WebSocketServer.sendMsg(json);
+            log.info(taskDate+"需要执行的任务");
+            log.info("开始进行任务" +new Date());
+            //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+            String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
+            List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(taskId);//获取此任务下的巡检点数量
+            Integer taskCount = instanceIdList.size();
+            List<TCruisePointInstance> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
+            //开始任务
+            TCruiseResult tCruiseResult = new TCruiseResult();
+            tCruiseResult.setTaskResultId(uuid);
+            tCruiseResult.setTaskId(taskId);
+            tCruiseResult.setAreaId(tCruiseTask.getAreaId());
+            tCruiseResult.setCType(tCruiseTask.getType());
+            tCruiseResult.setCState(239);//正在执行
+            tCruiseResult.setTaskCount(taskCount);
+            tCruiseResult.setTaskWait(taskCount);
+            tCruiseResult.setCreateTime(date);
+            tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
+            tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
 
             //任务状态
             TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
@@ -237,7 +237,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             if(redisTemplate.hasKey(taskId)) {
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
-                                //analysisInstanceList.add(item.getInstanceId().toString());
+                                analysisInstanceList.add(item.getInstanceId().toString());
                                 redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
@@ -256,6 +256,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             analysisList.add(analysis);
                             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
                             analysisMap.put("list",analysisList);
+                            log.info("算法信息：    "+analysisMap);
                             if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
                                 analysis(analysisMap);
                             }else {
@@ -337,6 +338,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             analysisList.add(analysis);
             Map<String, List<Analysis>> analysisMap  = new HashMap<>();
             analysisMap.put("list",analysisList);
+            log.info("算法信息：    "+analysisMap);
             analysis(analysisMap);
             //todo 结果的状态未作处理
             //tCruiseResult.setCState(240);

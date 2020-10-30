@@ -1,17 +1,14 @@
 package com.yjh.platform.module.device.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
-import com.yjh.platform.module.device.controller.SystemInfoController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +24,7 @@ public class SystemInfoService {
 
     SystemInfoUtil systemInfoUtil = new SystemInfoUtil();
 
-    private static final String SERVICE_URL = "http://iot-center-manager/managerService/v1/select";
+    private static final String SERVICE_URL = "http://192.168.9.40:18710/managerService/v1/select";
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
@@ -79,23 +76,14 @@ public class SystemInfoService {
 
     @Logs(title = "获取关键服务", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,Object>> getServices() {
-        Result re = service();
-        return (List<Map<String,Object>>)re.getData();
-
-    }
-
-
-    private  Result service() {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.getForObject(SERVICE_URL,Result.class);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+    public List<Map<String,Object>> getServices() throws Exception {
+        //Result re = service();
+        String services = HttpClientUtils.getInstance().getUrl(SERVICE_URL, null);
+        JSONObject jsonObject =JSONObject.parseObject(services);
+        List<Map<String,Object>> re= (List<Map<String,Object>>) jsonObject.get("data");
+        log.info("resg     "+re);
         return re;
+
     }
+
 }
