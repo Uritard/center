@@ -106,7 +106,7 @@ public class SystemInfoUtil {
                         map.put("pid",strArray[3]);
                         map.put("read",strArray[4]);
                         map.put("write",strArray[5]);
-                        Double all = Double.valueOf(strArray[3])+Double.valueOf(strArray[4]);
+                        Double all = Double.valueOf(strArray[4])+Double.valueOf(strArray[5]);
                         map.put("all",all.toString());
                         result.add(map);
                     }
