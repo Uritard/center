@@ -286,7 +286,8 @@ public class TCruiseTaskResultService {
                 //将两个时间字符串转为日期类型
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date d1 = simpleDateFormat.parse(startTime);
-                Date d2 = new Date("yyyy-MM-dd HH:mm:ss");
+                String d2String = simpleDateFormat.format(new Date());
+                Date d2 = simpleDateFormat.parse(d2String);
                 cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
             }
         }
