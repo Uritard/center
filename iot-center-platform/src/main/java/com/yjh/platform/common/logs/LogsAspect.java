@@ -23,6 +23,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -58,8 +61,8 @@ public class LogsAspect {
         Logs annotation = signature.getMethod().getAnnotation(Logs.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
-        HttpServletRequest request = null;
         String userId = null, userName = null, serviceId = null, ip = null;
+        HttpServletRequest request = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
@@ -82,7 +85,6 @@ public class LogsAspect {
                 params.set("title", annotation.title());
                 params.set("state", 1);
                 content.append(Arrays.toString(joinPoint.getArgs()));
-                System.out.println("content: "+content.toString());
                 params.set("userId", userId);
                 params.set("userName", userName);
             } catch (Exception e) {
@@ -91,12 +93,12 @@ public class LogsAspect {
             try {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
-                params.set("content", "参数：" + content.toString());
                 post(params);
+                params.set("content", "参数：" + content.toString());
                 return result;
             } catch (BusinessException e) {
-                params.set("content", "参数：" + content.toString() + "；错误信息：" + e.getMessage());
                 params.set("state", 2);
+                params.set("content", "参数：" + content.toString() + "；错误信息：" + e.getMessage());
                 post(params);
                 throw e;
             } catch (Throwable e) {
@@ -122,7 +124,7 @@ public class LogsAspect {
         }
     }
 
-    private void post(MultiValueMap<String, Object> params) {
+    public void post(MultiValueMap<String, Object> params) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {

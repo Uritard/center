@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -119,7 +121,7 @@ public class SysUserService{
         return areaInfoCountryList;
     }
 
-    @Logs(title = "用户登录", code = "module")
+//    @Logs(title = "用户登录", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public SysUserLogin userLogin(String userName, String password) { return this.sysUserDao.selectByUserNameL(userName, password); }
 

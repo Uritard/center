@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -16,6 +17,8 @@ import java.util.*;
 
 import io.swagger.annotations.*;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -252,6 +255,15 @@ public class SysUserController {
                 String userName = userMap.get("userName");
                 String password = userMap.get("password");
                 SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "iot-center-platform:module");
+                params.set("ip", request.getRequestURI());
+                params.set("title", "用户登录");
+                params.set("state", 1);
+                params.set("userId", sysUserLogin.getUserId());
+                params.set("userName", userName);
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
                 if (!Objects.equals(null, sysUserLogin)) {
                     if (sysUserLogin.getState()==2) {
                         Map<String, Object> mapResult = new HashMap<>();
