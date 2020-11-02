@@ -302,7 +302,7 @@ public class RunAtNowTask implements Runnable{
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
                                 //analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().rightPush(taskId,item.getInstanceId().toString());
+                                redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
                                 redisTemplate.opsForList().leftPushAll(taskId,analysisInstanceList);
@@ -421,16 +421,16 @@ public class RunAtNowTask implements Runnable{
             int re = abnormal+normal;
             if(re == all){
                 //所有点都做完了
-                mapForAbnormal.put("abnormal",taskAbnormal.toString());
-                mapForAbnormal.put("normal",taskNormal.toString());
+                mapForAbnormal.put("abnormal",abnormal.toString());
+                mapForAbnormal.put("normal",normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
             }else {
-                mapForAbnormal.put("abnormal",taskAbnormal.toString());
-                mapForAbnormal.put("normal",taskNormal.toString());
+                mapForAbnormal.put("abnormal",abnormal.toString());
+                mapForAbnormal.put("normal",normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
             //任务结束生成结果，
