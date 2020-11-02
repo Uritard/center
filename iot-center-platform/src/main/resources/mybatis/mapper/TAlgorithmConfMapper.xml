@@ -123,7 +123,7 @@
         left join t_algorithm_conf b on a.preset_id = b.preset_id
         left join t_algorithm_info e on b.algorithm_id=e.algorithm_id
         left join t_camera_info f on f.camera_id = a.camera_id
-        left join t_dict_business d on d.dict_code = e.analyse_type
+        left join t_dict_business d on d.dict_code = e.analyse_type and (d.col_name = "analyse_type" or d.col_name = "defect_type")
         WHERE 1 = 1
         <if test="configName != null and configName != ''"> and b.config_name like concat('%',#{configName, jdbcType=VARCHAR},'%')</if>
         <if test="cameraId != null and cameraId != ''"> and f.camera_id = #{cameraId, jdbcType=BIGINT}</if>
