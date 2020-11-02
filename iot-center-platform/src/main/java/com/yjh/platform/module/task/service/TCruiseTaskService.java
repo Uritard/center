@@ -385,6 +385,13 @@ public class TCruiseTaskService {
         return tCruiseResultDao.update(tCruiseResult);
     }
 
+    @Logs(title = "任务终止", code = "module",content = "任务终止")
+    @Transactional(rollbackFor = Exception.class)
+    public int taskShutDown(String taskId) {
+        TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+        tCruiseResult.setCState(242);
+        return tCruiseResultDao.update(tCruiseResult);
+    }
 
 
 }

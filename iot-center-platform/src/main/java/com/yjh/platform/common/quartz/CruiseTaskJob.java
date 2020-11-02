@@ -237,8 +237,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             if(redisTemplate.hasKey(taskId)) {
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
-                                analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
+                                //analysisInstanceList.add(item.getInstanceId().toString());
+                                redisTemplate.opsForList().rightPush(taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
                                 redisTemplate.opsForList().leftPushAll(taskId,analysisInstanceList);

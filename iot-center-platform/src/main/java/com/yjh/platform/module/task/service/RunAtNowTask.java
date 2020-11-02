@@ -239,6 +239,7 @@ public class RunAtNowTask implements Runnable{
                     map2.put("cameraId", tCameraPreset.getCameraId());
                     Result re = picture(map2);
                     JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
+                    //todo 对于相机的返回错误分析  任务异常终止/超期
                     String urlPath = (String) jsonForRe.get("urlPath");
                     String absPath = (String) jsonForRe.get("absPath");
                     if(absPath == null){
@@ -301,7 +302,7 @@ public class RunAtNowTask implements Runnable{
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
                                 //analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
+                                redisTemplate.opsForList().rightPush(taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
                                 redisTemplate.opsForList().leftPushAll(taskId,analysisInstanceList);
