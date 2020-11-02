@@ -258,10 +258,11 @@ public class SysUserController {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "iot-center-platform:module");
                 params.set("ip", request.getRequestURI());
-                params.set("title", "用户登录");
+                params.set("title", "登录");
                 params.set("state", 1);
                 params.set("userId", sysUserLogin.getUserId());
                 params.set("userName", userName);
+                params.set("content", "用户登录");
                 LogsAspect logsAspect = new LogsAspect();
                 logsAspect.post(params);
                 if (!Objects.equals(null, sysUserLogin)) {

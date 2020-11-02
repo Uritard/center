@@ -22,7 +22,7 @@ public class SysOrgService{
     @Autowired
     private SysOrgDao sysOrgDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module", content = "新增组织机构")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysOrg sysOrg) {
         return this.sysOrgDao.insert(sysOrg);

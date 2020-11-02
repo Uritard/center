@@ -12,4 +12,7 @@ public @interface Logs {
     //业务编码
     String code() default "";
 
+    //业务操作内容
+    String content() default "用户操作";
+
 }

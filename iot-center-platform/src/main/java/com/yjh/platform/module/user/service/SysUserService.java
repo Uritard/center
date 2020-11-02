@@ -121,7 +121,6 @@ public class SysUserService{
         return areaInfoCountryList;
     }
 
-//    @Logs(title = "用户登录", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public SysUserLogin userLogin(String userName, String password) { return this.sysUserDao.selectByUserNameL(userName, password); }
 
