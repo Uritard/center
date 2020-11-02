@@ -23,7 +23,7 @@ public class CheckPointType implements Serializable {
     @ApiModelProperty(value = "类别")
     private String meteType;
     @ApiModelProperty(value = "测点数")
-    private String meteNum;
+    private Integer meteNum;
     @ApiModelProperty(value = "未处理异常数")
-    private String regularNum;
+    private Integer regularNum;
 }

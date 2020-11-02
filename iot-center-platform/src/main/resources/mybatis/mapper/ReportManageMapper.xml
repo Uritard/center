@@ -30,15 +30,25 @@
         <result column="out_range" jdbcType="VARCHAR" property="outRange" />
         <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
     </resultMap>
-
-    <select id="reportGenerate" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
+    <sql id="TongYong">
         select
-        a.device_id,
-        b.device_mete_id,
-        d.instance_id,
-        e.cruise_result_id,
-        f.state,
-        f.identify_result as 'jieGuo',
+            a.cruise_data_id,
+            b.cruise_result_id,
+            b.instance_id,
+            d.device_mete_id,
+            e.mete_type,
+            f.dict_note as mete_type_name,
+            a.evaluation_state,
+            g.dict_note as evaluation_state_name
+        FROM t_cruise_data_result a
+        LEFT JOIN t_cruise_task_result_detail b on a.cruise_result_id = b.cruise_result_id
+        LEFT JOIN t_cruise_point_instance d on d.instance_id = b.instance_id
+        LEFT JOIN t_std_devicemete e on d.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business f on f.dict_code = e.mete_type
+        LEFT JOIN t_dict_business g on g.dict_code = a.evaluation_state
+    </sql>
+    <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
+        select
         a.device_name ,
         (CASE
         WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
@@ -49,7 +59,7 @@
         WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
         END) AS instance_name,
         h.dict_note as identify_result,
-        f.picpath,
+        f.origpic as picpath,
         g.dict_note as cruise_result,
         e.cruise_time
         FROM
@@ -68,7 +78,46 @@
         and g.dict_code = f.state
         and h.dict_code = f.identify_result
         <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
-
+    </select>
+    <select id="selectStationName" resultType="java.lang.String">
+        SELECT
+            a.station_name
+        FROM
+            t_std_region a
+        WHERE
+            a.up_region_id = -1
+    </select>
+    <select id="selectMeteNum" resultType="java.lang.Integer">
+        SELECT COUNT(device_mete_id or null) as mete_num
+        from
+        (
+            <include refid="TongYong"></include>GROUP BY device_mete_id
+        )big_table
+    </select>
+    <select id="selectAbnormalNum" resultType="java.lang.Integer">
+        SELECT COUNT(evaluation_state = 257 or null) as abnormal_num
+        from
+        (
+            <include refid="TongYong"></include>
+        )big_table
+    </select>
+    <select id="selectMeteType" resultType="com.yjh.platform.module.task.entity.CheckPointType">
+        SELECT
+               mete_type_name as mete_type,
+               1 as mete_num,
+               0 as regular_num
+        FROM
+        (
+            <include refid="TongYong"></include>
+        )bis
+        GROUP BY mete_type
+    </select>
+    <select id="selectMeteType2" resultType="com.yjh.platform.module.task.entity.CheckPointType">
+        SELECT a.dict_note as mete_type,
+               0 as mete_num,
+               0 as regular_num
+        FROM t_dict_business a
+        where col_name = 'mete_type'
     </select>
 
 </mapper>

@@ -228,9 +228,9 @@ public class ReportDataRepo {
         for (CheckPointType cpTypeItem : cpTypeItems) {
             elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{cpTypeItem.getMeteType()},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 3, new String[]{cpTypeItem.getRegularNum() + ""},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 3, new String[]{cpTypeItem.getMeteNum().toString()},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-            elements.add(new TableCellElement(rowIndex, rowIndex, 4, 6, new String[]{cpTypeItem.getMeteNum() + ""},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 4, 6, new String[]{cpTypeItem.getRegularNum().toString()},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
             rowIndex++;
             rowCount++;
@@ -271,13 +271,13 @@ public class ReportDataRepo {
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         elements.add(new TableCellElement(rowIndex, rowIndex, 2, 2, new String[]{taskVoInfo.getTaskName()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{taskVoInfo.getMeteNum()},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{taskVoInfo.getMeteNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{taskVoInfo.getMeteRelationNum()},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{taskVoInfo.getMeteRelationNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum()},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{taskVoInfo.getCruiseDate()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         rowIndex++;
         rowCount++;

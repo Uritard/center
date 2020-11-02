@@ -26,38 +26,73 @@ public class ReportManageService {
     @Logs(title = "生成报表", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType,String reportPath) {
-//        List<String> list = Arrays.asList(deviceIdList.split(","));
-
         //巡检记录报表对象
         ReportData recordData = new ReportData();
         //1.总体情况
-        TaskVO taskVO = new TaskVO();
-        taskVO.setCruiseDate(new Date());
+            TaskVO taskVO = new TaskVO();
+            //站所名称
+            String stationName = reportManageDao.selectStationName();
+            taskVO.setStationName(stationName);
+            //测点数
+            Integer meteNum = reportManageDao.selectMeteNum();
+            taskVO.setMeteNum(meteNum);
+            //未处理数
+            Integer abnormalNum = reportManageDao.selectAbnormalNum();
+            taskVO.setAbnormalNum(abnormalNum);
+            //关联测点数
+            taskVO.setMeteRelationNum(0);
+            //任务名称
+            taskVO.setTaskName("全站巡视");
         recordData.setTaskVO(taskVO);
         //2.分项预览
-        List<CheckPointType> cpTypeItems = new ArrayList<>();
-        recordData.setCpTypeItems(cpTypeItems);
-        //3.环境监测
-        List<EnvironmentResult> evnRecordList = new ArrayList<>();
-        recordData.setEvnRecordList(evnRecordList);
-        //4.关联设备
-        List<RelationDevice> rcpRecordList = new ArrayList<>();
-        recordData.setRcpRecordList(rcpRecordList);
-        //5.明细，一次巡检任务的所有测点巡检结果详情
-        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.reportGenerate(startTime,endTime);
+            List<CheckPointType> cpTypeItems = new ArrayList<>();
+            List<CheckPointType> meteType = reportManageDao.selectMeteType();//existed
+            List<CheckPointType> meteType2 = reportManageDao.selectMeteType2();//all mete type
+//            System.out.println("<--------meteType------->:"+meteType);
+//            System.out.println("<--------meteType2------->:"+meteType2);
+
+            for (int i = 0;i < meteType2.size();i++){
+                int flag = 0;
+                for (int j = 0;j < meteType.size();j++){
+                    if (meteType2.get(i).getMeteType().equals(meteType.get(j).getMeteType())){
+                        flag++;
+                    }
+                }
+                if (flag == 0){
+                    CheckPointType ws = new CheckPointType();
+                    ws.setMeteNum(0);
+                    ws.setMeteType(meteType2.get(i).getMeteType());
+                    ws.setRegularNum(0);
+                    cpTypeItems.add(ws);
+                }
+            }
+//            System.out.println("<--------cpTypeItems------->:"+cpTypeItems);
+            meteType.addAll(cpTypeItems);
+//            System.out.println("<--------最后的meteType------->:"+meteType);
+            recordData.setCpTypeItems(meteType);
+        //3.环境监测-暂无
+            List<EnvironmentResult> evnRecordList = new ArrayList<>();
+            recordData.setEvnRecordList(evnRecordList);
+        //4.关联设备-暂无
+            List<RelationDevice> rcpRecordList = new ArrayList<>();
+            recordData.setRcpRecordList(rcpRecordList);
+        //5.明细-所选设备的所有测点巡检结果详情
+//        List<String> list = Arrays.asList(deviceIdList.split(","));
+
+        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(startTime,endTime);
         recordData.setTCDRDList(tCDRDList);
-        System.out.println("<--------recordData------->:"+recordData);
+//        System.out.println("<--------recordData------->:"+recordData);
 
         SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();
         String nowTime = f.format(date);
 
-        String fileName = reportName+"-"+nowTime+"-"+reportType;//报表名称
-        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName+".xlsx";
+        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
+        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         File file = new File(reportPath2);
 
         ContentData contentData = ReportDataRepo.getData(recordData);
-        System.out.println("<--------contentData------->:"+contentData);
+//        System.out.println("<--------contentData------->:"+contentData);
 
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                 contentData.getElements(), file);
@@ -71,8 +106,8 @@ public class ReportManageService {
     public String reportDownload(String reportName,String reportType,String startTime,String reportPath) {
         String time2 =  DateTimeUtil.changeTime2(startTime);
         String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
-        String reportPatha = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-        String filePath = reportPatha+fileName;
+        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
+        String filePath = reportPathA+fileName;
 //        String filePath = reportPath+fileName;
         return filePath;
     }
@@ -83,8 +118,8 @@ public class ReportManageService {
         List<ReportForms> fileNameList = new ArrayList<>();//文件名列表
         List<String> folderNameList = new ArrayList<>();//文件夹名列表
 
-        String startTime1 = DateTimeUtil.changeTime2(startTime);//yyyyMMddHHmmss
-        String endTime1 = DateTimeUtil.changeTime2(endTime);//yyyyMMddHHmmss
+        String startTimeTemp = DateTimeUtil.changeTime2(startTime);//yyyyMMddHHmmss
+        String endTimeTemp = DateTimeUtil.changeTime2(endTime);//yyyyMMddHHmmss
 
         String folderPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
         File f = new File(folderPath);
@@ -113,7 +148,7 @@ public class ReportManageService {
                             String rDate = str[1];
                             String rType = str[2];
                             //没有时间过滤
-                            if (startTime1 == "" && endTime1==""){
+                            if (startTimeTemp == "" && endTimeTemp==""){
                                 reportForms.setReportName(rName);
                                 String time2 = DateTimeUtil.changeTime1(rDate);
                                 reportForms.setStartTime(time2);
@@ -122,8 +157,8 @@ public class ReportManageService {
                             }else {
                                 //时间过滤
                                 long tTime1 = Long.parseLong(rDate);
-                                long tTime2 = Long.parseLong(startTime1);
-                                long tTime3 = Long.parseLong(endTime1);
+                                long tTime2 = Long.parseLong(startTimeTemp);
+                                long tTime3 = Long.parseLong(endTimeTemp);
                                 if (tTime1 >= tTime2 && tTime1 <= tTime3){
                                     reportForms.setReportName(rName);
                                     String time2 = DateTimeUtil.changeTime1(rDate);
@@ -146,17 +181,18 @@ public class ReportManageService {
     @Logs(title = "删除报表", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public boolean reportDelete(String reportName,String reportType, String startTime,String reportPath) {
-        String time2 =  DateTimeUtil.changeTime2(startTime);
-        String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
-        String filePathAndName = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-//        String filePathAndName = reportPath+fileName;
-        return delete(filePathAndName);
+        String timeTemp =  DateTimeUtil.changeTime2(startTime);
+        String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
+
+        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+//        String filePath = reportPath+fileName;
+        return delete(filePath);
     }
-    public static boolean delete(String filePathAndName)
+    public static boolean delete(String filePath)
     {
         boolean result = false;
         try {
-            File myDelFile = new File(filePathAndName);
+            File myDelFile = new File(filePath);
             result = myDelFile.delete();
         } catch (Exception e) {
             System.out.println("删除文件操作出错");

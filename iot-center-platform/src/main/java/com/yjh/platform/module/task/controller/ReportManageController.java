@@ -57,7 +57,7 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
+            log.error("生成报表错误:", e);
         }
         return result;
     }
@@ -74,7 +74,7 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
+            log.error("下载报表错误:", e);
         }
         return result;
     }
@@ -91,7 +91,7 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
+            log.error("查询报表记录错误:", e);
         }
         return result;
     }
@@ -107,7 +107,7 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
+            log.error("删除报表错误:", e);
         }
         return result;
     }
