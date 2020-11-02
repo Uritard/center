@@ -59,4 +59,6 @@ public interface TCruiseResultDao {
     int updateCheck(@Param(value = "taskResultId")String taskResultId,
                     @Param(value = "checkUserName")String checkUserName,
                     @Param(value = "checkDate")Date checkDate);
+
+    TCruiseResult selectForTaskId(@Param(value = "taskId") String taskId);
 }

@@ -388,4 +388,25 @@
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
     </update>
 
+    <select id="selectForTaskId" resultType="com.yjh.platform.module.task.entity.TCruiseResult">
+        select
+        a.task_result_id,
+        a.task_id,
+        a.area_id,
+        a.c_type,
+        a.c_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.execute_time,
+        a.task_code,
+        a.remark
+        from t_cruise_result a
+        where a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

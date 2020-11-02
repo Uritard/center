@@ -125,7 +125,7 @@ public class TCruiseTaskService {
                 try {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao,
-                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao);
+                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -361,6 +361,31 @@ public class TCruiseTaskService {
         List<TCruiseTaskList> tCruiseTaskList = tCruiseTaskDao.selectPointStatus(taskId);
         return tCruiseTaskList;
     }
+
+    @Logs(title = "任务暂停", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int taskPause(String taskId) {
+        TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+        tCruiseResult.setCState(241);
+        return tCruiseResultDao.update(tCruiseResult);
+    }
+
+    @Logs(title = "任务继续", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int taskGoOn(String taskId) {
+        TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+        tCruiseResult.setCState(239);
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
+                tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao,
+                tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true);
+        Thread thread = new Thread(runAtNowTask);
+        thread.setDaemon(true);
+        thread.start();
+        return tCruiseResultDao.update(tCruiseResult);
+    }
+
+
 
 }
 

@@ -50,6 +50,7 @@ public class RunAtNowTask implements Runnable{
     private TCruiseDataResultDao tCruiseDataResultDao;
     private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
     private TCruiseTaskResultDao tCruiseTaskResultDao;
+    private Boolean isGoOn;
 
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
@@ -70,7 +71,7 @@ public class RunAtNowTask implements Runnable{
     public RunAtNowTask(TCruiseTask tCruiseTask,Long waitTime ,String picModelPath,RedisTemplate redisTemplate,TCruisePointInstanceDao tCruisePointInstanceDao,
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruiseTaskAttrDao tCruiseTaskAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
-                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao) {
+                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
         this.picModelPath = picModelPath;
@@ -84,6 +85,7 @@ public class RunAtNowTask implements Runnable{
         this.tCruiseDataResultDao = tCruiseDataResultDao;
         this.tCruiseTaskResultDetailDao = tCruiseTaskResultDetailDao;
         this.tCruiseTaskResultDao = tCruiseTaskResultDao;
+        this.isGoOn = isGoOn;//判断是否是在那听的任务重启
     }
 
     //相机抓图
@@ -156,47 +158,58 @@ public class RunAtNowTask implements Runnable{
             log.info(taskDate+"需要执行的任务");
             log.info("开始进行任务" +new Date());
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
-            String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+            //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
             List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(taskId);//获取此任务下的巡检点数量
+            if(isGoOn){
+                //任务重启
+                List<Long> isFinishedInstanceList = tCruiseTaskResultDetailDao.selectInstanceForTaskGoOn(taskId);
+                for(Long finished:isFinishedInstanceList){//删除已经做过的点
+                    instanceIdList.remove(finished);
+                }
+            }
             Integer taskCount = instanceIdList.size();
             List<TCruisePointInstance> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
             //开始任务
             TCruiseResult tCruiseResult = new TCruiseResult();
-            tCruiseResult.setTaskResultId(uuid);
-            tCruiseResult.setTaskId(taskId);
-            tCruiseResult.setAreaId(tCruiseTask.getAreaId());
-            tCruiseResult.setCType(tCruiseTask.getType());
-            tCruiseResult.setCState(239);//正在执行
-            tCruiseResult.setTaskCount(taskCount);
-            tCruiseResult.setTaskWait(taskCount);
-            tCruiseResult.setCreateTime(date);
-            tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
-            tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
+            tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+            if(tCruiseResult == null){//判断任务是否存在
+                tCruiseResult= new TCruiseResult();
+                String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");
+                tCruiseResult.setTaskResultId(uuid);
+                tCruiseResult.setTaskId(taskId);
+                tCruiseResult.setAreaId(tCruiseTask.getAreaId());
+                tCruiseResult.setCType(tCruiseTask.getType());
+                tCruiseResult.setCState(239);//正在执行
+                tCruiseResult.setTaskCount(taskCount);
+                tCruiseResult.setTaskWait(taskCount);
+                tCruiseResult.setCreateTime(date);
+                tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
+                tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
+            }
 
             //任务状态
             TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-            tCruiseTaskResult.setTaskResultId(uuid);
+            tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
             tCruiseTaskResult.setTaskId(taskId);
             //tCruiseTaskResult.setTaskStatus(239);
             tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
-
-            Map<String,String> mapForAbnormal = new HashMap<>();
-            mapForAbnormal.put("all",taskCount.toString());
-            mapForAbnormal.put("abnormal","0");
-            mapForAbnormal.put("normal","0");
             String strForCountAbnormal = "countForAbnormal:"+taskId;
-            redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
-
+            Map<String,String> mapForAbnormal = new HashMap<>();
+            if( !redisTemplate.hasKey(strForCountAbnormal)){//判断任务是否做过 没做->初始化  做了->后续工作直接从redis获取
+                mapForAbnormal.put("all",taskCount.toString());
+                mapForAbnormal.put("abnormal","0");
+                mapForAbnormal.put("normal","0");
+                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+            }
             Integer taskAbnormal = 0;//异常数量
-            Integer normal = 0;//正常
+            Integer taskNormal = 0;//正常
             List<String> analysisInstanceList = new ArrayList<>();
             log.info("开始巡检"+new Date());
             for (TCruisePointInstance item : instancesList) {
-
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
-                tCruiseTaskResultDetail.setCruiseResultId(uuid+item.getInstanceId().toString());
-                tCruiseTaskResultDetail.setTaskResultId(uuid);
+                tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
+                tCruiseTaskResultDetail.setTaskResultId(tCruiseResult.getTaskResultId());
                 tCruiseTaskResultDetail.setDeviceId(item.getDeviceId());
                 tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
                 tCruiseTaskResultDetail.setCruiseTime(new Date());
@@ -204,7 +217,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetail.setCruiseStatus(253);
 
                 TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
-                tCruiseDataResult.setCruiseResultId(uuid+item.getInstanceId().toString());
+                tCruiseDataResult.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
                 tCruiseDataResult.setCruiseId(item.getInstanceId());
                 //一次循环 一个巡检点
                 if (228 == item.getCruiseType()) {//todo 机器人
@@ -231,7 +244,7 @@ public class RunAtNowTask implements Runnable{
                     if(absPath == null){
                         //抓图失败 任务失败
                         taskAbnormal = taskAbnormal+1;
-                        tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
+                        tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
                         Integer taskWait = tCruiseResult.getTaskWait()-1;
                         if(taskWait == 0 ){
                             tCruiseResult.setCState(240);
@@ -258,8 +271,8 @@ public class RunAtNowTask implements Runnable{
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         // webSocket通知前端调用巡视监控的接口
                         Map<String,Object> jasonMapOnFinished=new HashMap<>();
-                        jasonMap.put("type","newTask");
-                        jasonMap.put("finishedOneInstance",taskId);
+                        jasonMapOnFinished.put("type","newTask");
+                        jasonMapOnFinished.put("finishedOneInstance",taskId);
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                         log.info("发送给前端的消息："+jsonMessage);
                         WebSocketServer.sendMsg(json);
@@ -287,7 +300,7 @@ public class RunAtNowTask implements Runnable{
                             if(redisTemplate.hasKey(taskId)) {
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
-                                analysisInstanceList.add(item.getInstanceId().toString());
+                                //analysisInstanceList.add(item.getInstanceId().toString());
                                 redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
@@ -313,8 +326,8 @@ public class RunAtNowTask implements Runnable{
                                 defect(analysisMap);
                             }
                         }else {
-                            normal = normal+1;
-                            tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
+                            taskNormal = taskNormal+1;
+                            tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
                                 tCruiseResult.setCState(240);
@@ -347,8 +360,8 @@ public class RunAtNowTask implements Runnable{
 
                             // webSocket通知前端调用巡视监控的接口
                             Map<String,Object> jasonMapOnFinished=new HashMap<>();
-                            jasonMap.put("type","newTask");
-                            jasonMap.put("finishedOneInstance",taskId);
+                            jasonMapOnFinished.put("type","newTask");
+                            jasonMapOnFinished.put("finishedOneInstance",taskId);
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
                             WebSocketServer.sendMsg(json);
@@ -364,18 +377,59 @@ public class RunAtNowTask implements Runnable{
                 }
                 if (232 == item.getCruiseType()) {//todo scala
                 }
+                //检测任务是否暂停
+                TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(taskId);
+                if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
+                    Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                    Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
+                    Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
+                    Integer all = Integer.valueOf(mapForGet.get("all"));
+                    int re = abnormal+normal;
+                    if(re == all){
+                        //所有点都做完了
+                        tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
+                        tCruiseTaskResultDao.insert(tCruiseTaskResult);
+                    }
+                    mapForAbnormal.put("abnormal",abnormal.toString());
+                    mapForAbnormal.put("normal",normal.toString());
+                    redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
+                    //任务结束生成结果，
+                    Analysis analysis = new Analysis();
+                    analysis.setTaskId(taskId);
+                    analysis.setInstanceId(-1L);
+                    //analysis.setPicPath(picUrl);
+                    //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
+                    //analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                    //analysis.setPicModelPath(picModelPath);//模板图片暂时没有
+                    List<Analysis> analysisList = new ArrayList<>();
+                    analysisList.add(analysis);
+                    Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                    analysisMap.put("list",analysisList);
+                    log.info("算法信息：    "+analysisMap);
+                    analysis(analysisMap);
+                    log.info("任务停止执行"+taskId);
+                    return;
+                }
             }
             //计算所有的异常巡检点
-            Map<String,String> map  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            int re = Integer.valueOf(map.get("abnormal"))  + Integer.valueOf(map.get("normal"))+taskAbnormal;
-            if(re == taskCount){
+            Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
+            Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
+            Integer all = Integer.valueOf(mapForGet.get("all"));
+            int re = abnormal+normal;
+            if(re == all){
                 //所有点都做完了
+                mapForAbnormal.put("abnormal",taskAbnormal.toString());
+                mapForAbnormal.put("normal",taskNormal.toString());
+                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
             }else {
                 mapForAbnormal.put("abnormal",taskAbnormal.toString());
-                mapForAbnormal.put("normal",normal.toString());
+                mapForAbnormal.put("normal",taskNormal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
             //任务结束生成结果，

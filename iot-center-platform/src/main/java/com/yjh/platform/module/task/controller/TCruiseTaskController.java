@@ -251,5 +251,35 @@ public class TCruiseTaskController {
         return result;
     }
 
+    @ApiOperation(value = "任务暂停")
+    @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
+    public Result taskPause(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseTaskService.taskPause(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务暂停异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务暂停错误:", e);
+        }
+        return result;
+    }
 
+    @ApiOperation(value = "任务继续")
+    @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
+    public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseTaskService.taskGoOn(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务继续异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务继续错误:", e);
+        }
+        return result;
+    }
 }

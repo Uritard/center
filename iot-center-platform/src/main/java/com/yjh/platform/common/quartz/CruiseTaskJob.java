@@ -139,7 +139,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
             Integer taskAbnormal = 0;//异常数量
-            Integer normal = 0;//正常
+            Integer taskNormal = 0;//正常
             List<String> analysisInstanceList = new ArrayList<>();
             log.info("开始巡检"+new Date());
             for (TCruisePointInstance item : instancesList) {
@@ -261,7 +261,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 defect(analysisMap);
                             }
                         }else {
-                            normal = normal+1;
+                            taskNormal = taskNormal+1;
                             tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
@@ -313,17 +313,55 @@ public class CruiseTaskJob extends QuartzJobBean {
                 if (232 == item.getCruiseType()) {//todo scala
                 }
 
+                //检测任务是否暂停
+                TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(taskId);
+                if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
+                    Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                    Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
+                    Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
+                    Integer all = Integer.valueOf(mapForGet.get("all"));
+                    int re = abnormal+normal;
+                    if(re == all){
+                        //所有点都做完了
+                        tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
+                        tCruiseTaskResultDao.insert(tCruiseTaskResult);
+                    }
+                    mapForAbnormal.put("abnormal",abnormal.toString());
+                    mapForAbnormal.put("normal",normal.toString());
+                    redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+
+                    //任务结束生成结果，
+                    Analysis analysis = new Analysis();
+                    analysis.setTaskId(taskId);
+                    analysis.setInstanceId(-1L);
+                    //analysis.setPicPath(picUrl);
+                    //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
+                    //analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                    //analysis.setPicModelPath(picModelPath);//模板图片暂时没有
+                    List<Analysis> analysisList = new ArrayList<>();
+                    analysisList.add(analysis);
+                    Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                    analysisMap.put("list",analysisList);
+                    log.info("算法信息：    "+analysisMap);
+                    analysis(analysisMap);
+                    log.info("任务停止执行"+taskId);
+                    return;
+                }
             }
             //计算所有的异常巡检点
-            Map<String,String> map  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            int re = Integer.valueOf(map.get("abnormal"))  + Integer.valueOf(map.get("normal"))+taskAbnormal;
-            if(re == taskCount){
+            Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
+            Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
+            Integer all = Integer.valueOf(mapForGet.get("all"));
+            int re = abnormal+normal;
+            if(re == all){
                 //所有点都做完了
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
             }else {
                 mapForAbnormal.put("abnormal",taskAbnormal.toString());
-                mapForAbnormal.put("normal",normal.toString());
+                mapForAbnormal.put("normal",taskNormal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
             //任务结束生成结果，

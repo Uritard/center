@@ -28,4 +28,5 @@ public interface TCruiseTaskResultDetailDao {
     List<TCruiseTaskResultDetail> selectByPage(TCruiseTaskResultDetail tCruiseTaskResultDetail);
 
     int batchInsert(List<TCruiseTaskResultDetail> list);
+    List<Long> selectInstanceForTaskGoOn(@Param(value = "taskId") String taskId);
 }
