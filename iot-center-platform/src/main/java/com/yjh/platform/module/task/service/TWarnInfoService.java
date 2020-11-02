@@ -31,50 +31,50 @@ public class TWarnInfoService{
 
     private DateTimeUtil dateTimeUtil;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "tWarnInfo",content = "根据算法返回的结果插入告警记录")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TWarnInfo tWarnInfo) {
         return this.tWarnInfoDao.insert(tWarnInfo);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "tWarnInfo",content = "根据web传递的参数删除告警记录")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long warnId) {
         return this.tWarnInfoDao.deleteByPrimaryId(warnId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "tWarnInfo",content = "根据web传递的参数更新告警记录")
     @Transactional(rollbackFor = Exception.class)
     public int update(TWarnInfo tWarnInfo) {
         return this.tWarnInfoDao.update(tWarnInfo);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
     public TWarnInfo selectByPrimaryId(Long warnId) {
         return this.tWarnInfoDao.selectByPrimaryId(warnId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfo> select(Long warnId, Integer warnLevel, Date warnTime, Integer warnType, String warnName, String warnContent, Long deviceId, String cunstomId, Long instanceId, Long stdMeteId, Integer confMode, Integer isWarn, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, Integer ifWarnDisable, Integer alarmSource, Integer warnSubtype, String deviceCode, String imagePath, String videoPath, String value, String outRange, String linkMessage) {
         List<TWarnInfo> tWarnInfoList = tWarnInfoDao.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, ifWarnDisable, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, linkMessage);
         return tWarnInfoList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfo> selectByPage(TWarnInfo tWarnInfo) {
         List<TWarnInfo> tWarnInfoList = tWarnInfoDao.selectByPage(tWarnInfo);
         return tWarnInfoList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "tWarnInfo",content = "根据算法返回的结果批量插入告警记录")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TWarnInfo> list) {
         return this.tWarnInfoDao.batchInsert(list);
     }
-    @Logs(title = "查询所有告警", code = "module")
+    @Logs(title = "查询所有告警", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfoDetail> selectWarnByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName) {
         HashMap<String, Object> map = new HashMap<>();
@@ -86,7 +86,7 @@ public class TWarnInfoService{
         map.put("deviceName", deviceName);
         return tWarnInfoDao.selectAllWarn(map);
     }
-    @Logs(title = "根据告警来源统计告警数据", code = "module")
+    @Logs(title = "统计告警数据", code = "tWarnInfo",content = "根据告警来源统计告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countByAlarmSource() {
         Map<String, Integer> map = tWarnInfoDao.countByAlarmSource();
@@ -102,14 +102,14 @@ public class TWarnInfoService{
         }
         return tjContentInfoList;
     }
-    @Logs(title = "根据设备类型统计告警数据", code = "module")
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据设备类型统计告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfoDetail> countByDeviceType(){
         List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType();
         System.out.println("tjContentInfoList是："+tjContentInfoList);
         return tjContentInfoList;
     }
-    @Logs(title = "统计近一月的所有告警个数", code = "module")
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "统计近一月的所有告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnOnMonth() {
         List<String> monthDates = dateTimeUtil.getDayDateList(30);
@@ -159,7 +159,7 @@ public class TWarnInfoService{
         });
         return list;
     }
-    @Logs(title = "根据告警处理状态统计告警个数-饼图", code = "module")
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警处理状态统计告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countWarnConfMode() {
         Map<String, Integer> map = tWarnInfoDao.countWarnConfMode();
@@ -176,12 +176,12 @@ public class TWarnInfoService{
         return tjContentInfoList;
     }
 
-    @Logs(title = "查看告警处理情况", code = "module")
+    @Logs(title = "查看告警处理情况", code = "tWarnInfo",content = "根据web传递的参数查看告警处理情况")
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfoDetail> selectAlarmProcess(Long warnId) {
         return tWarnInfoDao.selectAlarmProcess(warnId);
     }
-    @Logs(title = "进行告警处理", code = "module")
+    @Logs(title = "进行告警处理", code = "tWarnInfo",content = "根据web传递的参数进行告警处理")
     @Transactional(rollbackFor = Exception.class)
     public int alarmProcess(Long warnId,Integer alarmSource,Integer dealType,String dealInfo) {
         int jieGuo = 0;

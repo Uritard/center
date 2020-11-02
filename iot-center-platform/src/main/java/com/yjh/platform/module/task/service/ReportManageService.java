@@ -23,7 +23,7 @@ public class ReportManageService {
 
     @Autowired
     private ReportManageDao reportManageDao;
-    @Logs(title = "生成报表", code = "module")
+    @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType,String reportPath) {
         //巡检记录报表对象
@@ -101,7 +101,7 @@ public class ReportManageService {
 
         return tCDRDList;
     }
-    @Logs(title = "下载报表", code = "module")
+    @Logs(title = "下载报表", code = "reportManage",content = "通过web传递的参数下载报表")
     @Transactional(rollbackFor = Exception.class)
     public String reportDownload(String reportName,String reportType,String startTime,String reportPath) {
         String time2 =  DateTimeUtil.changeTime2(startTime);
@@ -111,7 +111,7 @@ public class ReportManageService {
 //        String filePath = reportPath+fileName;
         return filePath;
     }
-    @Logs(title = "查询报表生成记录", code = "module")
+    @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
     @Transactional(rollbackFor = Exception.class)
     public List<ReportForms> reportSelect(String queryStr,String startTime,String endTime,String reportPath) {
         HashMap<String, Object> map = new HashMap<>();
@@ -178,7 +178,7 @@ public class ReportManageService {
         return fileNameList;
 
     }
-    @Logs(title = "删除报表", code = "module")
+    @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
     public boolean reportDelete(String reportName,String reportType, String startTime,String reportPath) {
         String timeTemp =  DateTimeUtil.changeTime2(startTime);
@@ -200,7 +200,7 @@ public class ReportManageService {
         }
         return result;
     }
-    @Logs(title = "批量删除报表", code = "module")
+    @Logs(title = "批量删除报表", code = "reportManage",content = "通过web传递的参数批量删除报表记录")
     @Transactional(rollbackFor = Exception.class)
     public boolean reportBatchDelete(String reportName,String reportType, String startTime,String reportPath) {
         String time2 =  DateTimeUtil.changeTime2(startTime);

@@ -472,7 +472,7 @@
                 from t_std_device a,t_warn_info b
                 where a.device_id = b.device_id
                 and device_type = dict_code
-            ) as "count"
+            ) as c_ount
         from t_dict_business
         where dict_code in
             (
@@ -480,7 +480,7 @@
                 from t_dict_business
                 where col_name = 'device_type'
             )
-        ORDER BY dict_code
+         ORDER BY c_ount desc
     </select>
     <!--统计近一月内的告警数-->
     <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">

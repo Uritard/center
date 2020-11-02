@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -19,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YC
@@ -82,11 +86,17 @@ public class ReportManageController {
     @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
     public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
                                @RequestParam(value = "startTime", required = false)String startTime,
-                               @RequestParam(value = "endTime", required = false)String endTime) {
+                               @RequestParam(value = "endTime", required = false)String endTime,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
+        Map<String,Object> resultMap = new HashMap<>();
         try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
             List<ReportForms> list = reportManageService.reportSelect(reportName,startTime,endTime,reportPath);
-            result.setData(list);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -99,7 +109,7 @@ public class ReportManageController {
     @RequestMapping(value = "/reportDelete", method = RequestMethod.GET)
     public Result reportDelete(@RequestParam(value = "reportName") String reportName,
                                @RequestParam(value="reportType")String reportType,
-                               @RequestParam(value = "startTime")String startTime) {
+                                   @RequestParam(value = "startTime")String startTime) {
         Result result = new Result();
         try {
             result.setData(reportManageService.reportDelete(reportName,reportType,startTime,reportPath));

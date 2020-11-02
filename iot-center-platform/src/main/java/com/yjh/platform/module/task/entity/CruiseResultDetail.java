@@ -84,7 +84,7 @@ public class CruiseResultDetail {
     private String personCheck;
 
     @ApiModelProperty(value = "巡检分析图片")
-    private String picpath;
+    private String picPath;
 
 
 

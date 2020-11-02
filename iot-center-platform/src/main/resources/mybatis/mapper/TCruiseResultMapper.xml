@@ -220,7 +220,7 @@
         i.dict_note as evaluation_state_name,
         g.check_user,
         g.check_date,
-        g.picpath,
+        g.picpath as pic_path,
         g.identify_result,
         g.identify_state,
         g.person_check,
@@ -368,6 +368,7 @@
     <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
         SELECT
         a.task_id,
+        d.cruise_data_id,
         d.evaluation_state,
         e.dict_note as evaluation_state_name,
         d.check_user,

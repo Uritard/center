@@ -23,50 +23,50 @@ public class TDefectInfoService {
     private TDefectInfoDao tDefectInfoDao;
     private DateTimeUtil dateTimeUtil;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "tDefectInfo",content = "根据算法返回的结果插入缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TDefectInfo tDefectInfo) {
         return this.tDefectInfoDao.insert(tDefectInfo);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "tDefectInfo",content = "删除缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long defectId) {
         return this.tDefectInfoDao.deleteByPrimaryId(defectId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "tDefectInfo",content = "更新缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public int update(TDefectInfo tDefectInfo) {
         return this.tDefectInfoDao.update(tDefectInfo);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "tDefectInfo",content = "查询缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public TDefectInfo selectByPrimaryId(Long defectId) {
         return this.tDefectInfoDao.selectByPrimaryId(defectId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "tDefectInfo",content = "查询缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TDefectInfo> select(Long defectId, Integer defectLevel, Date defectTime, Integer defectType, String defectName, String defectContent, Long deviceId, String cunstomId, Long instanceId, Long stdMeteId, Integer confMode, Integer isDefect, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, Integer ifDefectDisable, Integer alarmSource, Integer defectSubtype, String deviceCode, String imagePath, String videoPath, String value, String outRange, String linkMessage) {
         List<TDefectInfo> tDefectInfoList = tDefectInfoDao.select(defectId, defectLevel, defectTime, defectType, defectName, defectContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isDefect, dealType, dealInfo, dealPersonId, dealTime, ifDefectDisable, alarmSource, defectSubtype, deviceCode, imagePath, videoPath, value, outRange, linkMessage);
         return tDefectInfoList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "tDefectInfo",content = "查询缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TDefectInfo> selectByPage(TDefectInfo tDefectInfo) {
         List<TDefectInfo> tDefectInfoList = tDefectInfoDao.selectByPage(tDefectInfo);
         return tDefectInfoList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "tDefectInfo",content = "根据算法返回的结果批量插入缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TDefectInfo> list) {
         return this.tDefectInfoDao.batchInsert(list);
     }
-    @Logs(title = "查询所有缺陷", code = "module")
+    @Logs(title = "查询所有缺陷", code = "tDefectInfo",content = "根据web传递的参数查询缺陷记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TDefectInfoDetail> selectDefectByPage(Integer confMode, Integer defectType, Date startTime, Date endTime, String deviceName) {
         HashMap<String, Object> map = new HashMap<>();
@@ -77,7 +77,7 @@ public class TDefectInfoService {
         map.put("deviceName", deviceName);
         return tDefectInfoDao.selectAllDefect(map);
     }
-    @Logs(title = "统计近一月的所有缺陷个数", code = "module")
+    @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "统计近一月的所有缺陷个数")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countDefectOnMonth() {
         List<String> monthDates = dateTimeUtil.getDayDateList(30);
@@ -127,7 +127,7 @@ public class TDefectInfoService {
         });
         return list;
     }
-    @Logs(title = "根据缺陷处理状态统计缺陷个数", code = "module")
+    @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "根据缺陷的处理状态统计缺陷个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countDefectConfMode() {
         Map<String, Integer> map = tDefectInfoDao.countDefectConfMode();
@@ -143,12 +143,12 @@ public class TDefectInfoService {
         }
         return tjContentInfoList;
     }
-    @Logs(title = "查看缺陷处理情况", code = "module")
+    @Logs(title = "查看缺陷处理情况", code = "tDefectInfo",content = "根据web传递的参数查看缺陷处理情况")
     @Transactional(rollbackFor = Exception.class)
     public List<TDefectInfoDetail> selectDefectProcess(Long defectId) {
         return tDefectInfoDao.selectDefectProcess(defectId);
     }
-    @Logs(title = "进行缺陷处理", code = "module")
+    @Logs(title = "进行缺陷处理", code = "tDefectInfo",content = "根据web传递的参数进行缺陷处理")
     @Transactional(rollbackFor = Exception.class)
     public int defectProcess(Long defectId,Integer dealType,String dealInfo) {
 

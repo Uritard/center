@@ -50,28 +50,35 @@ public class TCameraPresetController {
     public Result insert(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
-            //操作数据库
-            int resultNum = tCameraPresetService.insert(tCameraPreset);
+            int resultNum = 0;
+            //判断该预置位是否已被设置
+            if(tCameraPresetService.judgePresentNum(tCameraPreset.getPresetNum())){
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
+                return result;
+            }else{
+                //操作数据库
+                resultNum = tCameraPresetService.insert(tCameraPreset);
 
-            if (resultNum != 0) {
-                //操作预置位
-                TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
+                if (resultNum != 0) {
+                    //操作预置位
+                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
 
-                HashMap<String,Long> params = new HashMap<>();
-                params.put("cameraId",tCameraPreset1.getCameraId());
-                params.put("presetId",tCameraPreset1.getPresetId());
+                    HashMap<String,Long> params = new HashMap<>();
+                    params.put("cameraId",tCameraPreset1.getCameraId());
+                    params.put("presetId",tCameraPreset1.getPresetId());
 //                System.out.println("params是："+params);
 
-                Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
+                    Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
 //                System.out.println("data是："+response1.getData());
-                if (response1.getData().equals(true)) {
-                    Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-                    JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
-                    tCameraPreset1.setPresetImg((String) json.get("urlPath"));
+                    if (response1.getData().equals(true)) {
+                        Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+                        JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
+                        tCameraPreset1.setPresetImg((String) json.get("urlPath"));
 //                    System.out.println("PresetImg是："+json.get("urlPath"));
-                tCameraPresetService.update(tCameraPreset1);//存图
-                } else {
-                    tCameraPresetService.deleteByPrimaryId(tCameraPreset1.getPresetId());
+                        tCameraPresetService.update(tCameraPreset1);//存图
+                    } else {
+                        tCameraPresetService.deleteByPrimaryId(tCameraPreset1.getPresetId());
+                    }
                 }
             }
             result.setData(resultNum);

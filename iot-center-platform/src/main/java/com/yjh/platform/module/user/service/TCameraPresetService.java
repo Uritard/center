@@ -4,10 +4,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.entity.CameraInfo;
-import com.yjh.platform.module.user.entity.TCameraInfo;
-import com.yjh.platform.module.user.entity.TCameraPreset;
-import com.yjh.platform.module.user.entity.TCameraPresetExpand;
+import com.yjh.platform.module.user.entity.*;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,78 +27,78 @@ public class TCameraPresetService {
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "tCameraPreset",content = "根据web传递的参数插入摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraPreset tCameraPreset) {
         return this.tCameraPresetDao.insert(tCameraPreset);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "tCameraPreset",content = "根据web传递的参数删除摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long presetId) {
         return this.tCameraPresetDao.deleteByPrimaryId(presetId);
     }
 
-    @Logs(title = "批量删除", code = "TCameraPreset")
+    @Logs(title = "批量删除", code = "tCameraPreset",content = "根据web传递的参数批量删除摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedPreset(String presetIds) {
         List<String> list= Arrays.asList(presetIds.split(","));
         return this.tCameraPresetDao.deleteSelectedPreset(list);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "tCameraPreset",content = "根据web传递的参数更新摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraPreset tCameraPreset) {
         return this.tCameraPresetDao.update(tCameraPreset);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "tCameraPreset",content = "根据web传递的参数查询摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public TCameraPreset selectByPrimaryId(Long presetId) {
         return this.tCameraPresetDao.selectByPrimaryId(presetId);
     }
 
-    @Logs(title = "根据摄像机id查询所有预置位信息", code = "TCameraInfo")
+    @Logs(title = "根据摄像机id查询所有预置位信息", code = "tCameraPreset",content = "根据web传递的参数查询摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraPreset> selectByCameraId(Long cameraId) {
         List<TCameraPreset> tCameraPresetList = tCameraPresetDao.selectByCameraId(cameraId);
         return tCameraPresetList;
     }
 
-    @Logs(title = "根据预置位名称查询信息", code = "TCameraPreset")
+    @Logs(title = "根据预置位名称查询信息", code = "tCameraPreset",content = "根据web传递的参数查询摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraPreset> selectByPresetName(String presetName) {
         List<TCameraPreset> tCameraPresetList = tCameraPresetDao.selectByPresetName(presetName);
         return tCameraPresetList;
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "tCameraPreset",content = "根据web传递的参数查询摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraPreset> select(Long presetId, Long cameraId, Integer presetNum, String presetName, String creatorUser, Date creatorTime, Integer isUse, String presetImg, Integer inspectionPostion, Integer collectStatus, Integer calibrationStatus) {
         List<TCameraPreset> tCameraPresetList = tCameraPresetDao.select(presetId, cameraId, presetNum, presetName, creatorUser, creatorTime, isUse, presetImg, inspectionPostion, collectStatus, calibrationStatus);
         return tCameraPresetList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "tCameraPreset",content = "根据web传递的参数查询摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraPresetExpand> selectByPage(TCameraPreset tCameraPreset) {
         List<TCameraPresetExpand> tCameraPresetExpandList = tCameraPresetDao.selectByPage(tCameraPreset);
         return tCameraPresetExpandList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "tCameraPreset",content = "根据web传递的参数批量插入摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCameraPreset> list) {
         return this.tCameraPresetDao.batchInsert(list);
     }
 
-    @Logs(title = "查询最后一条记录", code = "module")
+    @Logs(title = "查询最后一条记录", code = "tCameraPreset",content = "查询摄像机预置位表最后一条记录")
     @Transactional(rollbackFor = Exception.class)
     public TCameraPreset selectLastOne() {
         return this.tCameraPresetDao.selectLastOne();
     }
 
-    @Logs(title = "获得预置位树", code = "module")
+    @Logs(title = "获得预置位树", code = "tCameraPreset",content = "获得预置位树")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectPresetTree(Long cameraId) {
         List<AreaInfo> tree = new LinkedList<>();
@@ -131,6 +128,13 @@ public class TCameraPresetService {
         tree.add(camera);
         return tree;
     }
-
+    public boolean judgePresentNum(Integer presentNum) {
+        boolean flag = false;
+        List<TCameraPreset> tCameraPresetList = this.tCameraPresetDao.select(null, null, presentNum, null, null, null, null, null, null, null,null);
+        if (tCameraPresetList.size()>0) {
+            flag=true;
+        }
+        return flag;
+    }
 }
 

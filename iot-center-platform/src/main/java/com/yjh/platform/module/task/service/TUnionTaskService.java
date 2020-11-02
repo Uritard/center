@@ -34,38 +34,38 @@ public class TUnionTaskService{
     private TUnionTaskAttrDao TUnionTaskAttrDao;
 
     private DateTimeUtil dateTimeUtil;
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "tUnionTask",content = "根据web传递的参数插入巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TUnionTask tUnionTask) {
         return this.tUnionTaskDao.insert(tUnionTask);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "tUnionTask",content = "根据web传递的参数删除巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String unionId) {
         return this.tUnionTaskDao.deleteByPrimaryId(unionId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "tUnionTask",content = "根据web传递的参数更新巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public int update(TUnionTask tUnionTask) {
         return this.tUnionTaskDao.update(tUnionTask);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "tUnionTask",content = "根据web传递的参数查询巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public TUnionTask selectByPrimaryId(String unionId) {
         return this.tUnionTaskDao.selectByPrimaryId(unionId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "tUnionTask",content = "根据web传递的参数查询巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTask> select(String unionId, Long ruleId, String unionName, Integer ruleDelay, Integer isFinish,  Long robotId,  Integer remark1, Integer remark2, String remark3, String paramValues, Date startTime, Date createTime) {
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, remark1, remark2, remark3, paramValues, startTime, createTime);
         return tUnionTaskList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "tUnionTask",content = "根据web传递的参数查询巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTask> selectByPage(TUnionTask tUnionTask) {
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
@@ -75,12 +75,12 @@ public class TUnionTaskService{
         return tUnionTaskList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "tUnionTask",content = "根据web传递的参数批量插入巡检记录")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TUnionTask> list) {
         return this.tUnionTaskDao.batchInsert(list);
     }
-    @Logs(title = "查看联动历史记录", code = "module")
+    @Logs(title = "查看联动历史记录", code = "tUnionTask",content = "根据web传递的参数查看联动历史记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskExpand> selectHistory(String ruleName,Date endDateTemp,Date startDateTemp) {
         List<TUnionTaskExpand> tUnionTaskList  = tUnionTaskDao.selectHistory(ruleName,endDateTemp,startDateTemp);
@@ -95,7 +95,7 @@ public class TUnionTaskService{
         }
         return tUnionTaskList;
     }
-    @Logs(title = "联动历史记录统计--近一周", code = "module")
+    @Logs(title = "联动历史记录统计--近一周", code = "tUnionTask",content = "统计近一周发生的联动次数")
     @Transactional(rollbackFor = Exception.class)
     public List<TutHistoryStatistical> historyStatisticalByWeek() {
         List<String> weekDates = dateTimeUtil.getDayDateList(8);
@@ -149,7 +149,7 @@ public class TUnionTaskService{
         });
         return tutHistoryStatisticalList;
     }
-    @Logs(title = "联动历史记录统计--近一年", code = "module")
+    @Logs(title = "联动历史记录统计--近一年", code = "tUnionTask",content = "统计近一年发生的联动次数")
     @Transactional(rollbackFor = Exception.class)
     public List<TutHistoryStatistical> historyStatisticalByYear() {
         List<String> yearDates = dateTimeUtil.getYearDateList1(13);
@@ -208,7 +208,7 @@ public class TUnionTaskService{
         });
         return tutHistoryStatisticalList;
     }
-    @Logs(title = "联动历史记录统计--近一月", code = "module")
+    @Logs(title = "联动历史记录统计--近一月", code = "tUnionTask",content = "统计近一月发生的联动次数")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> historyStatisticalByMonth() {
         List<String> monthDates = dateTimeUtil.getDayDateList(30);
@@ -258,7 +258,7 @@ public class TUnionTaskService{
         });
         return list;
     }
-    @Logs(title = "联动记录存储", code = "module")
+    @Logs(title = "联动记录存储", code = "tUnionTask",content = "触发联动进行记录存储")
     @Transactional(rollbackFor = Exception.class)
     public int insertRecord(Long ruleId,Long robotId,Date createTime,String paramValues) {
         TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
