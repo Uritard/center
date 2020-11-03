@@ -23,16 +23,12 @@
             plan_id,
             plan_name,
             type,
-            plan_point_types,
-            create_time,
-            update_time
+            plan_point_types
         )values(
                 #{planId, jdbcType=BIGINT},
                 #{planName, jdbcType=VARCHAR},
                 #{type, jdbcType=INTEGER},
-                #{planPointTypes, jdbcType=VARCHAR},
-                #{createTime, jdbcType=TIMESTAMP},
-                #{updateTime, jdbcType=TIMESTAMP}
+                #{planPointTypes, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -104,6 +100,7 @@
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+         order by a.create_time desc
     </select>
 
     <select id="selectByPlanPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlanCountByPage">
@@ -125,6 +122,7 @@
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        order by a.create_time desc
     </select>
 
     <insert id="batchInsert">

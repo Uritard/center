@@ -23,31 +23,31 @@ public class TCruiseResultService{
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
 
-    @Logs(title = "插入", code = "cruiseResult")
+    @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseResult tCruiseResult) {
         return this.tCruiseResultDao.insert(tCruiseResult);
     }
 
-    @Logs(title = "删除", code = "cruiseResult")
+    @Logs(title = "删除", code = "cruiseResult",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskResultId) {
         return this.tCruiseResultDao.deleteByPrimaryId(taskResultId);
     }
 
-    @Logs(title = "更新", code = "cruiseResult")
+    @Logs(title = "更新", code = "cruiseResult",content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseResult tCruiseResult) {
         return this.tCruiseResultDao.update(tCruiseResult);
     }
 
-    @Logs(title = "主键查询", code = "cruiseResult")
+    @Logs(title = "主键查询", code = "cruiseResult",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectByPrimaryId(String taskResultId) {
         return this.tCruiseResultDao.selectByPrimaryId(taskResultId);
     }
 
-    @Logs(title = "查询", code = "cruiseResult")
+    @Logs(title = "查询", code = "cruiseResult",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseResult> select(String taskResultId, String taskId, String areaId, Integer cType, Integer cState, Integer modifyState, Integer taskCount, Integer taskWait, String checkUser, Date checkDate, String weather, Date createTime, Date executeTime, String taskCode, String remark) {
         List<TCruiseResult> tCruiseResultList = tCruiseResultDao.select(taskResultId, taskId, areaId, cType, cState, modifyState, taskCount, taskWait, checkUser, checkDate, weather, createTime, executeTime, taskCode, remark);

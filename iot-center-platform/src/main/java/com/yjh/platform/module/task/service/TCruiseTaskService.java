@@ -84,7 +84,7 @@ public class TCruiseTaskService {
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "TCruiseTask",content = "根据web传入的参数新增任务")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTask tCruiseTask) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -151,7 +151,7 @@ public class TCruiseTaskService {
         return 1;
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "TCruiseTask",content = "根据web传入的参数删除任务")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskId, String startTime) {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
@@ -191,40 +191,40 @@ public class TCruiseTaskService {
 
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "TCruiseTask",content = "根据web传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseTask tCruiseTask) {
         return this.tCruiseTaskDao.update(tCruiseTask);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "TCruiseTask",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectByPrimaryId(String taskId) {
         return this.tCruiseTaskDao.selectByPrimaryId(taskId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "TCruiseTask",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTask> select(String taskId, String taskName, Long planId, String areaId, Integer type, Integer ifRun, Long robotId, String dateType, Integer taskType, Date startTime, Date createTime) {
         List<TCruiseTask> tCruiseTaskList = tCruiseTaskDao.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, startTime, createTime);
         return tCruiseTaskList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "TCruiseTask",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTask> selectByPage(TCruiseTask tCruiseTask) {
         List<TCruiseTask> tCruiseTaskList = tCruiseTaskDao.selectByPage(tCruiseTask);
         return tCruiseTaskList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "TCruiseTask",content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseTask> list) {
         return this.tCruiseTaskDao.batchInsert(list);
     }
 
     //任务统计
-    @Logs(title = "任务统计",code = "task")
+    @Logs(title = "任务统计",code = "TCruiseTask",content = "任务统计")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> taskCount(Date taskStartDate){
 
@@ -355,14 +355,14 @@ public class TCruiseTaskService {
         return listTask;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "TCruiseTask",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTaskList> selectPointStatus(String taskId) {
         List<TCruiseTaskList> tCruiseTaskList = tCruiseTaskDao.selectPointStatus(taskId);
         return tCruiseTaskList;
     }
 
-    @Logs(title = "任务暂停", code = "module")
+    @Logs(title = "任务暂停", code = "TCruiseTask",content = "任务暂停")
     @Transactional(rollbackFor = Exception.class)
     public int taskPause(String taskId) {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
@@ -370,7 +370,7 @@ public class TCruiseTaskService {
         return tCruiseResultDao.update(tCruiseResult);
     }
 
-    @Logs(title = "任务继续", code = "module")
+    @Logs(title = "任务继续", code = "TCruiseTask",content = "任务继续")
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId) {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
@@ -385,7 +385,7 @@ public class TCruiseTaskService {
         return tCruiseResultDao.update(tCruiseResult);
     }
 
-    @Logs(title = "任务终止", code = "module",content = "任务终止")
+    @Logs(title = "任务终止", code = "TCruiseTask",content = "任务终止")
     @Transactional(rollbackFor = Exception.class)
     public int taskShutDown(String taskId) {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);

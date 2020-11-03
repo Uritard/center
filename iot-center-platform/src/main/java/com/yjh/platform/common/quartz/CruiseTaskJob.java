@@ -208,8 +208,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         // webSocket通知前端调用巡视监控的接口
                         Map<String,Object> jasonMapOnFinished=new HashMap<>();
-                        jasonMap.put("type","newTask");
-                        jasonMap.put("finishedOneInstance",taskId);
+                        jasonMap.put("type","finishedOneInstance");
+                        jasonMap.put("taskId",taskId);
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                         log.info("发送给前端的消息："+jsonMessage);
                         WebSocketServer.sendMsg(json);
@@ -295,8 +295,8 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                             // webSocket通知前端调用巡视监控的接口
                             Map<String,Object> jasonMapOnFinished=new HashMap<>();
-                            jasonMap.put("type","newTask");
-                            jasonMap.put("finishedOneInstance",taskId);
+                            jasonMap.put("type","finishedOneInstance");
+                            jasonMap.put("taskId",taskId);
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
                             WebSocketServer.sendMsg(json);

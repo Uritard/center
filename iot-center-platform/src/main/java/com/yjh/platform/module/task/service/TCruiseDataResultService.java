@@ -33,45 +33,45 @@ public class TCruiseDataResultService{
     private Object Comparator;
     private Object CruiseResultAnalMeteInfo;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "TCruiseDataResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseDataResult tCruiseDataResult) {
         return this.tCruiseDataResultDao.insert(tCruiseDataResult);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "TCruiseDataResult",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long cruiseDataId) {
         return this.tCruiseDataResultDao.deleteByPrimaryId(cruiseDataId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "TCruiseDataResult",content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseDataResult tCruiseDataResult) {
         return this.tCruiseDataResultDao.update(tCruiseDataResult);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "TCruiseDataResult",content = "根据主键查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseDataResult selectByPrimaryId(Long cruiseDataId) {
         return this.tCruiseDataResultDao.selectByPrimaryId(cruiseDataId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "TCruiseDataResult",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResult> select(Long cruiseDataId, String cruiseResultId, Long cruiseId, Integer cruiseType, String resultDesc, String resultNum, String modifyNum, String picpath, String personcheck, String origpic, Integer state, String evaluationState, Integer identifyState, Integer identifyResult, Date createtime, String remark) {
         List<TCruiseDataResult> tCruiseDataResultList = tCruiseDataResultDao.select(cruiseDataId, cruiseResultId, cruiseId, cruiseType, resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
         return tCruiseDataResultList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "TCruiseDataResult",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResult> selectByPage(TCruiseDataResult tCruiseDataResult) {
         List<TCruiseDataResult> tCruiseDataResultList = tCruiseDataResultDao.selectByPage(tCruiseDataResult);
         return tCruiseDataResultList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "TCruiseDataResult",content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseDataResult> list) {
         return this.tCruiseDataResultDao.batchInsert(list);
@@ -79,7 +79,7 @@ public class TCruiseDataResultService{
 
 
 
-    @Logs(title = "巡视结果查询-测点查询",code = "module")
+    @Logs(title = "巡视结果查询-测点查询",code = "TCruiseDataResult",content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId)  {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos;
@@ -120,7 +120,7 @@ public class TCruiseDataResultService{
     }
 
 
-    @Logs(title = "获取当前测点下的巡检结果")
+    @Logs(title = "获取当前测点下的巡检结果",code = "TCruiseDataResult",content = "获取测点巡检结果")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalInfo> selectCruiseDataResultByList(Integer cruiseType,
                                                                    Integer cType,
@@ -132,7 +132,7 @@ public class TCruiseDataResultService{
         return cruiseResultAnalInfos;
     }
 
-    @Logs(title = "获取折线图元素信息")
+    @Logs(title = "获取折线图元素信息",code = "TCruiseDataResult",content = "获取折线图信息")
     @Transactional(rollbackFor = Exception.class)
     public List<BrokenLineInfo> selectBrokenLine(Integer cruiseType,
                                                  Integer cType,

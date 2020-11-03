@@ -20,45 +20,45 @@ public class TUnionTaskAttrService{
     @Autowired
     private TUnionTaskAttrDao tUnionTaskAttrDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "TUnionTaskAttr",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TUnionTaskAttr tUnionTaskAttr) {
         return this.tUnionTaskAttrDao.insert(tUnionTaskAttr);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "TUnionTaskAttr",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String unionId) {
         return this.tUnionTaskAttrDao.deleteByPrimaryId(unionId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "TUnionTaskAttr",content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TUnionTaskAttr tUnionTaskAttr) {
         return this.tUnionTaskAttrDao.update(tUnionTaskAttr);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "TUnionTaskAttr",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TUnionTaskAttr selectByPrimaryId(String unionId) {
         return this.tUnionTaskAttrDao.selectByPrimaryId(unionId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "TUnionTaskAttr",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskAttr> select(String unionId, Long instanceId, Long deviceMeteId, String deviceCustomId, Long pointTaskId, Integer ifRobot, Integer ifVideo, Integer ifInferad, Integer ifArtificial) {
         List<TUnionTaskAttr> tUnionTaskAttrList = tUnionTaskAttrDao.select(unionId, instanceId, deviceMeteId, deviceCustomId, pointTaskId, ifRobot, ifVideo, ifInferad, ifArtificial);
         return tUnionTaskAttrList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "TUnionTaskAttr",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskAttr> selectByPage(TUnionTaskAttr tUnionTaskAttr) {
         List<TUnionTaskAttr> tUnionTaskAttrList = tUnionTaskAttrDao.selectByPage(tUnionTaskAttr);
         return tUnionTaskAttrList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "TUnionTaskAttr",content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TUnionTaskAttr> list) {
         return this.tUnionTaskAttrDao.batchInsert(list);

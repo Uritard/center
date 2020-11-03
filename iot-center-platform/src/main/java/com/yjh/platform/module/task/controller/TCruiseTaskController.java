@@ -282,4 +282,20 @@ public class TCruiseTaskController {
         }
         return result;
     }
+
+    @ApiOperation(value = "任务终止")
+    @RequestMapping(value = "/taskShutDown", method = RequestMethod.GET)
+    public Result taskShutDown(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseTaskService.taskShutDown(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务终止异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务终止错误:", e);
+        }
+        return result;
+    }
 }

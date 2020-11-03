@@ -35,7 +35,7 @@ public class TCruisePlanService{
     @Autowired
     private TAlgorithmConfDao tAlgorithmConfDao;
 
-    @Logs(title = "新增预案", code = "task")
+    @Logs(title = "新增预案", code = "task",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(Map<String, Object> map) {
         System.out.println("_____________"+map+"________________");
@@ -85,14 +85,14 @@ public class TCruisePlanService{
         } else{ return ResultCodeEnum.CODE10010.getCode(); }
     }
 
-    @Logs(title = "删除", code = "task")
+    @Logs(title = "删除", code = "task",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long planId) {
         tCruisePlanAttrDao.deleteByPrimaryId(planId);
         return this.tCruisePlanDao.deleteByPrimaryId(planId);
     }
 
-    @Logs(title = "更新", code = "task")
+    @Logs(title = "更新", code = "task",content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(Map<String, Object> planDetailMap) {
         TCruisePlan tCruisePlan = new TCruisePlan();
@@ -116,40 +116,40 @@ public class TCruisePlanService{
         } else {return 0;}
     }
 
-    @Logs(title = "主键查询", code = "task")
+    @Logs(title = "主键查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruisePlanCount selectByPrimaryId(Long planId) {
         return this.tCruisePlanDao.selectByPrimaryId(planId);
     }
 
-    @Logs(title = "查询", code = "task")
+    @Logs(title = "查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlan> select(Long planId, String planName, Integer type, String planPointTypes, Date createTime, Date updateTime) {
         List<TCruisePlan> tCruisePlanList = tCruisePlanDao.select(planId, planName, type, planPointTypes, createTime, updateTime);
         return tCruisePlanList;
     }
 
-    @Logs(title = "分页查询", code = "task")
+    @Logs(title = "分页查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan) {
         List<TCruisePlanCount> tCruisePlanList = tCruisePlanDao.selectByPage(tCruisePlan);
         return tCruisePlanList;
     }
 
-    @Logs(title = "分页查询", code = "task")
+    @Logs(title = "分页查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanCountByPage> selectByPlanPage(TCruisePlan tCruisePlan) {
         List<TCruisePlanCountByPage> tCruisePlanList = tCruisePlanDao.selectByPlanPage(tCruisePlan);
         return tCruisePlanList;
     }
 
-    @Logs(title = "批量插入", code = "task")
+    @Logs(title = "批量插入", code = "task",content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruisePlan> list) {
         return this.tCruisePlanDao.batchInsert(list);
     }
 
-    @Logs(title = "查询标准设备下挂巡检点", code = "task")
+    @Logs(title = "查询标准设备下挂巡检点", code = "task",content = "查询设备下的巡检点")
     @Transactional(rollbackFor = Exception.class)
     public List<InstanceTree> findInstanceTree(String deviceIds) {
         List<Long> deviceIdList = new ArrayList<>();
