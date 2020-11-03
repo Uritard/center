@@ -51,12 +51,12 @@ public class TStdDevicemeteService{
         //若插入的测点中的deviceId、customId存在于device表中，则不更新device表；否则进行更新
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查看当前设备ID和部位ID下的设备信息
         if(Objects.isNull(tStdDevice)){
-            tStdDeviceDao.deleteByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),"101");  //删除之前本体部位的设备
             TStdDevice stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
             stdDevice.setCustomId(tStdDeviceMeteDetail.getCustomType());
             List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
             stdDevice.setCustomName(list.get(0).getDictNote());
             tStdDeviceDao.add(stdDevice);
+            tStdDeviceDao.deleteByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),"101");  //删除之前本体部位的设备
         }
         return this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
     }
