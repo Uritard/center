@@ -102,11 +102,14 @@ public class SystemInfoUtil {
                 while ((str = in.readLine()) != null) {
                     if(i > 3){
                         strArray = str.split("\\s+");
+                        if("".equals(strArray[0])){
+                            strArray= Arrays.copyOfRange(strArray,1,strArray.length);
+                        }
                         Map<String,String> map = new HashMap<>();
-                        map.put("pid",strArray[3]);
-                        map.put("read",strArray[4]);
-                        map.put("write",strArray[5]);
-                        Double all = Double.valueOf(strArray[4])+Double.valueOf(strArray[5]);
+                        map.put("pid",strArray[2]);
+                        map.put("read",strArray[3]);
+                        map.put("write",strArray[4]);
+                        Double all = Double.valueOf(strArray[3])+Double.valueOf(strArray[4]);
                         map.put("all",all.toString());
                         result.add(map);
                     }
