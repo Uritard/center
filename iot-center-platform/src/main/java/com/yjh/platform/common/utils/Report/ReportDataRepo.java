@@ -277,8 +277,13 @@ public class ReportDataRepo {
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{taskVoInfo.getCruiseDate()},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+        if (null != taskVoInfo.getCruiseDate()){
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
+                    TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+        }else{
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{},
+                    TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+        }
         rowIndex++;
         rowCount++;
 

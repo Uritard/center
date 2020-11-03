@@ -33,6 +33,6 @@ public class TaskVO implements Serializable {
     private Integer abnormalNum;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "巡检时间")
-    private String cruiseDate;
+    private Date cruiseDate;
 
 }
