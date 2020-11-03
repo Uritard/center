@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -138,8 +140,12 @@ public class CameraConController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            String filePathTem = "/presetId/" + presetId + ".jpg";
+            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
+            String mkdir = "mkdir "+capturePresetPath+"/"+presetId;
+            log.info("mkdir: "+mkdir);
+            Runtime.getRuntime().exec(mkdir);
+            Thread.sleep(2000);
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId);
             String urlPath = capturePathPreset+filePathTem;
