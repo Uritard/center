@@ -150,12 +150,18 @@ public class TDefectInfoService {
     }
     @Logs(title = "进行缺陷处理", code = "tDefectInfo",content = "根据web传递的参数进行缺陷处理")
     @Transactional(rollbackFor = Exception.class)
-    public int defectProcess(Long defectId,Integer dealType,String dealInfo) {
-
+    public int defectProcess(TDefectInfo tDefectInfoTemp,String userId) {
+        Long defectId = tDefectInfoTemp.getDefectId();
+        Integer dealType = tDefectInfoTemp.getDealType();
+        String dealInfo = tDefectInfoTemp.getDealInfo();
+        Date date = new Date();
         TDefectInfo tDefectInfo = new TDefectInfo();
         tDefectInfo.setDefectId(defectId);
         tDefectInfo.setDealInfo(dealInfo);
         tDefectInfo.setDealType(dealType);
+        tDefectInfo.setDealTime(date);
+        tDefectInfo.setConfMode(275);
+        tDefectInfo.setDealPersonId(userId);
         int jieGuo = tDefectInfoDao.update(tDefectInfo);
 
         return jieGuo;

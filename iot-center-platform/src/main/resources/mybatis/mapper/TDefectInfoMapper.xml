@@ -102,20 +102,20 @@
         update t_defect_info a <set>
         <if test="defectId != null and defectId != ''">a.defect_id = #{defectId, jdbcType=BIGINT},</if>
         <if test="defectLevel != null ">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
-        <if test="defectTime != null and defectTime != ''">a.defect_time = #{defectTime, jdbcType=TIMESTAMP},</if>
+        <if test="defectTime != null ">a.defect_time = #{defectTime, jdbcType=TIMESTAMP},</if>
         <if test="defectType != null ">a.defect_type = #{defectType, jdbcType=INTEGER},</if>
         <if test="defectName != null and defectName != ''">a.defect_name = #{defectName, jdbcType=VARCHAR},</if>
         <if test="defectContent != null and defectContent != ''">a.defect_content = #{defectContent, jdbcType=VARCHAR},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
-        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
         <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
         <if test="isDefect != null ">a.is_defect = #{isDefect, jdbcType=INTEGER},</if>
         <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
-        <if test="dealTime != null and dealTime != ''">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+        <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
         <if test="ifDefectDisable != null ">a.if_defect_disable = #{ifDefectDisable, jdbcType=INTEGER},</if>
         <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
         <if test="defectSubtype != null ">a.defect_subtype = #{defectSubtype, jdbcType=INTEGER},</if>
@@ -191,22 +191,22 @@
         a.link_message
         from t_defect_info a
         where 1 = 1
-        <if test="defectId != null and defectId != ''"> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
+        <if test="defectId != null "> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
         <if test="defectLevel != null "> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
-        <if test="defectTime != null and defectTime != ''"> and a.defect_time = #{defectTime, jdbcType=TIMESTAMP}</if>
+        <if test="defectTime != null "> and a.defect_time = #{defectTime, jdbcType=TIMESTAMP}</if>
         <if test="defectType != null "> and a.defect_type = #{defectType, jdbcType=INTEGER}</if>
         <if test="defectName != null and defectName != ''"> and a.defect_name = #{defectName, jdbcType=VARCHAR}</if>
         <if test="defectContent != null and defectContent != ''"> and a.defect_content = #{defectContent, jdbcType=VARCHAR}</if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null "> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
         <if test="confMode != null "> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="isDefect != null "> and a.is_defect = #{isDefect, jdbcType=INTEGER}</if>
         <if test="dealType != null "> and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
         <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
         <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
-        <if test="dealTime != null and dealTime != ''"> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
+        <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
         <if test="ifDefectDisable != null "> and a.if_defect_disable = #{ifDefectDisable, jdbcType=INTEGER}</if>
         <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="defectSubtype != null "> and a.defect_subtype = #{defectSubtype, jdbcType=INTEGER}</if>
@@ -247,22 +247,22 @@
         a.link_message
         from t_defect_info a
         where 1 = 1
-        <if test="defectId != null and defectId != ''"> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
+        <if test="defectId != null "> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
         <if test="defectLevel != null "> and a.defect_level = #{defectLevel, jdbcType=Integer}</if>
-        <if test="defectTime != null and defectTime != ''"> and a.defect_time = #{defectTime, jdbcType=TIMESTAMP}</if>
+        <if test="defectTime != null "> and a.defect_time = #{defectTime, jdbcType=TIMESTAMP}</if>
         <if test="defectType != null "> and a.defect_type = #{defectType, jdbcType=INTEGER}</if>
         <if test="defectName != null and defectName != ''"> and a.defect_name = #{defectName, jdbcType=VARCHAR}</if>
         <if test="defectContent != null and defectContent != ''"> and a.defect_content = #{defectContent, jdbcType=VARCHAR}</if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null "> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
         <if test="confMode != null "> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="isDefect != null "> and a.is_defect = #{isDefect, jdbcType=INTEGER}</if>
         <if test="dealType != null "> and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
         <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
         <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
-        <if test="dealTime != null and dealTime != ''"> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
+        <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
         <if test="ifDefectDisable != null "> and a.if_defect_disable = #{ifDefectDisable, jdbcType=INTEGER}</if>
         <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="defectSubtype != null "> and a.defect_subtype = #{defectSubtype, jdbcType=INTEGER}</if>
@@ -356,7 +356,7 @@
         a.defect_content
         FROM
         t_defect_info a
-        LEFT JOIN	t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_std_mete d on a.std_mete_id = d.std_mete_id
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
@@ -367,6 +367,7 @@
         <if test="defectType != null "> and defect_type = #{defectType, jdbcType=INTEGER}</if>
         <if test="confMode != null "> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="startTime != null and endTime != null"> and defect_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        ORDER BY deal_time desc
     </select>
     <!--统计近一月的所有缺陷个数-->
     <select id="countDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -389,8 +390,8 @@
     <!--根据缺陷处理状态统计缺陷个数-->
     <select id="countDefectConfMode" resultType="java.util.Map">
         SELECT
-            a.processed as '已处理',
-            b.untreated as '未处理'
+            a.processed as processed,
+            b.untreated as unProcessed
         FROM
         (
             (select count(conf_mode = 275 or null) as processed from t_defect_info ) a,

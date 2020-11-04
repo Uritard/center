@@ -201,16 +201,16 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
         update t_warn_info a <set>
-        <if test="warnId != null and warnId != ''">a.warn_id = #{warnId, jdbcType=BIGINT},</if>
+        <if test="warnId != null ">a.warn_id = #{warnId, jdbcType=BIGINT},</if>
         <if test="warnLevel != null ">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
-        <if test="warnTime != null and warnTime != ''">a.warn_time = #{warnTime, jdbcType=TIMESTAMP},</if>
+        <if test="warnTime != null ">a.warn_time = #{warnTime, jdbcType=TIMESTAMP},</if>
         <if test="warnType != null ">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
         <if test="warnName != null and warnName != ''">a.warn_name = #{warnName, jdbcType=VARCHAR},</if>
         <if test="warnContent != null and warnContent != ''">a.warn_content = #{warnContent, jdbcType=VARCHAR},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
-        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
         <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
         <if test="isWarn != null ">a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
         <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
@@ -292,22 +292,22 @@
         a.link_message
         from t_warn_info a
         where 1 = 1
-        <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnId != null "> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
         <if test="warnLevel != null "> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="warnTime != null and warnTime != ''"> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnTime != null "> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
         <if test="warnType != null "> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="warnName != null and warnName != ''"> and a.warn_name = #{warnName, jdbcType=VARCHAR}</if>
         <if test="warnContent != null and warnContent != ''"> and a.warn_content = #{warnContent, jdbcType=VARCHAR}</if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null "> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
         <if test="confMode != null "> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="isWarn != null "> and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
         <if test="dealType != null "> and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
         <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
         <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
-        <if test="dealTime != null and dealTime != ''"> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
+        <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
         <if test="ifWarnDisable != null "> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
         <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="warnSubtype != null "> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
@@ -348,22 +348,22 @@
         a.link_message
         from t_warn_info a
         where 1 = 1
-        <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnId != null "> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
         <if test="warnLevel != null "> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="warnTime != null and warnTime != ''"> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnTime != null "> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
         <if test="warnType != null "> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="warnName != null and warnName != ''"> and a.warn_name = #{warnName, jdbcType=VARCHAR}</if>
         <if test="warnContent != null and warnContent != ''"> and a.warn_content = #{warnContent, jdbcType=VARCHAR}</if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null "> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
         <if test="confMode != null "> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="isWarn != null "> and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
         <if test="dealType != null "> and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
         <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
         <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
-        <if test="dealTime != null and dealTime != ''"> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
+        <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
         <if test="ifWarnDisable != null "> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
         <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="warnSubtype != null "> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>

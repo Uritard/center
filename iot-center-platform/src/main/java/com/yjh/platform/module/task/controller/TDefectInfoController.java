@@ -9,6 +9,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TDefectInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,12 +234,11 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "进行缺陷处理")
     @RequestMapping(value = "/defectProcess", method = RequestMethod.PUT)
-    public Result defectProcess(@RequestParam(value = "warnId") Long defectId,
-                               @RequestParam(value = "dealType") Integer dealType,
-                               @RequestParam(value = "dealInfo") String dealInfo){
+    public Result defectProcess(@RequestBody TDefectInfo tDefectInfo,HttpServletRequest request){
         Result result = new Result();
+        String userId = request.getHeader("userId");
         try {
-            result.setData(tDefectInfoService.defectProcess(defectId,dealType,dealInfo));
+            result.setData(tDefectInfoService.defectProcess(tDefectInfo,userId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
