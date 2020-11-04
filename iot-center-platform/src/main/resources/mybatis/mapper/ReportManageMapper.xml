@@ -32,70 +32,89 @@
     </resultMap>
     <sql id="TongYong">
         select
-            a.cruise_data_id,
-            b.cruise_result_id,
-            b.instance_id,
-            d.device_mete_id,
-            e.mete_type,
-            f.dict_note as mete_type_name,
-            a.evaluation_state,
-            g.dict_note as evaluation_state_name
-        FROM t_cruise_data_result a
-        LEFT JOIN t_cruise_task_result_detail b on a.cruise_result_id = b.cruise_result_id
-        LEFT JOIN t_cruise_point_instance d on d.instance_id = b.instance_id
-        LEFT JOIN t_std_devicemete e on d.device_mete_id = e.device_mete_id
-        LEFT JOIN t_dict_business f on f.dict_code = e.mete_type
-        LEFT JOIN t_dict_business g on g.dict_code = a.evaluation_state
+		e.cruise_result_id,
+		f.cruise_data_id,
+		a.device_id,
+		b.device_mete_id,
+		d.instance_id,
+        b.mete_type,
+        q.dict_note as mete_type_name,
+		f.evaluation_state,
+		p.dict_note as evaluation_state_name,
+		a.device_name ,
+		(CASE
+		WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
+		WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
+		WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
+		WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
+		WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
+		WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
+		END) AS instance_name,
+		h.dict_note as identify_result,
+		f.origpic as picpath,
+		g.dict_note as cruise_result,
+		e.cruise_time
+		FROM t_std_device a
+		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
+		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
+		LEFT JOIN t_cruise_task_result_detail e on e.instance_id = d.instance_id
+		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
+		LEFT JOIN t_dict_business g on g.dict_code = f.state
+		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
+		LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
+		LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id
+		LEFT JOIN t_std_devicemete n ON n.device_mete_id = d.device_mete_id
+		LEFT JOIN t_dict_business p on p.dict_code = f.evaluation_state
+        LEFT JOIN t_dict_business q on q.dict_code = b.mete_type
+
     </sql>
     <sql id="TongYong2">
         select
-            a.cruise_data_id,
-            b.cruise_result_id,
-            b.instance_id,
-            d.device_mete_id,
-            e.mete_type,
-            f.dict_note as mete_type_name,
-            a.evaluation_state,
-            g.dict_note as evaluation_state_name
-        FROM t_cruise_data_result a
-        LEFT JOIN t_cruise_task_result_detail b on a.cruise_result_id = b.cruise_result_id
-		LEFT JOIN t_cruise_result h on h.task_result_id = b.task_result_id
-        LEFT JOIN t_cruise_point_instance d on d.instance_id = b.instance_id
-        LEFT JOIN t_std_devicemete e on d.device_mete_id = e.device_mete_id
-        LEFT JOIN t_dict_business f on f.dict_code = e.mete_type
-        LEFT JOIN t_dict_business g on g.dict_code = a.evaluation_state
-        WHERE 1 = 1
+		q.task_id,
+		e.cruise_result_id,
+		f.cruise_data_id,
+		a.device_id,
+		b.device_mete_id,
+		d.instance_id,
+		b.mete_type,
+		w.dict_note as mete_type_name,
+		f.evaluation_state,
+		x.dict_note as evaluation_state_name,
+		a.device_name ,
+		(CASE
+		WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
+		WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
+		WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
+		WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
+		WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
+		WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
+		END) AS instance_name,
+		h.dict_note as identify_result,
+		f.origpic as picpath,
+		g.dict_note as cruise_result,
+		e.cruise_time
+		FROM t_std_device a
+		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
+		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
+		LEFT JOIN t_cruise_task_result_detail e on e.instance_id = d.instance_id
+		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
+		LEFT JOIN t_cruise_result q on q.task_result_id = e.task_result_id
+		LEFT JOIN t_dict_business g on g.dict_code = f.state
+		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
+		LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
+		LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id
+		LEFT JOIN t_std_devicemete n ON n.device_mete_id = d.device_mete_id
+		LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
+		LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
     </sql>
+
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
-        select
-        a.device_name ,
-        (CASE
-        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
-        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
-        WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
-        WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
-        WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
-        WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
-        END) AS instance_name,
-        h.dict_note as identify_result,
-        f.origpic as picpath,
-        g.dict_note as cruise_result,
-        e.cruise_time
-        FROM
-        t_std_device a,
-        t_std_devicemete b,
-        t_cruise_task_result_detail e,
-        t_cruise_data_result f,
-        t_dict_business g,
-        t_dict_business h,
-        t_cruise_point_instance d
-        LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
-        LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id
-        LEFT JOIN t_std_devicemete n ON n.device_mete_id = d.device_mete_id
-        where  a.device_id = b.device_id and a.custom_id = b.custom_id and b.device_mete_id = d.device_mete_id
-        and e.instance_id = d.instance_id and e.cruise_result_id = f.cruise_result_id
-        and g.dict_code = f.state
-        and h.dict_code = f.identify_result
+        <include refid="TongYong"></include>
+        where 1 = 1
+        and a.device_id in
+        <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+            #{deviceIds, jdbcType=BIGINT}
+        </foreach>
         <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
     </select>
     <select id="selectStationName" resultType="java.lang.String">
@@ -110,7 +129,13 @@
         SELECT COUNT(device_mete_id or null) as mete_num
         from
         (
-            <include refid="TongYong"></include>GROUP BY device_mete_id
+            <include refid="TongYong"></include>
+        where 1 = 1
+        and a.device_id in
+        <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+            #{deviceIds, jdbcType=BIGINT}
+        </foreach>
+        GROUP BY device_mete_id
         )big_table
     </select>
     <select id="selectAbnormalNum" resultType="java.lang.Integer">
@@ -118,74 +143,83 @@
         from
         (
             <include refid="TongYong"></include>
+        where 1 = 1
+        and a.device_id in
+        <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+            #{deviceIds, jdbcType=BIGINT}
+        </foreach>
         )big_table
     </select>
     <select id="selectMeteType" resultType="com.yjh.platform.module.task.entity.CheckPointType">
         SELECT
-               mete_type_name as mete_type,
-               1 as mete_num,
-               0 as regular_num
-        FROM
+            dict_note as meteType,
+            (SELECT COUNT(*)
+                from
+                (
+                    <include refid="TongYong"></include>
+                    where 1 = 1
+                    and a.device_id in
+                    <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+                        #{deviceIds, jdbcType=BIGINT}
+                    </foreach>
+                    GROUP BY device_mete_id
+                ) big_table
+                where mete_type = dict_code
+            ) as meteNum,
+            0 as regular_num
+        from t_dict_business
+        where dict_code IN
         (
-            <include refid="TongYong"></include>
-        )bis
-        GROUP BY mete_type
+            select dict_code
+            from t_dict_business
+            where col_name = 'mete_type'
+        )
+        ORDER BY dict_code
     </select>
     <select id="selectMeteType2" resultType="com.yjh.platform.module.task.entity.CheckPointType">
-        SELECT a.dict_note as mete_type,
-               0 as mete_num,
-               0 as regular_num
-        FROM t_dict_business a
+        SELECT
+        dict_note as meteType,
+        (SELECT COUNT(*)
+        from
+        (
+        <include refid="TongYong2"></include>
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
+        GROUP BY device_mete_id
+        ) big_table
+        where mete_type = dict_code
+        ) as meteNum,
+        0 as regular_num
+        from t_dict_business
+        where dict_code IN
+        (
+        select dict_code
+        from t_dict_business
         where col_name = 'mete_type'
+        )
+        ORDER BY dict_code
     </select>
     <select id="selectTaskResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
-        select
-        a.device_name ,
-        (CASE
-        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
-        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
-        WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
-        WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
-        WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
-        WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
-        END) AS instance_name,
-        h.dict_note as identify_result,
-        f.origpic as picpath,
-        g.dict_note as cruise_result,
-        e.cruise_time
-        FROM
-        t_std_device a,
-        t_std_devicemete b,
-        t_cruise_task_result_detail e,
-        t_cruise_data_result f,
-        t_cruise_result q,
-        t_dict_business g,
-        t_dict_business h,
-        t_cruise_point_instance d
-        LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
-        LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id
-        LEFT JOIN t_std_devicemete n ON n.device_mete_id = d.device_mete_id
-        where  a.device_id = b.device_id and a.custom_id = b.custom_id and b.device_mete_id = d.device_mete_id
-        and e.instance_id = d.instance_id and e.cruise_result_id = f.cruise_result_id
-        and g.dict_code = f.state
-        and h.dict_code = f.identify_result
-        and q.task_result_id = e.task_result_id
+        <include refid="TongYong2"></include>
+        where 1 = 1
         <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectMeteNumByTask" resultType="java.lang.Integer">
         SELECT COUNT(device_mete_id or null) as mete_num
         from
         (
-        <include refid="TongYong2"></include>
-        <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
+            <include refid="TongYong2"></include>
+            where 1 = 1
+            <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
         )big_table
     </select>
     <select id="selectAbnormalNumByTask" resultType="java.lang.Integer">
         SELECT COUNT(evaluation_state = 257 or null) as abnormal_num
         from
         (
-        <include refid="TongYong2"></include>
-        <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
+            <include refid="TongYong2"></include>
+            where 1 = 1
+            <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
         )big_table
     </select>
     <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">

@@ -42,6 +42,8 @@ public class ReportManageController {
 
     @Value("${nginx.report.reflect}")
     private String reportPath;//报表路径
+    @Value("${nginx.temporary.reflect}")
+    private String temporaryPath;//临时路径
 
     public ReportManageController(ReportManageService reportManageService) {
         this.reportManageService = reportManageService;
@@ -51,7 +53,7 @@ public class ReportManageController {
     @RequestMapping(value = "/reportGenerate", method = RequestMethod.GET)
     public Result reportGenerate(@RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                  @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
-                                 @RequestParam(value="deviceIds", required = false)String deviceIds,
+                                 @RequestParam(value="deviceIds")String deviceIds,
                                  @RequestParam(value="reportName")String reportName,
                                  @RequestParam(value="reportType")String reportType) {
         Result result = new Result();
@@ -143,7 +145,7 @@ public class ReportManageController {
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            String filePath = reportManageService.reportByTask(taskId);
+            String filePath = reportManageService.reportByTask(taskId,temporaryPath);
             result.setData(filePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

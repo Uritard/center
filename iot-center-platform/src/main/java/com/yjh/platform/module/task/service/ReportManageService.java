@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.lambdaworks.redis.ScriptOutputType;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Report.ReportDataRepo;
@@ -27,6 +28,7 @@ public class ReportManageService {
     @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType,String reportPath) {
+        List<String> list = Arrays.asList(deviceIdList.split(","));
         //巡检记录报表对象
         ReportData recordData = new ReportData();
         //1.总体情况
@@ -35,10 +37,10 @@ public class ReportManageService {
             String stationName = reportManageDao.selectStationName();
             taskVO.setStationName(stationName);
             //测点数
-            Integer meteNum = reportManageDao.selectMeteNum();
+            Integer meteNum = reportManageDao.selectMeteNum(list);
             taskVO.setMeteNum(meteNum);
             //未处理数
-            Integer abnormalNum = reportManageDao.selectAbnormalNum();
+            Integer abnormalNum = reportManageDao.selectAbnormalNum(list);
             taskVO.setAbnormalNum(abnormalNum);
             //关联测点数
             taskVO.setMeteRelationNum(0);
@@ -46,31 +48,8 @@ public class ReportManageService {
             taskVO.setTaskName("全站巡视");
         recordData.setTaskVO(taskVO);
         //2.分项预览
-            List<CheckPointType> cpTypeItems = new ArrayList<>();
-            List<CheckPointType> meteType = reportManageDao.selectMeteType();//existed
-            List<CheckPointType> meteType2 = reportManageDao.selectMeteType2();//all mete type
-//            System.out.println("<--------meteType------->:"+meteType);
-//            System.out.println("<--------meteType2------->:"+meteType2);
-
-            for (int i = 0;i < meteType2.size();i++){
-                int flag = 0;
-                for (int j = 0;j < meteType.size();j++){
-                    if (meteType2.get(i).getMeteType().equals(meteType.get(j).getMeteType())){
-                        flag++;
-                    }
-                }
-                if (flag == 0){
-                    CheckPointType ws = new CheckPointType();
-                    ws.setMeteNum(0);
-                    ws.setMeteType(meteType2.get(i).getMeteType());
-                    ws.setRegularNum(0);
-                    cpTypeItems.add(ws);
-                }
-            }
-//            System.out.println("<--------cpTypeItems------->:"+cpTypeItems);
-            meteType.addAll(cpTypeItems);
-//            System.out.println("<--------最后的meteType------->:"+meteType);
-            recordData.setCpTypeItems(meteType);
+            List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list);
+            recordData.setCpTypeItems(cpTypeItems);
         //3.环境监测-暂无
             List<EnvironmentResult> evnRecordList = new ArrayList<>();
             recordData.setEvnRecordList(evnRecordList);
@@ -78,11 +57,9 @@ public class ReportManageService {
             List<RelationDevice> rcpRecordList = new ArrayList<>();
             recordData.setRcpRecordList(rcpRecordList);
         //5.明细-所选设备的所有测点巡检结果详情
-//        List<String> list = Arrays.asList(deviceIdList.split(","));
 
-        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(startTime,endTime);
+        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
         recordData.setTCDRDList(tCDRDList);
-//        System.out.println("<--------recordData------->:"+recordData);
 
         SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();
@@ -90,10 +67,11 @@ public class ReportManageService {
 
         String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
         String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+//        String reportPath2 = reportPath+fileName;
+
         File file = new File(reportPath2);
 
         ContentData contentData = ReportDataRepo.getData(recordData);
-//        System.out.println("<--------contentData------->:"+contentData);
 
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                 contentData.getElements(), file);
@@ -109,7 +87,6 @@ public class ReportManageService {
         String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
         String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
         String filePath = reportPathA+fileName;
-//        String filePath = reportPath+fileName;
         return filePath;
     }
     @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
@@ -212,7 +189,7 @@ public class ReportManageService {
     }
     @Logs(title = "下载报告", code = "reportManage",content = "根据巡检任务生成报告并下载")
     @Transactional(rollbackFor = Exception.class)
-    public String reportByTask(String taskId){
+    public String reportByTask(String taskId,String temporaryPath){
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
@@ -221,7 +198,6 @@ public class ReportManageService {
         taskVO.setStationName(stationName);
         //测点数
         Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
-        System.out.println("meteNum是："+meteNum);
         taskVO.setMeteNum(meteNum);
         //未处理数
         Integer abnormalNum = reportManageDao.selectAbnormalNumByTask(taskId);
@@ -234,31 +210,8 @@ public class ReportManageService {
         taskVO.setCruiseDate(taskNameAndTime.getCruiseDate());
         recordData.setTaskVO(taskVO);
         //2.分项预览
-        List<CheckPointType> cpTypeItems = new ArrayList<>();
-        List<CheckPointType> meteType = reportManageDao.selectMeteType();//existed
-        List<CheckPointType> meteType2 = reportManageDao.selectMeteType2();//all mete type
-//            System.out.println("<--------meteType------->:"+meteType);
-//            System.out.println("<--------meteType2------->:"+meteType2);
-
-        for (int i = 0;i < meteType2.size();i++){
-            int flag = 0;
-            for (int j = 0;j < meteType.size();j++){
-                if (meteType2.get(i).getMeteType().equals(meteType.get(j).getMeteType())){
-                    flag++;
-                }
-            }
-            if (flag == 0){
-                CheckPointType ws = new CheckPointType();
-                ws.setMeteNum(0);
-                ws.setMeteType(meteType2.get(i).getMeteType());
-                ws.setRegularNum(0);
-                cpTypeItems.add(ws);
-            }
-        }
-//            System.out.println("<--------cpTypeItems------->:"+cpTypeItems);
-        meteType.addAll(cpTypeItems);
-//            System.out.println("<--------最后的meteType------->:"+meteType);
-        recordData.setCpTypeItems(meteType);
+        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
+        recordData.setCpTypeItems(cpTypeItems);
         //3.环境监测-暂无
         List<EnvironmentResult> evnRecordList = new ArrayList<>();
         recordData.setEvnRecordList(evnRecordList);
@@ -272,12 +225,26 @@ public class ReportManageService {
         String taskName = recordData.getTaskVO().getTaskName();
         String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
         String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
-        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+reportName;
-        File file = new File(reportPath2);
-
-        ContentData contentData = ReportDataRepo.getData(recordData);
-        ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                contentData.getElements(), file);
+        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/temporaryFiles/";
+        File temporaryFile = new File(filePath);
+        String reportPath2 = null;
+        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
+        {
+            System.out.println("不存在");
+            temporaryFile.mkdir();
+            reportPath2 = filePath+reportName;
+            File file = new File(reportPath2);
+            ContentData contentData = ReportDataRepo.getData(recordData);
+            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+                    contentData.getElements(), file);
+        }else {
+            System.out.println("存在");
+            reportPath2 = filePath+reportName;
+            File file = new File(reportPath2);
+            ContentData contentData = ReportDataRepo.getData(recordData);
+            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+                    contentData.getElements(), file);
+        }
 
         return reportPath2;
     }

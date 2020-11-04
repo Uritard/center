@@ -16,15 +16,16 @@ import java.util.Map;
  */
 @Repository
 public interface ReportManageDao {
-    List<TCruiseDataResultDetail> selectDetail(@Param(value = "startTime")Date startTime,
-                                                 @Param(value = "endTime")Date endTime);
+    List<TCruiseDataResultDetail> selectDetail(@Param(value = "list") List<String> list,
+                                               @Param(value = "startTime")Date startTime,
+                                               @Param(value = "endTime")Date endTime);
     List<TCruiseDataResultDetail> selectTaskResult(@Param(value = "taskId")String taskId);
     String selectStationName();
     TaskVO selectTaskNameAndTime(@Param(value = "taskId")String taskId);
-    Integer selectMeteNum();
-    Integer selectMeteNumByTask(@Param(value = "taskId")String taskId);
-    Integer selectAbnormalNum();
-    Integer selectAbnormalNumByTask(@Param(value = "taskId")String taskId);
-    List<CheckPointType> selectMeteType();
-    List<CheckPointType> selectMeteType2();
+    int selectMeteNum(@Param(value = "list") List<String> list);
+    int selectMeteNumByTask(@Param(value = "taskId")String taskId);
+    int selectAbnormalNum(@Param(value = "list") List<String> list);
+    int selectAbnormalNumByTask(@Param(value = "taskId")String taskId);
+    List<CheckPointType> selectMeteType(@Param(value = "list") List<String> list);
+    List<CheckPointType> selectMeteType2(@Param(value = "taskId")String taskId);
 }
