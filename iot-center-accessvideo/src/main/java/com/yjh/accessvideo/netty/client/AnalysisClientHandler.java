@@ -128,7 +128,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void handlerData(String body) throws ParseException {
-        //TODO 具体转化逻辑
+        //TODO 添加线程池
         JSONObject jsonObject = JSON.parseObject(body);
         log.info("JSON对象1：" + jsonObject);
         if (jsonObject.get("msgType").toString().equals("2")) {
@@ -163,7 +163,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
                 //redis数据键名由taskId+instanceId命名
                 log.info("数据Redis业务开启");
-                // TODO: 2020/10/25 下任务时插redis库名需改
                 String redisName = jsonObjectResult.get("taskId").toString() + jsonObjectResult.get("instanceId").toString();
                 log.info("template:" + redisTemplate);
                 log.info("redisName:" + redisName);
@@ -315,7 +314,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
 
 
-            // TODO: 2020/10/29 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
+            // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
             Map<String,Object> cruiseResult=redisTemplate.opsForHash().entries("t_cruise_task_result:"+TASKID+INSTANCEID);
             String strForCountAbnormal = "countForAbnormal:"+TASKID;
             Map<String,Object>abnormalCount=redisTemplate.opsForHash().entries(strForCountAbnormal);
@@ -342,7 +341,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                 tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
                 tCruiseResult.setTaskWait(0);
                 analyseDataOperateService.updateCruiseResult(tCruiseResult);
-            }else {       // TODO: 2020/10/29 修改异常点数缓存
+            }else {       // 修改异常点数缓存
                 Map<String,String> mapForAbnormal = new HashMap<>();
                 Integer totAbnormal=abnormal+ABNORMAL;
                 Integer totNormal=normal+NORMAL;
@@ -373,7 +372,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //        log.info("instanceIds删除后:" + instanceIds);
         //所有巡视点都有了结果
 //        if (instanceIds.size() == 0) {
-//            // TODO: 2020/10/25 修改任务状态为已完成
+//            //  修改任务状态为已完成
 //            log.info("TCR开始");
 //            //TCR
 //            TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());

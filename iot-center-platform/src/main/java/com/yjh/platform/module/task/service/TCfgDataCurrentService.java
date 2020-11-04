@@ -121,9 +121,9 @@ public class TCfgDataCurrentService {
         //根据一次匹配拿到的meteId获取实时数据
         List<TCfgDataCurrent> currents = new ArrayList<>();
         for (Long meteId : meteIdR) {
-            TCfgDataCurrent currentDates = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
-            if (currentDates != null) {
-                currents.add(currentDates);
+            TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
+            if (currentDatas != null) {
+                currents.add(currentDatas);
             }
 
         }
