@@ -12,6 +12,7 @@ import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.module.device.service.AnalysisService;
+import com.yjh.accessvideo.thread.TaskExecutePool;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
@@ -119,7 +120,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         try {
             String body = new String(bytes, "UTF-8");
             log.info("接收服务端数据:" + body);
-            handlerData(body);
+            // TODO: 2020/11/4 构造线程池对象
+            //线程池数据处理
+            DataDealThread dataDealThread=new DataDealThread(body,redisTemplate,analyseDataOperateService);
+            TaskExecutePool.getInstance().execute(dataDealThread);
+//            handlerData(body); //单线程数据处理
         } catch (Exception e) {
             e.getMessage();
         }
