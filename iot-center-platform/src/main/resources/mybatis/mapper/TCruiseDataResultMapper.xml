@@ -264,34 +264,42 @@
 
     <select id="selectCruiseDataResultByList" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
         SELECT
-	      e.end_time,
-          b.cruise_name,
-          g.c_type,
-          i.dict_note AS cTypeName,
-          b.cruise_type,
-          h.dict_note AS cruiseTypeName,
-          f.identify_state,
-          j.dict_note AS identifyStateName,
-          f.result_num,
-          f.picpath
+        e.end_time,
+        b.cruise_name,
+        g.c_type,
+        i.dict_note AS cTypeName,
+        b.cruise_type,
+        h.dict_note AS cruiseTypeName,
+        f.identify_state,
+        j.dict_note AS identifyStateName,
+        f.result_num,
+        f.picpath
         FROM
-	      (
-		      t_std_devicemete a
-		      LEFT JOIN (
-			  (t_cruise_point_instance b LEFT JOIN t_dict_business h ON b.cruise_type=h.dict_code AND h.col_name="cruise_type")
-		     ) ON a.device_mete_id = b.device_mete_id
-	      )
+        (
+        t_std_devicemete a
         LEFT JOIN (
-	      (
-		     (
-			      t_cruise_task_result d
-			      LEFT JOIN t_cruise_task_result_detail e ON d.task_result_id = e.task_result_id
-		     )
-		        LEFT JOIN (t_cruise_data_result f LEFT JOIN t_dict_business j ON f.identify_state=j.dict_code AND j.col_name="identify_state") ON e.cruise_result_id = f.cruise_result_id
-	       )
-	    LEFT JOIN (t_cruise_result g LEFT JOIN t_dict_business i ON g.c_type=i.dict_code AND i.col_name="plan_type") ON d.task_result_id=g.task_result_id
-         )ON b.instance_id=e.instance_id
-
+        (
+        t_cruise_point_instance b
+        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code
+        AND h.col_name = "cruise_type"
+        )
+        ) ON a.device_mete_id = b.device_mete_id
+        )
+        LEFT JOIN (
+        (
+        t_cruise_task_result_detail e
+        LEFT JOIN (
+        t_cruise_data_result f
+        LEFT JOIN t_dict_business j ON f.identify_state = j.dict_code
+        AND j.col_name = "identify_state"
+        ) ON e.cruise_result_id = f.cruise_result_id
+        )
+        LEFT JOIN (
+        t_cruise_result g
+        LEFT JOIN t_dict_business i ON g.c_type = i.dict_code
+        AND i.col_name = "plan_type"
+        ) ON e.task_result_id = g.task_result_id
+        ) ON b.instance_id = e.instance_id
         WHERE a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}
 
         <if test="startDate != null " ><if test="endDate != null">and e.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>

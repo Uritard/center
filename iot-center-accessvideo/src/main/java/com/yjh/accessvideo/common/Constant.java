@@ -3,6 +3,8 @@ package com.yjh.accessvideo.common;
 import io.netty.bootstrap.Bootstrap;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Constant {
 
@@ -21,7 +23,10 @@ public class Constant {
     public static String INSTANCEID="";
     public static Integer ABNORMAL=0;
     public static Integer NORMAL=0;
+//    public static AtomicInteger NORMAL; //线程安全Integer
     public static Set<String> cruiseKeys=new HashSet<>();
+//    public static CopyOnWriteArraySet<String> cruiseKeys=new CopyOnWriteArraySet<>();//线程安全Set
+
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
 }
