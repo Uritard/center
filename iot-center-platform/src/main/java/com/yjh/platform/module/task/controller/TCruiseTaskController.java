@@ -80,8 +80,8 @@ public class TCruiseTaskController {
                     tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
                     tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
                     TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
-                    tCruiseTask.setTaskType(tCruisePlanCount.getType());
-                    tCruiseTask.setType(tCruiseTaskAdd.getType());
+                    tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
+                    tCruiseTask.setType(tCruisePlanCount.getType());
                     result.setData(tCruiseTaskService.insert(tCruiseTask));
                 } else {
                     result.setData(ResultCodeEnum.CODE10005.getName());
