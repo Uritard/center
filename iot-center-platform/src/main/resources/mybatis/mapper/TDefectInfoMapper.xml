@@ -367,7 +367,7 @@
         <if test="defectType != null "> and defect_type = #{defectType, jdbcType=INTEGER}</if>
         <if test="confMode != null "> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="startTime != null and endTime != null"> and defect_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        ORDER BY deal_time desc
+        ORDER BY deal_time descF
     </select>
     <!--统计近一月的所有缺陷个数-->
     <select id="countDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
