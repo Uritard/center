@@ -216,7 +216,7 @@
         <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
-        <if test="dealTime != null and dealTime != ''">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+        <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
         <if test="ifWarnDisable != null ">a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER},</if>
         <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
         <if test="warnSubtype != null ">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
@@ -439,6 +439,7 @@
         SELECT * FROM
         <include refid="TongYong"></include>
         where 1 = 1
+
         <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
@@ -449,14 +450,15 @@
         WHEN #{alarmSource, jdbcType=INTEGER} = 279 THEN alarm_source = 279
         WHEN #{alarmSource, jdbcType=INTEGER} != 279 and #{alarmSource, jdbcType=INTEGER} != 888 THEN alarm_source != 888 and alarm_source != 279
             END)</if>
+        ORDER BY deal_time DESC
     </select>
     <!--根据告警来源统计告警数据-->
     <select id="countByAlarmSource" resultType="java.util.Map">
        SELECT
-            a.countNum as '主设备',
-            b.countNum as '机器人',
-            d.countNum as '摄像机',
-            (a.countNum+b.countNum+d.countNum) as '总告警数'
+            a.countNum as device,
+            b.countNum as robot,
+            d.countNum as camera,
+            (a.countNum+b.countNum+d.countNum) as total
         FROM(
             (select count(*) as countNum from t_warn_info ) a,
             (select count(*) as countNum from t_robot_alarm ) b,

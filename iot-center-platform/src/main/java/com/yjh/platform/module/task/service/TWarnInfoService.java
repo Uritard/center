@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
+import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 
@@ -28,6 +29,8 @@ public class TWarnInfoService{
     private TCameraAlarmDao tCameraAlarmDao;
     @Autowired
     private TRobotAlarmDao tRobotAlarmDao;
+    @Autowired
+    private TCruiseResultDao tCruiseResultDao;
 
     private DateTimeUtil dateTimeUtil;
 
@@ -97,7 +100,7 @@ public class TWarnInfoService{
             Number mapValue =  (Number)map.get(key);
             TJContentInfo tjContentInfo = new TJContentInfo();
             tjContentInfo.setCount(mapValue);
-            tjContentInfo.setTJContent(key);
+            tjContentInfo.setContent(key);
             tjContentInfoList.add(tjContentInfo);
         }
         return tjContentInfoList;
@@ -170,7 +173,7 @@ public class TWarnInfoService{
             Number mapValue =  (Number)map.get(key);
             TJContentInfo tjContentInfo = new TJContentInfo();
             tjContentInfo.setCount(mapValue);
-            tjContentInfo.setTJContent(key);
+            tjContentInfo.setContent(key);
             tjContentInfoList.add(tjContentInfo);
         }
         return tjContentInfoList;
@@ -183,13 +186,21 @@ public class TWarnInfoService{
     }
     @Logs(title = "进行告警处理", code = "tWarnInfo",content = "根据web传递的参数进行告警处理")
     @Transactional(rollbackFor = Exception.class)
-    public int alarmProcess(Long warnId,Integer alarmSource,Integer dealType,String dealInfo) {
+    public int alarmProcess(TWarnInfo tWarnInfoTemp,String userId) {
+        Long warnId = tWarnInfoTemp.getWarnId();
+        Integer alarmSource = tWarnInfoTemp.getAlarmSource();
+        Integer dealType = tWarnInfoTemp.getDealType();
+        String dealInfo = tWarnInfoTemp.getDealInfo();
+        Date date = new Date();
         int jieGuo = 0;
         if (alarmSource == 279 ) {
             TRobotAlarm tRobotAlarm = new TRobotAlarm();
             tRobotAlarm.setRobotAlarmId(warnId);
             tRobotAlarm.setDealInfo(dealInfo);
             tRobotAlarm.setDealType(dealType);
+            tRobotAlarm.setAlarmState(275);
+            tRobotAlarm.setDealTime(date);
+            tRobotAlarm.setDealPersonId(userId);
             jieGuo = tRobotAlarmDao.update(tRobotAlarm);
         }else if (alarmSource == 888)
         {
@@ -197,12 +208,18 @@ public class TWarnInfoService{
             tCameraAlarm.setCameraAlarmId(warnId);
             tCameraAlarm.setDealInfo(dealInfo);
             tCameraAlarm.setDealType(dealType);
+            tCameraAlarm.setAlarmState(275);
+            tCameraAlarm.setDealTime(date);
+            tCameraAlarm.setDealPersonId(userId);
             jieGuo = tCameraAlarmDao.update(tCameraAlarm);
         }else{
             TWarnInfo tWarnInfo = new TWarnInfo();
             tWarnInfo.setWarnId(warnId);
             tWarnInfo.setDealInfo(dealInfo);
             tWarnInfo.setDealType(dealType);
+            tWarnInfo.setConfMode(275);
+            tWarnInfo.setDealTime(date);
+            tWarnInfo.setDealPersonId(userId);
             jieGuo = tWarnInfoDao.update(tWarnInfo);
         }
         return jieGuo;

@@ -85,7 +85,7 @@
         <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
-        <if test="dealTime != null and dealTime != ''">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+        <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
         <if test="alarmState != null ">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>

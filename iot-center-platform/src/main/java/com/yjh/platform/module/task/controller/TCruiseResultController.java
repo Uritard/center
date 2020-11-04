@@ -235,7 +235,6 @@ public class TCruiseResultController {
         return result;
     }
 
-
     @ApiOperation(value = "A-查询正在执行的任务")
     @RequestMapping(value = "/selectTaskIsRunning",method = RequestMethod.GET)
     public Result selectTaskIsRunning(){

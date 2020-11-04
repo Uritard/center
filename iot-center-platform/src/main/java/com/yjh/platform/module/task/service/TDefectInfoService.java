@@ -138,7 +138,7 @@ public class TDefectInfoService {
             Number mapValue =  (Number)map.get(key);
             TJContentInfo tjContentInfo = new TJContentInfo();
             tjContentInfo.setCount(mapValue);
-            tjContentInfo.setTJContent(key);
+            tjContentInfo.setContent(key);
             tjContentInfoList.add(tjContentInfo);
         }
         return tjContentInfoList;

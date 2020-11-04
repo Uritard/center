@@ -10,6 +10,7 @@ import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
 import com.yjh.platform.module.task.service.ReportManageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,6 +135,21 @@ public class ReportManageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("添加错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据任务生成巡检记录报告")
+    @RequestMapping(value = "/reportByTask", method = RequestMethod.GET)
+    public Result reportByTask(@RequestParam(value="taskId")String taskId) {
+        Result result = new Result();
+        try {
+            String filePath = reportManageService.reportByTask(taskId);
+            result.setData(filePath);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("生成报表错误:", e);
         }
         return result;
     }

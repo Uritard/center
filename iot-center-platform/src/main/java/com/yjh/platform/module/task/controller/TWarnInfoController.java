@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServlet;
 
 
 /**
@@ -259,13 +262,11 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "进行告警处理")
     @RequestMapping(value = "/alarmProcess", method = RequestMethod.PUT)
-    public Result alarmProcess(@RequestParam(value = "warnId") Long warnId,
-                               @RequestParam(value = "alarmSource") Integer alarmSource,
-                               @RequestParam(value = "dealType") Integer dealType,
-                               @RequestParam(value = "dealInfo") String dealInfo){
+    public Result alarmProcess(@RequestBody TWarnInfo tWarnInfo, HttpServletRequest request){
         Result result = new Result();
+        String userId = request.getHeader("userId");
         try {
-            result.setData(tWarnInfoService.alarmProcess(warnId,alarmSource,dealType,dealInfo));
+            result.setData(tWarnInfoService.alarmProcess(tWarnInfo,userId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);

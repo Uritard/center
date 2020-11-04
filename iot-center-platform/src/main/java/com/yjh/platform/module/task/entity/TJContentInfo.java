@@ -20,7 +20,7 @@ public class TJContentInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "统计内容名称")
-    private String tJContent;
+    private String content;
     @ApiModelProperty(value = "告警个数")
     private Number count;
 
