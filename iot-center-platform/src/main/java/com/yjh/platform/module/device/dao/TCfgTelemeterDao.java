@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.entity.TCfgTelemeter;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -51,4 +53,6 @@ public interface TCfgTelemeterDao {
     List<TCfgTelemeter> selectByPage(TCfgTelemeter tCfgTelemeter);
 
     int batchInsert(List<TCfgTelemeter> list);
+    int insertForAll(SYAllInfo syAllInfo);
+    int updateForAll(SYAllInfo syAllInfo);
 }

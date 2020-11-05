@@ -245,6 +245,66 @@
         </foreach>
     </insert>
 
+    <insert id="insertForAll" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+        insert into t_cfg_teleadjust(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            down_effect,
+            mete_precision,
+            unit,
+            mete_index,
+            mete_cid,
+            adjust_kind,
+            last_value,
+            last_time,
+            mete_code,
+            device_type,
+            description,
+            stander,
+            controlenable
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=REAL},
+                #{downEffect, jdbcType=REAL},
+                #{metePrecision, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{adjustKind, jdbcType=INTEGER},
+                #{lastValue, jdbcType=REAL},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{stander, jdbcType=REAL},
+                #{controlenable, jdbcType=INTEGER}
+        )
+    </insert>
 
-
+    <update id="updateForAll" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+        update t_cfg_teleadjust a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
+        <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
+        <if test="metePrecision != null ">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="meteIndex != null">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="adjustKind != null ">a.adjust_kind = #{adjustKind, jdbcType=INTEGER},</if>
+        <if test="lastValue != null and lastValue != ''">a.last_value = #{lastValue, jdbcType=REAL},</if>
+        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
+        <if test="controlenable != null ">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
+    </set>
+        where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
 </mapper>

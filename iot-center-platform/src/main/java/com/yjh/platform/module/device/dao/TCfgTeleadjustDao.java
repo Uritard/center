@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import java.util.List;
 import java.util.Date;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.entity.TCfgTeleadjust;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -38,4 +39,6 @@ public interface TCfgTeleadjustDao {
     List<TCfgTeleadjust> selectByPage(TCfgTeleadjust tCfgTeleadjust);
 
     int batchInsert(List<TCfgTeleadjust> list);
+    int insertForAll(SYAllInfo syAllInfo);
+    int updateForAll(SYAllInfo syAllInfo);
 }

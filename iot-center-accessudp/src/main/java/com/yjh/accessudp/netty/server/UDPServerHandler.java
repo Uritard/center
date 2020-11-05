@@ -1,7 +1,6 @@
 package com.yjh.accessudp.netty.server;
 
 import com.sun.xml.internal.bind.v2.TODO;
-import com.yjh.accessudp.common.utils.ByteUtil;
 import com.yjh.accessudp.module.device.service.SysLogsService;
 import com.yjh.accessudp.thread.TaskExecutePool;
 import io.netty.buffer.ByteBuf;
@@ -14,8 +13,12 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -37,7 +40,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
     //场站号
     private String strChannelID = "TT";
 
-    private byte[] bufBytes = new byte[1024 * 512];
+    private byte[] bufBytes = new byte[1024];
     private int bufdateLen;
     private ChannelHandlerContext ctx;
 
@@ -101,6 +104,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             ctx.close().sync();
             ctx.flush();
         }
+
     }
 
 //    @Override
@@ -122,8 +126,21 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket datagramPacket) throws Exception {
         // 解析数据包
+        ByteBuf sss = datagramPacket.content();
+        byte[] req = new byte[sss.readableBytes()];
+        sss.readBytes(req);
+        StringBuilder Str = new StringBuilder();
+        for (byte byteitem : req) {
+            Str.append(String.format("%02x ", byteitem));
+        }
+        log.info("commandSend:" + Str + " : " + strChannelID);
         String msgString = datagramPacket.content().toString(CharsetUtil.UTF_8);
         System.out.println(" 发来的消息：" + msgString);
+        handleDate(msgString);
+    }
+
+    private void handleDate(String msgData) {
+        //TODO
     }
 
     private void send(ChannelHandlerContext ctx, byte[] bytes) {

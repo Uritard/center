@@ -1,10 +1,11 @@
 package com.yjh.accessudp;
 
-import com.yjh.accessudp.netty.server.DataDealThread2;
+import com.yjh.accessudp.commons.logs.SpringBeanUtils;
+import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessudp.module.device.entity.SYAllInfo;
+import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import com.yjh.accessudp.netty.server.NettyServer;
 import com.yjh.accessudp.module.device.service.SysLogsService;
-import com.yjh.accessudp.thread.TaskExecutePool;
-import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +18,15 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.Enumeration;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description
@@ -44,6 +49,11 @@ public class AccessUdpApplication implements CommandLineRunner {
 
     @Autowired
     private SysLogsService sysLogsService;
+    @Autowired
+    private TCfgMeteService tCfgMeteService;
+
+    @Value("${spring.unoin.deviceInfo.path}")
+    private String devicePath;
 
     private NettyServer nettyServer = new NettyServer();
 
@@ -54,11 +64,53 @@ public class AccessUdpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
+        //loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
-        DataDealThread2 dataDealThread2 = new DataDealThread2(true);
-        TaskExecutePool.getInstance().execute(dataDealThread2);
         nettyServer.start(address, redisTemplate,sysLogsService);
+    }
+    public void loadDeviceInfo()throws IOException{
+        //读取联动设备的信息
+        BufferedReader br = null;
+        FileReader reader = null;
+        try  {
+            reader = new FileReader(devicePath);
+            br = new BufferedReader(reader);
+            String line;
+            String[] strArray = null;
+            List<SYAllInfo> list = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                // 一次读入一行数据
+                //System.out.println(line);
+                if(line.contains("#")){
+                    strArray = line.split("\\s+");
+                    if("".equals(strArray[0])){
+                        strArray= Arrays.copyOfRange(strArray,1,strArray.length);
+                    }
+                    //取数据
+                    SYAllInfo syAllInfo = new SYAllInfo();
+                    syAllInfo.setStationId(strArray[1]);
+                    String[] mete = strArray[3].split("/");
+                    String meteName = mete[mete.length-1]+"-"+strArray[4];
+                    syAllInfo.setMeteId(strArray[2]);
+                    syAllInfo.setMeteName(meteName);
+                    syAllInfo.setDeviceId(strArray[2]);
+                    syAllInfo.setDeviceName(strArray[3]);
+                    Integer meteKind = strArray[4].contains("遥信")?1:(strArray[4].contains("遥测")?2:(strArray[4].contains("遥控")?3:4));
+                    syAllInfo.setMeteKind(meteKind);
+                    list.add(syAllInfo);
+                    //System.out.println(list);
+                }
+            }
+            br.close();
+            reader.close();
+            //tCfgMeteService.insertForAll(list);
+        } catch (IOException e) {
+            log.info("读取联动设备错误: "+e);
+        } finally {
+            br.close();
+            reader.close();
+        }
     }
 
     private static String getLocalIp() throws SocketException {

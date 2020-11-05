@@ -215,4 +215,21 @@
                 </foreach>
     </delete>
 
+    <select id="selectByTaskId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseTaskAttr">
+        select
+        a.task_id,
+        a.instance_id,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.point_task_id,
+        a.if_robot,
+        a.if_video,
+        a.if_inferad,
+        a.if_artificial
+        from t_cruise_task_attr a
+        where 1 = 1
+            and a.task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
+
 </mapper>

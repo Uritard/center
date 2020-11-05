@@ -35,4 +35,5 @@ public interface TCruiseTaskAttrDao {
     List<Long> selectInstanceId(@Param(value = "taskId") String taskId);
 
     int deleteByInstanceId(@Param(value = "list")List<Long> list);
+    List<TCruiseTaskAttr> selectByTaskId(@Param(value = "taskId") String taskId);
 }

@@ -105,7 +105,7 @@ public class TCfgDeviceController {
                             @RequestParam(value = "deviceName", required = false) String deviceName,
                             @RequestParam(value = "deviceType", required = false) String deviceType,
                             @RequestParam(value = "deviceCode", required = false) String deviceCode,
-                            @RequestParam(value = "stationId", required = false) Long stationId,
+                            @RequestParam(value = "stationId", required = false) String stationId,
                             @RequestParam(value = "relationCode", required = false) String relationCode,
                             @RequestParam(value = "createTime", required = false) Date createTime,
                             @RequestParam(value = "updateTime", required = false) Date updateTime,

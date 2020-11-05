@@ -13,10 +13,8 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.websocket.WebSocketResult;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.entity.TCruiseResult;
-import com.yjh.platform.module.task.entity.TCruiseTaskResult;
-import com.yjh.platform.module.task.entity.TCruiseTaskResultDetail;
+import com.yjh.platform.module.task.dao.TCruiseTaskDao;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseResultService;
 import com.yjh.platform.module.task.service.TCruiseTaskResultService;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
@@ -48,6 +46,9 @@ public class HelloController {
     private Logger log = LoggerFactory.getLogger(HelloController.class);
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TCruiseTaskDao tCruiseTaskDao;
+
 
     //相机抓图
     private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePicture?cameraId={cameraId}";
@@ -96,20 +97,11 @@ public class HelloController {
     @PostMapping("/task")
     @ResponseBody
     public String task() throws Exception {
-        Analysis analysis = new Analysis();
-        analysis.setTaskId("9000009");
-        analysis.setInstanceId(1001L);
-        analysis.setPicPath("/home/yjh/iot-picture/resultImg/281020201444030724895.jpg");//相机拍摄图片
-        //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
-        analysis.setAnalyseType("1");
-        analysis.setPicModelPath("/home/yjh/iot-picture/sync/Template/BigImg/21000000096");//模板图片
-        List<Analysis> analysisList = new ArrayList<>();
-        analysisList.add(analysis);
-        Map<String, List<Analysis>> analysisMap = new HashMap<>();
-        analysisMap.put("list", analysisList);
-        log.info("发任务" + analysisMap);
-        analysis(analysisMap);
-        return "ok";
+        TCruiseTask newTask = tCruiseTaskDao.selectByPrimaryId("c1ce5bf2a4c44d06a5635c847f9e3e66");//获取任务
+        newTask.setTaskId(null);
+        tCruiseTaskDao.insert(newTask);
+        System.out.println(newTask.getTaskId());
+        return newTask.getTaskId();
     }
 
 

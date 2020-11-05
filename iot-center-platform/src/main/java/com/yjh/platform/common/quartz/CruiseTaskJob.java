@@ -97,9 +97,24 @@ public class CruiseTaskJob extends QuartzJobBean {
         }else {
 
             //Thread.sleep(10000);
+            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
+            //在任务表里新建一条
+            if(tCruiseTask.getIfRun() == 172){
+                List<TCruiseTaskAttr> attrList = tCruiseTaskAttrDao.selectByTaskId(tCruiseTask.getTaskId());
+                String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+                tCruiseTask.setTaskId(newTaskId);
+                tCruiseTask.setDateType(null);
+                tCruiseTask.setStartTime(new Date());
+                tCruiseTask.setCreateTime(new Date());
+                tCruiseTaskDao.insert(tCruiseTask);
+                for (TCruiseTaskAttr item:attrList) {
+                    item.setTaskId(newTaskId);
+                }
+                tCruiseTaskAttrDao.batchInsert(attrList);
+            }
             Map<String,Object> jasonMap=new HashMap<>();
             jasonMap.put("type","newTask");
-            jasonMap.put("taskId",taskId);
+            jasonMap.put("taskId",tCruiseTask.getTaskId());
             String json=JSON.toJSONString(jasonMap);
             log.info("发送给前端的消息：   "+json);
             WebSocketServer.sendMsg(json);
@@ -107,14 +122,14 @@ public class CruiseTaskJob extends QuartzJobBean {
             log.info("开始进行任务" +new Date());
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
-            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
-            List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(taskId);//获取此任务下的巡检点数量
+
+            List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(tCruiseTask.getTaskId());//获取此任务下的巡检点数量
             Integer taskCount = instanceIdList.size();
             List<TCruisePointInstance> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
             //开始任务
             TCruiseResult tCruiseResult = new TCruiseResult();
             tCruiseResult.setTaskResultId(uuid);
-            tCruiseResult.setTaskId(taskId);
+            tCruiseResult.setTaskId(tCruiseTask.getTaskId());
             tCruiseResult.setAreaId(tCruiseTask.getAreaId());
             tCruiseResult.setCType(tCruiseTask.getType());
             tCruiseResult.setCState(239);//正在执行
@@ -127,7 +142,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             //任务状态
             TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
             tCruiseTaskResult.setTaskResultId(uuid);
-            tCruiseTaskResult.setTaskId(taskId);
+            tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
             //tCruiseTaskResult.setTaskStatus(239);
             tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
 
@@ -135,7 +150,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             mapForAbnormal.put("all",taskCount.toString());
             mapForAbnormal.put("abnormal","0");
             mapForAbnormal.put("normal","0");
-            String strForCountAbnormal = "countForAbnormal:"+taskId;
+            String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
             redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
             Integer taskAbnormal = 0;//异常数量
@@ -196,10 +211,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                         tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
 
                         Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                        String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
+                        String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
                         Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                         tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
-                        tCruiseTaskResultDetailMap.put("taskId",taskId);
+                        tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                         tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                         tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                         tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
@@ -209,7 +224,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         // webSocket通知前端调用巡视监控的接口
                         Map<String,Object> jasonMapOnFinished=new HashMap<>();
                         jasonMap.put("type","finishedOneInstance");
-                        jasonMap.put("taskId",taskId);
+                        jasonMap.put("taskId",tCruiseTask.getTaskId());
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                         log.info("发送给前端的消息："+jsonMessage);
                         WebSocketServer.sendMsg(json);
@@ -221,11 +236,11 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                            String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
+                            String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
 
                             Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
-                            tCruiseTaskResultDetailMap.put("taskId",taskId);
+                            tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                             tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                             tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
@@ -234,17 +249,17 @@ public class CruiseTaskJob extends QuartzJobBean {
                             //log.info("tCruiseDataResultMap" +tCruiseDataResultMap);
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             //抓图成功 算法分析
-                            if(redisTemplate.hasKey(taskId)) {
+                            if(redisTemplate.hasKey(tCruiseTask.getTaskId())) {
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
                                 //analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
+                                redisTemplate.opsForList().leftPush(tCruiseTask.getTaskId(),item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPushAll(taskId,analysisInstanceList);
+                                redisTemplate.opsForList().leftPushAll(tCruiseTask.getTaskId(),analysisInstanceList);
                             }
                             Analysis analysis = new Analysis();
-                            analysis.setTaskId(taskId);
+                            analysis.setTaskId(tCruiseTask.getTaskId());
                             analysis.setInstanceId(item.getInstanceId());
                             analysis.setPicPath(absPath);
                             TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
@@ -282,10 +297,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
 
                             Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                            String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
+                            String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
                             Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
-                            tCruiseTaskResultDetailMap.put("taskId",taskId);
+                            tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                             tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                             tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
@@ -296,7 +311,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             // webSocket通知前端调用巡视监控的接口
                             Map<String,Object> jasonMapOnFinished=new HashMap<>();
                             jasonMap.put("type","finishedOneInstance");
-                            jasonMap.put("taskId",taskId);
+                            jasonMap.put("taskId",tCruiseTask.getTaskId());
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
                             WebSocketServer.sendMsg(json);
@@ -314,7 +329,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 }
 
                 //检测任务是否暂停
-                TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(taskId);
+                TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(tCruiseTask.getTaskId());
                 if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
                     Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                     Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
@@ -332,7 +347,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                     //任务结束生成结果，
                     Analysis analysis = new Analysis();
-                    analysis.setTaskId(taskId);
+                    analysis.setTaskId(tCruiseTask.getTaskId());
                     analysis.setInstanceId(-1L);
                     //analysis.setPicPath(picUrl);
                     //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
@@ -344,7 +359,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     analysisMap.put("list",analysisList);
                     log.info("算法信息：    "+analysisMap);
                     analysis(analysisMap);
-                    log.info("任务停止执行"+taskId);
+                    log.info("任务停止执行"+tCruiseTask.getTaskId());
                     return;
                 }
             }
@@ -370,7 +385,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             }
             //任务结束生成结果，
             Analysis analysis = new Analysis();
-            analysis.setTaskId(taskId);
+            analysis.setTaskId(tCruiseTask.getTaskId());
             analysis.setInstanceId(-1L);
             //analysis.setPicPath(picUrl);
             //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
@@ -393,7 +408,8 @@ public class CruiseTaskJob extends QuartzJobBean {
             log.info("完成任务执行"+new Date());
             }
         } catch (Exception e) {
-            log.error("定时任务异常" + e);
+            log.error("定时任务异常: ");
+            e.printStackTrace();
         }
 
 

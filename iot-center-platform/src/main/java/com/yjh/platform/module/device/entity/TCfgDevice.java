@@ -35,7 +35,7 @@ public class TCfgDevice implements Serializable {
 
 
     @ApiModelProperty(value = "项目id")
-    private Long stationId;
+    private String stationId;
 
     @ApiModelProperty(value = "关联设备编码")
     private String relationCode;

@@ -139,8 +139,9 @@ public class TCruiseTaskService {
                 } catch (Exception e) { e.getMessage(); }
             }
         }else{
-            //周期
-            quartzTask.setCronExpression(tCruiseTask.getDateType());
+            //周期 0 */10 * * * ?
+            //quartzTask.setCronExpression(tCruiseTask.getDateType());
+            quartzTask.setCronExpression("0 */1 * * * ?");
             log.info("quartzTask: "+quartzTask.getCronExpression());
             JobManager jobManager = new JobManager();
             try {

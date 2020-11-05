@@ -23,7 +23,7 @@ public interface TCfgDeviceDao {
                                 @Param(value = "deviceName") String deviceName,
                                 @Param(value = "deviceType") String deviceType,
                                 @Param(value = "deviceCode") String deviceCode,
-                                @Param(value = "stationId") Long stationId,
+                                @Param(value = "stationId") String stationId,
                                 @Param(value = "relationCode") String relationCode,
                                 @Param(value = "createTime") Date createTime,
                                 @Param(value = "updateTime") Date updateTime,
@@ -37,5 +37,6 @@ public interface TCfgDeviceDao {
     int insertIntoTelecontrol(TCfgTelecontrol tCfgTelecontrol);
     int insertIntoTelemeter(TCfgTelemeter tCfgTelemeter);
     int insertIntoTelesignal(TCfgTelesignal tCfgTelesignal);
-
+    int insertForAll(SYAllInfo syAllInfo);
+    int updateForAll(SYAllInfo syAllInfo);
 }

@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.entity.TCfgTelesignal;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -47,4 +49,6 @@ public interface TCfgTelesignalDao {
     List<TCfgTelesignal> selectByPage(TCfgTelesignal tCfgTelesignal);
 
     int batchInsert(List<TCfgTelesignal> list);
+    int insertForAll(SYAllInfo syAllInfo);
+    int updateForAll(SYAllInfo syAllInfo);
 }

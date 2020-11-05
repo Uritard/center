@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.entity.TCfgMete;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -48,4 +50,6 @@ public interface TCfgMeteDao {
     List<TCfgMete> selectByPage(TCfgMete tCfgMete);
 
     int batchInsert(List<TCfgMete> list);
+    int insertForAll(SYAllInfo syAllInfo);
+    int updateForAll(SYAllInfo syAllInfo);
 }

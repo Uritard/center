@@ -1,10 +1,11 @@
 package com.yjh.platform.module.device.service;
 
-import com.yjh.platform.module.device.entity.TCfgMete;
-import com.yjh.platform.module.device.dao.TCfgMeteDao;
+import com.yjh.platform.module.device.dao.*;
+import com.yjh.platform.module.device.entity.*;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,17 @@ public class TCfgMeteService{
 
     @Autowired
     private TCfgMeteDao tCfgMeteDao;
+    @Autowired
+    private TCfgDeviceDao tCfgDeviceDao;
+    @Autowired
+    private TCfgTeleadjustDao tCfgTeleadjustDao;
+    @Autowired
+    private TCfgTelecontrolDao tCfgTelecontrolDao;
+    @Autowired
+    private TCfgTelemeterDao tCfgTelemeterDao;
+    @Autowired
+    private TCfgTelesignalDao tCfgTelesignalDao;
+
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -63,6 +75,48 @@ public class TCfgMeteService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgMete> list) {
         return this.tCfgMeteDao.batchInsert(list);
+    }
+
+    @Logs(title = "插入四遥信息", code = "module",content = "插入四遥信息")
+    @Transactional(rollbackFor = Exception.class)
+    public int insertForAll(Map<String, List<SYAllInfo>> syAllInfoMap) {
+        List<SYAllInfo> syAllInfoList = syAllInfoMap.get("list");
+        for (SYAllInfo syAllInfo:syAllInfoList) {
+            this.tCfgMeteDao.insertForAll(syAllInfo);//mete
+            this.tCfgDeviceDao.insertForAll(syAllInfo);//device
+            if(syAllInfo.getMeteKind() == 1){//遥信
+                tCfgTelesignalDao.insertForAll(syAllInfo);
+            }
+            if(syAllInfo.getMeteKind() == 2){//遥测
+                tCfgTelemeterDao.insertForAll(syAllInfo);
+            }
+            if(syAllInfo.getMeteKind() == 3){//遥控
+                tCfgTelecontrolDao.insertForAll(syAllInfo);
+            }
+            tCfgTeleadjustDao.insertForAll(syAllInfo);//遥调
+        }
+        return 1;
+    }
+
+    @Logs(title = "更新四遥信息", code = "module",content = "更新四遥信息")
+    @Transactional(rollbackFor = Exception.class)
+    public int updateForAll(Map<String, List<SYAllInfo>> syAllInfoMap) {
+        List<SYAllInfo> syAllInfoList = syAllInfoMap.get("list");
+        for (SYAllInfo syAllInfo:syAllInfoList) {
+            this.tCfgMeteDao.updateForAll(syAllInfo);//mete
+            this.tCfgDeviceDao.updateForAll(syAllInfo);//device
+            if(syAllInfo.getMeteKind() == 1){//遥信
+                tCfgTelesignalDao.updateForAll(syAllInfo);
+            }
+            if(syAllInfo.getMeteKind() == 2){//遥测
+                tCfgTelemeterDao.updateForAll(syAllInfo);
+            }
+            if(syAllInfo.getMeteKind() == 3){//遥控
+                tCfgTelecontrolDao.updateForAll(syAllInfo);
+            }
+            tCfgTeleadjustDao.updateForAll(syAllInfo);//遥调
+        }
+        return 1;
     }
 
 }

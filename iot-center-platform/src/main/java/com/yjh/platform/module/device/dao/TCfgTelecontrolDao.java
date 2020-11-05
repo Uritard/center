@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.entity.TCfgTelecontrol;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -34,4 +35,6 @@ public interface TCfgTelecontrolDao {
     List<TCfgTelecontrol> selectByPage(TCfgTelecontrol tCfgTelecontrol);
 
     int batchInsert(List<TCfgTelecontrol> list);
+    int insertForAll(SYAllInfo syAllInfo);
+    int updateForAll(SYAllInfo syAllInfo);
 }

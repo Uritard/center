@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.service.TCfgMeteService;
 import com.yjh.platform.module.device.entity.TCfgMete;
 import java.util.HashMap;
@@ -168,6 +169,36 @@ public class TCfgMeteController {
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("系统测点信息表操作批量插入失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "插入四遥信息")
+    @RequestMapping(value = "/addForAll", method = RequestMethod.POST)
+    public Result addForAll(@RequestBody Map<String, List<SYAllInfo>> syAllInfoMap) {
+        Result result = new Result();
+        try {
+            result.setData(tCfgMeteService.insertForAll(syAllInfoMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("插入四遥信息错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "更新四遥信息")
+    @RequestMapping(value = "/updateForAll", method = RequestMethod.POST)
+    public Result updateForAll(@RequestBody Map<String, List<SYAllInfo>> syAllInfoMap) {
+        Result result = new Result();
+        try {
+            result.setData(tCfgMeteService.updateForAll(syAllInfoMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("更新四遥信息错误:", e);
         }
         return result;
     }

@@ -212,6 +212,57 @@
         </foreach>
     </insert>
 
+    <insert id="insertForAll" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+        insert into t_cfg_telecontrol(
+            device_id,
+            mete_id,
+            mete_name,
+            mete_index,
+            mete_cid,
+            control_status,
+            enable_string,
+            succeed_string,
+            trigger_string,
+            control_value,
+            mete_code,
+            device_type,
+            description,
+            describer
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{controlStatus, jdbcType=INTEGER},
+                #{enableString, jdbcType=VARCHAR},
+                #{succeedString, jdbcType=VARCHAR},
+                #{triggerString, jdbcType=VARCHAR},
+                #{controlValue, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{describer, jdbcType=VARCHAR}
+        )
+    </insert>
 
-
+    <update id="updateForAll" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+        update t_cfg_telecontrol a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="controlStatus != null ">a.control_status = #{controlStatus, jdbcType=INTEGER},</if>
+        <if test="enableString != null and enableString != ''">a.enable_string = #{enableString, jdbcType=VARCHAR},</if>
+        <if test="succeedString != null and succeedString != ''">a.succeed_string = #{succeedString, jdbcType=VARCHAR},</if>
+        <if test="triggerString != null and triggerString != ''">a.trigger_string = #{triggerString, jdbcType=VARCHAR},</if>
+        <if test="controlValue != null ">a.control_value = #{controlValue, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+    </set>
+        where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
 </mapper>

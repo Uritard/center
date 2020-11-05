@@ -355,6 +355,96 @@
         </foreach>
     </insert>
 
+    <insert id="insertForAll" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+        insert into t_cfg_telesignal(
+            device_id,
+            mete_id,
+            mete_name,
+            up_effect,
+            down_effect,
+            mete_index,
+            mete_cid,
+            signal_kind,
+            last_value,
+            last_time,
+            explain_type,
+            report_type,
+            report_level,
+            mask_type,
+            mask_mid,
+            mask_string,
+            mask_value,
+            delay_time,
+            mete_code,
+            device_type,
+            description,
+            isshield,
+            storageperiod,
+            describer,
+            alarmthresbhold,
+            alarmlevel,
+            link_mete_id
+        )values(
+                #{deviceId, jdbcType=VARCHAR},
+                #{meteId, jdbcType=VARCHAR},
+                #{meteName, jdbcType=VARCHAR},
+                #{upEffect, jdbcType=INTEGER},
+                #{downEffect, jdbcType=INTEGER},
+                #{meteIndex, jdbcType=INTEGER},
+                #{meteCid, jdbcType=INTEGER},
+                #{signalKind, jdbcType=INTEGER},
+                #{lastValue, jdbcType=INTEGER},
+                #{lastTime, jdbcType=TIMESTAMP},
+                #{explainType, jdbcType=INTEGER},
+                #{reportType, jdbcType=INTEGER},
+                #{reportLevel, jdbcType=INTEGER},
+                #{maskType, jdbcType=INTEGER},
+                #{maskMid, jdbcType=VARCHAR},
+                #{maskString, jdbcType=VARCHAR},
+                #{maskValue, jdbcType=INTEGER},
+                #{delayTime, jdbcType=INTEGER},
+                #{meteCode, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{description, jdbcType=VARCHAR},
+                #{isshield, jdbcType=INTEGER},
+                #{storageperiod, jdbcType=BIGINT},
+                #{describer, jdbcType=VARCHAR},
+                #{alarmthresbhold, jdbcType=INTEGER},
+                #{alarmlevel, jdbcType=INTEGER},
+                #{linkMeteId, jdbcType=VARCHAR}
+        )
+    </insert>
 
-
+    <update id="updateForAll" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+        update t_cfg_telesignal a <set>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
+        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
+        <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=INTEGER},</if>
+        <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
+        <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
+        <if test="signalKind != null ">a.signal_kind = #{signalKind, jdbcType=INTEGER},</if>
+        <if test="lastValue != null ">a.last_value = #{lastValue, jdbcType=INTEGER},</if>
+        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
+        <if test="explainType != null ">a.explain_type = #{explainType, jdbcType=INTEGER},</if>
+        <if test="reportType != null ">a.report_type = #{reportType, jdbcType=INTEGER},</if>
+        <if test="reportLevel != null ">a.report_level = #{reportLevel, jdbcType=INTEGER},</if>
+        <if test="maskType != null ">a.mask_type = #{maskType, jdbcType=INTEGER},</if>
+        <if test="maskMid != null and maskMid != ''">a.mask_mid = #{maskMid, jdbcType=VARCHAR},</if>
+        <if test="maskString != null and maskString != ''">a.mask_string = #{maskString, jdbcType=VARCHAR},</if>
+        <if test="maskValue != null ">a.mask_value = #{maskValue, jdbcType=INTEGER},</if>
+        <if test="delayTime != null ">a.delay_time = #{delayTime, jdbcType=INTEGER},</if>
+        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="isshield != null ">a.isshield = #{isshield, jdbcType=INTEGER},</if>
+        <if test="storageperiod != null and storageperiod != ''">a.storageperiod = #{storageperiod, jdbcType=BIGINT},</if>
+        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+        <if test="alarmthresbhold != null ">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
+        <if test="alarmlevel != null ">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
+        <if test="linkMeteId != null and linkMeteId != ''">a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR},</if>
+    </set>
+        where a.device_id = #{deviceId, jdbcType=VARCHAR}
+    </update>
 </mapper>
