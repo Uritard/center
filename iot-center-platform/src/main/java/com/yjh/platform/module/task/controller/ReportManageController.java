@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -109,10 +106,10 @@ public class ReportManageController {
         return result;
     }
     @ApiOperation(value = "删除报表")
-    @RequestMapping(value = "/reportDelete", method = RequestMethod.GET)
+    @RequestMapping(value = "/reportDelete", method = RequestMethod.DELETE)
     public Result reportDelete(@RequestParam(value = "reportName") String reportName,
                                @RequestParam(value="reportType")String reportType,
-                                   @RequestParam(value = "startTime")String startTime) {
+                               @RequestParam(value = "startTime")String startTime) {
         Result result = new Result();
         try {
             result.setData(reportManageService.reportDelete(reportName,reportType,startTime,reportPath));
@@ -125,13 +122,11 @@ public class ReportManageController {
         return result;
     }
     @ApiOperation(value = "批量删除报表")
-    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.GET)
-    public Result reportBatchDelete(@RequestParam(value = "reportName") String reportName,
-                                    @RequestParam(value="reportType")String reportType,
-                                    @RequestParam(value = "startTime")String startTime) {
+    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.DELETE)
+    public Result reportBatchDelete(@RequestBody List<ReportForms> fileNameList) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.reportBatchDelete(reportName,reportType,startTime,reportPath));
+            result.setData(reportManageService.reportBatchDelete(reportPath,fileNameList));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

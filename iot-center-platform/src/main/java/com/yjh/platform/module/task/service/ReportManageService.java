@@ -36,30 +36,30 @@ public class ReportManageService {
         //巡检记录报表对象
         ReportData recordData = new ReportData();
         //1.总体情况
-            TaskVO taskVO = new TaskVO();
-            //站所名称
-            String stationName = reportManageDao.selectStationName();
-            taskVO.setStationName(stationName);
-            //测点数
-            Integer meteNum = reportManageDao.selectMeteNum(list);
-            taskVO.setMeteNum(meteNum);
-            //未处理数
-            Integer abnormalNum = reportManageDao.selectAbnormalNum(list);
-            taskVO.setAbnormalNum(abnormalNum);
-            //关联测点数
-            taskVO.setMeteRelationNum(0);
-            //任务名称
-            taskVO.setTaskName("全站巡视");
+        TaskVO taskVO = new TaskVO();
+        //站所名称
+        String stationName = reportManageDao.selectStationName();
+        taskVO.setStationName(stationName);
+        //测点数
+        Integer meteNum = reportManageDao.selectMeteNum(list);
+        taskVO.setMeteNum(meteNum);
+        //未处理数
+        Integer abnormalNum = reportManageDao.selectAbnormalNum(list);
+        taskVO.setAbnormalNum(abnormalNum);
+        //关联测点数
+        taskVO.setMeteRelationNum(0);
+        //任务名称
+        taskVO.setTaskName("全站巡视");
         recordData.setTaskVO(taskVO);
         //2.分项预览
-            List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list);
-            recordData.setCpTypeItems(cpTypeItems);
+        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list);
+        recordData.setCpTypeItems(cpTypeItems);
         //3.环境监测-暂无
-            List<EnvironmentResult> evnRecordList = new ArrayList<>();
-            recordData.setEvnRecordList(evnRecordList);
+        List<EnvironmentResult> evnRecordList = new ArrayList<>();
+        recordData.setEvnRecordList(evnRecordList);
         //4.关联设备-暂无
-            List<RelationDevice> rcpRecordList = new ArrayList<>();
-            recordData.setRcpRecordList(rcpRecordList);
+        List<RelationDevice> rcpRecordList = new ArrayList<>();
+        recordData.setRcpRecordList(rcpRecordList);
         //5.明细-所选设备的所有测点巡检结果详情
 
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
@@ -105,12 +105,11 @@ public class ReportManageService {
         String endTimeTemp = DateTimeUtil.changeTime2(endTime);//yyyyMMddHHmmss
 
 //        String folderPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-//        String folderPath = "http://192.168.9.40:10086/files/reportFiles/";
         File f = new File(reportPath);
 
         if (!f.exists()) { //路径不存在
             map.put("retType", "1");
-        }else{ 
+        }else{
             boolean flag = f.isDirectory();
             if(flag==false){ //路径为文件
                 map.put("retType", "2");
@@ -160,10 +159,7 @@ public class ReportManageService {
         }
         log.info("<----------map--------->的值为："+map);
         log.info("fileNameList是："+fileNameList);
-        System.out.println("<----------map--------->的值为："+map);
-        System.out.println("fileNameList是："+fileNameList);
         return fileNameList;
-
     }
     @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
@@ -189,12 +185,20 @@ public class ReportManageService {
     }
     @Logs(title = "批量删除报表", code = "reportManage",content = "通过web传递的参数批量删除报表记录")
     @Transactional(rollbackFor = Exception.class)
-    public boolean reportBatchDelete(String reportName,String reportType, String startTime,String reportPath) {
-        String time2 =  DateTimeUtil.changeTime2(startTime);
-        String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
-        String filePathAndName = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-//        String filePathAndName = reportPath+fileName;
-        return delete(filePathAndName);
+    public boolean reportBatchDelete(String reportPath,List<ReportForms> fileNameList) {
+        for (ReportForms res:fileNameList) {
+            String reportName = res.getReportName();
+            String reportType = res.getReportType();
+            String startTime = res.getStartTime();
+            String time2 =  DateTimeUtil.changeTime2(startTime);
+            String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
+            String filePathAndName = reportPath+fileName;
+//           String filePathAndName = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+            if (!delete(filePathAndName)){
+                return  false;
+            }
+        }
+        return  true;
     }
     @Logs(title = "下载报告", code = "reportManage",content = "根据巡检任务生成报告并下载")
     @Transactional(rollbackFor = Exception.class)
@@ -254,7 +258,6 @@ public class ReportManageService {
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }
-
         return reportPath2;
     }
 }

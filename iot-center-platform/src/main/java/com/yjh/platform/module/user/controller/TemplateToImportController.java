@@ -1,49 +1,52 @@
-//package com.yjh.platform.module.user.controller;
-//
-//import com.yjh.platform.common.result.Result;
-//import com.yjh.platform.common.result.ResultCodeEnum;
-//import com.yjh.platform.common.utils.ExcelTemplate;
-//import com.yjh.platform.module.device.controller.TStdMetemodelController;
-//import com.yjh.platform.module.device.entity.*;
-//import com.yjh.platform.module.user.entity.*;
-//import com.yjh.platform.module.user.service.TemplateToImportService;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiOperation;
-//import org.apache.poi.ss.usermodel.CellType;
-//import org.apache.poi.ss.usermodel.Row;
-//import org.apache.poi.ss.usermodel.Sheet;
-//import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestMethod;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
-//
-//import java.io.FileInputStream;
-//import java.math.BigDecimal;
-//import java.util.ArrayList;
-//import java.util.Date;
-//import java.util.List;
-//
-///**
-// * @author YC
-// * @date 2020/8/26 - 10:42
-// */
-//@RestController
-//@RequestMapping("/tStdMeteModel/v1")
-//@Api(value = "/templateToImport", description = "模板导入操作接口")
-//public class TemplateToImportController {
-//
-//    @Autowired
-//    private final TemplateToImportService templateToImportService;
-//
-//    private Logger log = LoggerFactory.getLogger(TStdMetemodelController.class);
-//
-//    public TemplateToImportController(TemplateToImportService templateToImportService) {
-//        this.templateToImportService = templateToImportService;
-//    }
+package com.yjh.platform.module.user.controller;
+
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.ExcelTemplate;
+import com.yjh.platform.module.device.controller.TStdMetemodelController;
+import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.service.TemplateToImportService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.NumberToTextConverter;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.FileInputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @author YC
+ * @date 2020/8/26 - 10:42
+ */
+@RestController
+@RequestMapping("/tStdMeteModel/v1")
+@Api(value = "/templateToImport", description = "模板导入操作接口")
+public class TemplateToImportController {
+
+    @Autowired
+    private final TemplateToImportService templateToImportService;
+
+    private Logger log = LoggerFactory.getLogger(TStdMetemodelController.class);
+
+    public TemplateToImportController(TemplateToImportService templateToImportService) {
+        this.templateToImportService = templateToImportService;
+    }
 //
 //    @ApiOperation(value = "测点模板导入", notes = "导入")
 //    @RequestMapping(value = "/importExcelMete", method = RequestMethod.POST)
@@ -1933,74 +1936,123 @@
 //        return result;
 //    }
 //
-//    @ApiOperation(value = "模板导入测试", notes = "导入测试")
-//    @RequestMapping(value = "/importExcelTest", method = RequestMethod.POST)
-//    public Result importExcelTest(@RequestParam("excelFile") String pathName) {
-//        Result result = new Result();
-//        try {
-//            XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(pathName));//创建工作簿
-//            Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
-//            int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
-//
-//            List<ExcelTemplate> excelTemplateList = new ArrayList<>();
-//            SysRoleRegion sysRoleRegion = new SysRoleRegion();
-//
-//            excelTemplateList.add(new ExcelTemplate("角色ID", true, "Long"));
-//            excelTemplateList.add(new ExcelTemplate("机器人ID", true, "Long"));
-//            excelTemplateList.add(new ExcelTemplate("是否检查", false, "String"));
-//
+
+
+    @ApiOperation(value = "模板导入测试", notes = "导入测试")
+    @RequestMapping(value = "/importExcelTest", method = RequestMethod.POST)
+    public Result importExcelTest(@RequestParam("excelFile") String pathName) {
+        Result result = new Result();
+        try {
+            XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(pathName));//创建工作簿
+            Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
+            int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
+
+            List<ExcelTemplate> excelTemplateList = new ArrayList<>();
+            SysRoleRegion sysRoleRegion = new SysRoleRegion();
+
+            excelTemplateList.add(new ExcelTemplate("角色ID", true, "Integer"));
+            excelTemplateList.add(new ExcelTemplate("机器人ID", true, "Long"));
+            excelTemplateList.add(new ExcelTemplate("是否检查", false, "String"));
+            excelTemplateList.add(new ExcelTemplate("日期", false, "Date"));
+
 //            System.out.println("excelTemplateList是：" + excelTemplateList);
-//            int count = 0;
-//            for (ExcelTemplate itemAsLie : excelTemplateList) {
+            int count = 0;
+            boolean flag = true;
+            for (ExcelTemplate itemAsLie : excelTemplateList) {
 //                System.out.println("itemAsLie是：" + itemAsLie);
-//                    for (int i = 1; i <= total; i++) {
-//                        Row row = sheet.getRow(i);
-//                        if (row.getCell(count) == null){
-//                            System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为空，请检查");
-//                        }else {
-//                            switch (itemAsLie.ColumnType) {
-//                                case "Long": {
-//                                    System.out.println("Long转型");
-//                                    if (row.getCell(count) != null && row.getCell(count).getCellTypeEnum().equals(CellType.STRING)){
-//                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值" );
-//                                    }else if (row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)){
-//                                        Long result0 = new Double(row.getCell(count).getNumericCellValue()).longValue();
-//                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
-//                                    }
-//                                    break;
-//                                }
-//                                case "Integer": {
-//                                    System.out.println("Integer转型");
-//                                    if (row.getCell(count) != null && row.getCell(count).getCellTypeEnum().equals(CellType.STRING)){
-//                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值" );
-//                                    }else if (row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)) {
-//                                        Integer result0 = new Double(row.getCell(count).getNumericCellValue()).intValue();
-//                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
-//                                    }
-//                                    break;
-//                                }
-//                                case "String": {
-//                                    System.out.println("String转型");
-//                                    if (row.getCell(count) != null && row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)){
-//                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值" );
-//                                    }else {
-//                                        String result0 = row.getCell(count).getStringCellValue();
-//                                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
-//                                    }
-//                                    break;
-//                                }
-//                            }
-//                        }
-//                    }
-//                    count++;
-//            }
-//        } catch (Exception e) {
-//            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-//            log.error("导入失败：" + e);
-//        }
-//        return result;
-//    }
-//
+                for (int i = 2; i <= total; i++) {
+                    Row row = sheet.getRow(i);
+                    String excelValue =  getCellValue(row.getCell(count));//"".equals(excelValue)
+                    if (itemAsLie.IsRequire && "".equals(excelValue)) {
+                        System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为必填项，请检查");
+                        flag = false;
+                    } else {
+                        switch (itemAsLie.ColumnType) {
+                            case "Long": {
+                                System.out.println("Long转型");
+                                if ( row.getCell(count).getCellTypeEnum().equals(CellType.STRING)) {
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值");
+                                } else if (row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)) {
+                                    Long result0 = Long.valueOf(excelValue);
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                }
+                                break;
+                            }
+                            case "Integer": {
+                                System.out.println("Integer转型");
+                                if ( row.getCell(count).getCellTypeEnum().equals(CellType.STRING)) {
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值");
+                                } else if (row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)) {
+                                    Integer result0 = Integer.valueOf(excelValue);
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                }
+                                break;
+                            }
+                            case "String": {
+                                System.out.println("String转型");
+                                if ( row.getCell(count).getCellTypeEnum().equals(CellType.NUMERIC)) {
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值");
+                                } else {
+                                    String result0 = excelValue;
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                }
+                                break;
+                            }
+                            case "Date": {
+                                System.out.println("Date转型");
+                                if ( row.getCell(count).getCellTypeEnum().equals(CellType.STRING)) {
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值类型有误，请填写正确类型的值");
+                                } else {
+                                    String result0 = excelValue;
+                                    System.out.println("第" + (i + 1) + "行第" + (count + 1) + "列的值为：" + result0);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(!flag)
+                    break;
+                count++;
+            }
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("导入失败：" + e);
+        }
+        return result;
+    }
+    private String getCellValue(Cell cell) {
+        if (null == cell) {
+            return "";
+        }
+        String value = "";
+
+        switch (cell.getCellTypeEnum()) {
+            case STRING:
+                value = cell.getStringCellValue();
+//                value = cell.getDateCellValue();
+                break;
+            case BOOLEAN:
+                if (cell.getBooleanCellValue()) {
+                    value = String.valueOf(Boolean.TRUE);
+                } else {
+                    value = String.valueOf(Boolean.FALSE);
+                }
+                break;
+            case NUMERIC:
+                value = NumberToTextConverter.toText(cell.getNumericCellValue());
+                break;
+            case FORMULA:
+                value = cell.getStringCellValue();
+                break;
+            default:
+                break;
+        }
+
+        return value;
+    }
+}
+
 //    @ApiOperation(value = "遥测量数据模板导入", notes = "导入")
 //    @RequestMapping(value = "/importExcelTCfgTelemeter", method = RequestMethod.POST)
 //    public Result importExcelTCfgTelemeter(@RequestParam("excelFile") String pathName) {
