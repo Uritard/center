@@ -165,11 +165,8 @@ public class TCruiseTaskResultService {
                     cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());//设备名称
                 }
                 // instanceName为表中的cruiseName
-                if(tCruisePointInstanceDao.selectInstancename(Long.valueOf(resultMap.get("cruiseId").toString())).equals(null)){
-                    cruiseInspectResult.setInstanceName("");
-                }else {
-                    cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstancename(Long.valueOf(resultMap.get("cruiseId").toString())));//巡检点名称
-                }
+                cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(Long.valueOf(resultMap.get("instanceId").toString())));//巡检点名称
+
                 CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
                 if(cruiseTypeInfo.equals(null)){
                     cruiseInspectResult.setCruiseType(null);

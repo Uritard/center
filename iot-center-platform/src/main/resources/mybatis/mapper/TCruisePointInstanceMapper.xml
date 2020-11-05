@@ -462,14 +462,6 @@
 
     </select>
 
-    <select id="selectInstancename" parameterType="java.lang.Long" resultType="java.lang.String">
-        SELECT
-	      cruise_name
-        FROM
-	     t_cruise_point_instance
-        WHERE
-	    instance_id = #{instanceId,jdbcType=BIGINT}
-    </select>
 
     <select id="selectCruiseCommonInfoByInstanceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.CruiseTypeInfo">
         SELECT
@@ -518,4 +510,44 @@
             #{instanceId,jdbcType=BIGINT}
         </foreach>
     </delete>
+
+    <select id="selectInstanceName" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT
+            (
+                CASE
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(c.inspection_id)
+                AND ISNULL(d.preset_name) THEN
+                    ''
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(c.inspection_name) THEN
+                    d.preset_name
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(d.preset_img) THEN
+                    c.inspection_name
+                WHEN ISNULL(c.inspection_name)
+                AND ISNULL(d.preset_name) THEN
+                    b.mete_name
+                WHEN ISNULL(c.inspection_name) THEN
+                    CONCAT(
+                        b.mete_name,
+                        ' /',
+                        d.preset_name
+                    )
+                WHEN ISNULL(d.preset_name) THEN
+                    CONCAT(
+                        b.mete_name,
+                        ' /',
+                        c.inspection_name
+                    )
+                END
+            ) AS cruiseName
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+        WHERE
+            a.instance_id = #{instanceId,jdbcType=BIGINT}
+    </select>
 </mapper>

@@ -77,6 +77,10 @@ public class DataDealThread implements Runnable {
                 cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
                 cruiseResultMap.put("state", analyseDataOperateService.selectDictCode("data_state", "正常"));
                 cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
+                // TODO: 2020/11/4 对算法识别结果进行判断并决定再redis中插入哪个值：identifyState- 识别正常&识别异常
+                // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
+                cruiseResultMap.put("identifyState",analyseDataOperateService.selectDictCode("identify_state","识别正常"));
+                cruiseResultMap.put("identifyResult",analyseDataOperateService.selectDictCode("identify_result","正常"));
                 redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
                 NORMAL = NORMAL + 1;
                 // webSocket通知前端调用巡视监控的接口
@@ -137,6 +141,8 @@ public class DataDealThread implements Runnable {
                 tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
                 tCruiseDataResult.setEvaluationState(Integer.valueOf(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
                 tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
+                tCruiseDataResult.setIdentifyState(Integer.valueOf(cruiseWorkedMap.get("identifyState").toString()));//根据获取的算法识别结果对缓存中相应字段进行修改
+                tCruiseDataResult.setIdentifyResult(Integer.valueOf(cruiseWorkedMap.get("identifyResult").toString()));//根据巡视点执行结果对 缓存中相应字段进行修改
                 tCruiseDataResult.setCreatetime(new Date());
                 tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
                 dataList.add(tCruiseDataResult);
