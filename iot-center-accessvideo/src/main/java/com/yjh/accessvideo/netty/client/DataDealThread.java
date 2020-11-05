@@ -66,7 +66,7 @@ public class DataDealThread implements Runnable {
 //                    String instanceId=jsonObjectResult.get("instanceId").toString();
 //                    log.info(instanceId);
 
-                //redis数据键名由taskId+instanceId命名
+                //redis数据键名由taskId+instanceId命名--对每条巡视点Redis信息操作
                 log.info("数据Redis业务开启");
                 String redisName = jsonObjectResult.get("taskId").toString() + jsonObjectResult.get("instanceId").toString();
                 log.info("template:" + redisTemplate);

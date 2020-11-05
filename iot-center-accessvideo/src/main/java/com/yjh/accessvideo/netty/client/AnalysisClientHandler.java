@@ -122,9 +122,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             log.info("接收服务端数据:" + body);
             // TODO: 2020/11/4 构造线程池对象
             //线程池数据处理
-            DataDealThread dataDealThread=new DataDealThread(body,redisTemplate,analyseDataOperateService);
-            TaskExecutePool.getInstance().execute(dataDealThread);
-//            handlerData(body); //单线程数据处理
+//            DataDealThread dataDealThread=new DataDealThread(body,redisTemplate,analyseDataOperateService);
+//            TaskExecutePool.getInstance().execute(dataDealThread);
+            handlerData(body); //单线程数据处理
         } catch (Exception e) {
             e.getMessage();
         }

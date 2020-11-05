@@ -44,7 +44,7 @@ public class AnalysisService {
             msgDataObject.put("srcNode", "clientSocket001");
             int i=1;
             for (Analysis analysis: analysisList) {
-                if (analysis.getIsAi()==0) {
+                if (analysis.getIsAi()==1) {
                     JSONObject pictureInfoObject = new JSONObject();
                     JSONObject pictureDataObject = new JSONObject();
                     pictureDataObject.put("analyseType", analysis.getAnalyseType());
@@ -75,9 +75,10 @@ public class AnalysisService {
         analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
+        log.info("进入算法方法----------");
         int i=1;
         for (Analysis analysis: analysisList) {
-            if (analysis.getIsAi()==1) {
+            if (analysis.getIsAi()==0) {
                 JSONObject pictureDataObject = new JSONObject();
                 JSONObject pictureInfoObject = new JSONObject();
                 pictureDataObject.put("analyseType", analysis.getAnalyseType());
@@ -87,11 +88,13 @@ public class AnalysisService {
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                 pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                 msgDataObject.put("data", pictureInfoObject);
+                log.info("DATA内容:"+pictureInfoObject);
             }
             i++;
         }
         analysisObject.put("msgData", msgDataObject);
         AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+        log.info("缺陷算法结束------------"+msgDataObject);
         return "success";
     }
 
