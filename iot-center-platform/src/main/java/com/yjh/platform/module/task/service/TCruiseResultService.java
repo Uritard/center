@@ -108,12 +108,11 @@ public class TCruiseResultService{
         for (int i = 0; i < list.size(); i++) {
             // 把date类型的时间对象转换为long类型，时间越往后，long的值就越大，
             // 所以就依靠这个原理来判断距离现在最近的时间
-            Long timeTemp = list.get(i).getCheckDate().getTime();
-            System.out.println("timeTemp是："+timeTemp);
-            if (timeTemp!=null){
-                dates[i] = timeTemp;
+            Date timeTempOne = list.get(i).getCheckDate();
+            if(timeTempOne!=null){
+                dates[i] = timeTempOne.getTime();
             } else {
-              dates[i] = Long.valueOf(0);
+                dates[i] = Long.valueOf(0);
             }
         }
         Long maxIndex = dates[0];// 定义最大值为该数组的第一个数
