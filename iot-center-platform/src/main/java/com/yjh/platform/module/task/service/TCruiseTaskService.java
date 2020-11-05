@@ -140,8 +140,7 @@ public class TCruiseTaskService {
             }
         }else{
             //周期 0 */10 * * * ?
-            //quartzTask.setCronExpression(tCruiseTask.getDateType());
-            quartzTask.setCronExpression("0 */1 * * * ?");
+            quartzTask.setCronExpression(tCruiseTask.getDateType());
             log.info("quartzTask: "+quartzTask.getCronExpression());
             JobManager jobManager = new JobManager();
             try {
@@ -243,14 +242,28 @@ public class TCruiseTaskService {
         Date originTime = new Date();
         String firstDay = "", lastDay = "";
         if (Objects.equals(null, taskStartDate)) {
+//            Date date = new Date();
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(Calendar.MONTH, date.getMonth());
+//            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+//            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
             Date date = new Date();
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.MONTH, date.getMonth());
-            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-            calendar.set(Calendar.DAY_OF_MONTH, fDay);
-            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+            calendar.set(Calendar.MONTH, date.getMonth()-1);
+            if((date.getMonth())==1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            log.info("firstDay: "+firstDay);
 
             int lDay=0;
+            calendar.set(Calendar.MONTH, date.getMonth());
             //2月的平年瑞年天数
             if(date.getMonth()==1) {
                 lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
@@ -258,15 +271,29 @@ public class TCruiseTaskService {
             calendar.set(Calendar.MONTH, date.getMonth());
             calendar.set(Calendar.DAY_OF_MONTH, lDay);
             lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            log.info("lastDay: "+lastDay);
         } else {
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+//            calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
+//            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+//            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
-            calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
-            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-            calendar.set(Calendar.DAY_OF_MONTH, fDay);
-            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth()-1);
+            if((taskStartDate.getMonth())==1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            log.info("firstDay: "+firstDay);
 
             int lDay=0;
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
             //2月的平年瑞年天数
             if(taskStartDate.getMonth()==1) {
                 lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
@@ -274,7 +301,8 @@ public class TCruiseTaskService {
             calendar.set(Calendar.MONTH, taskStartDate.getMonth());
             calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
             calendar.set(Calendar.DAY_OF_MONTH, lDay);
-            lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            lastDay = sdfF.format(calendar.getTime())+" 00:00:00";
+            log.info("lastDay: "+lastDay);
         }
 
         try {
@@ -284,7 +312,7 @@ public class TCruiseTaskService {
         } catch (Exception e) { e.getMessage(); }
         List<TCruiseTaskCount> list = new ArrayList<>();
         list = this.tCruiseTaskDao.taskCount(dayBefore,dayAfter);
-        System.out.println("list: "+list);
+        log.info("list: "+list);
         List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
         for (TCruiseTaskCount tCruiseTaskCount:list) {
@@ -358,7 +386,7 @@ public class TCruiseTaskService {
                 listTask.add(taskCountMap);
             }
         }
-        System.out.println("listTask: "+listTask);
+        log.info("listTask: "+listTask);
         return listTask;
     }
 

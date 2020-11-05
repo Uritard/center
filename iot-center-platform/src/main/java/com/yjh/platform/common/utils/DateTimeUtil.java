@@ -1003,7 +1003,7 @@ public class DateTimeUtil {
         for (Date aValidTimeList:validTimeList) {
             validTimeList2.add(sdf.format(aValidTimeList));
         }
-        System.out.println("validTimeList2: "+validTimeList2);
+        logger.info("validTimeList2: "+validTimeList2);
         return validTimeList;
     }
 
