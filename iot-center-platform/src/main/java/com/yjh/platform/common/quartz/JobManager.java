@@ -173,15 +173,38 @@ public class JobManager {
         logger.info("定时任务创建成功");
         return "success";
     }
+
+    public void pauseJob(QuartzTask quartzTask, String triggerName) throws Exception {
+        JobKey jobKey = JobKey.jobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        StaticContextAccessor.getBean(Scheduler.class).pauseTrigger(new TriggerKey(triggerName, quartzTask.getJobGroup()));
+        StaticContextAccessor.getBean(Scheduler.class).pauseJob(jobKey);
+        logger.info(quartzTask.getJobName()+"pause!");
+    }
+
+    public void resumeJob(QuartzTask quartzTask) throws Exception {
+        JobKey jobKey = JobKey.jobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        StaticContextAccessor.getBean(Scheduler.class).resumeJob(jobKey);
+        StaticContextAccessor.getBean(Scheduler.class).resumeTrigger(new TriggerKey("triggerName","triggerGroupName"));
+        logger.info(quartzTask.getJobName()+"resume!");
+    }
+
+    public void deleteJob(QuartzTask quartzTask) throws Exception {
+        JobKey jobKey = JobKey.jobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        StaticContextAccessor.getBean(Scheduler.class).deleteJob(jobKey);
+        logger.info(quartzTask.getJobName()+"delete!");
+    }
+
     /**
      *删除周期巡视任务
      */
     public static void removeJob(String jobName, String jobGroupName,String triggerName, String triggerGroupName) {
         try {
             //Scheduler sched = StaticContextAccessor.getBean(Scheduler.class);
+            logger.info("jobName: "+jobName+", jobGroupName: "+jobGroupName+", triggerName: "+triggerName+", triggerGroupName: "+triggerGroupName);
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
             StaticContextAccessor.getBean(Scheduler.class).pauseTrigger(triggerKey);// 停止触发器
             StaticContextAccessor.getBean(Scheduler.class).unscheduleJob(triggerKey);// 移除触发器
+            StaticContextAccessor.getBean(Scheduler.class).interrupt(JobKey.jobKey(jobName, jobGroupName));
             StaticContextAccessor.getBean(Scheduler.class).deleteJob(JobKey.jobKey(jobName, jobGroupName));// 删除任务
         } catch (Exception e) {
             throw new RuntimeException(e);

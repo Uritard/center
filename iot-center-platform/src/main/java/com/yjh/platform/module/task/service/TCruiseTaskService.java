@@ -166,30 +166,36 @@ public class TCruiseTaskService {
                     tCruiseTaskDel.setDelTime(taskDate);
                 } catch (Exception e) { e.getMessage(); }
                 tCruiseTaskDel.setCreateTime(new Date());
+                log.info("del task single...");
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             }else {
-                // todo 删除整个周期任务
-                return  1;
-            }
-
-        } else {
-            if(Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==174){
-                //删除定时任务
+                //删除整个周期任务
                 for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
                     //找到任务Id
                     if(mapItem.get("taskId").equals(taskId)){
-                        //删除定时任务
                         JobManager.removeJob(mapItem.get("jobName").toString(),mapItem.get("jobGroupName").toString(),mapItem.get("triggerName").toString(),mapItem.get("triggerGroupName").toString());
                         Constant.taskMap.remove(mapItem);
                     }
                 }
+                log.info("del task totally...");
+                tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
+                tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+                return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
             }
-            tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
-            tCruiseTaskDelDao.deleteByPrimaryId(taskId);
-            return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
+        } else if (Objects.nonNull(tCruiseTask.getIfRun()) && tCruiseTask.getIfRun()==174){
+            //删除定时任务
+            for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
+                //找到任务Id
+                if(mapItem.get("taskId").equals(taskId)){
+                    //删除定时任务
+                    JobManager.removeJob(mapItem.get("jobName").toString(),mapItem.get("jobGroupName").toString(),mapItem.get("triggerName").toString(),mapItem.get("triggerGroupName").toString());
+                    Constant.taskMap.remove(mapItem);
+                }
+            }
         }
-        //删除周期的任务
-
+        tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
+        tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+        return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
     }
 
     @Logs(title = "更新", code = "TCruiseTask",content = "根据web传入的参数更新数据")
