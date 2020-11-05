@@ -5,8 +5,11 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Report.ReportDataRepo;
 import com.yjh.platform.common.utils.Report.ReportHelper;
+import com.yjh.platform.module.task.controller.ReportManageController;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,7 @@ import java.util.*;
 @Service
 public class ReportManageService {
 
+    private Logger log = LoggerFactory.getLogger(ReportManageService.class);
     @Autowired
     private ReportManageDao reportManageDao;
     private DateTimeUtil dateTimeUtil;
@@ -66,8 +70,8 @@ public class ReportManageService {
         String nowTime = f.format(date);
 
         String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
-        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-//        String reportPath2 = reportPath+fileName;
+//        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+        String reportPath2 = reportPath+fileName;
 
         File file = new File(reportPath2);
 
@@ -85,8 +89,9 @@ public class ReportManageService {
     public String reportDownload(String reportName,String reportType,String startTime,String reportPath) {
         String time2 =  DateTimeUtil.changeTime2(startTime);
         String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
-        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-        String filePath = reportPathA+fileName;
+//        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
+//        String reportPathA = "http://192.168.9.40:10086/files/reportFiles/";
+        String filePath = reportPath+fileName;
         return filePath;
     }
     @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
@@ -99,12 +104,13 @@ public class ReportManageService {
         String startTimeTemp = DateTimeUtil.changeTime2(startTime);//yyyyMMddHHmmss
         String endTimeTemp = DateTimeUtil.changeTime2(endTime);//yyyyMMddHHmmss
 
-        String folderPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-        File f = new File(folderPath);
+//        String folderPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
+//        String folderPath = "http://192.168.9.40:10086/files/reportFiles/";
+        File f = new File(reportPath);
 
         if (!f.exists()) { //路径不存在
             map.put("retType", "1");
-        }else{
+        }else{ 
             boolean flag = f.isDirectory();
             if(flag==false){ //路径为文件
                 map.put("retType", "2");
@@ -152,7 +158,10 @@ public class ReportManageService {
                 map.put("folderNameList", folderNameList);
             }
         }
+        log.info("<----------map--------->的值为："+map);
+        log.info("fileNameList是："+fileNameList);
         System.out.println("<----------map--------->的值为："+map);
+        System.out.println("fileNameList是："+fileNameList);
         return fileNameList;
 
     }
@@ -162,8 +171,8 @@ public class ReportManageService {
         String timeTemp =  DateTimeUtil.changeTime2(startTime);
         String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
 
-        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-//        String filePath = reportPath+fileName;
+//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+        String filePath = reportPath+fileName;
         return delete(filePath);
     }
     public static boolean delete(String filePath)
