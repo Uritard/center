@@ -969,9 +969,9 @@ public class DateTimeUtil {
             Date date = new Date();
             Date dd = new Date();
             if (dayAfter.getYear() <= date.getYear()) {
-                if (date.getMonth() > dayBefore.getMonth()) { return validTimeList;}
-                if (date.getMonth() == dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
-                if (date.getMonth() < dayBefore.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
+                if (date.getMonth() > dayAfter.getMonth()) { return validTimeList;}
+                if (date.getMonth() == dayAfter.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
+                if (date.getMonth() < dayAfter.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
                 while (dd.getTime() < dayAfter.getTime()) {
                     validTimeList.add(dd);
                     dd = exp.getNextValidTimeAfter(dd);
