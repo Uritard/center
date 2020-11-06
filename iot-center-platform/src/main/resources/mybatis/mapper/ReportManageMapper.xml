@@ -111,10 +111,12 @@
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         <include refid="TongYong"></include>
         where 1 = 1
-        and a.device_id in
-        <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
-            #{deviceIds, jdbcType=BIGINT}
-        </foreach>
+
+         and a.device_id in
+            <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+                #{deviceIds, jdbcType=BIGINT}
+            </foreach>
+
         <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
     </select>
     <select id="selectStationName" resultType="java.lang.String">

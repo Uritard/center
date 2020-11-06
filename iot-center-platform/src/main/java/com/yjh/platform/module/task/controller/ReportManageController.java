@@ -10,6 +10,8 @@ import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
 import com.yjh.platform.module.task.service.ReportManageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.http.conn.util.PublicSuffixList;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +41,9 @@ public class ReportManageController {
     private ReportManageService reportManageService;
 
     @Value("${nginx.report.reflect}")
-    private String reportPath;//报表路径
+    private String reportAbsolutePath;//报表绝对路径
+    @Value("${nginx.reportRelative.reflect}")
+    private String reportRelativePath;//报表相对路径
     @Value("${nginx.temporary.reflect}")
     private String temporaryPath;//临时路径
 
@@ -55,7 +60,7 @@ public class ReportManageController {
                                  @RequestParam(value="reportType")String reportType) {
         Result result = new Result();
         try {
-            List<TCruiseDataResultDetail> list = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportPath);
+            List<TCruiseDataResultDetail> list = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportAbsolutePath);
             result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -72,7 +77,7 @@ public class ReportManageController {
                                  @RequestParam(value = "startTime")String startTime) {
         Result result = new Result();
         try {
-            String downLoadFilePath = reportManageService.reportDownload(reportName,reportType,startTime,reportPath);
+            String downLoadFilePath = reportManageService.reportDownload(reportName,reportType,startTime,reportRelativePath);
             result.setData(downLoadFilePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -93,7 +98,7 @@ public class ReportManageController {
         Map<String,Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<ReportForms> list = reportManageService.reportSelect(reportName,startTime,endTime,reportPath);
+            List<ReportForms> list = reportManageService.reportSelect(reportName,startTime,endTime,reportAbsolutePath);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -112,7 +117,7 @@ public class ReportManageController {
                                @RequestParam(value = "startTime")String startTime) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.reportDelete(reportName,reportType,startTime,reportPath));
+            result.setData(reportManageService.reportDelete(reportName,reportType,startTime,reportAbsolutePath));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -126,12 +131,12 @@ public class ReportManageController {
     public Result reportBatchDelete(@RequestBody List<ReportForms> fileNameList) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.reportBatchDelete(reportPath,fileNameList));
+            result.setData(reportManageService.reportBatchDelete(reportAbsolutePath,fileNameList));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加错误:", e);
+            log.error("批量删除报表错误:", e);
         }
         return result;
     }
@@ -147,6 +152,24 @@ public class ReportManageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("生成报表错误:", e);
+        }
+        return result;
+    }
+    @RequestMapping(value = "/getDiZhi",method = RequestMethod.GET)
+    public Result  getDiZhi(HttpServletRequest request){
+        Result result = new Result();
+        try {
+            String scheme = request.getScheme();
+            String serverName = request.getServerName();
+            int port = request.getServerPort();
+            String path = scheme+"://"+serverName+":"+port;
+            log.info("<-------------path------------->:"+path);
+            result.setData(path);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取东西错误:", e);
         }
         return result;
     }

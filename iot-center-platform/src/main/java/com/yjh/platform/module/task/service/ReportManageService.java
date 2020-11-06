@@ -72,7 +72,7 @@ public class ReportManageService {
         String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String reportPath2 = reportPath+fileName;
-
+        log.info("reportPath2:"+reportPath2);
         File file = new File(reportPath2);
 
         ContentData contentData = ReportDataRepo.getData(recordData);
@@ -90,8 +90,8 @@ public class ReportManageService {
         String time2 =  DateTimeUtil.changeTime2(startTime);
         String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
 //        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-//        String reportPathA = "http://192.168.9.40:10086/files/reportFiles/";
         String filePath = reportPath+fileName;
+        log.info("filePath:"+filePath);
         return filePath;
     }
     @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
@@ -169,6 +169,7 @@ public class ReportManageService {
 
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String filePath = reportPath+fileName;
+        log.info("filePath:"+filePath);
         return delete(filePath);
     }
     public static boolean delete(String filePath)
