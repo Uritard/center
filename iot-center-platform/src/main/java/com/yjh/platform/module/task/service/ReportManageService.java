@@ -71,7 +71,7 @@ public class ReportManageService {
 
         String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-        String reportPath2 = reportPath+fileName;
+        String reportPath2 = reportPath+"/"+fileName;
         log.info("reportPath2:"+reportPath2);
         File file = new File(reportPath2);
 
@@ -90,7 +90,7 @@ public class ReportManageService {
         String time2 =  DateTimeUtil.changeTime2(startTime);
         String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
 //        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-        String filePath = reportPath+fileName;
+        String filePath = reportPath+"/"+fileName;
         log.info("filePath:"+filePath);
         return filePath;
     }
@@ -105,7 +105,7 @@ public class ReportManageService {
         String endTimeTemp = DateTimeUtil.changeTime2(endTime);//yyyyMMddHHmmss
 
 //        String folderPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-        File f = new File(reportPath);
+        File f = new File(reportPath+"/");
 
         if (!f.exists()) { //路径不存在
             map.put("retType", "1");
@@ -168,7 +168,7 @@ public class ReportManageService {
         String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
 
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-        String filePath = reportPath+fileName;
+        String filePath = reportPath+"/"+fileName;
         log.info("filePath:"+filePath);
         return delete(filePath);
     }
@@ -193,7 +193,7 @@ public class ReportManageService {
             String startTime = res.getStartTime();
             String time2 =  DateTimeUtil.changeTime2(startTime);
             String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
-            String filePathAndName = reportPath+fileName;
+            String filePathAndName = reportPath+"/"+fileName;
 //           String filePathAndName = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
             if (!delete(filePathAndName)){
                 return  false;
