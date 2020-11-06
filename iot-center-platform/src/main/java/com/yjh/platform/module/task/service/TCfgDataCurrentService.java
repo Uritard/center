@@ -145,7 +145,7 @@ public class TCfgDataCurrentService {
                     ScriptEngine engine = sm.getEngineByName("js");
                     String sum = engine.eval(content).toString();
                     if (sum == "true") {
-                        tUnionTaskService.insertRecord(rule.getRuleId(), null, new Date(), content);
+//                        tUnionTaskService.insertRecord(rule.getRuleId(), null, new Date(), content);
                         try {
                             int delay = rule.getRuleDelay();
                             Thread.sleep(delay * 1000);

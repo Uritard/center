@@ -70,7 +70,7 @@ public class TUnionTaskService{
     public List<TUnionTask> selectByPage(TUnionTask tUnionTask) {
         List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
 
-        int a = insertRecord(9000000037L,null,new Date(),"测试用的断面数据");
+        int a = insertRecord("123122",9000000037L,null,new Date(),"测试用的断面数据");
         System.out.println("哈哈啊哈哈哈："+a);
         return tUnionTaskList;
     }
@@ -260,10 +260,9 @@ public class TUnionTaskService{
     }
     @Logs(title = "联动记录存储", code = "tUnionTask",content = "触发联动进行记录存储")
     @Transactional(rollbackFor = Exception.class)
-    public int insertRecord(Long ruleId,Long robotId,Date createTime,String paramValues) {
+    public int insertRecord(String unionId,Long ruleId,Long robotId,Date createTime,String paramValues) {
         TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
         TUnionTask tUnionTask = new TUnionTask();
-        String unionId = String.valueOf(UUID.randomUUID()).replace("-", "");
         tUnionTask.setUnionId(unionId);
         tUnionTask.setRuleId(ruleId);
         tUnionTask.setUnionName(tCfgUnionRule.getRuleName()+tCfgUnionRule.getPlanId());

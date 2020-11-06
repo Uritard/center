@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -69,7 +70,7 @@ public class ReportManageService {
         Date date = new Date();
         String nowTime = f.format(date);
 
-        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
+        String fileName = nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String reportPath2 = reportPath+"/"+fileName;
         log.info("reportPath2:"+reportPath2);
@@ -79,7 +80,16 @@ public class ReportManageService {
 
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                 contentData.getElements(), file);
-
+        log.info("start rename.... ");
+        try {
+            Thread.sleep(3000);
+            String url2 = "mv "+ reportPath+"/"+fileName +" "+reportPath+"/"+reportName+"-"+nowTime+"-"+reportType+".xlsx";
+            log.info("url2: "+url2);
+            Runtime.getRuntime().exec(url2);
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        log.info("rename success.... ");
 //        DownloadUtil.downloadFile(reportPath, file.getName(), response, request);
 
         return tCDRDList;
@@ -135,7 +145,7 @@ public class ReportManageService {
                                 reportForms.setReportName(rName);
                                 String time2 = DateTimeUtil.changeTime1(rDate);
                                 reportForms.setStartTime(time2);
-                                reportForms.setReportType(rType);
+                                reportForms.setReportType(reportTypeTransform(rType));
                                 fileNameList.add(reportForms);
                             }else {
                                 //时间过滤
@@ -146,7 +156,7 @@ public class ReportManageService {
                                     reportForms.setReportName(rName);
                                     String time2 = DateTimeUtil.changeTime1(rDate);
                                     reportForms.setStartTime(time2);
-                                    reportForms.setReportType(rType);
+                                    reportForms.setReportType(reportTypeTransform(rType));
                                     fileNameList.add(reportForms);
                                 }
                             }
@@ -160,6 +170,19 @@ public class ReportManageService {
         log.info("<----------map--------->的值为："+map);
         log.info("fileNameList是："+fileNameList);
         return fileNameList;
+    }
+    public String reportTypeTransform(String reportTypeTemp){
+        String reportType = null;
+        if (reportTypeTemp.equals("dReport")){
+            reportType = "日报表";
+        }else if (reportTypeTemp.equals("wReport")){
+            reportType = "周报表";
+        }else if (reportTypeTemp.equals("mReport")){
+            reportType = "月报表";
+        }else if (reportTypeTemp.equals("sReport")){
+            reportType = "自定义报表";
+        }
+        return reportType;
     }
     @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
