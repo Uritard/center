@@ -86,7 +86,7 @@ public class TCruiseTaskService {
 
     @Logs(title = "插入", code = "TCruiseTask",content = "根据web传入的参数新增任务")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TCruiseTask tCruiseTask) {
+    public String insert(TCruiseTask tCruiseTask) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date startTime = null;
         try {
@@ -148,7 +148,7 @@ public class TCruiseTaskService {
             } catch (Exception e) { e.getMessage(); }
         }
 
-        return 1;
+        return tCruiseTask.getTaskId();
     }
 
     @Logs(title = "删除", code = "TCruiseTask",content = "根据web传入的参数删除任务")
