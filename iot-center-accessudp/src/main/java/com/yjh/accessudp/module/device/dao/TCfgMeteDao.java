@@ -3,6 +3,7 @@ package com.yjh.accessudp.module.device.dao;
 
 
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
+import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -32,4 +33,9 @@ public interface TCfgMeteDao {
 
     int insertForTelesignal(SYAllInfo syAllInfo);
     int updateForTelesignal(SYAllInfo syAllInfo);
+
+    String selectByMeteId(String meteId);
+    TCfgDataCurrent selectByPrimaryIdTCfgDataCurrent(Long meteId);
+    int insertTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent);
+    int updateTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent);
 }

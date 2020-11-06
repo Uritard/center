@@ -1,7 +1,16 @@
 package com.yjh.accessudp.netty.server;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.sun.xml.internal.bind.v2.TODO;
+import com.yjh.accessudp.common.utils.ByteUtil;
+import com.yjh.accessudp.common.utils.MeteValueUtils;
+import com.yjh.accessudp.commons.logs.SpringBeanUtils;
+import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessudp.module.device.entity.SYAllInfo;
+import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
 import com.yjh.accessudp.module.device.service.SysLogsService;
+import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import com.yjh.accessudp.thread.TaskExecutePool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -13,14 +22,28 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.math.BigInteger;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by tt on 2019/7/31.
@@ -30,9 +53,11 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     private SysLogsService sysLogsService;
     private RedisTemplate redisTemplate;
-    public UDPServerHandler(SysLogsService sysLogsService, RedisTemplate redisTemplate) {
+    private TCfgMeteService tCfgMeteService;
+    public UDPServerHandler(SysLogsService sysLogsService, RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService) {
         this.sysLogsService = sysLogsService;
         this.redisTemplate = redisTemplate;
+        this.tCfgMeteService = tCfgMeteService;
     }
     private boolean isThreadStart = true;
     public boolean getIsThreadStart() { return isThreadStart; }
@@ -129,14 +154,179 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         ByteBuf sss = datagramPacket.content();
         byte[] req = new byte[sss.readableBytes()];
         sss.readBytes(req);
+        int ss = ByteUtil.bytes2Int(req);
+        log.info("ss: "+ss);
         StringBuilder Str = new StringBuilder();
         for (byte byteitem : req) {
             Str.append(String.format("%02x ", byteitem));
         }
         log.info("commandSend:" + Str + " : " + strChannelID);
-        String msgString = datagramPacket.content().toString(CharsetUtil.UTF_8);
-        System.out.println(" 发来的消息：" + msgString);
-        handleDate(msgString);
+
+        //解析 Str = eb 90 eb 90 55 01 00 0a 27 01 06 e5 8a a8 e4 bd 9c 06 e5 90 88 e4 bd 8d
+        String[] udp = Str.toString().split(" ");
+        if("55".equals(udp[4])){
+            //获取meteid
+            Integer meteId = Integer.valueOf(new BigInteger(udp[7],16).toString())*100+Integer.valueOf(new BigInteger(udp[8],16).toString());
+            log.info("meteId:   "+meteId);
+            //获取meteKind
+            Integer meteKind = Integer.valueOf(new BigInteger(udp[9],16).toString());
+            log.info("meteKind:  "+meteKind);
+            //获取属性长度
+            Integer valueLength = Integer.valueOf(new BigInteger(udp[10],16).toString());
+            log.info("valueLength:  "+valueLength);
+            //获取属性
+            String value = arrayToString(udp,11,valueLength,true);
+            System.out.println("属性:  " + value);
+            //获取描述长度
+            int weizhi = 10+valueLength+1;
+            Integer commitLength = Integer.valueOf(new BigInteger(udp[weizhi],16).toString());
+            log.info("commitLength:  "+commitLength);
+            //获取描述
+            String commit = arrayToString(udp,weizhi+1,commitLength,true);
+            System.out.println("描述:  " + commit);
+            String commitValue = MeteValueUtils.meteValues(commit);
+            System.out.println("描述数字:"+commitValue);
+            //获取时间
+            String shijianchuo = arrayToString(udp,weizhi+1+commitLength,7,false);
+            long day= Long.valueOf(shijianchuo,16);
+            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//这个是你要转成后的时间的格式
+            String time = sdf.format(new Date(day));
+            System.out.println("time:  "+time);
+
+            TCfgDataCurrent tCfgDataCurrent = tCfgMeteService.selectByPrimaryIdTCfgDataCurrent(meteId.toString());
+            if(tCfgDataCurrent == null){
+                tCfgDataCurrent = new TCfgDataCurrent();
+                tCfgDataCurrent.setMeteId(Long.valueOf(meteId));
+                tCfgDataCurrent.setDeviceId(Long.valueOf(tCfgMeteService.selectByMeteId(meteId.toString())));
+                tCfgDataCurrent.setMeteKind(meteKind);
+                tCfgDataCurrent.setRecordTime(sdf.parse(time));
+                tCfgDataCurrent.setMeteValue(commitValue);
+                tCfgMeteService.insertTCfgDataCurrent(tCfgDataCurrent);
+            }else {
+                //库里已经有数据了
+                tCfgDataCurrent.setLastMeteValue(tCfgDataCurrent.getMeteValue());
+                tCfgDataCurrent.setRecordTime(sdf.parse(time));
+                tCfgDataCurrent.setMeteValue(commitValue);
+                tCfgMeteService.updateTCfgDataCurrent(tCfgDataCurrent);
+            }
+//            Map<String, Long> map = new HashMap<>();
+//            map.put("meteId",Long.valueOf(meteId));
+            //union(map);
+            //String json = JSON.toJSONString(meteId);
+            getUrl(UNINO_URL,meteId.toString());
+
+        }else if ("43".equals(udp[4])){
+            Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
+            log.info("有无后续：  "+doesHas);
+            Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
+            log.info("帧序号：  "+xuHao);
+            //其实传输位置 9-12
+            Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
+            String value = arrayToString(udp,14,valueLength,true);
+            log.info("文件内容:  " + value);
+            value = value.replace("\\t"," ");
+            log.info("文件内容(删除\\t):  " + value);
+            String[] valueArray = value.split("\\s+");
+            if("".equals(valueArray[0])){
+                valueArray= Arrays.copyOfRange(valueArray,1,valueArray.length);
+            }
+            log.info("文件内容(转字符数组):  " + Arrays.toString(valueArray));
+
+        }
+//        String msgString = datagramPacket.content().toString(CharsetUtil.UTF_8);
+//        System.out.println(" 发来的消息：" + msgString);
+//        handleDate(msgString);
+    }
+    private static String UNINO_URL = "http://192.168.33.133:18711/tCfgDataCurrent/v1/unionTest";
+    //private static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
+
+    public String getUrl(String url, String json) throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        String result = "";
+        try {
+            URI uri = new URIBuilder(url).setParameter("meteId", json).build();
+            HttpGet httpGet = new HttpGet(uri);
+            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+            httpGet.setHeader("Accept", "application/json");
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {e.getMessage();}
+        return result;
+    }
+
+    private void union(Map<String, Long> map) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(UNINO_URL, map, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public String arrayToString(String[] udp,int start,int length,boolean flag)throws UnsupportedEncodingException{
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < length;i++){
+            stringBuilder.append(udp[start+i]);
+        }
+        String str =  stringBuilder.toString();
+        if(flag){
+            return hexStr2Str(str);
+        }
+        return str;
+    }
+
+
+    public static String hexStr2Str(String hexStr) throws UnsupportedEncodingException {
+        String str = "0123456789abcdef"; //16进制能用到的所有字符 0-15
+        char[] hexs = hexStr.toCharArray();//toCharArray() 方法将字符串转换为字符数组。
+        int length = (hexStr.length() / 2);//1个byte数值 -> 两个16进制字符
+        byte[] bytes = new byte[length];
+        int n;
+        for (int i = 0; i < bytes.length; i++) {
+            int position = i * 2;//两个16进制字符 -> 1个byte数值
+            n = str.indexOf(hexs[position]) * 16;
+            n += str.indexOf(hexs[position + 1]);
+            // 保持二进制补码的一致性 因为byte类型字符是8bit的  而int为32bit 会自动补齐高位1  所以与上0xFF之后可以保持高位一致性
+            //当byte要转化为int的时候，高的24位必然会补1，这样，其二进制补码其实已经不一致了，&0xff可以将高的24位置为0，低8位保持原样，这样做的目的就是为了保证二进制数据的一致性。
+            bytes[i] = (byte) (n & 0xff);
+        }
+        return new String(bytes,"UTF-8");
+    }
+    //16进制字符串串转为汉字
+    public static String hexToString(String str) {
+        Pattern pattern = Pattern.compile("(\\\\\\\\[0-9A-Fa-f]{2})+");
+        Matcher matcher = pattern.matcher(str);
+        Map<String,String> result = new TreeMap<>();
+        List<String> listKey = new LinkedList<>();
+        while (matcher.find()) {
+            String group = matcher.group(0);
+            String groupReplace = group;
+            byte[] b = new byte[groupReplace.length() / 2];// 每两个字符为一个十六进制确定数字长度
+            for (int i = 0; i < b.length; i++) {
+                // 将字符串每两个字符做为一个十六进制进行截取
+                String a = groupReplace.substring(i * 2, i * 2 + 2);
+                b[i] = (byte) Integer.parseInt(a, 16);// 将如e4转成十六进制字节，放入数组
+            }
+            try {
+                // 将字节数字以utf-8编码以字符串形式输出
+                String ccc = new String(b, "UTF-8");
+                result.put(ccc,group);
+                listKey.add(ccc);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        if(listKey != null && listKey.size() > 0){
+            listKey.sort(Comparator.reverseOrder());
+            for (String key : listKey ) {
+                String value = result.get(key);
+                str = str.replace(value, key);
+            }
+        }
+        return str;
     }
 
     private void handleDate(String msgData) {

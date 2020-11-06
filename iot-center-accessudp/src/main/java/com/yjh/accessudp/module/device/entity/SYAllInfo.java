@@ -13,11 +13,11 @@ import java.util.Date;
  * @author lqh
  * @since 2020/11/4
  */
-        @Data
-        @EqualsAndHashCode(callSuper = false)
-        @Accessors(chain = true)
-        @ApiModel(value = "所有的四遥信息", description = "四要信息")
-        public class SYAllInfo implements Serializable {
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@ApiModel(value = "所有的四遥信息", description = "四要信息")
+public class SYAllInfo implements Serializable {
 
         @ApiModelProperty(value = "监控量编码")
         private String meteId;

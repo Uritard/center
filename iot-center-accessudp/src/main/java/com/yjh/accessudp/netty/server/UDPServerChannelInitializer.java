@@ -1,6 +1,7 @@
 package com.yjh.accessudp.netty.server;
 
 import com.yjh.accessudp.module.device.service.SysLogsService;
+import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -16,17 +17,19 @@ public class UDPServerChannelInitializer extends ChannelInitializer<NioDatagramC
 
     private RedisTemplate redisTemplate;
     private SysLogsService sysLogsService;
+    private TCfgMeteService tCfgMeteService;
     private NioDatagramChannel nioDatagramChannel;
 
-    public UDPServerChannelInitializer(RedisTemplate redisTemplate, SysLogsService sysLogsService) {
+    public UDPServerChannelInitializer(RedisTemplate redisTemplate, SysLogsService sysLogsService,TCfgMeteService tCfgMeteService) {
         this.redisTemplate = redisTemplate;
         this.sysLogsService = sysLogsService;
+        this.tCfgMeteService =  tCfgMeteService;
     }
 
     @Override
     protected void initChannel(NioDatagramChannel nioDatagramChannel) throws Exception {
         log.info("IEC104ServerChannelInitializer channelInit....");
-        nioDatagramChannel.pipeline().addLast(new UDPServerHandler(sysLogsService, redisTemplate));
+        nioDatagramChannel.pipeline().addLast(new UDPServerHandler(sysLogsService, redisTemplate, tCfgMeteService));
     }
 
     @Override

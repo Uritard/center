@@ -27,6 +27,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Description
@@ -67,7 +69,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         //loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
-        nettyServer.start(address, redisTemplate,sysLogsService);
+        nettyServer.start(address, redisTemplate,sysLogsService,tCfgMeteService);
     }
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
@@ -82,6 +84,16 @@ public class AccessUdpApplication implements CommandLineRunner {
             while ((line = br.readLine()) != null) {
                 // 一次读入一行数据
                 //System.out.println(line);
+                if(line.contains("time")){//读取时间
+                    String regex = "time='([\\s\\S]*?)\\W!";
+                    Matcher matcher = Pattern.compile(regex).matcher(line);
+                    if (matcher.find()){
+                        log.info("时间读取成功");
+                        String time = matcher.group(1).trim();
+                    }else {
+                        log.info("时间读取失败");
+                    }
+                }
                 if(line.contains("#")){
                     strArray = line.split("\\s+");
                     if("".equals(strArray[0])){

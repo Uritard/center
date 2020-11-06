@@ -81,6 +81,9 @@ public class TCruiseTaskService {
     //等待相机转到预置位时间
     @Value("${spring.move.waitTime}")
     private Long waitTime;
+    //jobName
+    @Value("${spring.QingHua.jobName}")
+    private String jobName;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
@@ -118,7 +121,7 @@ public class TCruiseTaskService {
         //开启定时任务
         QuartzTask quartzTask = new QuartzTask();
         quartzTask.setJobName(tCruiseTask.getTaskName());
-        quartzTask.setJobGroup("qh111");
+        quartzTask.setJobGroup(jobName);
         if(tCruiseTask.getDateType()== null){
             if(tCruiseTask.getIfRun() == 173){
                 //立即执行
@@ -141,6 +144,7 @@ public class TCruiseTaskService {
         }else{
             //周期 0 */10 * * * ?
             quartzTask.setCronExpression(tCruiseTask.getDateType());
+            //quartzTask.setCronExpression("0 */1 * * * ?");
             log.info("quartzTask: "+quartzTask.getCronExpression());
             JobManager jobManager = new JobManager();
             try {
