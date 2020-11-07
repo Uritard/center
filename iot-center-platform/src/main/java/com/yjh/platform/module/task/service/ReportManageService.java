@@ -70,8 +70,9 @@ public class ReportManageService {
         Date date = new Date();
         String nowTime = f.format(date);
 
-        String fileName = nowTime+"-"+reportType+".xlsx";
+//        String fileName = nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
         String reportPath2 = reportPath+"/"+fileName;
         log.info("reportPath2:"+reportPath2);
         File file = new File(reportPath2);
@@ -80,16 +81,16 @@ public class ReportManageService {
 
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                 contentData.getElements(), file);
-        log.info("start rename.... ");
-        try {
-            Thread.sleep(3000);
-            String url2 = "mv "+ reportPath+"/"+fileName +" "+reportPath+"/"+reportName+"-"+nowTime+"-"+reportType+".xlsx";
-            log.info("url2: "+url2);
-            Runtime.getRuntime().exec(url2);
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        log.info("rename success.... ");
+//        log.info("start rename.... ");
+//        try {
+//            Thread.sleep(3000);
+//            String url2 = "mv "+ reportPath+"/"+fileName +" "+reportPath+"/"+reportName+"-"+nowTime+"-"+reportType+".xlsx";
+//            log.info("url2: "+url2);
+//            Runtime.getRuntime().exec(url2);
+//        } catch (Exception e) {
+//            e.getMessage();
+//        }
+//        log.info("rename success.... ");
 //        DownloadUtil.downloadFile(reportPath, file.getName(), response, request);
 
         return tCDRDList;

@@ -155,22 +155,4 @@ public class ReportManageController {
         }
         return result;
     }
-    @RequestMapping(value = "/getDiZhi",method = RequestMethod.GET)
-    public Result  getDiZhi(HttpServletRequest request){
-        Result result = new Result();
-        try {
-            String scheme = request.getScheme();
-            String serverName = request.getServerName();
-            int port = request.getServerPort();
-            String path = scheme+"://"+serverName+":"+port;
-            log.info("<-------------path------------->:"+path);
-            result.setData(path);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("获取东西错误:", e);
-        }
-        return result;
-    }
 }
