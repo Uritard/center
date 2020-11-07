@@ -1,5 +1,8 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.module.task.controller.TCruiseTaskController;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TUnionTaskService;
@@ -44,6 +47,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TCruiseTaskService tCruiseTaskService;
+
+    @Autowired
+    private TCruiseTaskController tCruiseTaskController;
 
 
     @Logs(title = "插入", code = "TCfgDataCurrent",content = "根据web传入的参数新增")
@@ -95,21 +101,28 @@ public class TCfgDataCurrentService {
     }
 
 
+
+
+    //TODO: 测试方法 用完删除
     @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "TCfgDataCurrent",content = "联动规则匹配")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTask> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
+    public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws ScriptException {
         Set<Long> plans = new HashSet<>();//满足触发条件的预案
         Log cLogger = LogFactory.getLog(this.getClass());
+        cLogger.info("清华方数据："+meteMap);
+        cLogger.info("meteId--"+meteMap);
         //联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
-
-        for (Long meteId : meteIds) {
-            List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteId.toString());
+        
+           cLogger.info("开始");
+            List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
             for (TCfgUnionRule rule : unionrules) {
                 cLogger.info(rule.getInputParam());
                 rules.add(rule);
             }
-        }
+        cLogger.info("结束");
+        cLogger.info("规则："+rules);
+
         Set<Long> meteIdR = new HashSet<>();//一次匹配到的规则所涵盖的所有meteId
         for (TCfgUnionRule rule : rules) {
             String[] currentMeteId = rule.getInputParam().split(", ");
@@ -129,8 +142,10 @@ public class TCfgDataCurrentService {
         }
 
         //规则二次匹配与规则计算，判断表达式是否触发
-        // TODO: 2020/9/25 待完善--触发条件向巡检模块微服务发送预案信息Post方法;
+        //
 
+        List<TCfgUnionRule> unionRule=new ArrayList<>();//触发联动的规则
+        List<String> contents=new ArrayList<>();//触发联动的断面数据
         for (TCfgUnionRule rule : rules) {
             String content = rule.getRuleContent().replaceAll("\\{", "").replaceAll("}", "").replaceAll(",", "");
             for (TCfgDataCurrent current : currents) {
@@ -145,7 +160,8 @@ public class TCfgDataCurrentService {
                     ScriptEngine engine = sm.getEngineByName("js");
                     String sum = engine.eval(content).toString();
                     if (sum == "true") {
-//                        tUnionTaskService.insertRecord(rule.getRuleId(), null, new Date(), content);
+                        unionRule.add(rule);
+                        contents.add(content);
                         try {
                             int delay = rule.getRuleDelay();
                             Thread.sleep(delay * 1000);
@@ -172,18 +188,120 @@ public class TCfgDataCurrentService {
         //将满足条件的联动规则预案生成任务并执行
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
         for(Long plan:plans){
-        TCruiseTask tCruiseTask=new TCruiseTask();
-        TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
-        tCruiseTask.setPlanId(tCruisePlan.getPlanId());
-        tCruiseTask.setTaskName(tCruisePlan.getPlanName());
-        tCruiseTask.setIfRun(173);
-        tCruiseTaskService.insert(tCruiseTask);//执行联动任务
-        cLogger.info("联动开始执行");
-        tCruiseTasks.add(tCruiseTask);
+//            TCruiseTask tCruiseTask=new TCruiseTask();
+            TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
+//            tCruiseTasks.add(tCruiseTask);
+            TCruiseTaskAdd tCruiseTaskAdd=new TCruiseTaskAdd();
+            tCruiseTaskAdd.setPlanId(tCruisePlan.getPlanId());
+            tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName());
+            tCruiseTaskAdd.setIfRun(173);
+            tCruiseTaskAdd.setStartTime(new Date());
+            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
+            String taskId=result.getData().toString();//联动任务ID
+            cLogger.info("联动开始执行");
+            //联动记录插库
+            tUnionTaskService.insertRecord(taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
+
         }
+
+        cLogger.info("联动任务：----"+tCruiseTasks);
 //        return plans;
         return tCruiseTasks;
     }
+
+
+
+
+//    @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "TCfgDataCurrent",content = "联动规则匹配")
+//    @Transactional(rollbackFor = Exception.class)
+//    public List<TCruiseTask> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
+//        Set<Long> plans = new HashSet<>();//满足触发条件的预案
+//        Log cLogger = LogFactory.getLog(this.getClass());
+//        cLogger.info("清华方数据："+meteIds);
+//        //联动规则一次匹配
+//        Set<TCfgUnionRule> rules = new HashSet<>();
+//
+//        for (Long meteId : meteIds) {
+//            List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteId.toString());
+//            for (TCfgUnionRule rule : unionrules) {
+//                cLogger.info(rule.getInputParam());
+//                rules.add(rule);
+//            }
+//        }
+//        Set<Long> meteIdR = new HashSet<>();//一次匹配到的规则所涵盖的所有meteId
+//        for (TCfgUnionRule rule : rules) {
+//            String[] currentMeteId = rule.getInputParam().split(", ");
+//            for (int i = 0; i < currentMeteId.length; i++) {
+//                meteIdR.add(Long.valueOf(currentMeteId[i]));
+//            }
+//        }
+//
+//        //根据一次匹配拿到的meteId获取实时数据
+//        List<TCfgDataCurrent> currents = new ArrayList<>();
+//        for (Long meteId : meteIdR) {
+//            TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
+//            if (currentDatas != null) {
+//                currents.add(currentDatas);
+//            }
+//
+//        }
+//
+//        //规则二次匹配与规则计算，判断表达式是否触发
+//        // TODO: 2020/9/25 待完善--触发条件向巡检模块微服务发送预案信息Post方法;
+//
+//        for (TCfgUnionRule rule : rules) {
+//            String content = rule.getRuleContent().replaceAll("\\{", "").replaceAll("}", "").replaceAll(",", "");
+//            for (TCfgDataCurrent current : currents) {
+//                StringBuilder stringBuilder = new StringBuilder("id:");
+//                String contentTemp = content.replaceAll((stringBuilder.append((current.getMeteId()).toString())).toString(), current.getMeteValue());
+//                content = contentTemp;
+//
+//                if (content.contains("id:")) {
+//                    cLogger.info("未完成");
+//                } else if (content.contains("<") || content.contains(">") || content.contains("=")) {
+//                    ScriptEngineManager sm = new ScriptEngineManager();//字符串表达式计算
+//                    ScriptEngine engine = sm.getEngineByName("js");
+//                    String sum = engine.eval(content).toString();
+//                    if (sum == "true") {
+//                        tUnionTaskService.insertRecord(rule.getRuleId(), null, new Date(), content);
+//                        try {
+//                            int delay = rule.getRuleDelay();
+//                            Thread.sleep(delay * 1000);
+//                            cLogger.info(rule.getRuleName());
+//                            plans.add(rule.getPlanId());
+//                        } catch (Exception e) {
+//                            e.getMessage();
+//                        }
+//                        cLogger.info("执行预案");
+//                        cLogger.info(rule.getRuleName());
+//                        break;
+//                    } else if (sum == "false") {
+//                        cLogger.info("不满足触发条件");
+//                        break;
+//                    }
+//
+//                } else {
+//                    cLogger.info("表达式错误");
+//                }
+//
+//            }
+//
+//        }
+//        //将满足条件的联动规则预案生成任务并执行
+//        List<TCruiseTask>tCruiseTasks=new ArrayList<>();
+//        for(Long plan:plans){
+//        TCruiseTask tCruiseTask=new TCruiseTask();
+//        TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
+//        tCruiseTask.setPlanId(tCruisePlan.getPlanId());
+//        tCruiseTask.setTaskName(tCruisePlan.getPlanName());
+//        tCruiseTask.setIfRun(173);
+//        tCruiseTaskService.insert(tCruiseTask);//执行联动任务
+//        cLogger.info("联动开始执行");
+//        tCruiseTasks.add(tCruiseTask);
+//        }
+////        return plans;
+//        return tCruiseTasks;
+//    }
 
     @Logs(title = "联动记录&&告警信息-滚动刷新", code = "TCfgDataCurrent",content = "联动信息滚动刷新")
     @Transactional(rollbackFor = Exception.class)

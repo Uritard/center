@@ -163,12 +163,11 @@ public class TCfgDataCurrentController {
 
     @ApiOperation(value = "联动控制--测试接口")
     @RequestMapping(value = "/unionTest",method = RequestMethod.GET)
-    public Result unionTest(@RequestParam Map<String, List<Long>> map){
+    public Result unionTest(@RequestParam Map<String,String> meteId){
         Result result=new Result();
         try {
-            System.out.println(map.get("66"));
 
-            ///result.setData(tCfgDataCurrentService.unionRulesMatchAndCalculate(meteIds));
+            result.setData(tCfgDataCurrentService.unionRulesMatchAndCalculate(meteId.get("meteId")));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
