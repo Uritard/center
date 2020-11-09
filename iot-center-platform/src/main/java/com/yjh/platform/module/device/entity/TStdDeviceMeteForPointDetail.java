@@ -31,10 +31,10 @@ public class TStdDeviceMeteForPointDetail extends TStdDeviceMete{
 
     //private List<Long> meteIds;
 
-    private CruisePointType robotType = new CruisePointType();
-    private CruisePointType cameraType = new CruisePointType();
-    //private CruisePointType infraredType = new CruisePointType();
-    private CruisePointType voiceType = new CruisePointType();
+    private CruisePointType robotType = new CruisePointType();//机器人
+    private CruisePointType cameraType = new CruisePointType();//视频
+    private CruisePointType infraredType = new CruisePointType();//红外
+    private CruisePointType voiceType = new CruisePointType();//声纹
 
 //    private CruisePointType robotType ;
 //    private CruisePointType cameraType ;

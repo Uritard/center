@@ -74,4 +74,6 @@ public interface TCruisePointInstanceDao {
     int deleteByInstanceId(@Param(value = "list")List<Long> list);
 
     String selectInstanceName(@Param(value = "instanceId")Long instanceId);
+
+    Long selectForPresetId(@Param(value = "presetId")Long presetId);
 }
