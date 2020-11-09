@@ -1,25 +1,17 @@
 package com.yjh.accessudp.netty.server;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.sun.xml.internal.bind.v2.TODO;
 import com.yjh.accessudp.common.utils.ByteUtil;
 import com.yjh.accessudp.common.utils.MeteValueUtils;
 import com.yjh.accessudp.commons.logs.SpringBeanUtils;
 import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
-import com.yjh.accessudp.module.device.service.SysLogsService;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
-import com.yjh.accessudp.thread.TaskExecutePool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import io.netty.channel.socket.DatagramPacket;
-import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -29,21 +21,14 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by tt on 2019/7/31.
@@ -51,11 +36,9 @@ import java.util.regex.Pattern;
 @Slf4j
 public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    private SysLogsService sysLogsService;
     private RedisTemplate redisTemplate;
     private TCfgMeteService tCfgMeteService;
-    public UDPServerHandler(SysLogsService sysLogsService, RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService) {
-        this.sysLogsService = sysLogsService;
+    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService) {
         this.redisTemplate = redisTemplate;
         this.tCfgMeteService = tCfgMeteService;
     }

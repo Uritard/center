@@ -1,11 +1,8 @@
 package com.yjh.accessudp;
 
-import com.yjh.accessudp.commons.logs.SpringBeanUtils;
-import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import com.yjh.accessudp.netty.server.NettyServer;
-import com.yjh.accessudp.module.device.service.SysLogsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +23,6 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,8 +46,6 @@ public class AccessUdpApplication implements CommandLineRunner {
     private RedisTemplate redisTemplate;
 
     @Autowired
-    private SysLogsService sysLogsService;
-    @Autowired
     private TCfgMeteService tCfgMeteService;
 
     @Value("${spring.unoin.deviceInfo.path}")
@@ -69,7 +63,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         //loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
-        nettyServer.start(address, redisTemplate,sysLogsService,tCfgMeteService);
+        nettyServer.start(address, redisTemplate,tCfgMeteService);
     }
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
