@@ -200,20 +200,29 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 tCfgDataCurrent.setDeviceId(Long.valueOf(tCfgMeteService.selectByMeteId(meteId.toString())));
                 tCfgDataCurrent.setMeteKind(meteKind);
                 tCfgDataCurrent.setRecordTime(sdf.parse(time));
-                tCfgDataCurrent.setMeteValue(commitValue);
+                if(commitValue == null){
+                    tCfgDataCurrent.setMeteValue(commit);
+                }else{
+                    tCfgDataCurrent.setMeteValue(commitValue);
+                }
+
                 tCfgMeteService.insertTCfgDataCurrent(tCfgDataCurrent);
             }else {
                 //库里已经有数据了
                 tCfgDataCurrent.setLastMeteValue(tCfgDataCurrent.getMeteValue());
                 tCfgDataCurrent.setRecordTime(sdf.parse(time));
-                tCfgDataCurrent.setMeteValue(commitValue);
+                if(commitValue == null){
+                    tCfgDataCurrent.setMeteValue(commit);
+                }else{
+                    tCfgDataCurrent.setMeteValue(commitValue);
+                }
                 tCfgMeteService.updateTCfgDataCurrent(tCfgDataCurrent);
             }
-//            Map<String, Long> map = new HashMap<>();
-//            map.put("meteId",Long.valueOf(meteId));
-            //union(map);
+            Map<String, String> map = new HashMap<>();
+            map.put("meteId",meteId.toString());
+            union(map);
             //String json = JSON.toJSONString(meteId);
-            getUrl(UNINO_URL,meteId.toString());
+            //getUrl(UNINO_URL,meteId.toString());
 
         }else if ("43".equals(udp[4])){
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
@@ -237,8 +246,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //        System.out.println(" 发来的消息：" + msgString);
 //        handleDate(msgString);
     }
-    private static String UNINO_URL = "http://192.168.33.133:18711/tCfgDataCurrent/v1/unionTest";
-    //private static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
+    //private static String UNINO_URL = "http://192.168.33.133:18711/tCfgDataCurrent/v1/unionTest";
+    private static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
 
     public String getUrl(String url, String json) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
@@ -255,7 +264,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         return result;
     }
 
-    private void union(Map<String, Long> map) {
+    private void union(Map<String, String> map) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
@@ -296,38 +305,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         return new String(bytes,"UTF-8");
     }
     //16进制字符串串转为汉字
-    public static String hexToString(String str) {
-        Pattern pattern = Pattern.compile("(\\\\\\\\[0-9A-Fa-f]{2})+");
-        Matcher matcher = pattern.matcher(str);
-        Map<String,String> result = new TreeMap<>();
-        List<String> listKey = new LinkedList<>();
-        while (matcher.find()) {
-            String group = matcher.group(0);
-            String groupReplace = group;
-            byte[] b = new byte[groupReplace.length() / 2];// 每两个字符为一个十六进制确定数字长度
-            for (int i = 0; i < b.length; i++) {
-                // 将字符串每两个字符做为一个十六进制进行截取
-                String a = groupReplace.substring(i * 2, i * 2 + 2);
-                b[i] = (byte) Integer.parseInt(a, 16);// 将如e4转成十六进制字节，放入数组
-            }
-            try {
-                // 将字节数字以utf-8编码以字符串形式输出
-                String ccc = new String(b, "UTF-8");
-                result.put(ccc,group);
-                listKey.add(ccc);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        if(listKey != null && listKey.size() > 0){
-            listKey.sort(Comparator.reverseOrder());
-            for (String key : listKey ) {
-                String value = result.get(key);
-                str = str.replace(value, key);
-            }
-        }
-        return str;
-    }
+
 
     private void handleDate(String msgData) {
         //TODO

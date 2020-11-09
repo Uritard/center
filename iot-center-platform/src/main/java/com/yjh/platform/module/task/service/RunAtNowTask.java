@@ -276,7 +276,7 @@ public class RunAtNowTask implements Runnable{
                         jasonMapOnFinished.put("taskId",taskId);
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                         log.info("发送给前端的消息："+jsonMessage);
-                        WebSocketServer.sendMsg(json);
+                        WebSocketServer.sendMsg(jsonMessage);
 
 
                     }else {
@@ -365,7 +365,7 @@ public class RunAtNowTask implements Runnable{
                             jasonMapOnFinished.put("taskId",taskId);
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
-                            WebSocketServer.sendMsg(json);
+                            WebSocketServer.sendMsg(jsonMessage);
 
                         }
 
@@ -381,6 +381,14 @@ public class RunAtNowTask implements Runnable{
                 //检测任务是否暂停
                 TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(taskId);
                 if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
+                    if(tCruiseResultIsPause.getCState() == 242){
+                        Map<String,Object> jsonMap=new HashMap<>();
+                        jsonMap.put("type","newTask");
+                        jsonMap.put("taskId","");
+                        String jsonForShut=JSON.toJSONString(jsonMap);
+                        log.info("任务终止的消息：   "+jsonForShut);
+                        WebSocketServer.sendMsg(jsonForShut);
+                    }
                     Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                     Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                     Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
@@ -457,7 +465,7 @@ public class RunAtNowTask implements Runnable{
             //tCruiseTaskResultDao.update(tCruiseTaskResult);
             log.info("完成任务执行"+new Date());
         } catch (Exception e) {
-            log.error("定时任务异常" + e);
+            log.error("立即任务异常" + e);
         }
     }
 }
