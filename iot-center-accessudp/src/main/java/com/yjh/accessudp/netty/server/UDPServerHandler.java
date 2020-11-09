@@ -1,5 +1,6 @@
 package com.yjh.accessudp.netty.server;
 
+import com.yjh.accessudp.common.Constant;
 import com.yjh.accessudp.common.utils.ByteUtil;
 import com.yjh.accessudp.common.utils.MeteValueUtils;
 import com.yjh.accessudp.commons.logs.SpringBeanUtils;
@@ -159,22 +160,22 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             log.info("valueLength:  "+valueLength);
             //获取属性
             String value = arrayToString(udp,11,valueLength,true);
-            System.out.println("属性:  " + value);
+            log.info("属性:  " + value);
             //获取描述长度
             int weizhi = 10+valueLength+1;
             Integer commitLength = Integer.valueOf(new BigInteger(udp[weizhi],16).toString());
             log.info("commitLength:  "+commitLength);
             //获取描述
             String commit = arrayToString(udp,weizhi+1,commitLength,true);
-            System.out.println("描述:  " + commit);
+            log.info("描述:  " + commit);
             String commitValue = MeteValueUtils.meteValues(commit);
-            System.out.println("描述数字:"+commitValue);
+            log.info("描述数字:"+commitValue);
             //获取时间
             String shijianchuo = arrayToString(udp,weizhi+1+commitLength,7,false);
             long day= Long.valueOf(shijianchuo,16);
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//这个是你要转成后的时间的格式
             String time = sdf.format(new Date(day));
-            System.out.println("time:  "+time);
+            log.info("time:  "+time);
 
             TCfgDataCurrent tCfgDataCurrent = tCfgMeteService.selectByPrimaryIdTCfgDataCurrent(meteId.toString());
             if(tCfgDataCurrent == null){
@@ -201,11 +202,10 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 }
                 tCfgMeteService.updateTCfgDataCurrent(tCfgDataCurrent);
             }
-            Map<String, String> map = new HashMap<>();
-            map.put("meteId",meteId.toString());
-            union(map);
-            //String json = JSON.toJSONString(meteId);
-            //getUrl(UNINO_URL,meteId.toString());
+//            Map<String, String> map = new HashMap<>();
+//            map.put("meteId",meteId.toString());
+//            union(map);
+            getUrl(Constant.UNINO_URL,meteId.toString());
 
         }else if ("43".equals(udp[4])){
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
@@ -226,11 +226,9 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
         }
 //        String msgString = datagramPacket.content().toString(CharsetUtil.UTF_8);
-//        System.out.println(" 发来的消息：" + msgString);
+//        log.info(" 发来的消息：" + msgString);
 //        handleDate(msgString);
     }
-    //private static String UNINO_URL = "http://192.168.33.133:18711/tCfgDataCurrent/v1/unionTest";
-    private static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
 
     public String getUrl(String url, String json) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
@@ -251,7 +249,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(UNINO_URL, map, String.class);
+                serviceRestTemplate.postForObject(Constant.UNINO_URL, map, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -270,7 +268,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         return str;
     }
 
-
+    //16进制字符串串转为汉字
     public static String hexStr2Str(String hexStr) throws UnsupportedEncodingException {
         String str = "0123456789abcdef"; //16进制能用到的所有字符 0-15
         char[] hexs = hexStr.toCharArray();//toCharArray() 方法将字符串转换为字符数组。
@@ -287,7 +285,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         }
         return new String(bytes,"UTF-8");
     }
-    //16进制字符串串转为汉字
+
 
 
     private void handleDate(String msgData) {

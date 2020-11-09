@@ -51,4 +51,7 @@ public class Constant {
     public static final String TYPE_OC = "OC";
 
     public static final String TYPE_104 = "104";
+
+    public final static String UNINO_URL = "http://192.168.33.133:18711/tCfgDataCurrent/v1/unionTest";
+    //static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
 }
