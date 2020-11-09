@@ -497,8 +497,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         sendString(ctx, registerMsg);
     }
 
-    public void sendDataReguest(JSONObject analysisObject) {
+    public void sendDataReguest(JSONObject analysisObject) throws InterruptedException {
         String msg = analysisObject.toString();
+        Thread.sleep(3000);//延迟发送数据
         sendString(ctx, msg);
     }
 

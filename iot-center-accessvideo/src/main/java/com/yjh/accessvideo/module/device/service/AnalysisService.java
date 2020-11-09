@@ -66,7 +66,7 @@ public class AnalysisService {
 
     @Logs(title = "缺陷调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public String feignDefect(List<Analysis> analysisList, int aiPort) {
+    public String feignDefect(List<Analysis> analysisList, int aiPort) throws InterruptedException {
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
         defectMsgId = defectMsgId+1;
