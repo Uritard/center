@@ -146,7 +146,7 @@ public class ReportManageService {
                                 reportForms.setReportName(rName);
                                 String time2 = DateTimeUtil.changeTime1(rDate);
                                 reportForms.setStartTime(time2);
-                                reportForms.setReportType(reportTypeTransform(rType));
+                                reportForms.setReportType(rType);
                                 fileNameList.add(reportForms);
                             }else {
                                 //时间过滤
@@ -157,7 +157,7 @@ public class ReportManageService {
                                     reportForms.setReportName(rName);
                                     String time2 = DateTimeUtil.changeTime1(rDate);
                                     reportForms.setStartTime(time2);
-                                    reportForms.setReportType(reportTypeTransform(rType));
+                                    reportForms.setReportType(rType);
                                     fileNameList.add(reportForms);
                                 }
                             }
@@ -172,41 +172,22 @@ public class ReportManageService {
         log.info("fileNameList是："+fileNameList);
         return fileNameList;
     }
-    public String reportTypeTransform(String reportTypeTemp){
-        String reportType = null;
-        if (reportTypeTemp.equals("dReport")){
-            reportType = "日报表";
-        }else if (reportTypeTemp.equals("wReport")){
-            reportType = "周报表";
-        }else if (reportTypeTemp.equals("mReport")){
-            reportType = "月报表";
-        }else if (reportTypeTemp.equals("sReport")){
-            reportType = "自定义报表";
-        }
-        return reportType;
-    }
     @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
     public boolean reportDelete(String reportName,String reportType, String startTime,String reportPath) {
         String timeTemp =  DateTimeUtil.changeTime2(startTime);
         String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
-
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String filePath = reportPath+"/"+fileName;
         log.info("filePath:"+filePath);
-        return delete(filePath);
-    }
-    public static boolean delete(String filePath)
-    {
-        boolean result = false;
+        String url = "rm -f "+filePath;
         try {
-            File myDelFile = new File(filePath);
-            result = myDelFile.delete();
+            Process processForId = Runtime.getRuntime().exec(url);
+            processForId.waitFor();
         } catch (Exception e) {
-            System.out.println("删除文件操作出错");
-            e.printStackTrace();
+            e.getMessage();
         }
-        return result;
+        return true;
     }
     @Logs(title = "批量删除报表", code = "reportManage",content = "通过web传递的参数批量删除报表记录")
     @Transactional(rollbackFor = Exception.class)
@@ -219,8 +200,12 @@ public class ReportManageService {
             String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
             String filePathAndName = reportPath+"/"+fileName;
 //           String filePathAndName = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-            if (!delete(filePathAndName)){
-                return  false;
+           String url = "rm -f "+filePathAndName;
+            try {
+                Process processForId = Runtime.getRuntime().exec(url);
+                processForId.waitFor();
+            } catch (Exception e) {
+                e.getMessage();
             }
         }
         return  true;

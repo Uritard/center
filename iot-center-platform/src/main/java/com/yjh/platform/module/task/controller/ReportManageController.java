@@ -21,6 +21,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -97,9 +99,15 @@ public class ReportManageController {
         Result result = new Result();
         Map<String,Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            String url = "ls "+reportAbsolutePath+" | wc -w";
+            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
+            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+            String lineForId = null;
+            while ((lineForId = readerForId.readLine()) != null) {
+                long count = Long.parseLong(lineForId);
+                resultMap.put("count", count);
+            }
             List<ReportForms> list = reportManageService.reportSelect(reportName,startTime,endTime,reportAbsolutePath);
-            resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (BusinessException b) {

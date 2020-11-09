@@ -188,36 +188,37 @@ public class ExcelPoiUtil {
     }
 
     public static void main(String[] args)throws IOException {
-        String fileNameS="测试文档";
-        String sheetName="测试";
-        List<String> titleList=new ArrayList<String>();
-        titleList.add("列1");
-        titleList.add("列2");
-        titleList.add("列3");
-        List<String> titleCodeList=new ArrayList<String>();
-        titleCodeList.add("code1");
-        titleCodeList.add("code2");
-        titleCodeList.add("code3");
-        List<List<String>> parpamtsList=new ArrayList<List<String>>();
-        List<String> list = new ArrayList<String>();
-        list.add("a");
-        list.add("b");
-        list.add("c");
-        parpamtsList.add(list);
-        List<String> list2 = new ArrayList<String>();
-        list2.add("aa");
-        list2.add("bb");
-        list2.add("cc");
-        parpamtsList.add(list2);
-        List<String> list3 = new ArrayList<String>();
-        list3.add("aaa");
-        list3.add("bbb");
-        list3.add("ccc");
-        parpamtsList.add(list3);
-        HSSFWorkbook work=createExcel(fileNameS,sheetName,titleList,titleCodeList,parpamtsList);
-        FileOutputStream out = new FileOutputStream("D:\\测试.xls");//要输出的文件名字
-        work.write(out);
-        out.close();
+
+//        String fileNameS="测试文档";
+//        String sheetName="测试";
+//        List<String> titleList=new ArrayList<String>();
+//        titleList.add("列1");
+//        titleList.add("列2");
+//        titleList.add("列3");
+//        List<String> titleCodeList=new ArrayList<String>();
+//        titleCodeList.add("code1");
+//        titleCodeList.add("code2");
+//        titleCodeList.add("code3");
+//        List<List<String>> parpamtsList=new ArrayList<List<String>>();
+//        List<String> list = new ArrayList<String>();
+//        list.add("a");
+//        list.add("b");
+//        list.add("c");
+//        parpamtsList.add(list);
+//        List<String> list2 = new ArrayList<String>();
+//        list2.add("aa");
+//        list2.add("bb");
+//        list2.add("cc");
+//        parpamtsList.add(list2);
+//        List<String> list3 = new ArrayList<String>();
+//        list3.add("aaa");
+//        list3.add("bbb");
+//        list3.add("ccc");
+//        parpamtsList.add(list3);
+//        HSSFWorkbook work=createExcel(fileNameS,sheetName,titleList,titleCodeList,parpamtsList);
+//        FileOutputStream out = new FileOutputStream("D:\\测试.xls");//要输出的文件名字
+//        work.write(out);
+//        out.close();
     }
 
     /**
