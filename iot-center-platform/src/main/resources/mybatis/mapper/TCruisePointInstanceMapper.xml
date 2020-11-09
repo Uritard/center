@@ -488,7 +488,6 @@
         select a.cruise_id
         from t_cruise_point_instance a
         where 1=1
-        <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
     </select>
 
@@ -549,5 +548,12 @@
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
         WHERE
             a.instance_id = #{instanceId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectForPresetId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select b.camera_type
+        from  t_camera_preset a
+        left join t_camera_info b on a.camera_id = b.camera_id
+        where a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
 </mapper>
