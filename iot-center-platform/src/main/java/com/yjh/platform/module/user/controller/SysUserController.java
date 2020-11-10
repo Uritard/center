@@ -255,17 +255,17 @@ public class SysUserController {
                 String userName = userMap.get("userName");
                 String password = userMap.get("password");
                 SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
-                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "iot-center-platform:module");
-                params.set("ip", request.getRequestURI());
-                params.set("title", "登录");
-                params.set("state", 1);
-                params.set("userId", sysUserLogin.getUserId());
-                params.set("userName", userName);
-                params.set("content", "用户登录");
-                LogsAspect logsAspect = new LogsAspect();
-                logsAspect.post(params);
                 if (!Objects.equals(null, sysUserLogin)) {
+                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                    params.set("logType", "iot-center-platform:module");
+                    params.set("ip", request.getRequestURI());
+                    params.set("title", "登录");
+                    params.set("state", 1);
+                    params.set("userId", sysUserLogin.getUserId());
+                    params.set("userName", userName);
+                    params.set("content", "用户登录");
+                    LogsAspect logsAspect = new LogsAspect();
+                    logsAspect.post(params);
                     if (sysUserLogin.getState()==2) {
                         Map<String, Object> mapResult = new HashMap<>();
                         mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
@@ -293,6 +293,16 @@ public class SysUserController {
                     }
                 } else {
                     List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
+                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                    params.set("logType", "iot-center-platform:module");
+                    params.set("ip", request.getRequestURI());
+                    params.set("title", "登录");
+                    params.set("state", 1);
+                    params.set("userId", sysUserList.get(0).getUserId());
+                    params.set("userName", userName);
+                    params.set("content", "用户名或密码错误登录失败");
+                    LogsAspect logsAspect = new LogsAspect();
+                    logsAspect.post(params);
                     if (sysUserList.size()==0) {
                         Map<String, Object> mapResult = new HashMap<>();
                         mapResult.put("info", ResultCodeEnum.CODE10101.getName());
@@ -324,6 +334,7 @@ public class SysUserController {
                     return result;
                 }
             } else {
+                log.info("4 ");
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10103.getName());
@@ -332,6 +343,7 @@ public class SysUserController {
             }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            log.info("5 ");
             log.error("登录失败:", e);
         }
         return result;

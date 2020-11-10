@@ -35,6 +35,9 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Value("${netty.server.port}")
     private int port;
 
+    @Value("${netty.server.code}")
+    private String serverName;
+
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
@@ -52,8 +55,8 @@ public class AccessRobotApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
         InetSocketAddress address = new InetSocketAddress(url, port);
-        log.info("accessudp is running, url is : " + url);
-        nettyServer.start(address, redisTemplate,sysLogsService);
+        log.info("accessrobot is running, url is : " + url);
+        nettyServer.start(address, serverName, redisTemplate, sysLogsService);
     }
 
     private static String getLocalIp() throws SocketException {

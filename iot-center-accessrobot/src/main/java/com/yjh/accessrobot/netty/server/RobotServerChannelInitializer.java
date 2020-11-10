@@ -20,8 +20,10 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
 
     private RedisTemplate redisTemplate;
     private SysLogsService sysLogsService;
+    private String serverName;
 
-    public RobotServerChannelInitializer(RedisTemplate redisTemplate, SysLogsService sysLogsService) {
+    public RobotServerChannelInitializer(String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService) {
+        this.serverName = serverName;
         this.redisTemplate = redisTemplate;
         this.sysLogsService = sysLogsService;
     }
@@ -49,6 +51,7 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         //ip过滤
 
         RobotServerHandler robotServerHandler = new RobotServerHandler();
+        robotServerHandler.setServerName(serverName);
         robotServerHandler.setRedisTemplate(redisTemplate);
         robotServerHandler.setSysLogsService(sysLogsService);
         channel.pipeline().addLast(robotServerHandler);
