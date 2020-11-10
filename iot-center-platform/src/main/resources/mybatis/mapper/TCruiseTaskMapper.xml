@@ -262,4 +262,89 @@
         WHERE a.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 
+
+    <select id="taskCountByCondition" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TCruiseTaskCount">
+        select
+            a.task_id,
+            a.task_name,
+            a.plan_id,
+            a.area_id,
+            d.remark AS task_status,
+            e.dict_note AS task_state,
+            b.dict_note AS plan_type_name,
+            a.if_run,
+            c.dict_note AS type_name,
+            (SELECT COUNT(*) FROM t_cruise_task_attr c WHERE a.task_id = c.task_id) AS total,
+            a.robot_id,
+            a.date_type,
+            a.task_type,
+            DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+            DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        from t_cruise_task a
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+        LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
+        LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
+        LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
+        where a.if_run = 173
+        <if test="startTime != null and endTime != null"> and a.start_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="startTime != null and endTime == null"> and a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} </if>
+        <if test="startTime == null and endTime != null"> and a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP} </if>
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="taskState != null and taskState != ''"> and d.c_state = #{taskState, jdbcType=VARCHAR}</if>
+        UNION ALL (
+          select
+                a.task_id,
+                a.task_name,
+                a.plan_id,
+                a.area_id,
+                d.remark AS task_status,
+                e.dict_note AS task_state,
+                b.dict_note AS plan_type_name,
+                a.if_run,
+                c.dict_note AS type_name,
+                (SELECT COUNT(*) FROM t_cruise_task_attr c WHERE a.task_id = c.task_id) AS total,
+                a.robot_id,
+                a.date_type,
+                a.task_type,
+                DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+            from t_cruise_task a
+            LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+            LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
+            LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
+            LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
+            where a.if_run = 174
+        <if test="startTime != null and endTime != null"> and a.start_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="startTime != null and endTime == null"> and a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} </if>
+        <if test="startTime == null and endTime != null"> and a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP} </if>
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="taskState != null and taskState != ''"> and d.c_state = #{taskState, jdbcType=VARCHAR}</if>
+        )
+        UNION ALL (
+            select
+                a.task_id,
+                a.task_name,
+                a.plan_id,
+                a.area_id,
+                d.remark AS task_status,
+                e.dict_note AS task_state,
+                b.dict_note AS plan_type_name,
+                a.if_run,
+                c.dict_note AS type_name,
+                (SELECT COUNT(*) FROM t_cruise_task_attr c WHERE a.task_id = c.task_id) AS total,
+                a.robot_id,
+                a.date_type,
+                a.task_type,
+                DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+            from t_cruise_task a
+            LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+            LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
+            LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
+            LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
+            where a.if_run = 172
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="taskState != null and taskState != ''"> and d.c_state = #{taskState, jdbcType=VARCHAR}</if>
+        );
+    </select>
 </mapper>

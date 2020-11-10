@@ -5,6 +5,7 @@ import com.yjh.accessudp.common.utils.ByteUtil;
 import com.yjh.accessudp.common.utils.MeteValueUtils;
 import com.yjh.accessudp.commons.logs.SpringBeanUtils;
 import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import io.netty.buffer.ByteBuf;
@@ -223,6 +224,18 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 valueArray= Arrays.copyOfRange(valueArray,1,valueArray.length);
             }
             log.info("文件内容(转字符数组):  " + Arrays.toString(valueArray));
+
+            SYAllInfo syAllInfo = new SYAllInfo();
+            syAllInfo.setStationId(valueArray[1]);
+            String[] mete = valueArray[3].split("/");
+            String meteName = mete[mete.length-1]+"-"+valueArray[4];
+            syAllInfo.setMeteId(valueArray[2]);
+            syAllInfo.setMeteName(meteName);
+            syAllInfo.setDeviceId(valueArray[2]);
+            syAllInfo.setDeviceName(valueArray[3]);
+            Integer meteKind = valueArray[4].contains("遥信")?1:(valueArray[4].contains("遥测")?2:(valueArray[4].contains("遥控")?3:4));
+            syAllInfo.setMeteKind(meteKind);
+            tCfgMeteService.updateForAll(syAllInfo);
 
         }
 //        String msgString = datagramPacket.content().toString(CharsetUtil.UTF_8);

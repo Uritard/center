@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,4 +40,5 @@ public interface TCruiseTaskDao {
                                      @Param(value = "endTime") Date endTime);
 
     List<TCruiseTaskList> selectPointStatus(String taskId);
+    List<TCruiseTaskCount> taskCountByCondition(HashMap<String,Object> map);
 }

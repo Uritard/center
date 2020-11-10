@@ -229,5 +229,13 @@
     </foreach>
     </delete>
 
+    <select id="selectByPlanId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select
+        a.instance_id
+        from t_cruise_plan_attr a
+        where 1 = 1
+        and a.plan_id = #{planId, jdbcType=BIGINT}
+    </select>
+
 
 </mapper>

@@ -25,6 +25,7 @@ import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import lombok.Data;
 import lombok.NonNull;
 import org.quartz.CronExpression;
 import org.quartz.JobExecutionContext;
@@ -127,7 +128,7 @@ public class TCruiseTaskService {
                 //立即执行
                 try {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
-                            tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao,
+                            tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                             tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
@@ -416,7 +417,7 @@ public class TCruiseTaskService {
         tCruiseResult.setCState(239);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
-                tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruiseTaskAttrDao,
+                tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                 tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
@@ -431,6 +432,225 @@ public class TCruiseTaskService {
         tCruiseResult.setCState(242);
         return tCruiseResultDao.update(tCruiseResult);
     }
+
+    @Logs(title = "查找任务", code = "TCruiseTask",content = "根据参数过滤查找任务")
+    @Transactional(rollbackFor = Exception.class)
+    public  List<Map<String, Object>>  taskCountByCondition(Date startTime,Date endTime,String taskState,String taskName){
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("startTime",startTime);
+        map.put("endTime",endTime);
+        map.put("taskState",taskState);
+        map.put("taskName",taskName);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        List<Map<String, Object>> resultListAfter = null;
+        List<TCruiseTaskCount> list = new ArrayList<>();
+        Date now = new Date();
+        if((startTime != null && startTime.compareTo(now) < 0) && (endTime != null && endTime.compareTo(now) < 0)){
+            map.put("startTime",startTime);
+            map.put("endTime",endTime);
+        }
+        if((startTime != null && startTime.compareTo(now) < 0) && (endTime != null && endTime.compareTo(now) > 0)){
+            map.put("startTime",startTime);
+            map.put("endTime",now);
+            resultListAfter = this.afterTaskCount(endTime,taskState,taskName);
+        }
+        if((startTime != null && startTime.compareTo(now) > 0) && (endTime != null && endTime.compareTo(now) > 0)){
+            map.put("startTime",null);
+            map.put("endTime",null);
+            resultListAfter = this.afterTaskCount(endTime,taskState,taskName);
+        }
+
+        list = this.tCruiseTaskDao.taskCountByCondition(map);
+        for (TCruiseTaskCount tCruiseTaskCount:list) {
+            Map<String, Object> taskCountMap = new HashMap<>();
+            taskCountMap.put("total",tCruiseTaskCount.getTotal());
+            taskCountMap.put("taskState",tCruiseTaskCount.getTaskState());
+            taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+            taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+            taskCountMap.put("startTime",tCruiseTaskCount.getStartTime());
+            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+            taskCountMap.put("taskStatus",tCruiseTaskCount.getTaskStatus());
+            resultList.add(taskCountMap);
+        }
+        if(resultListAfter == null || resultList.size() == 0){
+            return resultList;
+        }else {
+            for (Map<String, Object> item:resultListAfter){
+                if (now.compareTo((Date)map.get("startTime")) <= 0  && endTime.compareTo((Date)map.get("startTime")) >= 0){
+                    resultListAfter.add(item);
+                }
+            }
+        }
+        resultList.addAll(resultListAfter);
+        return resultList;
+    }
+
+    public List<Map<String, Object>> afterTaskCount(Date taskStartDate,String taskState,String taskName){
+
+        SimpleDateFormat sdfF = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdfF2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date dayBefore = new Date();
+        Date dayAfter = new Date();
+        Date originTime = new Date();
+        String firstDay = "", lastDay = "";
+        if (Objects.equals(null, taskStartDate)) {
+//            Date date = new Date();
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(Calendar.MONTH, date.getMonth());
+//            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+//            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, date.getMonth()-1);
+            if((date.getMonth())==1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            log.info("firstDay: "+firstDay);
+
+            int lDay=0;
+            calendar.set(Calendar.MONTH, date.getMonth());
+            //2月的平年瑞年天数
+            if(date.getMonth()==1) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            }else { lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH); }
+            calendar.set(Calendar.MONTH, date.getMonth());
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            log.info("lastDay: "+lastDay);
+        } else {
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+//            calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
+//            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+//            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth()-1);
+            if((taskStartDate.getMonth())==1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = sdfF.format(calendar.getTime())+" 23:59:59";
+            log.info("firstDay: "+firstDay);
+
+            int lDay=0;
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            //2月的平年瑞年天数
+            if(taskStartDate.getMonth()==1) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            }else { lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH); }
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = sdfF.format(calendar.getTime())+" 00:00:00";
+            log.info("lastDay: "+lastDay);
+        }
+
+        try {
+            originTime = format.parse("2000-01-01 00:00:00");
+            dayBefore = format.parse(firstDay);
+            dayAfter = format.parse(lastDay);
+        } catch (Exception e) { e.getMessage(); }
+        List<TCruiseTaskCount> list = new ArrayList<>();
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("startTime",dayBefore);
+        map.put("endTime",dayAfter);
+        map.put("taskState",taskState);
+        map.put("taskName",taskName);
+        list = this.tCruiseTaskDao.taskCountByCondition(map);
+        log.info("list: "+list);
+        List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
+        List<Map<String, Object>> listTask = new ArrayList<>();
+        for (TCruiseTaskCount tCruiseTaskCount:list) {
+            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+                for (Date aTimeList:timeList) {
+                    Map<String, Object> taskCountMap = new HashMap<>();
+                    Map<String, Object> taskCountMapDel = new HashMap<>();
+                    long taskTime = aTimeList.getTime();
+                    if (listDel.size()>0) {
+                        for (TCruiseTaskDel tCruiseTaskDel:listDel) {
+                            long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
+                            if (Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && taskDelTime==taskTime) {
+                                log.info("已删除的任务信息： "+tCruiseTaskCount.getTaskId()+" "+taskDelTime);
+                                taskCountMapDel.put("taskId", tCruiseTaskCount.getTaskId());
+                                taskCountMapDel.put("taskDelTime", taskDelTime);
+                            }
+                        }
+                        if (taskCountMapDel.size()==0) {
+                            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                            taskCountMap.put("total",tCruiseTaskCount.getTotal());
+                            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                            taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                            taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                            //TODO 增加redis获取任务状态，1是真
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                                taskCountMap.put("taskState", "任务未开始");
+                            } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                                taskCountMap.put("taskStatus", "-1");
+                            } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
+                            taskCountMap.put("startTime", sdfF2.format(aTimeList));
+                            listTask.add(taskCountMap);
+                        }
+                    } else {
+                        taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                        taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                        taskCountMap.put("total",tCruiseTaskCount.getTotal());
+                        taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                        taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                        taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                        //TODO 增加redis获取任务状态，1是真
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                            taskCountMap.put("taskState", "任务未开始");
+                        } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                            taskCountMap.put("taskStatus", "-1");
+                        } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
+                        taskCountMap.put("startTime", sdfF2.format(aTimeList));
+                        listTask.add(taskCountMap);
+                    }
+                }
+            } else {
+                Map<String, Object> taskCountMap = new HashMap<>();
+                taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                taskCountMap.put("total",tCruiseTaskCount.getTotal());
+                taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                //TODO 增加redis获取任务状态，1是真
+                if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                    taskCountMap.put("taskState", "任务未开始");
+                } else { taskCountMap.put("taskState", tCruiseTaskCount.getTaskState()); }
+                if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                    taskCountMap.put("taskStatus", "-1");
+                } else { taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus()); }
+
+                taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getStartTime()));
+                listTask.add(taskCountMap);
+            }
+        }
+        log.info("listTask: "+listTask);
+        return listTask;
+    }
+
 
 
 }

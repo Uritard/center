@@ -298,4 +298,22 @@ public class TCruiseTaskController {
         }
         return result;
     }
+
+    //任务统计
+    @ApiOperation(value = "任务查询")
+    @RequestMapping(value = "/taskCountByCondition", method = RequestMethod.GET)
+    public Result taskCountByCondition(@RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startTime,
+                                       @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
+                                       @RequestParam(value = "taskState", required = false)  String taskState,
+                                       @RequestParam(value = "taskName", required = false)  String taskName){
+        Result result = new Result();
+        try {
+            List<Map<String, Object>> list = this.tCruiseTaskService.taskCountByCondition(startTime,endTime,taskState,taskName);
+            result.setData(list);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

@@ -1,5 +1,6 @@
 package com.yjh.accessudp;
 
+import com.yjh.accessudp.common.Constant;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import com.yjh.accessudp.netty.server.NettyServer;
@@ -60,7 +61,7 @@ public class AccessUdpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        //loadDeviceInfo();
+        loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
         nettyServer.start(address, redisTemplate,tCfgMeteService);
@@ -84,6 +85,14 @@ public class AccessUdpApplication implements CommandLineRunner {
                     if (matcher.find()){
                         log.info("时间读取成功");
                         String time = matcher.group(1).trim();
+//                        if(Constant.TIME.equals(time)){
+//                            //todo 时间是写死的
+//                            log.info("设备数据时间与上一次时间一致");
+//                            br.close();
+//                            reader.close();
+//                            return;
+//                        }
+//                        log.info("设备数据时间与上一次时间不一致，设备数据更新");
                     }else {
                         log.info("时间读取失败");
                     }
@@ -110,7 +119,8 @@ public class AccessUdpApplication implements CommandLineRunner {
             }
             br.close();
             reader.close();
-            //tCfgMeteService.insertForAll(list);
+            tCfgMeteService.deleteAll();
+            tCfgMeteService.insertForAll(list);
         } catch (IOException e) {
             log.info("读取联动设备错误: "+e);
         } finally {

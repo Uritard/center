@@ -41,8 +41,7 @@ public class TCfgMeteService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int updateForAll(List<SYAllInfo> syAllInfoList) {
-        for (SYAllInfo syAllInfo:syAllInfoList) {
+    public int updateForAll(SYAllInfo syAllInfo) {
             this.tCfgMeteDao.updateForMete(syAllInfo);//mete
             this.tCfgMeteDao.updateForDevice(syAllInfo);//device
             if(syAllInfo.getMeteKind() == 1){//遥信
@@ -55,7 +54,6 @@ public class TCfgMeteService {
                 tCfgMeteDao.updateForTelecontrol(syAllInfo);
             }
             tCfgMeteDao.updateForTeleadjust(syAllInfo);//遥调
-        }
         return 1;
     }
 
@@ -76,6 +74,18 @@ public class TCfgMeteService {
     public int updateTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent){
         return tCfgMeteDao.updateTCfgDataCurrent(tCfgDataCurrent);
     }
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteAll(){
+        int i = 0;
+        i = i+tCfgMeteDao.deleteForDeviceAll();
+        i = i+tCfgMeteDao.deleteForMeteAll();
+        i = i+tCfgMeteDao.deleteForTeleadjustAll();
+        i = i+tCfgMeteDao.deleteForTelecontrolAll();
+        i = i+tCfgMeteDao.deleteForTelemeterAll();
+        i = i+tCfgMeteDao.deleteForTelesignalAll();
+        return i;
+    }
+
 
 }
 

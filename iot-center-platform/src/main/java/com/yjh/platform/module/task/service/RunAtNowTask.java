@@ -46,7 +46,7 @@ public class RunAtNowTask implements Runnable{
     private TAlgorithmConfDao tAlgorithmConfDao;
     private TAlgorithmInfoDao tAlgorithmInfoDao;
 
-    private TCruiseTaskAttrDao tCruiseTaskAttrDao;
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
     private TCruiseDataResultDao tCruiseDataResultDao;
     private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
     private TCruiseTaskResultDao tCruiseTaskResultDao;
@@ -70,7 +70,7 @@ public class RunAtNowTask implements Runnable{
     private TCruiseTask tCruiseTask;
     public RunAtNowTask(TCruiseTask tCruiseTask,Long waitTime ,String picModelPath,RedisTemplate redisTemplate,TCruisePointInstanceDao tCruisePointInstanceDao,
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
-                        TAlgorithmInfoDao tAlgorithmInfoDao,TCruiseTaskAttrDao tCruiseTaskAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
+                        TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
                         TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
@@ -81,7 +81,7 @@ public class RunAtNowTask implements Runnable{
         this.tCruiseResultDao = tCruiseResultDao;
         this.tAlgorithmConfDao =tAlgorithmConfDao;
         this.tAlgorithmInfoDao =tAlgorithmInfoDao;
-        this.tCruiseTaskAttrDao = tCruiseTaskAttrDao;
+        this.tCruisePlanAttrDao = tCruisePlanAttrDao;
         this.tCruiseDataResultDao = tCruiseDataResultDao;
         this.tCruiseTaskResultDetailDao = tCruiseTaskResultDetailDao;
         this.tCruiseTaskResultDao = tCruiseTaskResultDao;
@@ -160,7 +160,7 @@ public class RunAtNowTask implements Runnable{
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
-            List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(taskId);//获取此任务下的巡检点数量
+            List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTask.getPlanId());//获取此任务下的巡检点数量
             if(isGoOn){
                 //任务重启
                 List<Long> isFinishedInstanceList = tCruiseTaskResultDetailDao.selectInstanceForTaskGoOn(taskId);
@@ -222,9 +222,9 @@ public class RunAtNowTask implements Runnable{
                 //一次循环 一个巡检点
                 if (228 == item.getCruiseType()) {//todo 机器人
                 }
-                if (229 == item.getCruiseType()) {
+                if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
                     log.info("巡检点开始巡检"+new Date());
-                    tCruiseDataResult.setCruiseType(229);
+                    tCruiseDataResult.setCruiseType(item.getCruiseType());
                     //视频
                     TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
                     //1.转到预置位
@@ -371,8 +371,6 @@ public class RunAtNowTask implements Runnable{
 
 
                     }
-                }
-                if (230 == item.getCruiseType()) {//todo 红外
                 }
                 if (231 == item.getCruiseType()) {//todo 在线监控
                 }

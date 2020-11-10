@@ -38,4 +38,10 @@ public interface TCfgMeteDao {
     TCfgDataCurrent selectByPrimaryIdTCfgDataCurrent(Long meteId);
     int insertTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent);
     int updateTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent);
+    int deleteForDeviceAll();
+    int deleteForMeteAll();
+    int deleteForTeleadjustAll();
+    int deleteForTelecontrolAll();
+    int deleteForTelemeterAll();
+    int deleteForTelesignalAll();
 }

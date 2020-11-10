@@ -54,4 +54,5 @@ public class Constant {
 
     public final static String UNINO_URL = "http://192.168.9.40:18711/tCfgDataCurrent/v1/unionTest";
     //static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
+    public static String TIME= "2020-05-05\t08:18:55";
 }

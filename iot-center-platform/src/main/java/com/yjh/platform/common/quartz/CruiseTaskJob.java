@@ -57,6 +57,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
+    @Autowired
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
 
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CruiseTaskJob.class);
@@ -123,7 +125,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
 
-            List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(tCruiseTask.getTaskId());//获取此任务下的巡检点数量
+            List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTask.getPlanId());//获取此任务下的巡检点数量
             Integer taskCount = instanceIdList.size();
             List<TCruisePointInstance> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
             //开始任务
@@ -174,9 +176,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                 //一次循环 一个巡检点
                 if (228 == item.getCruiseType()) {//todo 机器人
                 }
-                if (229 == item.getCruiseType()) {
+                if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
                     log.info("巡检点开始巡检"+new Date());
-                    tCruiseDataResult.setCruiseType(229);
+                    tCruiseDataResult.setCruiseType(item.getCruiseType());
                     //视频
                     TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
                     //1.转到预置位
@@ -320,8 +322,6 @@ public class CruiseTaskJob extends QuartzJobBean {
 
 
                     }
-                }
-                if (230 == item.getCruiseType()) {//todo 红外
                 }
                 if (231 == item.getCruiseType()) {//todo 在线监控
                 }
