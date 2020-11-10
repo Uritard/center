@@ -41,4 +41,5 @@ public interface TCruiseTaskDao {
 
     List<TCruiseTaskList> selectPointStatus(String taskId);
     List<TCruiseTaskCount> taskCountByCondition(HashMap<String,Object> map);
+    List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
 }

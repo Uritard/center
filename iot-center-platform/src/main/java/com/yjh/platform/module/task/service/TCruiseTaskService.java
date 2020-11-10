@@ -455,11 +455,6 @@ public class TCruiseTaskService {
             map.put("endTime",now);
             resultListAfter = this.afterTaskCount(endTime,taskState,taskName);
         }
-        if((startTime != null && startTime.compareTo(now) > 0) && (endTime != null && endTime.compareTo(now) > 0)){
-            map.put("startTime",null);
-            map.put("endTime",null);
-            resultListAfter = this.afterTaskCount(endTime,taskState,taskName);
-        }
 
         list = this.tCruiseTaskDao.taskCountByCondition(map);
         for (TCruiseTaskCount tCruiseTaskCount:list) {
@@ -469,22 +464,29 @@ public class TCruiseTaskService {
             taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
             taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
             taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
-            taskCountMap.put("startTime",tCruiseTaskCount.getStartTime());
+            taskCountMap.put("startTime",format.format(tCruiseTaskCount.getStartTime()));
             taskCountMap.put("type", tCruiseTaskCount.getIfRun());
             taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
             taskCountMap.put("taskStatus",tCruiseTaskCount.getTaskStatus());
             resultList.add(taskCountMap);
         }
-        if(resultListAfter == null || resultList.size() == 0){
+        if((startTime != null && startTime.compareTo(now) > 0) && (endTime != null && endTime.compareTo(now) > 0)){
+            resultList = new ArrayList<>();
+            resultListAfter = this.afterTaskCount(endTime,taskState,taskName);
+        }
+        List<Map<String, Object>> resultListForAdd = new ArrayList<>();
+        if(resultListAfter == null || resultListAfter.size() == 0){
             return resultList;
         }else {
             for (Map<String, Object> item:resultListAfter){
-                if (now.compareTo((Date)map.get("startTime")) <= 0  && endTime.compareTo((Date)map.get("startTime")) >= 0){
-                    resultListAfter.add(item);
+                try {
+                if (now.compareTo(format.parse(item.get("startTime").toString())) <= 0  && endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0){
+                    resultListForAdd.add(item);
                 }
+                } catch (Exception e) { e.getMessage(); }
             }
         }
-        resultList.addAll(resultListAfter);
+        resultList.addAll(resultListForAdd);
         return resultList;
     }
 
@@ -572,7 +574,7 @@ public class TCruiseTaskService {
         map.put("endTime",dayAfter);
         map.put("taskState",taskState);
         map.put("taskName",taskName);
-        list = this.tCruiseTaskDao.taskCountByCondition(map);
+        list = this.tCruiseTaskDao.afterTaskCount(map);
         log.info("list: "+list);
         List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
