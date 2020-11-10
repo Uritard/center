@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
     <version>1.0.0</version>
     <modules>
+        <module>iot-center-accessrobot</module>
         <module>iot-center-accessvideo</module>
         <module>iot-center-accessudp</module>
         <module>iot-center-device</module>
