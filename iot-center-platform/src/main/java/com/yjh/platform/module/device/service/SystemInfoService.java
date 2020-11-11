@@ -2,6 +2,9 @@ package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
 import org.slf4j.Logger;
@@ -9,10 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -24,7 +25,7 @@ public class SystemInfoService {
 
     SystemInfoUtil systemInfoUtil = new SystemInfoUtil();
 
-    private static final String SERVICE_URL = "http://192.168.9.40:18710/managerService/v1/select";
+    private static final String SERVICE_URL = "http://iot-center-manager/managerService/v1/select";
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
@@ -77,13 +78,50 @@ public class SystemInfoService {
     @Logs(title = "获取关键服务", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> getServices() throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long currentTime =System.currentTimeMillis();
+        Date now = new Date();
         //Result re = service();
-        String services = HttpClientUtils.getInstance().getUrl(SERVICE_URL, null);
-        JSONObject jsonObject =JSONObject.parseObject(services);
-        List<Map<String,Object>> re= (List<Map<String,Object>>) jsonObject.get("data");
+//        String services = HttpClientUtils.getInstance().getUrl(SERVICE_URL, null);
+//        JSONObject jsonObject =JSONObject.parseObject(services);
+//        List<Map<String,Object>> re= (List<Map<String,Object>>) jsonObject.get("data");
+        List<Map<String,Object>> re = (List<Map<String,Object>>)serives().getData();
+        for(Map<String,Object> item :re){
+           // long createTime = simpleDateFormat.parse((Date)item.get("registerTime"));
+            log.info("registerTime:  "+item.get("registerTime").toString());
+            String used = item.get("registerTime").toString();
+            log.info("used:  "+used);
+            long diff = now.getTime()-simpleDateFormat.parse(used).getTime();
+            long days = diff / (1000 * 60 * 60 * 24);
+            long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
+            long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
+            String usedTime= "";
+            if(days != 0){
+                usedTime =usedTime+days+"天";
+            }
+            if(hours != 0){
+                usedTime =usedTime+hours+"小时";
+            }
+            if(minutes != 0){
+                usedTime =usedTime+minutes+"分";
+            }
+            item.put("usedTime",usedTime);
+        }
         log.info("resg     "+re);
         return re;
 
+    }
+    private  Result serives() {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(SERVICE_URL, Result.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return re;
     }
 
 }

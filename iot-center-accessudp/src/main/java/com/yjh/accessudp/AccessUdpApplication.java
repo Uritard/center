@@ -61,7 +61,7 @@ public class AccessUdpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        loadDeviceInfo();
+        //loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
         nettyServer.start(address, redisTemplate,tCfgMeteService);
@@ -124,8 +124,13 @@ public class AccessUdpApplication implements CommandLineRunner {
         } catch (IOException e) {
             log.info("读取联动设备错误: "+e);
         } finally {
-            br.close();
-            reader.close();
+            if(br != null ){
+                br.close();
+            }
+            if(reader != null ){
+                reader.close();
+            }
+
         }
     }
 
