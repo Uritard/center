@@ -128,19 +128,142 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        //注册指令
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         String body = new String(bytes, "UTF-8");
-        String bodyTem = body.substring(15);
-        log.info("接收机器人端数据:" + bodyTem);
-        Map<String, Object> xmlToMap = getMessage(bodyTem);
-        if (xmlToMap.get("Command").equals("1")) {
-            strRobotCode = String.valueOf(xmlToMap.get("SendCode"));
-            robotServerHandlerMap.putIfAbsent(strRobotCode, this);
-        }
-        handlerData();
+        String sendSessions = body.substring(0,1);
+        log.info("接收机器人端数据sendSessions:" + sendSessions+"end");
+        String receiveSessions = body.substring(1,9);
+        log.info("接收机器人端数据receiveSessions:" + receiveSessions+"end");
+        String receiveSessions1 = body.substring(17,18);
+        log.info("接收机器人端数据receiveSessions1:" + receiveSessions1+"end");
+        String receiveSessions12 = body.substring(18,22);
+        log.info("接收机器人端数据receiveSessions12:" + receiveSessions12+"end");
+        String bodyTem = body.substring(21);
+        log.info("接收机器人端数据bodyTem:" + bodyTem+"end");
+        String bodyTem2 = bodyTem.substring(0,bodyTem.length()-1);
+        log.info("接收机器人端数据bodyTem2:" + bodyTem2+"end");
+
+        Map<String, Object> xmlToMap = getXmlMessage(bodyTem2);
+
+//        byte[] responseByte = null;
+//        redisTemplate.opsForHash().putAll("RobotXML", xmlToMap);//将Map放缓存
+//
+//        Map<String, Object> RobotXMLMap = redisTemplate.opsForHash().entries("RobotXML");//读redis
+//
+//        if (RobotXMLMap.containsValue(RobotXMLMap.get("SendCode"))) {
+//            log.info("该机器人存在");
+//            String robotName = String.valueOf(xmlToMap.get("SendCode"));
+//            log.info("该机器人是："+robotName);
+//            //组装响应协议
+//            StringBuilder registerResponse = new StringBuilder();
+//                //创建响应XML
+//                Document document = DocumentHelper.createDocument();
+//                Element rss = document.addElement("Robot");//根节点
+//                Element childNode1 = rss.addElement("SendCode");//生成子节点
+//                childNode1.setText("巡视主机");//子节点内容
+//                Element childNode2 = rss.addElement("ReceiveCode");
+//                childNode2.setText(robotName);
+//                Element childNode3 = rss.addElement("Type");
+//                childNode3.setText("251");
+//                Element childNode4 = rss.addElement("Code");
+//                childNode4.setText("200");
+//                Element childNode5 = rss.addElement("Time");
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                childNode5.setText(sdf.format(new Date()));
+//                Element childNode6= rss.addElement("Items");
+//                Element childNode66 = childNode6.addElement("Item");
+//                childNode66.addAttribute("heart_beat_interval","6");
+//                childNode66.addAttribute("robot_run_interval","66");
+//                childNode66.addAttribute("weather_interval","666");
+//
+//            Element childNode7 = rss.addElement("Command");
+//                childNode7.setText("4");
+//
+//                String xmlString = document.asXML();
+//                log.info("生成的xml是："+xmlString);
+//                int len = xmlString.getBytes("UTF-8").length ;
+//                log.info("xml的字节长度是："+len);
+//                registerResponse.append("EB90").append("发送/接收会话序列号").append("0x01").append(len).append(xmlString).append("EB90");
+//                log.info("registerResponse是："+registerResponse);
+//                responseByte = registerResponse.toString().getBytes();
+//        }else {
+//            log.info("该机器人不存在");
+//        }
+//        DataDealThread dataDealThread = new DataDealThread(this, isThreadStart);
+//        Thread thread = new Thread(dataDealThread);
+//        thread.setDaemon(true);
+//        thread.start();
+//        send(ctx,responseByte);
+        //心跳指令
+//        ByteBuf byteBuf = (ByteBuf) msg;
+//        byte[] bytes = new byte[byteBuf.readableBytes()];
+//        byteBuf.readBytes(bytes);
+//        String body = new String(bytes, "UTF-8");
+//        String sendSessions = "";
+//        String receiveSessions = "";
+//        String bodyTem = body.substring(21);
+//        log.info("接收机器人端数据bodyTem:" + bodyTem);
+//        String bodyTem2 = bodyTem.substring(0,bodyTem.length()-1);
+//        log.info("接收机器人端数据bodyTem2:" + bodyTem2);
+//        Map<String, Object> xmlToMap = getXmlMessage(bodyTem2);
+//
+//        redisTemplate.opsForHash().putAll("RobotXML", xmlToMap);//将Map放缓存
+//
+//        Map<String, Object> RobotXMLMap = redisTemplate.opsForHash().entries("RobotXML");//读redis
+//        if (RobotXMLMap.containsValue(RobotXMLMap.get("SendCode"))) {
+//            log.info("该机器人存在");
+//            String robotName = String.valueOf(xmlToMap.get("SendCode"));
+//            log.info("该机器人是：" + robotName);
+//            //组装响应协议
+//            StringBuilder heartResponse = new StringBuilder();
+//            //创建响应XML
+//            Document document = DocumentHelper.createDocument();
+//            Element rss = document.addElement("Robot");//根节点
+//            Element childNode1 = rss.addElement("SendCode");//生成子节点
+//            childNode1.setText("巡视主机");//子节点内容
+//            Element childNode2 = rss.addElement("ReceiveCode");
+//            childNode2.setText(robotName);
+//            Element childNode3 = rss.addElement("Type");
+//            childNode3.setText("251");
+//            Element childNode4 = rss.addElement("Code");
+//            childNode4.setText("200");
+//            Element childNode5 = rss.addElement("Time");
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            childNode5.setText(sdf.format(new Date()));
+//            Element childNode6 = rss.addElement("Items");
+//
+//            Element childNode7 = rss.addElement("Command");
+//            childNode7.setText("3");
+//
+//            String xmlSend = document.asXML();
+//            log.info("生成的xml是：" + xmlSend);
+//            int len = xmlSend.getBytes("UTF-8").length;
+//            log.info("xml的字节长度是：" + len);
+//            heartResponse.append("EB90").append("发送/接收会话序列号").append("0x01").append(len).append(xmlSend).append("EB90");
+//            log.info("heartResponse是：" + heartResponse);
+//        }
         ReferenceCountUtil.release(byteBuf);
+    }
+    //解析XML
+    public static Map<String, Object> getXmlMessage(String messageXML) throws Exception {
+        Map<String, Object> message = new HashMap<String, Object>();
+        //将报文XML交给DocumentHelper解析为Document
+        Document document = DocumentHelper.parseText(messageXML);
+        //获取根节点Robot
+        Element root = document.getRootElement();
+        log.info("根节点是："+root.getName());
+        Iterator itt = root.elementIterator();
+        while (itt.hasNext()) {
+            Element rootChild = (Element) itt.next();
+            String name = rootChild.getName();
+            String value = rootChild.getStringValue();
+            message.put(name,value);
+        }
+        log.info("message是："+message);
+        return message;
     }
 
     private void handlerData() { }
