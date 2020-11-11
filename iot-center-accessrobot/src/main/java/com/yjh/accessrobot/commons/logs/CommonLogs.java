@@ -1,7 +1,7 @@
 package com.yjh.accessrobot.commons.logs;
 
-import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessudp.commons.utils.http.IPUtil;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.utils.http.IPUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;

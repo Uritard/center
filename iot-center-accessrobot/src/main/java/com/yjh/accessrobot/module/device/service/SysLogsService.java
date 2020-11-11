@@ -1,7 +1,7 @@
 package com.yjh.accessrobot.module.device.service;
 
-import com.yjh.accessudp.module.device.dao.SysLogsDao;
-import com.yjh.accessudp.module.device.entity.SysLogs;
+import com.yjh.accessrobot.module.device.dao.SysLogsDao;
+import com.yjh.accessrobot.module.device.entity.SysLogs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

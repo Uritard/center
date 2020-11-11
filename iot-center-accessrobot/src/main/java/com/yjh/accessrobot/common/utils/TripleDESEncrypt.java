@@ -1,6 +1,6 @@
 package com.yjh.accessrobot.common.utils;
 
-import com.yjh.accessudp.commons.utils.Base64;
+import com.yjh.accessrobot.commons.utils.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

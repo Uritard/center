@@ -1,9 +1,9 @@
 package com.yjh.accessrobot.module.device.controller;
 
-import com.yjh.accessudp.commons.result.Result;
-import com.yjh.accessudp.commons.result.ResultCodeEnum;
-import com.yjh.accessudp.module.device.entity.SysLogs;
-import com.yjh.accessudp.module.device.service.SysLogsService;
+import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.module.device.entity.SysLogs;
+import com.yjh.accessrobot.module.device.service.SysLogsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

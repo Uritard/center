@@ -1,7 +1,7 @@
 
 package com.yjh.accessrobot.common.handler;
 
-import com.yjh.accessudp.commons.result.Result;
+import com.yjh.accessrobot.commons.result.Result;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

@@ -1,9 +1,9 @@
 package com.yjh.accessrobot.commons.logs;
 
 
-import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessudp.commons.result.BusinessException;
-import com.yjh.accessudp.commons.utils.http.IPUtil;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.BusinessException;
+import com.yjh.accessrobot.commons.utils.http.IPUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

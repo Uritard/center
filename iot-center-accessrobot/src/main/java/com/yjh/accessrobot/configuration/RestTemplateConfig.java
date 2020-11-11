@@ -1,6 +1,6 @@
 package com.yjh.accessrobot.configuration;
 
-import com.yjh.accessudp.common.handler.ThrowErrorHandler;
+import com.yjh.accessrobot.common.handler.ThrowErrorHandler;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;

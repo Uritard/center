@@ -122,6 +122,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             ctx.close().sync();
             ctx.flush();
         }
+        ctx.close().sync();
+        ctx.flush();
     }
 
     @Override
@@ -130,8 +132,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         String body = new String(bytes, "UTF-8");
-        log.info("接收服务端数据:" + body);
-        Map<String, Object> xmlToMap = getMessage(body);
+        String bodyTem = body.substring(15);
+        log.info("接收机器人端数据:" + bodyTem);
+        Map<String, Object> xmlToMap = getMessage(bodyTem);
         if (xmlToMap.get("Command").equals("1")) {
             strRobotCode = String.valueOf(xmlToMap.get("SendCode"));
             robotServerHandlerMap.putIfAbsent(strRobotCode, this);
