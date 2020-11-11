@@ -92,8 +92,8 @@ public class SystemInfoController {
     }
 
     @ApiOperation(value = "获取硬盘利用率")
-    @RequestMapping(value = "/getDeskOnUse", method = RequestMethod.GET)
-    public Result getDeskOnUse() {
+    @RequestMapping(value = "/getDiskOnUse", method = RequestMethod.GET)
+    public Result getDiskOnUse() {
         Result result = new Result();
         try {
             result.setData(systemInfoService.getDeskOnUse());

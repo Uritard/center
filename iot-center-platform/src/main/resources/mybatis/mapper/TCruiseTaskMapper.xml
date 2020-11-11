@@ -186,7 +186,8 @@
             a.plan_id,
             a.area_id,
             d.remark AS task_status,
-            e.dict_note AS task_state,
+            d.c_state AS task_state,
+        e.dict_note AS taskStateName,
             b.dict_note AS plan_type_name,
             a.if_run,
             c.dict_note AS type_name,
@@ -209,7 +210,8 @@
                 a.plan_id,
                 a.area_id,
                 d.remark AS task_status,
-                e.dict_note AS task_state,
+                d.c_state AS task_state,
+        e.dict_note AS taskStateName,
                 b.dict_note AS plan_type_name,
                 a.if_run,
                 c.dict_note AS type_name,
@@ -233,7 +235,8 @@
                 a.plan_id,
                 a.area_id,
                 d.remark AS task_status,
-                e.dict_note AS task_state,
+                d.c_state AS task_state,
+        e.dict_note AS taskStateName,
                 b.dict_note AS plan_type_name,
                 a.if_run,
                 c.dict_note AS type_name,
@@ -270,7 +273,8 @@
             a.plan_id,
             a.area_id,
             d.remark AS task_status,
-            e.dict_note AS task_state,
+        d.c_state AS task_state,
+        e.dict_note AS taskStateName,
             b.dict_note AS plan_type_name,
             a.if_run,
             c.dict_note AS type_name,
@@ -296,7 +300,8 @@
                 a.plan_id,
                 a.area_id,
                 d.remark AS task_status,
-                e.dict_note AS task_state,
+        d.c_state AS task_state,
+        e.dict_note AS taskStateName,
                 b.dict_note AS plan_type_name,
                 a.if_run,
                 c.dict_note AS type_name,
@@ -323,7 +328,8 @@
                 a.plan_id,
                 a.area_id,
                 d.remark AS task_status,
-                e.dict_note AS task_state,
+        d.c_state AS task_state,
+        e.dict_note AS taskStateName,
                 b.dict_note AS plan_type_name,
                 a.if_run,
                 c.dict_note AS type_name,
@@ -351,7 +357,8 @@
         a.plan_id,
         a.area_id,
         d.remark AS task_status,
-        e.dict_note AS task_state,
+        d.c_state AS task_state,
+        e.dict_note AS taskStateName,
         b.dict_note AS plan_type_name,
         a.if_run,
         c.dict_note AS type_name,
@@ -369,7 +376,6 @@
         where a.if_run = 173
         <if test="startTime != null and endTime != null"> and a.start_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
-        <if test="taskState != null and taskState != ''"> and d.c_state = #{taskState, jdbcType=VARCHAR}</if>
         UNION ALL (
         select
         a.task_id,
@@ -377,7 +383,8 @@
         a.plan_id,
         a.area_id,
         d.remark AS task_status,
-        e.dict_note AS task_state,
+        d.c_state AS task_state,
+        e.dict_note AS taskStateName,
         b.dict_note AS plan_type_name,
         a.if_run,
         c.dict_note AS type_name,
@@ -395,7 +402,6 @@
         where a.if_run = 174
         <if test="startTime != null and endTime != null"> and a.start_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
-        <if test="taskState != null and taskState != ''"> and d.c_state = #{taskState, jdbcType=VARCHAR}</if>
         )
         UNION ALL (
         select
@@ -404,7 +410,8 @@
         a.plan_id,
         a.area_id,
         d.remark AS task_status,
-        e.dict_note AS task_state,
+        d.c_state AS task_state,
+        e.dict_note AS taskStateName,
         b.dict_note AS plan_type_name,
         a.if_run,
         c.dict_note AS type_name,
@@ -421,7 +428,6 @@
         LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
         where a.if_run = 172
         <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
-        <if test="taskState != null and taskState != ''"> and d.c_state = #{taskState, jdbcType=VARCHAR}</if>
         );
     </select>
 </mapper>

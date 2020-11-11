@@ -41,6 +41,8 @@ public class TCruiseTaskCount implements Serializable {
     @ApiModelProperty(value = "任务状态：1.正在执行 2.执行完成 3.任务终止")
     private String taskState;
 
+    private String taskStateName;
+
     @ApiModelProperty(value = "任务状态：1.成功 0.失败")
     private String taskStatus;
 
