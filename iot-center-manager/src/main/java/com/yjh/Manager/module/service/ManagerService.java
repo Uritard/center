@@ -12,6 +12,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -33,6 +34,7 @@ public class ManagerService {
         for (Application application : sortedApplications){
             String name = application.getName();
             List<InstanceInfo> instances = application.getInstances();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (InstanceInfo instanceInfo : instances){
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", name);
@@ -41,6 +43,10 @@ public class ManagerService {
                 map.put("port", instanceInfo.getPort());
                 map.put("instanceId", instanceInfo.getInstanceId());
                 map.put("url", instanceInfo.getHomePageUrl());
+                Date dirtyTime = new Date(instanceInfo.getLastDirtyTimestamp());
+                Date updateTime = new Date(instanceInfo.getLastUpdatedTimestamp());
+                map.put("registerTime", df.format(dirtyTime));
+                map.put("updateTime", df.format(updateTime));
                 list.add(map);
             }
         }
