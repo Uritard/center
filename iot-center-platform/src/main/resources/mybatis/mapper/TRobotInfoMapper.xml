@@ -358,7 +358,6 @@
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
     </select>
 
-
     <select id="selectRobotScreen" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.CameraOfRobotInfo">
             SELECT
              f.robot_id,

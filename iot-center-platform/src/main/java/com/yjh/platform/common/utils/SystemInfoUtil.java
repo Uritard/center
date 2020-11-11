@@ -3,6 +3,7 @@ package com.yjh.platform.common.utils;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -12,9 +13,9 @@ import java.util.*;
 public class SystemInfoUtil {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(SystemInfoUtil.class);
+    DecimalFormat df   = new DecimalFormat("#.00");
 
-
-        /**
+    /**
          * 获取cpu使用情况
          * @return
          * @throws Exception
@@ -110,7 +111,7 @@ public class SystemInfoUtil {
                         map.put("read",strArray[3]);
                         map.put("write",strArray[4]);
                         Double all = Double.valueOf(strArray[3])+Double.valueOf(strArray[4]);
-                        map.put("all",all.toString());
+                        map.put("all",df.format(all));
                         result.add(map);
                     }
                     i++;
@@ -146,7 +147,8 @@ public class SystemInfoUtil {
                     if("".equals(strArray[0])){
                         strArray= Arrays.copyOfRange(strArray,1,strArray.length);
                     }
-                    return Double.parseDouble(strArray[1]);
+                    re = Double.parseDouble(strArray[1]);
+                    return Double.valueOf(df.format(re));
                 }
                 i++;
             }
@@ -183,8 +185,8 @@ public class SystemInfoUtil {
                 use = use + Double.parseDouble(strArray[2]);
 
             }
-            map.put("all",all);
-            map.put("use",use);
+            map.put("all",Double.valueOf(df.format(all)));
+            map.put("use",Double.valueOf(df.format(use)));
         } catch (Exception e) {
             log.error("获取磁盘利用率:", e);
         } finally {

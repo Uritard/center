@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import java.util.List;
 
 import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

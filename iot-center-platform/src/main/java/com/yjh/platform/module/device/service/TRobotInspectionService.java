@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 
@@ -63,6 +64,5 @@ public class TRobotInspectionService{
     public int batchInsert(List<TRobotInspection> list) {
         return this.tRobotInspectionDao.batchInsert(list);
     }
-
 }
 
