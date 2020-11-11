@@ -1,6 +1,6 @@
 package com.yjh.accessrobot.module.device.dao;
 
-import com.yjh.accessudp.module.device.entity.SysLogs;
+import com.yjh.accessrobot.module.device.entity.SysLogs;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

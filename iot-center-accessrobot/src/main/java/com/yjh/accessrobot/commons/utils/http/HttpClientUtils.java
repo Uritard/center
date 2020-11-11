@@ -1,7 +1,7 @@
 package com.yjh.accessrobot.commons.utils.http;
 
 
-import com.yjh.accessudp.commons.result.BusinessException;
+import com.yjh.accessrobot.commons.result.BusinessException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;

@@ -3,7 +3,6 @@ package com.yjh.accessrobot.module.command.controller;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
-import com.yjh.accessrobot.module.command.entity.Analysis;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +26,7 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/robot/v1")
-@Api(value = "/command", description = "机器人操作接口")
+@Api(value = "/operator", description = "机器人操作接口")
 public class RobotController {
 
     @Autowired
@@ -35,26 +34,18 @@ public class RobotController {
 
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
-    public RobotController(RobotService robotService) {
-        this.robotService = robotService;
-    }
-
-    @Value("${netty.recognize.port}")
-    private int recognizePort;//识别算法端口
-    @Value("${netty.ai.port}")
-    private int aiPort;//缺陷算法端口
+    public RobotController(RobotService robotService) { this.robotService = robotService; }
 
     @ApiOperation(value = "控制接口")
-    @RequestMapping(value = "/algorithm", method = RequestMethod.POST)
-    public Result feignAlgorithm(@RequestBody Map<String, List<Analysis>> analysisMap) {
+    @RequestMapping(value = "/command", method = RequestMethod.POST)
+    public Result feignRobotControl(@RequestBody Map<String, Object> analysisMap) {
         Result result = new Result();
         try {
-            if (Objects.isNull(analysisMap.get("list"))) {
+            if (Objects.isNull(analysisMap)) {
                 result.setMessage("参数为空");
                 return result;
             }
-            List<Analysis> analysisList = analysisMap.get("list");
-            result.setData(robotService.feignRobotControl(analysisList, recognizePort));
+            result.setData(robotService.feignRobotControl(analysisMap));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

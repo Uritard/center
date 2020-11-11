@@ -1,7 +1,7 @@
 package com.yjh.accessrobot.commons.security;
 
 
-import com.yjh.accessudp.commons.result.BusinessException;
+import com.yjh.accessrobot.commons.result.BusinessException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

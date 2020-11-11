@@ -54,7 +54,7 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        InetSocketAddress address = new InetSocketAddress(url, port);
+        InetSocketAddress address = new InetSocketAddress("192.168.33.170", port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address, serverName, redisTemplate, sysLogsService);
     }

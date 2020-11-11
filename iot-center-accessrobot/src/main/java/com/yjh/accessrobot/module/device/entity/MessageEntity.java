@@ -2,7 +2,7 @@ package com.yjh.accessrobot.module.device.entity;
 
 
 import com.google.common.base.Strings;
-import com.yjh.e200.util.ValueUtil;
+import com.yjh.accessrobot.common.utils.ValueUtil;
 
 import java.util.Map;
 import java.util.Objects;

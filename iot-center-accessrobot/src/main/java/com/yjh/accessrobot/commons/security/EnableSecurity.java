@@ -1,7 +1,7 @@
 package com.yjh.accessrobot.commons.security;
 
 
-import com.yjh.accessudp.commons.logs.LogsRegister;
+import com.yjh.accessrobot.commons.logs.LogsRegister;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
