@@ -131,33 +131,22 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         //接收发送的指令
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
-
-        ByteBuf byteBuf01 = ctx.alloc().buffer();
-        byteBuf01.writeBytes(bytes);
-        StringBuilder Str = new StringBuilder();
+        StringBuilder Str1 = new StringBuilder();
         for (byte byteitem : bytes) {
-            Str.append(String.format("%02x ", byteitem));
+            Str1.append(String.format("%02x ", byteitem));
         }
-        log.info("机器人发送数据内容:" + Str + "<end>");
-
+        log.info("接收到机器人的指令是<start>" + Str1 + "<end>");
         byteBuf.readBytes(bytes);
         String body = new String(bytes, "UTF-8");
-        String startSign = body.substring(0,1);//起始标志位
-        log.info("接收机器人端数据startSign:" + startSign+"end");
-        String sendSessions = body.substring(1,9);//发送会话序列号
-        log.info("接收机器人端数据sendSessions:" + sendSessions+"end");
-        String receiveSessions = body.substring(1,9);//接收会话序列号
-        log.info("接收机器人端数据receiveSessions:" + receiveSessions+"end");
-        String sourceSign = body.substring(17,18);//会话源标识
-        log.info("接收机器人端数据sourceSign:" + sourceSign+"end");
-        String byteLength = body.substring(18,22);//xml字节长度
-        log.info("接收机器人端数据byteLength:" + byteLength+"end");
         String bodyTem = body.substring(21);
-        log.info("接收机器人端数据bodyTem:" + bodyTem+"end");
+        log.info("接收机器人端数据bodyTem<start>" + bodyTem+"<end>");
         String bodyTem2 = bodyTem.substring(0,bodyTem.length()-1);
-        log.info("接收机器人端数据bodyTem2:" + bodyTem2+"end");
+        log.info("接收机器人端数据bodyTem2<start>" + bodyTem2+"<end>");
+        int hahah = bodyTem2.getBytes("UTF-8").length ;
+        log.info("发送的xml字节长度:"+hahah);
 
-        Map<String, Object> xmlToMap = getXmlMessage(bodyTem2);
+
+        Map<String, Object> xmlToMap = getXmlMessage(bodyTem2);//解析xml
 
 //        redisTemplate.opsForHash().putAll("RobotXML", xmlToMap);//将Map放缓存
 
@@ -166,48 +155,82 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         if (xmlToMap.get("SendCode").equals("Client01") && xmlToMap.get("Command").equals("1")) {
             //注册指令接收相应
             String robotName = String.valueOf(xmlToMap.get("SendCode"));
-            log.info("该机器人是："+robotName);
+            log.info("该机器人是<start>"+robotName+"<end>");
             //组装响应协议
-            StringBuilder registerResponse = new StringBuilder();
-                //创建响应XML
-                Document document = DocumentHelper.createDocument();
-                Element rss = document.addElement("Robot");//根节点
-                Element childNode1 = rss.addElement("SendCode");//生成子节点
-                childNode1.setText("巡视主机");//子节点内容
-                Element childNode2 = rss.addElement("ReceiveCode");
-                childNode2.setText(robotName);
-                Element childNode3 = rss.addElement("Type");
-                childNode3.setText("251");
-                Element childNode4 = rss.addElement("Code");
-                childNode4.setText("200");
-                Element childNode5 = rss.addElement("Time");
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                childNode5.setText(sdf.format(new Date()));
-                Element childNode6= rss.addElement("Items");
-                Element childNode66 = childNode6.addElement("Item");
-                Element childNode67 = childNode6.addElement("Item");
-                Element childNode68 = childNode6.addElement("Item");
-                childNode66.addAttribute("heart_beat_interval","6");
-                childNode67.addAttribute("robot_run_interval","66");
-                childNode68.addAttribute("weather_interval","666");
-                Element childNode7 = rss.addElement("Command");
-                childNode7.setText("4");
+            //创建响应XML
+            Document document = DocumentHelper.createDocument();
+            Element rss = document.addElement("Robot");//根节点
+            Element childNode1 = rss.addElement("SendCode");//生成子节点
+            childNode1.setText("巡视主机");//子节点内容
+            Element childNode2 = rss.addElement("ReceiveCode");
+            childNode2.setText(robotName);
+            Element childNode3 = rss.addElement("Type");
+            childNode3.setText("251");
+            Element childNode4 = rss.addElement("Code");
+            childNode4.setText("200");
+            Element childNode5 = rss.addElement("Time");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            childNode5.setText(sdf.format(new Date()));
+            Element childNode6= rss.addElement("Items");
+            Element childNode66 = childNode6.addElement("Item");
+            Element childNode67 = childNode6.addElement("Item");
+            Element childNode68 = childNode6.addElement("Item");
+            childNode66.addAttribute("heart_beat_interval","6");
+            childNode67.addAttribute("robot_run_interval","66");
+            childNode68.addAttribute("weather_interval","666");
+            Element childNode7 = rss.addElement("Command");
+            childNode7.setText("4");
 
-                String xmlString = document.asXML();
-                log.info("生成的xml是："+xmlString);
-                int len = xmlString.getBytes("UTF-8").length ;
-                log.info("xml的字节长度是："+len);
-                registerResponse.append(startSign).append(sendSessions).append(receiveSessions).append("0x01").append(len).append(xmlString).append(startSign);
-                log.info("registerResponse是："+registerResponse);
-                byte[] responseByte = registerResponse.toString().getBytes();
-                log.info("responseByte是："+responseByte);
-                send(ctx,responseByte);
+            String xmlString = document.asXML();
+            log.info("生成的注册xml是<start>"+xmlString+"<end>");
+            byte[] xmlByte = xmlString.getBytes();
+            int lenll = xmlByte.length;
+            byte[] bytes5 = new byte[4];
+            bytes5[0] = (byte)(lenll & 0xFF);
+            bytes5[1] = (byte)(lenll >> 8 & 0xFF);
+            bytes5[2] = (byte)(lenll >> 16 & 0xFF);
+            bytes5[3] = (byte)(lenll >> 24 & 0xFF);
+
+            byte[] headerByte = new byte[19];
+            byte[] firstByte = new byte[2];
+            System.arraycopy(bytes, 0, headerByte, 0,19);
+            System.arraycopy(bytes, 0, firstByte, 0,2);
+
+            List<Byte> listAll= new ArrayList<>();
+            for(byte item:headerByte){
+                listAll.add(item);
+            }
+            for(byte item:bytes5){
+                listAll.add(item);
+            }
+            for(byte item:xmlByte){
+                listAll.add(item);
+            }
+            for(byte item:firstByte){
+                listAll.add(item);
+            }
+            byte[] xiexi = new byte[listAll.size()];
+            int i = 0;
+            for(byte item:listAll){
+                xiexi[i] = item;
+                i++;
+            }
+
+//            byte[] responseByte = new byte[headerByte.length+xmlByte.length+1];
+//            System.arraycopy(headerByte, 0, responseByte, 0, 23);//头
+//            System.arraycopy(bytes5, 0, responseByte, 18, 4);//xml长度
+//            System.arraycopy(xmlByte, 0, responseByte, 22, xmlByte.length);//xml
+//            System.arraycopy(firstByte, 0, responseByte, responseByte.length-2, 2);//尾
+            StringBuilder Str = new StringBuilder();
+            for (byte byteitem : xiexi) {
+                Str.append(String.format("%02x ", byteitem));
+            }
+            log.info("发送给机器人的指令是<start>" + Str + "<end>");
+            send(ctx,xiexi);
         }else if (xmlToMap.get("SendCode").equals("Client01") && xmlToMap.get("Command").equals("2")){
-            //心跳指令接收相应
-            String robotName = String.valueOf(xmlToMap.get("SendCode"));
-            log.info("该机器人是：" + robotName);
+            //心跳指令接收响应
+            String robotName = "Client01";
             //组装响应协议
-            StringBuilder heartResponse = new StringBuilder();
             //创建响应XML
             Document document = DocumentHelper.createDocument();
             Element rss = document.addElement("Robot");//根节点
@@ -223,17 +246,51 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             childNode5.setText(sdf.format(new Date()));
             Element childNode6 = rss.addElement("Items");
-
             Element childNode7 = rss.addElement("Command");
             childNode7.setText("3");
 
-            String xmlSend = document.asXML();
-            log.info("生成的xml是：" + xmlSend);
-            int len = xmlSend.getBytes("UTF-8").length;
-            log.info("xml的字节长度是：" + len);
-            heartResponse.append("EB90").append("发送/接收会话序列号").append("0x01").append(len).append(xmlSend).append("EB90");
-            log.info("heartResponse是：" + heartResponse);
-            log.info("该机器人不存在");
+            String xmlString = document.asXML();
+            log.info("生成的心跳xml是<start>" + xmlString+"<end>");
+            byte[] xmlByte = xmlString.getBytes();
+            int lenll = xmlByte.length;
+            byte[] bytes5 = new byte[4];
+            bytes5[0] = (byte)(lenll & 0xFF);
+            bytes5[1] = (byte)(lenll >> 8 & 0xFF);
+            bytes5[2] = (byte)(lenll >> 16 & 0xFF);
+            bytes5[3] = (byte)(lenll >> 24 & 0xFF);
+
+            byte[] headerByte = new byte[19];
+            byte[] firstByte = new byte[2];
+            System.arraycopy(bytes, 0, headerByte, 0,19);
+            System.arraycopy(bytes, 0, firstByte, 0,2);
+
+            List<Byte> listAll= new ArrayList<>();
+            for(byte item:headerByte){
+                listAll.add(item);
+            }
+            for(byte item:bytes5){
+                listAll.add(item);
+            }
+            for(byte item:xmlByte){
+                listAll.add(item);
+            }
+            for(byte item:firstByte){
+                listAll.add(item);
+            }
+            byte[] xiexi = new byte[listAll.size()];
+            int i = 0;
+            for(byte item:listAll){
+                xiexi[i] = item;
+                i++;
+            }
+
+            StringBuilder Str = new StringBuilder();
+            for (byte byteitem : xiexi) {
+                Str.append(String.format("%02x ", byteitem));
+            }
+            log.info("发送给机器人的指令是<start>" + Str + "<end>");
+            send(ctx,xiexi);
+
         }
 //        DataDealThread dataDealThread = new DataDealThread(this, isThreadStart);
 //        Thread thread = new Thread(dataDealThread);
@@ -241,6 +298,35 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        thread.start();
 
         ReferenceCountUtil.release(byteBuf);
+    }
+    public static String Bytes2HexString(byte[] b) {
+        byte[] hex = "0123456789ABCDEF".getBytes();
+        byte[] buff = new byte[3 * b.length];
+        for (int i = 0; i < b.length; i++) {
+            buff[3 * i] = hex[(b[i] >> 4) & 0x0f];
+            buff[3 * i + 1] = hex[b[i] & 0x0f];
+            buff[3 * i + 2] = 45;
+        }
+        String re = new String(buff);
+        return re.replace("-", "");
+    }
+    public static byte[] HexString2Bytes(String hexstr) {
+        hexstr = hexstr.replace(" ", "");
+        byte[] b = new byte[hexstr.length() / 2];
+        int j = 0;
+        for (int i = 0; i < b.length; i++) {
+            char c0 = hexstr.charAt(j++);
+            char c1 = hexstr.charAt(j++);
+            b[i] = (byte) ((parse(c0) << 4) | parse(c1));
+        }
+        return b;
+    }
+    private static int parse(char c) {
+        if (c >= 'a')
+            return (c - 'a' + 10) & 0x0f;
+        if (c >= 'A')
+            return (c - 'A' + 10) & 0x0f;
+        return (c - '0') & 0x0f;
     }
     //解析XML
     public static Map<String, Object> getXmlMessage(String messageXML) throws Exception {
