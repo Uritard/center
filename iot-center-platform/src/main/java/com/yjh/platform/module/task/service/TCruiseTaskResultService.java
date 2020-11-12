@@ -199,7 +199,7 @@ public class TCruiseTaskResultService {
 
     @Logs(title = "统计获取当前任务的执行进度", code = "TCruiseTaskResult",content = "统计任务执行进度")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Float> selectCruiseAdvance(String taskId) {
+    public Map<String,Object>selectCruiseAdvance(String taskId) {
         Set<String> keyResult = redisScan("t_cruise_task_result*");
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
@@ -225,13 +225,16 @@ public class TCruiseTaskResultService {
                 }
             }
         }
-        Map<String, Float> Rate = new HashMap<>();
+//        Map<String, Float> Rate = new HashMap<>();
+        Map<String,Object> rateAndTaskInfo=new HashMap<>();
         if(cruiseComCount==0 || cruiseComCount==0){
-            Rate.put("rate",Float.valueOf("0"));
+            rateAndTaskInfo.put("rate",Float.valueOf("0"));
         }else {
-            Rate.put("rate", cruiseComCount / cruiseCount);
+            rateAndTaskInfo.put("rate", cruiseComCount / cruiseCount);
         }
-        return Rate;
+        rateAndTaskInfo.put("taskState",tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
+        rateAndTaskInfo.put("taskStateName",tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
+        return rateAndTaskInfo;
     }
 
 

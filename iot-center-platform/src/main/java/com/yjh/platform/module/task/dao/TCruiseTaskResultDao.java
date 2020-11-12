@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.task.entity.TCruiseTaskResult;
+import com.yjh.platform.module.task.entity.TaskSimpleInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +30,7 @@ public interface TCruiseTaskResultDao {
     List<TCruiseTaskResult> selectByPage(TCruiseTaskResult tCruiseTaskResult);
 
     int batchInsert(List<TCruiseTaskResult> list);
+    TaskSimpleInfo selectTaskStateByTaskId(@Param(value = "taskId")String taskId);
+
+
 }
