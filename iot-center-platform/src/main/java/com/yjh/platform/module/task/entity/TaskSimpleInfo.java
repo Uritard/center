@@ -23,11 +23,9 @@ public class TaskSimpleInfo implements Serializable {
     @ApiModelProperty(value = "任务类型")
     private Integer Type;
     @ApiModelProperty(value = "任务状态")
-    private Integer cState;
+    private Integer taskState;
     @ApiModelProperty(value = "任务类型名称")
     private String TypeName;
-    @ApiModelProperty(value = "任务来源")
-    private Integer taskType;
-    @ApiModelProperty(value = "任务来源名称")
-    private String taskTypeName;
+    @ApiModelProperty(value = "任务状态名称")
+    private String taskStateName;
 }

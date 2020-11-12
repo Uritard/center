@@ -296,27 +296,20 @@
 
     <select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TaskSimpleInfo">
          SELECT
-	       a.task_id,
-	       a.task_name,
-	       a.task_type,
-	       a.type,
-	       b.c_state,
-	       d.dict_note AS typeName,
-	       c.dict_note AS taskTypeName
-         FROM
-	       (
-		      (
-			     t_cruise_task a
-			     LEFT JOIN t_dict_business c ON a.task_type = c.dict_code
-			     AND c.col_name = "task_type"
-		      )
-		     LEFT JOIN t_dict_business d ON a.type = d.dict_code
-		     AND d.col_name = "plan_type"
-	       )
-          LEFT JOIN t_cruise_result b ON a.task_id = b.task_id
-          WHERE
-	      b.c_state IN (239,241)
-	      ORDER BY a.start_time DESC
+        d.task_id,
+        d.task_name,
+        d.type,
+        a.c_state as 'taskState',
+        b.dict_note AS 'taskStateName',
+        e.dict_note AS 'typeName'
+        FROM
+        t_cruise_task d
+        LEFT JOIN t_dict_business e ON d.type=e.dict_code AND e.col_name='plan_type'
+        JOIN t_cruise_result a ON a.task_id=d.task_id
+        LEFT JOIN t_dict_business b ON a.c_state=b.dict_code AND b.col_name='task_state'
+
+        WHERE a.c_state in(239,241)
+        ORDER BY d.start_time DESC
 </select>
 
     <!--巡视任务结果统计-->
