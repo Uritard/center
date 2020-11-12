@@ -83,11 +83,11 @@ public class SystemInfoService {
     public List<Map<String,Object>> getServices() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         long currentTime =System.currentTimeMillis();
-        Date now = new Date();
         //Result re = service();
         String services = HttpClientUtils.getInstance().getUrl(SERVICE_URL, null);
         JSONObject jsonObject =JSONObject.parseObject(services);
         List<Map<String,Object>> re= (List<Map<String,Object>>) jsonObject.get("data");
+        Date now = new Date();
         for(Map<String,Object> item :re){
            // long createTime = simpleDateFormat.parse((Date)item.get("registerTime"));
             log.info("registerTime:  "+item.get("registerTime").toString());

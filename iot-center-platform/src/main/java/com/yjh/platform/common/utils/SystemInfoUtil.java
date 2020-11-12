@@ -13,7 +13,7 @@ import java.util.*;
 public class SystemInfoUtil {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(SystemInfoUtil.class);
-    DecimalFormat df   = new DecimalFormat("#.00");
+    DecimalFormat df   = new DecimalFormat("########0.00");
 
     /**
          * 获取cpu使用情况

@@ -457,14 +457,9 @@ public class TCruiseTaskService {
         map.put("taskName",taskName);
         List<Map<String, Object>> resultList = new ArrayList<>();
         List<Map<String, Object>> resultListAfter = null;
-        List<TCruiseTaskCount> list = new ArrayList<>();
+        List<Map<String, Object>> resultListBefore = new ArrayList<>();
+        List<Map<String, Object>> resultListForAdd = new ArrayList<>();
         Date now = new Date();
-
-
-//        if((startTime != null && startTime.compareTo(now) < 0) && (endTime != null && endTime.compareTo(now) < 0)){
-//            map.put("startTime",startTime);
-//            map.put("endTime",endTime);
-//        }
         try{
             if(endTime == null){
                 Calendar calendar = new GregorianCalendar();
@@ -491,55 +486,45 @@ public class TCruiseTaskService {
                 System.out.println("一天的开始时间: "+endTime);
             }
         }catch (Exception e) { e.getMessage(); }
-//        if((startTime != null && startTime.compareTo(now) < 0) && (endTime != null && endTime.compareTo(now) > 0)){
-//            map.put("startTime",startTime);
-//            map.put("endTime",now);
-//        }
+
         map.put("startTime",startTime);
         map.put("endTime",endTime);
-        list = this.tCruiseTaskDao.taskCountByCondition(map);
-        for (TCruiseTaskCount tCruiseTaskCount:list) {
-            Map<String, Object> taskCountMap = new HashMap<>();
-            taskCountMap.put("total",tCruiseTaskCount.getTotal());
-            taskCountMap.put("taskState",tCruiseTaskCount.getTaskState());
-            taskCountMap.put("taskStateName",tCruiseTaskCount.getTaskStateName());
-            taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
-            taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
-            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
-            taskCountMap.put("startTime",format.format(tCruiseTaskCount.getStartTime()));
-            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
-            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
-            taskCountMap.put("taskStatus",tCruiseTaskCount.getTaskStatus());
-            resultList.add(taskCountMap);
-        }
-//        if((startTime != null && startTime.compareTo(now) > 0) && (endTime != null && endTime.compareTo(now) > 0)){
-//            resultList = new ArrayList<>();
-//        }
+        resultListBefore = this.afterTaskCount(startTime,taskState,taskName);
         resultListAfter = this.afterTaskCount(endTime,taskState,taskName);
-        List<Map<String, Object>> resultListForAdd = new ArrayList<>();
-        if(resultListAfter == null || resultListAfter.size() == 0){
+
+        resultListForAdd.addAll(resultListBefore);
+
+        for (Map<String, Object> itemBefore:resultListBefore) {
+            for (Map<String, Object> itemAfter:resultListAfter) {
+                if(itemAfter.get("taskId").toString().equals(itemBefore.get("taskId").toString())){
+                    resultListForAdd.remove(itemBefore);
+                    break;
+                }
+            }
+        }
+        resultListForAdd.addAll(resultListAfter);
+        if(resultListForAdd == null || resultListForAdd.size() == 0){
             return resultList;
         }else {
             try {
-            for (Map<String, Object> item:resultListAfter){
+            for (Map<String, Object> item:resultListForAdd){
 
-                if (now.compareTo(format.parse(item.get("startTime").toString())) <= 0  && endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0){
+                if (startTime.compareTo(format.parse(item.get("startTime").toString())) <= 0  && endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0){
                     if(taskState != null){
 //                        System.out.println("------------:"+item.get("taskState"));
 //                        System.out.println("-------------"+taskState.equals(item.get("taskState").toString()));
                         if(taskState.equals(item.get("taskState").toString())){
-                            resultListForAdd.add(item);
+                            resultList.add(item);
                             continue;
                         }else {
                             continue;
                         }
                     }
-                    resultListForAdd.add(item);
+                    resultList.add(item);
                 }
             }
             } catch (Exception e) { e.getMessage(); }
         }
-        resultList.addAll(resultListForAdd);
         return resultList;
     }
 
