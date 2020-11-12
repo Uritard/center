@@ -61,7 +61,7 @@ public class AccessUdpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        //loadDeviceInfo();
+        loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
         nettyServer.start(address, redisTemplate,tCfgMeteService);

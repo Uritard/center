@@ -195,7 +195,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
                     String urlPath = (String) jsonForRe.get("urlPath");
                     String absPath = (String) jsonForRe.get("absPath");
-                    if(absPath == null){
+                    if(absPath == null || urlPath == null){
                         //抓图失败 任务失败
                         taskAbnormal = taskAbnormal+1;
                         tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);

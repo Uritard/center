@@ -242,7 +242,7 @@ public class RunAtNowTask implements Runnable{
                     //todo 对于相机的返回错误分析  任务异常终止/超期
                     String urlPath = (String) jsonForRe.get("urlPath");
                     String absPath = (String) jsonForRe.get("absPath");
-                    if(absPath == null){
+                    if(absPath == null || urlPath == null){
                         //抓图失败 任务失败
                         taskAbnormal = taskAbnormal+1;
                         tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());

@@ -453,6 +453,9 @@ public class TCruiseTaskService {
     public  List<Map<String, Object>>  taskCountByCondition(Date startTime,Date endTime,String taskState,String taskName){
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         HashMap<String,Object> map = new HashMap<>();
+        if("-1".equals(taskState)){
+            taskState = null;
+        }
         map.put("taskState",taskState);
         map.put("taskName",taskName);
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -474,7 +477,7 @@ public class TCruiseTaskService {
                 String startStr = format.format(dayStart);
                 now = format.parse(startStr);
                 startTime = now;
-                System.out.println("一天的开始时间: "+now);
+                //System.out.println("一天的开始时间: "+now);
                 //一天的结束时间 yyyy:MM:dd 23:59:59
                 calendar.set(Calendar.HOUR_OF_DAY,23);
                 calendar.set(Calendar.MINUTE,59);
@@ -483,7 +486,7 @@ public class TCruiseTaskService {
                 Date dayEnd = calendar.getTime();
                 String endStr = format.format(dayEnd);
                 endTime = format.parse(endStr);
-                System.out.println("一天的开始时间: "+endTime);
+                //System.out.println("一天的开始时间: "+endTime);
             }
         }catch (Exception e) { e.getMessage(); }
 

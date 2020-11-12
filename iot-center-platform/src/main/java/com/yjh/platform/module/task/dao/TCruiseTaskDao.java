@@ -40,6 +40,6 @@ public interface TCruiseTaskDao {
                                      @Param(value = "endTime") Date endTime);
 
     List<TCruiseTaskList> selectPointStatus(String taskId);
-    List<TCruiseTaskCount> taskCountByCondition(HashMap<String,Object> map);
+    //List<TCruiseTaskCount> taskCountByCondition(HashMap<String,Object> map);
     List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
 }
