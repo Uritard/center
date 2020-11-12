@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
+
 @RestController
 @Api("HelloController")
 @RequestMapping("/hello")
@@ -86,9 +87,7 @@ public class HelloController {
         if (redisTemplate.opsForList().index("AnalysisList：9000001", 0).equals("-1") && redisTemplate.opsForList().index("AnalysisList：9000001",1).equals("0")) {
             log.info("执行数据操作");
         }
-//
-//        String str="{\n\"msgType\": \"5\", \n\"msgData\": {\n\"instanceId\": " + "\"" + 111 + "\", \n\"taskId\": \"" + 222 + "\"\n}\n}\n";
-//        log.info("JsonObject:"+ JSON.parseObject(JSON.parseObject(str).get("msgData").toString()).get("taskId").toString());
+
         return name + "你好!";
     }
 

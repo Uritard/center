@@ -300,6 +300,7 @@
 	       a.task_name,
 	       a.task_type,
 	       a.type,
+	       b.c_state,
 	       d.dict_note AS typeName,
 	       c.dict_note AS taskTypeName
          FROM
@@ -314,7 +315,7 @@
 	       )
           LEFT JOIN t_cruise_result b ON a.task_id = b.task_id
           WHERE
-	      b.c_state = 239
+	      b.c_state IN (239,241)
 	      ORDER BY a.start_time DESC
 </select>
 

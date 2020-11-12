@@ -196,6 +196,7 @@ public class TCfgDataCurrentService {
             tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName());
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
+            tCruiseTaskAdd.setTaskType(218);
             Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
             String taskId=result.getData().toString();//联动任务ID
             cLogger.info("联动开始执行");
@@ -302,6 +303,7 @@ public class TCfgDataCurrentService {
 ////        return plans;
 //        return tCruiseTasks;
 //    }
+
 
     @Logs(title = "联动记录&&告警信息-滚动刷新", code = "TCfgDataCurrent",content = "联动信息滚动刷新")
     @Transactional(rollbackFor = Exception.class)

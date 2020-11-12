@@ -166,7 +166,6 @@ public class TCfgDataCurrentController {
     public Result unionTest(@RequestParam Map<String,String> meteId){
         Result result=new Result();
         try {
-
             result.setData(tCfgDataCurrentService.unionRulesMatchAndCalculate(meteId.get("meteId")));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
