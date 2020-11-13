@@ -88,6 +88,15 @@ public class MeteValueUtils {
         if("触发".equals(commintValue)){
             return "2";
         }
+        if("故障".equals(commintValue)){
+            return "0";
+        }
+        if("非电量".equals(commintValue)){
+            return "0";
+        }
+        if("保护跳闸".equals(commintValue)){
+            return "0";
+        }
         return null;
     }
 }

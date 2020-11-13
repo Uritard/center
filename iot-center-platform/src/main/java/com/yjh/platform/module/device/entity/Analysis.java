@@ -36,5 +36,7 @@ public class Analysis implements Serializable {
     @ApiModelProperty(value = "模版图片路径")
     private String picModelPath;
 
+    @ApiModelProperty(value = "是否AI算法 0是1否")
+    private int isAi;
 
 }

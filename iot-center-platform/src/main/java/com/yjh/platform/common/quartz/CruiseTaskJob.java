@@ -267,6 +267,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                             TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
+                            analysis.setIsAi(tAlgorithmInfo.getIsAi());
+                            tCruiseDataResult.setPicpath(urlPath);
+                            tCruiseDataResult.setOrigpic(absPath);
                             List<Analysis> analysisList = new ArrayList<>();
                             analysisList.add(analysis);
                             Map<String, List<Analysis>> analysisMap  = new HashMap<>();

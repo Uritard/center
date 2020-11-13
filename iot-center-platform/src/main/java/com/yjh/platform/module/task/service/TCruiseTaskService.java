@@ -513,7 +513,7 @@ public class TCruiseTaskService {
             for (Map<String, Object> item:resultListForAdd){
 
                 if (startTime.compareTo(format.parse(item.get("startTime").toString())) <= 0  && endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0){
-                    if(taskState != null){
+                    if(taskState != null && !taskState.equals("")){
 //                        System.out.println("------------:"+item.get("taskState"));
 //                        System.out.println("-------------"+taskState.equals(item.get("taskState").toString()));
                         if(taskState.equals(item.get("taskState").toString())){

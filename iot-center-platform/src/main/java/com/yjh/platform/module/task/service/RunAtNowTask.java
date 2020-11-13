@@ -314,6 +314,7 @@ public class RunAtNowTask implements Runnable{
                             TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
+                            analysis.setIsAi(tAlgorithmInfo.getIsAi());
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             List<Analysis> analysisList = new ArrayList<>();
