@@ -76,17 +76,18 @@ public class HelloController {
 //       redisTemplate.opsForList().leftPushAll("AnalysisList：9000001","1000003");
 //       redisTemplate.opsForList().remove("AnalysisList：9000001",0,"1000003");
 
-        if(name2.equals("2")){
-            log.info("1"+name2);
-            redisTemplate.opsForList().remove("AnalysisList：9000001", 0, "1000001");
-            redisTemplate.opsForList().rightPush("AnalysisList：9000001","0");
-        }else if(name2.equals("6")){
-            log.info("2"+name2);
-            redisTemplate.opsForList().leftPush("AnalysisList：9000001","-1");
-        }
-        if (redisTemplate.opsForList().index("AnalysisList：9000001", 0).equals("-1") && redisTemplate.opsForList().index("AnalysisList：9000001",1).equals("0")) {
-            log.info("执行数据操作");
-        }
+//        if(name2.equals("2")){
+//            log.info("1"+name2);
+//            redisTemplate.opsForList().remove("AnalysisList：9000001", 0, "1000001");
+//            redisTemplate.opsForList().rightPush("AnalysisList：9000001","0");
+//        }else if(name2.equals("6")){
+//            log.info("2"+name2);
+//            redisTemplate.opsForList().leftPush("AnalysisList：9000001","-1");
+//        }
+//        if (redisTemplate.opsForList().index("AnalysisList：9000001", 0).equals("-1") && redisTemplate.opsForList().index("AnalysisList：9000001",1).equals("0")) {
+//            log.info("执行数据操作");
+//        }
+
 
         return name + "你好!";
     }
