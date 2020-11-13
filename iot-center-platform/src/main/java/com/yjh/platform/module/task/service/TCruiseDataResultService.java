@@ -96,8 +96,8 @@ public class TCruiseDataResultService{
              //通过测点ID获取相应的符合条件的巡检点结果
              CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
              deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
-             deviceInfo.setIdentifyState(cruiseResultAnalMeteInfo.getIdentifyState());
-             deviceInfo.setIdentifyStateName(cruiseResultAnalMeteInfo.getIdentifyStateName());
+             deviceInfo.setState(cruiseResultAnalMeteInfo.getState());
+             deviceInfo.setStateName(cruiseResultAnalMeteInfo.getStateName());
              deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
              deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
              deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());

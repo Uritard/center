@@ -239,8 +239,8 @@
     <select id="selectMeteCruiseByDeviceId" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo" >
        SELECT
 	b.instance_id,
-	d.identify_state,
-	f.dict_note AS identifyStateName,
+	d.state,
+	f.dict_note AS stateName,
 	b.end_time,
 	d.picpath,
     (CASE
@@ -256,8 +256,8 @@
         t_cruise_point_instance a
     LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
     LEFT JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
-    LEFT JOIN t_dict_business f ON d.identify_state = f.dict_code
-    AND f.col_name = "identify_state"
+    LEFT JOIN t_dict_business f ON d.state = f.dict_code
+    AND f.col_name = "data_state"
     LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
     LEFT JOIN t_robot_inspection g ON a.cruise_id = g.inspection_id
     LEFT JOIN t_camera_preset h ON a.cruise_id = h.preset_id

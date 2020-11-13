@@ -176,7 +176,7 @@ public class TCruiseTaskResultService {
                     cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
                 }
                 //当缓存中的巡视点还没有数据结果时，置为“--”
-                if(resultMap.get("resultNum").toString().equals("")){
+                if(resultMap.get("resultNum").toString().equals("") ||resultMap.get("resultNum").toString().equals(null)){
                     cruiseInspectResult.setCruiseResultName("--");
                 }else {
                     cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());//巡检结果
