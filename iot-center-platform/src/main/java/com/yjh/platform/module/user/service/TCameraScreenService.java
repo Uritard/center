@@ -51,7 +51,7 @@ public class TCameraScreenService{
             this.tCameraScreenDao.update(tCameraScreen);
             return tCameraScreen.getCreateTime();
         }else {
-            this.tCameraScreenDao.update(tCameraScreen);
+            this.tCameraScreenDao.add(tCameraScreen);
             return tCameraScreen.getCreateTime();
         }
     }

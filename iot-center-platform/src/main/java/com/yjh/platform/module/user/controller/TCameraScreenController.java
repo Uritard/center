@@ -93,7 +93,7 @@ public class TCameraScreenController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
-            result.setData(tCameraScreenService.selectByPrimaryId(Long.parseLong("10001")));
+            result.setData(tCameraScreenService.selectByPrimaryId(Long.parseLong(userId)));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
