@@ -24,8 +24,9 @@ public class RobotService {
     @Logs(title = "机器人控制调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public String feignRobotControl(Map<String, Object> analysisMap) throws InterruptedException {
-        RobotServerHandler.getRobotServerHandlerMap().get(analysisMap.get("strRobotCode")).SendHeartBeat();
         log.info("analysisMap:"+analysisMap);
+
+        RobotServerHandler.getRobotServerHandlerMap().get(analysisMap.get("strRobotCode")).SendHeartBeat();
         return "success";
     }
 

@@ -5,14 +5,11 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.task.entity.ReportForms;
-import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
+import com.yjh.platform.module.task.entity.TDefectInfo;
+import com.yjh.platform.module.task.entity.TReportInfo;
 import com.yjh.platform.module.task.service.ReportManageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.http.conn.util.PublicSuffixList;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
-import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -62,8 +56,8 @@ public class ReportManageController {
                                  @RequestParam(value="reportType")String reportType) {
         Result result = new Result();
         try {
-            List<TCruiseDataResultDetail> list = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportAbsolutePath);
-            result.setData(list);
+            int generateResult = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportAbsolutePath);
+            result.setData(generateResult);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -89,32 +83,55 @@ public class ReportManageController {
         }
         return result;
     }
+//    @ApiOperation(value = "查询报表生成记录")
+//    @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
+//    public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
+//                               @RequestParam(value = "startTime", required = false)String startTime,
+//                               @RequestParam(value = "endTime", required = false)String endTime,
+//                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+//                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+//        Result result = new Result();
+//        Map<String,Object> resultMap = new HashMap<>();
+//        try {
+//            String url = "ls "+reportAbsolutePath+" | wc -w";
+//            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
+//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+//            String lineForId = null;
+//            while ((lineForId = readerForId.readLine()) != null) {
+//                long count = Long.parseLong(lineForId);
+//                resultMap.put("count", count);
+//            }
+//            Page page = PageHelper.startPage(pageNum, pageSize);
+//            List<TReportInfo> list = reportManageService.reportSelect(reportName,startTime,endTime,reportAbsolutePath);
+//            resultMap.put("count", page.getTotal());
+//            resultMap.put("list", list);
+//            result.setData(resultMap);
+//        } catch (BusinessException b) {
+//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+//        } catch (Exception e) {
+//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+//            log.error("查询报表记录错误:", e);
+//        }
+//        return result;
+//    }
     @ApiOperation(value = "查询报表生成记录")
     @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
     public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
-                               @RequestParam(value = "startTime", required = false)String startTime,
-                               @RequestParam(value = "endTime", required = false)String endTime,
+                               @RequestParam(value = "startTime", required = false) String startTime,
+                               @RequestParam(value = "endTime", required = false) String endTime,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
-        Map<String,Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
-            String url = "ls "+reportAbsolutePath+" | wc -w";
-            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
-            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
-            String lineForId = null;
-            while ((lineForId = readerForId.readLine()) != null) {
-                long count = Long.parseLong(lineForId);
-                resultMap.put("count", count);
-            }
-            List<ReportForms> list = reportManageService.reportSelect(reportName,startTime,endTime,reportAbsolutePath);
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TReportInfo> list = reportManageService.reportSelect(reportName,startTime,endTime);
+            resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询报表记录错误:", e);
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
         }
         return result;
     }
@@ -134,20 +151,20 @@ public class ReportManageController {
         }
         return result;
     }
-    @ApiOperation(value = "批量删除报表")
-    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.DELETE)
-    public Result reportBatchDelete(@RequestBody List<ReportForms> fileNameList) {
-        Result result = new Result();
-        try {
-            result.setData(reportManageService.reportBatchDelete(reportAbsolutePath,fileNameList));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量删除报表错误:", e);
-        }
-        return result;
-    }
+//    @ApiOperation(value = "批量删除报表")
+//    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.DELETE)
+//    public Result reportBatchDelete(@RequestBody List<TReportInfo> fileNameList) {
+//        Result result = new Result();
+//        try {
+////            result.setData(reportManageService.reportBatchDelete(reportAbsolutePath,fileNameList));
+//        } catch (BusinessException b) {
+//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+//        } catch (Exception e) {
+//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+//            log.error("批量删除报表错误:", e);
+//        }
+//        return result;
+//    }
     @ApiOperation(value = "根据任务生成巡检记录报告")
     @RequestMapping(value = "/reportByTask", method = RequestMethod.GET)
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {

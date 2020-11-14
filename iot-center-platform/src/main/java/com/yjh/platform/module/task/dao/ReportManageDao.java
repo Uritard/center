@@ -2,13 +2,14 @@ package com.yjh.platform.module.task.dao;
 
 import com.yjh.platform.module.task.entity.CheckPointType;
 import com.yjh.platform.module.task.entity.TCruiseDataResultDetail;
+import com.yjh.platform.module.task.entity.TReportInfo;
 import com.yjh.platform.module.task.entity.TaskVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author YC
@@ -28,4 +29,8 @@ public interface ReportManageDao {
     int selectAbnormalNumByTask(@Param(value = "taskId")String taskId);
     List<CheckPointType> selectMeteType(@Param(value = "list") List<String> list);
     List<CheckPointType> selectMeteType2(@Param(value = "taskId")String taskId);
+    int insertReport(TReportInfo reportInfo);
+    List<TReportInfo> reportSelect(HashMap<String,Object> map);
+    int reportDelete(@Param(value = "reportName") String reportName,
+                     @Param(value = "startTime")String startTime);
 }
