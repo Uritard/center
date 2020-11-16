@@ -19,14 +19,17 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "ReportForms", description = "报表临时存储")
-public class ReportForms implements Serializable {
+@ApiModel(value = "TReportInfo对象 ", description = "报表信息表")
+public class TReportInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "报表名称")
     private String reportName;
     @ApiModelProperty(value = "报表类型")
     private String reportType;
-    @ApiModelProperty(value = "发起时间")
-    private String startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "生成日期")
+    private Date generateDate;
+    @ApiModelProperty(value = "备注")
+    private String remarks;
 }

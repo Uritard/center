@@ -107,7 +107,38 @@
 		LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
 		LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
     </sql>
+    <delete id="reportDelete" parameterType="java.lang.Long">
+        delete from
+            t_report_info
+        WHERE
+            report_name = #{reportName, jdbcType=VARCHAR} and generate_date = #{generateDate, jdbcType=TIMESTAMP}
+    </delete>
 
+    <select id="reportSelect" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TReportInfo">
+        SELECT
+            a.report_name,
+            a.report_type,
+            a.generate_date
+        FROM
+         t_report_info a
+        WHERE 1 = 1
+        <if test="reportName != null and reportName != ''"> and a.report_name like concat ('%',#{reportName,jdbcType=VARCHAR},'%')</if>
+        <if test="startTime != null and endTime != null"> and generate_date BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+
+    </select>
+    <insert id="insertReport" parameterType="com.yjh.platform.module.task.entity.TReportInfo">
+        insert into t_report_info(
+            report_name,
+            report_type,
+            generate_date,
+            remarks
+        )values(
+                #{reportName, jdbcType=VARCHAR},
+                #{reportType, jdbcType=VARCHAR},
+                #{generateDate, jdbcType=TIMESTAMP},
+                #{remarks, jdbcType=VARCHAR}
+        )
+    </insert>
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         <include refid="TongYong"></include>
         where 1 = 1

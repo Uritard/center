@@ -49,9 +49,9 @@ public class CruiseResultDetail {
     private String resultNum;
 
     @ApiModelProperty(value = "巡视结果")
-    private Integer state;
+    private Integer dataState;
     @ApiModelProperty(value = "巡检数据状态")
-    private String dataState;
+    private String dataStateName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
