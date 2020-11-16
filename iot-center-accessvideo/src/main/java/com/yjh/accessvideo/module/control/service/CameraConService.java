@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -36,8 +37,12 @@ public class CameraConService {
     @Value("${nvr.rtmp.video}")
     private String UrlTem;
 
+    @Value("${nvr.rtmp.back}")
+    private String UrlBackTem;
+
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private NativeLong m_lRealPalyHandle = new NativeLong(-1);
+    private NativeLong m_lPlayHandle = new NativeLong(-1);// playhandle
     private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();	// play structure
 
@@ -89,13 +94,11 @@ public class CameraConService {
                 String rtmpUrlCamera = Constant.mapsForCamera.get(String.valueOf(cameraId));
                 String[] rtmpUrlCameras = rtmpUrlCamera.split("/");
                 livePath = rtmpUrlCameras[rtmpUrlCameras.length-1];
-                log.info("livePath: "+livePath);
             } else {
                 String[] rtmpUrls = rtmpUrl.split("/");
                 livePath = rtmpUrls[rtmpUrls.length-1];
-                log.info("livePath: "+livePath);
             }
-
+            log.info("livePath: "+livePath);
             String url = "ps -ef | grep ffmpeg | grep '"+ livePath +"' | grep -v 'grep'";
             Process processForId=Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
             processForId.waitFor();
@@ -110,6 +113,58 @@ public class CameraConService {
             Runtime.getRuntime().exec(urlStop);
         } catch (Exception e) {e.getMessage();}
         return urlStop;
+    }
+
+    @Logs(title = "视频回放", code = "cameraPlayBack")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> startPlayBack(Long cameraId, Date startTime, Date stopTime) {
+        Map<String, Object> returnMap = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
+            String userName = cameraConInfo.getUserName();
+            String cameraIp = cameraConInfo.getRecordIp();
+            String password = cameraConInfo.getPwd();
+            int cameraPort = cameraConInfo.getRtspPort();
+            int iChanNum = cameraConInfo.getChannelNum();
+            int historyPath;
+            if (Objects.nonNull(Constant.maps.get("historyPath"))) {
+                historyPath = Constant.maps.get("historyPath")+1;
+                Constant.maps.put("historyPath", Constant.maps.get("historyPath")+1);
+            } else {
+                historyPath = 123;
+                Constant.maps.put("historyPath", 123);
+            }
+            log.info("Constant.maps: "+Constant.maps);
+            int yearStart = startTime.getYear()+1900;
+            int monthStart = startTime.getMonth()+1;
+            int dateStart = startTime.getDate();
+            int hourStart = startTime.getHours();
+            int minuteStart = startTime.getMinutes();
+            int secondStart = startTime.getSeconds();
+            String starttime = yearStart+monthStart+dateStart+"T"+hourStart+minuteStart+secondStart+"Z";
+
+            int yearStop = stopTime.getYear()+1900;
+            int monthStop = stopTime.getMonth()+1;
+            int dateStop = stopTime.getDate();
+            int hourStop = stopTime.getHours();
+            int minuteStop = stopTime.getMinutes();
+            int secondStop = stopTime.getSeconds();
+            String endtime = yearStop+monthStop+dateStop+"T"+hourStop+minuteStop+secondStop+"Z";
+            ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
+            //rtsp://admin:hik12345@192.168.33.2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
+            log.info("userName: "+userName+",password: "+password+",cameraIp: "+cameraIp+",cameraPort: " +cameraPort
+                    +",iChanNum: "+iChanNum +",starttime: "+starttime+",endtime: "+endtime+",historyPath: "+historyPath);
+            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum,1, starttime, endtime, historyPath);
+            log.info("transUrl: "+transUrl);
+            Runtime.getRuntime().exec(transUrl);
+            String[] rtmpUrls = transUrl.split("rtmp");
+            String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
+            returnMap.put("rtmpUrl", rtmpUrl);
+            Constant.mapsForCamera.put(String.valueOf(cameraId), rtmpUrl);
+            log.info("mapsForCamera: "+Constant.mapsForCamera);
+            log.info("returnMap: "+returnMap);
+        } catch (Exception e) {e.getMessage();}
+        return returnMap;
     }
 
     @Logs(title = "云台控制", code = "cameraControl")
@@ -182,6 +237,31 @@ public class CameraConService {
                 m_sClientInfo, null, null, true);
         } else { return lUserIDLong;}
     }
+
+//    private boolean playBack() {
+//        NET_DVR_VOD_PARA  struVoidParam = new NET_DVR_VOD_PARA();
+//        struVoidParam.dwSize = struVoidParam.size();
+//        struVoidParam.struBeginTime = struStartTime;
+//        struVoidParam.struEndTime = struStopTime;
+//        struVoidParam.hWnd = hwnd;
+//        NET_DVR_STREAM_INFO struInfo = new NET_DVR_STREAM_INFO ();
+//        struInfo.dwSize = struInfo.size();
+//        struInfo.dwChannel = m_iChanShowNum;
+//        struVoidParam.struIDInfo = struInfo;
+//        if(RadioForward.isSelected()) {
+//            m_lPlayHandle = hCNetSDK.NET_DVR_PlayBackByTime_V40(lUserIDLong, struVoidParam);
+//        } else {
+//            NET_DVR_PLAYCOND struPlayCond = new NET_DVR_PLAYCOND();
+//            struPlayCond.dwChannel = m_iChanShowNum;
+//            struPlayCond.struStartTime = struStartTime;
+//            struPlayCond.struStopTime = struStopTime;
+//            m_lPlayHandle = hCNetSDK.NET_DVR_PlayBackReverseByTime_V40(lUserIDLong,hwnd,struPlayCond);
+//        }
+//        if (m_lPlayHandle.intValue() == -1) {
+//            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
+//            return false;
+//        } else { return true; }
+//    }
 
 }
 
