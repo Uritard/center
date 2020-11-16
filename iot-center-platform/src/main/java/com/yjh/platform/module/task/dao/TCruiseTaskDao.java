@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.task.entity.CruiseInspectResult;
 import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.entity.TCruiseTaskCount;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
@@ -42,4 +43,6 @@ public interface TCruiseTaskDao {
     List<TCruiseTaskList> selectPointStatus(String taskId);
     //List<TCruiseTaskCount> taskCountByCondition(HashMap<String,Object> map);
     List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
+
+    List<CruiseInspectResult> selectCruiseInspectByTaskId(@Param(value = "taskId")String taskId);
 }

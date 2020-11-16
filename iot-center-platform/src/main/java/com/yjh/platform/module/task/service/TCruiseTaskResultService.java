@@ -9,6 +9,7 @@ import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.task.controller.HelloController;
+import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 
@@ -68,6 +69,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
+    @Autowired
+    private TCruiseTaskDao tCruiseTaskDao;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
     @Logs(title = "插入", code = "TCruiseTaskResult",content = "根据web传入的参数新增")
@@ -144,55 +148,92 @@ public class TCruiseTaskResultService {
     @Logs(title = "获取当前任务的巡检点全量信息 ", code = "TCruiseTaskResult",content = "获取任务巡检信息")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseInspectResult> selectCruiseTaskResult(String taskId) throws ParseException {
-        List<CruiseInspectResult> cruiseInspectResults = new ArrayList<>();
+        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskId(taskId);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //获取数据库键名列表
-        Set<String> keyResult = redisScan("t_cruise_task_result*");
-        for (String key : keyResult) {
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);//循环每个键名取相应的键值对数据
-
-            String value = resultMap.get("taskId").toString();//取出每条数据的key值为“taskId”的value值
-            String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
-            if (TaskId.equals(value)) {
-                CruiseInspectResult cruiseInspectResult = new CruiseInspectResult();
-//                cruiseInspectResult.setCruiseResultName(resultMap.get("cruiseResultName").toString());//巡检结果名称
-                cruiseInspectResult.setInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));//instanceId
-                cruiseInspectResult.setDeviceId(Long.valueOf(resultMap.get("deviceId").toString()));//设备ID
-                TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(Long.valueOf(resultMap.get("deviceId").toString()));
-                if(tStdDevice.equals(null)){
-                    cruiseInspectResult.setDeviceName("");
-                }else {
-                    cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());//设备名称
-                }
-
-                cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(Long.valueOf(resultMap.get("instanceId").toString())));//巡检点名称
-
-                CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
-                if(cruiseTypeInfo.equals(null)){
-                    cruiseInspectResult.setCruiseType(null);
-                    cruiseInspectResult.setCruiseTypeName(null);
-                }else {
-                    cruiseInspectResult.setCruiseType(cruiseTypeInfo.getCruiseType());//巡视方式
-                    cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
-                }
-                //当缓存中的巡视点还没有数据结果时，置为“--”
-                if(resultMap.get("resultNum").toString().equals("") ||resultMap.get("resultNum").toString().equals("null")){
+        for(CruiseInspectResult cruiseInspectResult:cruiseInspectResults){
+            TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(cruiseInspectResult.getDeviceId());
+            if(tStdDevice.equals(null)){
+                cruiseInspectResult.setDeviceName("");
+            }else {
+                cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());
+            }
+            cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(cruiseInspectResult.getInstanceId()));
+            log.info("离谱");
+            Set<String> cruiseKeys=redisScan("t_cruise_task_result:"+taskId);
+            for(String key:cruiseKeys){
+                Map<String,Object> resultMap=redisTemplate.opsForHash().entries(key);
+                log.info("---___---:"+resultMap);
+                if(resultMap.equals(null)){
                     cruiseInspectResult.setCruiseResultName("--");
-                }else {
-                    cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());//巡检结果
-                }
-                //Integer和Date类型判空
-                if (resultMap.get("endTime").equals("")) {
                     cruiseInspectResult.setEndTime(null);
-                } else {
-//                    // TODO: 2020/10/9 巡视结果是否为该巡视点完成后采集到的数据
-                    cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));//巡检时间
+                    return cruiseInspectResults;
+                }else {
+                    if(resultMap.get("instanceId").toString().equals(cruiseInspectResult.getInstanceId().toString())){
+                        if(resultMap.get("resultNum").toString().equals("") ||resultMap.get("resultNum").toString().equals("null")){
+                            cruiseInspectResult.setCruiseResultName("--");
+                        }else {
+                            cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
+                        }
+                        if(resultMap.get("endTime").equals("")){
+                            cruiseInspectResult.setEndTime(null);
+                        }else {
+                            cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));
+                        }
+                    }
                 }
-
-                cruiseInspectResults.add(cruiseInspectResult);
             }
 
         }
+
+
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        //获取数据库键名列表
+//        Set<String> keyResult = redisScan("t_cruise_task_result*");
+//        for (String key : keyResult) {
+//            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);//循环每个键名取相应的键值对数据
+//
+//            String value = resultMap.get("taskId").toString();//取出每条数据的key值为“taskId”的value值
+//            String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
+//            if (TaskId.equals(value)) {
+//                CruiseInspectResult cruiseInspectResult = new CruiseInspectResult();
+////                cruiseInspectResult.setCruiseResultName(resultMap.get("cruiseResultName").toString());//巡检结果名称
+//                cruiseInspectResult.setInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));//instanceId
+//                cruiseInspectResult.setDeviceId(Long.valueOf(resultMap.get("deviceId").toString()));//设备ID
+//                TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(Long.valueOf(resultMap.get("deviceId").toString()));
+//                if(tStdDevice.equals(null)){
+//                    cruiseInspectResult.setDeviceName("");
+//                }else {
+//                    cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());//设备名称
+//                }
+//
+//                cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(Long.valueOf(resultMap.get("instanceId").toString())));//巡检点名称
+//
+//                CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(resultMap.get("cruiseId").toString()));
+//                if(cruiseTypeInfo.equals(null)){
+//                    cruiseInspectResult.setCruiseType(null);
+//                    cruiseInspectResult.setCruiseTypeName(null);
+//                }else {
+//                    cruiseInspectResult.setCruiseType(cruiseTypeInfo.getCruiseType());//巡视方式
+//                    cruiseInspectResult.setCruiseTypeName(cruiseTypeInfo.getCruiseTypeName());//巡视方式类型
+//                }
+//                //当缓存中的巡视点还没有数据结果时，置为“--”
+//                if(resultMap.get("resultNum").toString().equals("") ||resultMap.get("resultNum").toString().equals("null")){
+//                    cruiseInspectResult.setCruiseResultName("--");
+//                }else {
+//                    cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());//巡检结果
+//                }
+//                //Integer和Date类型判空
+//                if (resultMap.get("endTime").equals("")) {
+//                    cruiseInspectResult.setEndTime(null);
+//                } else {
+////                    // TODO: 2020/10/9 巡视结果是否为该巡视点完成后采集到的数据
+//                    cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));//巡检时间
+//                }
+//
+//                cruiseInspectResults.add(cruiseInspectResult);
+//            }
+//
+//        }
         return cruiseInspectResults;
     }
 

@@ -344,4 +344,19 @@
         <if test="taskName != null and taskName != ''"> and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%') </if>
         );
     </select>
+
+    <select id="selectCruiseInspectByTaskId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseInspectResult">
+        SELECT
+            c.device_id as'deviceId',
+            c.instance_id as 'instanceId',
+            c.cruise_type as 'cruiseType',
+            d.dict_note as 'cruiseTypeName'
+        FROM
+            t_cruise_task a
+        LEFT JOIN t_cruise_plan_attr b ON a.plan_id = b.plan_id
+        LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+        LEFT JOIN t_dict_business d ON c.cruise_type=d.dict_code AND d.col_name='cruise_type'
+        WHERE
+            a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
 </mapper>

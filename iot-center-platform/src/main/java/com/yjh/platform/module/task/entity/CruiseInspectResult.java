@@ -26,8 +26,6 @@ public class CruiseInspectResult implements Serializable {
     private Long instanceId;
     @ApiModelProperty(value = "巡检点名称")
     private String instanceName;
-    @ApiModelProperty(value = "巡检结果")
-    private String  cruiseResult;
     @ApiModelProperty(value = "巡检结果名称")
     private String cruiseResultName;
     @ApiModelProperty(value = "巡视时间")

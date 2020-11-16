@@ -556,4 +556,6 @@
         left join t_camera_info b on a.camera_id = b.camera_id
         where a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
+
+
 </mapper>
