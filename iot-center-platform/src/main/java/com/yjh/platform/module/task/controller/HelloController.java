@@ -38,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-
 @RestController
 @Api("HelloController")
 @RequestMapping("/hello")
@@ -66,7 +65,7 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public String sayHello(@ApiParam(value = "ceshi ", required = true) @RequestParam String name,@ApiParam(value = "ceshi ", required = true)@RequestParam String name2) {
+    public String sayHello(@ApiParam(value = "ceshi ", required = true) @RequestParam String name, @ApiParam(value = "ceshi ", required = true) @RequestParam String name2) {
         WebSocketServer.sendMsg(name + "hello！");
         JSONObject jsonObject = JSONObject.fromObject(WebSocketResult.builder().type("1").info(name + "  很好!").build());
         WebSocketServer.sendMsg(jsonObject.toString());
@@ -87,8 +86,75 @@ public class HelloController {
 //        if (redisTemplate.opsForList().index("AnalysisList：9000001", 0).equals("-1") && redisTemplate.opsForList().index("AnalysisList：9000001",1).equals("0")) {
 //            log.info("执行数据操作");
 //        }
+//        String value = "wcaqm 655 68 872 314 wcgz 529 272 1022 1078";
+//        String[]value1 = value.split("[^a-z^A-Z]");
+//        log.info("lenth:"+value1.length);
+//        for(int i=0;i<value1.length;i++){
+//            log.info("result:"+value1[i]);
+//        }
 
 
+//        Set<Integer> index = new HashSet<>();
+//        index.add(value1.indexOf("wcaqm"));
+//        index.add(value1.indexOf("wcgz"));
+//        index.add(value1.indexOf("yydd"));
+//        index.add(value1.indexOf("xy"));
+//        index.add(value1.indexOf("slydmyw"));
+//        index.add(value1.indexOf("ywnc"));
+//        index.add(value1.indexOf("ywgkxfw"));
+//        index.add(value1.indexOf("jyzbmwh"));
+//        index.add(value1.indexOf("jyzpl"));
+//        index.add(value1.indexOf("jyzlw"));
+//        index.add(value1.indexOf("hxqgjbs"));
+//        index.add(value1.indexOf("hxqgjtps"));
+//        index.add(value1.indexOf("ywztyfyc"));
+//        index.add(value1.indexOf("bjbpmh"));
+//        index.add(value1.indexOf("bjbpps"));
+//        index.add(value1.indexOf("bjwkps"));
+//        index.add(value1.indexOf("mcqdmsh"));
+//        index.add(value1.indexOf("gbps"));
+//        index.add(value1.indexOf("gjptwss"));
+//        index.add(value1.indexOf("xmbhyc"));
+//        index.add(value1.indexOf("jsxs"));
+//        log.info("Set:"+index);
+//
+//        String[] str1 = value.split("[0-9]");
+//        StringBuffer stringBuffer = new StringBuffer();
+//        for (int i = 0; i < str1.length; i++) {
+//            stringBuffer.append(str1[i]);
+//        }
+//        String value2 = stringBuffer.toString();
+//        String[] str2 = value2.split(" ");
+//        stringBuffer.delete(0, stringBuffer.length() - 1);
+//        for (int i = 0; i < str2.length; i++) {
+//            stringBuffer.append(str2[i]);
+//        }
+//
+//
+//        for(Integer ind:index){
+//            if (ind.equals(-1)){
+//                continue;
+//            }else {
+//                switch (str2[ind]){
+//                    case "wcaqm":
+//                        defectValue=defectValue+"未穿安全帽"+" ";
+//                       break;
+//                    case "wcgz":
+//                        defectValue=defectValue+"未穿工装"+" ";
+//                       break;
+//                    case "rydd":
+//                        defectValue=defectValue+"人员倒地"+" ";
+//                        break;
+//
+//                }
+//            }
+//        }
+//        log.info("结果---:" + defectValue);
+
+
+//        String str="0.32";
+//        log.info("Result:"+str.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$"));
+      
         return name + "你好!";
     }
 

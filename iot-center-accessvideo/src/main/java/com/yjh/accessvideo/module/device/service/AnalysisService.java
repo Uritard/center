@@ -29,7 +29,7 @@ public class AnalysisService {
     @Logs(title = "算法调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public String feignAlgorithm(List<Analysis> analysisList, int recognizePort) throws InterruptedException {
-
+        log.info("analysisList____-----____:"+analysisList);
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
         log.info("任务结束心跳发送");
@@ -44,6 +44,7 @@ public class AnalysisService {
             msgDataObject.put("srcNode", "clientSocket001");
             int i=1;
             for (Analysis analysis: analysisList) {
+                log.info("表计IsAI："+analysis.getIsAi());
                 if (analysis.getIsAi()==1) {
                     JSONObject pictureInfoObject = new JSONObject();
                     JSONObject pictureDataObject = new JSONObject();
@@ -78,6 +79,7 @@ public class AnalysisService {
         log.info("进入算法方法----------");
         int i=1;
         for (Analysis analysis: analysisList) {
+            log.info("缺陷IsAI："+analysis.getIsAi());
             if (analysis.getIsAi()==0) {
                 JSONObject pictureDataObject = new JSONObject();
                 JSONObject pictureInfoObject = new JSONObject();

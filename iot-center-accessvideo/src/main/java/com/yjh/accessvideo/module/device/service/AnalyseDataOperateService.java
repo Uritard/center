@@ -4,16 +4,22 @@ package com.yjh.accessvideo.module.device.service;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.commons.logs.Logs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AnalyseDataOperateService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
+
+    private Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
     @Logs(title = "告警信息插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
@@ -124,6 +130,19 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.selectCruiseByTaskId(taskId);
     }
 
+    @Logs(title = "插入缺陷信息")
+    @Transactional(rollbackFor = Exception.class)
+    public int insertDefectInfo(TDefectInfo tDefectInfo){
+        return this.analyseDataOperateDao.insertDefectInfo(tDefectInfo);
+    }
+
+    @Logs(title = "插入缺陷信息")
+    @Transactional(rollbackFor = Exception.class)
+    public int batchInsertDefectInfo(List<TDefectInfo> list){
+        return this.analyseDataOperateDao.batchInsertDefectInfo(list);
+    }
+
+
     @Logs(title = "告警判断", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgement(Float value,
@@ -142,6 +161,131 @@ public class AnalyseDataOperateService {
         }else
             return 0;
 
+    }
+
+    @Logs(title = "缺陷识别结果解析",code = "")
+    @Transactional(rollbackFor = Exception.class)
+    public String resolveDefectResult(String resultValue){
+        log.info("----缺陷识别结果解析---resultValue:"+resultValue);
+        String defectValue="";
+        String value = resultValue;
+        String value1 = value.replaceAll("[^a-z^A-Z]", "");
+        Set<Integer> index = new HashSet<>();
+        index.add(value1.indexOf("wcaqm"));
+        index.add(value1.indexOf("wcgz"));
+        index.add(value1.indexOf("yydd"));
+        index.add(value1.indexOf("xy"));
+        index.add(value1.indexOf("slydmyw"));
+        index.add(value1.indexOf("ywnc"));
+        index.add(value1.indexOf("ywgkxfw"));
+        index.add(value1.indexOf("jyzbmwh"));
+        index.add(value1.indexOf("jyzpl"));
+        index.add(value1.indexOf("jyzlw"));
+        index.add(value1.indexOf("hxqgjbs"));
+        index.add(value1.indexOf("hxqgjtps"));
+        index.add(value1.indexOf("ywztyfyc"));
+        index.add(value1.indexOf("bjbpmh"));
+        index.add(value1.indexOf("bjbpps"));
+        index.add(value1.indexOf("bjwkps"));
+        index.add(value1.indexOf("mcqdmsh"));
+        index.add(value1.indexOf("gbps"));
+        index.add(value1.indexOf("gjptwss"));
+        index.add(value1.indexOf("xmbhyc"));
+        index.add(value1.indexOf("jsxs"));
+        log.info("----缺陷识别结果解析---Set:"+index);
+
+        index.remove(-1);
+        if(index.size()==0){
+            return "null";
+        }
+
+        log.info("发生错误？"+index.size());
+
+        String[] str1 = value.split("[0-9]");
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < str1.length; i++) {
+            stringBuffer.append(str1[i]);
+        }
+        String value2 = stringBuffer.toString();
+        String[] str2 = value2.split(" ");
+        stringBuffer.delete(0, stringBuffer.length() - 1);
+        for (int i = 0; i < str2.length; i++) {
+            stringBuffer.append(str2[i]);
+        }
+
+
+        for(Integer ind:index){
+            if (ind.equals(-1)){
+                continue;
+            }else {
+                switch (str2[ind]){
+                    case "wcaqm":
+                        defectValue=defectValue+"未穿安全帽"+" ";
+                        break;
+                    case "wcgz":
+                        defectValue=defectValue+"未穿工装"+" ";
+                        break;
+                    case "rydd":
+                        defectValue=defectValue+"人员倒地"+" ";
+                        break;
+                    case "xy":
+                        defectValue=defectValue+"吸烟"+" ";
+                        break;
+                    case "slydmyw":
+                        defectValue=defectValue+"地面油污"+" ";
+                        break;
+                    case "ywnc":
+                        defectValue=defectValue+"鸟窝"+" ";
+                        break;
+                    case "ywgkxfw":
+                        defectValue=defectValue+"飘挂物"+" ";
+                        break;
+                    case "jyzbmwh":
+                        defectValue=defectValue+"绝缘子-表面污秽"+" ";
+                        break;
+                    case "jyzpl":
+                        defectValue=defectValue+"绝缘子-破裂"+" ";
+                        break;
+                    case "jyzlw":
+                        defectValue=defectValue+"绝缘子-裂纹"+" ";
+                        break;
+                    case "hxqgjbs":
+                        defectValue=defectValue+"呼吸器-硅胶变色"+" ";
+                        break;
+                    case "hxqgjtps":
+                        defectValue=defectValue+"呼吸器-硅胶筒破损"+" ";
+                        break;
+                    case "ywztyfyc":
+                        defectValue=defectValue+"油位状态-油位异常"+" ";
+                        break;
+                    case "bjbpmh":
+                        defectValue=defectValue+"表计-表盘模糊"+" ";
+                        break;
+                    case "bjbpps":
+                        defectValue=defectValue+"表计-表盘破损"+" ";
+                        break;
+                    case "bjwkps":
+                        defectValue=defectValue+"表计-外壳破损"+" ";
+                        break;
+                    case "mcqdmsh":
+                        defectValue=defectValue+"门窗墙地面损坏"+" ";
+                        break;
+                    case "gbps":
+                        defectValue=defectValue+"盖板破损"+" ";
+                        break;
+                    case "gjptwss":
+                        defectValue=defectValue+"构架爬梯未上锁"+" ";
+                        break;
+                    case "xmbhyc":
+                        defectValue=defectValue+"箱门闭合异常"+" ";
+                        break;
+                    case "jsxs":
+                        defectValue=defectValue+"金属锈蚀"+" ";
+                        break;
+                }
+            }
+        }
+        return defectValue;
     }
 
 }

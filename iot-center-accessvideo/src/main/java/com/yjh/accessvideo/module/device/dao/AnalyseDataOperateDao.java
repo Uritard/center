@@ -35,5 +35,8 @@ public interface AnalyseDataOperateDao {
     String selectDictCode(@Param(value = "colName")String colName,@Param(value = "dictNote")String dictNote);
     List<TCruisePointInstance> selectCruiseByTaskId(@Param(value = "taskId")String taskId);
 
+    int insertDefectInfo(TDefectInfo tDefectInfo);
+    int batchInsertDefectInfo(List<TDefectInfo> list);
+
 
 }
