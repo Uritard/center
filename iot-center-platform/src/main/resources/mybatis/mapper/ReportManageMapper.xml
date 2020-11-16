@@ -124,7 +124,7 @@
         WHERE 1 = 1
         <if test="reportName != null and reportName != ''"> and a.report_name like concat ('%',#{reportName,jdbcType=VARCHAR},'%')</if>
         <if test="startTime != null and endTime != null"> and generate_date BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-
+        ORDER BY generate_date DESC
     </select>
     <insert id="insertReport" parameterType="com.yjh.platform.module.task.entity.TReportInfo">
         insert into t_report_info(

@@ -243,7 +243,7 @@ public class ReportManageService {
             BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
             String lineForId = null;
             while ((lineForId = readerForId.readLine()) != null) {
-                count = Long.parseLong(lineForId);
+                count2 = Long.parseLong(lineForId);
             }
         } catch (IOException e) {
             e.printStackTrace();
