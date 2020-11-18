@@ -154,6 +154,15 @@ public class HelloController {
 
 //        String str="0.32";
 //        log.info("Result:"+str.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$"));
+
+        Set<String>Keys1=redisScan("salary:");
+        Set<String>Key2=redisScan("defectInfo:");
+        log.info("size1:"+ Keys1.size());
+        log.info("size2:"+Key2.size());
+        if(Keys1.size()==0){
+            log.info("问题解决");
+        }
+
       
         return name + "你好!";
     }

@@ -66,23 +66,24 @@ public class TStdDevicemeteService{
     @Logs(title = "删除", code = "device")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceMeteId) {
-        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
-        Long deviceId=tStdDeviceMete.getDeviceId();
-        String customId=tStdDeviceMete.getCustomId();
+//        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
+//        Long deviceId=tStdDeviceMete.getDeviceId();
+//        String customId=tStdDeviceMete.getCustomId();
         this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);//删除当前标准测点
 
-        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
-
-            if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
-                TStdDevice tStdDevice=tStdDeviceDao.selectByPrimaryId(deviceId);
-                tStdDevice.setCustomId("101");
-                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
-                tStdDeviceDao.add(tStdDevice);
-            }else {                                               //若存在则删除与当前测点关联的设备信息
-                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
-            }
-
-        }
+//        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
+//
+//            if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
+//                TStdDevice tStdDevice=tStdDeviceDao.selectByPrimaryId(deviceId);
+//                tStdDevice.setCustomId("101");
+//                tStdDevice.setCustomName("本体");
+//                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+//                tStdDeviceDao.add(tStdDevice);
+//            }else {                                               //若存在则删除与当前测点关联的设备信息
+//                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+//            }
+//
+//        }
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         //tCruisePointInstance.setDeviceMeteId(deviceMeteId);
         List<Long> haveList = tStdDevicemeteDao.selectHave(deviceMeteId);
@@ -208,16 +209,22 @@ public class TStdDevicemeteService{
         int deleteCount=0;
         List<String> list1= Arrays.asList(list.split(","));
         for (String item:list1) {
-            tCruisePointInstanceDao.deleteByDeviceMeteId(Long.valueOf(item));//遍历删除巡视点
+            List<Long> haveList = tStdDevicemeteDao.selectHave(Long.valueOf(item));
+            tCruisePointInstanceDao.deleteByDeviceMeteId(Long.valueOf(item));//遍历删除巡检点
+            //删除关联的表
+            if(haveList != null && haveList.size()>0){
+                tCruisePlanAttrDao.deleteByInstanceId(haveList);
+                tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+            }
 
-            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));
-            Long deviceId=tStdDeviceMete.getDeviceId();
-            String customId=tStdDeviceMete.getCustomId();
+//            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));//根据devicemeteId查测点
+//            Long deviceId=tStdDeviceMete.getDeviceId();
+//            String customId=tStdDeviceMete.getCustomId();
             deleteCount=tStdDevicemeteDao.deleteByPrimaryId(Long.valueOf(item))+deleteCount;
 
-            if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){
-                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
-            }
+//            if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){
+//                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+//            }
 
         }
         return deleteCount;//批量删除标准测点

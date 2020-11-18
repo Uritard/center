@@ -74,51 +74,52 @@ public class TCruiseTaskResultService {
     private TCruiseTaskDao tCruiseTaskDao;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
-    @Logs(title = "插入", code = "TCruiseTaskResult",content = "根据web传入的参数新增")
+
+    @Logs(title = "插入", code = "TCruiseTaskResult", content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTaskResult tCruiseTaskResult) {
         return this.tCruiseTaskResultDao.insert(tCruiseTaskResult);
     }
 
-    @Logs(title = "删除", code = "TCruiseTaskResult",content = "根据web传入的参数删除")
+    @Logs(title = "删除", code = "TCruiseTaskResult", content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskResultId) {
         return this.tCruiseTaskResultDao.deleteByPrimaryId(taskResultId);
     }
 
-    @Logs(title = "更新", code = "TCruiseTaskResult",content = "根据web传入的参数更新")
+    @Logs(title = "更新", code = "TCruiseTaskResult", content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseTaskResult tCruiseTaskResult) {
         return this.tCruiseTaskResultDao.update(tCruiseTaskResult);
     }
 
-    @Logs(title = "主键查询", code = "TCruiseTaskResult",content = "根据web传入的参数查询")
+    @Logs(title = "主键查询", code = "TCruiseTaskResult", content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTaskResult selectByPrimaryId(String taskResultId) {
         return this.tCruiseTaskResultDao.selectByPrimaryId(taskResultId);
     }
 
-    @Logs(title = "查询", code = "TCruiseTaskResult",content = "根据web传入的参数查询")
+    @Logs(title = "查询", code = "TCruiseTaskResult", content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTaskResult> select(String taskResultId, String taskId, Integer taskAbnormal, Integer taskAlarm, String runExecute, Date cruiseTaskTime, Integer taskStatus, Integer cruiseResult, String remark) {
         List<TCruiseTaskResult> tCruiseTaskResultList = tCruiseTaskResultDao.select(taskResultId, taskId, taskAbnormal, taskAlarm, runExecute, cruiseTaskTime, taskStatus, cruiseResult, remark);
         return tCruiseTaskResultList;
     }
 
-    @Logs(title = "分页查询", code = "TCruiseTaskResult",content = "根据web传入的参数查询")
+    @Logs(title = "分页查询", code = "TCruiseTaskResult", content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTaskResult> selectByPage(TCruiseTaskResult tCruiseTaskResult) {
         List<TCruiseTaskResult> tCruiseTaskResultList = tCruiseTaskResultDao.selectByPage(tCruiseTaskResult);
         return tCruiseTaskResultList;
     }
 
-    @Logs(title = "批量插入", code = "TCruiseTaskResult",content = "根据web传入的参数批量插入")
+    @Logs(title = "批量插入", code = "TCruiseTaskResult", content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseTaskResult> list) {
         return this.tCruiseTaskResultDao.batchInsert(list);
     }
 
-    @Logs(title = "Redis数据库批量查询Key值游标", code = "TCruiseTaskResult",content = "获取redis的数据")
+    @Logs(title = "Redis数据库批量查询Key值游标", code = "TCruiseTaskResult", content = "获取redis的数据")
     @Transactional(rollbackFor = Exception.class)
     public Set<String> redisScan(String key) {
         return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
@@ -145,40 +146,36 @@ public class TCruiseTaskResultService {
         });
     }
 
-    @Logs(title = "获取当前任务的巡检点全量信息 ", code = "TCruiseTaskResult",content = "获取任务巡检信息")
+    @Logs(title = "获取当前任务的巡检点全量信息 ", code = "TCruiseTaskResult", content = "获取任务巡检信息")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseInspectResult> selectCruiseTaskResult(String taskId) throws ParseException {
         List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskId(taskId);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for(CruiseInspectResult cruiseInspectResult:cruiseInspectResults){
+        for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
             TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(cruiseInspectResult.getDeviceId());
-            if(tStdDevice.equals(null)){
+            if (tStdDevice.equals(null)) {
                 cruiseInspectResult.setDeviceName("");
-            }else {
+            } else {
                 cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());
             }
             cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(cruiseInspectResult.getInstanceId()));
+            cruiseInspectResult.setCruiseResultName("--");
+            cruiseInspectResult.setEndTime(null);
             log.info("离谱");
-            Set<String> cruiseKeys=redisScan("t_cruise_task_result:"+taskId);
-            for(String key:cruiseKeys){
-                Map<String,Object> resultMap=redisTemplate.opsForHash().entries(key);
-                log.info("---___---:"+resultMap);
-                if(resultMap.equals(null)){
-                    cruiseInspectResult.setCruiseResultName("--");
-                    cruiseInspectResult.setEndTime(null);
-                    return cruiseInspectResults;
-                }else {
-                    if(resultMap.get("instanceId").toString().equals(cruiseInspectResult.getInstanceId().toString())){
-                        if(resultMap.get("resultNum").toString().equals("") ||resultMap.get("resultNum").toString().equals("null")){
-                            cruiseInspectResult.setCruiseResultName("--");
-                        }else {
-                            cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
-                        }
-                        if(resultMap.get("endTime").equals("")){
-                            cruiseInspectResult.setEndTime(null);
-                        }else {
-                            cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));
-                        }
+            Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + taskId);
+            for (String key : cruiseKeys) {
+                Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
+                log.info("---___---:" + resultMap);
+                if (resultMap.get("instanceId").toString().equals(cruiseInspectResult.getInstanceId().toString())) {
+                    if (resultMap.get("resultNum").toString().equals("") || resultMap.get("resultNum").toString().equals("null")) {
+                        cruiseInspectResult.setCruiseResultName("--");
+                    } else {
+                        cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
+                    }
+                    if (resultMap.get("endTime").equals("")) {
+                        cruiseInspectResult.setEndTime(null);
+                    } else {
+                        cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));
                     }
                 }
             }
@@ -238,9 +235,9 @@ public class TCruiseTaskResultService {
     }
 
 
-    @Logs(title = "统计获取当前任务的执行进度", code = "TCruiseTaskResult",content = "统计任务执行进度")
+    @Logs(title = "统计获取当前任务的执行进度", code = "TCruiseTaskResult", content = "统计任务执行进度")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object>selectCruiseAdvance(String taskId) {
+    public Map<String, Object> selectCruiseAdvance(String taskId) {
         Set<String> keyResult = redisScan("t_cruise_task_result*");
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
@@ -267,19 +264,19 @@ public class TCruiseTaskResultService {
             }
         }
 //        Map<String, Float> Rate = new HashMap<>();
-        Map<String,Object> rateAndTaskInfo=new HashMap<>();
-        if(cruiseComCount==0 || cruiseComCount==0){
-            rateAndTaskInfo.put("rate",Float.valueOf("0"));
-        }else {
+        Map<String, Object> rateAndTaskInfo = new HashMap<>();
+        if (cruiseComCount == 0 || cruiseComCount == 0) {
+            rateAndTaskInfo.put("rate", Float.valueOf("0"));
+        } else {
             rateAndTaskInfo.put("rate", cruiseComCount / cruiseCount);
         }
-        rateAndTaskInfo.put("taskState",tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
-        rateAndTaskInfo.put("taskStateName",tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
+        rateAndTaskInfo.put("taskState", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
+        rateAndTaskInfo.put("taskStateName", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
         return rateAndTaskInfo;
     }
 
 
-    @Logs(title = "查询当前任务下巡检点关联的标准测点各个状态下的数量", code = "TCruiseTaskResult",content = "统计任务里各个状态的测点数量")
+    @Logs(title = "查询当前任务下巡检点关联的标准测点各个状态下的数量", code = "TCruiseTaskResult", content = "统计任务里各个状态的测点数量")
     @Transactional(rollbackFor = Exception.class)
     public CruiseResultCounter selectCruiseStatusCount(String taskId) throws ParseException {
 
@@ -299,21 +296,21 @@ public class TCruiseTaskResultService {
             String TaskId = taskId.toString();
             Long a = Long.valueOf(resultMap.get("cruiseId").toString());
             if (TaskId.equals(value)) {
-                if(tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)){
+                if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
                     deviceMete.add(null);
-                }else {
+                } else {
                     deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
                 }
                 if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
-                    if(tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)){
+                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
                         deviceMeteAbnormal.add(null);
-                    }else {
+                    } else {
                         deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
                     }
                 } else if (resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) {
-                    if(tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)){
+                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
                         deviceMeteNotComp.add(null);
-                    }else {
+                    } else {
                         deviceMeteNotComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
                     }
                 }
@@ -348,7 +345,7 @@ public class TCruiseTaskResultService {
     }
 
 
-    @Logs(title = "查询当前任务下机器人/摄像头的基本信息和与之关联的巡检点执行进度", code = "TCruiseTaskResult",content = "查询巡检点执行进度")
+    @Logs(title = "查询当前任务下机器人/摄像头的基本信息和与之关联的巡检点执行进度", code = "TCruiseTaskResult", content = "查询巡检点执行进度")
     @Transactional(rollbackFor = Exception.class)
     public List<Object> selectCruiseDeviceAndCruiseAdvance(String taskId) {
 
@@ -564,7 +561,7 @@ public class TCruiseTaskResultService {
     }
 
 
-    @Logs(title = "图片比较", code = "TCruiseTaskResult",content = "图片比较")//结果集仍需优化、只获取了摄像头原始图片
+    @Logs(title = "图片比较", code = "TCruiseTaskResult", content = "图片比较")//结果集仍需优化、只获取了摄像头原始图片
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> PictureCompare(String taskId, Long instanceId) {
 //     List<String> pictureResult=new ArrayList<>();
@@ -587,26 +584,26 @@ public class TCruiseTaskResultService {
         return map;
     }
 
-    @Logs(title = "获取机器人巡视画面", code = "TCruiseTaskResult",content = "获取机器人巡检画面")
+    @Logs(title = "获取机器人巡视画面", code = "TCruiseTaskResult", content = "获取机器人巡检画面")
     @Transactional(rollbackFor = Exception.class)
     public List<CameraOfRobotInfo> selectRobotScreen(String taskId) {
         List<CameraOfRobotInfo> cameraOfRobotInfos = tRobotInfoDao.selectRobotScreen(taskId);
         return cameraOfRobotInfos;
     }
 
-    @Logs(title = "获取摄像头缓存信息", code = "TCruiseTaskResult",content = "获取摄像头缓存信息")
+    @Logs(title = "获取摄像头缓存信息", code = "TCruiseTaskResult", content = "获取摄像头缓存信息")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> cameraInfoByRedis(){
+    public Map<String, Object> cameraInfoByRedis() {
         Set<String> cruiseKeys = redisScan("t_cruise_task_result*");
-        for(String cruiseKey:cruiseKeys){
-            Map<String,Object>cruiseInfo=redisTemplate.opsForHash().entries(cruiseKey);
+        for (String cruiseKey : cruiseKeys) {
+            Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
             CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
             cruiseTypeInfo.getCruiseId().toString();
 
         }
-        Map<String,Object> cameraInfo=redisTemplate.opsForHash().entries("camera_info:21000000015");
+        Map<String, Object> cameraInfo = redisTemplate.opsForHash().entries("camera_info:21000000015");
         System.out.print(cameraInfo.getClass());
-        return  cameraInfo;
+        return cameraInfo;
     }
 
 }
