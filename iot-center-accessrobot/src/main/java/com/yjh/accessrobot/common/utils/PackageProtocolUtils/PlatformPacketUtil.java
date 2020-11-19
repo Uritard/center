@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.common.utils;
+package com.yjh.accessrobot.common.utils.PackageProtocolUtils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -107,7 +107,7 @@ public class PlatformPacketUtil {
      *
      * 生成发送的报文
      */
-    public static byte[] createPacket(long receiveSessionId,long sendSessionId,boolean isSend,String body){
+    public static byte[] createPacket(long sendSessionId,long receiveSessionId,boolean isSend,String body){
         //实际报文消息体
         byte[] soc = null;
 

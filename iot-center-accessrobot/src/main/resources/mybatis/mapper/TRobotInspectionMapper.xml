@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotInspectionDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        <id column="inspection_id" jdbcType="BIGINT" property="inspectionId" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="inspection_name" jdbcType="VARCHAR" property="inspectionName" />
+        <result column="inspection_type" jdbcType="INTEGER" property="inspectionType" />
+        <result column="alarm_top" jdbcType="VARCHAR" property="alarmTop" />
+        <result column="alarm_bottom" jdbcType="VARCHAR" property="alarmBottom" />
+        <result column="default_value" jdbcType="VARCHAR" property="defaultValue" />
+        <result column="inspection_position" jdbcType="INTEGER" property="inspectionPosition" />
+        <result column="collect_status" jdbcType="INTEGER" property="collectStatus" />
+        <result column="calibration_status" jdbcType="INTEGER" property="calibrationStatus" />
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        inspection_id, robot_id, inspection_name, inspection_type, alarm_top, alarm_bottom, default_value, inspection_position, collect_status, calibration_status, unit
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="inspectionId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        insert into t_robot_inspection(
+            inspection_id,
+            robot_id,
+            inspection_name,
+            inspection_type,
+            alarm_top,
+            alarm_bottom,
+            default_value,
+            inspection_position,
+            collect_status,
+            calibration_status,
+            unit
+        )values(
+                #{inspectionId, jdbcType=BIGINT},
+                #{robotId, jdbcType=BIGINT},
+                #{inspectionName, jdbcType=VARCHAR},
+                #{inspectionType, jdbcType=INTEGER},
+                #{alarmTop, jdbcType=VARCHAR},
+                #{alarmBottom, jdbcType=VARCHAR},
+                #{defaultValue, jdbcType=VARCHAR},
+                #{inspectionPosition, jdbcType=INTEGER},
+                #{collectStatus, jdbcType=INTEGER},
+                #{calibrationStatus, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_robot_inspection
+                where inspection_id = #{inspectionId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        update t_robot_inspection a <set>
+        <if test="inspectionId != null and inspectionId != ''">a.inspection_id = #{inspectionId, jdbcType=BIGINT},</if>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
+        <if test="inspectionType != null and inspectionType != ''">a.inspection_type = #{inspectionType, jdbcType=INTEGER},</if>
+        <if test="alarmTop != null and alarmTop != ''">a.alarm_top = #{alarmTop, jdbcType=VARCHAR},</if>
+        <if test="alarmBottom != null and alarmBottom != ''">a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR},</if>
+        <if test="defaultValue != null and defaultValue != ''">a.default_value = #{defaultValue, jdbcType=VARCHAR},</if>
+        <if test="inspectionPosition != null and inspectionPosition != ''">a.inspection_position = #{inspectionPosition, jdbcType=INTEGER},</if>
+        <if test="collectStatus != null and collectStatus != ''">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
+        <if test="calibrationStatus != null and calibrationStatus != ''">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
+        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+    </set>
+            where a.inspection_id = #{inspectionId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        select
+        a.inspection_id,
+        a.robot_id,
+        a.inspection_name,
+        a.inspection_type,
+        a.alarm_top,
+        a.alarm_bottom,
+        a.default_value,
+        a.inspection_position,
+        a.collect_status,
+        a.calibration_status,
+        a.unit
+        from t_robot_inspection a
+        where 1 = 1
+            and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        select
+        a.inspection_id,
+        a.robot_id,
+        a.inspection_name,
+        a.inspection_type,
+        a.alarm_top,
+        a.alarm_bottom,
+        a.default_value,
+        a.inspection_position,
+        a.collect_status,
+        a.calibration_status,
+        a.unit
+        from t_robot_inspection a
+        where 1 = 1
+        <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
+        <if test="inspectionType != null and inspectionType != ''"> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
+        <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
+        <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
+        <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
+        <if test="inspectionPosition != null and inspectionPosition != ''"> and a.inspection_position = #{inspectionPosition, jdbcType=INTEGER}</if>
+        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
+        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        select
+        a.inspection_id,
+        a.robot_id,
+        a.inspection_name,
+        a.inspection_type,
+        a.alarm_top,
+        a.alarm_bottom,
+        a.default_value,
+        a.inspection_position,
+        a.collect_status,
+        a.calibration_status,
+        a.unit
+        from t_robot_inspection a
+        where 1 = 1
+        <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
+        <if test="inspectionType != null and inspectionType != ''"> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
+        <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
+        <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
+        <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
+        <if test="inspectionPosition != null and inspectionPosition != ''"> and a.inspection_position = #{inspectionPosition, jdbcType=INTEGER}</if>
+        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
+        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_robot_inspection(
+            inspection_id,
+            robot_id,
+            inspection_name,
+            inspection_type,
+            alarm_top,
+            alarm_bottom,
+            default_value,
+            inspection_position,
+            collect_status,
+            calibration_status,
+            unit
+        )values
+        <foreach collection="list" item="TRobotInspection" separator=",">
+            (
+                #{TRobotInspection.inspectionId, jdbcType=BIGINT},
+                #{TRobotInspection.robotId, jdbcType=BIGINT},
+                #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
+                #{TRobotInspection.inspectionType, jdbcType=INTEGER},
+                #{TRobotInspection.alarmTop, jdbcType=VARCHAR},
+                #{TRobotInspection.alarmBottom, jdbcType=VARCHAR},
+                #{TRobotInspection.defaultValue, jdbcType=VARCHAR},
+                #{TRobotInspection.inspectionPosition, jdbcType=INTEGER},
+                #{TRobotInspection.collectStatus, jdbcType=INTEGER},
+                #{TRobotInspection.calibrationStatus, jdbcType=INTEGER},
+                #{TRobotInspection.unit, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

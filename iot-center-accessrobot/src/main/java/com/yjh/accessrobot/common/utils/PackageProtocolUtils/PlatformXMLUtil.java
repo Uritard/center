@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.common.utils;
+package com.yjh.accessrobot.common.utils.PackageProtocolUtils;
 
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import org.apache.commons.lang.StringUtils;
@@ -17,13 +17,13 @@ import java.util.*;
  */
 public class PlatformXMLUtil {
     //解析xml
-    public static XMLBaseModel readStringXmlOut(String xml) {
+    public static XMLBaseModel readStringXmlOut(Document doc) {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> itemsList = new ArrayList<>();
-        Document doc = null;
+//        Document doc = null;
 
         try {
-            doc = DocumentHelper.parseText(xml); // 将字符串转为XML
+//            doc = DocumentHelper.parseText(xml); // 将字符串转为XML
             Element rootElt = doc.getRootElement(); // 获取根节点
             List<Element> list = rootElt.elements();// 获取根节点下所有节点
             for (Element element : list) { // 遍历节点
@@ -45,36 +45,33 @@ public class PlatformXMLUtil {
                 if (element.getName().equals("Time")) {
                     xmlBaseModel.setTime(element.getText());
                 }
-                if (element.getName().equals("Items")) {
+                if(element.getName().equals("Items")){
                     List<Element> items = element.elements();
-                    if (items.size() != 0) {
-                        for (Element item : items) {
+                    if (items.size()!= 0){
+                        for(Element item : items){
                             List<DefaultAttribute> attributes = item.attributes();
                             Map<String, Object> map = new HashMap<String, Object>();
-                            for (DefaultAttribute defaultAttribute : attributes) {
-                                map.put(defaultAttribute.getName(), defaultAttribute.getValue());// 节点的属性name为map的key，value为map的value
+                            for(DefaultAttribute defaultAttribute : attributes){
+                                map.put(defaultAttribute.getName(),defaultAttribute.getValue());// 节点的属性name为map的key，value为map的value
                             }
                             itemsList.add(map);
                         }
-                    } else {
+                    }else {
                         Map<String, Object> map = new HashMap<String, Object>();
-                        if (element.attribute("value") != null) {
-                            map.put(element.attribute("value").getName(), element.attribute("value").getValue());
+                        if (element.attribute("value")!=null){
+                            map.put(element.attribute("value").getName(),element.attribute("value").getValue());
                         }
-                        if (element.attribute("direction") != null) {
-                            map.put(element.attribute("direction").getName(), element.attribute("direction").getValue());
+                        if (element.attribute("direction")!=null){
+                            map.put(element.attribute("direction").getName(),element.attribute("direction").getValue());
                         }
-                        if (!map.isEmpty()) {
+                        if (!map.isEmpty()){
                             itemsList.add(map);
                         }
                     }
                     xmlBaseModel.setItems(itemsList);
                 }
             }
-        } catch (
-                DocumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
+        }  catch (Exception e) {
             e.printStackTrace();
         }
         return xmlBaseModel;

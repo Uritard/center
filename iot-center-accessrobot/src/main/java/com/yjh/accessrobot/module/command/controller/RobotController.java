@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.controller;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,16 +37,55 @@ public class RobotController {
 
     public RobotController(RobotService robotService) { this.robotService = robotService; }
 
-    @ApiOperation(value = "控制接口")
+    @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.POST)
-    public Result feignRobotControl(@RequestBody Map<String, Object> analysisMap) {
+    public Result feignRobotControl(@RequestBody XMLBaseModel xmlBaseModel) {
+        Result result = new Result();
+//        log.info("前端送来的xmlBaseModel:"+xmlBaseModel);
+        try {
+            result.setData(robotService.feignRobotControl(xmlBaseModel));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人控制接口调用错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "发送模型同步指令接口")
+    @RequestMapping(value = "/fileTransfer", method = RequestMethod.POST)
+    public Result feignRobotTransfer() {
         Result result = new Result();
         try {
-            if (Objects.isNull(analysisMap)) {
-                result.setMessage("参数为空");
-                return result;
-            }
-            result.setData(robotService.feignRobotControl(analysisMap));
+            result.setData(robotService.feignRobotTransfer());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人控制接口调用错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "发送任务/联动任务指令接口")
+    @RequestMapping(value = "/taskIssued", method = RequestMethod.POST)
+    public Result feignRobotTaskIssued(@RequestBody XMLBaseModel xmlBaseModel) {
+        Result result = new Result();
+        try {
+            result.setData(robotService.feignRobotTaskIssued(xmlBaseModel));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人控制接口调用错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "发送任务控制指令接口")
+    @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
+    public Result feignRobotTaskControl(@RequestBody XMLBaseModel xmlBaseModel) {
+        Result result = new Result();
+        try {
+            result.setData(robotService.feignRobotTaskControl(xmlBaseModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

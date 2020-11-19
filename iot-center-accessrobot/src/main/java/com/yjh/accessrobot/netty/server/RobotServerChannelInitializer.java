@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.server;
 
+import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -21,11 +22,13 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
     private RedisTemplate redisTemplate;
     private SysLogsService sysLogsService;
     private String serverName;
+    private RobotService robotService;
 
-    public RobotServerChannelInitializer(String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService) {
+    public RobotServerChannelInitializer(String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService,RobotService robotService) {
         this.serverName = serverName;
         this.redisTemplate = redisTemplate;
         this.sysLogsService = sysLogsService;
+        this.robotService = robotService;
     }
 
     @Override
@@ -54,6 +57,7 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         robotServerHandler.setServerName(serverName);
         robotServerHandler.setRedisTemplate(redisTemplate);
         robotServerHandler.setSysLogsService(sysLogsService);
+        robotServerHandler.setRobotService(robotService);
         channel.pipeline().addLast(robotServerHandler);
 
     }

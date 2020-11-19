@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        <id column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
+        <result column="robot_name" jdbcType="VARCHAR" property="robotName" />
+        <result column="robot_status" jdbcType="VARCHAR" property="robotStatus" />
+        <result column="robot_type" jdbcType="INTEGER" property="robotType" />
+        <result column="robot_ip" jdbcType="VARCHAR" property="robotIp" />
+        <result column="robot_port" jdbcType="INTEGER" property="robotPort" />
+        <result column="light_ip" jdbcType="VARCHAR" property="lightIp" />
+        <result column="light_port" jdbcType="VARCHAR" property="lightPort" />
+        <result column="light_username" jdbcType="VARCHAR" property="lightUsername" />
+        <result column="light_password" jdbcType="VARCHAR" property="lightPassword" />
+        <result column="lnferad_IP" jdbcType="VARCHAR" property="lnferadIp" />
+        <result column="Inferad_Port" jdbcType="INTEGER" property="inferadPort" />
+        <result column="Inferad_username" jdbcType="VARCHAR" property="inferadUsername" />
+        <result column="Inferad_password" jdbcType="VARCHAR" property="inferadPassword" />
+        <result column="phote_path" jdbcType="VARCHAR" property="photePath" />
+        <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="robot_factory" jdbcType="VARCHAR" property="robotFactory" />
+        <result column="is_use" jdbcType="VARCHAR" property="isUse" />
+        <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="robot_position" jdbcType="VARCHAR" property="robotPosition" />
+        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        robot_id, robot_code, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, robot_factory, is_use, commission_date, up_region_id, robot_position, remarks
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="robotId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        insert into t_robot_info(
+            robot_id,
+            robot_code,
+            robot_name,
+            robot_status,
+            robot_type,
+            robot_ip,
+            robot_port,
+            light_ip,
+            light_port,
+            light_username,
+            light_password,
+            lnferad_IP,
+            Inferad_Port,
+            Inferad_username,
+            Inferad_password,
+            phote_path,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            robot_factory,
+            is_use,
+            commission_date,
+            up_region_id,
+            robot_position,
+            remarks
+        )values(
+                #{robotId, jdbcType=BIGINT},
+                #{robotCode, jdbcType=VARCHAR},
+                #{robotName, jdbcType=VARCHAR},
+                #{robotStatus, jdbcType=VARCHAR},
+                #{robotType, jdbcType=INTEGER},
+                #{robotIp, jdbcType=VARCHAR},
+                #{robotPort, jdbcType=INTEGER},
+                #{lightIp, jdbcType=VARCHAR},
+                #{lightPort, jdbcType=VARCHAR},
+                #{lightUsername, jdbcType=VARCHAR},
+                #{lightPassword, jdbcType=VARCHAR},
+                #{lnferadIp, jdbcType=VARCHAR},
+                #{inferadPort, jdbcType=INTEGER},
+                #{inferadUsername, jdbcType=VARCHAR},
+                #{inferadPassword, jdbcType=VARCHAR},
+                #{photePath, jdbcType=VARCHAR},
+                #{createBy, jdbcType=VARCHAR},
+                #{createDate, jdbcType=TIMESTAMP},
+                #{updateBy, jdbcType=VARCHAR},
+                #{updateDate, jdbcType=TIMESTAMP},
+                #{robotFactory, jdbcType=VARCHAR},
+                #{isUse, jdbcType=VARCHAR},
+                #{commissionDate, jdbcType=TIMESTAMP},
+                #{upRegionId, jdbcType=BIGINT},
+                #{robotPosition, jdbcType=VARCHAR},
+                #{remarks, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_robot_info
+                where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        update t_robot_info a <set>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="robotCode != null and robotCode != ''">a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
+        <if test="robotName != null and robotName != ''">a.robot_name = #{robotName, jdbcType=VARCHAR},</if>
+        <if test="robotStatus != null and robotStatus != ''">a.robot_status = #{robotStatus, jdbcType=VARCHAR},</if>
+        <if test="robotType != null and robotType != ''">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
+        <if test="robotIp != null and robotIp != ''">a.robot_ip = #{robotIp, jdbcType=VARCHAR},</if>
+        <if test="robotPort != null and robotPort != ''">a.robot_port = #{robotPort, jdbcType=INTEGER},</if>
+        <if test="lightIp != null and lightIp != ''">a.light_ip = #{lightIp, jdbcType=VARCHAR},</if>
+        <if test="lightPort != null and lightPort != ''">a.light_port = #{lightPort, jdbcType=VARCHAR},</if>
+        <if test="lightUsername != null and lightUsername != ''">a.light_username = #{lightUsername, jdbcType=VARCHAR},</if>
+        <if test="lightPassword != null and lightPassword != ''">a.light_password = #{lightPassword, jdbcType=VARCHAR},</if>
+        <if test="lnferadIp != null and lnferadIp != ''">a.lnferad_IP = #{lnferadIp, jdbcType=VARCHAR},</if>
+        <if test="inferadPort != null and inferadPort != ''">a.Inferad_Port = #{inferadPort, jdbcType=INTEGER},</if>
+        <if test="inferadUsername != null and inferadUsername != ''">a.Inferad_username = #{inferadUsername, jdbcType=VARCHAR},</if>
+        <if test="inferadPassword != null and inferadPassword != ''">a.Inferad_password = #{inferadPassword, jdbcType=VARCHAR},</if>
+        <if test="photePath != null and photePath != ''">a.phote_path = #{photePath, jdbcType=VARCHAR},</if>
+        <if test="createBy != null and createBy != ''">a.create_by = #{createBy, jdbcType=VARCHAR},</if>
+        <if test="createDate != null and createDate != ''">a.create_date = #{createDate, jdbcType=TIMESTAMP},</if>
+        <if test="updateBy != null and updateBy != ''">a.update_by = #{updateBy, jdbcType=VARCHAR},</if>
+        <if test="updateDate != null and updateDate != ''">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
+        <if test="robotFactory != null and robotFactory != ''">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
+        <if test="isUse != null and isUse != ''">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
+        <if test="commissionDate != null and commissionDate != ''">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+        <if test="robotPosition != null and robotPosition != ''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
+        <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
+    </set>
+            where a.robot_id = #{robotId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select
+        a.robot_id,
+        a.robot_code,
+        a.robot_name,
+        a.robot_status,
+        a.robot_type,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.light_username,
+        a.light_password,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+        a.Inferad_password,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
+        a.remarks
+        from t_robot_info a
+        where 1 = 1
+            and a.robot_id = #{robotId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select
+        a.robot_id,
+        a.robot_code,
+        a.robot_name,
+        a.robot_status,
+        a.robot_type,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.light_username,
+        a.light_password,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+        a.Inferad_password,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
+        a.remarks
+        from t_robot_info a
+        where 1 = 1
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+        <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
+        <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
+        <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
+        <if test="robotIp != null and robotIp != ''"> and a.robot_ip = #{robotIp, jdbcType=VARCHAR}</if>
+        <if test="robotPort != null and robotPort != ''"> and a.robot_port = #{robotPort, jdbcType=INTEGER}</if>
+        <if test="lightIp != null and lightIp != ''"> and a.light_ip = #{lightIp, jdbcType=VARCHAR}</if>
+        <if test="lightPort != null and lightPort != ''"> and a.light_port = #{lightPort, jdbcType=VARCHAR}</if>
+        <if test="lightUsername != null and lightUsername != ''"> and a.light_username = #{lightUsername, jdbcType=VARCHAR}</if>
+        <if test="lightPassword != null and lightPassword != ''"> and a.light_password = #{lightPassword, jdbcType=VARCHAR}</if>
+        <if test="lnferadIp != null and lnferadIp != ''"> and a.lnferad_IP = #{lnferadIp, jdbcType=VARCHAR}</if>
+        <if test="inferadPort != null and inferadPort != ''"> and a.Inferad_Port = #{inferadPort, jdbcType=INTEGER}</if>
+        <if test="inferadUsername != null and inferadUsername != ''"> and a.Inferad_username = #{inferadUsername, jdbcType=VARCHAR}</if>
+        <if test="inferadPassword != null and inferadPassword != ''"> and a.Inferad_password = #{inferadPassword, jdbcType=VARCHAR}</if>
+        <if test="photePath != null and photePath != ''"> and a.phote_path = #{photePath, jdbcType=VARCHAR}</if>
+        <if test="createBy != null and createBy != ''"> and a.create_by = #{createBy, jdbcType=VARCHAR}</if>
+        <if test="createDate != null and createDate != ''"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
+        <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
+        <if test="updateDate != null and updateDate != ''"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
+        <if test="robotFactory != null and robotFactory != ''"> and a.robot_factory = #{robotFactory, jdbcType=VARCHAR}</if>
+        <if test="isUse != null and isUse != ''"> and a.is_use = #{isUse, jdbcType=VARCHAR}</if>
+        <if test="commissionDate != null and commissionDate != ''"> and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotPosition != null and robotPosition != ''"> and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
+        <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select
+        a.robot_id,
+        a.robot_code,
+        a.robot_name,
+        a.robot_status,
+        a.robot_type,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.light_username,
+        a.light_password,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+        a.Inferad_password,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
+        a.remarks
+        from t_robot_info a
+        where 1 = 1
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+        <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
+        <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
+        <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
+        <if test="robotIp != null and robotIp != ''"> and a.robot_ip = #{robotIp, jdbcType=VARCHAR}</if>
+        <if test="robotPort != null and robotPort != ''"> and a.robot_port = #{robotPort, jdbcType=INTEGER}</if>
+        <if test="lightIp != null and lightIp != ''"> and a.light_ip = #{lightIp, jdbcType=VARCHAR}</if>
+        <if test="lightPort != null and lightPort != ''"> and a.light_port = #{lightPort, jdbcType=VARCHAR}</if>
+        <if test="lightUsername != null and lightUsername != ''"> and a.light_username = #{lightUsername, jdbcType=VARCHAR}</if>
+        <if test="lightPassword != null and lightPassword != ''"> and a.light_password = #{lightPassword, jdbcType=VARCHAR}</if>
+        <if test="lnferadIp != null and lnferadIp != ''"> and a.lnferad_IP = #{lnferadIp, jdbcType=VARCHAR}</if>
+        <if test="inferadPort != null and inferadPort != ''"> and a.Inferad_Port = #{inferadPort, jdbcType=INTEGER}</if>
+        <if test="inferadUsername != null and inferadUsername != ''"> and a.Inferad_username = #{inferadUsername, jdbcType=VARCHAR}</if>
+        <if test="inferadPassword != null and inferadPassword != ''"> and a.Inferad_password = #{inferadPassword, jdbcType=VARCHAR}</if>
+        <if test="photePath != null and photePath != ''"> and a.phote_path = #{photePath, jdbcType=VARCHAR}</if>
+        <if test="createBy != null and createBy != ''"> and a.create_by = #{createBy, jdbcType=VARCHAR}</if>
+        <if test="createDate != null and createDate != ''"> and a.create_date = #{createDate, jdbcType=TIMESTAMP}</if>
+        <if test="updateBy != null and updateBy != ''"> and a.update_by = #{updateBy, jdbcType=VARCHAR}</if>
+        <if test="updateDate != null and updateDate != ''"> and a.update_date = #{updateDate, jdbcType=TIMESTAMP}</if>
+        <if test="robotFactory != null and robotFactory != ''"> and a.robot_factory = #{robotFactory, jdbcType=VARCHAR}</if>
+        <if test="isUse != null and isUse != ''"> and a.is_use = #{isUse, jdbcType=VARCHAR}</if>
+        <if test="commissionDate != null and commissionDate != ''"> and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotPosition != null and robotPosition != ''"> and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
+        <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_robot_info(
+            robot_id,
+            robot_code,
+            robot_name,
+            robot_status,
+            robot_type,
+            robot_ip,
+            robot_port,
+            light_ip,
+            light_port,
+            light_username,
+            light_password,
+            lnferad_IP,
+            Inferad_Port,
+            Inferad_username,
+            Inferad_password,
+            phote_path,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            robot_factory,
+            is_use,
+            commission_date,
+            up_region_id,
+            robot_position,
+            remarks
+        )values
+        <foreach collection="list" item="TRobotInfo" separator=",">
+            (
+                #{TRobotInfo.robotId, jdbcType=BIGINT},
+                #{TRobotInfo.robotCode, jdbcType=VARCHAR},
+                #{TRobotInfo.robotName, jdbcType=VARCHAR},
+                #{TRobotInfo.robotStatus, jdbcType=VARCHAR},
+                #{TRobotInfo.robotType, jdbcType=INTEGER},
+                #{TRobotInfo.robotIp, jdbcType=VARCHAR},
+                #{TRobotInfo.robotPort, jdbcType=INTEGER},
+                #{TRobotInfo.lightIp, jdbcType=VARCHAR},
+                #{TRobotInfo.lightPort, jdbcType=VARCHAR},
+                #{TRobotInfo.lightUsername, jdbcType=VARCHAR},
+                #{TRobotInfo.lightPassword, jdbcType=VARCHAR},
+                #{TRobotInfo.lnferadIp, jdbcType=VARCHAR},
+                #{TRobotInfo.inferadPort, jdbcType=INTEGER},
+                #{TRobotInfo.inferadUsername, jdbcType=VARCHAR},
+                #{TRobotInfo.inferadPassword, jdbcType=VARCHAR},
+                #{TRobotInfo.photePath, jdbcType=VARCHAR},
+                #{TRobotInfo.createBy, jdbcType=VARCHAR},
+                #{TRobotInfo.createDate, jdbcType=TIMESTAMP},
+                #{TRobotInfo.updateBy, jdbcType=VARCHAR},
+                #{TRobotInfo.updateDate, jdbcType=TIMESTAMP},
+                #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
+                #{TRobotInfo.isUse, jdbcType=VARCHAR},
+                #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
+                #{TRobotInfo.upRegionId, jdbcType=BIGINT},
+                #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
+                #{TRobotInfo.remarks, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

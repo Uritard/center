@@ -1,5 +1,8 @@
 package com.yjh.accessrobot.common.utils;
 
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -9,9 +12,12 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.*;
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultAttribute;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -188,36 +194,46 @@ public class ExcelPoiUtil {
     }
 
     public static void main(String[] args)throws IOException {
-        String fileNameS="测试文档";
-        String sheetName="测试";
-        List<String> titleList=new ArrayList<String>();
-        titleList.add("列1");
-        titleList.add("列2");
-        titleList.add("列3");
-        List<String> titleCodeList=new ArrayList<String>();
-        titleCodeList.add("code1");
-        titleCodeList.add("code2");
-        titleCodeList.add("code3");
-        List<List<String>> parpamtsList=new ArrayList<List<String>>();
-        List<String> list = new ArrayList<String>();
-        list.add("a");
-        list.add("b");
-        list.add("c");
-        parpamtsList.add(list);
-        List<String> list2 = new ArrayList<String>();
-        list2.add("aa");
-        list2.add("bb");
-        list2.add("cc");
-        parpamtsList.add(list2);
-        List<String> list3 = new ArrayList<String>();
-        list3.add("aaa");
-        list3.add("bbb");
-        list3.add("ccc");
-        parpamtsList.add(list3);
-        HSSFWorkbook work=createExcel(fileNameS,sheetName,titleList,titleCodeList,parpamtsList);
-        FileOutputStream out = new FileOutputStream("D:\\测试.xls");//要输出的文件名字
-        work.write(out);
-        out.close();
+//        String fileNameS="测试文档";
+//        String sheetName="测试";
+//        List<String> titleList=new ArrayList<String>();
+//        titleList.add("列1");
+//        titleList.add("列2");
+//        titleList.add("列3");
+//        List<String> titleCodeList=new ArrayList<String>();
+//        titleCodeList.add("code1");
+//        titleCodeList.add("code2");
+//        titleCodeList.add("code3");
+//        List<List<String>> parpamtsList=new ArrayList<List<String>>();
+//        List<String> list = new ArrayList<String>();
+//        list.add("a");
+//        list.add("b");
+//        list.add("c");
+//        parpamtsList.add(list);
+//        List<String> list2 = new ArrayList<String>();
+//        list2.add("aa");
+//        list2.add("bb");
+//        list2.add("cc");
+//        parpamtsList.add(list2);
+//        List<String> list3 = new ArrayList<String>();
+//        list3.add("aaa");
+//        list3.add("bbb");
+//        list3.add("ccc");
+//        parpamtsList.add(list3);
+//        HSSFWorkbook work=createExcel(fileNameS,sheetName,titleList,titleCodeList,parpamtsList);
+//        FileOutputStream out = new FileOutputStream("D:\\测试.xls");//要输出的文件名字
+//        work.write(out);
+//        out.close();
+        String haha = "<?xml version='1.0' encoding='UTF-8'?><Robot><SendCode>巡视主机</SendCode><ReceiveCode>Client01</ReceiveCode><Type>251</Type><Code>200</Code><Time>2020-11-18 15:26:11</Time><Items><Item xixix='1'/><Item hahah='2'/><Item dadada='3'/></Items><Command>3</Command></Robot>";
+        XMLBaseModel map = null;
+        try {
+            map = RobotServerHandler.getXmlMessage("D:/testform/111.xml");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        List<Map<String,Object>> li  = map.getItems();
+        System.out.println("得到的map是："+map.getItems());
+
     }
 
     /**

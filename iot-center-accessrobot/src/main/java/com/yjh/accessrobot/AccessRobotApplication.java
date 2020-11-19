@@ -1,5 +1,6 @@
 package com.yjh.accessrobot;
 
+import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
 import com.yjh.accessrobot.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Autowired
     private SysLogsService sysLogsService;
+    @Autowired
+    private RobotService robotService;
 
     private NettyServer nettyServer = new NettyServer();
 
@@ -56,7 +59,7 @@ public class AccessRobotApplication implements CommandLineRunner {
         String url = getLocalIp();
         InetSocketAddress address = new InetSocketAddress("192.168.33.126", port);
         log.info("accessrobot is running, url is : " + url);
-        nettyServer.start(address, serverName, redisTemplate, sysLogsService);
+        nettyServer.start(address, serverName, redisTemplate, sysLogsService,robotService);
     }
 
     private static String getLocalIp() throws SocketException {
