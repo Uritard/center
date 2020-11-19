@@ -30,7 +30,8 @@ public interface TCruisePlanAttrDao {
                                  @Param(value = "inferadAnalyze") String inferadAnalyze,
                                  @Param(value = "irTempBox") String irTempBox,
                                  @Param(value = "createTime") Date createTime,
-                                 @Param(value = "updateTime") Date updateTime);
+                                 @Param(value = "updateTime") Date updateTime,
+                                 @Param(value = "subType") Integer subType);
     List<TCruisePlanAttr> selectByPage(TCruisePlanAttr tCruisePlanAttr);
 
     int batchInsert(@Param(value = "tCruisePlanAttrList") List<TCruisePlanAttr> tCruisePlanAttrList);

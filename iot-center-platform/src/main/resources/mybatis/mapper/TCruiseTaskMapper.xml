@@ -265,6 +265,7 @@
         WHERE a.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
     <select id="afterTaskCount" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TCruiseTaskCount">
+select *from (
         select
         a.task_id,
         a.task_name,
@@ -342,7 +343,7 @@
         LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
         where a.if_run = 172
         <if test="taskName != null and taskName != ''"> and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%') </if>
-        );
+        ) ) h order by h.start_time desc;
     </select>
 
     <select id="selectCruiseInspectByTaskId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseInspectResult">

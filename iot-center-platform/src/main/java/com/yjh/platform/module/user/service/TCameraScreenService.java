@@ -1,17 +1,11 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
-import com.yjh.platform.module.user.entity.Camera;
-import com.yjh.platform.module.user.entity.TCameraInfo;
-import com.yjh.platform.module.user.entity.TCameraScreen;
+import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Date;
-import java.util.Arrays;
+import java.util.*;
 
-import com.yjh.platform.module.user.entity.TCameraScreenDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -108,6 +102,50 @@ public class TCameraScreenService{
     public int batchDelete(String userId) {
     List<String> list1= Arrays.asList(userId.split(","));
     return this.tCameraScreenDao.batchDelete(list1);
+    }
+
+    @Logs(title = "摄像机状态树", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfoDetail> cameraStateTree() {
+        List<AreaInfoDetail> listTree = new ArrayList<>();
+        listTree = tCameraScreenDao.selectCameraTreeDevice();
+        List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
+        for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
+            AreaInfoDetail areaInfoMap = it.next();
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+                AreaInfoDetail areaInfoCountry = new AreaInfoDetail();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountryList.add(areaInfoCountry);
+            }
+        }
+        Map<String,Object> map = new HashMap<>();
+        diGui(areaInfoCountryList, listTree,map);
+        return areaInfoCountryList;
+    }
+    private void diGui(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,Object> map) {
+        for(AreaInfoDetail areaInfo : areaInfoList){
+            List<AreaInfoDetail> childrenList = new ArrayList<>();
+            for(Iterator<AreaInfoDetail> it = listTree.iterator();it.hasNext();){
+                AreaInfoDetail areaInfoMap = it.next();
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                    AreaInfoDetail areaInfoTem = new AreaInfoDetail();
+                    areaInfoTem.setId(areaInfoMap.getId());
+                    areaInfoTem.setUpId(areaInfoMap.getUpId());
+                    areaInfoTem.setLabel(areaInfoMap.getLabel());
+                    areaInfoTem.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    //todo 摄像机状态
+                    //areaInfoTem.setState()
+                    childrenList.add(areaInfoTem);
+                }
+            }
+            if (childrenList.size()>0 ) {
+                areaInfo.setChildren(childrenList);
+                diGui(childrenList, listTree,map);
+            }
+        }
     }
 
 

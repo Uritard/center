@@ -7,6 +7,7 @@ import com.yjh.platform.module.task.entity.InstanceTree;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,4 +33,6 @@ public interface TCruisePlanDao {
 
     int batchInsert(List<TCruisePlan> list);
     List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList);
+    List<TDictBusiness>selectCruiseType();
+    List<TDictBusiness>selectCruiseTypeChild(@Param("dictCode") String dictCode);
 }

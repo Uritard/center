@@ -100,7 +100,7 @@ public class TCruiseTaskService {
             }
         } catch (Exception e) { e.getMessage(); }
         tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
-        List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(),null,null,null,null,null,null,null,null,null,null,null,null);
+        List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(),null,null,null,null,null,null,null,null,null,null,null,null,null);
         List<Long> instanceList = new ArrayList<>();
         for (TCruisePlanAttr tCruisePlanAttr:tCruisePlanAttrList) {
             instanceList.add(tCruisePlanAttr.getInstanceId());

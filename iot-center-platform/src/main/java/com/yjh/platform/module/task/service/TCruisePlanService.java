@@ -4,6 +4,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.entity.*;
@@ -13,6 +14,7 @@ import java.util.*;
 
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -164,5 +166,47 @@ public class TCruisePlanService{
         return instanceTreeList;
     }
 
+    @Logs(title = "查询巡视类型树", code = "task",content = "查询巡视类型树")
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfo> cruiseTypeTree() {
+        List<AreaInfo> upList = new ArrayList<>();
+        AreaInfo up = new AreaInfo();
+        up.setId(1L);
+        up.setLabel("巡视类型树");
+        up.setInfoType("cruiseType");
+        List<AreaInfo> cruiseTypeTree = new ArrayList<>();
+        List<TDictBusiness> cruiseTypeList = this.tCruisePlanDao.selectCruiseType();
+        for (TDictBusiness item: cruiseTypeList) {
+            if("218".equals(item.getDictCode())){continue;}
+            AreaInfo areaInfo = new AreaInfo();
+            areaInfo.setId(Long.valueOf(item.getDictCode()));
+            areaInfo.setLabel(item.getDictNote());
+            areaInfo.setInfoType(item.getColName());
+            areaInfo.setUpId(1L);
+            areaInfo.setUpName("巡视类型树");
+            cruiseTypeTree.add(areaInfo);
+        }
+        for (AreaInfo areaInfoItem: cruiseTypeTree) {
+            List<TDictBusiness> cruiseTypeChildList = this.tCruisePlanDao.selectCruiseTypeChild(areaInfoItem.getId().toString());
+            if(cruiseTypeChildList == null || cruiseTypeChildList.size() == 0){
+                continue;
+            }
+            List<AreaInfo> cruiseTypeChild = new ArrayList<>();
+            for (TDictBusiness childItem: cruiseTypeChildList) {
+                if("218".equals(childItem.getDictCode())){continue;}
+                AreaInfo areaInfo = new AreaInfo();
+                areaInfo.setId(Long.valueOf(childItem.getDictCode()));
+                areaInfo.setLabel(childItem.getDictNote());
+                areaInfo.setInfoType(childItem.getColName());
+                areaInfo.setUpId(areaInfoItem.getId());
+                areaInfo.setUpName(areaInfoItem.getLabel());
+                cruiseTypeChild.add(areaInfo);
+            }
+            areaInfoItem.setChildren(cruiseTypeChild);
+        }
+        up.setChildren(cruiseTypeTree);
+        upList.add(up);
+        return upList;
+    }
 }
 

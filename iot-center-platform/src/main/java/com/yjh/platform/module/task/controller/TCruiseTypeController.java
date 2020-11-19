@@ -1,11 +1,11 @@
 package com.yjh.platform.module.task.controller;
 
-import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
-import com.yjh.platform.module.task.service.TCruisePlanAttrService;
-import com.yjh.platform.module.task.entity.TCruisePlanAttr;
+import com.yjh.platform.module.task.entity.TCruiseTypeDetail;
+import com.yjh.platform.module.task.service.TCruiseTypeService;
+import com.yjh.platform.module.task.entity.TCruiseType;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Date;
+
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,47 +21,49 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * @author tt
- * @since 2020-09-04
+ * @author lqh
+ * @since 2020-11-17
  */
 @RestController
-@RequestMapping("/tCruisePlanAttr/v1")
-@Api(value = "/tCruisePlanAttr", description = "巡检预案属性表操作接口")
-public class TCruisePlanAttrController {
+@RequestMapping("/tCruiseType/v1")
+@Api(value = "/tCruiseType", description = "巡视类型关联实例点表操作接口")
+public class TCruiseTypeController {
 
     @Autowired
-    private final TCruisePlanAttrService tCruisePlanAttrService;
+    private final TCruiseTypeService tCruiseTypeService;
 
-    private Logger log = LoggerFactory.getLogger(TCruisePlanAttrController.class);
+    private Logger log = LoggerFactory.getLogger(TCruiseTypeController.class);
 
-    public TCruisePlanAttrController(TCruisePlanAttrService tCruisePlanAttrService) {
-        this.tCruisePlanAttrService = tCruisePlanAttrService;
+    public TCruiseTypeController(TCruiseTypeService tCruiseTypeService) {
+        this.tCruiseTypeService = tCruiseTypeService;
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
+    @RequestMapping(value = "/add", method = RequestMethod.GET)
+    public Result add(@RequestParam(value = "cruiseType") Integer cruiseType,
+                      @RequestParam(value = "instanceList") String instanceList,
+                      @RequestParam(value = "subType",required = false) String remake) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanAttrService.insert(tCruisePlanAttr));
+            result.setData(tCruiseTypeService.add(cruiseType,instanceList,remake));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加预案属性错误:", e);
+            log.error("添加错误:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
+    public Result delete(@RequestParam(value = "subType", required = false) Integer subType) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanAttrService.deleteByPrimaryId(planId));
+            result.setData(tCruiseTypeService.deleteByPrimaryId(subType));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("删除预案属性异常:", e);
+            log.error("删除异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除错误:", e);
@@ -71,13 +73,13 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
+    public Result update(@RequestBody TCruiseType tCruiseType) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanAttrService.update(tCruisePlanAttr));
+            result.setData(tCruiseTypeService.update(tCruiseType));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新预案属性异常:", e);
+            log.error("更新异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("更新错误:", e);
@@ -87,11 +89,11 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "planId", required = true) Long planId) {
+    public Result selectByPrimaryId(@RequestParam(value = "subType", required = true) Integer subType) {
         Result result = new Result();
         try {
-            List<TCruisePlanAttrDetail> tCruisePlanAttrList = tCruisePlanAttrService.selectByPrimaryId(planId);
-            result.setData(tCruisePlanAttrList);
+            TCruiseType tCruiseType = tCruiseTypeService.selectByPrimaryId(subType);
+            result.setData(tCruiseType);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -101,23 +103,10 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "planId", required = false) Long planId,
-                            @RequestParam(value = "instanceId", required = false) Long instanceId,
-                            @RequestParam(value = "pointType", required = false) Integer pointType,
-                            @RequestParam(value = "areaId", required = false) String areaId,
-                            @RequestParam(value = "cruiseRegionIds", required = false) String cruiseRegionIds,
-                            @RequestParam(value = "exceptionType", required = false) Integer exceptionType,
-                            @RequestParam(value = "robotId", required = false) Long robotId,
-                            @RequestParam(value = "position", required = false) String position,
-                            @RequestParam(value = "algorithmId", required = false) Long algorithmId,
-                            @RequestParam(value = "inferadAnalyze", required = false) String inferadAnalyze,
-                            @RequestParam(value = "irTempBox", required = false) String irTempBox,
-                            @RequestParam(value = "createTime", required = false) Date createTime,
-                            @RequestParam(value = "updateTime", required = false) Date updateTime,
-                         @RequestParam(value = "subType", required = false) Integer subType) {
+    public Result select(@RequestParam(value = "subType", required = true) Integer subType) {
         Result result = new Result();
         try {
-            List<TCruisePlanAttr> list = tCruisePlanAttrService.select(planId, instanceId, pointType, areaId, cruiseRegionIds, exceptionType, robotId, position, algorithmId, inferadAnalyze, irTempBox, createTime, updateTime,subType);
+            List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -128,14 +117,14 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCruisePlanAttr tCruisePlanAttr,
+    public Result selectByPage(@RequestBody TCruiseType tCruiseType,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCruisePlanAttr> list = tCruisePlanAttrService.selectByPage(tCruisePlanAttr);
+            List<TCruiseTypeDetail> list = tCruiseTypeService.selectByPage(tCruiseType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -147,16 +136,33 @@ public class TCruisePlanAttrController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCruisePlanAttr> list) {
+    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    public Result batchAdd(@RequestBody List<TCruiseType> list) {
         Result result = new Result();
         try {
-        result.setData(tCruisePlanAttrService.batchInsert(list));
+        result.setData(tCruiseTypeService.batchAdd(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);
         }
         return result;
     }
+
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    public Result batchDelete(@RequestParam(value = "subTypes") String subTypes) {
+    Result result = new Result();
+    try {
+        result.setData(tCruiseTypeService.batchDelete(subTypes));
+    } catch (BusinessException e) {
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量删除失败：" + e);
+    }catch (Exception e) {
+        result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量删除错误:", e);
+    }
+    return result;
+    }
+
 
 }

@@ -2,6 +2,8 @@ package com.yjh.platform.module.user.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.user.entity.AreaInfoDetail;
 import com.yjh.platform.module.user.entity.TCameraScreen;
 import com.yjh.platform.module.user.entity.TCameraScreenDetail;
 import org.apache.ibatis.annotations.Param;
@@ -26,4 +28,5 @@ public interface TCameraScreenDao {
 
     int batchAdd(List<TCameraScreen> list);
     int batchDelete(List<String> list);
+    List<AreaInfoDetail> selectCameraTreeDevice();
 }

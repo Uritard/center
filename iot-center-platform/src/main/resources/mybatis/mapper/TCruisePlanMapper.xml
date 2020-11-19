@@ -173,4 +173,18 @@
         </foreach> GROUP BY a.instance_id ORDER BY a.device_id, a.custom_id
     </select>
 
+    <select id="selectCruiseType" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select a.*
+        from t_dict_business a
+        where a.col_name = "plan_type"
+    </select>
+
+    <select id="selectCruiseTypeChild" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        SELECT  a.*
+        FROM t_dict_business a
+        left join t_dict_business b on b.dict_id = a.up_dict
+        WHERE a.col_name = 'sub_plan_type'
+        and a.up_dict = ( SELECT c.dict_id FROM t_dict_business c WHERE c.dict_code = #{dictCode,jdbcType=VARCHAR} )
+    </select>
+
 </mapper>

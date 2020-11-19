@@ -17,11 +17,12 @@
         <result column="ir_temp_box" jdbcType="VARCHAR" property="irTempBox" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="sub_type" jdbcType="INTEGER" property="subType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        plan_id, instance_id, point_type, area_id, cruise_region_ids, exception_type, robot_id, position, algorithm_id, inferad_analyze, ir_temp_box, create_time, update_time
+        plan_id, instance_id, point_type, area_id, cruise_region_ids, exception_type, robot_id, position, algorithm_id, inferad_analyze, ir_temp_box, create_time, update_time ,sub_type
     </sql>
 
 
@@ -39,7 +40,8 @@
             inferad_analyze,
             ir_temp_box,
             create_time,
-            update_time
+            update_time,
+            sub_type
         )values(
                 #{planId, jdbcType=BIGINT},
                 #{instanceId, jdbcType=BIGINT},
@@ -53,7 +55,8 @@
                 #{inferadAnalyze, jdbcType=VARCHAR},
                 #{irTempBox, jdbcType=VARCHAR},
                 #{createTime, jdbcType=TIMESTAMP},
-                #{updateTime, jdbcType=TIMESTAMP}
+                #{updateTime, jdbcType=TIMESTAMP},
+                #{subType, jdbcType=INTEGER}
         )
     </insert>
 
@@ -77,6 +80,7 @@
         <if test="irTempBox != null and irTempBox != ''">a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="subType != null">a.sub_type = #{subType, jdbcType=INTEGER},</if>
     </set>
             where a.plan_id = #{planId, jdbcType=BIGINT}
     </update>
@@ -109,7 +113,8 @@
         a.inferad_analyze,
         a.ir_temp_box,
         a.create_time,
-        a.update_time
+        a.update_time,
+        a.sub_type
         FROM t_cruise_plan_attr a
         LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
@@ -136,7 +141,8 @@
         a.inferad_analyze,
         a.ir_temp_box,
         a.create_time,
-        a.update_time
+        a.update_time,
+        a.sub_type
         from t_cruise_plan_attr a
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
@@ -152,6 +158,7 @@
         <if test="irTempBox != null and irTempBox != ''"> and a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
@@ -168,7 +175,8 @@
         a.inferad_analyze,
         a.ir_temp_box,
         a.create_time,
-        a.update_time
+        a.update_time,
+        a.sub_type
         from t_cruise_plan_attr a
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
@@ -184,6 +192,7 @@
         <if test="irTempBox != null and irTempBox != ''"> and a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null and updateTime != ''"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
     </select>
 
     <insert id="batchInsert">
@@ -200,7 +209,8 @@
             inferad_analyze,
             ir_temp_box,
             create_time,
-            update_time
+            update_time,
+            a.sub_type
         )values
         <foreach collection="tCruisePlanAttrList" item="TCruisePlanAttr" separator=",">
             (
@@ -216,7 +226,8 @@
                 #{TCruisePlanAttr.inferadAnalyze, jdbcType=VARCHAR},
                 #{TCruisePlanAttr.irTempBox, jdbcType=VARCHAR},
                 #{TCruisePlanAttr.createTime, jdbcType=TIMESTAMP},
-                #{TCruisePlanAttr.updateTime, jdbcType=TIMESTAMP}
+                #{TCruisePlanAttr.updateTime, jdbcType=TIMESTAMP},
+                #{TCruisePlanAttr.subType, jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>

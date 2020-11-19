@@ -1,10 +1,11 @@
 package com.yjh.platform.module.user.controller;
 
-import com.yjh.platform.module.user.service.TCameraScreenService;
-import com.yjh.platform.module.user.entity.TCameraScreen;
+import com.yjh.platform.module.user.entity.TCameraGroupDetail;
+import com.yjh.platform.module.user.service.TCameraGroupService;
+import com.yjh.platform.module.user.entity.TCameraGroup;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Date;
+
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,33 +19,31 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
  * @author lqh
- * @since 2020-10-16
+ * @since 2020-11-17
  */
 @RestController
-@RequestMapping("/tCameraScreen/v1")
-@Api(value = "/tCameraScreen", description = "分屏配置表操作接口")
-public class TCameraScreenController {
+@RequestMapping("/tCameraGroup/v1")
+@Api(value = "/tCameraGroup", description = "相机分组表操作接口")
+public class TCameraGroupController {
 
     @Autowired
-    private final TCameraScreenService tCameraScreenService;
+    private final TCameraGroupService tCameraGroupService;
 
-    private Logger log = LoggerFactory.getLogger(TCameraScreenController.class);
+    private Logger log = LoggerFactory.getLogger(TCameraGroupController.class);
 
-    public TCameraScreenController(TCameraScreenService tCameraScreenService) {
-        this.tCameraScreenService = tCameraScreenService;
+    public TCameraGroupController(TCameraGroupService tCameraGroupService) {
+        this.tCameraGroupService = tCameraGroupService;
     }
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TCameraScreen tCameraScreen) {
+    public Result add(@RequestBody TCameraGroup tCameraGroup) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.add(tCameraScreen));
+            result.setData(tCameraGroupService.add(tCameraGroup));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -56,10 +55,10 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
+    public Result delete(@RequestParam(value = "groupId", required = true) Long groupId) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.deleteByPrimaryId(userId));
+            result.setData(tCameraGroupService.deleteByPrimaryId(groupId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -72,11 +71,10 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(HttpServletRequest request,@RequestBody TCameraScreen tCameraScreen) {
+    public Result update(@RequestBody TCameraGroup tCameraGroup) {
         Result result = new Result();
         try {
-            String userId = request.getHeader("userId");
-            result.setData(tCameraScreenService.update(tCameraScreen,userId));
+            result.setData(tCameraGroupService.update(tCameraGroup));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
@@ -89,11 +87,11 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(HttpServletRequest request) {
+    public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId) {
         Result result = new Result();
         try {
-            String userId = request.getHeader("userId");
-            result.setData(tCameraScreenService.selectByPrimaryId(Long.parseLong(userId)));
+            TCameraGroupDetail tCameraGroupDetail = tCameraGroupService.selectByPrimaryId(groupId);
+            result.setData(tCameraGroupDetail);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -103,13 +101,13 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "userId", required = false) Long userId,
-                            @RequestParam(value = "screenNum", required = false) String screenNum,
+    public Result select(@RequestParam(value = "groupId", required = false) Long groupId,
+                            @RequestParam(value = "groupName", required = false) String groupName,
                             @RequestParam(value = "cameraIds", required = false) String cameraIds,
-                            @RequestParam(value = "createTime", required = false) Date createTime) {
+                            @RequestParam(value = "remarks", required = false) String remarks) {
         Result result = new Result();
         try {
-            List<TCameraScreen> list = tCameraScreenService.select(userId, screenNum, cameraIds, createTime);
+            List<TCameraGroup> list = tCameraGroupService.select(groupId, groupName, cameraIds, remarks);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -120,14 +118,14 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCameraScreen tCameraScreen,
+    public Result selectByPage(@RequestBody TCameraGroup tCameraGroup,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TCameraScreen> list = tCameraScreenService.selectByPage(tCameraScreen);
+            List<TCameraGroup> list = tCameraGroupService.selectByPage(tCameraGroup);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -140,10 +138,10 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TCameraScreen> list) {
+    public Result batchAdd(@RequestBody List<TCameraGroup> list) {
         Result result = new Result();
         try {
-        result.setData(tCameraScreenService.batchAdd(list));
+        result.setData(tCameraGroupService.batchAdd(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);
@@ -153,10 +151,10 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
-    public Result batchDelete(@RequestParam(value = "userIds") String userIds) {
+    public Result batchDelete(@RequestParam(value = "groupIds") String groupIds) {
     Result result = new Result();
     try {
-        result.setData(tCameraScreenService.batchDelete(userIds));
+        result.setData(tCameraGroupService.batchDelete(groupIds));
     } catch (BusinessException e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量删除失败：" + e);
@@ -167,17 +165,30 @@ public class TCameraScreenController {
     return result;
     }
 
-    @ApiOperation(value = "摄像机状态树")
-    @RequestMapping(value = "/cameraStateTree", method = RequestMethod.GET)
-    public Result cameraStateTree() {
+
+    @ApiOperation(value = "获取分组树")
+    @RequestMapping(value = "/groupTree", method = RequestMethod.GET)
+    public Result groupTree() {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.cameraStateTree());
+            result.setData(tCameraGroupService.groupTree());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("获取分组树失败描述：", e);
         }
         return result;
     }
 
+    @ApiOperation(value = "获取所有的相机")
+    @RequestMapping(value = "/selectAllCamera", method = RequestMethod.GET)
+    public Result selectAllCamera() {
+        Result result = new Result();
+        try {
+            result.setData(tCameraGroupService.selectAllCamera());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("获取分组树失败描述：", e);
+        }
+        return result;
+    }
 }

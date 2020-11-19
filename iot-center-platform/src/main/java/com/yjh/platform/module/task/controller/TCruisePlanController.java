@@ -230,4 +230,17 @@ public class TCruisePlanController {
         return result;
     }
 
+    @ApiOperation(value = "巡检类型树")
+    @RequestMapping(value = "/cruiseTypeTree", method = RequestMethod.GET)
+    public Result cruiseTypeTree() {
+        Result result = new Result();
+        try{
+            result.setData(tCruisePlanService.cruiseTypeTree());
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("巡检类型树获取失败描述：", e);
+        }
+        return result;
+    }
+
 }

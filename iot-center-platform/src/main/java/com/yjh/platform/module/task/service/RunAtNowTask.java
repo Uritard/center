@@ -327,6 +327,13 @@ public class RunAtNowTask implements Runnable{
                             }else {
                                 defect(analysisMap);
                             }
+                            // webSocket通知前端调用巡视监控的接口
+                            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                            jasonMapOnFinished.put("type","finishedOneInstance");
+                            jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
+                            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+                            log.info("发送给前端的消息："+jsonMessage);
+                            WebSocketServer.sendMsg(jsonMessage);
                         }else {
                             taskNormal = taskNormal+1;
                             tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
