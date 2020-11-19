@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.task.controller.TCruiseDataResultController;
 import com.yjh.platform.module.task.entity.BrokenLineInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
@@ -11,8 +12,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -27,11 +31,15 @@ public class TCruiseDataResultService{
 
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
+    @Autowired
+    private TDictBusinessDao tDictBusinessDao;
 
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
     private Object Comparator;
     private Object CruiseResultAnalMeteInfo;
+
+    private Logger log = LoggerFactory.getLogger(TCruiseDataResultService.class);
 
     @Logs(title = "插入", code = "TCruiseDataResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
@@ -95,12 +103,29 @@ public class TCruiseDataResultService{
 
              //通过测点ID获取相应的符合条件的巡检点结果
              CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
+             log.info("CrusieResultAnalMeteInfo:"+cruiseResultAnalMeteInfo);
              deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
              deviceInfo.setState(cruiseResultAnalMeteInfo.getState());
              deviceInfo.setStateName(cruiseResultAnalMeteInfo.getStateName());
              deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
              deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
              deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
+             deviceInfo.setIdentifyResult(cruiseResultAnalMeteInfo.getIdentifyResult());
+             deviceInfo.setIdentifyResultName(cruiseResultAnalMeteInfo.getIdentifyResultName());
+             if(Objects.isNull(deviceInfo.getIdentifyResult())){
+                 if(deviceInfo.getState()==247){
+                     deviceInfo.setFinalState(1);
+                 }else {
+                     deviceInfo.setFinalState(0);
+                 }
+             }else {
+                 if(deviceInfo.getIdentifyResult()==261){
+                     deviceInfo.setFinalState(1);
+                 }else {
+                     deviceInfo.setFinalState(0);
+                 }
+
+             }
      }
 
      //按时间降序排列

@@ -564,6 +564,7 @@
             ORDER BY
                 d.end_time,d.device_id,b.device_mete_id DESC
 
+
     </select>
 
     <select id="getdeviceMeteByPointinstance" parameterType="java.lang.Long" resultType="java.lang.Long">

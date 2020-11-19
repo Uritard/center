@@ -28,6 +28,12 @@ public class CruiseResultAnalMeteInfo implements Serializable {
     private Integer state;
     @ApiModelProperty(value = "数据状态名")
     private String stateName;
+    @ApiModelProperty(value = "实际结果")
+    private Integer identifyResult;
+    @ApiModelProperty(value = "实际结果名称")
+    private String identifyResultName;
+    @ApiModelProperty(value = "最终状态:0-异常 1-正常")
+    private Integer finalState;
     @ApiModelProperty(value = "图片路径")
     private String picPath;
     @ApiModelProperty(value = "识别时间")

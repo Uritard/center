@@ -94,76 +94,85 @@ public class HelloController {
 //        }
 
 
-//        Set<Integer> index = new HashSet<>();
-//        index.add(value1.indexOf("wcaqm"));
-//        index.add(value1.indexOf("wcgz"));
-//        index.add(value1.indexOf("yydd"));
-//        index.add(value1.indexOf("xy"));
-//        index.add(value1.indexOf("slydmyw"));
-//        index.add(value1.indexOf("ywnc"));
-//        index.add(value1.indexOf("ywgkxfw"));
-//        index.add(value1.indexOf("jyzbmwh"));
-//        index.add(value1.indexOf("jyzpl"));
-//        index.add(value1.indexOf("jyzlw"));
-//        index.add(value1.indexOf("hxqgjbs"));
-//        index.add(value1.indexOf("hxqgjtps"));
-//        index.add(value1.indexOf("ywztyfyc"));
-//        index.add(value1.indexOf("bjbpmh"));
-//        index.add(value1.indexOf("bjbpps"));
-//        index.add(value1.indexOf("bjwkps"));
-//        index.add(value1.indexOf("mcqdmsh"));
-//        index.add(value1.indexOf("gbps"));
-//        index.add(value1.indexOf("gjptwss"));
-//        index.add(value1.indexOf("xmbhyc"));
-//        index.add(value1.indexOf("jsxs"));
-//        log.info("Set:"+index);
-//
-//        String[] str1 = value.split("[0-9]");
-//        StringBuffer stringBuffer = new StringBuffer();
-//        for (int i = 0; i < str1.length; i++) {
-//            stringBuffer.append(str1[i]);
-//        }
-//        String value2 = stringBuffer.toString();
-//        String[] str2 = value2.split(" ");
-//        stringBuffer.delete(0, stringBuffer.length() - 1);
+//        String defectValue="";
+//        String value = "ywzt_yfyc 998 787 bj_bpmh 765 bj_bpps 765 9876 bj_wkps 987 mcqdmsh 876 gbps 765 gjptwss 7898 xmbhyc 87 998 jsxs 887 564";
+//        String finalValue = value.replaceAll("[0-9]", "");
+//        log.info("final:"+finalValue);
+//        String[] str2 = finalValue.split("\\s+");
+//        log.info("length:"+str2.length);
 //        for (int i = 0; i < str2.length; i++) {
-//            stringBuffer.append(str2[i]);
-//        }
-//
-//
-//        for(Integer ind:index){
-//            if (ind.equals(-1)){
-//                continue;
-//            }else {
-//                switch (str2[ind]){
-//                    case "wcaqm":
-//                        defectValue=defectValue+"未穿安全帽"+" ";
-//                       break;
-//                    case "wcgz":
-//                        defectValue=defectValue+"未穿工装"+" ";
-//                       break;
-//                    case "rydd":
-//                        defectValue=defectValue+"人员倒地"+" ";
-//                        break;
-//
-//                }
+//            log.info("str[]:"+str2[i]);
+//            switch (str2[i]) {
+//                case "wcaqm":
+//                    defectValue = defectValue + "未穿安全帽" + " ";
+//                    break;
+//                case "wcgz":
+//                    defectValue = defectValue + "未穿工装" + " ";
+//                    break;
+//                case "rydd":
+//                    defectValue = defectValue + "人员倒地" + " ";
+//                    break;
+//                case "xy":
+//                    defectValue = defectValue + "吸烟" + " ";
+//                    break;
+//                case "sly_dmyw":
+//                    defectValue = defectValue + "地面油污" + " ";
+//                    break;
+//                case "yw_nc":
+//                    defectValue = defectValue + "鸟窝" + " ";
+//                    break;
+//                case "yw_gkxfw":
+//                    defectValue = defectValue + "飘挂物" + " ";
+//                    break;
+//                case "jyz_bmwh":
+//                    defectValue = defectValue + "绝缘子-表面污秽" + " ";
+//                    break;
+//                case "jyz_pl":
+//                    defectValue = defectValue + "绝缘子-破裂" + " ";
+//                    break;
+//                case "jyz_lw":
+//                    defectValue = defectValue + "绝缘子-裂纹" + " ";
+//                    break;
+//                case "hxq_gjbs":
+//                    defectValue = defectValue + "呼吸器-硅胶变色" + " ";
+//                    break;
+//                case "hxq_gjtps":
+//                    defectValue = defectValue + "呼吸器-硅胶筒破损" + " ";
+//                    break;
+//                case "ywzt_yfyc":
+//                    defectValue = defectValue + "油位状态-油位异常" + " ";
+//                    break;
+//                case "bj_bpmh":
+//                    defectValue = defectValue + "表计-表盘模糊" + " ";
+//                    break;
+//                case "bj_bpps":
+//                    defectValue = defectValue + "表计-表盘破损" + " ";
+//                    break;
+//                case "bj_wkps":
+//                    defectValue = defectValue + "表计-外壳破损" + " ";
+//                    break;
+//                case "mcqdmsh":
+//                    defectValue = defectValue + "门窗墙地面损坏" + " ";
+//                    break;
+//                case "gbps":
+//                    defectValue = defectValue + "盖板破损" + " ";
+//                    break;
+//                case "gjptwss":
+//                    defectValue = defectValue + "构架爬梯未上锁" + " ";
+//                    break;
+//                case "xmbhyc":
+//                    defectValue = defectValue + "箱门闭合异常" + " ";
+//                    break;
+//                case "jsxs":
+//                    defectValue = defectValue + "金属锈蚀" + " ";
+//                    break;
+//                default:
+//                    log.info("缺陷："+"null");
 //            }
 //        }
-//        log.info("结果---:" + defectValue);
+//        log.info("缺陷："+defectValue);
 
 
-//        String str="0.32";
-//        log.info("Result:"+str.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$"));
-
-        Set<String>Keys1=redisScan("salary:");
-        Set<String>Key2=redisScan("defectInfo:");
-        log.info("size1:"+ Keys1.size());
-        log.info("size2:"+Key2.size());
-        if(Keys1.size()==0){
-            log.info("问题解决");
-        }
-
-      
         return name + "你好!";
     }
 
