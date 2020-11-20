@@ -155,6 +155,9 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             log.info("meteId:   "+meteId);
             //获取meteKind
             Integer meteKind = Integer.valueOf(new BigInteger(udp[9],16).toString());
+            if(meteKind == 0){
+                meteKind = 3;
+            }
             log.info("meteKind:  "+meteKind);
             //获取属性长度
             Integer valueLength = Integer.valueOf(new BigInteger(udp[10],16).toString());
@@ -206,6 +209,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //            Map<String, String> map = new HashMap<>();
 //            map.put("meteId",meteId.toString());
 //            union(map);
+            //将实时表里的数据更新到历史表里
+            tCfgMeteService.insertIntoHis(tCfgDataCurrent);
             getUrl(Constant.UNINO_URL,meteId.toString());
 
         }else if ("43".equals(udp[4])){

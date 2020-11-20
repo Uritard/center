@@ -3,6 +3,8 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.module.user.entity.TCameraGroupDetail;
 import com.yjh.platform.module.user.service.TCameraGroupService;
 import com.yjh.platform.module.user.entity.TCameraGroup;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -90,8 +92,13 @@ public class TCameraGroupController {
     public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId) {
         Result result = new Result();
         try {
-            TCameraGroupDetail tCameraGroupDetail = tCameraGroupService.selectByPrimaryId(groupId);
-            result.setData(tCameraGroupDetail);
+            if(groupId == -1){
+                result.setData(new ArrayList<>());
+            }else {
+                TCameraGroupDetail tCameraGroupDetail = tCameraGroupService.selectByPrimaryId(groupId);
+                result.setData(tCameraGroupDetail);
+            }
+
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -191,4 +198,17 @@ public class TCameraGroupController {
         }
         return result;
     }
+
+//    @ApiOperation(value = "获取相机树")
+//    @RequestMapping(value = "/cameraTree", method = RequestMethod.GET)
+//    public Result cameraTree() {
+//        Result result = new Result();
+//        try {
+//            result.setData(tCameraGroupService.cameraTree());
+//        } catch (Exception e) {
+//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+//            log.error("获取分组树失败描述：", e);
+//        }
+//        return result;
+//    }
 }

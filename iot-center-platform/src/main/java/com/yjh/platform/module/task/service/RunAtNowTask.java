@@ -6,7 +6,6 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
-import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -21,8 +20,6 @@ import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -66,12 +63,15 @@ public class RunAtNowTask implements Runnable{
     private String picModelPath;
     //等待相机转到预置位时间
     private Long waitTime;
+    //任务超期天数
+    private Long tasksAreTime;
 
     private TCruiseTask tCruiseTask;
+
     public RunAtNowTask(TCruiseTask tCruiseTask,Long waitTime ,String picModelPath,RedisTemplate redisTemplate,TCruisePointInstanceDao tCruisePointInstanceDao,
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
-                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn) {
+                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Long tasksAreTime) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
         this.picModelPath = picModelPath;
@@ -85,7 +85,8 @@ public class RunAtNowTask implements Runnable{
         this.tCruiseDataResultDao = tCruiseDataResultDao;
         this.tCruiseTaskResultDetailDao = tCruiseTaskResultDetailDao;
         this.tCruiseTaskResultDao = tCruiseTaskResultDao;
-        this.isGoOn = isGoOn;//判断是否是在那听的任务重启
+        this.isGoOn = isGoOn;//判断是否是任务重启
+        this.tasksAreTime = tasksAreTime;
     }
 
     //相机抓图
@@ -139,7 +140,11 @@ public class RunAtNowTask implements Runnable{
     @Override
     public void run() {
         try {
-            Thread.sleep(5000);
+            //Thread.sleep(10000);
+            Long timeIsOk = tasksAreTime*24*60*60*100;
+            Date taskStart = new Date();
+            log.info("开始进行任务" +taskStart);
+            Long taskIsStart = taskStart.getTime();
             String taskId = tCruiseTask.getTaskId();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
             String taskDate = simpleDateFormat.format(tCruiseTask.getStartTime());
@@ -156,7 +161,6 @@ public class RunAtNowTask implements Runnable{
             log.info("发送给前端的消息：   "+json);
             WebSocketServer.sendMsg(json);
             log.info(taskDate+"需要执行的任务");
-            log.info("开始进行任务" +new Date());
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
@@ -200,6 +204,7 @@ public class RunAtNowTask implements Runnable{
                 mapForAbnormal.put("all",taskCount.toString());
                 mapForAbnormal.put("abnormal","0");
                 mapForAbnormal.put("normal","0");
+                mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
             Integer taskAbnormal = 0;//异常数量
@@ -242,7 +247,8 @@ public class RunAtNowTask implements Runnable{
                     //todo 对于相机的返回错误分析  任务异常终止/超期
                     String urlPath = (String) jsonForRe.get("urlPath");
                     String absPath = (String) jsonForRe.get("absPath");
-                    if(absPath == null || urlPath == null){
+                    String isOk = re.getMessage();
+                    if( !"success".equals(isOk)){
                         //抓图失败 任务失败
                         taskAbnormal = taskAbnormal+1;
                         tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
@@ -384,8 +390,38 @@ public class RunAtNowTask implements Runnable{
                 }
                 if (232 == item.getCruiseType()) {//todo scala
                 }
-                //检测任务是否暂停
-                TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(taskId);
+                //检测任务是否暂停  或者任务是否超期
+                Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(tCruiseTask.getTaskId());
+                Long taskEndTime = new Date().getTime();
+                if((taskEndTime - taskIsStart)>timeIsOk){
+                    //任务超期
+                    tCruiseResult.setCState(244);
+                    tCruiseResultDao.update(tCruiseResult);
+                    //任务结束生成结果，
+                    Analysis analysis = new Analysis();
+                    analysis.setTaskId(tCruiseTask.getTaskId());
+                    analysis.setInstanceId(-1L);
+                    //analysis.setPicPath(picUrl);
+                    //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
+                    //analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                    //analysis.setPicModelPath(picModelPath);//模板图片暂时没有
+                    List<Analysis> analysisList = new ArrayList<>();
+                    analysisList.add(analysis);
+                    Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                    analysisMap.put("list",analysisList);
+                    log.info("算法信息：    "+analysisMap);
+                    analysis(analysisMap);
+                    log.info("任务超期"+tCruiseTask.getTaskId());
+                    Map<String,Object> jsonMap=new HashMap<>();
+                    jsonMap.put("type","taskAre");
+                    jsonMap.put("taskId",taskId);
+                    String jsonForTaskAre= JSON.toJSONString(jsonMap);
+                    log.info("任务超期的消息：   "+jsonForTaskAre);
+                    WebSocketServer.sendMsg(jsonForTaskAre);
+                    return;
+
+                }
                 if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
                     if(tCruiseResultIsPause.getCState() == 242){
                         Map<String,Object> jsonMap=new HashMap<>();
@@ -395,7 +431,6 @@ public class RunAtNowTask implements Runnable{
                         log.info("任务终止的消息：   "+jsonForShut);
                         WebSocketServer.sendMsg(jsonForShut);
                     }
-                    Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                     Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                     Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
                     Integer all = Integer.valueOf(mapForGet.get("all"));
@@ -411,7 +446,7 @@ public class RunAtNowTask implements Runnable{
 
                     //任务结束生成结果，
                     Analysis analysis = new Analysis();
-                    analysis.setTaskId(taskId);
+                    analysis.setTaskId(tCruiseTask.getTaskId());
                     analysis.setInstanceId(-1L);
                     //analysis.setPicPath(picUrl);
                     //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
@@ -423,7 +458,7 @@ public class RunAtNowTask implements Runnable{
                     analysisMap.put("list",analysisList);
                     log.info("算法信息：    "+analysisMap);
                     analysis(analysisMap);
-                    log.info("任务停止执行"+taskId);
+                    log.info("任务停止执行"+tCruiseTask.getTaskId());
                     return;
                 }
             }

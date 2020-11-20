@@ -3,6 +3,8 @@ package com.yjh.accessudp.module.device.service;
 import com.yjh.accessudp.module.device.dao.TCfgMeteDao;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
+import com.yjh.accessudp.module.device.entity.THisSignalData;
+import com.yjh.accessudp.module.device.entity.THisTelemeterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +88,27 @@ public class TCfgMeteService {
         return i;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public int insertIntoHis(TCfgDataCurrent tCfgDataCurrent){
+        if(tCfgDataCurrent.getMeteKind() == 2){
+            THisTelemeterData tHisTelemeterData = new THisTelemeterData();
+            tHisTelemeterData.setMeteId(tCfgDataCurrent.getMeteId());
+            tHisTelemeterData.setDeviceId(tCfgDataCurrent.getDeviceId());
+            tHisTelemeterData.setRecordTime(tCfgDataCurrent.getRecordTime());
+            tHisTelemeterData.setMeteKind(tCfgDataCurrent.getMeteKind());
+            tHisTelemeterData.setMeteValue(tCfgDataCurrent.getMeteValue());
+            tHisTelemeterData.setLastMeteValue(tCfgDataCurrent.getLastMeteValue());
+            return tCfgMeteDao.insertIntoTHisTelemeterData(tHisTelemeterData);
+        }
+        THisSignalData tHisSignalData = new THisSignalData();
+        tHisSignalData.setMeteId(tCfgDataCurrent.getMeteId());
+        tHisSignalData.setDeviceId(tCfgDataCurrent.getDeviceId());
+        tHisSignalData.setRecordTime(tCfgDataCurrent.getRecordTime());
+        tHisSignalData.setMeteKind(tCfgDataCurrent.getMeteKind());
+        tHisSignalData.setMeteValue(tCfgDataCurrent.getMeteValue());
+        tHisSignalData.setLastMeteValue(tCfgDataCurrent.getLastMeteValue());
+        return tCfgMeteDao.insertIntoTHisSignalData(tHisSignalData);
+    }
 
 }
 

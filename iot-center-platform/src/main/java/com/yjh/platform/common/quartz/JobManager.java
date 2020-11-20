@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -212,5 +211,36 @@ public class JobManager {
 
     }
 
-
+    /**
+     *检查暂停的任务是否超期
+     */
+    public String checkTaskIsOver(QuartzTask quartzTask, String taskId) throws Exception {
+        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
+        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
+        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
+            logger.error(" Job already exist");
+            return "false";
+        }
+        JobDetail jobDetail = JobBuilder.newJob(CheckTaskAreJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
+                usingJobData("taskId", taskId).build();
+        taskMap.put("taskId",taskId);
+        taskMap.put("jobName",quartzTask.getJobName());
+        taskMap.put("jobGroupName",quartzTask.getJobGroup());
+        String str = quartzTask.getJobName()+System.currentTimeMillis();
+        taskMap.put("triggerName",str);
+        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
+        Constant.taskMap.add(taskMap);
+        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
+                .withIdentity(str, quartzTask.getJobGroup())
+                .startAt(quartzTask.getStartTime())
+                .withSchedule(
+                        SimpleScheduleBuilder.simpleSchedule()
+                                .withIntervalInSeconds(3)
+                                .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
+                .build();
+        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
+        logger.info("定时任务创建成功");
+        return "success";
+    }
 }

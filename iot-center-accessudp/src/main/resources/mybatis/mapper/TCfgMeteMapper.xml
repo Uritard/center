@@ -532,4 +532,42 @@
     <delete id="deleteForTelesignalAll">
         delete from t_cfg_telesignal
     </delete>
+
+    <insert id="insertIntoTHisSignalData" useGeneratedKeys="true" keyProperty="Id" parameterType="com.yjh.accessudp.module.device.entity.THisSignalData">
+        insert into t_his_signal_data(
+            mete_id,
+            device_id,
+            record_time,
+            mete_kind,
+            mete_value,
+            last_mete_value
+        )values(
+                #{meteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{recordTime, jdbcType=TIMESTAMP},
+                #{meteKind, jdbcType=INTEGER},
+                #{meteValue, jdbcType=VARCHAR},
+                #{lastMeteValue, jdbcType=VARCHAR}
+        )
+    </insert>
+
+
+    <insert id="insertIntoTHisTelemeterData" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessudp.module.device.entity.THisTelemeterData">
+        insert into t_his_telemeter_data(
+            mete_id,
+            device_id,
+            record_time,
+            mete_kind,
+            mete_value,
+            last_mete_value
+        )values(
+
+                #{meteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{recordTime, jdbcType=TIMESTAMP},
+                #{meteKind, jdbcType=INTEGER},
+                #{meteValue, jdbcType=VARCHAR},
+                #{lastMeteValue, jdbcType=VARCHAR}
+        )
+    </insert>
 </mapper>

@@ -85,6 +85,8 @@ public class TCruiseTaskService {
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
+    @Value("${spring.tasks.are.Time}")
+    private Long tasksAreTime;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
@@ -129,7 +131,7 @@ public class TCruiseTaskService {
                 try {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
-                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false);
+                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -419,9 +421,28 @@ public class TCruiseTaskService {
 
     @Logs(title = "任务暂停", code = "TCruiseTask",content = "任务暂停")
     @Transactional(rollbackFor = Exception.class)
-    public int taskPause(String taskId) {
+    public int taskPause(String taskId)  {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(241);
+        try{
+            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+            QuartzTask quartzTask = new QuartzTask();
+            quartzTask.setJobName(tCruiseTask.getTaskName());
+            quartzTask.setJobGroup(jobName);
+            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
+            Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            Long taskStartTime = Long.valueOf(mapForGet.get("taskStart"));
+            Long endTime = taskStartTime + tasksAreTime*24*60*60*1000;
+            String s =sd.format(endTime);
+            quartzTask.setStartTime(sd.parse(s));
+            JobManager jobManager =new JobManager();
+            jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
+        } catch (Exception e) {
+            log.error("定时任务异常: ");
+            e.printStackTrace();
+        }
+
         return tCruiseResultDao.update(tCruiseResult);
     }
 
@@ -433,10 +454,19 @@ public class TCruiseTaskService {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
-                tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true);
+                tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
         thread.start();
+        // todo 删除检查任务超期的任务
+        for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
+            //找到任务Id
+            if(mapItem.get("taskId").equals(taskId)){
+                //删除定时任务
+                JobManager.removeJob(mapItem.get("jobName").toString(),mapItem.get("jobGroupName").toString(),mapItem.get("triggerName").toString(),mapItem.get("triggerGroupName").toString());
+                Constant.taskMap.remove(mapItem);
+            }
+        }
         return tCruiseResultDao.update(tCruiseResult);
     }
 

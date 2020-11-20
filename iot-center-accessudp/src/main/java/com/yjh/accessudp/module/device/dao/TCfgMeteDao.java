@@ -4,6 +4,8 @@ package com.yjh.accessudp.module.device.dao;
 
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
+import com.yjh.accessudp.module.device.entity.THisSignalData;
+import com.yjh.accessudp.module.device.entity.THisTelemeterData;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -44,4 +46,7 @@ public interface TCfgMeteDao {
     int deleteForTelecontrolAll();
     int deleteForTelemeterAll();
     int deleteForTelesignalAll();
+
+    int insertIntoTHisSignalData(THisSignalData tHisSignalData);
+    int insertIntoTHisTelemeterData(THisTelemeterData tHisTelemeterData);
 }
