@@ -281,8 +281,8 @@
         i.dict_note AS cTypeName,
         b.cruise_type,
         h.dict_note AS cruiseTypeName,
-        f.identify_state,
-        j.dict_note AS identifyStateName,
+        f.identify_result,
+        j.dict_note AS identifyResultName,
         f.result_num,
         f.picpath,
         (
@@ -322,8 +322,8 @@
         AND h.col_name = "cruise_type"
         LEFT JOIN t_cruise_task_result_detail e ON b.instance_id = e.instance_id
         LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
-        LEFT JOIN t_dict_business j ON f.identify_state = j.dict_code
-        AND j.col_name = "identify_state"
+        LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code
+        AND j.col_name = "identify_result"
         LEFT JOIN t_cruise_result g ON e.task_result_id = g.task_result_id
         LEFT JOIN t_dict_business i ON g.c_type = i.dict_code
         AND i.col_name = "plan_type"

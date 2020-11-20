@@ -9,9 +9,7 @@ import com.yjh.platform.module.task.entity.TCruiseDataResult;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
 import io.swagger.annotations.*;
 import org.apache.commons.logging.Log;
@@ -22,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
@@ -204,10 +200,9 @@ public class TCruiseDataResultController {
                                                @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date endDateTemp;
         Date startDateTemp;
-
         try {
             if (endDate.equals("") && startDate.equals("")) {
                 endDateTemp = null;
