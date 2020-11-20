@@ -16,6 +16,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
@@ -37,6 +38,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     private SysLogsService sysLogsService;
     private RobotService robotService;
+    @Value("${ftp.key.path}")
+    private String filePath;//SFTP文件在服务器的地址
 
     public void setSysLogsService(SysLogsService sysLogsService) {
         this.sysLogsService = sysLogsService;
@@ -162,8 +165,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("解析出来的xml是："+xmlRes);
         //item的大小为0(注册，心跳，控制),1(任务控制、联动任务),2(模型同步),7(状态,运行,微气象),
         //6(坐标，巡视路线),4(异常告警),9(任务状态),14(巡视结果)
-        int itemSize = xmlRes.getItems().get(0).size();
-        log.info("itemSize的大小是："+itemSize);
+//        int itemSize = xmlRes.getItems().get(0).size();
+//        log.info("itemSize的大小是："+itemSize);
 
 //        redisTemplate.opsForHash().putAll("RobotXML", xmlToMap);//将Map放缓存
 //        Map<String, Object> RobotXMLMap = redisTemplate.opsForHash().entries("RobotXML");//读redis
@@ -261,7 +264,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("解析得到的items是<start>"+xmlRes.getItems()+"<end>");
                 String deviceFile = xmlRes.getItems().get(0).get("device_file_path").toString();//设备文件路径
                 String robotFile = xmlRes.getItems().get(0).get("robot_file_path").toString();//机器人文件路径
-                XMLBaseModel deviceModel = getXmlMessage("/home/yjh_iot_center/ftps/"+deviceFile);
+                XMLBaseModel deviceModel = getXmlMessage(filePath+"/"+deviceFile);
                 List<Map<String,Object>> deviceMap = deviceModel.getItems();
                 log.info("deviceMap是："+deviceMap);
                 XMLBaseModel robotModel = getXmlMessage(robotFile);
