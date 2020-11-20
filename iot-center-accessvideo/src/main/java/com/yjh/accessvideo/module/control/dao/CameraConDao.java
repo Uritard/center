@@ -15,4 +15,6 @@ public interface CameraConDao {
 
     CameraConInfo selectConInfo(@Param(value = "cameraId") Long cameraId, @Param(value = "presetId") Long presetId);
 
+    CameraConInfo selectStatusInfo(@Param(value = "cameraId") Long cameraId);
+
 }

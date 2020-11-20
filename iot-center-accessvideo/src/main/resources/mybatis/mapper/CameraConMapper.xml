@@ -41,6 +41,22 @@
         limit 1
     </select>
 
+    <select id="selectStatusInfo" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraConInfo">
+        SELECT
+        a.camera_id,
+        a.channel_num,
+        a.camera_type,
+        c.record_id,
+        c.record_ip,
+        c.user_name,
+        c.pwd,
+        c.rtsp_port
+        FROM t_camera_info a
+        LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
+        WHERE 1 = 1
+        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+    </select>
+
 
 
 </mapper>

@@ -228,6 +228,21 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "获取相机状态")
+    @RequestMapping(value = "/getCameraStatus", method = RequestMethod.GET)
+    public Result getCameraStatus(@RequestParam(value = "cameraId", required = false) Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getCameraStatus(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取相机状态失败:", e);
+        }
+        return result;
+    }
+
     private static String getLocalIp() throws SocketException {
         String ip = "";
         try {

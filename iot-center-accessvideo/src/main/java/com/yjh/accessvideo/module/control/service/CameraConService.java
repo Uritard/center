@@ -1,6 +1,8 @@
 package com.yjh.accessvideo.module.control.service;
 
 import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.hik.HCNetSDK;
@@ -16,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
 * @author tt
@@ -41,10 +40,11 @@ public class CameraConService {
     private String UrlBackTem;
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
-    private NativeLong m_lRealPalyHandle = new NativeLong(-1);
-    private NativeLong m_lPlayHandle = new NativeLong(-1);// playhandle
+    private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
+    private NativeLong m_minsOne = new NativeLong(-1);
     private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();	// play structure
+    private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
 
 
     @Logs(title = "相机播放", code = "cameraPlay")
@@ -172,20 +172,20 @@ public class CameraConService {
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
         int iChanNum = cameraConInfo.getChannelNum()+32;
-        m_lRealPalyHandle = realPlay(iChanNum);
-        if (m_lRealPalyHandle.intValue() == -1) {
+        m_lRealPlayHandle = realPlay(iChanNum);
+        if (m_lRealPlayHandle.intValue() == -1) {
             log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
             return "fail";
         }
         if (dwPTZCommand==29) {
-            return hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, dStop, speed);
+            return hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, dStop, speed);
         } else {
-            if (hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, 0, speed)) {
+            if (hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, 0, speed)) {
                 try {
                     Thread.sleep(200);
                 } catch (Exception e) {e.getMessage();}
-                hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPalyHandle, dwPTZCommand, 1, speed);
-                return hCNetSDK.NET_DVR_StopRealPlay(m_lRealPalyHandle);
+                hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, 1, speed);
+                return hCNetSDK.NET_DVR_StopRealPlay(m_lRealPlayHandle);
             } else { return "PTZ control fail, errorInfo: "+hCNetSDK.NET_DVR_GetLastError(); }
         }
 
@@ -201,13 +201,38 @@ public class CameraConService {
         lpJpegPara.wPicSize = 0xff;
         lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
         if (Objects.nonNull(Constant.maps.get("lUserID"))) {
+            boolean capPictureResult = false;
             lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
             log.info("lUserIDLong: "+lUserIDLong);
-            if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath)) {
-                log.error("capture picture fail, error code: "+hCNetSDK.NET_DVR_GetLastError());
-                return "capture picture fail, error code: "+hCNetSDK.NET_DVR_GetLastError();
-            }
-            return "success";
+            if (cameraConInfo.getCameraType()==206) {
+                log.info("红外相机，特殊拍照");
+                m_lRealPlayHandle = hCNetSDK.NET_DVR_RealPlay_V40(lUserIDLong, dvr_previewinfo, null, null);
+                if (Objects.equals(m_lRealPlayHandle, m_minsOne)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("capture picture fail, error code: "+iErr);
+                    return "capture picture fail, error code: "+iErr;
+                }
+                int m_lRealPlayHandleIndex = hCNetSDK.NET_DVR_GetRealPlayerIndex(m_lRealPlayHandle);
+                if (Objects.equals(m_lRealPlayHandleIndex, -1)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("capture picture fail, error code: "+iErr);
+                    return "capture picture fail, error code: "+iErr;
+                }
+                //打开测温信息
+                hCNetSDK.PlayM4_RenderPrivateData(iChanNum, 0x20, 1);
+                hCNetSDK.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 1);
+                hCNetSDK.PlayM4_SetOverlayPriInfoFlag(iChanNum, 0x20, true);
+                hCNetSDK.PlayM4_GetJPEG(iChanNum, lpJpegPara.getPointer(), lpJpegPara.wPicSize, lpJpegPara.wPicQuality);
+                //关闭测温信息
+                hCNetSDK.PlayM4_RenderPrivateData(iChanNum, 0x20, 0);
+                hCNetSDK.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 0);
+            } else { capPictureResult = hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath); }
+            log.info("capPictureResult: "+capPictureResult);
+            if (!capPictureResult) {
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("capture picture fail, error code: "+iErr);
+                return "capture picture fail, error code: "+iErr;
+            } else { return "success"; }
         } else { return "userID is null"; }
     }
 
@@ -217,16 +242,49 @@ public class CameraConService {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,presetId);
         int iChanNum = cameraConInfo.getChannelNum()+32;
         int iPreset = cameraConInfo.getPresetNum();
-        m_lRealPalyHandle = realPlay(iChanNum);
-        if (m_lRealPalyHandle.intValue() == -1) {
+        m_lRealPlayHandle = realPlay(iChanNum);
+        if (m_lRealPlayHandle.intValue() == -1) {
             log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
             return false;
         }
-        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPalyHandle, presetCmd, iPreset)) {
+        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPlayHandle, presetCmd, iPreset)) {
             log.error("set presetPoint fail, presetId：" + iPreset+", error code: "+hCNetSDK.NET_DVR_GetLastError());
             return false;
         }
         return true;
+    }
+
+    @Logs(title = "获取相机状态", code = "getCameraStatus")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, String> getCameraStatus(Long cameraId) {
+        CameraConInfo cameraConInfo = cameraConDao.selectStatusInfo(cameraId);
+        NativeLong iChanNum = new NativeLong(cameraConInfo.getChannelNum()+32);
+        NativeLong iChanNumTem = new NativeLong(0);
+        Map<String, String> channleStatusMap = new HashMap<>();
+        if (Objects.nonNull(Constant.maps.get("lUserID"))) {
+            lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+            log.info("lUserIDLong: "+lUserIDLong);
+            HCNetSDK.NET_DVR_IPPARACFG_V40 ipparacfg_v40 = new HCNetSDK.NET_DVR_IPPARACFG_V40();
+            ipparacfg_v40.dwSize = ipparacfg_v40.dwGroupNum = ipparacfg_v40.dwAChanNum = ipparacfg_v40.dwDChanNum = ipparacfg_v40.dwStartDChan = 0;
+            log.info("iChanNum: "+iChanNum);
+            IntByReference intByReference = new IntByReference(0);
+            log.info("2 ");
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG_V40, iChanNumTem, ipparacfg_v40.getPointer(), ipparacfg_v40.size(), intByReference)) {
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("get camera status fail, error code: "+iErr);
+                channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
+                return channleStatusMap;
+            }
+            log.info("3 ");
+            for (int i=0;i<ipparacfg_v40.dwDChanNum;i++) {
+                String byChannel = String.valueOf(ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byChannel & 0xFF);
+                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==1) { channleStatusMap.put(byChannel, "online"); }
+                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==0) { channleStatusMap.put(byChannel, "offline"); }
+            }
+            return channleStatusMap;
+        }
+        channleStatusMap.put("errorMessage: " ,"userID is null");
+        return channleStatusMap;
     }
 
     private NativeLong realPlay(int lChannel) {

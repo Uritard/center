@@ -25,8 +25,8 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.ShortByReference;
-import com.yjh.accessvideo.common.Constant;
-import org.springframework.beans.factory.annotation.Value;
+import com.sun.jna.win32.StdCallLibrary;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,14 +35,11 @@ import java.util.List;
 //SDK接口说明,HCNetSDK.dll
 public interface HCNetSDK extends Library {
 
-//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(Constant.sdkPath+"/libhcnetsdk.so",
+//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh_iot_center/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
 //            HCNetSDK.class);
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh_iot_center/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk",
             HCNetSDK.class);
-
-//    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk",
-//            HCNetSDK.class);
     /***宏定义***/
     //常量
 
@@ -531,6 +528,8 @@ public interface HCNetSDK extends Library {
     //设备编码类型配置(NET_DVR_COMPRESSION_AUDIO结构)
     public static final int NET_DVR_GET_COMPRESSCFG_AUD = 1058;     //获取设备语音对讲编码参数
     public static final int NET_DVR_SET_COMPRESSCFG_AUD = 1059;     //设置设备语音对讲编码参数
+    //
+    public static final int NET_DVR_GET_IPPARACFG_V40 = 1062;     //获取IP接入配置参数
     //设备的配置信息配置
     public static final int NET_DVR_GET_ISP_CAMERAPARAMCFG = 3255;	//获取设备的配置信息
     public static final int NET_DVR_SET_ISP_CAMERAPARAMCFG = 3256;	//设置设备的配置信息
@@ -3565,11 +3564,6 @@ EMAIL参数结构
         public float fHeight;
     }
 
-    public static class NET_VCA_POINT extends Structure {
-        public  float  fX;
-        public float  fY;
-    }
-
     public static class NET_ITC_POLYGON extends Structure {
         public int dwPointNum;
         public NET_VCA_POINT[] struPos = new NET_VCA_POINT[ITC_MAX_POLYGON_POINT_NUM];
@@ -3581,6 +3575,99 @@ EMAIL参数结构
             }
         }
     }
+
+    //tt: 2020-11-16 start
+    //  HCNetSDK 中 热成像 实时温度回调结构体
+    //  NET_SDK_MANUAL_THERMOMETRY 手动测温规则配置结构体。
+    public static class NET_SDK_MANUAL_THERMOMETRY extends Structure
+    {
+        public int dwSize; /* 结构体大小 */
+        public int dwChannel;
+        public int dwRelativeTime;
+        public int dwAbsTime;
+        public byte byThermometryUnit;
+        public byte byDataType;
+        public byte[] byRes1 = new byte[6];
+        public NET_SDK_MANUALTHERM_RULE  struRuleInfo;
+        public byte[] byRes = new byte[512];
+    }
+    //手动测温规则结构体。
+    public static class NET_SDK_MANUALTHERM_RULE extends Structure
+    {
+        public byte byRuleID;
+        public byte byEnable;
+        public byte[] byRes1 = new byte[2];
+        public byte[] szRuleName = new byte[NAME_LEN];
+        public byte byRuleCalibType;
+        public byte[] byRes2 = new byte[3];
+        public NET_SDK_POINT_THERMOMETRY  struPointTherm;
+        public NET_SDK_REGION_THERMOMETRY  struRegionTherm;
+        public byte[] byRes = new byte[512];
+    }
+    //点测温结构体。
+    public static class NET_SDK_POINT_THERMOMETRY extends Structure
+    {
+        public float fPointTemperature;
+        public byte[] byRes = new byte[20];
+        public NET_VCA_POINT struPoint;
+    }
+    public static class NET_VCA_POINT extends Structure
+    {
+        public float fX;//X轴坐标，取值范围[0.001,1]
+        public float fY;//Y轴坐标，取值范围[0.001,1]
+
+    }
+
+    //区域测温结构体。
+    public static class NET_SDK_REGION_THERMOMETRY extends Structure
+    {
+        public float fMaxTemperature;
+        public float fMinTemperature;
+        public float fAverageTemperature;
+        public float fTemperatureDiff;
+        public byte[] byRes = new byte[20];
+        public   NET_VCA_POLYGON  struPoint;
+
+    }
+
+    //多边形结构体。
+    public static class NET_VCA_POLYGON extends Structure
+    {
+        public int dwPointNum; /* 结构体大小 */
+        public NET_VCA_POINT[] struPos = new NET_VCA_POINT[10];
+
+    }
+
+    public static class NET_DVR_STD_CONFIG extends Structure {
+        public Pointer lpCondBuffer;        //[in]条件参数(结构体格式),例如通道号等.可以为NULL
+        public int dwCondSize;            //[in] lpCondBuffer指向的内存大小
+        public Pointer lpInBuffer;            //[in]输入参数(结构体格式),设置时不为NULL，获取时为NULL
+        public int dwInSize;            //[in] lpInBuffer指向的内存大小
+        public Pointer lpOutBuffer;        //[out]输出参数(结构体格式),获取时不为NULL,设置时为NULL
+        public int dwOutSize;            //[in] lpOutBuffer指向的内存大小
+        public Pointer lpStatusBuffer;        //[out]返回的状态参数(XML格式),获取成功时不会赋值,如果不需要,可以置NULL
+        public int dwStatusSize;        //[in] lpStatusBuffer指向的内存大小
+        public Pointer lpXmlBuffer;    //[in/out]byDataType = 1时有效,xml格式数据
+        public int dwXmlSize;      //[in/out]lpXmlBuffer指向的内存大小,获取时同时作为输入和输出参数，获取成功后会修改会实际长度，设置时表示实际长度，而不是整个内存大小
+        public byte byDataType;     //[in]输入/输出参数类型,0-使用结构体类型lpInBuffer/lpOutBuffer有效,1-使用XML类型lpXmlBuffer有效
+        public byte[] byRes= new byte[23];
+    }
+
+    //  HCNetSDK 中 热成像 实时温度检测条件参数结构体
+    public static class NET_DVR_REALTIME_THERMOMETRY_COND extends Structure {
+        public int dwSize; /* 结构体大小 */
+        public int dwChan; /* 通道号，从1开始，0xffffffff代表获取全部通道 */
+        public byte byRuleID;/* 规则ID，0代表获取全部规则，具体规则ID从1开始 */
+        public byte byMode;// 长连接模式：0- 保留（兼容不支持该功能的老设备），1- 定时模式，2- 温差模式
+        public byte[] byRes2 = new byte[62];
+    }
+
+    public static class REMOTECONFIGSTATUS extends Structure {
+        public byte[] byStatus = new byte[4];
+        public byte[] byErrorCode = new byte[4];
+    }
+
+    //tt: 2020-11-16 end
 
     public static class B extends Structure {
         public int b1;
@@ -4307,6 +4394,21 @@ EMAIL参数结构
     boolean  NET_DVR_CaptureJPEGPicture(NativeLong lUserID, NativeLong lChannel, NET_DVR_JPEGPARA lpJpegPara, String sPicFileName);
     //JPEG抓图到内存
     boolean  NET_DVR_CaptureJPEGPicture_NEW(NativeLong lUserID, NativeLong lChannel, NET_DVR_JPEGPARA lpJpegPara, String sJpegPicBuffer, int dwPicSize, IntByReference lpSizeReturned);
+
+    boolean  PlayM4_SetOverlayPriInfoFlag(long nPort, int nIntelType, boolean bTrue);
+    boolean PlayM4_GetJPEG(long nPort, Pointer pJpg, int nbufSize, int pJpgSize);
+
+    //第一个接口为测温主类型接口，开启关闭测温的大开关；nIntelType：对应为0x20；bTrue：0表示关闭，1表示开启
+    boolean PlayM4_RenderPrivateData(long nPort, int nIntelType, int bTrue);
+    boolean PlayM4_RenderPrivateDataEx(long nPort, int nIntelType, int nSubType, int bTrue);
+
+    //tt: 获取设备的配置信息。lUserID 设备注册后获取的ID，dwCommand 设备配置命令
+    boolean  NET_DVR_SetSTDConfig(NativeLong lUserID, int dwCommand, NET_DVR_STD_CONFIG lpConfigParam);
+
+    public static interface FRemoteConfigCallback extends StdCallLibrary.StdCallCallback {
+        public void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
+    }
+    NativeLong NET_DVR_StartRemoteConfig (NativeLong lUserID, int dwCommand, Pointer lpInBuffer, int dwInBufferLen, FRemoteConfigCallback cbStateCallback, Pointer pUserData);
 
 
     //2006-02-16
