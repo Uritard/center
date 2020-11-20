@@ -99,12 +99,10 @@ public class CameraConController {
         Result result = new Result();
         try {
             List<String> resultList = new ArrayList<>();
-            for(Map.Entry<Long, String> entry : map.entrySet()){
-                Long cameraId = entry.getKey();
-                String rtmpUrl = entry.getValue();
+            map.forEach((cameraId, rtmpUrl) -> {
                 String resultBack = cameraConService.stopRealPlay(cameraId, rtmpUrl);
                 resultList.add(resultBack);
-            }
+            });
             result.setData(resultList);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
