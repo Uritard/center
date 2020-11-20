@@ -112,7 +112,46 @@ public class CameraConService {
             urlStop = "kill -9 "+processNum;
             Runtime.getRuntime().exec(urlStop);
         } catch (Exception e) {e.getMessage();}
-        return urlStop;
+        return "stop " + cameraId + " preview success!";
+    }
+
+    @Logs(title = "相机批量播放", code = "cameraPlay")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> batchStartRealPlay(List<Long> list) {
+        Map<String, Object> returnMap = new HashMap<>();
+        try {
+            List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(list);
+            for (CameraConInfo cameraConInfo: cameraConInfoList) {
+                String userName = cameraConInfo.getUserName();
+                String password = cameraConInfo.getPwd();
+                String cameraIp = cameraConInfo.getRecordIp();
+                int cameraPort = cameraConInfo.getRtspPort();
+                int iChanNum = cameraConInfo.getChannelNum();
+                int cameraType = cameraConInfo.getCameraType();
+                int livePath;
+                if (Objects.nonNull(Constant.maps.get("livePath"))) {
+                    livePath = Constant.maps.get("livePath")+1;
+                    Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+                } else {
+                    livePath = 123;
+                    Constant.maps.put("livePath", 123);
+                }
+                log.info("Constant.maps: "+Constant.maps);
+                log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+cameraType+" "+livePath);
+                String transUrl = "";
+                if (cameraType==205) {
+                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
+                } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
+                Runtime.getRuntime().exec(transUrl);
+                String[] rtmpUrls = transUrl.split("rtmp");
+                String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
+                returnMap.put(String.valueOf(cameraConInfo.getCameraId()), rtmpUrl);
+                Constant.mapsForCamera.put(String.valueOf(cameraConInfo.getCameraId()), rtmpUrl);
+                log.info("mapsForCamera: "+Constant.mapsForCamera);
+                log.info("returnMap: "+returnMap);
+            }
+        } catch (Exception e) {e.getMessage();}
+        return returnMap;
     }
 
     @Logs(title = "视频回放", code = "cameraPlayBack")
@@ -263,24 +302,26 @@ public class CameraConService {
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.nonNull(Constant.maps.get("lUserID"))) {
             lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+            IntByReference intByReference = new IntByReference(0);
             log.info("lUserIDLong: "+lUserIDLong);
             HCNetSDK.NET_DVR_IPPARACFG_V40 ipparacfg_v40 = new HCNetSDK.NET_DVR_IPPARACFG_V40();
-            ipparacfg_v40.dwSize = ipparacfg_v40.dwGroupNum = ipparacfg_v40.dwAChanNum = ipparacfg_v40.dwDChanNum = ipparacfg_v40.dwStartDChan = 0;
+            Pointer ipparacfgV40Pointer = ipparacfg_v40.getPointer();
+            ipparacfg_v40.write();
             log.info("iChanNum: "+iChanNum);
-            IntByReference intByReference = new IntByReference(0);
-            log.info("2 ");
-            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG_V40, iChanNumTem, ipparacfg_v40.getPointer(), ipparacfg_v40.size(), intByReference)) {
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG_V40, iChanNumTem, ipparacfgV40Pointer, ipparacfg_v40.size(), intByReference)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get camera status fail, error code: "+iErr);
                 channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
                 return channleStatusMap;
             }
-            log.info("3 ");
+            ipparacfg_v40.read();
+            log.info("2 ");
             for (int i=0;i<ipparacfg_v40.dwDChanNum;i++) {
                 String byChannel = String.valueOf(ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byChannel & 0xFF);
-                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==1) { channleStatusMap.put(byChannel, "online"); }
-                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==0) { channleStatusMap.put(byChannel, "offline"); }
+                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==1) { channleStatusMap.put(byChannel, "1"); }
+                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==0) { channleStatusMap.put(byChannel, "0"); }
             }
+            log.info("3 ");
             return channleStatusMap;
         }
         channleStatusMap.put("errorMessage: " ,"userID is null");

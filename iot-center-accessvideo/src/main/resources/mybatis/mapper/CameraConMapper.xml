@@ -41,6 +41,24 @@
         limit 1
     </select>
 
+    <select id="batchSelectConInfo" resultType="com.yjh.accessvideo.module.control.entity.CameraConInfo">
+        SELECT
+        a.camera_id,
+        a.channel_num,
+        a.camera_type,
+        c.record_id,
+        c.record_ip,
+        c.user_name,
+        c.pwd,
+        c.rtsp_port
+        FROM t_camera_info a
+        LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
+        WHERE 1 = 1 and a.camera_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="cameraId">
+            #{cameraId, jdbcType=BIGINT}
+        </foreach>
+    </select>
+
     <select id="selectStatusInfo" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraConInfo">
         SELECT
         a.camera_id,

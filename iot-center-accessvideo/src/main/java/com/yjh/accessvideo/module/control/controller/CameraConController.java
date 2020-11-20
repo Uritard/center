@@ -11,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,10 +19,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tt
@@ -80,6 +74,43 @@ public class CameraConController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("相机停止播放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "相机批量播放")
+    @RequestMapping(value = "/startRealPlay", method = RequestMethod.POST)
+    public Result batchStartRealPlay(@RequestBody List<Long> list) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.batchStartRealPlay(list));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机批量播放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "相机批量停止播放")
+    @RequestMapping(value = "/stopRealPlay", method = RequestMethod.POST)
+    public Result batchStopRealPlay(@RequestBody Map<Long, String> map) {
+        Result result = new Result();
+        try {
+            List<String> resultList = new ArrayList<>();
+            for(Map.Entry<Long, String> entry : map.entrySet()){
+                Long cameraId = entry.getKey();
+                String rtmpUrl = entry.getValue();
+                String resultBack = cameraConService.stopRealPlay(cameraId, rtmpUrl);
+                resultList.add(resultBack);
+            }
+            result.setData(resultList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机批量停止播放失败:", e);
         }
         return result;
     }
