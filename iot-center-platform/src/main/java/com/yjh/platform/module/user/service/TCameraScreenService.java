@@ -120,11 +120,20 @@ public class TCameraScreenService{
                 areaInfoCountryList.add(areaInfoCountry);
             }
         }
-        Map<String,Object> map = new HashMap<>();
+        Map<String,String> map = new HashMap<>();
+        //获取相机的状态
+        List<Map<String,String>> listForState = new ArrayList<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            //todo 摄像机状态
+        }
+        for(Map<String,String> item:listForState){
+            map.putAll(item);
+        }
         diGui(areaInfoCountryList, listTree,map);
         return areaInfoCountryList;
     }
-    private void diGui(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,Object> map) {
+    private void diGui(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,String> map) {
         for(AreaInfoDetail areaInfo : areaInfoList){
             List<AreaInfoDetail> childrenList = new ArrayList<>();
             for(Iterator<AreaInfoDetail> it = listTree.iterator();it.hasNext();){
@@ -136,8 +145,9 @@ public class TCameraScreenService{
                     areaInfoTem.setLabel(areaInfoMap.getLabel());
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
-                    //todo 摄像机状态
-                    //areaInfoTem.setState()
+                    if("camera".equals(areaInfoMap.getInfoType())){
+                        areaInfoTem.setState(Integer.valueOf(map.get(areaInfoMap.getId().toString())));
+                    }
                     childrenList.add(areaInfoTem);
                 }
             }

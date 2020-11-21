@@ -8,6 +8,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
@@ -48,6 +49,7 @@ public class RunAtNowTask implements Runnable{
     private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
     private TCruiseTaskResultDao tCruiseTaskResultDao;
     private Boolean isGoOn;
+    private TRobotInspectionDao tRobotInspectionDao;
 
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
@@ -71,7 +73,8 @@ public class RunAtNowTask implements Runnable{
     public RunAtNowTask(TCruiseTask tCruiseTask,Long waitTime ,String picModelPath,RedisTemplate redisTemplate,TCruisePointInstanceDao tCruisePointInstanceDao,
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
-                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Long tasksAreTime) {
+                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Long tasksAreTime,
+                        TRobotInspectionDao tRobotInspectionDao) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
         this.picModelPath = picModelPath;
@@ -87,6 +90,7 @@ public class RunAtNowTask implements Runnable{
         this.tCruiseTaskResultDao = tCruiseTaskResultDao;
         this.isGoOn = isGoOn;//判断是否是任务重启
         this.tasksAreTime = tasksAreTime;
+        this.tRobotInspectionDao = tRobotInspectionDao;
     }
 
     //相机抓图
@@ -205,11 +209,36 @@ public class RunAtNowTask implements Runnable{
                 mapForAbnormal.put("abnormal","0");
                 mapForAbnormal.put("normal","0");
                 mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
+                mapForAbnormal.put("overDay",tasksAreTime.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
             Integer taskAbnormal = 0;//异常数量
             Integer taskNormal = 0;//正常
             List<String> analysisInstanceList = new ArrayList<>();
+
+            //找出机器人做任务的巡检点
+            List<Long> robotInstanceList = new ArrayList<>();
+            for (TCruisePointInstance item : instancesList) {
+                if (228 == item.getCruiseType()) {//todo 机器人
+                    robotInstanceList.add(item.getCruiseId());
+                }
+            }
+            log.info("robotInstanceList   :" +robotInstanceList);
+            List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+            List<RobotTaskMonitor> robotTaskInfoList = new ArrayList<>();
+            log.info("robotId   :" +robotId);
+            for (Long item: robotId){
+                RobotTaskMonitor robotTaskInfo = new RobotTaskMonitor();
+                robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                robotTaskInfo.setTaskId(taskId);
+                robotTaskInfo.setPriority(4);//优先级 暂定4
+                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
+                robotTaskInfo.setDeviceList(deviceList);
+                robotTaskInfoList.add(robotTaskInfo);
+            }
+            log.info("robotTaskInfoList   :" +robotTaskInfoList);
+
             log.info("开始巡检"+new Date());
             for (TCruisePointInstance item : instancesList) {
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -225,8 +254,6 @@ public class RunAtNowTask implements Runnable{
                 tCruiseDataResult.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
                 tCruiseDataResult.setCruiseId(item.getInstanceId());
                 //一次循环 一个巡检点
-                if (228 == item.getCruiseType()) {//todo 机器人
-                }
                 if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
                     log.info("巡检点开始巡检"+new Date());
                     tCruiseDataResult.setCruiseType(item.getCruiseType());

@@ -211,7 +211,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //            union(map);
             //将实时表里的数据更新到历史表里
             tCfgMeteService.insertIntoHis(tCfgDataCurrent);
-            getUrl(Constant.UNINO_URL,meteId.toString());
+            getUrl(Constant.UNION_URL,meteId.toString());
 
         }else if ("43".equals(udp[4])){
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
@@ -267,7 +267,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.UNINO_URL, map, String.class);
+                serviceRestTemplate.postForObject(Constant.UNION_URL, map, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

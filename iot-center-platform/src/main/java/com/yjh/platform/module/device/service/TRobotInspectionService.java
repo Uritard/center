@@ -47,8 +47,8 @@ public class TRobotInspectionService{
 
     @Logs(title = "查询", code = "device")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInspection> select(Long inspectionId, Long robotId, String inspectionName, Integer inspectionType, String alarmTop, String alarmBottom, String defaultValue, Integer inspectionPostion, Integer collectStatus, Integer calibrationStatus, String unit) {
-        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPostion, collectStatus, calibrationStatus, unit);
+    public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName, Integer inspectionType, String alarmTop, String alarmBottom, String defaultValue, Integer inspectionPosition, Integer collectStatus, Integer calibrationStatus, String unit) {
+        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
         return tRobotInspectionList;
     }
 

@@ -52,7 +52,7 @@ public class Constant {
 
     public static final String TYPE_104 = "104";
 
-    public final static String UNINO_URL = "http://192.168.9.40:18711/tCfgDataCurrent/v1/unionTest";
+    public final static String UNION_URL = "http://192.168.9.40:18711/tCfgDataCurrent/v1/unionTest";
     //static String UNINO_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest";
     public static String TIME= "";
 }

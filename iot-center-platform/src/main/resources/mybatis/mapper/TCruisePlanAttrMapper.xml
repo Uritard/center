@@ -210,7 +210,7 @@
             ir_temp_box,
             create_time,
             update_time,
-            a.sub_type
+            sub_type
         )values
         <foreach collection="tCruisePlanAttrList" item="TCruisePlanAttr" separator=",">
             (

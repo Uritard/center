@@ -101,19 +101,20 @@ public class TRobotInspectionController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "inspectionId", required = false) Long inspectionId,
+                         @RequestParam(value = "inspectionCode", required = false)String inspectionCode,
                             @RequestParam(value = "robotId", required = false) Long robotId,
                             @RequestParam(value = "inspectionName", required = false) String inspectionName,
                             @RequestParam(value = "inspectionType", required = false) Integer inspectionType,
                             @RequestParam(value = "alarmTop", required = false) String alarmTop,
                             @RequestParam(value = "alarmBottom", required = false) String alarmBottom,
                             @RequestParam(value = "defaultValue", required = false) String defaultValue,
-                            @RequestParam(value = "inspectionPostion", required = false) Integer inspectionPostion,
+                            @RequestParam(value = "inspectionPosition", required = false) Integer inspectionPosition,
                             @RequestParam(value = "collectStatus", required = false) Integer collectStatus,
                             @RequestParam(value = "calibrationStatus", required = false) Integer calibrationStatus,
                             @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPostion, collectStatus, calibrationStatus, unit);
+            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

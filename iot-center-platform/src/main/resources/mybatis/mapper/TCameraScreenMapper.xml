@@ -119,4 +119,11 @@
                 LEFT JOIN t_std_region b ON d.up_region_id = b.region_id);
     </select>
 
+    <select id="selectRecordId" resultType="java.lang.Long">
+        SELECT DISTINCT
+            a.record_id
+        FROM
+            t_camera_info a
+    </select>
+
 </mapper>

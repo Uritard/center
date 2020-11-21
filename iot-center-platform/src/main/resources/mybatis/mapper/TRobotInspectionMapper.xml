@@ -5,13 +5,14 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TRobotInspection">
         <id column="inspection_id" jdbcType="BIGINT" property="inspectionId" />
+        <result column="inspection_code" jdbcType="VARCHAR" property="inspectionCode" />
         <result column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="inspection_name" jdbcType="VARCHAR" property="inspectionName" />
         <result column="inspection_type" jdbcType="INTEGER" property="inspectionType" />
         <result column="alarm_top" jdbcType="VARCHAR" property="alarmTop" />
         <result column="alarm_bottom" jdbcType="VARCHAR" property="alarmBottom" />
         <result column="default_value" jdbcType="VARCHAR" property="defaultValue" />
-        <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
+        <result column="inspection_position" jdbcType="INTEGER" property="inspectionPosition" />
         <result column="collect_status" jdbcType="INTEGER" property="collectStatus" />
         <result column="calibration_status" jdbcType="INTEGER" property="calibrationStatus" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
@@ -19,32 +20,34 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        inspection_id, robot_id, inspection_name, inspection_type, alarm_top, alarm_bottom, default_value, inspection_postion, collect_status, calibration_status, unit
+        inspection_id,inspection_code, robot_id, inspection_name, inspection_type, alarm_top, alarm_bottom, default_value, inspection_position, collect_status, calibration_status, unit
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="inspectionId" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
         insert into t_robot_inspection(
             inspection_id,
+            inspection_code,
             robot_id,
             inspection_name,
             inspection_type,
             alarm_top,
             alarm_bottom,
             default_value,
-            inspection_postion,
+            inspection_position,
             collect_status,
             calibration_status,
             unit
         )values(
                 #{inspectionId, jdbcType=BIGINT},
+                #{inspectionCode,jdbcType=VARCHAR},
                 #{robotId, jdbcType=BIGINT},
                 #{inspectionName, jdbcType=VARCHAR},
                 #{inspectionType, jdbcType=INTEGER},
                 #{alarmTop, jdbcType=VARCHAR},
                 #{alarmBottom, jdbcType=VARCHAR},
                 #{defaultValue, jdbcType=VARCHAR},
-                #{inspectionPostion, jdbcType=INTEGER},
+                #{inspectionPosition, jdbcType=INTEGER},
                 #{collectStatus, jdbcType=INTEGER},
                 #{calibrationStatus, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR}
@@ -59,13 +62,14 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
         update t_robot_inspection a <set>
         <if test="inspectionId != null and inspectionId != ''">a.inspection_id = #{inspectionId, jdbcType=BIGINT},</if>
+        <if test="inspectionCode != null and inspectionCode != ''">a.inspection_code = #{inspectionCode, jdbcType=VARCHAR},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
         <if test="inspectionType != null ">a.inspection_type = #{inspectionType, jdbcType=INTEGER},</if>
         <if test="alarmTop != null and alarmTop != ''">a.alarm_top = #{alarmTop, jdbcType=VARCHAR},</if>
         <if test="alarmBottom != null and alarmBottom != ''">a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR},</if>
         <if test="defaultValue != null and defaultValue != ''">a.default_value = #{defaultValue, jdbcType=VARCHAR},</if>
-        <if test="inspectionPostion != null ">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
+        <if test="inspectionPosition != null ">a.inspection_position = #{inspectionPosition, jdbcType=INTEGER},</if>
         <if test="collectStatus != null ">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
         <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
@@ -76,13 +80,14 @@
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
         select
         a.inspection_id,
+        a.inspection_code,
         a.robot_id,
         a.inspection_name,
         a.inspection_type,
         a.alarm_top,
         a.alarm_bottom,
         a.default_value,
-        a.inspection_postion,
+        a.inspection_position,
         a.collect_status,
         a.calibration_status,
         a.unit
@@ -95,26 +100,28 @@
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
         select
         a.inspection_id,
+        a.inspection_code,
         a.robot_id,
         a.inspection_name,
         a.inspection_type,
         a.alarm_top,
         a.alarm_bottom,
         a.default_value,
-        a.inspection_postion,
+        a.inspection_position,
         a.collect_status,
         a.calibration_status,
         a.unit
         from t_robot_inspection a
         where 1 = 1
         <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
+        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
         <if test="inspectionType != null "> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
         <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
         <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
         <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
-        <if test="inspectionPostion != null "> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
+        <if test="inspectionPosition != null "> and a.inspection_position = #{inspectionPosition, jdbcType=INTEGER}</if>
         <if test="collectStatus != null "> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
         <if test="calibrationStatus != null"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
@@ -123,26 +130,28 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
         select
         a.inspection_id,
+        a.inspection_code,
         a.robot_id,
         a.inspection_name,
         a.inspection_type,
         a.alarm_top,
         a.alarm_bottom,
         a.default_value,
-        a.inspection_postion,
+        a.inspection_position,
         a.collect_status,
         a.calibration_status,
         a.unit
         from t_robot_inspection a
         where 1 = 1
         <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
+        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
         <if test="inspectionType != null "> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
         <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
         <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
         <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
-        <if test="inspectionPostion != null "> and a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER}</if>
+        <if test="inspectionPosition != null "> and a.inspection_position = #{inspectionPosition, jdbcType=INTEGER}</if>
         <if test="collectStatus != null "> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
         <if test="calibrationStatus != null "> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
@@ -151,13 +160,14 @@
     <insert id="batchInsert">
         insert into t_robot_inspection(
             inspection_id,
+            inspection_code,
             robot_id,
             inspection_name,
             inspection_type,
             alarm_top,
             alarm_bottom,
             default_value,
-            inspection_postion,
+            inspection_position,
             collect_status,
             calibration_status,
             unit
@@ -165,13 +175,14 @@
         <foreach collection="list" item="TRobotInspection" separator=",">
             (
                 #{TRobotInspection.inspectionId, jdbcType=BIGINT},
+                #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
                 #{TRobotInspection.robotId, jdbcType=BIGINT},
                 #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
                 #{TRobotInspection.inspectionType, jdbcType=INTEGER},
                 #{TRobotInspection.alarmTop, jdbcType=VARCHAR},
                 #{TRobotInspection.alarmBottom, jdbcType=VARCHAR},
                 #{TRobotInspection.defaultValue, jdbcType=VARCHAR},
-                #{TRobotInspection.inspectionPostion, jdbcType=INTEGER},
+                #{TRobotInspection.inspectionPosition, jdbcType=INTEGER},
                 #{TRobotInspection.collectStatus, jdbcType=INTEGER},
                 #{TRobotInspection.calibrationStatus, jdbcType=INTEGER},
                 #{TRobotInspection.unit, jdbcType=VARCHAR}
@@ -179,5 +190,47 @@
         </foreach>
     </insert>
 
+    <select id="selectForRobotTask" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT DISTINCT
+            a.robot_id
+        FROM
+            t_robot_inspection a
+        WHERE
+            a.inspection_id IN
+            <foreach collection="list" open="(" close=")" separator="," item="inspectionId">
+                #{inspectionId,jdbcType=BIGINT}
+            </foreach>
+    </select>
+
+    <select id="selectRobotInspectionId" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT
+        a.inspection_code
+        FROM
+        `t_robot_inspection` a
+        WHERE
+        a.robot_id = #{robotId,jdbcType=BIGINT}
+        and a.inspection_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="inspectionId">
+            #{inspectionId,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+<!--    <select id="selectRobotTask" resultType="com.yjh.platform.module.device.entity.RobotTaskMonitor">-->
+<!--        SELECT-->
+<!--            a.inspection_id,-->
+<!--            d.cruise_result_id,-->
+<!--            c.task_result_id,-->
+<!--            b.task_id,-->
+<!--            c.device_id ,-->
+<!--            e.device_name-->
+<!--        FROM-->
+<!--            t_robot_inspection a-->
+<!--        LEFT JOIN t_cruise_data_result d ON a.inspection_id = d.cruise_id-->
+<!--        LEFT JOIN t_cruise_task_result_detail c ON d.cruise_result_id = c.cruise_result_id-->
+<!--        LEFT JOIN t_cruise_result b ON b.c_state = 239 AND b.task_result_id = c.task_result_id-->
+<!--        left join (SELECT	DISTINCT device_id,device_name from t_std_device) e on e.device_id = c.device_id-->
+<!--        WHERE-->
+<!--            a.robot_id = #{robotId,jdbcType=BIGINT}-->
+<!--    </select>-->
 
 </mapper>

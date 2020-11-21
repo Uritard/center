@@ -19,17 +19,21 @@ public interface TRobotInspectionDao {
     int update(TRobotInspection tRobotInspection);
     TRobotInspection selectByPrimaryId(@Param(value = "inspectionId") Long inspectionId);
     List<TRobotInspection> select(@Param(value = "inspectionId") Long inspectionId,
+                                @Param(value = "inspectionCode")String inspectionCode,
                                 @Param(value = "robotId") Long robotId,
                                 @Param(value = "inspectionName") String inspectionName,
                                 @Param(value = "inspectionType") Integer inspectionType,
                                 @Param(value = "alarmTop") String alarmTop,
                                 @Param(value = "alarmBottom") String alarmBottom,
                                 @Param(value = "defaultValue") String defaultValue,
-                                @Param(value = "inspectionPostion") Integer inspectionPostion,
+                                @Param(value = "inspectionPosition") Integer inspectionPosition,
                                 @Param(value = "collectStatus") Integer collectStatus,
                                 @Param(value = "calibrationStatus") Integer calibrationStatus,
                                 @Param(value = "unit") String unit);
     List<TRobotInspection> selectByPage(TRobotInspection tRobotInspection);
 
     int batchInsert(List<TRobotInspection> list);
+    List<Long> selectForRobotTask(@Param(value = "list") List<Long> list);
+    List<String> selectRobotInspectionId(@Param(value = "list") List<Long> list,
+                                       @Param(value = "robotId") Long robotId);
 }

@@ -24,7 +24,7 @@ public class TCameraGroupService{
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "根据参数新增一个分组信息")
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraGroup tCameraGroup) {
         if(tCameraGroup.getGroupId() == null){
@@ -33,7 +33,7 @@ public class TCameraGroupService{
         return this.update(tCameraGroup);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "删除分组信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long groupId) {
         return this.tCameraGroupDao.deleteByPrimaryId(groupId);
@@ -46,7 +46,7 @@ public class TCameraGroupService{
     }
 
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "根据web传递的参数查询分组信息")
     @Transactional(rollbackFor = Exception.class)
     public TCameraGroupDetail selectByPrimaryId(Long groupId) {
         TCameraGroup tCameraGroup = this.tCameraGroupDao.selectByPrimaryId(groupId);
@@ -122,7 +122,7 @@ public class TCameraGroupService{
     }
 
 
-    @Logs(title = "查询所有的相机", code = "module")
+    @Logs(title = "查询所有的相机", code = "module",content = "根据参数查询分组内的摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraGroupDetail> selectAllCamera() {
         List<TCameraGroup> all = tCameraGroupDao.selectAll();

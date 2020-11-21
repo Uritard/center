@@ -15,6 +15,7 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
@@ -76,6 +77,8 @@ public class TCruiseTaskService {
     private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
+    @Autowired
+    private TRobotInspectionDao tRobotInspectionDao;
     //模板图片路径
     @Value("${spring.picModelPath.dir}")
     private String picModelPath;
@@ -131,7 +134,8 @@ public class TCruiseTaskService {
                 try {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
-                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime);
+                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
+                            tRobotInspectionDao);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -454,11 +458,12 @@ public class TCruiseTaskService {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
-                tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime);
+                tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime,
+                tRobotInspectionDao);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
         thread.start();
-        // todo 删除检查任务超期的任务
+
         for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
             //找到任务Id
             if(mapItem.get("taskId").equals(taskId)){

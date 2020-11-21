@@ -8,6 +8,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
@@ -59,6 +60,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruiseDataResultDao tCruiseDataResultDao;
     @Autowired
     private TCruisePlanAttrDao tCruisePlanAttrDao;
+    @Autowired
+    private TRobotInspectionDao tRobotInspectionDao;
 
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CruiseTaskJob.class);
@@ -170,9 +173,29 @@ public class CruiseTaskJob extends QuartzJobBean {
             Integer taskNormal = 0;//正常
             List<String> analysisInstanceList = new ArrayList<>();
 
+            //找出机器人做任务的巡检点
+            List<Long> robotInstanceList = new ArrayList<>();
             for (TCruisePointInstance item : instancesList) {
-
+                if (228 == item.getCruiseType()) {//todo 机器人
+                    robotInstanceList.add(item.getCruiseId());
+                }
             }
+            log.info("robotInstanceList   :" +robotInstanceList);
+            List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+            List<RobotTaskMonitor> robotTaskInfoList = new ArrayList<>();
+            log.info("robotId   :" +robotId);
+            for (Long item: robotId){
+                RobotTaskMonitor robotTaskInfo = new RobotTaskMonitor();
+                robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                robotTaskInfo.setTaskId(taskId);
+                robotTaskInfo.setPriority(4);//优先级 暂定4
+                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
+                robotTaskInfo.setDeviceList(deviceList);
+                robotTaskInfoList.add(robotTaskInfo);
+            }
+            log.info("robotTaskInfoList   :" +robotTaskInfoList);
+
             log.info("开始巡检"+new Date());
 
 
@@ -191,8 +214,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseDataResult.setCruiseResultId(uuid+item.getInstanceId().toString());
                 tCruiseDataResult.setCruiseId(item.getInstanceId());
                 //一次循环 一个巡检点
-                if (228 == item.getCruiseType()) {//todo 机器人
-                }
                 if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
                     log.info("巡检点开始巡检"+new Date());
                     tCruiseDataResult.setCruiseType(item.getCruiseType());
