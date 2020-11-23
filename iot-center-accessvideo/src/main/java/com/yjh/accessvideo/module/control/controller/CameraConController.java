@@ -79,36 +79,16 @@ public class CameraConController {
     }
 
     @ApiOperation(value = "相机批量播放")
-    @RequestMapping(value = "/startRealPlay", method = RequestMethod.POST)
-    public Result batchStartRealPlay(@RequestBody List<Long> list) {
+    @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
+    public Result batchStartRealPlay(@RequestParam(value = "cameraIds") String cameraIds) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.batchStartRealPlay(list));
+            result.setData(cameraConService.batchStartRealPlay(cameraIds));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("相机批量播放失败:", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "相机批量停止播放")
-    @RequestMapping(value = "/stopRealPlay", method = RequestMethod.POST)
-    public Result batchStopRealPlay(@RequestBody Map<Long, String> map) {
-        Result result = new Result();
-        try {
-            List<String> resultList = new ArrayList<>();
-            map.forEach((cameraId, rtmpUrl) -> {
-                String resultBack = cameraConService.stopRealPlay(cameraId, rtmpUrl);
-                resultList.add(resultBack);
-            });
-            result.setData(resultList);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("相机批量停止播放失败:", e);
         }
         return result;
     }
@@ -259,10 +239,10 @@ public class CameraConController {
 
     @ApiOperation(value = "获取相机状态")
     @RequestMapping(value = "/getCameraStatus", method = RequestMethod.GET)
-    public Result getCameraStatus(@RequestParam(value = "cameraId", required = false) Long cameraId) {
+    public Result getCameraStatus(@RequestParam(value = "recordId") Long recordId) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.getCameraStatus(cameraId));
+            result.setData(cameraConService.getCameraStatus(recordId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -270,31 +250,6 @@ public class CameraConController {
             log.error("获取相机状态失败:", e);
         }
         return result;
-    }
-
-    private static String getLocalIp() throws SocketException {
-        String ip = "";
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                String name = intf.getName();
-                if (!name.contains("docker") && !name.contains("lo")) {
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        if (!inetAddress.isLoopbackAddress()) {
-                            String ipaddress = inetAddress.getHostAddress();
-                            if (!ipaddress.contains("::") && !ipaddress.contains("0:0:") && !ipaddress.contains("fe80")) {
-                                ip = ipaddress;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            ip = "127.0.0.1";
-            ex.getMessage();
-        }
-        return ip;
     }
 
 }

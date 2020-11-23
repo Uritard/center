@@ -8,6 +8,7 @@ import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
+import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,8 +118,11 @@ public class CameraConService {
 
     @Logs(title = "相机批量播放", code = "cameraPlay")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> batchStartRealPlay(List<Long> list) {
-        Map<String, Object> returnMap = new HashMap<>();
+    public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
+        List<Long> list = new ArrayList<>();
+        String[] cameraIdArry = cameraIds.split(",");
+        for (String aCameraIdArry : cameraIdArry) list.add(Long.valueOf(aCameraIdArry));
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
         try {
             List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(list);
             for (CameraConInfo cameraConInfo: cameraConInfoList) {
@@ -145,13 +149,16 @@ public class CameraConService {
                 Runtime.getRuntime().exec(transUrl);
                 String[] rtmpUrls = transUrl.split("rtmp");
                 String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-                returnMap.put(String.valueOf(cameraConInfo.getCameraId()), rtmpUrl);
+                Map<String, Object> returnMap = new HashMap<>();
+                returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
+                returnMap.put("rtmpUrl", rtmpUrl);
+                returnMapList.add(returnMap);
                 Constant.mapsForCamera.put(String.valueOf(cameraConInfo.getCameraId()), rtmpUrl);
                 log.info("mapsForCamera: "+Constant.mapsForCamera);
-                log.info("returnMap: "+returnMap);
             }
         } catch (Exception e) {e.getMessage();}
-        return returnMap;
+        log.info("returnMapList: "+returnMapList);
+        return returnMapList;
     }
 
     @Logs(title = "视频回放", code = "cameraPlayBack")
@@ -295,33 +302,38 @@ public class CameraConService {
 
     @Logs(title = "获取相机状态", code = "getCameraStatus")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, String> getCameraStatus(Long cameraId) {
-        CameraConInfo cameraConInfo = cameraConDao.selectStatusInfo(cameraId);
-        NativeLong iChanNum = new NativeLong(cameraConInfo.getChannelNum()+32);
+    public Map<String, String> getCameraStatus(Long recordId) {
+        List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
+        log.info("cameraConInfoMap: "+cameraConInfoMap);
         NativeLong iChanNumTem = new NativeLong(0);
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.nonNull(Constant.maps.get("lUserID"))) {
             lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
             IntByReference intByReference = new IntByReference(0);
-            log.info("lUserIDLong: "+lUserIDLong);
-            HCNetSDK.NET_DVR_IPPARACFG_V40 ipparacfg_v40 = new HCNetSDK.NET_DVR_IPPARACFG_V40();
-            Pointer ipparacfgV40Pointer = ipparacfg_v40.getPointer();
-            ipparacfg_v40.write();
-            log.info("iChanNum: "+iChanNum);
-            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG_V40, iChanNumTem, ipparacfgV40Pointer, ipparacfg_v40.size(), intByReference)) {
+            HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG();
+            m_strIpparaCfg.write();
+            Pointer m_strIpparaCfgPointer = m_strIpparaCfg.getPointer();
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem, m_strIpparaCfgPointer, m_strIpparaCfg.size(), intByReference)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get camera status fail, error code: "+iErr);
                 channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
                 return channleStatusMap;
             }
-            ipparacfg_v40.read();
-            log.info("2 ");
-            for (int i=0;i<ipparacfg_v40.dwDChanNum;i++) {
-                String byChannel = String.valueOf(ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byChannel & 0xFF);
-                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==1) { channleStatusMap.put(byChannel, "1"); }
-                if (ipparacfg_v40.struStreamMode[i].uGetStream.struChanInfo.byEnable==0) { channleStatusMap.put(byChannel, "0"); }
+            m_strIpparaCfg.read();
+            //设备支持IP通道
+            for(int iChannum =1; iChannum < HCNetSDK.MAX_IP_CHANNEL+1; iChannum++) {
+                if (m_strIpparaCfg.struIPChanInfo[iChannum-1].byEnable == 1){
+                    for (CameraStatusInfo cameraStatusInfo:cameraConInfoMap) {
+                        if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum)) channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
+                    }
+                }
+                if (m_strIpparaCfg.struIPChanInfo[iChannum-1].byEnable == 0) {
+                    for (CameraStatusInfo cameraStatusInfo:cameraConInfoMap) {
+                        if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum)) channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "0");
+                    }
+                }
+
             }
-            log.info("3 ");
             return channleStatusMap;
         }
         channleStatusMap.put("errorMessage: " ,"userID is null");

@@ -59,20 +59,14 @@
         </foreach>
     </select>
 
-    <select id="selectStatusInfo" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraConInfo">
+    <select id="cameraInfoByNVR" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraStatusInfo">
         SELECT
-        a.camera_id,
         a.channel_num,
-        a.camera_type,
-        c.record_id,
-        c.record_ip,
-        c.user_name,
-        c.pwd,
-        c.rtsp_port
+        a.camera_id
         FROM t_camera_info a
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
         WHERE 1 = 1
-        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="recordId != null and recordId != ''"> and c.record_id = #{recordId, jdbcType=BIGINT}</if>
     </select>
 
 
