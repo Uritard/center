@@ -2,10 +2,7 @@ package com.yjh.accessrobot.common.utils.PackageProtocolUtils;
 
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
+import org.dom4j.*;
 import org.dom4j.tree.DefaultAttribute;
 
 import java.text.SimpleDateFormat;
@@ -49,9 +46,9 @@ public class PlatformXMLUtil {
                     List<Element> items = element.elements();
                     if (items.size()!= 0){
                         for(Element item : items){
-                            List<DefaultAttribute> attributes = item.attributes();
+                            List<Attribute> attributes = item.attributes();
                             Map<String, Object> map = new HashMap<String, Object>();
-                            for(DefaultAttribute defaultAttribute : attributes){
+                            for(Attribute defaultAttribute : attributes){
                                 map.put(defaultAttribute.getName(),defaultAttribute.getValue());// 节点的属性name为map的key，value为map的value
                             }
                             itemsList.add(map);
@@ -99,8 +96,8 @@ public class PlatformXMLUtil {
         if(xmlBaseModel.getItems()!=null && xmlBaseModel.getItems().size()>0) {
             List<Map<String,Object>> itemsList = xmlBaseModel.getItems();
             for(Map<String, Object> item : itemsList) {
+                Element childNode61 = childNode6.addElement("Item");
                 for(String key : item.keySet()){
-                    Element childNode61 = childNode6.addElement("Item");
                     childNode61.addAttribute(key, String.valueOf(item.get(key)));
                 }
             }

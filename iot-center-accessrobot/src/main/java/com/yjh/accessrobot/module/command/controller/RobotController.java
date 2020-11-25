@@ -11,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -39,11 +36,11 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.POST)
-    public Result feignRobotControl(@RequestBody XMLBaseModel xmlBaseModel) {
+    public Result feignRobotControl(@RequestParam(value = "type") String type,
+                                    @RequestParam(value = "command") String command) {
         Result result = new Result();
-//        log.info("前端送来的xmlBaseModel:"+xmlBaseModel);
         try {
-            result.setData(robotService.feignRobotControl(xmlBaseModel));
+            result.setData(robotService.feignRobotControl(type,command));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -82,10 +79,11 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务控制指令接口")
     @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
-    public Result feignRobotTaskControl(@RequestBody XMLBaseModel xmlBaseModel) {
+    public Result feignRobotTaskControl(@RequestParam(value = "commandValue") String commandValue,
+                                        @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTaskControl(xmlBaseModel));
+            result.setData(robotService.feignRobotTaskControl(commandValue,taskId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

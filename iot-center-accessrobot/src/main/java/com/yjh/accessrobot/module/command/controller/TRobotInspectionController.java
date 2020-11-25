@@ -101,6 +101,7 @@ public class TRobotInspectionController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "inspectionId", required = false) Long inspectionId,
+                         @RequestParam(value = "inspectionCode", required = false) String inspectionCode,
                             @RequestParam(value = "robotId", required = false) Long robotId,
                             @RequestParam(value = "inspectionName", required = false) String inspectionName,
                             @RequestParam(value = "inspectionType", required = false) Integer inspectionType,
@@ -113,7 +114,7 @@ public class TRobotInspectionController {
                             @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
+            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode,robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

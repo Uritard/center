@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,7 +24,6 @@ import java.util.Date;
 public class TRobotInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
 
     @ApiModelProperty(value = "机器人id")
     @TableId(value = "robot_id", type = IdType.AUTO)
@@ -68,10 +68,13 @@ public class TRobotInfo implements Serializable {
 
     private String createBy;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "创建日期")
     private Date createDate;
 
     private String updateBy;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateDate;
 
     @ApiModelProperty(value = "机器人厂家")
@@ -80,6 +83,7 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "使用状态")
     private String isUse;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "投运日期")
     private Date commissionDate;
 

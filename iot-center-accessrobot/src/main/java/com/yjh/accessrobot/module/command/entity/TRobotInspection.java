@@ -27,6 +27,9 @@ public class TRobotInspection implements Serializable {
     @TableId(value = "inspection_id", type = IdType.AUTO)
     private Long inspectionId;
 
+    @ApiModelProperty(value = "机器人检测点编码")
+    private String inspectionCode;
+
     @ApiModelProperty(value = "机器人ID")
     private Long robotId;
 
@@ -56,6 +59,5 @@ public class TRobotInspection implements Serializable {
 
     @ApiModelProperty(value = "巡检结果单位")
     private String unit;
-
 
 }

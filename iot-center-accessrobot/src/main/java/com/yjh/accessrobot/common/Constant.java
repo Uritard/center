@@ -11,4 +11,6 @@ public class Constant {
     public static final byte HEARTBEAT = 0x03;
 
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
+
+    public static final String filePath = "/home/yjh_iot_center/ftps/";
 }

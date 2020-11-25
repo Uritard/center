@@ -343,7 +343,10 @@
             )
         </foreach>
     </insert>
-
+    <select id="selectRobotIdByCode" parameterType="java.lang.String" resultType="java.lang.Long">
+        select robot_id from t_robot_info
+        where robot_code = #{robotCode.jdbcType=VARCHAR}
+    </select>
 
 
 </mapper>

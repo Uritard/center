@@ -18,6 +18,7 @@ public interface TRobotInspectionDao {
     int update(TRobotInspection tRobotInspection);
     TRobotInspection selectByPrimaryId(@Param(value = "inspectionId") Long inspectionId);
     List<TRobotInspection> select(@Param(value = "inspectionId") Long inspectionId,
+                                  @Param(value = "inspectionCode") String inspectionCode,
                                   @Param(value = "robotId") Long robotId,
                                   @Param(value = "inspectionName") String inspectionName,
                                   @Param(value = "inspectionType") Integer inspectionType,

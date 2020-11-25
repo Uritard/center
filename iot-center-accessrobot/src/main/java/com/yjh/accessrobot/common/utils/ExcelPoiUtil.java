@@ -12,17 +12,10 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.*;
-import org.dom4j.Element;
-import org.dom4j.tree.DefaultAttribute;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExcelPoiUtil {
 
@@ -233,7 +226,6 @@ public class ExcelPoiUtil {
         }
 //        List<Map<String,Object>> li  = map.getItems();
         System.out.println("得到的map是："+map.getItems());
-
     }
 
     /**
