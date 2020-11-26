@@ -4395,13 +4395,6 @@ EMAIL参数结构
     //JPEG抓图到内存
     boolean  NET_DVR_CaptureJPEGPicture_NEW(NativeLong lUserID, NativeLong lChannel, NET_DVR_JPEGPARA lpJpegPara, String sJpegPicBuffer, int dwPicSize, IntByReference lpSizeReturned);
 
-    boolean  PlayM4_SetOverlayPriInfoFlag(long nPort, int nIntelType, boolean bTrue);
-    boolean PlayM4_GetJPEG(long nPort, Pointer pJpg, int nbufSize, int pJpgSize);
-
-    //第一个接口为测温主类型接口，开启关闭测温的大开关；nIntelType：对应为0x20；bTrue：0表示关闭，1表示开启
-    boolean PlayM4_RenderPrivateData(long nPort, int nIntelType, int bTrue);
-    boolean PlayM4_RenderPrivateDataEx(long nPort, int nIntelType, int nSubType, int bTrue);
-
     //tt: 获取设备的配置信息。lUserID 设备注册后获取的ID，dwCommand 设备配置命令
     boolean  NET_DVR_SetSTDConfig(NativeLong lUserID, int dwCommand, NET_DVR_STD_CONFIG lpConfigParam);
 
@@ -4529,29 +4522,6 @@ EMAIL参数结构
     boolean NET_DVR_GetLocalIP(byte sIP[], IntByReference pValidNum, ByteByReference pEnableBind);
     boolean NET_DVR_SetValidIP(int dwIPIndex, boolean bEnableBind);
 
-}
-
-
-//播放库函数声明,PlayCtrl.dll
-interface PlayCtrl extends Library
-{
-    PlayCtrl INSTANCE = (PlayCtrl) Native.loadLibrary("PlayCtrl",
-            PlayCtrl.class);
-
-//    PlayCtrl INSTANCE = (PlayCtrl) Native.loadLibrary("/home/yjh/iot-center-accessvideo-1.0.0/config/lib/libPlayCtrl.so",
-//            PlayCtrl.class);
-
-    public static final int STREAME_REALTIME = 0;
-    public static final int STREAME_FILE = 1;
-
-    boolean PlayM4_GetPort(NativeLongByReference nPort);
-    boolean PlayM4_OpenStream(NativeLong nPort, ByteByReference pFileHeadBuf, int nSize, int nBufPoolSize);
-    boolean PlayM4_InputData(NativeLong nPort, ByteByReference pBuf, int nSize);
-    boolean PlayM4_CloseStream(NativeLong nPort);
-    boolean PlayM4_SetStreamOpenMode(NativeLong nPort, int nMode);
-    boolean PlayM4_Play(NativeLong nPort, HWND hWnd);
-    boolean PlayM4_Stop(NativeLong nPort);
-    boolean PlayM4_SetSecretKey(NativeLong nPort, NativeLong lKeyType, String pSecretKey, NativeLong lKeyLen);
 }
 
 //windows gdi接口,gdi32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用

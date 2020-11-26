@@ -124,8 +124,13 @@ public class AccessVideoApplication implements CommandLineRunner {
             System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
             ptrByteArraySsl.write();
             hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
-            //模拟通道个数
-            log.info("The max number of analog channels: "+ m_strDeviceInfo.struDeviceV30.byChanNum);
+
+            //设置libPlayCtrl.so所在路径
+            HCNetSDK.BYTE_ARRAY ptrPlayCtrl = new HCNetSDK.BYTE_ARRAY(256);
+            String ptrPlayCtrlPath = sdkPath+"/libPlayCtrl.so";
+            System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
+            ptrPlayCtrl.write();
+            hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
             //IP通道个数
             log.info("The max number of IP channels: "+ m_strDeviceInfo.struDeviceV30.byIPChanNum);
             return true;

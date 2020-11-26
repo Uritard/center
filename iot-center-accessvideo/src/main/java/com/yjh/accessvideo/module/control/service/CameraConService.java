@@ -6,6 +6,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
 import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
@@ -17,7 +18,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.stream.FileImageOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
@@ -40,7 +44,11 @@ public class CameraConService {
     @Value("${nvr.rtmp.back}")
     private String UrlBackTem;
 
+    @Value("${nvr.capture.Preset}")
+    private String capturePresetPath;//预置位路径
+
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
+    private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
     private NativeLong m_minsOne = new NativeLong(-1);
     private NativeLong lUserIDLong = new NativeLong(-1);
@@ -247,38 +255,68 @@ public class CameraConService {
         lpJpegPara.wPicSize = 0xff;
         lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
         if (Objects.nonNull(Constant.maps.get("lUserID"))) {
-            boolean capPictureResult = false;
             lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
             log.info("lUserIDLong: "+lUserIDLong);
             if (cameraConInfo.getCameraType()==206) {
                 log.info("红外相机，特殊拍照");
-                m_lRealPlayHandle = hCNetSDK.NET_DVR_RealPlay_V40(lUserIDLong, dvr_previewinfo, null, null);
-                if (Objects.equals(m_lRealPlayHandle, m_minsOne)) {
-                    int iErr = hCNetSDK.NET_DVR_GetLastError();
-                    log.error("capture picture fail, error code: "+iErr);
-                    return "capture picture fail, error code: "+iErr;
-                }
-                int m_lRealPlayHandleIndex = hCNetSDK.NET_DVR_GetRealPlayerIndex(m_lRealPlayHandle);
-                if (Objects.equals(m_lRealPlayHandleIndex, -1)) {
-                    int iErr = hCNetSDK.NET_DVR_GetLastError();
-                    log.error("capture picture fail, error code: "+iErr);
-                    return "capture picture fail, error code: "+iErr;
-                }
+                m_lRealPlayHandle = realPlay(iChanNum);
+//                dvr_previewinfo.hPlayWnd = new W32API.HWND();
+//                log.info("dvr_previewInfo.hPlayWnd: "+dvr_previewinfo.hPlayWnd);
+//                m_lRealPlayHandle = hCNetSDK.NET_DVR_RealPlay_V40(lUserIDLong, dvr_previewinfo, null, null);
+//                if (Objects.equals(m_lRealPlayHandle, m_minsOne)) {
+//                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+//                    log.error("NET_DVR_RealPlay_V40, error code: "+iErr);
+//                    return "NET_DVR_RealPlay_V40, error code: "+iErr;
+//                }
+//                int m_lRealPlayHandleIndex = hCNetSDK.NET_DVR_GetRealPlayerIndex(m_lRealPlayHandle);
+//                if (Objects.equals(m_lRealPlayHandleIndex, -1)) {
+//                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+//                    log.error("NET_DVR_GetRealPlayerIndex, error code: "+iErr);
+//                    return "NET_DVR_GetRealPlayerIndex, error code: "+iErr;
+//                }
                 //打开测温信息
-                hCNetSDK.PlayM4_RenderPrivateData(iChanNum, 0x20, 1);
-                hCNetSDK.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 1);
-                hCNetSDK.PlayM4_SetOverlayPriInfoFlag(iChanNum, 0x20, true);
-                hCNetSDK.PlayM4_GetJPEG(iChanNum, lpJpegPara.getPointer(), lpJpegPara.wPicSize, lpJpegPara.wPicQuality);
+                if (!playCtrl.PlayM4_RenderPrivateData(iChanNum, 0x20, 1)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("PlayM4_RenderPrivateData fail, error code: "+iErr);
+                    return "PlayM4_RenderPrivateData, error code: "+iErr;
+                }
+                if (!playCtrl.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 1)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("PlayM4_RenderPrivateDataEx fail, error code: "+iErr);
+                    return "PlayM4_RenderPrivateDataEx, error code: "+iErr;
+                }
+                if (!playCtrl.PlayM4_SetOverlayPriInfoFlag(iChanNum, 0x20, true)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("PlayM4_SetOverlayPriInfoFlag fail, error code: "+iErr);
+                    return "PlayM4_SetOverlayPriInfoFlag, error code: "+iErr;
+                }
+                PlayCtrl.NET_DVR_JPEGSIZE netDvrJpegsize = new PlayCtrl.NET_DVR_JPEGSIZE();
+                if(!playCtrl.PlayM4_GetJPEG(iChanNum, netDvrJpegsize.getPointer(), 32000, 32000)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("capture picture fail(PlayM4_GetJPEG), error code: "+iErr);
+                    return "capture picture fail(PlayM4_GetJPEG), error code: "+iErr;
+                }
+                netDvrJpegsize.write();
+                netDvrJpegsize.read();
+                byteToImage(netDvrJpegsize.lpJpeg, filePath);
                 //关闭测温信息
-                hCNetSDK.PlayM4_RenderPrivateData(iChanNum, 0x20, 0);
-                hCNetSDK.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 0);
-            } else { capPictureResult = hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath); }
-            log.info("capPictureResult: "+capPictureResult);
-            if (!capPictureResult) {
-                int iErr = hCNetSDK.NET_DVR_GetLastError();
-                log.error("capture picture fail, error code: "+iErr);
-                return "capture picture fail, error code: "+iErr;
-            } else { return "success"; }
+                if (!playCtrl.PlayM4_RenderPrivateData(iChanNum, 0x20, 0)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("PlayM4_RenderPrivateData fail, error code: "+iErr);
+                    return "PlayM4_RenderPrivateData, error code: "+iErr;
+                }
+                if (!playCtrl.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 0)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("PlayM4_RenderPrivateDataEx fail, error code: "+iErr);
+                    return "PlayM4_RenderPrivateDataEx, error code: "+iErr;
+                }
+            } else {
+                if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath)) {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("capture picture fail(NET_DVR_CaptureJPEGPicture), error code: "+iErr);
+                    return "capture picture fail(NET_DVR_CaptureJPEGPicture), error code: "+iErr;
+                }}
+            return "success";
         } else { return "userID is null"; }
     }
 
@@ -296,6 +334,10 @@ public class CameraConService {
         if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPlayHandle, presetCmd, iPreset)) {
             log.error("set presetPoint fail, presetId：" + iPreset+", error code: "+hCNetSDK.NET_DVR_GetLastError());
             return false;
+        }
+        if (presetCmd==9) {
+            String delPresetPic = "rm -rf "+capturePresetPath + "/"+presetId;
+            try { Runtime.getRuntime().exec(delPresetPic); } catch (Exception e) { e.getMessage(); }
         }
         return true;
     }
@@ -349,30 +391,19 @@ public class CameraConService {
         } else { return lUserIDLong;}
     }
 
-//    private boolean playBack() {
-//        NET_DVR_VOD_PARA  struVoidParam = new NET_DVR_VOD_PARA();
-//        struVoidParam.dwSize = struVoidParam.size();
-//        struVoidParam.struBeginTime = struStartTime;
-//        struVoidParam.struEndTime = struStopTime;
-//        struVoidParam.hWnd = hwnd;
-//        NET_DVR_STREAM_INFO struInfo = new NET_DVR_STREAM_INFO ();
-//        struInfo.dwSize = struInfo.size();
-//        struInfo.dwChannel = m_iChanShowNum;
-//        struVoidParam.struIDInfo = struInfo;
-//        if(RadioForward.isSelected()) {
-//            m_lPlayHandle = hCNetSDK.NET_DVR_PlayBackByTime_V40(lUserIDLong, struVoidParam);
-//        } else {
-//            NET_DVR_PLAYCOND struPlayCond = new NET_DVR_PLAYCOND();
-//            struPlayCond.dwChannel = m_iChanShowNum;
-//            struPlayCond.struStartTime = struStartTime;
-//            struPlayCond.struStopTime = struStopTime;
-//            m_lPlayHandle = hCNetSDK.NET_DVR_PlayBackReverseByTime_V40(lUserIDLong,hwnd,struPlayCond);
-//        }
-//        if (m_lPlayHandle.intValue() == -1) {
-//            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
-//            return false;
-//        } else { return true; }
-//    }
+    //byte数组到图片
+    private void byteToImage(byte[] data,String path){
+        if(data.length<3||path.equals("")) return;
+        try{
+            FileImageOutputStream imageOutput = new FileImageOutputStream(new File(path));
+            imageOutput.write(data, 0, data.length);
+            imageOutput.close();
+            log.info("Make Picture success,Please find image in " + path);
+        } catch(Exception ex) {
+            log.info("Exception: " + ex);
+            ex.getMessage();
+        }
+    }
 
 }
 

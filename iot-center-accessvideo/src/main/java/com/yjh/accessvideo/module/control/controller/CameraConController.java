@@ -93,6 +93,26 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "相机批量停止播放")
+    @RequestMapping(value = "/batchStopRealPlay", method = RequestMethod.POST)
+    public Result batchStopRealPlay(@RequestBody List<Map<String, String>> list) {
+        Result result = new Result();
+        try {
+            List<String> resultList = new ArrayList<>();
+            for (Map<String, String> map:list) {
+                String resultBack = cameraConService.stopRealPlay(Long.valueOf(map.get("cameraId")), map.get("rtmpUrl"));
+                resultList.add(resultBack);
+            }
+            result.setData(resultList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机批量停止播放失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "视频回放")
     @RequestMapping(value = "/startPlayBack", method = RequestMethod.GET)
     public Result startPlayBack(@RequestParam(value = "cameraId") Long cameraId,
