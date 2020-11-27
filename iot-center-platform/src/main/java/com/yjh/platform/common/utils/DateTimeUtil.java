@@ -679,14 +679,14 @@ public class DateTimeUtil {
         }
         return yearDates;
     }
-    //获取前一天23:59:59
+    //获取当天23:59:59
     public static String getDayBefore(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-        calendar.add(Calendar.DAY_OF_MONTH,-1);
+        calendar.add(Calendar.DAY_OF_MONTH,0);
         Date dd = calendar.getTime();
         String time = format(dd);
         return time;

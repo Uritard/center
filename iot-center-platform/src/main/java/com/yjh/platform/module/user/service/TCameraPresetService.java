@@ -128,9 +128,9 @@ public class TCameraPresetService {
         tree.add(camera);
         return tree;
     }
-    public boolean judgePresentNum(Integer presentNum) {
+    public boolean judgePresentNum(Long cameraId,Integer presentNum) {
         boolean flag = false;
-        List<TCameraPreset> tCameraPresetList = this.tCameraPresetDao.select(null, null, presentNum, null, null, null, null, null, null, null,null);
+        List<TCameraPreset> tCameraPresetList = this.tCameraPresetDao.select(null, cameraId, presentNum, null, null, null, null, null, null, null,null);
         if (tCameraPresetList.size()>0) {
             flag=true;
         }

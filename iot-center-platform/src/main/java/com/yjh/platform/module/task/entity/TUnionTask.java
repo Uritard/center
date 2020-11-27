@@ -41,7 +41,7 @@ public class TUnionTask implements Serializable {
     private Long robotId;
 
     @ApiModelProperty(value = "备注1")
-    private Integer remark1;
+    private Long meteId;
 
     @ApiModelProperty(value = "备注2")
     private Integer remark2;

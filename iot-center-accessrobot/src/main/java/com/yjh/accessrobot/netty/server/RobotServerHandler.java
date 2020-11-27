@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.server;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
@@ -67,6 +68,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     //场站号
     private String strRobotCode = "TT";
     private boolean isThreadStart = true;
+    ByteUtil byteUtil = new ByteUtil();
 
     public boolean getIsThreadStart() {
         return isThreadStart;
@@ -152,66 +154,240 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        ctx.close().sync();
 //        ctx.flush();
     }
-
+    //数组倒序
+    public static byte[] reserve( byte[] arr ){
+        byte[] arr1 = new byte[arr.length];
+        for( int x=0;x<arr.length;x++ ){
+            arr1[x] = arr[arr.length-x-1];
+        }
+        return arr1 ;
+    }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //接收机器人发送的指令
         ByteBuf byteBuf = (ByteBuf) msg;
-        byte[] bytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(bytes);
-        String body = new String(bytes, "UTF-8");
-        log.info("还没处理的xml是|" + body + "|");
-        int flag = 0;
-        String bodyTem = null;
-        if (flag == 0) {
-            bodyTem = body.substring(22);//21,60
-            flag++;
-        } else {
-            bodyTem = body;
+        byte[] bytes = new byte[byteBuf.readableBytes()];//中间变量
+        StringBuilder Str = new StringBuilder();
+        for (byte byteitem : bytes) {
+            Str.append(String.format("%02x ", byteitem));
         }
-        String xmlContext = null;
-        String bdy = bodyTem.replace("</Robot>", "</Robot>flag");
-        String[] res = bdy.split("flag");
-        for (int i = 0; i < res.length; i++) {
-            log.info("截取的内容是:" + res[i]);
-            if (res[i].startsWith("<?xml") && res[i].endsWith("</Robot>")) {
-                xmlContext = res[i];
-                log.info("处理过的xml是|" + xmlContext + "|");
-                zuoJueDing(bytes,xmlContext);
-            }
-//            else{
-//                xmlContext = res[i].substring(23);
+        log.info("机器人发送的的指令是<start>" + Str + "<end>");
+//        byte[] bytes = bytes1;
+
+        byteBuf.readBytes(bytes);
+
+//        byte[] startIdentifierByte = new byte[2];//起始标志符
+//        System.arraycopy(bytes,0,startIdentifierByte,0,2);
+//        StringBuilder startStr = new StringBuilder();
+//        for (byte byteitem : startIdentifierByte) {
+//            startStr.append(String.format("%02x ", byteitem));
+//        }
+//        if ("eb 90".equals(startStr.toString()) ){
+//            byte[] xmlByteLengthByte = new byte[4];
+//            System.arraycopy(bytes,19,xmlByteLengthByte,0,4);
+//            long xmlByteLength2 = PlatformPacketUtil.reserve(xmlByteLengthByte);//xml的字节长度
+//            log.info("xml的字节长度为："+xmlByteLength2);
+//            long len = 2+8+8+1+4+xmlByteLength2+2;
+//            byte[] total = new byte[(int)len];
+//            System.arraycopy(bytes,0,total,0,(int)len);
+//            byte[] shengYu = new byte[bytes.length-total.length];
+//            System.arraycopy(bytes,(int)len,shengYu,0,bytes.length-total.length);
+//
+//        }
+
+        lookByte(bytes);//看指令
+
+
+//        System.arraycopy(bytes,bytes.length-2,endIdentifierByte,0,2);
+//        StringBuilder endStr = new StringBuilder();
+//        for (byte byteitem : endIdentifierByte) {
+//            endStr.append(String.format("%02x ", byteitem));
+//        }
+//        if ("eb 90".equals(startStr.toString()) ){
+//            System.arraycopy(bytes,19,xmlByteLengthByte,0,4);
+//            long xmlByteLength2 = PlatformPacketUtil.reserve(xmlByteLengthByte);//xml的字节长度
+//            log.info("xml的字节长度为："+xmlByteLength2);
+//            long len = 2+8+8+1+4+xmlByteLength2+2;
+//            byte[] total = new byte[(int)len];
+//            System.arraycopy(bytes,0,total,0,(int)len);
+//            byte[] shengYu = new byte[bytes.length-total.length];
+//            System.arraycopy(bytes,(int)len,shengYu,0,bytes.length-total.length);
+//
+//        }
+//        }else {
+//        int xmlByteLength = ByteUtil.bytes2Int(xmlByteLengthByte);
+//        long xmlByteLength4 = PlatformPacketUtil.bytesToLong(sendSessionIdByte);
+//        log.info("xml的字节长度为:"+xmlByteLength);
+//        byte[] xmlByte = new byte[(int)xmlByteLength];//xml的内容
+//        System.arraycopy(bytes,23,xmlByte,0,(int)xmlByteLength);
+//        StringBuilder Str1 = new StringBuilder();
+//        for (byte byteitem : bytes) {
+//            Str1.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("发送的xml内容指令是<start>" + Str1 + "<end>");
+
+
+        String body = new String(bytes, "UTF-8");
+//        String zzbds = "^(?:(?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[\\W].*))[\\W0-9A-Za-z]{0,}$";
+//        if (!Packet.matches(zzbds)){
+//            Packet = "";
+//        }
+        log.info("Packet="+Packet);
+        log.info("机器人发来的内容="+body);
+        String temporaryBody = Packet + body ;//临时
+        String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
+        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
+
+        handlingMethod(bytes,finalBody);
+
+//        int flag = 0;
+//        String bodyTem = null;
+//        if (flag == 0) {
+//            bodyTem = body.substring(22);//21,60
+//            flag++;
+//        } else {
+//            bodyTem = body;
+//        }
+//        String xmlContext = null;
+//        String bdy = bodyTem.replace("</Robot>", "</Robot>flag");
+//        String[] res = bdy.split("flag");
+//        for (int i = 0; i < res.length; i++) {
+//            log.info("截取的内容是:" + res[i]);
+//            if (res[i].startsWith("<?xml") && res[i].endsWith("</Robot>")) {
+//                xmlContext = res[i];
 //                log.info("处理过的xml是|" + xmlContext + "|");
 //                zuoJueDing(bytes,xmlContext);
 //            }
-//            else {
-//                log.info("临时文件是:"+res[i]);
-//                String linShi = "";
-//                res[i] = linShi+res[i];
-//                log.info("组装的文件是:"+res[i]);
-//            }
-        }
+//        }
         ReferenceCountUtil.release(byteBuf);
     }
-    private void zuoJueDing(byte[] bytes,String xmlContext)throws Exception{
-        Document document = DocumentHelper.parseText(xmlContext);//String转XML
-        XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
-        byte[] sendSessionIdByte = new byte[8];//发送会话序列号Byte
-        byte[] receiveSessionIdByte = new byte[8];//接收会话序列号Byte
-        System.arraycopy(bytes, 2, sendSessionIdByte, 0, 8);
-        System.arraycopy(bytes, 10, receiveSessionIdByte, 0, 8);
-        long sendSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
-        long receiveSessionId = PlatformPacketUtil.bytesToLong(receiveSessionIdByte);//接收会话序列号
+    /* 看指令的工具
+    *
+    * */
+    public void lookByte(byte[] bytes){
+        byte[] startIdentifierByte = new byte[2];
+        byte[] sendSessionIdByte = new byte[8];
+        byte[] receiveSessionIdByte = new byte[8];
+        byte[] sessionSourceIdByte = new byte[1];
+        byte[] xmlByteLengthByte = new byte[4];
+        byte[] endIdentifierByte = new byte[2];
+        //1.起始标志符
+        System.arraycopy(bytes,0,startIdentifierByte,0,2);
+//        StringBuilder startStr = new StringBuilder();
+//        for (byte byteitem : startIdentifierByte) {
+//            startStr.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("起始标志符指令为："+startStr);
+        //2.发送会话序列号
+        System.arraycopy(bytes,2,sendSessionIdByte,0,8);
+//        StringBuilder sendSessionIdStr = new StringBuilder();
+//        for (byte byteitem : sendSessionIdByte) {
+//            sendSessionIdStr.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("发送会话序列号指令为："+sendSessionIdStr);
+        long ssi = PlatformPacketUtil.reserve(sendSessionIdByte);//发送会话序列号的字节长度
+        log.info("发送会话序列号为："+ssi);
+        //3.接收会话序列号
+        System.arraycopy(bytes,10,receiveSessionIdByte,0,8);
+//        StringBuilder receiveSessionIdStr = new StringBuilder();
+//        for (byte byteitem : receiveSessionIdByte) {
+//            receiveSessionIdStr.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("接收会话序列号指令为："+receiveSessionIdStr);
+        //4.会话源标识
+        System.arraycopy(bytes,18,sessionSourceIdByte,0,1);
+//        StringBuilder sessionSourceIdStr = new StringBuilder();
+//        for (byte byteitem : sessionSourceIdByte) {
+//            sessionSourceIdStr.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("会话源标识指令为："+sessionSourceIdStr);
+        //5.xml的字节长度
+        System.arraycopy(bytes,19,xmlByteLengthByte,0,4);
+//        StringBuilder xmlByteLengthStr = new StringBuilder();
+//        for (byte byteitem : xmlByteLengthByte) {
+//            xmlByteLengthStr.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("xml的字节长度指令为："+xmlByteLengthStr);
+        long xmlByteLength = PlatformPacketUtil.reserve(xmlByteLengthByte);//xml的字节长度
+        log.info("xml的字节长度为："+xmlByteLength);
+        byte[] xmlByte = new byte[(int)xmlByteLength];
+        //6.xml的内容
+        System.arraycopy(bytes,23,xmlByte,0,(int)xmlByteLength);
+//        StringBuilder Str1 = new StringBuilder();
+//        for (byte byteitem : xmlByte) {
+//            Str1.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("发送的xml内容指令是<start>" + Str1 + "<end>");
+        //7.结束标志符号
+        System.arraycopy(bytes,bytes.length-2,endIdentifierByte,0,2);
+//        StringBuilder endStr = new StringBuilder();
+//        for (byte byteitem : endIdentifierByte) {
+//            endStr.append(String.format("%02x ", byteitem));
+//        }
+//        log.info("结束标志符号指令是<start>" + endStr + "<end>");
+    }
 
-        log.info("解析出来的xml是：" + xmlRes);
+    /*拆包工具
+    *
+    * */
+    private void handlingMethod(byte[] bytes,String parameter)throws Exception {
+//        if (null != parameter) {
+            log.info("Packet+机器人发来的内容总和=：" + parameter);
+
+            String hua = null;
+
+            if (parameter.contains("开始") || parameter.contains("结束")) {
+                hua = parameter;
+            } else {
+                String bian = parameter.replace("<?xml version='1.0' encoding='UTF-8'?>", "开始<?xml version='1.0' encoding='UTF-8'?>");
+                hua = bian.replace("</Robot>", "</Robot>结束");
+            }
+            Pattern pattern1 = Pattern.compile("(\\<\\?xml version='1.0' encoding='UTF-8'?[^>])([\\s\\S]*?)(</Robot>)");
+            Matcher matcher1 = pattern1.matcher(hua);
+            String wanZheng = null;
+            String shengYu = null;
+            if (matcher1.find()) {
+                wanZheng = matcher1.group();
+                log.info("匹配到一个完整包的内容=" + wanZheng);
+                stringToXml(bytes, wanZheng);
+//                if (null != parameter) {
+                shengYu = parameter.replace(wanZheng, "");
+                log.info("除去一个完整包剩余的=" + shengYu);
+                handlingMethod(bytes, shengYu);
+//                }
+            } else {
+                Packet = parameter;
+                log.info("不足一个完整的包：" + Packet);
+            }
+//        }else {
+//            log.info("xmlContext的值是null,啥也不是");
+//            Packet = "";
+//        }
+    }
+    private void stringToXml(byte[] bytes,String xmlContext)throws Exception{
+//        if (null != xmlContext){
+            Document document = DocumentHelper.parseText(xmlContext);//String转XML
+            XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
+            log.info("解析出来的xml是：" + xmlRes);
+            byte[] sendSessionIdByte = new byte[8];//发送会话序列号Byte
+            byte[] receiveSessionIdByte = new byte[8];//接收会话序列号Byte
+            System.arraycopy(bytes, 2, sendSessionIdByte, 0, 8);
+            System.arraycopy(bytes, 10, receiveSessionIdByte, 0, 8);
+            long sendSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
+            long receiveSessionId = PlatformPacketUtil.bytesToLong(receiveSessionIdByte);//接收会话序列号
+            if (xmlRes.getSendCode() == null) {
+                log.info("连接可能断了，等待重连.....");
+            } else {
+                doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
+            }
+//        }else {
+//            log.info("xmlContext的值是null,啥也不是");
+//            Packet = "";
+//        }
 
 //        redisTemplate.opsForHash().putAll("RobotXML", xmlToMap);//将Map放缓存
 //        Map<String, Object> RobotXMLMap = redisTemplate.opsForHash().entries("RobotXML");//读redis
-        if (xmlRes.getSendCode() == null) {
-            log.info("连接可能断了，等待重连.....");
-        } else {
-            doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
-        }
+
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
         if ("251".equals(xmlBaseModel.getType())){
@@ -222,9 +398,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     List<Map<String, Object>> ItemsList = new ArrayList<>();
                     Map<String, Object> Items = new HashMap<>();
-                    Items.put("heart_beat_interval", "6");
-                    Items.put("robot_run_interval", "6");
-                    Items.put("weather_interval", "6");
+                    Items.put("heart_beat_interval", "5");//心跳间隔
+                    Items.put("robot_run_interval", "6000");//机器人运行数据间隔
+                    Items.put("weather_interval", "6");//微气象数据间隔
                     ItemsList.add(Items);
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
                             .setSendCode("巡视主机")
@@ -238,11 +414,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("生成的注册xml是<start>" + registerXmlString + "<end>");
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
 
-                    StringBuilder Str = new StringBuilder();
-                    for (byte byteitem : registerProtocol) {
-                        Str.append(String.format("%02x ", byteitem));
-                    }
-                    log.info("发送给机器人的注册指令是<start>" + Str + "<end>");
+//                    StringBuilder Str = new StringBuilder();
+//                    for (byte byteitem : registerProtocol) {
+//                        Str.append(String.format("%02x ", byteitem));
+//                    }
+//                    log.info("发送给机器人的注册指令是<start>" + Str + "<end>");
                     SendHeartBeat(registerProtocol);
                     //启动线程
 //                    DataDealThread dataDealThread = new DataDealThread(this, isThreadStart);
@@ -258,11 +434,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("生成的心跳xml是<start>" + heartXmlString + "<end>");
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
 
-                    StringBuilder Str2 = new StringBuilder();
-                    for (byte byteitem : heartProtocol) {
-                        Str2.append(String.format("%02x ", byteitem));
-                    }
-                    log.info("发送给机器人的心跳指令是<start>" + Str2 + "<end>");
+//                    StringBuilder Str2 = new StringBuilder();
+//                    for (byte byteitem : heartProtocol) {
+//                        Str2.append(String.format("%02x ", byteitem));
+//                    }
+//                    log.info("发送给机器人的心跳指令是<start>" + Str2 + "<end>");
                     send(ctx, heartProtocol);
                     break;
                 //模型同步指令and任务控制指令(接收响应)
@@ -316,7 +492,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人状态数据是："+robotStatusList);
                     //放缓存(还没写)
                     String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + statusXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + statusXmlString + "<end>");
                     byte[] statusProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, statusXmlString);
                     send(ctx, statusProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -327,21 +503,21 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("巡视主机收到机器人运行数据了");
                     //处理机器人运行数据
                     List<Map<String,String>> robotOperationList = new ArrayList<>();
-                    xmlBaseModel.getItems().forEach(res-> {
-                        Map<String, String> robotOperationMap = new HashMap<>();
-                        robotOperationMap.put("robotName", res.get("robot_name").toString());
-                        robotOperationMap.put("robotCode", xmlBaseModel.getSendCode());
-                        robotOperationMap.put("time", res.get("time").toString());
+                    xmlBaseModel.getItems().forEach(res->{
+                        Map<String,String> robotOperationMap = new HashMap<>();
+                        robotOperationMap.put("robotName",res.get("robot_name").toString());
+                        robotOperationMap.put("robotCode",res.get("robot_code").toString());
+                        robotOperationMap.put("time",res.get("time").toString());
                         robotOperationMap.put("type",res.get("type").toString());//1.运动速度2.行驶里程3.电池电量
-                        robotOperationMap.put("value", res.get("value").toString());
-                        robotOperationMap.put("valueUnit", res.get("valueUnit").toString());
-                        robotOperationMap.put("unit", res.get("unit").toString());
+                        robotOperationMap.put("value",res.get("value").toString());
+                        robotOperationMap.put("valueUnit",res.get("value_unit").toString());
+                        robotOperationMap.put("unit",res.get("unit").toString());
                         robotOperationList.add(robotOperationMap);
                     });
-                    log.info("机器人运行数据是："+robotOperationList);
+                    log.info("机器人运行数据是；"+robotOperationList);
                     //放缓存(还没写)
                     String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + operationXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + operationXmlString + "<end>");
                     byte[] operationProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, operationXmlString);
                     send(ctx, operationProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -365,7 +541,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人坐标数据是："+robotCoordinateList);
                     //放缓存(还没写)
                     String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + coordinateXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + coordinateXmlString + "<end>");
                     byte[] coordinateProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, coordinateXmlString);
                     send(ctx, coordinateProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -389,7 +565,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人巡视路线数据是："+robotRoadList);
                     //放缓存(还没写)
                     String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + roadXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + roadXmlString + "<end>");
                     byte[] roadProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, roadXmlString);
                     send(ctx, roadProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -411,7 +587,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人异常告警数据是："+robotAlarmList);
                     //入库(还没写)
                     String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + alarmXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + alarmXmlString + "<end>");
                     byte[] alarmProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, alarmXmlString);
                     send(ctx, alarmProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -426,17 +602,17 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         Map<String, String> weatherMap = new HashMap<>();
                         weatherMap.put("robotName", res.get("robot_name").toString());
                         weatherMap.put("robotCode", xmlBaseModel.getSendCode());
-                        weatherMap.put("time", res.get("robot_name").toString());
-                        weatherMap.put("type", res.get("robot_name").toString());//1.环境温度2.环境适度3.风速4.大气压5.雨量
-                        weatherMap.put("value", res.get("robot_name").toString());
-                        weatherMap.put("value_unit", res.get("robot_name").toString());
-                        weatherMap.put("unit", res.get("robot_name").toString());
+                        weatherMap.put("time", res.get("time").toString());
+                        weatherMap.put("type", res.get("type").toString());//1.环境温度2.环境适度3.风速4.大气压5.雨量
+                        weatherMap.put("value", res.get("value").toString());
+                        weatherMap.put("valueUnit", res.get("value_unit").toString());
+                        weatherMap.put("unit", res.get("unit").toString());
                         weatherList.add(weatherMap);
                     });
                     log.info("微气象数据是："+weatherList);
                     //放缓存(还没写)
                     String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + weatherXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + weatherXmlString + "<end>");
                     byte[] weatherProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, weatherXmlString);
                     send(ctx, weatherProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -464,7 +640,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人任务状态数据是："+taskStatusList);
                     //入库或者放缓存(还没写)
                     String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + taskStatusXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + taskStatusXmlString + "<end>");
                     byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, taskStatusXmlString);
                     send(ctx, taskStatusProtocol);
                     log.info("巡视主机给机器人响应了");
@@ -498,7 +674,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人巡视结果数据是："+cruiseResultList);
                     //入库(还没写)
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true));
-                    log.info("生成的响应xml是<start>" + cruiseResultXmlString + "<end>");
+//                    log.info("生成的响应xml是<start>" + cruiseResultXmlString + "<end>");
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, cruiseResultXmlString);
                     send(ctx, cruiseResultProtocol);
                     log.info("巡视主机给机器人响应了");

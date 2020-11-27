@@ -103,6 +103,27 @@ public class PlatformPacketUtil {
                 ((long)src[7] << 56 & 0xFF00000000000000L);
         return value;
     }
+    //数组倒序后，转成十六进制字符串，再转成10进制数
+    public static long reserve( byte[] arr ){
+//        StringBuilder Str2 = new StringBuilder();
+//        for (byte byteitem : arr) {
+//            Str2.append(String.format("%02x ", byteitem));
+//        }
+//        System.out.println("发送的xml字节长度倒序的内容是<start>" + Str2 + "<end>");
+        byte[] arr1 = new byte[arr.length];
+        for( int x=0;x<arr.length;x++ ){
+            arr1[x] = arr[arr.length-x-1];
+        }
+        byte arrNew[] = new byte[arr.length];//倒序后的数组
+        for (int i = 0; i <arr1.length ; i++) {
+            arrNew[i] = arr1[i];
+        }
+        String byteString = Bytes2HexString(arrNew);//16进制byte转String
+//        System.out.println("字节长度字符串为:"+byteString);
+        String n = byteString.replaceAll("[g-z]","");//过滤掉f以上的字母
+        long byteLength = Long.parseLong(n,16);//将字符串n看作是十六进制的数，并以十进制读取
+        return byteLength ;
+    }
     /**
      *
      * 生成发送的报文

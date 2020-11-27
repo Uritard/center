@@ -52,7 +52,7 @@ public class TCameraPresetController {
         try {
             int resultNum = 0;
             //判断该预置位是否已被设置
-            if(tCameraPresetService.judgePresentNum(tCameraPreset.getPresetNum())){
+            if(tCameraPresetService.judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
                 return result;
             }else{
@@ -78,6 +78,7 @@ public class TCameraPresetController {
                         tCameraPresetService.update(tCameraPreset1);//存图
                     } else {
                         tCameraPresetService.deleteByPrimaryId(tCameraPreset1.getPresetId());
+                        resultNum = 0;
                     }
                 }
             }
