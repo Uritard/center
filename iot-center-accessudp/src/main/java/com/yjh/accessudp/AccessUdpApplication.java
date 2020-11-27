@@ -41,6 +41,8 @@ public class AccessUdpApplication implements CommandLineRunner {
 
     @Value("${netty.server.port}")
     private int port;
+    @Value("${spring.union.url}")
+    private String UNION_URL;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -64,7 +66,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
-        nettyServer.start(address, redisTemplate,tCfgMeteService);
+        nettyServer.start(address, redisTemplate,tCfgMeteService,UNION_URL);
     }
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
@@ -86,7 +88,6 @@ public class AccessUdpApplication implements CommandLineRunner {
                         log.info("时间读取成功");
                         String time = matcher.group(1).trim();
                         if(time.equals(Constant.TIME)){
-                            //todo 时间是写死的
                             log.info("设备数据时间与上一次时间一致");
                             br.close();
                             reader.close();

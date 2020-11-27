@@ -225,10 +225,10 @@ public class RunAtNowTask implements Runnable{
             }
             log.info("robotInstanceList   :" +robotInstanceList);
             List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
-            List<RobotTaskMonitor> robotTaskInfoList = new ArrayList<>();
+            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
             log.info("robotId   :" +robotId);
             for (Long item: robotId){
-                RobotTaskMonitor robotTaskInfo = new RobotTaskMonitor();
+                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                 robotTaskInfo.setCruiseType(tCruiseTask.getType());
                 robotTaskInfo.setTaskId(taskId);
                 robotTaskInfo.setPriority(4);//优先级 暂定4

@@ -1,5 +1,9 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
@@ -125,7 +129,10 @@ public class TCameraScreenService{
         List<Map<String,String>> listForState = new ArrayList<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId:recordIdList){
-            //todo 摄像机状态
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            map.putAll((Map<String,String>)re.getData());
         }
         for(Map<String,String> item:listForState){
             map.putAll(item);
@@ -146,7 +153,11 @@ public class TCameraScreenService{
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
                     if("camera".equals(areaInfoMap.getInfoType())){
-                        areaInfoTem.setState(Integer.valueOf(map.get(areaInfoMap.getId().toString())));
+                        if(map.get(areaInfoMap.getId().toString()) != null){
+                            areaInfoTem.setState(Integer.valueOf(map.get(areaInfoMap.getId().toString())));
+                        }else {
+                            areaInfoTem.setState(0);
+                        }
                     }
                     childrenList.add(areaInfoTem);
                 }
@@ -156,6 +167,18 @@ public class TCameraScreenService{
                 diGui(childrenList, listTree,map);
             }
         }
+    }
+    private static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+            }
+        } catch (Exception e) {
+
+        }
+        return re;
     }
 
 

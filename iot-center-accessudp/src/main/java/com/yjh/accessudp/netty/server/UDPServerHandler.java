@@ -40,9 +40,11 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     private RedisTemplate redisTemplate;
     private TCfgMeteService tCfgMeteService;
-    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService) {
+    private String UNION_URL;
+    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService,String UNION_URL) {
         this.redisTemplate = redisTemplate;
         this.tCfgMeteService = tCfgMeteService;
+        this.UNION_URL=UNION_URL;
     }
     private boolean isThreadStart = true;
     public boolean getIsThreadStart() { return isThreadStart; }
@@ -211,7 +213,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //            union(map);
             //将实时表里的数据更新到历史表里
             tCfgMeteService.insertIntoHis(tCfgDataCurrent);
-            getUrl(Constant.UNION_URL,meteId.toString());
+            getUrl(UNION_URL,meteId.toString());
 
         }else if ("43".equals(udp[4])){
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
@@ -267,7 +269,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.UNION_URL, map, String.class);
+                serviceRestTemplate.postForObject(UNION_URL, map, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -15,16 +15,16 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class RobotTaskInfo implements Serializable {
+public class RobotTaskMessage implements Serializable {
 
-    private String cruiseName;
+    private String instanceName;//巡视点名称
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date cruiseTime;
+    private Date cruiseTime;//巡视时间
 
-    private Long deviceID;
+//    private Long deviceId;//设备id
 
-    private String deviceName;
+    private String deviceName;//设备名称
 
-    private String result;
+    private String result;//巡视结果
 }

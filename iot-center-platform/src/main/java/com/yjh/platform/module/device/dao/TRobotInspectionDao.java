@@ -2,8 +2,8 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TRobotInspection;
-import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -36,4 +36,5 @@ public interface TRobotInspectionDao {
     List<Long> selectForRobotTask(@Param(value = "list") List<Long> list);
     List<String> selectRobotInspectionId(@Param(value = "list") List<Long> list,
                                        @Param(value = "robotId") Long robotId);
+    List<RobotTaskMessage> selectRobotTaskMessage(@Param(value = "robotId") Long robotId);
 }

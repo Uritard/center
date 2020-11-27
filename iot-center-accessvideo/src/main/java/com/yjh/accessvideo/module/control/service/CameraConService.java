@@ -405,5 +405,54 @@ public class CameraConService {
         }
     }
 
+
+//    //todo NET_DVR_StartVoiceCom_V30(NativeLong lUserID, int dwVoiceChan, boolean bNeedCBNoEncData, FVoiceDataCallBack_V30 fVoiceDataCallBack, Pointer pUser);
+//    @Logs(title = "开始语言对讲", code = "startChat")
+//    @Transactional(rollbackFor = Exception.class)
+//    public int startChat(Long cameraId){
+//        try {
+//
+//            HCNetSDK.FVoiceDataCallBack fVoiceDataCallBack = new HCNetSDK.FVoiceDataCallBack();
+//            hCNetSDK.NET_DVR_StartVoiceCom_V30(Constant.maps.get("lUserID"), 1, 1, fVoiceDataCallBack,null);
+//        }catch (IOException e)
+//            {
+//                log.error("转到预置点失败:", e);
+//            }
+//        return  1;
+//    }
+
+//    class FVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_V30
+//    {
+//        //对对讲的音频数据进行回调操作,以下写入文件操作
+//        public void invoke(NativeLong lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser)
+//        {
+//            //byAudioFlag为0表示本地文件,为1表示设备的音频文件
+//            if (byAudioFlag == 0)
+//            {
+//                try
+//                {
+//                    fLocal.write(pRecvDataBuffer);
+//                    fLocal.flush();
+//                } catch (IOException ex)
+//                {
+//                    java.util.logging.Logger.getLogger(JDialogVoiceTalk.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            } else
+//            {
+//                if (byAudioFlag == 1)
+//                {
+//                    try
+//                    {
+//                        fDevice.write(pRecvDataBuffer);
+//                        fDevice.flush();
+//                    } catch (IOException ex)
+//                    {
+//                        java.util.logging.Logger.getLogger(JDialogVoiceTalk.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
 }
 

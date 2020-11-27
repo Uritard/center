@@ -156,4 +156,17 @@ public class TRobotInspectionController {
         return result;
     }
 
+    @ApiOperation(value = "机器人任务数据")
+    @RequestMapping(value = "/selectRobotTaskMessage", method = RequestMethod.GET)
+    public Result selectRobotTaskMessage(@RequestParam(value = "robotId") Long robotId){
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.selectRobotTaskMessage(robotId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("机器人巡检点分页查询失败描述：", e);
+        }
+        return result;
+    }
+
 }

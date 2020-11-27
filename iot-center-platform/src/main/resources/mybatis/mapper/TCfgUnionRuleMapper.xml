@@ -187,7 +187,7 @@
             a.mete_name as label,
             "mete" as infoType
             from t_cfg_mete a
-            left join t_dict_business b on a.mete_kind = b.dict_code
+            left join t_dict_business b on a.mete_kind = b.dict_code and b.col_name="mete_kind"
             where a.mete_kind = #{meteKind, jdbcType=INTEGER}
     </select>
 

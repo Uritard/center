@@ -15,4 +15,6 @@ public class Constant {
     public static final String CAPTURE_PRESET_URL = "http://iot-center-accessvideo/camera/v1/capturePresetPicture?cameraId={cameraId}&presetId={presetId}";
 
     public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
+
+    public static final String CAMERA_STATES = "http://iot-center-accessvideo/camera/v1/getCameraStatus?recordId={recordId}";
 }

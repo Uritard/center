@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class RobotTaskMonitor implements Serializable {
+public class RobotTaskInstanceInfo implements Serializable {
     private Integer cruiseType;
 
     private String taskId;

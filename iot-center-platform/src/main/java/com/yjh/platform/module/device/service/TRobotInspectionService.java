@@ -1,6 +1,6 @@
 package com.yjh.platform.module.device.service;
 
-import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 
@@ -63,6 +63,12 @@ public class TRobotInspectionService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TRobotInspection> list) {
         return this.tRobotInspectionDao.batchInsert(list);
+    }
+
+    @Logs(title = "机器人监控", code = "device",content = "查询机器人的任务信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId){
+        return this.tRobotInspectionDao.selectRobotTaskMessage(robotId);
     }
 }
 

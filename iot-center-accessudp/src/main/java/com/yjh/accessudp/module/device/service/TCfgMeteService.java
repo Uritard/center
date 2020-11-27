@@ -30,12 +30,15 @@ public class TCfgMeteService {
             this.tCfgMeteDao.insertForDevice(syAllInfo);//device
             if(syAllInfo.getMeteKind() == 1){//遥信
                 tCfgMeteDao.insertForTelesignal(syAllInfo);
+                continue;
             }
             if(syAllInfo.getMeteKind() == 2){//遥测
                 tCfgMeteDao.insertForTelemeter(syAllInfo);
+                continue;
             }
             if(syAllInfo.getMeteKind() == 3){//遥控
                 tCfgMeteDao.insertForTelecontrol(syAllInfo);
+                continue;
             }
             tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
         }
