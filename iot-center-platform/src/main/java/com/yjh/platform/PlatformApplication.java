@@ -3,6 +3,9 @@ package com.yjh.platform;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.module.user.controller.TSysParamController;
+import com.yjh.platform.module.user.dao.TSysParamDao;
+import com.yjh.platform.module.user.service.TSysParamService;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -28,6 +31,8 @@ import java.net.InetSocketAddress;
 @EnableFeignClients 
 public class PlatformApplication  implements CommandLineRunner {
 
+    @Autowired
+    private TSysParamService tSysParamService;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -39,6 +44,7 @@ public class PlatformApplication  implements CommandLineRunner {
 //        quartzTask.setJobName("PlatformScheduler");
 //        quartzTask.setJobGroup("Platform");
 //        jobManager.addJob(quartzTask);
+        tSysParamService.insertIntoRedis();
     }
 
     @Bean

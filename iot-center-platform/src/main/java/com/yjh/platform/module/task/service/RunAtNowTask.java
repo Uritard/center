@@ -16,9 +16,11 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TSysParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -165,6 +167,7 @@ public class RunAtNowTask implements Runnable{
             log.info("发送给前端的消息：   "+json);
             WebSocketServer.sendMsg(json);
             log.info(taskDate+"需要执行的任务");
+
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
@@ -224,20 +227,22 @@ public class RunAtNowTask implements Runnable{
                 }
             }
             log.info("robotInstanceList   :" +robotInstanceList);
-            List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
-            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
-            log.info("robotId   :" +robotId);
-            for (Long item: robotId){
-                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
-                robotTaskInfo.setCruiseType(tCruiseTask.getType());
-                robotTaskInfo.setTaskId(taskId);
-                robotTaskInfo.setPriority(4);//优先级 暂定4
-                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
-                robotTaskInfo.setDeviceList(deviceList);
-                robotTaskInfoList.add(robotTaskInfo);
+            if(robotInstanceList.size() != 0){
+                List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+                List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+                log.info("robotId   :" +robotId);
+                for (Long item: robotId){
+                    RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                    robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                    robotTaskInfo.setTaskId(taskId);
+                    robotTaskInfo.setPriority(4);//优先级 暂定4
+                    robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                    List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
+                    robotTaskInfo.setDeviceList(deviceList);
+                    robotTaskInfoList.add(robotTaskInfo);
+                }
+                log.info("robotTaskInfoList   :" +robotTaskInfoList);
             }
-            log.info("robotTaskInfoList   :" +robotTaskInfoList);
 
             log.info("开始巡检"+new Date());
             for (TCruisePointInstance item : instancesList) {
@@ -331,14 +336,14 @@ public class RunAtNowTask implements Runnable{
                             //log.info("tCruiseDataResultMap" +tCruiseDataResultMap);
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             //抓图成功 算法分析
-                            if(redisTemplate.hasKey(taskId)) {
+                            if(redisTemplate.hasKey("analysisList:"+taskId)) {
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
                                 //analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPush(taskId,item.getInstanceId().toString());
+                                redisTemplate.opsForList().leftPush("analysisList:"+taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPushAll(taskId,analysisInstanceList);
+                                redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                             }
                             Analysis analysis = new Analysis();
                             analysis.setTaskId(taskId);

@@ -2,6 +2,7 @@ package com.yjh.accessudp;
 
 import com.yjh.accessudp.common.Constant;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
+import com.yjh.accessudp.module.device.entity.TSysParam;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import com.yjh.accessudp.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,6 @@ public class AccessUdpApplication implements CommandLineRunner {
     @Autowired
     private TCfgMeteService tCfgMeteService;
 
-    @Value("${spring.unoin.deviceInfo.path}")
     private String devicePath;
 
     private NettyServer nettyServer = new NettyServer();
@@ -70,6 +70,8 @@ public class AccessUdpApplication implements CommandLineRunner {
     }
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
+        TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
+        devicePath = tSysParam.getContent();
         BufferedReader br = null;
         FileReader reader = null;
         try  {

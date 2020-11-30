@@ -206,7 +206,7 @@
         SELECT
         a.inspection_code
         FROM
-        `t_robot_inspection` a
+        t_robot_inspection a
         WHERE
         a.robot_id = #{robotId,jdbcType=BIGINT}
         and a.inspection_id IN
@@ -236,6 +236,25 @@
 		left join t_std_devicemete g on f.device_mete_id = g.device_mete_id
         WHERE
             a.robot_id = #{robotId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectRobotInfo" resultType="com.yjh.platform.module.device.entity.Robot">
+        SELECT
+            a.robot_id,
+            a.robot_code,
+            a.robot_name,
+            a.robot_status,
+            a.robot_type,
+            b.dict_note AS robotTypeName,
+            a.robot_position,
+            c.dict_note AS robotPositionName,
+            a.phote_path
+        FROM
+            t_robot_info a
+            LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code
+            LEFT JOIN t_dict_business c ON a.robot_position = c.dict_code
+        where 1=1
+
     </select>
 
 </mapper>

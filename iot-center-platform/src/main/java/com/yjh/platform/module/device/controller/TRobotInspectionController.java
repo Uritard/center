@@ -169,4 +169,29 @@ public class TRobotInspectionController {
         return result;
     }
 
+    @ApiOperation(value = "查询机器人信息")
+    @RequestMapping(value = "/selectRobotInfo", method = RequestMethod.GET)
+    public Result selectRobotInfo() {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.selectRobotInfo());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("机器人巡检点查询失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询机器人状态信息")
+    @RequestMapping(value = "/selectRobotStatus", method = RequestMethod.GET)
+    public Result selectRobotStatus(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.selectRobotInfo());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("机器人巡检点查询失败描述：", e);
+        }
+        return result;
+    }
 }

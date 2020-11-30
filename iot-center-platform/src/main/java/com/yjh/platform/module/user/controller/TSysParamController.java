@@ -118,14 +118,18 @@ public class TSysParamController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TSysParam tSysParam,
+    public Result selectByPage(@RequestParam(value = "paramId", required = false) Integer paramId,
+                               @RequestParam(value = "paramType", required = false) String paramType,
+                               @RequestParam(value = "paramName", required = false) String paramName,
+                               @RequestParam(value = "content", required = false) String content,
+                               @RequestParam(value = "remark", required = false) String remark,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TSysParam> list = tSysParamService.selectByPage(tSysParam);
+            List<TSysParam> list = tSysParamService.selectByPage(paramId, paramType, paramName, content, remark);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -145,6 +149,19 @@ public class TSysParamController {
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("系统参数批量插入失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "将数据写入redis")
+    @RequestMapping(value = "/insertIntoRedis", method = RequestMethod.GET)
+    public Result insertIntoRedis() {
+        Result result = new Result();
+        try {
+            result.setData(this.tSysParamService.insertIntoRedis());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("将数据写入redis失败：" + e);
         }
         return result;
     }

@@ -2,10 +2,8 @@ package com.yjh.accessudp.module.device.dao;
 
 
 
-import com.yjh.accessudp.module.device.entity.SYAllInfo;
-import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
-import com.yjh.accessudp.module.device.entity.THisSignalData;
-import com.yjh.accessudp.module.device.entity.THisTelemeterData;
+import com.yjh.accessudp.module.device.entity.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -49,4 +47,6 @@ public interface TCfgMeteDao {
 
     int insertIntoTHisSignalData(THisSignalData tHisSignalData);
     int insertIntoTHisTelemeterData(THisTelemeterData tHisTelemeterData);
+
+    TSysParam selectByParamType(@Param(value = "paramType") String paramType);
 }

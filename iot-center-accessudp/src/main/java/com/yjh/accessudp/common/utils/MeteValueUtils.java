@@ -97,6 +97,18 @@ public class MeteValueUtils {
         if("保护跳闸".equals(commintValue)){
             return "0";
         }
+        if("火灾报警".equals(commintValue)){
+            return "0";
+        }
+        if("报警".equals(commintValue)){
+            return "0";
+        }
+        if("门开".equals(commintValue)){
+            return "1";
+        }
+        if("门关".equals(commintValue)){
+            return "0";
+        }
         return null;
     }
 }

@@ -22,7 +22,14 @@ public interface TSysParamDao {
                                 @Param(value = "paramName") String paramName,
                                 @Param(value = "content") String content,
                                 @Param(value = "remark") String remark);
-    List<TSysParam> selectByPage(TSysParam tSysParam);
+    List<TSysParam> selectByPage(@Param(value = "paramId") Integer paramId,
+                                 @Param(value = "paramType") String paramType,
+                                 @Param(value = "paramName") String paramName,
+                                 @Param(value = "content") String content,
+                                 @Param(value = "remark") String remark);
 
     int batchInsert(List<TSysParam> list);
+
+    List<TSysParam>selectAll();
+    TSysParam selectByParamType(@Param(value = "paramType") String paramType);
 }

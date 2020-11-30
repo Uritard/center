@@ -16,6 +16,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.*;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -62,6 +63,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private TSysParamDao tSysParamDao;
 
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CruiseTaskJob.class);
@@ -75,13 +78,9 @@ public class CruiseTaskJob extends QuartzJobBean {
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     //模板图片路径
-    @Value("${spring.picModelPath.dir}")
     private String picModelPath;
     //等待相机转到预置位时间
-    @Value("${spring.move.waitTime}")
     private Long waitTime;
-    //spring.tasks.are.Time
-    @Value("${spring.tasks.are.Time}")
     private Long tasksAreTime;
 
 
@@ -111,6 +110,13 @@ public class CruiseTaskJob extends QuartzJobBean {
             Date taskStart = new Date();
             log.info("开始进行任务" +taskStart);
             Long taskIsStart = taskStart.getTime();
+
+            TSysParam tSysParam = tSysParamDao.selectByParamType("picModelPath");//模板图片路径
+            picModelPath = tSysParam.getContent();
+            tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
+            waitTime = Long.valueOf(tSysParam.getContent());
+            tSysParam = tSysParamDao.selectByParamType("tasksAreTime");//任务超期时间
+            tasksAreTime = Long.valueOf(tSysParam.getContent());
 
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
             //在任务表里新建一条
@@ -181,20 +187,22 @@ public class CruiseTaskJob extends QuartzJobBean {
                 }
             }
             log.info("robotInstanceList   :" +robotInstanceList);
-            List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
-            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
-            log.info("robotId   :" +robotId);
-            for (Long item: robotId){
-                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
-                robotTaskInfo.setCruiseType(tCruiseTask.getType());
-                robotTaskInfo.setTaskId(taskId);
-                robotTaskInfo.setPriority(4);//优先级 暂定4
-                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
-                robotTaskInfo.setDeviceList(deviceList);
-                robotTaskInfoList.add(robotTaskInfo);
+            if(robotInstanceList.size() != 0){
+                List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+                List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+                log.info("robotId   :" +robotId);
+                for (Long item: robotId){
+                    RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                    robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                    robotTaskInfo.setTaskId(taskId);
+                    robotTaskInfo.setPriority(4);//优先级 暂定4
+                    robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                    List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
+                    robotTaskInfo.setDeviceList(deviceList);
+                    robotTaskInfoList.add(robotTaskInfo);
+                }
+                log.info("robotTaskInfoList   :" +robotTaskInfoList);
             }
-            log.info("robotTaskInfoList   :" +robotTaskInfoList);
 
             log.info("开始巡检"+new Date());
 
@@ -290,14 +298,14 @@ public class CruiseTaskJob extends QuartzJobBean {
                             //log.info("tCruiseDataResultMap" +tCruiseDataResultMap);
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             //抓图成功 算法分析
-                            if(redisTemplate.hasKey(tCruiseTask.getTaskId())) {
+                            if(redisTemplate.hasKey("analysisList:"+taskId)) {
                                 //System.out.println("---------> true");
                                 //analysisInstanceList =  (List<String>) redisTemplate.opsForList().g(analysisInstanceList);
                                 //analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPush(tCruiseTask.getTaskId(),item.getInstanceId().toString());
+                                redisTemplate.opsForList().leftPush("analysisList:"+taskId,item.getInstanceId().toString());
                             } else {
                                 analysisInstanceList.add(item.getInstanceId().toString());
-                                redisTemplate.opsForList().leftPushAll(tCruiseTask.getTaskId(),analysisInstanceList);
+                                redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                             }
                             Analysis analysis = new Analysis();
                             analysis.setTaskId(tCruiseTask.getTaskId());

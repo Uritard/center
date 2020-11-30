@@ -1,11 +1,15 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 
-import java.util.List;
+import java.util.*;
 
+import com.yjh.platform.module.user.entity.AreaInfoDetail;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -20,6 +24,8 @@ public class TRobotInspectionService{
 
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Logs(title = "插入", code = "device")
     @Transactional(rollbackFor = Exception.class)
@@ -70,5 +76,20 @@ public class TRobotInspectionService{
     public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId){
         return this.tRobotInspectionDao.selectRobotTaskMessage(robotId);
     }
+
+    @Logs(title = "查询机器人信息", code = "device",content = "查询机器人信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<Robot> selectRobotInfo(){
+        return this.tRobotInspectionDao.selectRobotInfo();
+    }
+
+    @Logs(title = "查询机器人状态信息", code = "device",content = "查询机器人状态信息")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectRobotStatus(Long robotId){
+        //获取状态信息
+        Map<String,Object> mapForGet  = redisTemplate.opsForHash().entries("robotId");
+        return mapForGet;
+    }
+
 }
 

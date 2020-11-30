@@ -1,10 +1,7 @@
 package com.yjh.accessudp.module.device.service;
 
 import com.yjh.accessudp.module.device.dao.TCfgMeteDao;
-import com.yjh.accessudp.module.device.entity.SYAllInfo;
-import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
-import com.yjh.accessudp.module.device.entity.THisSignalData;
-import com.yjh.accessudp.module.device.entity.THisTelemeterData;
+import com.yjh.accessudp.module.device.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,6 +108,10 @@ public class TCfgMeteService {
         tHisSignalData.setMeteValue(tCfgDataCurrent.getMeteValue());
         tHisSignalData.setLastMeteValue(tCfgDataCurrent.getLastMeteValue());
         return tCfgMeteDao.insertIntoTHisSignalData(tHisSignalData);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public TSysParam selectByParamType(String paramType){
+        return this.tCfgMeteDao.selectByParamType(paramType);
     }
 
 }

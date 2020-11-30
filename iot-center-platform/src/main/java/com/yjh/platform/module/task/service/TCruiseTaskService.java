@@ -23,9 +23,11 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TSysParam;
 import lombok.Data;
 import lombok.NonNull;
 import org.quartz.CronExpression;
@@ -79,16 +81,16 @@ public class TCruiseTaskService {
     private TCruiseDataResultDao tCruiseDataResultDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private TSysParamDao tSysParamDao;
     //模板图片路径
-    @Value("${spring.picModelPath.dir}")
     private String picModelPath;
     //等待相机转到预置位时间
-    @Value("${spring.move.waitTime}")
     private Long waitTime;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
-    @Value("${spring.tasks.are.Time}")
+
     private Long tasksAreTime;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
@@ -132,6 +134,12 @@ public class TCruiseTaskService {
             if(tCruiseTask.getIfRun() == 173){
                 //立即执行
                 try {
+                    TSysParam tSysParam = tSysParamDao.selectByParamType("picModelPath");//模板图片路径
+                    picModelPath = tSysParam.getContent();
+                    tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
+                    waitTime = Long.valueOf(tSysParam.getContent());
+                    tSysParam = tSysParamDao.selectByParamType("tasksAreTime");//任务超期时间
+                    tasksAreTime = Long.valueOf(tSysParam.getContent());
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                             tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
@@ -456,6 +464,12 @@ public class TCruiseTaskService {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(239);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        TSysParam tSysParam = tSysParamDao.selectByParamType("picModelPath");//模板图片路径
+        picModelPath = tSysParam.getContent();
+        tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
+        waitTime = Long.valueOf(tSysParam.getContent());
+        tSysParam = tSysParamDao.selectByParamType("picModelPath");//任务超期时间
+        tasksAreTime = Long.valueOf(tSysParam.getContent());
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                 tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime,
