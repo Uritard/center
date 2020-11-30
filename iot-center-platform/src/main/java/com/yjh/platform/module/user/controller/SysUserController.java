@@ -5,10 +5,10 @@ import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysRoleMenu;
 import com.yjh.platform.module.user.entity.SysUserLogin;
-import com.yjh.platform.module.user.service.SysRoleMenuService;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.entity.SysUser;
 
@@ -46,7 +46,7 @@ public class SysUserController {
     @Autowired
     private UserManager userManager;
     @Autowired
-    private SysRoleMenuService sysRoleMenuService;
+    private SysRoleMenuDao sysRoleMenuDao;
 
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
     @Autowired
@@ -256,6 +256,8 @@ public class SysUserController {
                 String userName = userMap.get("userName");
                 String password = userMap.get("password");
                 SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
+                String appKey = getRandomNickname(10);
+                sysUserLogin.setAppkey(appKey);
                 if (!Objects.equals(null, sysUserLogin)) {
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                     params.set("logType", "iot-center-platform:module");
@@ -283,9 +285,7 @@ public class SysUserController {
                     }
                     if (sysUserLogin.getState()==1) {
                         Map<String, Object> mapResult = new HashMap<>();
-                        SysRoleMenu sysRoleMenu = new SysRoleMenu();
-                        sysRoleMenu.setRoleId(sysUserLogin.getRoleId());
-                        List<SysRoleMenu> sysRoleMenuList = sysRoleMenuService.selectByPage(sysRoleMenu);
+                        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
                         mapResult.put("roleMenuList", sysRoleMenuList);
                         mapResult.put("sysUserLogin", sysUserLogin);
                         result.setData(mapResult);
@@ -293,6 +293,7 @@ public class SysUserController {
                         Map<String, Object> map = new HashMap<>();
                         map.put("userId", userId);
                         map.put("userName", userName);
+                        map.put("appKey", appKey);
                         map.put("expireTime", String.valueOf(System.currentTimeMillis()));
                         map.put("errorInputTimes", "0");
                         String key = Constant.account_lock_times.replace("userAccountID", userId);
@@ -326,6 +327,7 @@ public class SysUserController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("userId", userId);
                     map.put("userName", userName);
+                    map.put("appKey", appKey);
                     map.put("expireTime", String.valueOf(System.currentTimeMillis()));
                     map.put("errorInputTimes", String.valueOf(errorInputTimes));
                     redisTemplate.opsForHash().putAll(key, map);
@@ -449,6 +451,18 @@ public class SysUserController {
             log.error("用户修改密码错误:", e);
         }
         return result;
+    }
+
+    /**
+     * java生成随机数字10位数
+     */
+    public static String getRandomNickname(int length) {
+        String val = "";
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            val += String.valueOf(random.nextInt(10));
+        }
+        return val;
     }
 
 }

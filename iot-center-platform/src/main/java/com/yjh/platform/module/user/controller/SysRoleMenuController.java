@@ -164,7 +164,7 @@ public class SysRoleMenuController {
             } else {
                 result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
             }
-            log.error("失败描述：", e);
+            log.error("角色菜单表批量失败描述：", e);
         }
         return result;
     }

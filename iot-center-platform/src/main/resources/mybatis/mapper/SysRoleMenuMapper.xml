@@ -116,4 +116,12 @@
         </foreach>
     </insert>
 
+    <select id="selectByRoleId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select
+        a.menu_code
+        from sys_role_menu a
+        where
+        <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
+    </select>
+
 </mapper>

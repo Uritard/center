@@ -26,4 +26,5 @@ public interface SysRoleMenuDao {
     List<SysRoleMenu> selectByPage(SysRoleMenu sysRoleMenu);
 
     int batchInsert(@Param("list") List<SysRoleMenu> list);
+    List<String> selectByRoleId(@Param(value = "roleId") Long roleId);
 }
