@@ -121,7 +121,7 @@
         a.menu_code
         from sys_role_menu a
         where
-        <if test="roleId != null and roleId != ''"> and a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        <if test="roleId != null and roleId != ''"> a.role_id = #{roleId, jdbcType=BIGINT}</if>
     </select>
 
 </mapper>
