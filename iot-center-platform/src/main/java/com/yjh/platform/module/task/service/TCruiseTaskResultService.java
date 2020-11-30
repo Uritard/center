@@ -232,19 +232,37 @@ public class TCruiseTaskResultService {
 //
 //        }
 
+//        List<CruiseInspectResult> endTimeNull=new ArrayList<>();
+//        for(CruiseInspectResult ctemp:cruiseInspectResults){
+//            if(Objects.isNull(ctemp.getEndTime())){
+//                endTimeNull.add(ctemp);
+//                cruiseInspectResults.remove(ctemp);
+//            }
+//        }
         //按时间降序排列
         Collections.sort(cruiseInspectResults, new Comparator<CruiseInspectResult>() {
             @Override
             public int compare(CruiseInspectResult o1, CruiseInspectResult o2) {
-                int flag = o1.getEndTime().compareTo(o2.getEndTime());
-                if(flag == -1){
-                    flag = 1;
-                }else if(flag == 1){
-                    flag = -1;
+                if(Objects.isNull(o1.getEndTime()) || Objects.isNull(o2.getEndTime())){
+                    int flag=1;
+                    return flag;
+                }else {
+                    int flag = o1.getEndTime().compareTo(o2.getEndTime());
+                    if(flag == -1){
+                        flag = 1;
+                    }else if(flag == 1){
+                        flag = -1;
+                    }
+                    return flag;
                 }
-                return flag;
+
             }
         });
+
+//        for(CruiseInspectResult cTemp:endTimeNull){
+//            cruiseInspectResults.add(cTemp);
+//        }
+
         return cruiseInspectResults;
     }
 
