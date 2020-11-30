@@ -1,15 +1,14 @@
 package com.yjh.platform.module.user.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
+import com.yjh.platform.module.user.entity.SysRoleMenu;
 import com.yjh.platform.module.user.entity.SysUserLogin;
-import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.service.SysRoleMenuService;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.entity.SysUser;
 
@@ -46,6 +45,8 @@ public class SysUserController {
     private final SysUserService sysUserService;
     @Autowired
     private UserManager userManager;
+    @Autowired
+    private SysRoleMenuService sysRoleMenuService;
 
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
     @Autowired
@@ -281,7 +282,13 @@ public class SysUserController {
                         return result;
                     }
                     if (sysUserLogin.getState()==1) {
-                        result.setData(sysUserLogin);
+                        Map<String, Object> mapResult = new HashMap<>();
+                        SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                        sysRoleMenu.setRoleId(sysUserLogin.getRoleId());
+                        List<SysRoleMenu> sysRoleMenuList = sysRoleMenuService.selectByPage(sysRoleMenu);
+                        mapResult.put("roleMenuList", sysRoleMenuList);
+                        mapResult.put("sysUserLogin", sysUserLogin);
+                        result.setData(mapResult);
                         String userId = String.valueOf(sysUserLogin.getUserId());
                         Map<String, Object> map = new HashMap<>();
                         map.put("userId", userId);
@@ -334,7 +341,6 @@ public class SysUserController {
                     return result;
                 }
             } else {
-                log.info("4 ");
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10103.getName());
@@ -343,7 +349,6 @@ public class SysUserController {
             }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
-            log.info("5 ");
             log.error("登录失败:", e);
         }
         return result;

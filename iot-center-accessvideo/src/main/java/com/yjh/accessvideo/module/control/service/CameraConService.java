@@ -4,7 +4,9 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.examples.win32.W32API;
+import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.hik.HCNetSDK;
@@ -57,6 +59,8 @@ public class CameraConService {
     private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();	// play structure
     private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
+    private NativeLong m_lPort =  new NativeLong(-1);
+    FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
 
     @Logs(title = "相机播放", code = "cameraPlay")
@@ -262,64 +266,58 @@ public class CameraConService {
             log.info("lUserIDLong: "+lUserIDLong);
             if (cameraConInfo.getCameraType()==206) {
                 log.info("红外相机，特殊拍照");
-                java.awt.Panel panelRealplay = new java.awt.Panel();
-//                System.setProperty("java.awt.headless", "false");
-                W32API.HWND hwnd = new W32API.HWND(Native.getComponentPointer(panelRealplay));
                 m_sClientInfo.lChannel = new NativeLong(iChanNum);
-                m_sClientInfo.hPlayWnd = hwnd;
                 if (Objects.nonNull(Constant.maps.get("lUserID"))) {
                     lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
-                    hCNetSDK.NET_DVR_RealPlay_V30(lUserIDLong, m_sClientInfo, null, null, true);
-                }
-//                dvr_previewinfo.hPlayWnd = new W32API.HWND();
-//                log.info("dvr_previewInfo.hPlayWnd: "+dvr_previewinfo.hPlayWnd);
-//                m_lRealPlayHandle = hCNetSDK.NET_DVR_RealPlay_V40(lUserIDLong, dvr_previewinfo, null, null);
-//                if (Objects.equals(m_lRealPlayHandle, m_minsOne)) {
-//                    int iErr = hCNetSDK.NET_DVR_GetLastError();
-//                    log.error("NET_DVR_RealPlay_V40, error code: "+iErr);
-//                    return "NET_DVR_RealPlay_V40, error code: "+iErr;
-//                }
-                int m_lPort = hCNetSDK.NET_DVR_GetRealPlayerIndex(m_lRealPlayHandle);
-                if (Objects.equals(m_lPort, -1)) {
-                    int iErr = hCNetSDK.NET_DVR_GetLastError();
-                    log.error("NET_DVR_GetRealPlayerIndex, error code: "+iErr);
-                    return "NET_DVR_GetRealPlayerIndex, error code: "+iErr;
+                    m_lPort = hCNetSDK.NET_DVR_RealPlay_V30(lUserIDLong, m_sClientInfo, fRealDataCallBack, null, true);
+                    log.info("m_lPort: "+m_lPort);
                 }
                 //打开测温信息
-                if (!playCtrl.PlayM4_RenderPrivateData(iChanNum, 0x20, 1)) {
+                if (!playCtrl.PlayM4_RenderPrivateData(m_lPort.longValue(), 0x20, 1)) {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.error("PlayM4_RenderPrivateData fail, error code: "+iErr);
                     return "PlayM4_RenderPrivateData, error code: "+iErr;
                 }
-                if (!playCtrl.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 1)) {
+                if (!playCtrl.PlayM4_RenderPrivateDataEx(m_lPort.longValue(), 0x20, 7, 1)) {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.error("PlayM4_RenderPrivateDataEx fail, error code: "+iErr);
                     return "PlayM4_RenderPrivateDataEx, error code: "+iErr;
                 }
-//                if (!playCtrl.PlayM4_SetOverlayPriInfoFlag(iChanNum, 0x20, true)) {
-//                    int iErr = playCtrl.PlayM4_GetLastError();
-//                    log.error("PlayM4_SetOverlayPriInfoFlag fail, error code: "+iErr);
-//                    return "PlayM4_SetOverlayPriInfoFlag, error code: "+iErr;
-//                }
+                if (!playCtrl.PlayM4_SetOverlayPriInfoFlag(m_lPort.longValue(), 0x20, true)) {
+                    int iErr = playCtrl.PlayM4_GetLastError();
+                    log.error("PlayM4_SetOverlayPriInfoFlag fail, error code: "+iErr);
+                    return "PlayM4_SetOverlayPriInfoFlag, error code: "+iErr;
+                }
+                //获取播放库未使用的通道号
+                if (!playCtrl.PlayM4_GetPort(new NativeLongByReference(m_lPort))) {
+                    int iErr = playCtrl.PlayM4_GetLastError();
+                    log.error("capture picture fail(PlayM4_GetPort), error code: "+iErr);
+                    return "capture picture fail(PlayM4_GetPort), error code: "+iErr;
+                }
+                if(!playCtrl.PlayM4_Play(m_lPort, null)) {
+                    int iErr = playCtrl.PlayM4_GetLastError();
+                    log.error("capture picture fail(PlayM4_Play), error code: "+iErr);
+                    return "capture picture fail(PlayM4_Play), error code: "+iErr;
+                }
                 byte[] sJpgPicBuffer = new byte[1920*1080*2];
                 IntByReference ipSizeReturned = new IntByReference();
-                if(!playCtrl.PlayM4_GetJPEG(m_lPort, sJpgPicBuffer, 1920*1080*2, ipSizeReturned)) {
+                if(!playCtrl.PlayM4_GetJPEG(m_lPort.longValue(), sJpgPicBuffer, 1920*1080*2, ipSizeReturned)) {
                     int iErr = playCtrl.PlayM4_GetLastError();
                     log.error("capture picture fail(PlayM4_GetJPEG), error code: "+iErr);
                     return "capture picture fail(PlayM4_GetJPEG), error code: "+iErr;
                 }
                 byteToImage(sJpgPicBuffer, filePath);
                 //关闭测温信息
-                if (!playCtrl.PlayM4_RenderPrivateData(iChanNum, 0x20, 0)) {
-                    int iErr = playCtrl.PlayM4_GetLastError();
-                    log.error("PlayM4_RenderPrivateData fail, error code: "+iErr);
-                    return "PlayM4_RenderPrivateData, error code: "+iErr;
-                }
-                if (!playCtrl.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 0)) {
-                    int iErr = playCtrl.PlayM4_GetLastError();
-                    log.error("PlayM4_RenderPrivateDataEx fail, error code: "+iErr);
-                    return "PlayM4_RenderPrivateDataEx, error code: "+iErr;
-                }
+//                if (!playCtrl.PlayM4_RenderPrivateData(iChanNum, 0x20, 0)) {
+//                    int iErr = playCtrl.PlayM4_GetLastError();
+//                    log.error("PlayM4_RenderPrivateData fail, error code: "+iErr);
+//                    return "PlayM4_RenderPrivateData, error code: "+iErr;
+//                }
+//                if (!playCtrl.PlayM4_RenderPrivateDataEx(iChanNum, 0x20, 7, 0)) {
+//                    int iErr = playCtrl.PlayM4_GetLastError();
+//                    log.error("PlayM4_RenderPrivateDataEx fail, error code: "+iErr);
+//                    return "PlayM4_RenderPrivateDataEx, error code: "+iErr;
+//                }
             } else {
                 if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNumLong, lpJpegPara, filePath)) {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
