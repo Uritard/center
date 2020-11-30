@@ -34,6 +34,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.awt.geom.FlatteningPathIterator;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -70,6 +71,35 @@ public class HelloController {
         JSONObject jsonObject = JSONObject.fromObject(WebSocketResult.builder().type("1").info(name + "  很好!").build());
         WebSocketServer.sendMsg(jsonObject.toString());
         log.info("转换时间：" + Math.random() * 100);
+
+
+
+
+
+            Float value=new Float(0.9);
+            Float highLimit1=new Float(5.5);
+            Float highLimit2=new Float(8.8);
+            Float lowLimit1=new Float(4.5);
+            Float lowLimit2=new Float(1.1);
+       if(value.toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")){
+           if (value > highLimit1 && value < highLimit2) {
+               log.info("结果:"+"过高");
+           } else if (value < lowLimit1 && value > lowLimit2) {
+               log.info("结果:"+"过低");
+           } else if (value > highLimit2) {
+               log.info("结果:"+"超高");
+           } else if (value < lowLimit2) {
+               log.info("结果:"+"超低");
+           } else
+               log.info("结果:"+"正常");
+       }else {
+           log.info("算法结果非数值类型");
+       }
+
+
+
+
+
 
 //       log.info("RedisList:"+redisTemplate.opsForList().leftPushIfPresent("AnalysisList：9000001","1000003"));
 //       redisTemplate.opsForList().leftPushAll("AnalysisList：9000001","1000003");

@@ -123,7 +123,7 @@ public class TCfgDataCurrentService {
         cLogger.info("结束");
         cLogger.info("规则："+rules);
 
-        Set<Long> meteIdR = new HashSet<>();//一次匹配到的规则所涵盖的所有meteId
+        List<Long> meteIdR = new ArrayList<>();//一次匹配到的规则所涵盖的所有meteId
         for (TCfgUnionRule rule : rules) {
             String[] currentMeteId = rule.getInputParam().split(", ");
             for (int i = 0; i < currentMeteId.length; i++) {
@@ -201,7 +201,7 @@ public class TCfgDataCurrentService {
             String taskId=result.getData().toString();//联动任务ID
             cLogger.info("联动开始执行");
             //联动记录插库
-            tUnionTaskService.insertRecord(taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
+            tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
 
         }
 
