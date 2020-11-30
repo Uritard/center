@@ -231,6 +231,20 @@ public class TCruiseTaskResultService {
 //            }
 //
 //        }
+
+        //按时间降序排列
+        Collections.sort(cruiseInspectResults, new Comparator<CruiseInspectResult>() {
+            @Override
+            public int compare(CruiseInspectResult o1, CruiseInspectResult o2) {
+                int flag = o1.getEndTime().compareTo(o2.getEndTime());
+                if(flag == -1){
+                    flag = 1;
+                }else if(flag == 1){
+                    flag = -1;
+                }
+                return flag;
+            }
+        });
         return cruiseInspectResults;
     }
 
