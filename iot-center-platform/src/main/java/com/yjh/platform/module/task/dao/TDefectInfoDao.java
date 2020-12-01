@@ -1,8 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
-import com.yjh.platform.module.task.entity.TDefectInfo;
-import com.yjh.platform.module.task.entity.TDefectInfoDetail;
-import com.yjh.platform.module.task.entity.WarnStatistical;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -56,4 +54,6 @@ public interface TDefectInfoDao {
                                              @Param(value = "endTime")String endTime);
 
     Map<String, Integer> countDefectConfMode();
+    List<TJDefectByType>  countByDefectType();
+
 }

@@ -68,13 +68,14 @@ public class TDefectInfoService {
     }
     @Logs(title = "查询所有缺陷", code = "tDefectInfo",content = "根据web传递的参数查询缺陷记录")
     @Transactional(rollbackFor = Exception.class)
-    public List<TDefectInfoDetail> selectDefectByPage(Integer confMode, Integer defectType, Date startTime, Date endTime, String deviceName) {
+    public List<TDefectInfoDetail> selectDefectByPage(Integer confMode, Integer defectType, Date startTime, Date endTime, String deviceName,String meteName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("confMode", confMode);
         map.put("defectType", defectType);
         map.put("startTime", startTime);
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
+        map.put("meteName", meteName);
         return tDefectInfoDao.selectAllDefect(map);
     }
     @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "统计近一月的所有缺陷个数")
@@ -126,6 +127,13 @@ public class TDefectInfoService {
             }
         });
         return list;
+    }
+    @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "根据缺陷类型统计缺陷个数")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TJDefectByType> countByDefectType(){
+        List<TJDefectByType> tjContentInfoList = tDefectInfoDao.countByDefectType();
+        System.out.println("tjContentInfoList是："+tjContentInfoList);
+        return tjContentInfoList;
     }
     @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "根据缺陷的处理状态统计缺陷个数")
     @Transactional(rollbackFor = Exception.class)

@@ -36,11 +36,13 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.POST)
-    public Result feignRobotControl(@RequestParam(value = "type") String type,
-                                    @RequestParam(value = "command") String command) {
+    public Result feignRobotControl(@RequestParam(value = "robotCode") String robotCode,
+                                    @RequestParam(value = "type") String type,
+                                    @RequestParam(value = "command") String command,
+                                    @RequestParam(value = "Item",required = false) List<Map<String,Object>> Item) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotControl(type,command));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,Item));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -51,10 +53,10 @@ public class RobotController {
     }
     @ApiOperation(value = "发送模型同步指令接口")
     @RequestMapping(value = "/fileTransfer", method = RequestMethod.POST)
-    public Result feignRobotTransfer() {
+    public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTransfer());
+            result.setData(robotService.feignRobotTransfer(robotCode));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -65,10 +67,11 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务/联动任务指令接口")
     @RequestMapping(value = "/taskIssued", method = RequestMethod.POST)
-    public Result feignRobotTaskIssued(@RequestBody XMLBaseModel xmlBaseModel) {
+    public Result feignRobotTaskIssued(@RequestParam(value = "ItemMap",required = false) Map<String, Object> ItemMap,
+                                       @RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTaskIssued(xmlBaseModel));
+            result.setData(robotService.feignRobotTaskIssued(ItemMap,robotCode));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -80,10 +83,11 @@ public class RobotController {
     @ApiOperation(value = "发送任务控制指令接口")
     @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
     public Result feignRobotTaskControl(@RequestParam(value = "commandValue") String commandValue,
-                                        @RequestParam(value = "taskId") String taskId) {
+                                        @RequestParam(value = "taskId") String taskId,
+                                        @RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTaskControl(commandValue,taskId));
+            result.setData(robotService.feignRobotTaskControl(commandValue,taskId,robotCode));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -92,5 +96,19 @@ public class RobotController {
         }
         return result;
     }
-
+    /*用完就删*/
+    @ApiOperation(value = "方法测试")
+    @RequestMapping(value = "/xixixi", method = RequestMethod.POST)
+    public Result xixixi(@RequestParam(value = "taskId") String taskId){
+        Result result = new Result();
+        try {
+            result.setData(robotService.selectRelateInfo(taskId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人控制接口调用错误:", e);
+        }
+        return result;
+    }
 }

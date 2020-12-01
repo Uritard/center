@@ -177,13 +177,14 @@ public class TDefectInfoController {
                                      @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                      @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
+                                     @RequestParam(value = "meteName", required = false) String meteName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TDefectInfoDetail> list = tDefectInfoService.selectDefectByPage(confMode,defectType,startTime,endTime,deviceName);
+            List<TDefectInfoDetail> list = tDefectInfoService.selectDefectByPage(confMode,defectType,startTime,endTime,deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -199,6 +200,19 @@ public class TDefectInfoController {
         Result result = new Result();
         try {
             List<WarnStatistical> list = tDefectInfoService.countDefectOnMonth();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据缺陷类型统计缺陷个数-柱图")
+    @RequestMapping(value = "/countByDefectType", method = RequestMethod.GET)
+    public Result countByDeviceType(){
+        Result result = new Result();
+        try {
+            List<TJDefectByType> list = tDefectInfoService.countByDefectType();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

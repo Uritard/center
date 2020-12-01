@@ -79,7 +79,7 @@ public class TWarnInfoService{
     }
     @Logs(title = "查询所有告警", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfoDetail> selectWarnByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName) {
+    public List<TWarnInfoDetail> selectWarnByPage(Integer warnLevel, Integer confMode, Integer alarmSource, Date startTime, Date endTime, String deviceName,String meteName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("warnLevel", warnLevel);
         map.put("confMode", confMode);
@@ -87,6 +87,7 @@ public class TWarnInfoService{
         map.put("startTime", startTime);
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
+        map.put("meteName", meteName);
         return tWarnInfoDao.selectAllWarn(map);
     }
     @Logs(title = "统计告警数据", code = "tWarnInfo",content = "根据告警来源统计告警个数")

@@ -50,7 +50,7 @@
         a.alarm_source,
         d.dict_note AS alarm_source_name,
         a.std_mete_id,
-        f.mete_name,
+        k.mete_name,
         a.image_path,
         a.deal_info,
         a.deal_type,
@@ -65,6 +65,7 @@
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
         LEFT JOIN t_std_mete f on f.std_mete_id = a.std_mete_id
+        LEFT JOIN t_std_devicemete k on f.std_mete_id = k.mete_id
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
@@ -443,6 +444,7 @@
         <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="alarmSource != null">
         AND (CASE
@@ -450,7 +452,7 @@
         WHEN #{alarmSource, jdbcType=INTEGER} = 279 THEN alarm_source = 279
         WHEN #{alarmSource, jdbcType=INTEGER} != 279 and #{alarmSource, jdbcType=INTEGER} != 888 THEN alarm_source != 888 and alarm_source != 279
             END)</if>
-        ORDER BY deal_time DESC
+        ORDER BY alarm_time DESC
     </select>
     <!--根据告警来源统计告警数据-->
     <select id="countByAlarmSource" resultType="java.util.Map">

@@ -340,7 +340,7 @@
         a.device_id,
         b.device_name,
         a.std_mete_id,
-        d.mete_name,
+        k.mete_name,
         a.defect_time,
         a.deal_time,
         a.defect_type,
@@ -358,16 +358,18 @@
         t_defect_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_std_mete d on a.std_mete_id = d.std_mete_id
+        LEFT JOIN t_std_devicemete k on d.std_mete_id = k.mete_id
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
         LEFT JOIN sys_user h on a.deal_person_id = h.user_id
         WHERE 1 = 1
         <if test="deviceName != null and deviceName != ''"> and  device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''"> and  k.mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         <if test="defectType != null "> and defect_type = #{defectType, jdbcType=INTEGER}</if>
         <if test="confMode != null "> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="startTime != null and endTime != null"> and defect_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        ORDER BY deal_time desc
+        ORDER BY defect_time desc
     </select>
     <!--统计近一月的所有缺陷个数-->
     <select id="countDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -386,6 +388,24 @@
         and DATE_FORMAT( defect_time, '%Y-%m-%d %H:%i:%S' ) BETWEEN  #{startTime} and #{endTime}
         GROUP BY
         time_node
+    </select>
+    <!--根据缺陷类型统计缺陷数据-->
+    <select id="countByDefectType" resultType="com.yjh.platform.module.task.entity.TJDefectByType">
+        select
+            dict_code as defect_type,
+            dict_note as defect_type_name,
+            (select COUNT(*)
+                from t_defect_info
+                WHERE defect_type = dict_code
+            ) as c_ount
+        from t_dict_business
+        where dict_code in
+            (
+                select dict_code
+                from t_dict_business
+                where col_name = 'defect_type'
+            )
+         ORDER BY c_ount desc
     </select>
     <!--根据缺陷处理状态统计缺陷个数-->
     <select id="countDefectConfMode" resultType="java.util.Map">

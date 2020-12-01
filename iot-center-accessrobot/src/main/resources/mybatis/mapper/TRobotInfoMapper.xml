@@ -343,10 +343,25 @@
             )
         </foreach>
     </insert>
+
+    <select id="selectLastRobotId" resultType="java.lang.Long">
+        select robot_id from t_robot_info order by robot_id DESC limit 1
+    </select>
     <select id="selectRobotIdByCode" parameterType="java.lang.String" resultType="java.lang.Long">
         select robot_id from t_robot_info
-        where robot_code = #{robotCode.jdbcType=VARCHAR}
+        where 1 = 1
+        <if test="robotCode != null and robotCode != ''"> and robot_code = #{robotCode, jdbcType=VARCHAR}</if>
     </select>
-
-
+    <select id="selectRelateInfo" resultType="java.util.Map">
+        SELECT
+            a.task_id,
+            a.task_result_id,
+            d.cruise_result_id,
+            d.cruise_data_id
+        FROM t_cruise_result a
+        LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
+        LEFT JOIN t_cruise_data_result d on b.cruise_result_id = d.cruise_result_id
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
 </mapper>

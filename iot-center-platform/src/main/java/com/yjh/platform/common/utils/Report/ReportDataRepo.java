@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ReportDataRepo {
     private static final String[] TASK_TITLE_CONTENT = {
-            "一、总体情况", "二、分项预览", "三、环境监测", "四、关联设备", "五、明细"
+            "一、总体情况", "二、分项预览", "三、明细"
     };
 
     private static final String[] TASK_REPORT_TITLE = {"巡检记录报告"};
@@ -27,14 +27,14 @@ public class ReportDataRepo {
     private static final String[] TASK_ITEM = {
             "类别", "测点数", "未处理异常数"
     };
-    //环境设备
-    private static final String[] TASK_ENV = {
-            "环境设备名称", "设备类型名称", "检测值", "状态", "位置"
-    };
-    //关联设备
-    private static final String[] TASK_REPORT_INFO = {
-            "类别", "检测值", "状态"
-    };
+//    //环境设备
+//    private static final String[] TASK_ENV = {
+//            "环境设备名称", "设备类型名称", "检测值", "状态", "位置"
+//    };
+//    //关联设备
+//    private static final String[] TASK_REPORT_INFO = {
+//            "类别", "检测值", "状态"
+//    };
     //明细
     private static final String[] TASK_PORT_INFO = {
             "序号", "设备名称", "检测内容", "结果", "图片", "巡检结果", "巡检时间"
@@ -59,9 +59,9 @@ public class ReportDataRepo {
 
         rowCount += prepareReportTaskItem(elements, rowCount, param);
 
-        rowCount += prepareReportTaskEnv(elements, rowCount, param);
+//        rowCount += prepareReportTaskEnv(elements, rowCount, param);
 
-        rowCount += prepareReportTaskReportInfo(elements, rowCount, param);
+//        rowCount += prepareReportTaskReportInfo(elements, rowCount, param);
 
         rowCount += prepareReportTaskPortInfo(elements, rowCount, param);
 
@@ -71,7 +71,7 @@ public class ReportDataRepo {
     private static int prepareReportTaskPortInfo(List<TableCellElement> elements, int rowStart, ReportData param) {
         int rowIndex = rowStart, rowCount = 0;
 
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 6, new String[]{TASK_TITLE_CONTENT[4]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 6, new String[]{TASK_TITLE_CONTENT[2 ]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_LEFT).setBold(true));
 
         rowIndex++;
@@ -136,14 +136,14 @@ public class ReportDataRepo {
         rowIndex++;
         rowCount++;
 
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_REPORT_INFO[0]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 3, new String[]{TASK_REPORT_INFO[1]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 6, new String[]{TASK_REPORT_INFO[2]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        rowIndex++;
-        rowCount++;
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_REPORT_INFO[0]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 3, new String[]{TASK_REPORT_INFO[1]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 6, new String[]{TASK_REPORT_INFO[2]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        rowIndex++;
+//        rowCount++;
 
         List<RelationDevice> rcpRecordList = param.getRcpRecordList();
 
@@ -171,18 +171,18 @@ public class ReportDataRepo {
         rowIndex++;
         rowCount++;
 
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_ENV[0]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 3, new String[]{TASK_ENV[1]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{TASK_ENV[2]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_ENV[3]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_ENV[4]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        rowIndex++;
-        rowCount++;
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_ENV[0]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 3, new String[]{TASK_ENV[1]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{TASK_ENV[2]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_ENV[3]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_ENV[4]},
+//                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+//        rowIndex++;
+//        rowCount++;
 
         List<EnvironmentResult> evnRecordList = param.getEvnRecordList();
 

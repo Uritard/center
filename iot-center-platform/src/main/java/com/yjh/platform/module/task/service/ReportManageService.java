@@ -53,17 +53,17 @@ public class ReportManageService {
         //关联测点数
         taskVO.setMeteRelationNum(0);
         //任务名称
-        taskVO.setTaskName("全站巡视");
+//        taskVO.setTaskName("全站巡视");
         recordData.setTaskVO(taskVO);
         //2.分项预览
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list);
         recordData.setCpTypeItems(cpTypeItems);
         //3.环境监测-暂无
-        List<EnvironmentResult> evnRecordList = new ArrayList<>();
-        recordData.setEvnRecordList(evnRecordList);
-        //4.关联设备-暂无
-        List<RelationDevice> rcpRecordList = new ArrayList<>();
-        recordData.setRcpRecordList(rcpRecordList);
+//        List<EnvironmentResult> evnRecordList = new ArrayList<>();
+//        recordData.setEvnRecordList(evnRecordList);
+//        //4.关联设备-暂无
+//        List<RelationDevice> rcpRecordList = new ArrayList<>();
+//        recordData.setRcpRecordList(rcpRecordList);
         //5.明细-所选设备的所有测点巡检结果详情
 
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
@@ -302,11 +302,11 @@ public class ReportManageService {
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
         recordData.setCpTypeItems(cpTypeItems);
         //3.环境监测-暂无
-        List<EnvironmentResult> evnRecordList = new ArrayList<>();
-        recordData.setEvnRecordList(evnRecordList);
-        //4.关联设备-暂无
-        List<RelationDevice> rcpRecordList = new ArrayList<>();
-        recordData.setRcpRecordList(rcpRecordList);
+//        List<EnvironmentResult> evnRecordList = new ArrayList<>();
+//        recordData.setEvnRecordList(evnRecordList);
+//        //4.关联设备-暂无
+//        List<RelationDevice> rcpRecordList = new ArrayList<>();
+//        recordData.setRcpRecordList(rcpRecordList);
         //5.明细-所选设备的所有测点巡检结果详情
 
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);

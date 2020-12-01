@@ -160,7 +160,7 @@
     <insert id="batchInsert">
         insert into t_robot_inspection(
             inspection_id,
-            inspection_codem,
+            inspection_code,
             robot_id,
             inspection_name,
             inspection_type,

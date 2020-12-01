@@ -7,7 +7,6 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
-import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.TRobotInspection;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -38,15 +37,16 @@ public class RobotService {
 
     @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotControl(String type, String command){
+    public String feignRobotControl(String robotCode,String type, String command,List<Map<String,Object>> Item){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode("巡视主机")
-                .setReceiveCode("Client01")
+                .setReceiveCode(robotCode)
                 .setCode("省检018")
                 .setTime(sdf.format(new Date()))
                 .setType(type)
-                .setCommand(command);
+                .setCommand(command)
+                .setItems(Item);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get("TT");
@@ -59,12 +59,11 @@ public class RobotService {
     }
     @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotTransfer(){
+    public String feignRobotTransfer(String robotCode){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
-        sdf.format(new Date());
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode("巡视主机")//巡视主机唯一标识
-                .setReceiveCode("Client01")//机器人主机唯一标识
+                .setReceiveCode(robotCode)//机器人主机唯一标识
                 .setCode("省检018")//机器人编码
                 .setTime(sdf.format(new Date()))//时间
                 .setType("61")//消息类型
@@ -100,59 +99,77 @@ public class RobotService {
     }
     @Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int robotFileIntoDB(List<Map<String,Object>> deviceMapList, List<Map<String,Object>> robotMap) {
+    public int robotFileIntoDB(List<Map<String,Object>> deviceMapList, List<Map<String,Object>> robotMap,XMLBaseModel xmlBaseModel) {
         //机器人模型文件
-        String robotPosition = null;
-        if (robotMap.get(0).get("type").equals(1)){
-            robotPosition = "156";
-        }else if(robotMap.get(0).get("type").equals(2)) {
-            robotPosition = "155";
-        }
+//        log.info("robotMap是："+robotMap);
+//
+//        String robotPosition = null;
+//        if (robotMap.get(0).get("type").equals("1")){
+//            robotPosition = "156";
+//        }else if(robotMap.get(0).get("type").equals("2")) {
+//            robotPosition = "155";
+//        }
         String picPath = Constant.filePath+robotMap.get(0).get("mappath").toString();
         log.info("图片路径为："+picPath);
         /*
         * 将ftp图copy到40环境(还没搞！！！！！！！！)
         * */
-        TRobotInfo tRobotInfo = new TRobotInfo()
-                .setRobotName(robotMap.get(0).get("robot_name").toString())
-                .setRobotCode(robotMap.get(0).get("SendCode").toString())
-                .setRobotFactory(robotMap.get(0).get("manufacturer").toString())
-                .setRobotPosition(robotPosition)
-                .setCreateDate(new Date())
-                .setPhotePath(picPath)
-                .setRobotStatus("on line")
-                .setRemarks(robotMap.get(0).get("robot_info").toString());
-        log.info("获得的tRobotInfo是："+tRobotInfo);
-//        int res1 = tRobotInfoDao.insert(tRobotInfo);//机器人入库
-//        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotMap.get(0).get("robot_code").toString());
-        //设备模型文件
-        List<TRobotInspection> list = new ArrayList<>();
-        for (Map<String,Object> deviceMap : deviceMapList){
-            TRobotInspection tRobotInspection = new TRobotInspection()
-                    .setInspectionCode(deviceMap.get("device_id").toString())
-//                    .setRobotId(robotId)
-                    .setInspectionName(deviceMap.get("device_name").toString());
-            list.add(tRobotInspection);
-        }
-        log.info("获得的list是："+list);
-//        int res2 = tRobotInspectionDao.batchInsert(list);//测点入库
-        return 1;
-//        return res1+res2;
+
+//        TRobotInfo tRobotInfo = new TRobotInfo()
+//                .setRobotName(robotMap.get(0).get("robot_name").toString())
+//                .setRobotCode(xmlBaseModel.getSendCode())
+//                .setRobotFactory(robotMap.get(0).get("manufacturer").toString())
+//                .setRobotPosition(robotPosition)
+//                .setCreateDate(new Date())
+//                .setPhotePath(picPath)
+//                .setRobotStatus("在线")
+//                .setRemarks(robotMap.get(0).get("robot_info").toString());
+//        log.info("获得的tRobotInfo是："+tRobotInfo);
+//        int res1 = 0;
+//        int res2 = 0;
+//        res1 = tRobotInfoDao.insert(tRobotInfo);//机器人数据入库
+//        log.info("入库的条数："+res1);
+//        if (res1 > 0){
+        log.info("机器人code是:"+xmlBaseModel.getSendCode());
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
+//            Long robotId = tRobotInfoDao.selectLastRobotId();
+            log.info("机器人的id是："+robotId);
+            //设备模型文件
+            List<TRobotInspection> deviceList = new ArrayList<>();
+            for (Map<String,Object> deviceMap : deviceMapList){
+                TRobotInspection tRobotInspection = new TRobotInspection()
+                        .setInspectionCode(deviceMap.get("device_id").toString())
+                        .setRobotId(robotId)
+                        .setInspectionName(deviceMap.get("device_name").toString());
+                deviceList.add(tRobotInspection);
+            }
+            log.info("获得的deviceList是："+deviceList);
+            int  res2 = tRobotInspectionDao.batchInsert(deviceList);//测点数据入库
+//        }
+        return res2;
     }
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotTaskIssued(XMLBaseModel xmlBaseModel) {
+    public int feignRobotTaskIssued(Map<String, Object> ItemMap,String robotCode) {
 //        if ("任务下发".equals("10")) {
-            xmlBaseModel.setType("101");
-            List<Map<String, Object>> mapList = new ArrayList<>();
-            Map<String, Object> map = new HashMap<>();
-            map.put("type", "1");//巡视类型
-            map.put("task_code","12138");//任务编码
-            map.put("task_name", "好牛的任务哦");//任务名称
-            map.put("priority", "4");//优先级
-            map.put("device_level", "3");//设备层级
-            map.put("device_list", "0AD13EF0E24C43829F79F1BB51C3FB9E,1E43B10A5BAC47F984B89899B3DDF8C5");//设备列表
-//            map.put("fixed_start_time", "定期开始时间");
+        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setType("101")
+                .setSendCode("巡视主机")
+                .setReceiveCode(robotCode)
+                .setCode("省检018")
+                .setTime(sdf.format(new Date()))
+                .setCommand("1");//任务配置
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "1");//巡视类型
+        map.put("task_code","12138");//任务编码
+        map.put("task_name", "好牛的任务哦");//任务名称
+        map.put("priority", "4");//优先级
+        map.put("device_level", "3");//设备层级
+        map.put("device_list", "0AD13EF0E24C43829F79F1BB51C3FB9E,1E43B10A5BAC47F984B89899B3DDF8C5");//设备列表
+        map.put("fixed_start_time", sdf.format(new Date()));//定期开始时间
 //            map.put("cycle_month", "周期（月）");
 //            map.put("cycle_week", "周期（周）");
 //            map.put("cycle_execute_time", "周期（执行时间） ");
@@ -168,9 +185,9 @@ public class RobotService {
 //            map.put("isenable", "是否可用");
 //            map.put("creator", "编制人");
 //            map.put("create_time", "编制时间");
-            mapList.add(map);
-            log.info("任务下发的item是："+mapList);
-            xmlBaseModel.setItems(mapList);
+        mapList.add(map);
+        log.info("任务下发的item是："+mapList);
+        xmlBaseModel.setItems(mapList);
 //        }else if ("联动任务".equals("10")){
 //            xmlBaseModel.setType("102");
 //            List<Map<String, Object>> mapList = new ArrayList<>();
@@ -183,13 +200,6 @@ public class RobotService {
 //            mapList.add(map);
 //            xmlBaseModel.setItems(mapList);
 //        }
-        xmlBaseModel.setSendCode("巡视主机");//巡视主机唯一标识
-        xmlBaseModel.setReceiveCode("Client01");//机器人主机唯一标识
-        xmlBaseModel.setCode("省检018");//机器人编码
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
-        sdf.format(new Date());
-        xmlBaseModel.setTime(sdf.format(new Date()));//时间
-        xmlBaseModel.setCommand("1");//任务配置
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
         RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get("TT");
@@ -202,13 +212,14 @@ public class RobotService {
     }
     @Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotTaskControl(String  commandValue,String taskId) {
+    public int feignRobotTaskControl(String  commandValue,String taskId,String robotCode) {
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setType("41")
                 .setSendCode("巡视主机")
-                .setReceiveCode("Client01")
+                .setReceiveCode(robotCode)
                 .setCode(taskId)
+                //1.任务启动2.任务暂停3.任务继续4.任务停止
                 .setCommand(commandValue)
                 .setTime(sdf.format(new Date()));
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
@@ -221,6 +232,12 @@ public class RobotService {
         }
         return 1;
     }
-
+    @Logs(title = "根据taskId查询相关内容", code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,String> selectRelateInfo(String  taskId) {
+        Map<String,String> resMap = tRobotInfoDao.selectRelateInfo(taskId);
+        System.out.println("结果："+resMap);
+        return resMap;
+    }
 }
 

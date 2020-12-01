@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
@@ -47,5 +48,7 @@ public interface TRobotInfoDao {
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
 
     int batchInsert(List<TRobotInfo> list);
-    Long selectRobotIdByCode(@Param(value = "robotCode")String robotCode);
+    Long selectLastRobotId();
+    Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
+    Map<String,String> selectRelateInfo(@Param(value = "taskId") String taskId);
 }
