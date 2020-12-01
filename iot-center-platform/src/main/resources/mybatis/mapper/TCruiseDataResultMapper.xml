@@ -284,6 +284,8 @@
         f.identify_result,
         j.dict_note AS identifyResultName,
         f.result_num,
+        f.state,
+        z.dict_note as 'dataStateName',
         f.picpath,
         (
         CASE
@@ -329,6 +331,7 @@
         AND i.col_name = "plan_type"
         LEFT JOIN t_camera_preset x ON b.cruise_id=x.preset_id
         LEFT JOIN t_robot_inspection y ON b.cruise_id=y.inspection_id
+        LEFT JOIN t_dict_business z ON f.state=z.dict_code AND z.col_name="data_state"
         WHERE a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}
 
         <if test="startDate != null " ><if test="endDate != null">and e.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>

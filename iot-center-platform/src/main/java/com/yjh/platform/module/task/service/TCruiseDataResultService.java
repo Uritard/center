@@ -112,6 +112,7 @@ public class TCruiseDataResultService{
              deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
              deviceInfo.setIdentifyResult(cruiseResultAnalMeteInfo.getIdentifyResult());
              deviceInfo.setIdentifyResultName(cruiseResultAnalMeteInfo.getIdentifyResultName());
+             //根据巡视点的-算法数据结果状态和最终审核结果判断最终的展示状态结果
              if(Objects.isNull(deviceInfo.getIdentifyResult())){
                  if(deviceInfo.getState()==247){
                      deviceInfo.setFinalState(1);
@@ -153,6 +154,11 @@ public class TCruiseDataResultService{
                                                                    Date endDate,
                                                                    Date startDate){
         List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(cruiseType,cType,deviceMeteId,endDate,startDate);
+        for(CruiseResultAnalInfo cruiseResultAnalInfo:cruiseResultAnalInfos){
+            if(cruiseResultAnalInfo.getIdentifyResult()==0 || Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())){
+                cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getDataStateName());
+            }
+        }
 
         return cruiseResultAnalInfos;
     }
