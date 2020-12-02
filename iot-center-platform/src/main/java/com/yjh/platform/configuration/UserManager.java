@@ -76,7 +76,7 @@ public class UserManager implements UserInterface {
     public String getUserRole() {
         String appKey = getAppKey();
         if (Objects.isNull(appKey)) return null;
-        Map<String, Object> map = (Map<String, Object>) redisTemplate.opsForValue().get(appKey);
+        Map<String, Object> map = (Map<String, Object>) redisTemplate.opsForValue().get("appKey:"+appKey);
         if (Objects.isNull(map)) return null;
         return String.valueOf(map.get("roleId"));
     }

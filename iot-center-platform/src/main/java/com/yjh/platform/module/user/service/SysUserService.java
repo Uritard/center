@@ -30,7 +30,7 @@ public class SysUserService{
     @Autowired
     private SysUserDao sysUserDao;
 
-    @Logs(title = "插入新用户", code = "sysUser")
+    @Logs(title = "新增", code = "sysUser", content = "新增用户")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysUser sysUser) {
         Date date = new Date();
@@ -39,13 +39,13 @@ public class SysUserService{
         return this.sysUserDao.insert(sysUser);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module", content = "删除用户")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long userId) {
         return this.sysUserDao.deleteByPrimaryId(userId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module", content = "更新用户")
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) {
         Date date = new Date();
@@ -53,13 +53,13 @@ public class SysUserService{
         return this.sysUserDao.update(sysUser);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "查询", code = "module", content = "根据用户ID查询用户")
     @Transactional(rollbackFor = Exception.class)
     public SysUser selectByPrimaryId(Long userId) {
         return this.sysUserDao.selectByPrimaryId(userId);
     }
 
-    @Logs(title = "用户状态查询", code = "module")
+    @Logs(title = "查询", code = "module", content = "用户状态查询")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> selectByUserState(Integer state) {
         if(state.equals(-1)){
@@ -68,19 +68,19 @@ public class SysUserService{
         return this.sysUserDao.selectByUserState(state);
     }
 
-    @Logs(title = "用户名查询", code ="module")
+    @Logs(title = "查询", code ="module", content = "根据用户名查询用户信息")
     @Transactional(rollbackFor =Exception.class )
     public  List<SysUser> selectByUserName(String userName){
         return this.sysUserDao.selectByUserName(userName);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module", content = "用户名查询")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Date invalidTime, Date lastLogin) {
         return sysUserDao.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module", content = "分页查询用户信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, String>> selectByPage(SysUser sysUser) {
         if (sysUser.getUserStatus() != null && sysUser.getUserStatus()==-1) {
@@ -89,19 +89,19 @@ public class SysUserService{
         return sysUserDao.selectByPage(sysUser);
     }
 
-    @Logs(title = "根据用户ID查询关联的组织结构信息", code = "module")
+    @Logs(title = "查询", code = "module", content = "根据用户ID查询关联的组织结构信息")
     @Transactional(rollbackFor = Exception.class)
     public SysOrg selectRelationOrg(Long userId) {
         return this.sysUserDao.selectRelationOrg(userId);
     }
 
-    @Logs(title = "根据用户ID查询关联菜单权限", code = "module")
+    @Logs(title = "查询", code = "module", content = "根据用户ID查询关联菜单权限")
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectRelationMenu(Long userId) {
         return this.sysUserDao.selectRelationMenu(userId);
     }
 
-    @Logs(title = "根据用户ID查询关联区域设备权限", code = "module")
+    @Logs(title = "查询", code = "module", content = "根据用户ID查询关联区域设备权限")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectRelationAuthor(Long userId) {
         List<AreaInfo> areaInfoCountryList = new ArrayList<>();
@@ -124,7 +124,7 @@ public class SysUserService{
     @Transactional(rollbackFor = Exception.class)
     public SysUserLogin userLogin(String userName, String password) { return this.sysUserDao.selectByUserNameL(userName, password); }
 
-    @Logs(title = "用户登出", code = "module")
+    @Logs(title = "用户登出", code = "module", content = "用户登出")
     @Transactional(rollbackFor = Exception.class)
     public int userLogout(String userId) {
         SysUser sysUserParams = new SysUser();
@@ -134,7 +134,7 @@ public class SysUserService{
         return this.sysUserDao.update(sysUserParams);
     }
 
-    @Logs(title = "用户帐号解锁", code = "unlockUserAccount")
+    @Logs(title = "用户帐号解锁", code = "unlockUserAccount", content = "用户帐号解锁")
     @Transactional(rollbackFor = Exception.class)
     public int unlockUserAccount(Map<String, String> map) {
         SysUser sysUserLocked = new SysUser();
@@ -145,7 +145,7 @@ public class SysUserService{
         return this.sysUserDao.update(sysUserLocked);
     }
 
-    @Logs(title = "更新密码", code = "changePassword")
+    @Logs(title = "更新密码", code = "changePassword", content = "更新密码")
     @Transactional(rollbackFor = Exception.class)
     public int changePassword(Long userId, Map<String, String> map) {
         SysUser sysUser = new SysUser();

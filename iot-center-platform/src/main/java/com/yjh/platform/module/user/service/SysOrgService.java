@@ -37,39 +37,39 @@ public class SysOrgService{
         return flag;
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module", content = "删除组织机构")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long orgId) {
         return this.sysOrgDao.deleteByPrimaryId(orgId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module", content = "更新组织机构")
     @Transactional(rollbackFor = Exception.class)
     public int update(SysOrg sysOrg) {
         return this.sysOrgDao.update(sysOrg);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module", content = "新增组织机构")
     @Transactional(rollbackFor = Exception.class)
     public SysOrg selectByPrimaryId(Long orgId) {
         return this.sysOrgDao.selectByPrimaryId(orgId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module", content = "查询组织机构")
     @Transactional(rollbackFor = Exception.class)
     public List<SysOrg> select(Long orgId, String orgName, String orgCode, Long upId, Integer sort, Date createTime, Long creatorId, Integer orgLevel, String orgPath, String deptName) {
         List<SysOrg> sysOrgList = sysOrgDao.select(orgId, orgName, orgCode, upId, sort, createTime, creatorId, orgLevel, orgPath, deptName);
         return sysOrgList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module", content = "分页查询组织机构")
     @Transactional(rollbackFor = Exception.class)
     public List<SysOrg> selectByPage(SysOrg sysOrg) {
         List<SysOrg> sysOrgList = sysOrgDao.selectByPage(sysOrg);
         return sysOrgList;
     }
 
-    @Logs(title = "组织机构树查询", code = "module")
+    @Logs(title = "组织机构树查询", code = "module", content = "查询组织机构树")
     @Transactional(rollbackFor = Exception.class)
     public List<OrgInfo> selectOrgTree() {
         List<OrgInfo> listTree = this.sysOrgDao.selectOrgTree();
@@ -85,7 +85,7 @@ public class SysOrgService{
         return orgInfoStartList;
     }
 
-    @Logs(title = "根据组织机构名称模糊查询", code = "module")
+    @Logs(title = "根据组织机构名称查询", code = "module", content = "根据组织机构名称模糊查询组织机构树")
     @Transactional(rollbackFor = Exception.class)
     public List<OrgInfo> selectOrgTreeByName(String orgName) {
         List<OrgInfo> listTree = new ArrayList<>();

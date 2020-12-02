@@ -305,7 +305,7 @@ public class SysUserController {
                         mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                         mapAppKey.put("appKey", appKey);
                         mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        redisTemplate.opsForHash().putAll(appKey, mapAppKey);
+                        redisTemplate.opsForHash().putAll("appKey:"+appKey, mapAppKey);
                     }
                 } else {
                     List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
