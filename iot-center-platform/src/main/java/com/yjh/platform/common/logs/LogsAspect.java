@@ -84,7 +84,7 @@ public class LogsAspect {
                 params.set("ip", ip);
                 params.set("title", annotation.title());
                 params.set("state", 1);
-                content.append(Arrays.toString(joinPoint.getArgs()));
+                content.append(annotation.content());
                 params.set("userId", userId);
                 params.set("userName", userName);
             } catch (Exception e) {
@@ -116,7 +116,7 @@ public class LogsAspect {
             params.set("ip", ip);
             params.set("title", "内部接口错误");
             params.set("state", 2);
-            params.set("content", "参数：" + Arrays.toString(joinPoint.getArgs()) + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
+            params.set("content", annotation.content() + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
             params.set("userId", userId);
             params.set("userName", userName);
             post(params);
