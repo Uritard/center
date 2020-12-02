@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
-import com.yjh.platform.configuration.PrivilegeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +66,6 @@ public class SystemInfoService {
     }
 
     @Logs(title = "获取cpu利用率", code = "module")
-    @PrivilegeInfo(roleIds = "1234,1235")
     @Transactional(rollbackFor = Exception.class)
     public double getCpuOnUse() throws Exception {
         return systemInfoUtil.getCpuOnUse();

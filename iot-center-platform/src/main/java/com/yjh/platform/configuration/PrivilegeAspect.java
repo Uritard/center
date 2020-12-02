@@ -6,30 +6,33 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Objects;
 
 @Aspect
 @Component
 @Slf4j
 public class PrivilegeAspect {
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Pointcut("@annotation(com.yjh.platform.configuration.PrivilegeInfo)")
     private void checkCut(){ }
 
-    // 前置通知
-    @Before("checkCut()")
-    public void myBefore(JoinPoint joinPoint) {
-        log.info("前置通知，目标：");
-        log.info(joinPoint.getTarget() + "方法名称:");
-        log.info(joinPoint.getSignature().getName());
-    }
-
-    // 前置通知
+    // 后置通知
     @After("checkCut()")
     public void myAfter(JoinPoint joinPoint) {
-        log.info("hou置通知，目标：");
+        log.info("后置通知，目标：");
         log.info(joinPoint.getTarget() + "方法名称:");
         log.info(joinPoint.getSignature().getName());
     }
@@ -51,11 +54,18 @@ public class PrivilegeAspect {
             PrivilegeInfo privilegeInfo = method.getAnnotation(PrivilegeInfo.class);
             // 获取到注解中的name值
             methAccess = privilegeInfo.roleIds();
-            log.info("methAccess: "+methAccess);
-            Object[] parm = joinPoint.getArgs();
+            String roleIdParam = "";
+            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            if (Objects.nonNull(request.getHeader("appKey"))) {
+                String appKey = request.getHeader("appKey");
+                Map<String, Object> map = (Map<String, Object>)redisTemplate.opsForHash().entries(appKey);
+                roleIdParam = String.valueOf(map.get("roleId"));
+            }
             String[] roleIds = methAccess.split(",");
             for (String roleId:roleIds) {
-                if (parm[0].equals(roleId)){
+                if (roleIdParam.equals(roleId)){
                     log.info("获取到该权限");
                     return joinPoint.proceed();
                 }
