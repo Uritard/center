@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.task.entity.THisTelemeterData;
+import com.yjh.platform.module.task.entity.UnionTaskInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,13 @@ public interface THisTelemeterDataDao {
     List<THisTelemeterData> selectByPage(THisTelemeterData tHisTelemeterData);
 
     int batchInsert(List<THisTelemeterData> list);
+    List<THisTelemeterData>selectAll(@Param(value = "startTime") Date startTime,
+                                     @Param(value = "endTime") Date endTime,
+                                     @Param(value = "meteKind") Integer meteKind,
+                                     @Param(value = "meteName") String meteName);
+    List<UnionTaskInfo> selectUnionTask(@Param(value = "startTime") Date startTime,
+                                        @Param(value = "endTime") Date endTime,
+                                        @Param(value = "meteKind") Integer meteKind,
+                                        @Param(value = "meteName") String meteName);
+
 }

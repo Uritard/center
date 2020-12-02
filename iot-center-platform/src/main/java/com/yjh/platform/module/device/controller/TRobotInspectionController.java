@@ -177,20 +177,33 @@ public class TRobotInspectionController {
             result.setData(tRobotInspectionService.selectRobotInfo());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("机器人巡检点查询失败描述：", e);
+            log.error("查询机器人信息失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "查询机器人状态信息")
     @RequestMapping(value = "/selectRobotStatus", method = RequestMethod.GET)
-    public Result selectRobotStatus(@RequestParam(value = "robotId") Long robotId) {
+    public Result selectRobotStatus(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.selectRobotInfo());
+            result.setData(tRobotInspectionService.selectRobotStatus(robotCode));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("机器人巡检点查询失败描述：", e);
+            log.error("查询机器人状态信息失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询机器人任务进度信息")
+    @RequestMapping(value = "/selectRobotTaskProgress", method = RequestMethod.GET)
+    public Result selectRobotTaskProgress(@RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.selectRobotTaskProgress(robotCode));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询机器人状态信息失败描述：", e);
         }
         return result;
     }

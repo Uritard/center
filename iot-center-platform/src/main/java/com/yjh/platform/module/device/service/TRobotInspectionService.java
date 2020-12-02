@@ -85,10 +85,31 @@ public class TRobotInspectionService{
 
     @Logs(title = "查询机器人状态信息", code = "device",content = "查询机器人状态信息")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> selectRobotStatus(Long robotId){
+    public Map<String,Object> selectRobotStatus(String robotCode){
+        Map<String,Object> re = new HashMap<>();
         //获取状态信息
-        Map<String,Object> mapForGet  = redisTemplate.opsForHash().entries("robotId");
-        return mapForGet;
+        Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":3");
+        re.put("batteryLevel",mapForCell.get("valueUnit"));//电池电量
+        Map<String,Object> mapForState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+        re.put("state",mapForState.get("value"));//状态
+        Map<String,Object> mapForRobotCoordinate  = redisTemplate.opsForHash().entries("RobotCoordinate:"+robotCode);
+        re.put("robotCoordinate",mapForRobotCoordinate.get("coordinatePixel"));//机器人坐标
+        //todo 机器人里程和速度未获得
+        Map<String,Object> mapForMileage  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":2");
+        re.put("mileage",mapForMileage.get("valueUnit"));//里程
+        Map<String,Object> mapForSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":1");
+        re.put("speed",mapForSpeed.get("valueUnit"));//速度
+        return re;
+    }
+
+    @Logs(title = "查询机器人任务进度", code = "device",content = "查询机器人任务进度")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectRobotTaskProgress(String robotCode){
+        Map<String,Object> re = new HashMap<>();
+        //获取状态信息
+        Map<String,Object> mapTaskProgress  = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
+        re.put("taskProgress",mapTaskProgress.get("taskProgress"));
+        return re;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.module.task.entity.UnionTaskInfo;
 import com.yjh.platform.module.task.service.THisTelemeterDataService;
 import com.yjh.platform.module.task.entity.THisTelemeterData;
 import java.util.HashMap;
@@ -119,15 +120,18 @@ public class THisTelemeterDataController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody THisTelemeterData tHisTelemeterData,
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    public Result selectByPage(@RequestParam(value = "startTime", required = false) Date startTime,
+                               @RequestParam(value = "endTime", required = false) Date endTime,
+                               @RequestParam(value = "meteKind", required = false) Integer meteKind,
+                               @RequestParam(value = "meteName", required = false) String meteName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<THisTelemeterData> list = tHisTelemeterDataService.selectByPage(tHisTelemeterData);
+            List<THisTelemeterData> list = tHisTelemeterDataService.selectAll(startTime, endTime, meteKind, meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -147,6 +151,29 @@ public class THisTelemeterDataController {
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询联动任务信息")
+    @RequestMapping(value = "/selectUnionTask", method = RequestMethod.GET)
+    public Result selectUnionTask(@RequestParam(value = "startTime", required = false) Date startTime,
+                                  @RequestParam(value = "endTime", required = false) Date endTime,
+                                  @RequestParam(value = "meteKind", required = false) Integer meteKind,
+                                  @RequestParam(value = "meteName", required = false) String meteName,
+                                  @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                  @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<UnionTaskInfo> list = tHisTelemeterDataService.selectUnionTask(startTime, endTime, meteKind, meteName);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询联动任务信息失败描述：", e);
         }
         return result;
     }

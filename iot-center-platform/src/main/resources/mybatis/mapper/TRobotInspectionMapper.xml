@@ -190,11 +190,12 @@
         </foreach>
     </insert>
 
-    <select id="selectForRobotTask" parameterType="java.lang.Long" resultType="java.lang.Long">
+    <select id="selectForRobotTask" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT DISTINCT
-            a.robot_id
+            b.robot_code
         FROM
             t_robot_inspection a
+            left join t_robot_info b on a.robot_id = b.robot_id
         WHERE
             a.inspection_id IN
             <foreach collection="list" open="(" close=")" separator="," item="inspectionId">
@@ -202,17 +203,17 @@
             </foreach>
     </select>
 
-    <select id="selectRobotInspectionId" parameterType="java.lang.Long" resultType="java.lang.String">
+    <select id="selectRobotInspectionId" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT
-        a.inspection_code
+        b.inspection_code
         FROM
-        t_robot_inspection a
-        WHERE
-        a.robot_id = #{robotId,jdbcType=BIGINT}
-        and a.inspection_id IN
+        t_robot_info a
+        left join t_robot_inspection b on a.robot_id = b.robot_id and b.inspection_id IN
         <foreach collection="list" open="(" close=")" separator="," item="inspectionId">
             #{inspectionId,jdbcType=BIGINT}
         </foreach>
+        WHERE
+        a.robot_code = #{robotCode,jdbcType=VARCHAR}
     </select>
 
     <select id="selectRobotTaskMessage" resultType="com.yjh.platform.module.device.entity.RobotTaskMessage">

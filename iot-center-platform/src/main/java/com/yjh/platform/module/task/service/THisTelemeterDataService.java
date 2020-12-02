@@ -6,6 +6,8 @@ import com.yjh.platform.module.task.dao.THisTelemeterDataDao;
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.UnionTaskInfo;
+import io.swagger.models.auth.In;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -65,5 +67,17 @@ public class THisTelemeterDataService{
         return this.tHisTelemeterDataDao.batchInsert(list);
     }
 
+    @Logs(title = "查询所有联动信息", code = "THisTelemeterData",content = "根据web传入的参数查询所有联动信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<THisTelemeterData> selectAll(Date startTime, Date endTime, Integer meteKind,String meteName){
+        return this.tHisTelemeterDataDao.selectAll(startTime,endTime,meteKind, meteName);
+    }
+
+
+    @Logs(title = "查询联动任务信息", code = "THisTelemeterData",content = "根据web传入的参数查询联动任务信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<UnionTaskInfo> selectUnionTask(Date startTime, Date endTime, Integer meteKind,String meteName){
+        return this.tHisTelemeterDataDao.selectUnionTask(startTime,endTime,meteKind, meteName);
+    }
 }
 

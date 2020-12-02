@@ -134,6 +134,52 @@
         </foreach>
     </insert>
 
+    <select id="selectAll" parameterType="com.yjh.platform.module.task.entity.THisTelemeterData" resultType="com.yjh.platform.module.task.entity.THisTelemeterData">
+        SELECT
+            a.*,
+            c.mete_name
+        FROM
+            t_his_signal_data a
+        left join t_cfg_mete c on a.mete_id = c.mete_id
+        where 1=1
+        <if test="startTime != null and endTime != null"> and a.record_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteKind != null ">and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteName != null and meteName != ''"> and a.mete_id in (select mete_id from t_cfg_mete where mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%'))</if>
+        UNION ALL
+        (
+        SELECT
+        b.*,
+        c.mete_name
+        FROM
+        t_his_telemeter_data b
+        left join t_cfg_mete c on b.mete_id = c.mete_id
+        where 1=1
+        <if test="startTime != null and endTime != null">and b.record_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
+            #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteKind != null ">and b.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteName != null and meteName != ''">and b.mete_id in (select mete_id from t_cfg_mete where mete_name
+            like concat('%',#{meteName, jdbcType=VARCHAR},'%'))</if>
+        )  order by record_time desc
+    </select>
 
-
+    <select id="selectUnionTask"  resultType="com.yjh.platform.module.task.entity.UnionTaskInfo">
+        SELECT
+            a.union_id,
+            g.mete_name,
+            c.cruise_time,
+            d.result_num,
+            d.origpic,
+            d.person_check
+        FROM
+            t_union_task a
+            LEFT JOIN t_cruise_task_result b ON a.union_id = b.task_id
+            LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
+            LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
+            LEFT JOIN (select DISTINCT device_id,device_name from t_std_device) e ON c.device_id = e.device_id
+            left join t_cfg_mete g on a.mete_id = g.mete_id
+        WHERE 1 =1
+        <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="meteKind != null ">and a.mete_id in (select mete_id from t_cfg_mete where mete_kind = #{meteKind, jdbcType=INTEGER}) </if>
+        <if test="meteName != null and meteName != ''"> and a.mete_id in (select mete_id from t_cfg_mete where mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%'))</if>
+    </select>
 </mapper>

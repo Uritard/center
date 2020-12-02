@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TVoiceDeviceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TVoiceDevice">
+        <id column="voice_device_id" jdbcType="VARCHAR" property="voiceDeviceId" />
+        <result column="voice_device_name" jdbcType="VARCHAR" property="voiceDeviceName" />
+        <result column="std_device_id" jdbcType="BIGINT" property="stdDeviceId" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="config_id" jdbcType="VARCHAR" property="configId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        voice_device_id, voice_device_name, std_device_id, device_type, config_id
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="voiceDeviceId" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice">
+        insert into t_voice_device(
+            voice_device_id,
+            voice_device_name,
+            std_device_id,
+            device_type,
+            config_id
+        )values(
+                #{voiceDeviceId, jdbcType=VARCHAR},
+                #{voiceDeviceName, jdbcType=VARCHAR},
+                #{stdDeviceId, jdbcType=BIGINT},
+                #{deviceType, jdbcType=VARCHAR},
+                #{configId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_voice_device
+                where voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice">
+        update t_voice_device a <set>
+        <if test="voiceDeviceId != null and voiceDeviceId != ''">a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR},</if>
+        <if test="voiceDeviceName != null and voiceDeviceName != ''">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
+        <if test="stdDeviceId != null and stdDeviceId != ''">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
+        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="configId != null and configId != ''">a.config_id = #{configId, jdbcType=VARCHAR},</if>
+    </set>
+            where a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
+        select
+        a.voice_device_id,
+        a.voice_device_name,
+        a.std_device_id,
+        a.device_type,
+        a.config_id
+        from t_voice_device a
+        where 1 = 1
+            and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
+        select
+        a.voice_device_id,
+        a.voice_device_name,
+        a.std_device_id,
+        a.device_type,
+        a.config_id
+        from t_voice_device a
+        where 1 = 1
+        <if test="voiceDeviceId != null and voiceDeviceId != ''"> and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}</if>
+        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR}</if>
+        <if test="stdDeviceId != null and stdDeviceId != ''"> and a.std_device_id = #{stdDeviceId, jdbcType=BIGINT}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="configId != null and configId != ''"> and a.config_id = #{configId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
+        select
+        a.voice_device_id,
+        a.voice_device_name,
+        a.std_device_id,
+        a.device_type,
+        a.config_id
+        from t_voice_device a
+        where 1 = 1
+        <if test="voiceDeviceId != null and voiceDeviceId != ''"> and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}</if>
+        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR}</if>
+        <if test="stdDeviceId != null and stdDeviceId != ''"> and a.std_device_id = #{stdDeviceId, jdbcType=BIGINT}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="configId != null and configId != ''"> and a.config_id = #{configId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_voice_device(
+            voice_device_id,
+            voice_device_name,
+            std_device_id,
+            device_type,
+            config_id
+        )values
+        <foreach collection="list" item="TVoiceDevice" separator=",">
+            (
+                #{TVoiceDevice.voiceDeviceId, jdbcType=VARCHAR},
+                #{TVoiceDevice.voiceDeviceName, jdbcType=VARCHAR},
+                #{TVoiceDevice.stdDeviceId, jdbcType=BIGINT},
+                #{TVoiceDevice.deviceType, jdbcType=VARCHAR},
+                #{TVoiceDevice.configId, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_voice_device
+        where voice_device_id in (
+            <foreach collection="list" item="voiceDeviceId" separator=",">
+                #{voiceDeviceId, jdbcType=VARCHAR}
+            </foreach>
+            )
+    </delete>
+
+    <select id="selectAll" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
+        select *
+        from t_voice_device
+    </select>
+
+</mapper>

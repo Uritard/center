@@ -41,5 +41,7 @@ public class THisTelemeterData implements Serializable {
     @ApiModelProperty(value = "上一次值")
     private String lastMeteValue;
 
+    private String meteName;
+
 
 }

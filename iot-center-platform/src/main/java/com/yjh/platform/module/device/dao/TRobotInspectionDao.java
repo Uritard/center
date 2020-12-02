@@ -34,9 +34,9 @@ public interface TRobotInspectionDao {
     List<TRobotInspection> selectByPage(TRobotInspection tRobotInspection);
 
     int batchInsert(List<TRobotInspection> list);
-    List<Long> selectForRobotTask(@Param(value = "list") List<Long> list);
+    List<String> selectForRobotTask(@Param(value = "list") List<Long> list);
     List<String> selectRobotInspectionId(@Param(value = "list") List<Long> list,
-                                       @Param(value = "robotId") Long robotId);
+                                       @Param(value = "robotCode") String robotCode);
     List<RobotTaskMessage> selectRobotTaskMessage(@Param(value = "robotId") Long robotId);
 
     List<Robot> selectRobotInfo();

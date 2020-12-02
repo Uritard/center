@@ -63,6 +63,8 @@ public class RunAtNowTask implements Runnable{
     private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+    //机器人任务路径
+    private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
@@ -141,7 +143,17 @@ public class RunAtNowTask implements Runnable{
             log.error(e.getMessage(), e);
         }
     }
-
+    //让机器人做任务
+    private void robotTask(Map<String,Object> robotTaskInfoMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
     @Override
     public void run() {
@@ -221,17 +233,19 @@ public class RunAtNowTask implements Runnable{
 
             //找出机器人做任务的巡检点
             List<Long> robotInstanceList = new ArrayList<>();
+            List<Long> instanceList = new ArrayList<>();
             for (TCruisePointInstance item : instancesList) {
-                if (228 == item.getCruiseType()) {//todo 机器人
+                if (228 == item.getCruiseType()) {
                     robotInstanceList.add(item.getCruiseId());
+                    instanceList.add(item.getInstanceId());
                 }
             }
             log.info("robotInstanceList   :" +robotInstanceList);
             if(robotInstanceList.size() != 0){
-                List<Long> robotId = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
-                log.info("robotId   :" +robotId);
-                for (Long item: robotId){
+                log.info("robotCode   :" +robotCode);
+                for (String item: robotCode){
                     RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                     robotTaskInfo.setCruiseType(tCruiseTask.getType());
                     robotTaskInfo.setTaskId(taskId);
@@ -239,9 +253,16 @@ public class RunAtNowTask implements Runnable{
                     robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
                     List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
                     robotTaskInfo.setDeviceList(deviceList);
+                    robotTaskInfo.setRobotCode(item);
                     robotTaskInfoList.add(robotTaskInfo);
                 }
-                log.info("robotTaskInfoList   :" +robotTaskInfoList);
+                Map<String,Object> robotTaskInfoMap = new HashMap<>();
+                robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
+                robotTaskInfoMap.put("instanceList",instanceList);
+
+                log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
+                //让机器人做任务
+                robotTask(robotTaskInfoMap);
             }
 
             log.info("开始巡检"+new Date());

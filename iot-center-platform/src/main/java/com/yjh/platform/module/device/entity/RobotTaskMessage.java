@@ -27,4 +27,5 @@ public class RobotTaskMessage implements Serializable {
     private String deviceName;//设备名称
 
     private String result;//巡视结果
+
 }

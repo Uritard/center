@@ -15,6 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class RobotTaskInstanceInfo implements Serializable {
+
     private Integer cruiseType;
 
     private String taskId;
@@ -26,5 +27,7 @@ public class RobotTaskInstanceInfo implements Serializable {
     private Integer deviceLevel = 3;
 
     private List<String> deviceList;
+
+    private String robotCode;
 
 }
