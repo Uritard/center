@@ -294,7 +294,7 @@ public class SysUserController {
                         Map<String, Object> mapAppKey = new HashMap<>();
                         mapAccount.put("userId", userId);
                         mapAccount.put("userName", userName);
-                        mapAccount.put("roleId", sysUserLogin.getRoleId());
+                        mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                         mapAccount.put("appKey", appKey);
                         mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
                         mapAccount.put("errorInputTimes", "0");
@@ -302,7 +302,7 @@ public class SysUserController {
                         redisTemplate.opsForHash().putAll(key, mapAccount);
                         mapAppKey.put("userId", userId);
                         mapAppKey.put("userName", userName);
-                        mapAppKey.put("roleId", sysUserLogin.getRoleId());
+                        mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                         mapAppKey.put("appKey", appKey);
                         mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
                         redisTemplate.opsForHash().putAll(appKey, mapAppKey);
@@ -335,7 +335,7 @@ public class SysUserController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("userId", userId);
                     map.put("userName", userName);
-                    map.put("roleId", sysUserLogin.getRoleId());
+                    map.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                     map.put("expireTime", String.valueOf(System.currentTimeMillis()));
                     map.put("errorInputTimes", String.valueOf(errorInputTimes));
                     redisTemplate.opsForHash().putAll(key, map);
