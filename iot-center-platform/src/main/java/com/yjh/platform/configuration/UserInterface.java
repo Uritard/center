@@ -19,6 +19,13 @@ public interface UserInterface {
     long getCreatorId();
 
     /**
+     * 获取用户角色
+     *
+     * @return
+     */
+    String getAppKey();
+
+    /**
      * 获取用户权限
      *
      * @param code
@@ -38,7 +45,7 @@ public interface UserInterface {
      *
      * @return
      */
-    String getUserRoles();
+    String getUserRole();
 
     /**
      * 是否是超级管理员

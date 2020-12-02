@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
+import com.yjh.platform.configuration.PrivilegeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,7 @@ public class SystemInfoService {
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
     @Logs(title = "获取内存信息", code = "module")
+    @PrivilegeInfo(roleIds = "1234,1235")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> getMemory() throws Exception {
         return systemInfoUtil.getMemUsage();
@@ -53,6 +55,7 @@ public class SystemInfoService {
         return result2;
     }
     @Logs(title = "获取磁盘信息", code = "module")
+    @PrivilegeInfo(roleIds = "1234,1235")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getSwap() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getDeskUsage();
@@ -66,12 +69,14 @@ public class SystemInfoService {
     }
 
     @Logs(title = "获取cpu利用率", code = "module")
+    @PrivilegeInfo(roleIds = "1234,1235")
     @Transactional(rollbackFor = Exception.class)
     public double getCpuOnUse() throws Exception {
         return systemInfoUtil.getCpuOnUse();
     }
 
     @Logs(title = "获取硬盘利用率", code = "module")
+    @PrivilegeInfo(roleIds = "1234,1235")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> getDeskOnUse() throws Exception {
         return systemInfoUtil.getDeskOnUse();
@@ -79,6 +84,7 @@ public class SystemInfoService {
 
 
     @Logs(title = "获取关键服务", code = "module")
+    @PrivilegeInfo(roleIds = "1234,1235")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> getServices() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

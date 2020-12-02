@@ -11,6 +11,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Author tt
@@ -31,6 +32,11 @@ public class UserManager implements UserInterface {
     public String getUserName() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         return request.getHeader("userName");
+    }
+
+    public String getAppKey() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        return request.getHeader("appKey");
     }
 
     /**
@@ -67,16 +73,12 @@ public class UserManager implements UserInterface {
      *
      * @return String
      */
-    public String getUserRoles() {
-        long creatorId = getCreatorId();
-        if (0 == creatorId) {
-            return null;
-        }
-        Object obj = redisTemplate.opsForValue().get(USER_ROLE + creatorId);
-        if (null != obj) {
-            return String.valueOf(obj);
-        }
-        return null;
+    public String getUserRole() {
+        String appKey = getAppKey();
+        if (Objects.isNull(appKey)) return null;
+        Map<String, Object> map = (Map<String, Object>) redisTemplate.opsForValue().get(appKey);
+        if (Objects.isNull(map)) return null;
+        return String.valueOf(map.get("roleId"));
     }
 
     /**
@@ -85,7 +87,7 @@ public class UserManager implements UserInterface {
      * @return
      */
     public boolean isSysAdmin() {
-        String roles = getUserRoles();
+        String roles = getUserRole();
         if (null == roles) {
             return false;
         }

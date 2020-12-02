@@ -290,14 +290,22 @@ public class SysUserController {
                         mapResult.put("sysUserLogin", sysUserLogin);
                         result.setData(mapResult);
                         String userId = String.valueOf(sysUserLogin.getUserId());
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("userId", userId);
-                        map.put("userName", userName);
-                        map.put("appKey", appKey);
-                        map.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        map.put("errorInputTimes", "0");
+                        Map<String, Object> mapAccount = new HashMap<>();
+                        Map<String, Object> mapAppKey = new HashMap<>();
+                        mapAccount.put("userId", userId);
+                        mapAccount.put("userName", userName);
+                        mapAccount.put("roleId", sysUserLogin.getRoleId());
+                        mapAccount.put("appKey", appKey);
+                        mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                        mapAccount.put("errorInputTimes", "0");
                         String key = Constant.account_lock_times.replace("userAccountID", userId);
-                        redisTemplate.opsForHash().putAll(key, map);
+                        redisTemplate.opsForHash().putAll(key, mapAccount);
+                        mapAppKey.put("userId", userId);
+                        mapAppKey.put("userName", userName);
+                        mapAppKey.put("roleId", sysUserLogin.getRoleId());
+                        mapAppKey.put("appKey", appKey);
+                        mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                        redisTemplate.opsForHash().putAll(appKey, mapAppKey);
                     }
                 } else {
                     List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
@@ -327,7 +335,7 @@ public class SysUserController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("userId", userId);
                     map.put("userName", userName);
-                    map.put("appKey", appKey);
+                    map.put("roleId", sysUserLogin.getRoleId());
                     map.put("expireTime", String.valueOf(System.currentTimeMillis()));
                     map.put("errorInputTimes", String.valueOf(errorInputTimes));
                     redisTemplate.opsForHash().putAll(key, map);
