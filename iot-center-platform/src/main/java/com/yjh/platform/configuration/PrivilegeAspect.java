@@ -35,7 +35,7 @@ public class PrivilegeAspect {
     }
 
     @Around("checkCut()")
-    public void parse(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object parse(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("环绕开始");
 
         // 获取目标方法
@@ -46,7 +46,7 @@ public class PrivilegeAspect {
         Method method = methodSignature.getMethod();
         String methAccess = "";
 
-        // 判断注解中是否存在@RoleInfo注解
+        // 判断注解中是否存在@PrivilegeInfo注解
         if(method.isAnnotationPresent(PrivilegeInfo.class)){
             PrivilegeInfo privilegeInfo = method.getAnnotation(PrivilegeInfo.class);
             // 获取到注解中的name值
@@ -57,12 +57,11 @@ public class PrivilegeAspect {
             for (String roleId:roleIds) {
                 if (parm[0].equals(roleId)){
                     log.info("获取到该权限");
-                    joinPoint.proceed();
-                    return;
+                    return joinPoint.proceed();
                 }
             }
             log.info("没有执行权限");
-            log.info("环绕结束");
         }
+        return "环绕结束";
     }
 }

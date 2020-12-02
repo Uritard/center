@@ -264,7 +264,7 @@ public class CameraConService {
         if (Objects.nonNull(Constant.maps.get("lUserID"))) {
             lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
             log.info("lUserIDLong: "+lUserIDLong);
-            if (cameraConInfo.getCameraType()==206) {
+            if (cameraConInfo.getCameraType()==207) {
                 log.info("红外相机，特殊拍照");
                 m_sClientInfo.lChannel = new NativeLong(iChanNum);
                 if (Objects.nonNull(Constant.maps.get("lUserID"))) {
