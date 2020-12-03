@@ -343,15 +343,26 @@
             )
         </foreach>
     </insert>
-
+    <!--查询最新一条数据的机器人id-->
     <select id="selectLastRobotId" resultType="java.lang.Long">
         select robot_id from t_robot_info order by robot_id DESC limit 1
     </select>
+    <!--根据机器人id查询机器人code-->
     <select id="selectRobotIdByCode" parameterType="java.lang.String" resultType="java.lang.Long">
         select robot_id from t_robot_info
         where 1 = 1
         <if test="robotCode != null and robotCode != ''"> and robot_code = #{robotCode, jdbcType=VARCHAR}</if>
     </select>
+    <!--根据instanceId查询inspectionCode-->
+    <select id="selectInspectionCode" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT
+            b.inspection_code
+        FROM t_cruise_point_instance a,t_robot_inspection b
+        where  1 = 1
+        and a.cruise_id = b.inspection_id
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=VARCHAR}</if>
+    </select>
+    <!--查询机器人相关信息-->
     <select id="selectRelateInfo" resultType="java.util.Map">
         SELECT
             a.task_id,
@@ -364,4 +375,218 @@
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
+    <!--机器人本体告警入库-->
+    <insert id="insertRobotAlarm"  parameterType="com.yjh.accessrobot.module.command.entity.TRobotAlarm">
+        insert into t_robot_alarm(
+            robot_alarm_id,
+            alarm_name,
+            robot_id,
+            station_id,
+            alarm_type,
+            alarm_level,
+            alarm_info,
+            alarm_time,
+            deal_type,
+            deal_info,
+            deal_person_id,
+            deal_time,
+            position_station_num,
+            position_offset,
+            alarm_state,
+            create_time,
+            end_time
+        )values(
+                #{robotAlarmId, jdbcType=BIGINT},
+                #{alarmName, jdbcType=VARCHAR},
+                #{robotId, jdbcType=BIGINT},
+                #{stationId, jdbcType=VARCHAR},
+                #{alarmType, jdbcType=INTEGER},
+                #{alarmLevel, jdbcType=INTEGER},
+                #{alarmInfo, jdbcType=VARCHAR},
+                #{alarmTime, jdbcType=TIMESTAMP},
+                #{dealType, jdbcType=INTEGER},
+                #{dealInfo, jdbcType=VARCHAR},
+                #{dealPersonId, jdbcType=VARCHAR},
+                #{dealTime, jdbcType=TIMESTAMP},
+                #{positionStationNum, jdbcType=VARCHAR},
+                #{positionOffset, jdbcType=VARCHAR},
+                #{alarmState, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <!--TCTRD信息批量入库-->
+    <insert id="batchInsertCruiseTaskResultDetail">
+        insert into t_cruise_task_result_detail(
+        cruise_result_id,
+        task_result_id,
+        device_id,
+        instance_id,
+        cruise_time,
+        end_time,
+        cruise_status,
+        remark
+        )values
+        <foreach collection="list" item="TCruiseTaskResultDetail" separator=",">
+            (
+            #{TCruiseTaskResultDetail.cruiseResultId, jdbcType=VARCHAR},
+            #{TCruiseTaskResultDetail.taskResultId, jdbcType=VARCHAR},
+            #{TCruiseTaskResultDetail.deviceId, jdbcType=BIGINT},
+            #{TCruiseTaskResultDetail.instanceId, jdbcType=BIGINT},
+            #{TCruiseTaskResultDetail.cruiseTime, jdbcType=TIMESTAMP},
+            #{TCruiseTaskResultDetail.endTime, jdbcType=TIMESTAMP},
+            #{TCruiseTaskResultDetail.cruiseStatus, jdbcType=INTEGER},
+            #{TCruiseTaskResultDetail.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <!--TCDR信息批量入库-->
+    <insert id="batchInsertCruiseDataResult">
+        insert into t_cruise_data_result(
+        cruise_data_id,
+        cruise_result_id,
+        cruise_id,
+        cruise_type,
+        result_desc,
+        result_num,
+        modify_num,
+        picpath,
+        person_check,
+        origpic,
+        state,
+        evaluation_state,
+        identify_state,
+        identify_result,
+        createtime,
+        remark,
+        check_user,
+        check_date,
+        is_warn
+        )values
+        <foreach collection="list" item="TCruiseDataResult" separator=",">
+            (
+            #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseResultId, jdbcType=VARCHAR},
+            #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseType, jdbcType=INTEGER},
+            #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
+            #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
+            #{TCruiseDataResult.state, jdbcType=INTEGER},
+            #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
+            #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
+            #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
+            #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.remark, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+    <!--TCTRD信息单个入库-->
+    <insert id="insertTCruiseTaskResultDetail" useGeneratedKeys="true" keyProperty="cruiseResultId" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail">
+        insert into t_cruise_task_result_detail(
+            cruise_result_id,
+            task_result_id,
+            device_id,
+            instance_id,
+            cruise_time,
+            end_time,
+            cruise_status,
+            remark
+        )values(
+                #{cruiseResultId, jdbcType=VARCHAR},
+                #{taskResultId, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{instanceId, jdbcType=BIGINT},
+                #{cruiseTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP},
+                #{cruiseStatus, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+    <!--TCDR信息单个入库-->
+    <insert id="insertTCruiseDataResult" useGeneratedKeys="true" keyProperty="cruiseDataId" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseDataResult">
+        insert into t_cruise_data_result(
+            cruise_data_id,
+            cruise_result_id,
+            cruise_id,
+            cruise_type,
+            result_desc,
+            result_num,
+            modify_num,
+            picpath,
+            person_check,
+            origpic,
+            state,
+            evaluation_state,
+            identify_state,
+            identify_result,
+            createtime,
+            remark,
+            check_user,
+            check_date,
+            is_warn
+        )values(
+                #{cruiseDataId, jdbcType=BIGINT},
+                #{cruiseResultId, jdbcType=VARCHAR},
+                #{cruiseId, jdbcType=BIGINT},
+                #{cruiseType, jdbcType=INTEGER},
+                #{resultDesc, jdbcType=VARCHAR},
+                #{resultNum, jdbcType=VARCHAR},
+                #{modifyNum, jdbcType=VARCHAR},
+                #{picpath, jdbcType=VARCHAR},
+                #{personCheck, jdbcType=VARCHAR},
+                #{origpic, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{evaluationState, jdbcType=INTEGER},
+                #{identifyState, jdbcType=INTEGER},
+                #{identifyResult, jdbcType=INTEGER},
+                #{createtime, jdbcType=TIMESTAMP},
+                #{remark, jdbcType=VARCHAR},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{isWarn, jdbcType=INTEGER}
+        )
+    </insert>
+    <!--TCR信息更新-->
+    <update id="updateTCruiseResult">
+        update t_cruise_result a <set>
+        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
+        <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
+        <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+        <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+        <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
+        a.create_time = #{createTime, jdbcType=TIMESTAMP},
+        a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
+        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+    </update>
+    <!--TCTR信息更新-->
+    <update id="updateTCruiseTaskResult">
+        update t_cruise_task_result a <set>
+        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
+        <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
+        a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},
+        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+    </update>
 </mapper>

@@ -1,12 +1,12 @@
 package com.yjh.accessrobot.module.command.dao;
 
+import com.yjh.accessrobot.module.command.entity.*;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import com.yjh.accessrobot.module.command.entity.TRobotInfo;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 /**
  * @author YC
@@ -46,9 +46,18 @@ public interface TRobotInfoDao {
                             @Param(value = "robotPosition") String robotPosition,
                             @Param(value = "remarks") String remarks);
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
-
     int batchInsert(List<TRobotInfo> list);
+
     Long selectLastRobotId();
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
+    String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
     Map<String,String> selectRelateInfo(@Param(value = "taskId") String taskId);
+    int insertRobotAlarm(TRobotAlarm tRobotAlarm);
+    int batchInsertCruiseDataResult(List<TCruiseDataResult> list);
+    int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> list);
+    int insertTCruiseDataResult(TCruiseDataResult tCruiseDataResult);
+    int insertTCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail);
+    int updateTCruiseResult(TCruiseResult tCruiseResult);
+    int updateTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
+
 }
