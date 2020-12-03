@@ -106,7 +106,7 @@ public class TCruiseTaskService {
                 tCruiseTask.setStartTime(startTime);
             }
         } catch (Exception e) { e.getMessage(); }
-        tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        if (Objects.isNull(tCruiseTask.getTaskId())) tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
         List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(),null,null,null,null,null,null,null,null,null,null,null,null,null);
         List<Long> instanceList = new ArrayList<>();
         for (TCruisePlanAttr tCruisePlanAttr:tCruisePlanAttrList) {
@@ -124,6 +124,32 @@ public class TCruiseTaskService {
             tCruiseTaskAttr.setPointTaskId(String.valueOf(tCruisePointInstance.getCruiseId()));
             tCruiseTaskAttrList.add(tCruiseTaskAttr);
         }
+
+        //判断机器人是否空闲，不空闲则二次确认
+        TSysParam tSysParamConfirm= tSysParamDao.selectByParamType("confirmExpireTime");
+        long confirmExpireTime = Long.valueOf(tSysParamConfirm.getContent());
+        List<ConfirmImmediately> inspectionIdList = tRobotInspectionDao.selectRobotInspectionIds();
+        if (Objects.isNull(Constant.confirmImmediatelyMap.get(tCruiseTask.getTaskId())) && tCruiseTask.getIfRun() == 173) {
+            Constant.confirmImmediatelyMap.put(tCruiseTask.getTaskId(), 0);
+            for (TCruiseTaskAttr tCruiseTaskAttr:tCruiseTaskAttrList) {
+                for (ConfirmImmediately confirmImmediately:inspectionIdList){
+                    String inspectionIdString =  String.valueOf(confirmImmediately.getInspectionId());
+                    if (tCruiseTaskAttr.getPointTaskId().equals(inspectionIdString)) {
+                        Map<String, Object> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+ confirmImmediately.getRobotCode() +":41");
+                        new Thread(() -> {
+                            try { Thread.sleep(confirmExpireTime); } catch (Exception e) {e.getMessage();}
+                            if (Objects.nonNull(Constant.confirmImmediatelyMap.get(tCruiseTask.getTaskId()))) Constant.confirmImmediatelyMap.remove(tCruiseTask.getTaskId());
+                        }).start();
+                        if (Objects.nonNull(robotStatusMap.get("value")) && String.valueOf(robotStatusMap.get("value")).equals("2"))
+                            return "robotId: "+confirmImmediately.getRobotId()+",robotName: "+confirmImmediately.getRobotName()+",taskId: "+tCruiseTask.getTaskId();
+                    }
+                }
+            }
+        }
+        if (Objects.nonNull(Constant.confirmImmediatelyMap.get(tCruiseTask.getTaskId())) && Objects.equals(Constant.confirmImmediatelyMap.get(tCruiseTask.getTaskId()), 0)
+                && tCruiseTask.getIfRun() == 173)
+            Constant.confirmImmediatelyMap.remove(tCruiseTask.getTaskId());
+
         this.tCruiseTaskDao.insert(tCruiseTask);
         this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
         //开启定时任务

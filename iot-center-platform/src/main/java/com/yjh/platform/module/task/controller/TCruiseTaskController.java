@@ -96,6 +96,7 @@ public class TCruiseTaskController {
                 tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
                 TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
                 tCruiseTask.setType(tCruisePlanCount.getType());
+                if (Objects.nonNull(tCruiseTaskAdd.getTaskId()))tCruiseTask.setTaskId(tCruiseTaskAdd.getTaskId());
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
                 } else { tCruiseTask.setStartTime(new Date()); }

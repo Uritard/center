@@ -1,7 +1,9 @@
 package com.yjh.platform.common;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Constant {
@@ -17,4 +19,6 @@ public class Constant {
     public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
 
     public static final String CAMERA_STATES = "http://iot-center-accessvideo/camera/v1/getCameraStatus?recordId={recordId}";
+
+    public static Map<String, Object> confirmImmediatelyMap = new HashMap<>();
 }

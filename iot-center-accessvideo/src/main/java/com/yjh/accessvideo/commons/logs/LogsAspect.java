@@ -90,19 +90,19 @@ public class LogsAspect {
             }
             try {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
+                params.set("content", content.toString());
                 result = joinPoint.proceed();
-                params.set("content", "参数：" + content.toString());
-//                post(params);
+                post(params);
                 return result;
             } catch (BusinessException e) {
-                params.set("content", "参数：" + content.toString() + "；错误信息：" + e.getMessage());
+                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
                 params.set("state", 2);
-//                post(params);
+                post(params);
                 throw e;
             } catch (Throwable e) {
-                params.set("content", "参数：" + content.toString() + "；异常信息：" + e.getMessage());
+                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
                 params.set("state", 3);
-//                post(params);
+                post(params);
                 throw e;
             }
         }
@@ -117,7 +117,7 @@ public class LogsAspect {
             params.set("content", content.toString() + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
             params.set("userId", userId);
             params.set("userName", userName);
-//            post(params);
+            post(params);
             throw e;
         }
     }

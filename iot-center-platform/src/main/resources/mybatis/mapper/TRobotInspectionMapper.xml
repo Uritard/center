@@ -216,6 +216,14 @@
         a.robot_code = #{robotCode,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectRobotInspectionIds" resultType="com.yjh.platform.module.task.entity.ConfirmImmediately">
+        SELECT
+        a.inspection_id, a.robot_id, b.robot_name, b.robot_code
+        FROM
+        t_robot_inspection a
+        left join t_robot_info b ON a.robot_id = b.robot_id
+    </select>
+
     <select id="selectRobotTaskMessage" resultType="com.yjh.platform.module.device.entity.RobotTaskMessage">
         SELECT
             e.device_name,
