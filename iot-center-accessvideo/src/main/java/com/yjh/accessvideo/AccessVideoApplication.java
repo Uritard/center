@@ -2,6 +2,8 @@ package com.yjh.accessvideo;
 
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.module.control.dao.CameraConDao;
+import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 
 /**
@@ -28,14 +31,9 @@ public class AccessVideoApplication implements CommandLineRunner {
     private RedisTemplate redisTemplate;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
-    @Value("${nvr.server.ip}")
-    private String m_sDeviceIP;//已登录设备的IP地址
-    @Value("${nvr.server.username}")
-    private String m_sUsername;//设备用户名
-    @Value("${nvr.server.password}")
-    private String m_sPassword;//设备密码
-    @Value("${nvr.server.port}")
-    private Short m_port;//设备端口
+    @Autowired
+    private CameraConDao cameraConDao;
+
     @Value("${nvr.sdk.path}")
     private String sdkPath;//sdk路径
     @Value("${nvr.log.path}")
@@ -82,59 +80,69 @@ public class AccessVideoApplication implements CommandLineRunner {
             hCNetSDK.NET_DVR_Logout(lUserID);
             lUserID = -1;
         }
-        //注册
-        m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-        System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
+        List<RecorderConInfo> recorderConInfoList = cameraConDao.SelectRecords();
+        long recordId = 1234;
+        for (RecorderConInfo recorderConInfo:recorderConInfoList) {
 
-        m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-        System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
+            recordId = recorderConInfo.getRecordId();
+            String m_sDeviceIP = recorderConInfo.getRecordIp();
+            log.info("register nvr, and ip is "+m_sDeviceIP+", and name is "+recorderConInfo.getRecordName());
+            String m_sUsername = recorderConInfo.getUserName();
+            String m_sPassword = recorderConInfo.getPwd();
+            Short m_port = recorderConInfo.getHttpPort().shortValue();
+            //注册
+            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
 
-        m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-        System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
+            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+            System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
 
-        m_strLoginInfo.wPort = m_port;
+            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+            System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
 
-        m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+            m_strLoginInfo.wPort = m_port;
 
-        m_strLoginInfo.write();
-        lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
 
-        if (lUserID == -1) {
-            log.error("register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
-            return false;
-        } else {
-            Constant.maps.put("lUserID", lUserID);
-            //设置HCNetSDKCom组件库所在路径
-            String strPathCom = sdkPath;
-            HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
-            System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
-            struComPath.write();
-            hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
-
-            //设置libcrypto.so所在路径
-            HCNetSDK.BYTE_ARRAY ptrByteArrayCrypto = new HCNetSDK.BYTE_ARRAY(256);
-            String strPathCrypto = sdkPath+"/libcrypto.so";
-            System.arraycopy(strPathCrypto.getBytes(), 0, ptrByteArrayCrypto.byValue, 0, strPathCrypto.length());
-            ptrByteArrayCrypto.write();
-            hCNetSDK.NET_DVR_SetSDKInitCfg(3, ptrByteArrayCrypto.getPointer());
-
-            //设置libssl.so所在路径
-            HCNetSDK.BYTE_ARRAY ptrByteArraySsl = new HCNetSDK.BYTE_ARRAY(256);
-            String strPathSsl = sdkPath+"/libssl.so";
-            System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
-            ptrByteArraySsl.write();
-            hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
-
-            //设置libPlayCtrl.so所在路径
-            HCNetSDK.BYTE_ARRAY ptrPlayCtrl = new HCNetSDK.BYTE_ARRAY(256);
-            String ptrPlayCtrlPath = sdkPath+"/libPlayCtrl.so";
-            System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
-            ptrPlayCtrl.write();
-            hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
-            //IP通道个数
-            log.info("The max number of IP channels: "+ m_strDeviceInfo.struDeviceV30.byIPChanNum);
-            return true;
+            m_strLoginInfo.write();
+            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            if (lUserID == -1) {
+                log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
+                return false;
+            }
+            Constant.maps.put(String.valueOf(recordId), lUserID);
+            log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
         }
+        //设置HCNetSDKCom组件库所在路径
+        String strPathCom = sdkPath;
+        HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
+        System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
+        struComPath.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
+
+        //设置libcrypto.so所在路径
+        HCNetSDK.BYTE_ARRAY ptrByteArrayCrypto = new HCNetSDK.BYTE_ARRAY(256);
+        String strPathCrypto = sdkPath+"/libcrypto.so";
+        System.arraycopy(strPathCrypto.getBytes(), 0, ptrByteArrayCrypto.byValue, 0, strPathCrypto.length());
+        ptrByteArrayCrypto.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(3, ptrByteArrayCrypto.getPointer());
+
+        //设置libssl.so所在路径
+        HCNetSDK.BYTE_ARRAY ptrByteArraySsl = new HCNetSDK.BYTE_ARRAY(256);
+        String strPathSsl = sdkPath+"/libssl.so";
+        System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
+        ptrByteArraySsl.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
+
+        //设置libPlayCtrl.so所在路径
+        HCNetSDK.BYTE_ARRAY ptrPlayCtrl = new HCNetSDK.BYTE_ARRAY(256);
+        String ptrPlayCtrlPath = sdkPath+"/libPlayCtrl.so";
+        System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
+        ptrPlayCtrl.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
+        //IP通道个数
+        log.info("The max number of IP channels: "+ m_strDeviceInfo.struDeviceV30.byIPChanNum);
+        return true;
     }
 
 }

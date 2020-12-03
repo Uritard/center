@@ -140,8 +140,13 @@ public class TCruiseTaskService {
                             try { Thread.sleep(confirmExpireTime); } catch (Exception e) {e.getMessage();}
                             if (Objects.nonNull(Constant.confirmImmediatelyMap.get(tCruiseTask.getTaskId()))) Constant.confirmImmediatelyMap.remove(tCruiseTask.getTaskId());
                         }).start();
-                        if (Objects.nonNull(robotStatusMap.get("value")) && String.valueOf(robotStatusMap.get("value")).equals("2"))
-                            return "robotId: "+confirmImmediately.getRobotId()+",robotName: "+confirmImmediately.getRobotName()+",taskId: "+tCruiseTask.getTaskId();
+                        if (Objects.nonNull(robotStatusMap.get("value")) && String.valueOf(robotStatusMap.get("value")).equals("2")) {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("robotId", confirmImmediately.getRobotId());
+                            jsonObject.put("robotName", confirmImmediately.getRobotName());
+                            jsonObject.put("taskId", tCruiseTask.getTaskId());
+                            return jsonObject.toString();
+                        }
                     }
                 }
             }

@@ -233,7 +233,7 @@ public class CameraConService {
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
         int iChanNum = cameraConInfo.getChannelNum()+32;
-        m_lRealPlayHandle = realPlay(iChanNum);
+        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
         if (m_lRealPlayHandle.intValue() == -1) {
             log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
             return "fail";
@@ -261,14 +261,14 @@ public class CameraConService {
         HCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new HCNetSDK.NET_DVR_JPEGPARA();
         lpJpegPara.wPicSize = 0xff;
         lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
-        if (Objects.nonNull(Constant.maps.get("lUserID"))) {
-            lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong: "+lUserIDLong);
             if (cameraConInfo.getCameraType()==207) {
                 log.info("红外相机，特殊拍照");
                 m_sClientInfo.lChannel = new NativeLong(iChanNum);
-                if (Objects.nonNull(Constant.maps.get("lUserID"))) {
-                    lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+                if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
+                    lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
                     m_lPort = hCNetSDK.NET_DVR_RealPlay_V30(lUserIDLong, m_sClientInfo, fRealDataCallBack, null, true);
                     log.info("m_lPort: "+m_lPort);
                 }
@@ -334,7 +334,7 @@ public class CameraConService {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,presetId);
         int iChanNum = cameraConInfo.getChannelNum()+32;
         int iPreset = cameraConInfo.getPresetNum();
-        m_lRealPlayHandle = realPlay(iChanNum);
+        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
         if (m_lRealPlayHandle.intValue() == -1) {
             log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
             return false;
@@ -357,8 +357,8 @@ public class CameraConService {
         log.info("cameraConInfoMap: "+cameraConInfoMap);
         NativeLong iChanNumTem = new NativeLong(0);
         Map<String, String> channleStatusMap = new HashMap<>();
-        if (Objects.nonNull(Constant.maps.get("lUserID"))) {
-            lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             IntByReference intByReference = new IntByReference(0);
             HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG();
             m_strIpparaCfg.write();
@@ -390,10 +390,10 @@ public class CameraConService {
         return channleStatusMap;
     }
 
-    private NativeLong realPlay(int lChannel) {
+    private NativeLong realPlay(int lChannel, long recordId) {
         m_sClientInfo.lChannel = new NativeLong(lChannel);
-        if (Objects.nonNull(Constant.maps.get("lUserID"))) {
-            lUserIDLong = new NativeLong(Constant.maps.get("lUserID"));
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             return hCNetSDK.NET_DVR_RealPlay_V30(lUserIDLong,
                     m_sClientInfo, null, null, true);
         } else { return lUserIDLong;}

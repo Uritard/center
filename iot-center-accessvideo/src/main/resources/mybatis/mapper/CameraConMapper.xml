@@ -59,6 +59,21 @@
         </foreach>
     </select>
 
+    <select id="SelectRecords" resultType="com.yjh.accessvideo.module.control.entity.RecorderConInfo">
+        SELECT
+        a.record_id,
+        a.record_name,
+        a.record_ip,
+        a.protocol,
+        a.http_port,
+        a.trans_port,
+        a.rtsp_port,
+        a.user_name,
+        a.pwd,
+        a.max_channel
+        FROM t_camera_recorder a
+    </select>
+
     <select id="cameraInfoByNVR" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraStatusInfo">
         SELECT
         a.channel_num,
