@@ -470,14 +470,24 @@ public class TCruiseTaskService {
             SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
             Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            Long taskStartTime = Long.valueOf(mapForGet.get("taskStart"));
+            Date startTime = sd.parse(mapForGet.get("taskStart"));
+            Long taskStartTime = startTime.getTime();
             Long endTime = taskStartTime + tasksAreTime*24*60*60*1000;
             String s =sd.format(endTime);
             quartzTask.setStartTime(sd.parse(s));
             JobManager jobManager =new JobManager();
             jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
+            //机器人任务暂停
+            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+            if(robotCodeList != null && robotCodeList.size()>0){
+                Map<String,Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId",taskId);
+                robotTaskStatesMap.put("commandValue",2);
+                robotTaskStatesMap.put("robotCodeList",robotCodeList);
+                robotTaskStates(robotTaskStatesMap);
+            }
         } catch (Exception e) {
-            log.error("定时任务异常: ");
+            log.error("任务暂停异常: ");
             e.printStackTrace();
         }
 
@@ -494,7 +504,7 @@ public class TCruiseTaskService {
         picModelPath = tSysParam.getContent();
         tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
         waitTime = Long.valueOf(tSysParam.getContent());
-        tSysParam = tSysParamDao.selectByParamType("picModelPath");//任务超期时间
+        tSysParam = tSysParamDao.selectByParamType("tasksAreTime");//任务超期时间
         tasksAreTime = Long.valueOf(tSysParam.getContent());
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
@@ -512,14 +522,43 @@ public class TCruiseTaskService {
                 Constant.taskMap.remove(mapItem);
             }
         }
+        //机器人任务继续
+        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        if(robotCodeList != null && robotCodeList.size()>0){
+            Map<String,Object> robotTaskStatesMap = new HashMap<>();
+            robotTaskStatesMap.put("taskId",taskId);
+            robotTaskStatesMap.put("commandValue",3);
+            robotTaskStatesMap.put("robotCodeList",robotCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
         return tCruiseResultDao.update(tCruiseResult);
     }
 
+    private void robotTaskStates(Map<String,Object> robotTaskStatesMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_STATUS_URL, robotTaskStatesMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
     @Logs(title = "任务终止", code = "TCruiseTask",content = "任务终止")
     @Transactional(rollbackFor = Exception.class)
     public int taskShutDown(String taskId) {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(242);
+        //机器人任务终止
+        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        if(robotCodeList != null && robotCodeList.size()>0){
+            Map<String,Object> robotTaskStatesMap = new HashMap<>();
+            robotTaskStatesMap.put("taskId",taskId);
+            robotTaskStatesMap.put("commandValue",4);
+            robotTaskStatesMap.put("robotCodeList",robotCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
+
         return tCruiseResultDao.update(tCruiseResult);
     }
 

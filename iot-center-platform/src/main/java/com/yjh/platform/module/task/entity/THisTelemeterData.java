@@ -2,6 +2,8 @@ package com.yjh.platform.module.task.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,6 +31,7 @@ public class THisTelemeterData implements Serializable {
     @ApiModelProperty(value = "设备编号")
     private Long deviceId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "数值时间")
     private Date recordTime;
 
@@ -40,8 +43,5 @@ public class THisTelemeterData implements Serializable {
 
     @ApiModelProperty(value = "上一次值")
     private String lastMeteValue;
-
-    private String meteName;
-
 
 }

@@ -20,11 +20,13 @@ public class SysMenuService{
     @Autowired
     private SysMenuDao sysMenuDao;
 
+
     @Logs(title = "插入", code = "module", content = "新增系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysMenu sysMenu) {
         return this.sysMenuDao.insert(sysMenu);
     }
+
 
     @Logs(title = "删除", code = "module", content = "删除系统菜单")
     @Transactional(rollbackFor = Exception.class)
@@ -32,17 +34,20 @@ public class SysMenuService{
         return this.sysMenuDao.deleteByPrimaryId(menuId);
     }
 
+
     @Logs(title = "更新", code = "module", content = "更新系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public int update(SysMenu sysMenu) {
         return this.sysMenuDao.update(sysMenu);
     }
 
+
     @Logs(title = "主键查询", code = "module", content = "根据菜单ID查询系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public SysMenu selectByPrimaryId(Long menuId) {
         return this.sysMenuDao.selectByPrimaryId(menuId);
     }
+
 
     @Logs(title = "查询", code = "module", content = "根据入参查询系统菜单")
     @Transactional(rollbackFor = Exception.class)

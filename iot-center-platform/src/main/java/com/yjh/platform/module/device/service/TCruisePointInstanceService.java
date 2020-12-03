@@ -59,37 +59,37 @@ public class TCruisePointInstanceService{
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruisePointInstance tCruisePointInstance) {
         return this.tCruisePointInstanceDao.insert(tCruisePointInstance);
     }
 
-    @Logs(title = "根据主键删除", code = "module")
+    @Logs(title = "根据主键删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long instanceId) {
         return this.tCruisePointInstanceDao.deleteByPrimaryId(instanceId);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int delete(TCruisePointInstance tCruisePointInstance) {
         return this.tCruisePointInstanceDao.delete(tCruisePointInstance);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module",content = "根据页面传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruisePointInstance tCruisePointInstance) {
         return this.tCruisePointInstanceDao.update(tCruisePointInstance);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TCruisePointInstance selectByPrimaryId(Long instanceId) {
         return this.tCruisePointInstanceDao.selectByPrimaryId(instanceId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstance> select(Long instanceId, Long deviceMeteId, String stationId, String stationName, Long deviceId, String customId, String dataFormat, Integer identifyType, Integer identifySonType, Integer cruiseType, Long cruiseId, String cruiseName, String cruiseContent, String positionType, String unit, Integer ifSy, Integer syType, Integer ifVideotape, String videotapeTime, String textDesc, String sort) {
         List<TCruisePointInstance> tCruisePointInstanceList = tCruisePointInstanceDao.select(instanceId, deviceMeteId, stationId, stationName, deviceId, customId, dataFormat, identifyType, identifySonType, cruiseType, cruiseId, cruiseName, cruiseContent, positionType, unit, ifSy, syType, ifVideotape, videotapeTime, textDesc, sort);
@@ -146,7 +146,7 @@ public class TCruisePointInstanceService{
         }
         return i;
     }
-    @Logs(title = "巡检点分页查询", code = "module")
+    @Logs(title = "巡检点分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,int pageSize) {
         Result result = new Result();
@@ -225,7 +225,7 @@ public class TCruisePointInstanceService{
             listAll.get(length).getVoiceType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
         }
     }
-    @Logs(title = "告警联动分页查询", code = "module")
+    @Logs(title = "告警联动分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public Result selectSYCruisePointByPage(TCfgMeteForPointDetail tCfgMeteForPointDetail,int pageNum,int pageSize) {
         Result result = new Result();
@@ -262,20 +262,20 @@ public class TCruisePointInstanceService{
     }
 
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstance> selectByPage(TCruisePointInstance tCruisePointInstance) {
         List<TCruisePointInstance> list = tCruisePointInstanceDao.selectByPage(tCruisePointInstance);
         return list;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruisePointInstance> list) {
         return this.tCruisePointInstanceDao.batchInsert(list);
     }
 
-    @Logs(title = "标准测点关联机器人巡检点", code = "module")
+    @Logs(title = "标准测点关联机器人巡检点", code = "module",content = "根据页面传入的参数关联机器人巡检点")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstance> StdMeteUnionInspectionId(Long deviceId) {
         List<TCruisePointInstance> tCruisePointInstanceList = tCruisePointInstanceDao.StdMeteUnionInspectionId(deviceId);
@@ -283,7 +283,7 @@ public class TCruisePointInstanceService{
     }
 
 
-    @Logs(title = "巡检点关联配置",code = "module")
+    @Logs(title = "巡检点关联配置",code = "module",content = "根据页面传入的参数配置巡检点")
     @Transactional(rollbackFor = Exception.class)
     public int instanceUpdate(TCruisePointInstanceDetail tCruisePointInstanceDetail){
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
@@ -397,7 +397,7 @@ public class TCruisePointInstanceService{
 
 
 
-    @Logs(title = "告警联动配置",code = "module")
+    @Logs(title = "告警联动配置",code = "module",content = "根据页面传入的参数配置告警联动")
     @Transactional(rollbackFor = Exception.class)
     public int warnInspectUpdate(TCruisePointInstanceDetail tCruisePointInstanceDetail){
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
@@ -444,7 +444,7 @@ public class TCruisePointInstanceService{
 
 
 
-    @Logs(title="统计当前任务下的巡检点数量",code = "module")
+    @Logs(title="统计当前任务下的巡检点数量",code = "module",content = "根据页面传入的参数统计任务的巡检点数量")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Integer> selectCruiseCount(String taskId){
         Map<String,Integer>map=new HashMap<>();
@@ -452,7 +452,7 @@ public class TCruisePointInstanceService{
         return map;
     }
 
-    @Logs(title = "查询各种巡检类型下的巡检点数量",code = "module")
+    @Logs(title = "查询各种巡检类型下的巡检点数量",code = "module",content = "根据页面传入的参数查询巡检类型数据")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseCountOfType> selectCruiseCountByType(String taskId){
         return this.tCruisePointInstanceDao.selectCruiseCountByType(taskId);

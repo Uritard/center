@@ -45,7 +45,7 @@ public class TStdDevicemeteService{
     private TCruisePlanAttrDao tCruisePlanAttrDao;
 
 
-    @Logs(title = "插入", code = "device")
+    @Logs(title = "插入", code = "device",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         //若插入的测点中的deviceId、customId存在于device表中，则不更新device表；否则进行更新
@@ -63,7 +63,7 @@ public class TStdDevicemeteService{
         return this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
     }
 
-    @Logs(title = "删除", code = "device")
+    @Logs(title = "删除", code = "device",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceMeteId) {
 //        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
@@ -96,7 +96,7 @@ public class TStdDevicemeteService{
         return this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);//删除测点
     }
 
-    @Logs(title = "更新", code = "device")
+    @Logs(title = "更新", code = "device",content = "根据页面传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在
@@ -128,13 +128,13 @@ public class TStdDevicemeteService{
         return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }
 
-    @Logs(title = "主键查询", code = "device")
+    @Logs(title = "主键查询", code = "device",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TStdDeviceMete selectByPrimaryId(Long deviceMeteId) {
         return this.tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
     }
 
-    @Logs(title = "查询", code = "device")
+    @Logs(title = "查询", code = "device",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId,String cusomId,Long meteId, String meteKind,String meteType, String meteName, Integer deviceType,  String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark,String stateZero,String stateOne,Integer  alarmState) {
         List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId,cusomId, meteId, meteKind, meteType,meteName, deviceType,  positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
@@ -143,7 +143,7 @@ public class TStdDevicemeteService{
     }
 
     //告警规则未定
-    @Logs(title = "分页查询", code = "device")
+    @Logs(title = "分页查询", code = "device",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
 //        if(tStdDeviceMeteDetail.getDeviceId() == null) {
@@ -163,19 +163,19 @@ public class TStdDevicemeteService{
         return tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail);
     }
 
-    @Logs(title = "批量插入", code = "device")
+    @Logs(title = "批量插入", code = "device",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TStdDeviceMete> list) {
         return this.tStdDevicemeteDao.batchAdd(list);
     }
 
-    @Logs(title = "根据设备模版ID查询对应测点", code = "device")
+    @Logs(title = "根据设备模版ID查询对应测点", code = "device",content = "根据页面传入的参数据设备模版ID查询对应测点")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceMete> selectDevMeteByModelId(Long modelId) {
         return tStdDevicemeteDao.selectDevMeteByModelId(modelId);
     }
 
-    @Logs(title = "新增/修改设备测点", code = "device")
+    @Logs(title = "新增/修改设备测点", code = "device",content = "根据页面传入的参数修改数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchUpdateDevMete(List<TStdDeviceMete> list) {
         Long deviceId = list.get(0).getDeviceId();
@@ -183,27 +183,27 @@ public class TStdDevicemeteService{
         return this.tStdDevicemeteDao.batchAdd(list);
     }
 
-    @Logs(title = "根据设备Id删除设备测点", code = "device")
+    @Logs(title = "根据设备Id删除设备测点", code = "device",content = "根据页面传入的参数根据设备Id删除设备测点")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByDevId(Long deviceId) {
         return this.tStdDevicemeteDao.deleteByDevId(deviceId);
     }
 
-    @Logs(title = "设备ID与部位ID查询设备测点", code = "device")
+    @Logs(title = "设备ID与部位ID查询设备测点", code = "device",content = "根据页面传入的参数查询设备ID与部位ID查询设备测点")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceMete> selectByDevCus(Long deviceId,String customType) {
         return this.tStdDevicemeteDao.selectByDevCus(deviceId, customType);
     }
 
 
-    @Logs(title = "查询生成预定义模板测点信息表",code = "device")
+    @Logs(title = "查询生成预定义模板测点信息表",code = "device",content = "根据页面传入的参数查询查询生成预定义模板测点信息表")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceMete> selectPreDeviceMete(Long modelId,Long deviceId,Long customType){
         return this.tStdDevicemeteDao.selectPreDeviceMete(modelId,  deviceId, customType);
     }
 
 
-    @Logs(title = "批量删除", code = "device")
+    @Logs(title = "批量删除", code = "device",content = "根据页面传入的参数批量删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String list) {
         int deleteCount=0;

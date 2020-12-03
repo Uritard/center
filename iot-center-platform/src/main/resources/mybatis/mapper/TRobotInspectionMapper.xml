@@ -203,14 +203,15 @@
             </foreach>
     </select>
 
-    <select id="selectRobotInspectionId" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.Long">
         SELECT
-        b.inspection_code
+        c.instance_id
         FROM
         t_robot_info a
-        left join t_robot_inspection b on a.robot_id = b.robot_id and b.inspection_id IN
-        <foreach collection="list" open="(" close=")" separator="," item="inspectionId">
-            #{inspectionId,jdbcType=BIGINT}
+        left join t_robot_inspection b on a.robot_id = b.robot_id
+        left join t_cruise_point_instance c on b.inspection_id = c.cruise_id and c.instance_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="instanceId">
+            #{instanceId,jdbcType=BIGINT}
         </foreach>
         WHERE
         a.robot_code = #{robotCode,jdbcType=VARCHAR}
@@ -264,6 +265,19 @@
             LEFT JOIN t_dict_business c ON a.robot_position = c.dict_code
         where 1=1
 
+    </select>
+    
+    <select id="selectRobotIsRunning" resultType="java.lang.String">
+        SELECT DISTINCT
+            e.robot_code
+        FROM
+            t_cruise_task a
+            LEFT JOIN t_cruise_plan_attr b ON a.plan_id = b.plan_id
+            LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+            LEFT JOIN t_robot_inspection d ON c.cruise_id = d.inspection_id
+            LEFT JOIN t_robot_info e ON d.robot_id = e.robot_id
+        where 1=1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
 </mapper>

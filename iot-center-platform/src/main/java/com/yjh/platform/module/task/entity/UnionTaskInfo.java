@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,7 @@ public class UnionTaskInfo implements Serializable {
 
     private String meteName;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cruiseTime;
 
     private String resultNum;
@@ -29,5 +31,11 @@ public class UnionTaskInfo implements Serializable {
     private String origpic;
 
     private String personCheck;
+
+    private String taskName;
+
+    private Long deviceId;
+
+    private String deviceName;
 
 }

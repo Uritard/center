@@ -21,45 +21,45 @@ public class TCfgTelesignalService{
     @Autowired
     private TCfgTelesignalDao tCfgTelesignalDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgTelesignal tCfgTelesignal) {
         return this.tCfgTelesignalDao.insert(tCfgTelesignal);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String deviceId) {
         return this.tCfgTelesignalDao.deleteByPrimaryId(deviceId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module",content = "根据页面传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgTelesignal tCfgTelesignal) {
         return this.tCfgTelesignalDao.update(tCfgTelesignal);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TCfgTelesignal selectByPrimaryId(String deviceId) {
         return this.tCfgTelesignalDao.selectByPrimaryId(deviceId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgTelesignal> select(String deviceId, String meteId, String meteName, Integer upEffect, Integer downEffect, Integer meteIndex, Integer meteCid, Integer signalKind, Integer lastValue, Date lastTime, Integer explainType, Integer reportType, Integer reportLevel, Integer maskType, String maskMid, String maskString, Integer maskValue, Integer delayTime, String meteCode, String deviceType, String description, Integer isshield, Long storageperiod, String describer, Integer alarmthresbhold, Integer alarmlevel, String linkMeteId) {
         List<TCfgTelesignal> tCfgTelesignalList = tCfgTelesignalDao.select(deviceId, meteId, meteName, upEffect, downEffect, meteIndex, meteCid, signalKind, lastValue, lastTime, explainType, reportType, reportLevel, maskType, maskMid, maskString, maskValue, delayTime, meteCode, deviceType, description, isshield, storageperiod, describer, alarmthresbhold, alarmlevel, linkMeteId);
         return tCfgTelesignalList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgTelesignal> selectByPage(TCfgTelesignal tCfgTelesignal) {
         List<TCfgTelesignal> tCfgTelesignalList = tCfgTelesignalDao.selectByPage(tCfgTelesignal);
         return tCfgTelesignalList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgTelesignal> list) {
         return this.tCfgTelesignalDao.batchInsert(list);

@@ -36,11 +36,14 @@ public interface TRobotInspectionDao {
 
     int batchInsert(List<TRobotInspection> list);
     List<String> selectForRobotTask(@Param(value = "list") List<Long> list);
-    List<String> selectRobotInspectionId(@Param(value = "list") List<Long> list,
+    List<Long> selectRobotTaskInstanceId(@Param(value = "list") List<Long> list,
                                        @Param(value = "robotCode") String robotCode);
     List<RobotTaskMessage> selectRobotTaskMessage(@Param(value = "robotId") Long robotId);
 
     List<Robot> selectRobotInfo();
 
     List<ConfirmImmediately> selectRobotInspectionIds();
+
+    List<String> selectRobotIsRunning(@Param(value = "taskId") String taskId);
+
 }

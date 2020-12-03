@@ -26,7 +26,7 @@ public class RobotTaskInstanceInfo implements Serializable {
 
     private Integer deviceLevel = 3;
 
-    private List<String> deviceList;
+    private List<Long> instanceList;
 
     private String robotCode;
 

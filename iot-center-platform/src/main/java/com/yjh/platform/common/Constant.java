@@ -21,4 +21,7 @@ public class Constant {
     public static final String CAMERA_STATES = "http://iot-center-accessvideo/camera/v1/getCameraStatus?recordId={recordId}";
 
     public static Map<String, Object> confirmImmediatelyMap = new HashMap<>();
+
+    public static final String ROBOT_TASK_STATUS_URL = "http://iot-center-accessrobot/robot/v1/taskControl";
+
 }

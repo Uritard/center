@@ -174,8 +174,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             //获取描述
             String commit = arrayToString(udp,weizhi+1,commitLength,true);
             log.info("描述:  " + commit);
-            String commitValue = MeteValueUtils.meteValues(commit);
-            log.info("描述数字:"+commitValue);
+//            String commitValue = MeteValueUtils.meteValues(commit);
+//            log.info("描述数字:"+commitValue);
             //获取时间
             String shijianchuo = arrayToString(udp,weizhi+1+commitLength,7,false);
             long day= Long.valueOf(shijianchuo,16);
@@ -190,30 +190,21 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 tCfgDataCurrent.setDeviceId(Long.valueOf(tCfgMeteService.selectByMeteId(meteId.toString())));
                 tCfgDataCurrent.setMeteKind(meteKind);
                 tCfgDataCurrent.setRecordTime(sdf.parse(time));
-                if(commitValue == null){
-                    tCfgDataCurrent.setMeteValue(commit);
-                }else{
-                    tCfgDataCurrent.setMeteValue(commitValue);
-                }
-
+                tCfgDataCurrent.setMeteValue(commit);
                 tCfgMeteService.insertTCfgDataCurrent(tCfgDataCurrent);
             }else {
                 //库里已经有数据了
                 tCfgDataCurrent.setLastMeteValue(tCfgDataCurrent.getMeteValue());
                 tCfgDataCurrent.setRecordTime(sdf.parse(time));
-                if(commitValue == null){
-                    tCfgDataCurrent.setMeteValue(commit);
-                }else{
-                    tCfgDataCurrent.setMeteValue(commitValue);
-                }
+                tCfgDataCurrent.setMeteValue(commit);
                 tCfgMeteService.updateTCfgDataCurrent(tCfgDataCurrent);
             }
-            Map<String, String> map = new HashMap<>();
-            map.put("meteId",meteId.toString());
-            union(map);
+//            Map<String, String> map = new HashMap<>();
+//            map.put("meteId",meteId.toString());
+//            union(map);
             //将实时表里的数据更新到历史表里
-//            tCfgMeteService.insertIntoHis(tCfgDataCurrent);
-//            getUrl(UNION_URL,meteId.toString());
+            tCfgMeteService.insertIntoHis(tCfgDataCurrent);
+            getUrl(UNION_URL,meteId.toString());
 
         }else if ("43".equals(udp[4])){
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());

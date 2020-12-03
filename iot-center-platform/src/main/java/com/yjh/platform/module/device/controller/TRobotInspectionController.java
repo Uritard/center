@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.service.TRobotInspectionService;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import java.util.HashMap;
@@ -160,8 +161,13 @@ public class TRobotInspectionController {
     @RequestMapping(value = "/selectRobotTaskMessage", method = RequestMethod.GET)
     public Result selectRobotTaskMessage(@RequestParam(value = "robotId") Long robotId){
         Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
-            result.setData(tRobotInspectionService.selectRobotTaskMessage(robotId));
+            List<RobotTaskMessage> list =tRobotInspectionService.selectRobotTaskMessage(robotId);
+            resultMap.put("taskInfo",list);
+            Object taskProgress = tRobotInspectionService.selectRobotTaskProgress(robotId);
+            resultMap.put("taskProgress",taskProgress);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("机器人巡检点分页查询失败描述：", e);
@@ -195,16 +201,4 @@ public class TRobotInspectionController {
         return result;
     }
 
-    @ApiOperation(value = "查询机器人任务进度信息")
-    @RequestMapping(value = "/selectRobotTaskProgress", method = RequestMethod.GET)
-    public Result selectRobotTaskProgress(@RequestParam(value = "robotCode") String robotCode) {
-        Result result = new Result();
-        try {
-            result.setData(tRobotInspectionService.selectRobotTaskProgress(robotCode));
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("查询机器人状态信息失败描述：", e);
-        }
-        return result;
-    }
 }

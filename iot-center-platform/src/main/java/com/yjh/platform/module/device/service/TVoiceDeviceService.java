@@ -24,51 +24,51 @@ public class TVoiceDeviceService{
     @Autowired
     private TVoiceDeviceDao tVoiceDeviceDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int add(TVoiceDevice tVoiceDevice) {
         return this.tVoiceDeviceDao.add(tVoiceDevice);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String voiceDeviceId) {
         return this.tVoiceDeviceDao.deleteByPrimaryId(voiceDeviceId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module",content = "根据页面传入的参数修改数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TVoiceDevice tVoiceDevice) {
         return this.tVoiceDeviceDao.update(tVoiceDevice);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TVoiceDevice selectByPrimaryId(String voiceDeviceId) {
         return this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TVoiceDevice> select(String voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, String configId) {
         List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId);
         return tVoiceDeviceList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TVoiceDevice> selectByPage(TVoiceDevice tVoiceDevice) {
         List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(tVoiceDevice);
         return tVoiceDeviceList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TVoiceDevice> list) {
         return this.tVoiceDeviceDao.batchAdd(list);
     }
 
-    @Logs(title = "批量删除", code = "module")
+    @Logs(title = "批量删除", code = "module",content = "根据页面传入的参数批量删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String voiceDeviceId) {
     List<String> list1= Arrays.asList(voiceDeviceId.split(","));
@@ -81,9 +81,9 @@ public class TVoiceDeviceService{
     public List<VoiceDevice> selectVoiceDeviceTree() {
         List<VoiceDevice> re = new ArrayList<>();
         VoiceDevice voiceDeviceTree = new VoiceDevice();
-        voiceDeviceTree.setInfoType("");
+        voiceDeviceTree.setInfoType("tree");
         voiceDeviceTree.setLabel("音频设备树");
-        voiceDeviceTree.setId("1");
+        voiceDeviceTree.setId("-1");
         List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.selectAll();
         List<VoiceDevice> child = new ArrayList<>();
         for (TVoiceDevice item:tVoiceDeviceList) {
@@ -91,6 +91,7 @@ public class TVoiceDeviceService{
             childDevice.setId(item.getVoiceDeviceId());
             childDevice.setLabel(item.getVoiceDeviceName());
             childDevice.setUpId("1");
+            childDevice.setInfoType("device");
             childDevice.setUpName("音频设备树");
             child.add(childDevice);
         }

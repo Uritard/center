@@ -21,45 +21,45 @@ public class TCfgTeleadjustService{
     @Autowired
     private TCfgTeleadjustDao tCfgTeleadjustDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增一条数据")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgTeleadjust tCfgTeleadjust) {
         return this.tCfgTeleadjustDao.insert(tCfgTeleadjust);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除一条数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String deviceId) {
         return this.tCfgTeleadjustDao.deleteByPrimaryId(deviceId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module",content = "根据页面传入的参数修改一条数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgTeleadjust tCfgTeleadjust) {
         return this.tCfgTeleadjustDao.update(tCfgTeleadjust);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TCfgTeleadjust selectByPrimaryId(String deviceId) {
         return this.tCfgTeleadjustDao.selectByPrimaryId(deviceId);
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgTeleadjust> select(String deviceId, String meteId, String meteName, Float upEffect, Float downEffect, Integer metePrecision, String unit, Integer meteIndex, Integer meteCid, Integer adjustKind, Float lastValue, Date lastTime, String meteCode, String deviceType, String description, Float stander, Integer controlenable) {
         List<TCfgTeleadjust> tCfgTeleadjustList = tCfgTeleadjustDao.select(deviceId, meteId, meteName, upEffect, downEffect, metePrecision, unit, meteIndex, meteCid, adjustKind, lastValue, lastTime, meteCode, deviceType, description, stander, controlenable);
         return tCfgTeleadjustList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgTeleadjust> selectByPage(TCfgTeleadjust tCfgTeleadjust) {
         List<TCfgTeleadjust> tCfgTeleadjustList = tCfgTeleadjustDao.selectByPage(tCfgTeleadjust);
         return tCfgTeleadjustList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgTeleadjust> list) {
         return this.tCfgTeleadjustDao.batchInsert(list);

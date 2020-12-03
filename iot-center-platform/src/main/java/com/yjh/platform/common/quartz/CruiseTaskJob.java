@@ -183,17 +183,17 @@ public class CruiseTaskJob extends QuartzJobBean {
             List<String> analysisInstanceList = new ArrayList<>();
 
             //找出机器人做任务的巡检点
-            List<Long> robotInstanceList = new ArrayList<>();
+            List<Long> robotCruiseList = new ArrayList<>();
             List<Long> instanceList = new ArrayList<>();
             for (TCruisePointInstance item : instancesList) {
                 if (228 == item.getCruiseType()) {
-                    robotInstanceList.add(item.getCruiseId());
+                    robotCruiseList.add(item.getCruiseId());
                     instanceList.add(item.getInstanceId());
                 }
             }
-            log.info("robotInstanceList   :" +robotInstanceList);
-            if(robotInstanceList.size() != 0){
-                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+            log.info("robotCruiseList   :" +robotCruiseList);
+            if(robotCruiseList.size() != 0){
+                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 log.info("robotCode   :" +robotCode);
                 for (String item: robotCode){
@@ -202,14 +202,13 @@ public class CruiseTaskJob extends QuartzJobBean {
                     robotTaskInfo.setTaskId(taskId);
                     robotTaskInfo.setPriority(4);//优先级 暂定4
                     robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                    List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
-                    robotTaskInfo.setDeviceList(deviceList);
+                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
+                    robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     robotTaskInfo.setRobotCode(item);
                     robotTaskInfoList.add(robotTaskInfo);
                 }
-                Map<String,Object> robotTaskInfoMap = new HashMap<>();
+                Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
                 robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
-                robotTaskInfoMap.put("instanceList",instanceList);
 
                 log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                 //让机器人做任务
@@ -569,7 +568,7 @@ public class CruiseTaskJob extends QuartzJobBean {
     }
 
     //让机器人做任务
-    private void robotTask(Map<String,Object> robotTaskInfoMap) {
+    private void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {

@@ -144,7 +144,7 @@ public class RunAtNowTask implements Runnable{
         }
     }
     //让机器人做任务
-    private void robotTask(Map<String,Object> robotTaskInfoMap) {
+    private void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
@@ -232,17 +232,17 @@ public class RunAtNowTask implements Runnable{
             List<String> analysisInstanceList = new ArrayList<>();
 
             //找出机器人做任务的巡检点
-            List<Long> robotInstanceList = new ArrayList<>();
+            List<Long> robotCruiseList = new ArrayList<>();
             List<Long> instanceList = new ArrayList<>();
             for (TCruisePointInstance item : instancesList) {
                 if (228 == item.getCruiseType()) {
-                    robotInstanceList.add(item.getCruiseId());
+                    robotCruiseList.add(item.getCruiseId());
                     instanceList.add(item.getInstanceId());
                 }
             }
-            log.info("robotInstanceList   :" +robotInstanceList);
-            if(robotInstanceList.size() != 0){
-                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotInstanceList);
+            log.info("robotCruiseList   :" +robotCruiseList);
+            if(robotCruiseList.size() != 0  && !isGoOn){
+                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 log.info("robotCode   :" +robotCode);
                 for (String item: robotCode){
@@ -251,21 +251,31 @@ public class RunAtNowTask implements Runnable{
                     robotTaskInfo.setTaskId(taskId);
                     robotTaskInfo.setPriority(4);//优先级 暂定4
                     robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                    List<String> deviceList = tRobotInspectionDao.selectRobotInspectionId(robotInstanceList,item);
-                    robotTaskInfo.setDeviceList(deviceList);
+                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
+                    robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     robotTaskInfo.setRobotCode(item);
                     robotTaskInfoList.add(robotTaskInfo);
+                    Map<String,Object> robotStates  = redisTemplate.opsForHash().entries("RobotTaskStatus:"+item);
+                    Map<String,Object> mapForRobotStates=new HashMap<>();
+                    jasonMap.put("type","robotStates");
+                    jasonMap.put("taskId",taskId);
+                    jasonMap.put("robotStates",robotStates.get("value"));
+                    String forRobotStates=JSON.toJSONString(mapForRobotStates);
+                    log.info("发送给前端的机器人状态消息：   "+forRobotStates);
+                    WebSocketServer.sendMsg(forRobotStates);
                 }
-                Map<String,Object> robotTaskInfoMap = new HashMap<>();
+                Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
                 robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
-                robotTaskInfoMap.put("instanceList",instanceList);
 
                 log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                 //让机器人做任务
                 robotTask(robotTaskInfoMap);
+                //获取机器人运行状态
             }
 
             log.info("开始巡检"+new Date());
+
+
             for (TCruisePointInstance item : instancesList) {
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                 tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());

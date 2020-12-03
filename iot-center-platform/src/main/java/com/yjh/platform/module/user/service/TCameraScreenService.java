@@ -27,19 +27,19 @@ public class TCameraScreenService{
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraScreen tCameraScreen) {
         return this.tCameraScreenDao.add(tCameraScreen);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long userId) {
         return this.tCameraScreenDao.deleteByPrimaryId(userId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module",content = "根据页面传入的参数修改数据")
     @Transactional(rollbackFor = Exception.class)
     public Date update(TCameraScreen tCameraScreen,String userId) {
         Long user = Long.parseLong(userId);
@@ -54,7 +54,7 @@ public class TCameraScreenService{
         }
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TCameraScreenDetail selectByPrimaryId(Long userId) {
         TCameraScreenDetail tCameraScreenDetail = this.tCameraScreenDao.selectByPrimaryId(userId);
@@ -81,34 +81,34 @@ public class TCameraScreenService{
         return tCameraScreenDetail;
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraScreen> select(Long userId, String screenNum, String cameraIds, Date createTime) {
         List<TCameraScreen> tCameraScreenList = tCameraScreenDao.select(userId, screenNum, cameraIds, createTime);
         return tCameraScreenList;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraScreen> selectByPage(TCameraScreen tCameraScreen) {
         List<TCameraScreen> tCameraScreenList = tCameraScreenDao.selectByPage(tCameraScreen);
         return tCameraScreenList;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TCameraScreen> list) {
         return this.tCameraScreenDao.batchAdd(list);
     }
 
-    @Logs(title = "批量删除", code = "module")
+    @Logs(title = "批量删除", code = "module",content = "根据页面传入的参数批量删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String userId) {
     List<String> list1= Arrays.asList(userId.split(","));
     return this.tCameraScreenDao.batchDelete(list1);
     }
 
-    @Logs(title = "摄像机状态树", code = "module")
+    @Logs(title = "摄像机状态树", code = "module",content = "根据页面传入的参数获取摄像机状态树")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfoDetail> cameraStateTree() {
         List<AreaInfoDetail> listTree = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.module.task.entity.TUnionInfo;
 import com.yjh.platform.module.task.entity.UnionTaskInfo;
 import com.yjh.platform.module.task.service.THisTelemeterDataService;
 import com.yjh.platform.module.task.entity.THisTelemeterData;
@@ -124,6 +125,7 @@ public class THisTelemeterDataController {
     public Result selectByPage(@RequestParam(value = "startTime", required = false) Date startTime,
                                @RequestParam(value = "endTime", required = false) Date endTime,
                                @RequestParam(value = "meteKind", required = false) Integer meteKind,
+                               @RequestParam(value = "deviceName", required = false) String deviceName,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
@@ -131,7 +133,7 @@ public class THisTelemeterDataController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<THisTelemeterData> list = tHisTelemeterDataService.selectAll(startTime, endTime, meteKind, meteName);
+            List<TUnionInfo> list = tHisTelemeterDataService.selectAll(startTime, endTime, meteKind, deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -159,15 +161,16 @@ public class THisTelemeterDataController {
     @RequestMapping(value = "/selectUnionTask", method = RequestMethod.GET)
     public Result selectUnionTask(@RequestParam(value = "startTime", required = false) Date startTime,
                                   @RequestParam(value = "endTime", required = false) Date endTime,
-                                  @RequestParam(value = "meteKind", required = false) Integer meteKind,
                                   @RequestParam(value = "meteName", required = false) String meteName,
+                                  @RequestParam(value = "deviceName", required = false) String deviceName,
                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+        //@RequestParam(value = "meteKind", required = false) Integer meteKind,
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<UnionTaskInfo> list = tHisTelemeterDataService.selectUnionTask(startTime, endTime, meteKind, meteName);
+            List<UnionTaskInfo> list = tHisTelemeterDataService.selectUnionTask(startTime, endTime, meteName,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

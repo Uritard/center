@@ -20,17 +20,20 @@ public class SysRoleCameraService{
     @Autowired
     private SysRoleCameraDao sysRoleCameraDao;
 
+
     @Logs(title = "插入", code = "module", content = "新增角色相机关联关系")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysRoleCamera sysRoleCamera) {
         return this.sysRoleCameraDao.insert(sysRoleCamera);
     }
 
+
     @Logs(title = "删除", code = "module", content = "删除角色相机关联关系")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long roleId) {
         return this.sysRoleCameraDao.deleteByPrimaryId(roleId);
     }
+
 
     @Logs(title = "更新", code = "module", content = "更新角色相机关联关系")
     @Transactional(rollbackFor = Exception.class)

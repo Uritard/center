@@ -25,12 +25,14 @@ public class TSysParamService{
     @Autowired
     private RedisTemplate redisTemplate;
 
+
     @Logs(title = "插入", code = "module", content = "新增系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TSysParam tSysParam) {
          this.tSysParamDao.insert(tSysParam);
          return this.insertIntoRedis();
     }
+
 
     @Logs(title = "删除", code = "module", content = "删除系统参数信息")
     @Transactional(rollbackFor = Exception.class)
@@ -46,11 +48,13 @@ public class TSysParamService{
         return this.insertIntoRedis();
     }
 
+
     @Logs(title = "查询", code = "module", content = "根据参数ID查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public TSysParam selectByPrimaryId(Integer paramId) {
         return this.tSysParamDao.selectByPrimaryId(paramId);
     }
+
 
     @Logs(title = "查询", code = "module", content = "查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
@@ -59,12 +63,14 @@ public class TSysParamService{
         return tSysParamList;
     }
 
+
     @Logs(title = "分页查询", code = "module", content = "分页查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TSysParam> selectByPage(Integer paramId, String paramType, String paramName, String content, String remark) {
         List<TSysParam> tSysParamList = tSysParamDao.selectByPage(paramId, paramType, paramName, content, remark);
         return tSysParamList;
     }
+
 
     @Logs(title = "新增", code = "module", content = "批量新增系统参数信息")
     @Transactional(rollbackFor = Exception.class)

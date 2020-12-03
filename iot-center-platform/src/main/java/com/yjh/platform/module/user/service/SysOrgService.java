@@ -49,6 +49,7 @@ public class SysOrgService{
         return this.sysOrgDao.update(sysOrg);
     }
 
+
     @Logs(title = "主键查询", code = "module", content = "新增组织机构")
     @Transactional(rollbackFor = Exception.class)
     public SysOrg selectByPrimaryId(Long orgId) {
