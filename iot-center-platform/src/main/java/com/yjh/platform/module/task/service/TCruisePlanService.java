@@ -56,7 +56,10 @@ public class TCruisePlanService{
                 for (Map<String, Object> instanceMap:InstanceMapList) {
                     TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
                     tCruisePlanAttr.setPlanId(planId);
-                    if (Objects.nonNull(map.get("subType"))) tCruisePlanAttr.setSubType(Integer.parseInt(String.valueOf(map.get("subType"))));
+                    if (Objects.nonNull(map.get("subType"))) {
+                        Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
+                        tCruisePlanAttr.setSubType(subType);
+                    }
                     Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
                     tCruisePlanAttr.setInstanceId(instanceId);
                     if (Objects.nonNull(instanceMap.get("cruiseType"))) {
@@ -110,7 +113,10 @@ public class TCruisePlanService{
             tCruisePlanAttr.setPlanId(planId);
             tCruisePlanAttr.setInstanceId(Long.valueOf(String.valueOf(map.get("instanceId"))));
             tCruisePlanAttr.setUpdateTime(date);
-            if (Objects.nonNull(map.get("subType"))) tCruisePlanAttr.setSubType(Integer.parseInt(String.valueOf(map.get("subType"))));
+            if (Objects.nonNull(map.get("subType"))) {
+                Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
+                tCruisePlanAttr.setSubType(subType);
+            }
             tCruisePlanAttrList.add(tCruisePlanAttr);
         }
         this.tCruisePlanAttrDao.deleteByPrimaryId(planId);

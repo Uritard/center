@@ -220,8 +220,12 @@ public class TCruisePlanController {
                 deviceIds.add(tCruisePlanAttrDetail.getDeviceId());
             }
             deviceIds = deviceIds.stream().distinct().collect(Collectors.toList());
-            if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubType())) planDetailMap.put("subType", tCruisePlanAttrDetailList.get(0).getSubType());
-            if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubTypeName())) planDetailMap.put("subTypeName", tCruisePlanAttrDetailList.get(0).getSubTypeName());
+            if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubType())) {
+                planDetailMap.put("subType", tCruisePlanAttrDetailList.get(0).getSubType());
+            } else {planDetailMap.put("subType", "");}
+            if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubTypeName())) {
+                planDetailMap.put("subTypeName", tCruisePlanAttrDetailList.get(0).getSubTypeName());
+            } else {planDetailMap.put("subTypeName", "");}
             planDetailMap.put("instanceList", tCruisePlanAttrDetailList);
             planDetailMap.put("deviceIds", deviceIds);
             result.setData(planDetailMap);

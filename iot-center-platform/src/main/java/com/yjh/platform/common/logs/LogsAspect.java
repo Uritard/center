@@ -61,7 +61,7 @@ public class LogsAspect {
         Logs annotation = signature.getMethod().getAnnotation(Logs.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
-        String userId = null, userName = null, serviceId = null, ip = null;
+        String userId = "", userName = "", serviceId = "", ip = "";
         HttpServletRequest request = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
@@ -116,7 +116,7 @@ public class LogsAspect {
             params.set("ip", ip);
             params.set("title", "内部接口错误");
             params.set("state", 2);
-            params.set("content", annotation.content() + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
+            params.set("content", content.toString() + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
             params.set("userId", userId);
             params.set("userName", userName);
             post(params);
