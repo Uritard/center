@@ -114,9 +114,12 @@
 
     <select id="reportSelect" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TReportInfo">
         SELECT
+            a.report_id,
             a.report_name,
             a.report_type,
-            a.generate_date
+            a.generate_date,
+            a.report_env_id,
+            a.remarks
         FROM
          t_report_info a
         WHERE 1 = 1
