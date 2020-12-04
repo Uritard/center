@@ -387,7 +387,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     Items.put("weather_interval", "6");//微气象数据间隔
                     ItemsList.add(Items);
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
-                            .setSendCode("巡视主机")
+                            .setSendCode("Server01")
                             .setReceiveCode(xmlBaseModel.getSendCode())//Client01
                             .setType("251")
                             .setCode("200")
@@ -629,7 +629,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 case "41":
                     log.info("巡视主机收到任务状态数据了");
                     //处理任务状态数据
-                        Map<String, String> taskStatusMap = new HashMap<>();
+                        Map<String, Object> taskStatusMap = new HashMap<>();
                         taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
                         taskStatusMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
                         taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
@@ -644,7 +644,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //入库或者放缓存(还没写)
 
                     //先读缓存，进行修改
-                    Map<String, String> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode());
+                    Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode());
                     taskStatusMap.put("instanceList",listMap.get("instanceIdList"));
                     //再将taskStatusMap放进缓存
                     redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode(), taskStatusMap);
@@ -708,16 +708,19 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     *《这》《里》《是》《处》《理》《巡》
                     * 《检》《结》《果》《的》《步》《骤》
                     * */
+
                     //根据taskId查询相关内容
 //                    String taskId = cruiseResultList.get(0).get("taskCode");
                     String taskId = cruiseResultMap.get("taskCode");
                     Map<String,String> relateInfoMap = robotService.selectRelateInfo(taskId);
                     String taskResultId = relateInfoMap.get("task_result_id");
+
 //
 //                    List<TCruiseTaskResultDetail> TCTRDList = new ArrayList<>();//巡检点状态详细表tctrd
 //                    for (Map<String,String> map : cruiseResultList) {
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                     Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info*");
+                    Map<String,Object> tCruiseTaskResultMap = new HashMap<>();
 
                     for (String key : robotInfoKeys){
                         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);//读缓存
@@ -725,16 +728,23 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             String instanceId = redisInfoMap.get("instanceId");
                             String cruiseTime = redisInfoMap.get("redisInfoMap");
                             log.info("该deviceId对应的instanceId是===" + instanceId);
-                            tCruiseTaskResultDetail.setInstanceId(Long.valueOf(instanceId));
-                            tCruiseTaskResultDetail.setCruiseResultId(taskResultId + instanceId);
-                            tCruiseTaskResultDetail.setCruiseTime(sdf.parse(cruiseTime));
+
+                            String str = "t_cruise_task_result:"+taskId + instanceId;
+                            tCruiseTaskResultMap.put("instanceId",instanceId);
+                            tCruiseTaskResultMap.put("cruiseResultId",instanceId);
+
                         }
                     }
+
+                    /*tCruiseTaskResultDetail.setInstanceId(Long.valueOf(instanceId));
+                    tCruiseTaskResultDetail.setCruiseResultId(taskResultId + instanceId);
+                    tCruiseTaskResultDetail.setCruiseTime(sdf.parse(cruiseTime));
                     tCruiseTaskResultDetail.setTaskResultId(taskResultId);
                     tCruiseTaskResultDetail.setDeviceId(null);
                     tCruiseTaskResultDetail.setEndTime(sdf.parse(cruiseResultMap.get("time")));
                     tCruiseTaskResultDetail.setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
-                    tCruiseTaskResultDetail.setRemark(null);
+                    tCruiseTaskResultDetail.setRemark(null);*/
+
 //                        TCTRDList.add(tCruiseTaskResultDetail);
 //                    }
 //                    log.info("TCTRDList的内容==="+TCTRDList);
@@ -816,7 +826,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         xmlBaseModelEmpty.setTime(sdf.format(new Date()));
         xmlBaseModelEmpty.setType("251");
         xmlBaseModelEmpty.setCode(flag?"200":"500");
-        xmlBaseModelEmpty.setSendCode("巡视主机");
+        xmlBaseModelEmpty.setSendCode("Server01");
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;
     }

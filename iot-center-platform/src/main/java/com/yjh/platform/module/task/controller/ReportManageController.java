@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.task.entity.TDefectInfo;
 import com.yjh.platform.module.task.entity.TReportInfo;
 import com.yjh.platform.module.task.service.ReportManageService;
 import io.swagger.annotations.Api;
@@ -15,7 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -68,12 +70,10 @@ public class ReportManageController {
     }
     @ApiOperation(value = "下载报表")
     @RequestMapping(value = "/reportDownload", method = RequestMethod.GET)
-    public Result reportDownload(@RequestParam(value = "reportName") String reportName,
-                                 @RequestParam(value="reportType")String reportType,
-                                 @RequestParam(value = "startTime")String startTime) {
+    public Result reportDownload(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {
-            String downLoadFilePath = reportManageService.reportDownload(reportName,reportType,startTime,reportRelativePath);
+            String downLoadFilePath = reportManageService.reportDownload(reportId,reportRelativePath);
             result.setData(downLoadFilePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -137,12 +137,10 @@ public class ReportManageController {
     }
     @ApiOperation(value = "删除报表")
     @RequestMapping(value = "/reportDelete", method = RequestMethod.DELETE)
-    public Result reportDelete(@RequestParam(value = "reportName") String reportName,
-                               @RequestParam(value="reportType")String reportType,
-                               @RequestParam(value = "startTime")String startTime) {
+    public Result reportDelete(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.reportDelete(reportName,reportType,startTime,reportAbsolutePath));
+            result.setData(reportManageService.reportDelete(reportId,reportAbsolutePath));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

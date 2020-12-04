@@ -1,14 +1,11 @@
 package com.yjh.platform.module.task.service;
 
-import com.lambdaworks.redis.ScriptOutputType;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Report.ReportDataRepo;
 import com.yjh.platform.common.utils.Report.ReportHelper;
-import com.yjh.platform.module.task.controller.ReportManageController;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
-import org.apache.bcel.generic.RET;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +71,9 @@ public class ReportManageService {
         String nowTime = f.format(date);
 
 //        String fileName = nowTime+"-"+reportType+".xlsx";
-        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
+        //生成随机的文件名称
+        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+//        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String reportPath2 = reportPath+"/"+fileName;
         log.info("reportPath2:"+reportPath2);
@@ -107,21 +106,25 @@ public class ReportManageService {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        TReportInfo reportInfo = new TReportInfo();
-        reportInfo.setReportName(reportName);
-        reportInfo.setReportType(reportType);
-        reportInfo.setGenerateDate(date);
-        reportInfo.setRemarks("");
+        TReportInfo reportInfo = new TReportInfo()
+                .setReportId(String.valueOf(UUID.randomUUID()).replace("-", ""))
+                .setReportName(reportName)
+                .setReportType(reportType)
+                .setGenerateDate(date)
+                .setReportEnvId(fileName);
         int res = reportManageDao.insertReport(reportInfo);
         return res;
     }
     @Logs(title = "下载报表", code = "reportManage",content = "通过web传递的参数下载报表")
     @Transactional(rollbackFor = Exception.class)
-    public String reportDownload(String reportName,String reportType,String startTime,String reportPath) {
-        String time2 =  DateTimeUtil.changeTime2(startTime);
-        String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
+    public String reportDownload(String reportId,String reportPath) {
+//        String time2 =  DateTimeUtil.changeTime2(startTime);
+//        String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
 //        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
+        String fileName = reportManageDao.selectReportEnvId(reportId);
         String filePath = reportPath+"/"+fileName;
+//        String filePath = reportPathA+fileName;
+
         log.info("filePath:"+filePath);
         return filePath;
     }
@@ -210,7 +213,7 @@ public class ReportManageService {
     }
     @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
-    public int reportDelete(String reportName,String reportType, String startTime,String reportPath) {
+    public int reportDelete(String reportId,String reportPath) {
         String url = "ls "+reportPath+" | wc -w";
         long count = 0;
         try {
@@ -224,8 +227,9 @@ public class ReportManageService {
             e.printStackTrace();
         }
         log.info("删除前文件的个数："+count);
-        String timeTemp =  DateTimeUtil.changeTime2(startTime);
-        String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
+//        String timeTemp =  DateTimeUtil.changeTime2(startTime);
+//        String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
+        String fileName = reportManageDao.selectReportEnvId(reportId);
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String filePath = reportPath+"/"+fileName;
         log.info("filePath:"+filePath);
@@ -251,7 +255,7 @@ public class ReportManageService {
         log.info("删除后文件的个数："+count2);
         int res = 0;
         if (count - 1 == count2){
-            res = reportManageDao.reportDelete(reportName,startTime);
+             res = reportManageDao.reportDelete(reportId);
         }
         return res;
     }

@@ -107,11 +107,9 @@
 		LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
 		LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
     </sql>
-    <delete id="reportDelete" parameterType="java.lang.Long">
-        delete from
-            t_report_info
-        WHERE
-            report_name = #{reportName, jdbcType=VARCHAR} and generate_date = #{generateDate, jdbcType=TIMESTAMP}
+    <delete id="reportDelete" parameterType="java.lang.String">
+        delete from t_report_info
+        WHERE report_id = #{reportId, jdbcType=VARCHAR}
     </delete>
 
     <select id="reportSelect" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TReportInfo">
@@ -132,17 +130,26 @@
     </select>
     <insert id="insertReport" parameterType="com.yjh.platform.module.task.entity.TReportInfo">
         insert into t_report_info(
+            report_id,
             report_name,
             report_type,
             generate_date,
+            report_env_id,
             remarks
         )values(
+                #{reportId, jdbcType=VARCHAR},
                 #{reportName, jdbcType=VARCHAR},
                 #{reportType, jdbcType=VARCHAR},
                 #{generateDate, jdbcType=TIMESTAMP},
+                #{reportEnvId, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR}
         )
     </insert>
+    <select id="selectReportEnvId" parameterType="java.lang.String" resultType="java.lang.String">
+        select  report_env_id from t_report_info
+        where 1 = 1
+        <if test="reportId != null and reportId != ''">and report_id = #{reportId,jdbcType = VARCHAR}</if>
+    </select>
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         <include refid="TongYong"></include>
         where 1 = 1

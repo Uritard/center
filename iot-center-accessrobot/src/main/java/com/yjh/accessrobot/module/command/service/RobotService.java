@@ -44,7 +44,7 @@ public class RobotService {
     public String feignRobotControl(String robotCode,String type, String command,List<Map<String,Object>> Item){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("巡视主机")
+                .setSendCode("Server01")
                 .setReceiveCode(robotCode)
                 .setCode("省检018")
                 .setTime(sdf.format(new Date()))
@@ -62,7 +62,7 @@ public class RobotService {
     public String feignRobotTransfer(String robotCode){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("巡视主机")
+                .setSendCode("Server01")
                 .setReceiveCode(robotCode)
                 .setCode("省检018")
                 .setTime(sdf.format(new Date()))
@@ -182,7 +182,7 @@ public class RobotService {
 
                 //将instanceIdList放缓存，以备后续使用
                 Map<String,Object> instanceListMap = new HashMap<>();
-                instanceListMap.put("instanceIdList",instanceIdList);
+                instanceListMap.put("instanceIdList",String.valueOf(instanceIdList));
                 redisTemplate.opsForHash().putAll("RobotTaskStatus:"+rTII.getRobotCode(),instanceListMap);
 
                 for (Long instanceId : instanceIdList) {
@@ -236,7 +236,7 @@ public class RobotService {
 
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("101")
-                        .setSendCode("巡视主机")
+                        .setSendCode("Server01")
                         .setReceiveCode(rTII.getRobotCode())
                         .setCode("省检018")
                         .setTime(sdf.format(new Date()))
@@ -269,7 +269,7 @@ public class RobotService {
         for (String robotCode : robotCodeList){
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setType("41")
-                    .setSendCode("巡视主机")
+                    .setSendCode("Server01")
                     .setReceiveCode(robotCode)
                     .setCode(taskId)
                     .setCommand(commandValue)

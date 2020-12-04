@@ -30,7 +30,7 @@ public interface ReportManageDao {
     List<CheckPointType> selectMeteType(@Param(value = "list") List<String> list);
     List<CheckPointType> selectMeteType2(@Param(value = "taskId")String taskId);
     int insertReport(TReportInfo reportInfo);
+    String selectReportEnvId(@Param(value = "reportId") String reportId);
     List<TReportInfo> reportSelect(HashMap<String,Object> map);
-    int reportDelete(@Param(value = "reportName") String reportName,
-                     @Param(value = "startTime")String startTime);
+    int reportDelete(@Param(value = "reportId") String reportId);
 }
