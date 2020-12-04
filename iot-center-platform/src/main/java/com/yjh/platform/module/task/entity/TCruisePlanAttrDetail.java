@@ -56,6 +56,9 @@ public class TCruisePlanAttrDetail implements Serializable {
     @ApiModelProperty(value = "巡检方式 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹")
     private Integer pointType;
 
+    @ApiModelProperty(value = "任务子类型")
+    private Integer subType;
+
     @ApiModelProperty(value = "区域ID")
     private String areaId;
 

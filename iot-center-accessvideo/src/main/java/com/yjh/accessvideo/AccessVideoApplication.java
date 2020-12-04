@@ -81,9 +81,9 @@ public class AccessVideoApplication implements CommandLineRunner {
             lUserID = -1;
         }
         List<RecorderConInfo> recorderConInfoList = cameraConDao.SelectRecords();
+        log.info("recorderConInfoList: "+recorderConInfoList);
         long recordId = 1234;
         for (RecorderConInfo recorderConInfo:recorderConInfoList) {
-
             recordId = recorderConInfo.getRecordId();
             String m_sDeviceIP = recorderConInfo.getRecordIp();
             log.info("register nvr, and ip is "+m_sDeviceIP+", and name is "+recorderConInfo.getRecordName());

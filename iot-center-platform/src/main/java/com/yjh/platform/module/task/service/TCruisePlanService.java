@@ -109,6 +109,7 @@ public class TCruisePlanService{
             tCruisePlanAttr.setPlanId(planId);
             tCruisePlanAttr.setInstanceId(Long.valueOf(String.valueOf(map.get("instanceId"))));
             tCruisePlanAttr.setUpdateTime(date);
+            if (Objects.nonNull(map.get("subType"))) tCruisePlanAttr.setSubType(Integer.parseInt(String.valueOf(map.get("subType"))));
             tCruisePlanAttrList.add(tCruisePlanAttr);
         }
         this.tCruisePlanAttrDao.deleteByPrimaryId(planId);
