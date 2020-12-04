@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
+import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.task.entity.ConfirmImmediately;
 import org.apache.ibatis.annotations.Param;
@@ -38,12 +39,14 @@ public interface TRobotInspectionDao {
     List<String> selectForRobotTask(@Param(value = "list") List<Long> list);
     List<Long> selectRobotTaskInstanceId(@Param(value = "list") List<Long> list,
                                        @Param(value = "robotCode") String robotCode);
-    List<RobotTaskMessage> selectRobotTaskMessage(@Param(value = "robotId") Long robotId);
+    List<TCruisePointAttr> selectRobotTaskMessage(@Param(value = "list") String[] list);
 
     List<Robot> selectRobotInfo();
 
     List<ConfirmImmediately> selectRobotInspectionIds();
 
     List<String> selectRobotIsRunning(@Param(value = "taskId") String taskId);
+
+    String selectRobotCode(@Param(value = "robotId") Long robotId);
 
 }

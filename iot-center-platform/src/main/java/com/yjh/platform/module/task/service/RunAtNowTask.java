@@ -494,6 +494,9 @@ public class RunAtNowTask implements Runnable{
                         //所有点都做完了
                         tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                         tCruiseTaskResultDao.insert(tCruiseTaskResult);
+                        Thread.sleep(15000);
+                        tCruiseResult.setCState(240);
+                        tCruiseResultDao.update(tCruiseResult);
                     }
                     mapForAbnormal.put("abnormal",abnormal.toString());
                     mapForAbnormal.put("normal",normal.toString());
@@ -531,6 +534,9 @@ public class RunAtNowTask implements Runnable{
 
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
+                Thread.sleep(15000);
+                tCruiseResult.setCState(240);
+                tCruiseResultDao.update(tCruiseResult);
 
             }else {
                 mapForAbnormal.put("abnormal",abnormal.toString());

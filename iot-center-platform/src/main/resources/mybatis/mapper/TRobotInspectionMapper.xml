@@ -225,27 +225,25 @@
         left join t_robot_info b ON a.robot_id = b.robot_id
     </select>
 
-    <select id="selectRobotTaskMessage" resultType="com.yjh.platform.module.device.entity.RobotTaskMessage">
+    <select id="selectRobotTaskMessage" resultType="com.yjh.platform.module.device.entity.TCruisePointAttr">
         SELECT
-            e.device_name,
+            e.device_name as attrName,
 			(CASE
             WHEN ISNULL(g.mete_name) AND ISNULL(a.inspection_name) THEN ''
             WHEN ISNULL(g.mete_name)  THEN a.inspection_name
             WHEN ISNULL(a.inspection_name)  THEN g.mete_name
             ELSE CONCAT(g.mete_name,'/',a.inspection_name)
             END) AS instance_name,
-            d.result_num as result,
-            c.cruise_time
+            f.instance_id
         FROM
-            t_robot_inspection a
-        LEFT JOIN t_cruise_data_result d ON a.inspection_id = d.cruise_id
-        LEFT JOIN t_cruise_task_result_detail c ON d.cruise_result_id = c.cruise_result_id
-        LEFT JOIN t_cruise_result b ON b.c_state = 239 AND b.task_result_id = c.task_result_id
-        left join (SELECT	DISTINCT device_id,device_name from t_std_device) e on e.device_id = c.device_id
-		left join t_cruise_point_instance f on c.instance_id = f.instance_id
+            t_cruise_point_instance f
+        left join (SELECT DISTINCT device_id,device_name from t_std_device) e on e.device_id = f.device_id
+		left join t_robot_inspection a on f.cruise_id = a.inspection_id
 		left join t_std_devicemete g on f.device_mete_id = g.device_mete_id
         WHERE
-            a.robot_id = #{robotId,jdbcType=BIGINT}
+            f.instance_id in <foreach collection="list" open="(" close=")" separator="," item="instanceId">
+        #{instanceId,jdbcType=BIGINT}
+    </foreach>
     </select>
 
     <select id="selectRobotInfo" resultType="com.yjh.platform.module.device.entity.Robot">
@@ -278,6 +276,12 @@
             LEFT JOIN t_robot_info e ON d.robot_id = e.robot_id
         where 1=1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectRobotCode" resultType="java.lang.String">
+        select robot_code
+        from t_robot_info
+        where robot_id = #{robotId,jdbcType=BIGINT}
     </select>
 
 </mapper>

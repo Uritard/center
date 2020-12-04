@@ -23,6 +23,8 @@ public class UnionTaskInfo implements Serializable {
 
     private String meteName;
 
+    private String meteValue;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cruiseTime;
 

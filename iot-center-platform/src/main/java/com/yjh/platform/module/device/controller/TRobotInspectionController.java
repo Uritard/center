@@ -165,8 +165,12 @@ public class TRobotInspectionController {
         try {
             List<RobotTaskMessage> list =tRobotInspectionService.selectRobotTaskMessage(robotId);
             resultMap.put("taskInfo",list);
-            Object taskProgress = tRobotInspectionService.selectRobotTaskProgress(robotId);
-            resultMap.put("taskProgress",taskProgress);
+            if(list != null){
+                Object taskProgress = tRobotInspectionService.selectRobotTaskProgress(robotId);
+                resultMap.put("taskProgress",taskProgress);
+            }else {
+                resultMap.put("taskProgress",0);
+            }
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

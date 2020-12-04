@@ -1,15 +1,17 @@
 package com.yjh.platform.module.device.service;
 
+import com.baomidou.mybatisplus.extension.api.R;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
+import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 
 import java.util.*;
 
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import com.yjh.platform.module.user.entity.AreaInfoDetail;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class TRobotInspectionService{
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
 
     @Logs(title = "插入", code = "device",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
@@ -78,7 +81,46 @@ public class TRobotInspectionService{
     @Logs(title = "机器人监控", code = "device",content = "查询机器人的任务信息")
     @Transactional(rollbackFor = Exception.class)
     public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId){
-        return this.tRobotInspectionDao.selectRobotTaskMessage(robotId);
+        List<RobotTaskMessage> re = new ArrayList<>();
+        //获取此机器人的巡视点
+        String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
+        Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
+        Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
+        String taskId = (String)mapForRobotInstance.get("taskPatrolled_id");
+        String robotState =(String) mapForRobotState.get("value");
+        if( !"2".equals(robotState)){
+            //机器人未在做任务
+            return  null;
+        }
+        String instanceList = (String)mapForRobotInstance.get("instanceIdList");
+        instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
+        String[] instanceIdList = instanceList.split(", ");
+        List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
+        for (String item:instanceIdList) {
+            //获取任务数据
+            Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
+            RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
+            robotTaskMessage.setDeviceName(getName(Long.valueOf(item),1,nameList));
+            robotTaskMessage.setInstanceName(getName(Long.valueOf(item),0,nameList));
+            robotTaskMessage.setCruiseTime((Date)mapForRobotTaskMessage.get("cruiseTime"));
+            robotTaskMessage.setResult((String)mapForRobotTaskMessage.get("resultNum"));
+            re.add(robotTaskMessage);
+        }
+        return re;
+    }
+
+    private String getName(Long instanceId,int flag,List<TCruisePointAttr> nameList){
+        for (TCruisePointAttr item:nameList) {
+            if(instanceId.equals(item.getInstanceId())){
+                if(flag == 0){//巡检点名称
+                    return item.getInstanceName();
+                }
+                if(flag == 1){//设备名称
+                    return item.getAttrName();
+                }
+            }
+        }
+        return null;
     }
 
     @Logs(title = "查询机器人信息", code = "device",content = "查询机器人信息")
@@ -94,8 +136,8 @@ public class TRobotInspectionService{
         //获取状态信息
         Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":3");
         re.put("batteryLevel",mapForCell.get("valueUnit"));//电池电量
-        Map<String,Object> mapForState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-        re.put("state",mapForState.get("value"));//状态
+        Map<String,Object> mapForOnlineState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+        re.put("onlineState",mapForOnlineState.get("value"));//网络状态
         Map<String,Object> mapForRobotCoordinate  = redisTemplate.opsForHash().entries("RobotCoordinate:"+robotCode);
         re.put("robotCoordinate",mapForRobotCoordinate.get("coordinatePixel"));//机器人坐标
         Map<String,Object> mapForMileage  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":2");
@@ -104,6 +146,8 @@ public class TRobotInspectionService{
         re.put("speed",mapForSpeed.get("valueUnit"));//速度
         Map<String,Object> mapForCruiseMap  = redisTemplate.opsForHash().entries("RobotRoad:"+robotCode);
         re.put("cruiseMapPath",mapForCruiseMap.get("filePath"));//巡视路径地图路径
+        Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
+        re.put("robotState",mapForRobotState.get("value"));//机器人状态
         return re;
     }
 

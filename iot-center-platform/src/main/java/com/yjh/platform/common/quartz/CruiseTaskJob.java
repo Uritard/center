@@ -445,6 +445,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                         //所有点都做完了
                         tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                         tCruiseTaskResultDao.update(tCruiseTaskResult);
+                        Thread.sleep(15000);
+                        tCruiseResult.setCState(240);
+                        tCruiseResultDao.update(tCruiseResult);
                     }
                     mapForAbnormal.put("abnormal",abnormal.toString());
                     mapForAbnormal.put("normal",normal.toString());
@@ -480,9 +483,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                 mapForAbnormal.put("normal",normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
-                //todo 任务的完成状态
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
+                Thread.sleep(15000);
+                tCruiseResult.setCState(240);
+                tCruiseResultDao.update(tCruiseResult);
 
             }else {
                 mapForAbnormal.put("abnormal",abnormal.toString());
