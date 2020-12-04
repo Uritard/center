@@ -27,7 +27,7 @@
         <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
         <result column="value" jdbcType="VARCHAR" property="value" />
         <result column="out_range" jdbcType="VARCHAR" property="outRange" />
-        <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
+        <result column="task_id" jdbcType="VARCHAR" property="taskId"/>
     </resultMap>
 
     <resultMap id="videoAnalyseResult" type="com.yjh.accessvideo.module.device.entity.TVideoAnalyseResult">
@@ -102,6 +102,7 @@
         <result column="remark" jdbcType="VARCHAR" property="remark" />
         <result column="check_user" jdbcType="VARCHAR" property="checkUser" />
         <result column="check_date" jdbcType="TIMESTAMP" property="checkDate" />
+        <result column="is_warn" jdbcType="INTEGER" property="isWarn"/>
     </resultMap>
 
     <resultMap id="stdDeviceMete" type="com.yjh.accessvideo.module.device.entity.TStdDevicemete">
@@ -205,7 +206,7 @@
             video_path,
             value,
             out_range,
-            link_message
+            task_id
         )values(
                 #{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
@@ -231,7 +232,7 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{linkMessage, jdbcType=VARCHAR}
+                #{taskId, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -262,7 +263,7 @@
         video_path,
         value,
         out_range,
-        link_message
+        task_id
         )values
         <foreach collection="list" item="TWarnInfo" separator=",">
             (
@@ -290,7 +291,7 @@
             #{TWarnInfo.videoPath, jdbcType=VARCHAR},
             #{TWarnInfo.value, jdbcType=VARCHAR},
             #{TWarnInfo.outRange, jdbcType=VARCHAR},
-            #{TWarnInfo.linkMessage, jdbcType=VARCHAR}
+            #{TWarnInfo.taskId, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -529,7 +530,8 @@
             createtime,
             remark,
             check_user,
-            check_date
+            check_date,
+            is_warn
         )values(
                 #{cruiseDataId, jdbcType=BIGINT},
                 #{cruiseResultId, jdbcType=VARCHAR},
@@ -548,7 +550,8 @@
                 #{createtime, jdbcType=TIMESTAMP},
                 #{remark, jdbcType=VARCHAR},
                 #{checkUser, jdbcType=VARCHAR},
-                #{checkDate, jdbcType=TIMESTAMP}
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{isWarn,jdbcType=INTEGER}
         )
     </insert>
 
@@ -571,7 +574,8 @@
         createtime,
         remark,
         check_user,
-        check_date
+        check_date,
+        is_warn
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
@@ -592,7 +596,8 @@
             #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
             #{TCruiseDataResult.remark, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
-            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP}
+            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

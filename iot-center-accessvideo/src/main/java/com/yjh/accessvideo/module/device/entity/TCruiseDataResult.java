@@ -77,5 +77,8 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "审核时间")
     private Date checkDate;
 
+    @ApiModelProperty(value = "是否产生告警 --0：否  1：是")
+    private Integer isWarn;
+
 
 }

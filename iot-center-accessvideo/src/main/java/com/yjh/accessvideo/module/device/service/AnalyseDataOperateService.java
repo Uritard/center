@@ -45,34 +45,34 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.batchInsertVideoAnalyseResult(list);
     }
 
-    @Logs(title = "巡视任务结果单查",code = "Analysis")
-    @Transactional(rollbackFor =Exception.class)
-    public TCruiseResult selectByPrimaryIdCruiseResult(String taskResultId){
+    @Logs(title = "巡视任务结果单查", code = "Analysis")
+    @Transactional(rollbackFor = Exception.class)
+    public TCruiseResult selectByPrimaryIdCruiseResult(String taskResultId) {
         return this.analyseDataOperateDao.selectByPrimaryIdCruiseResult(taskResultId);
     }
 
-    @Logs(title = "巡视任务结果修改",code = "")
+    @Logs(title = "巡视任务结果修改", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public int updateCruiseResult(TCruiseResult tCruiseResult){
+    public int updateCruiseResult(TCruiseResult tCruiseResult) {
         return this.analyseDataOperateDao.updateCruiseResult(tCruiseResult);
     }
 
 
-    @Logs(title = "任务-巡视点状态结果单查",code = "")
+    @Logs(title = "任务-巡视点状态结果单查", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public TCruiseTaskResult selectByPrimaryIdCruiseTaskResult(String taskResultId){
+    public TCruiseTaskResult selectByPrimaryIdCruiseTaskResult(String taskResultId) {
         return this.analyseDataOperateDao.selectByPrimaryIdCruiseTaskResult(taskResultId);
     }
 
-    @Logs(title ="任务-巡视点状态结构更新",code = "")
+    @Logs(title = "任务-巡视点状态结构更新", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public int updateCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
+    public int updateCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.analyseDataOperateDao.updateCruiseTaskResult(tCruiseTaskResult);
     }
 
-    @Logs(title = "任务-巡视点状态结构新增插入",code = "")
+    @Logs(title = "任务-巡视点状态结构新增插入", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
+    public int insertCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.analyseDataOperateDao.insertCruiseTaskResult(tCruiseTaskResult);
     }
 
@@ -112,177 +112,135 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.selectDeviceMeteByInstanceId(instanceId);
     }
 
-    @Logs(title = "根据巡视点ID查询巡视点信息",code = "Analysis")
+    @Logs(title = "根据巡视点ID查询巡视点信息", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public TCruisePointInstance selectPointInstance(Long instanceId){
-        return  this.analyseDataOperateDao.selectPointInstance(instanceId);
+    public TCruisePointInstance selectPointInstance(Long instanceId) {
+        return this.analyseDataOperateDao.selectPointInstance(instanceId);
     }
 
-    @Logs(title = "查询字典码",code = "Analysis")
+    @Logs(title = "查询字典码", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public String selectDictCode(String colName,String dictNote){
-        return this.analyseDataOperateDao.selectDictCode(colName,dictNote);
+    public String selectDictCode(String colName, String dictNote) {
+        return this.analyseDataOperateDao.selectDictCode(colName, dictNote);
     }
 
-    @Logs(title = "查询任务下所有巡视点",code = "Analysis")
+    @Logs(title = "查询任务下所有巡视点", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruisePointInstance> selectCruiseByTask(String taskId){
+    public List<TCruisePointInstance> selectCruiseByTask(String taskId) {
         return this.analyseDataOperateDao.selectCruiseByTaskId(taskId);
     }
 
     @Logs(title = "插入缺陷信息")
     @Transactional(rollbackFor = Exception.class)
-    public int insertDefectInfo(TDefectInfo tDefectInfo){
+    public int insertDefectInfo(TDefectInfo tDefectInfo) {
         return this.analyseDataOperateDao.insertDefectInfo(tDefectInfo);
     }
 
     @Logs(title = "插入缺陷信息")
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertDefectInfo(List<TDefectInfo> list){
+    public int batchInsertDefectInfo(List<TDefectInfo> list) {
         return this.analyseDataOperateDao.batchInsertDefectInfo(list);
     }
 
 
-    @Logs(title = "告警判断", code = "Analysis")
+    @Logs(title = "表计识别-告警判断-数值结果判断", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgement(Float value,
-                                 Float highLimit1,
-                                 Float lowLimit1,
-                                 Float highLimit2,
-                                 Float lowLimit2) {
-        if(value>highLimit1 && value<highLimit2){
+                             Float highLimit1,
+                             Float lowLimit1,
+                             Float highLimit2,
+                             Float lowLimit2) {
+        if (value > highLimit1 && value < highLimit2) {
             return 1; //过高
-        }else if(value<lowLimit1 && value>lowLimit2){
+        } else if (value < lowLimit1 && value > lowLimit2) {
             return 2; //过低
-        }else if(value>highLimit2){
+        } else if (value > highLimit2) {
             return 3; //超高
-        }else if (value<lowLimit2){
+        } else if (value < lowLimit2) {
             return 4; //超低
-        }else
+        } else
             return 0;
 
     }
 
-    @Logs(title = "缺陷识别结果解析",code = "")
+    // TODO: 2020/11/21 表计识别结果告警判断--文字结果判断
+    
+    
+    @Logs(title = "缺陷识别结果解析", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public String resolveDefectResult(String resultValue){
-        log.info("----缺陷识别结果解析---resultValue:"+resultValue);
-        String defectValue="";
+    public String  resolveDefectResult(String resultValue) {
+        log.info("----缺陷识别结果解析---resultValue:" + resultValue);
+        String defectValue = "";
         String value = resultValue;
-        String value1 = value.replaceAll("[^a-z^A-Z]", "");
-        Set<Integer> index = new HashSet<>();
-        index.add(value1.indexOf("wcaqm"));
-        index.add(value1.indexOf("wcgz"));
-        index.add(value1.indexOf("yydd"));
-        index.add(value1.indexOf("xy"));
-        index.add(value1.indexOf("slydmyw"));
-        index.add(value1.indexOf("ywnc"));
-        index.add(value1.indexOf("ywgkxfw"));
-        index.add(value1.indexOf("jyzbmwh"));
-        index.add(value1.indexOf("jyzpl"));
-        index.add(value1.indexOf("jyzlw"));
-        index.add(value1.indexOf("hxqgjbs"));
-        index.add(value1.indexOf("hxqgjtps"));
-        index.add(value1.indexOf("ywztyfyc"));
-        index.add(value1.indexOf("bjbpmh"));
-        index.add(value1.indexOf("bjbpps"));
-        index.add(value1.indexOf("bjwkps"));
-        index.add(value1.indexOf("mcqdmsh"));
-        index.add(value1.indexOf("gbps"));
-        index.add(value1.indexOf("gjptwss"));
-        index.add(value1.indexOf("xmbhyc"));
-        index.add(value1.indexOf("jsxs"));
-        log.info("----缺陷识别结果解析---Set:"+index);
-
-        index.remove(-1);
-        if(index.size()==0){
-            return "null";
-        }
-
-        log.info("发生错误？"+index.size());
-
-        String[] str1 = value.split("[0-9]");
-        StringBuffer stringBuffer = new StringBuffer();
-        for (int i = 0; i < str1.length; i++) {
-            stringBuffer.append(str1[i]);
-        }
-        String value2 = stringBuffer.toString();
-        String[] str2 = value2.split(" ");
-        stringBuffer.delete(0, stringBuffer.length() - 1);
+        String finalValue = value.replaceAll("[0-9]", "");
+        String[] str2 = finalValue.split("\\s+");
         for (int i = 0; i < str2.length; i++) {
-            stringBuffer.append(str2[i]);
-        }
-
-
-        for(Integer ind:index){
-            if (ind.equals(-1)){
-                continue;
-            }else {
-                switch (str2[ind]){
-                    case "wcaqm":
-                        defectValue=defectValue+"未穿安全帽"+" ";
-                        break;
-                    case "wcgz":
-                        defectValue=defectValue+"未穿工装"+" ";
-                        break;
-                    case "rydd":
-                        defectValue=defectValue+"人员倒地"+" ";
-                        break;
-                    case "xy":
-                        defectValue=defectValue+"吸烟"+" ";
-                        break;
-                    case "slydmyw":
-                        defectValue=defectValue+"地面油污"+" ";
-                        break;
-                    case "ywnc":
-                        defectValue=defectValue+"鸟窝"+" ";
-                        break;
-                    case "ywgkxfw":
-                        defectValue=defectValue+"飘挂物"+" ";
-                        break;
-                    case "jyzbmwh":
-                        defectValue=defectValue+"绝缘子-表面污秽"+" ";
-                        break;
-                    case "jyzpl":
-                        defectValue=defectValue+"绝缘子-破裂"+" ";
-                        break;
-                    case "jyzlw":
-                        defectValue=defectValue+"绝缘子-裂纹"+" ";
-                        break;
-                    case "hxqgjbs":
-                        defectValue=defectValue+"呼吸器-硅胶变色"+" ";
-                        break;
-                    case "hxqgjtps":
-                        defectValue=defectValue+"呼吸器-硅胶筒破损"+" ";
-                        break;
-                    case "ywztyfyc":
-                        defectValue=defectValue+"油位状态-油位异常"+" ";
-                        break;
-                    case "bjbpmh":
-                        defectValue=defectValue+"表计-表盘模糊"+" ";
-                        break;
-                    case "bjbpps":
-                        defectValue=defectValue+"表计-表盘破损"+" ";
-                        break;
-                    case "bjwkps":
-                        defectValue=defectValue+"表计-外壳破损"+" ";
-                        break;
-                    case "mcqdmsh":
-                        defectValue=defectValue+"门窗墙地面损坏"+" ";
-                        break;
-                    case "gbps":
-                        defectValue=defectValue+"盖板破损"+" ";
-                        break;
-                    case "gjptwss":
-                        defectValue=defectValue+"构架爬梯未上锁"+" ";
-                        break;
-                    case "xmbhyc":
-                        defectValue=defectValue+"箱门闭合异常"+" ";
-                        break;
-                    case "jsxs":
-                        defectValue=defectValue+"金属锈蚀"+" ";
-                        break;
-                }
+            switch (str2[i]) {
+                case "wcaqm":
+                    defectValue = defectValue + "未穿安全帽" + " ";
+                    break;
+                case "wcgz":
+                    defectValue = defectValue + "未穿工装" + " ";
+                    break;
+                case "rydd":
+                    defectValue = defectValue + "人员倒地" + " ";
+                    break;
+                case "xy":
+                    defectValue = defectValue + "吸烟" + " ";
+                    break;
+                case "sly_dmyw":
+                    defectValue = defectValue + "地面油污" + " ";
+                    break;
+                case "yw_nc":
+                    defectValue = defectValue + "鸟窝" + " ";
+                    break;
+                case "yw_gkxfw":
+                    defectValue = defectValue + "飘挂物" + " ";
+                    break;
+                case "jyz_bmwh":
+                    defectValue = defectValue + "绝缘子-表面污秽" + " ";
+                    break;
+                case "jyz_pl":
+                    defectValue = defectValue + "绝缘子-破裂" + " ";
+                    break;
+                case "jyz_lw":
+                    defectValue = defectValue + "绝缘子-裂纹" + " ";
+                    break;
+                case "hxq_gjbs":
+                    defectValue = defectValue + "呼吸器-硅胶变色" + " ";
+                    break;
+                case "hxq_gjtps":
+                    defectValue = defectValue + "呼吸器-硅胶筒破损" + " ";
+                    break;
+                case "ywzt_yfyc":
+                    defectValue = defectValue + "油位状态-油位异常" + " ";
+                    break;
+                case "bj_bpmh":
+                    defectValue = defectValue + "表计-表盘模糊" + " ";
+                    break;
+                case "bj_bpps":
+                    defectValue = defectValue + "表计-表盘破损" + " ";
+                    break;
+                case "bj_wkps":
+                    defectValue = defectValue + "表计-外壳破损" + " ";
+                    break;
+                case "mcqdmsh":
+                    defectValue = defectValue + "门窗墙地面损坏" + " ";
+                    break;
+                case "gbps":
+                    defectValue = defectValue + "盖板破损" + " ";
+                    break;
+                case "gjptwss":
+                    defectValue = defectValue + "构架爬梯未上锁" + " ";
+                    break;
+                case "xmbhyc":
+                    defectValue = defectValue + "箱门闭合异常" + " ";
+                    break;
+                case "jsxs":
+                    defectValue = defectValue + "金属锈蚀" + " ";
+                    break;
+                default:
+                    return "null";
             }
         }
         return defectValue;

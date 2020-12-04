@@ -132,7 +132,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         ReferenceCountUtil.release(byteBuf);
     }
 
-    private void handlerData(String body) throws ParseException {
+    private void handlerData(String body) throws ParseException, InterruptedException {
         //TODO 添加线程池
         String remoteAdds = ctx.channel().remoteAddress().toString();
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
@@ -193,6 +193,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             NORMAL = NORMAL + 1;
                         }
 
+//                        //单个数值表计识别结果的告警判断与处理
 //                        if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")) {
 //                            //告警处理
 //                            //告警判断并组合数据插库
@@ -209,8 +210,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //                                Map<String, String> warnMap = new HashMap<>();
 //                                warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
 //                                warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
-//
+//                                warnMap.put("value",jsonObjectResult.get("resultValue").toString());
+//                                warnMap.put("imagePath",cruiseResult.get("picpath").toString());
+//                                // TODO: 2020/12/1 巡视点产生告警-将redis中该巡视点的isWarn键值改为0
 //                                // TODO: 2020/10/20 组装TWarnInfo数据并插库
+//                                // TODO: 2020/12/1 告警信息中插入taskID
 //                                TWarnInfo tWarnInfo = new TWarnInfo();
 ////                                tWarnInfo.setWarnLevel(tStdDevicemeteM.getAlarmLevel());
 ////                                tWarnInfo.setWarnTime(new Date());//时间尚未格式化
@@ -250,14 +254,14 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //                                warnMap.put("deviceCode", tCruisePointInstance.getDeviceCode());
 //                                redisTemplate.opsForHash().putAll(warnName, warnMap);
 //
-//                        tWarnInfo.setImagePath();//该巡视点所拍摄的图片
-//                        tWarnInfo.setValue(jsonObjectResult.get("resultValue").toString());//resultValue
-//                        tWarnInfo.setLinkMessage();//若该巡视点属于联动任务，则赋值
-
+////                        tWarnInfo.setImagePath();//该巡视点所拍摄的图片
+////                        tWarnInfo.setValue(jsonObjectResult.get("resultValue").toString());//resultValue
+////                        tWarnInfo.setLinkMessage();//若该巡视点属于联动任务，则赋值
+//
 //                                analyseDataOperateService.insertWarnInfo(tWarnInfo);//组装完成的告警信息插库
 //                            }
-
-
+//
+//
 //                        }
                         break;
                     case 13669:
@@ -330,8 +334,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                 WebSocketServer.sendMsg(json);
 
                 //修改缓存中任务算法巡视点List
-                redisTemplate.opsForList().remove(cruiseResult.get("taskId").toString(), 0, cruiseResult.get("instanceId").toString());
-                redisTemplate.opsForList().leftPush(cruiseResult.get("taskId").toString(), "0");
+                redisTemplate.opsForList().remove("analysisList:"+cruiseResult.get("taskId").toString(), 0, cruiseResult.get("instanceId").toString());
+                redisTemplate.opsForList().leftPush("analysisList:"+cruiseResult.get("taskId").toString(), "0");
 
                 log.info("RedisList修改成功");
 
@@ -340,8 +344,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
         } else if (jsonObject.get("msgType").toString().equals("6")) { //任务结束后发来的心跳信息
             String taskId = JSON.parseObject(jsonObject.get("msgData").toString()).get("taskId").toString();
-            redisTemplate.opsForList().leftPush(taskId, "-1");
-            log.info("心跳处理结束" + taskId);
+            redisTemplate.opsForList().leftPush("analysisList:"+taskId, "-1");
+            log.info("心跳处理结束" +taskId);
         }
 
         if (redisTemplate.opsForList().index(TASKID, 0).equals("-1") && redisTemplate.opsForList().index(TASKID, 1).equals("0")) {  //满足插库条件
@@ -435,6 +439,17 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
             if (abnormal + ABNORMAL + normal + NORMAL == total) {
                 //TCTR开始
+
+                // webSocket通知前端调用巡视监控的接口
+                Map<String, Object> jasonMap = new HashMap<>();
+                jasonMap.put("type", "finishedOneInstance");
+                jasonMap.put("taskId", cruiseResult.get("taskId").toString());
+                String json = JSON.toJSONString(jasonMap);
+                log.info("发送给前端的消息：" + json);
+                WebSocketServer.sendMsg(json);
+
+                Thread.sleep(15000);
+
                 log.info("TCTR开始");
                 TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
                 tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());

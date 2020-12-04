@@ -96,8 +96,9 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "预警值超限差值")
     private String outRange;
 
-    @ApiModelProperty(value = "联动信息")
-    private String linkMessage;
+    @ApiModelProperty(value = "任务ID")
+    private String taskId;
+
 
 
 }
