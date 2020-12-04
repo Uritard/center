@@ -71,6 +71,7 @@ public class LogsAspect {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             } else {
+                userId = "18711";
                 userName = request.getParameter("userName");
             }
 

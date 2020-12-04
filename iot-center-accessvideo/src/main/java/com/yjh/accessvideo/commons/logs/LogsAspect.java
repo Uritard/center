@@ -59,7 +59,7 @@ public class LogsAspect {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
         HttpServletRequest request = null;
-        String userId = null, userName = null, serviceId = null, ip = null;
+        String userId = "", userName = "", serviceId = "", ip = "";
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
@@ -68,6 +68,7 @@ public class LogsAspect {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             } else {
+                userId = "18715";
                 userName = request.getParameter("userName");
             }
 

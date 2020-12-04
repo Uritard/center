@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -24,6 +25,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @Description
@@ -45,6 +47,9 @@ public class LogsAspect {
         return new ServiceRestTemplate();
     }
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Pointcut("execution(* com.yjh..service..*.*(..))")
     public void selectAspect() {
     }
@@ -61,11 +66,15 @@ public class LogsAspect {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
             request = servletRequestAttributes.getRequest();
-            if (request != null) {
+            if (Objects.nonNull(request.getHeader("userId"))) {
                 userId = request.getHeader("userId");
-                userName = request.getHeader("userName");
-                ip = IPUtil.getRemoteIP(request);
+                userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
+            } else {
+                userId = "18714";
+                userName = request.getParameter("userName");
             }
+
+            ip = IPUtil.getRemoteIP(request);
         }
         Object result = null;
         if (annotation != null) {
