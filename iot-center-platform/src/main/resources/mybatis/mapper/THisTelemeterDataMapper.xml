@@ -172,25 +172,40 @@
 
     <select id="selectUnionTask"  resultType="com.yjh.platform.module.task.entity.UnionTaskInfo">
         SELECT
-            a.union_id,
-            g.mete_name,
-            a.create_time as cruiseTime ,
-            d.result_num,
-            d.origpic,
-            d.person_check,
-            h.task_name,
-            j.device_id,
-            j.device_name
+        a.union_id,
+        g.mete_name,
+        a.create_time as cruiseTime ,
+        d.result_num,
+        d.origpic,
+        d.person_check,
+        h.task_name,
+        j.device_id,
+        j.device_name,
+        g.mete_kind,
+        k.dict_note as meteKindName,
+        (CASE
+        WHEN ISNULL(o.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(n.preset_name) THEN ''
+        WHEN ISNULL(o.mete_name) AND ISNULL(m.inspection_name) THEN n.preset_name
+        WHEN ISNULL(o.mete_name) AND ISNULL(n.preset_name) THEN m.inspection_name
+        WHEN ISNULL(m.inspection_name) AND ISNULL(n.preset_name) THEN o.mete_name
+        WHEN ISNULL(m.inspection_name) THEN CONCAT(o.mete_name,'/',n.preset_name)
+        WHEN ISNULL(n.preset_name) THEN CONCAT(o.mete_name,'/',m.inspection_name)
+        END) AS instance_name
         FROM
         t_union_task a
-            LEFT JOIN t_cruise_task_result b ON a.union_id = b.task_id
-            LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
-            LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
-            LEFT JOIN (select DISTINCT device_id,device_name from t_std_device) e ON c.device_id = e.device_id
-            left join t_cfg_mete g on a.mete_id = g.mete_id
-            left join t_cruise_task h on a.union_id = h.task_id
-            left join t_cfg_data_current i on a.mete_id = i.mete_id
-            left join t_cfg_device j on i.device_id = j.device_id
+        LEFT JOIN t_cruise_task_result b ON a.union_id = b.task_id
+        LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
+        LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
+        LEFT JOIN (select DISTINCT device_id,device_name from t_std_device) e ON c.device_id = e.device_id
+        left join t_cfg_mete g on a.mete_id = g.mete_id
+        left join t_cruise_task h on a.union_id = h.task_id
+        left join t_cfg_data_current i on a.mete_id = i.mete_id
+        left join t_cfg_device j on i.device_id = j.device_id
+        left join t_dict_business k on g.mete_kind  = k.dict_code and k.col_name="mete_kind"
+        left join t_cruise_point_instance l on c.instance_id = l.instance_id
+        left join t_robot_inspection m on l.cruise_id = m.inspection_id
+        left join t_camera_preset n on l.cruise_id = n.preset_id
+        left join t_std_devicemete o on l.device_mete_id = o.device_mete_id
         WHERE 1 =1
         <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName != null and deviceName != ''"> and a.mete_id in (SELECT mete_id from t_cfg_data_current where device_id in (select device_id from t_cfg_device WHERE device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') ))</if>

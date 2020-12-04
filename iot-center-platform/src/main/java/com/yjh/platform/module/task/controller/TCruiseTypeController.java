@@ -103,11 +103,22 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "subType", required = true) Integer subType) {
+    public Result select(@RequestParam(value = "subType", required = true) Integer subType,
+                         @RequestParam(value = "pageNum", required = false) Integer pageNum,
+                         @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
-            List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);
-            result.setData(list);
+            if(pageNum != null && pageSize != null){
+                Page page = PageHelper.startPage(pageNum, pageSize);
+                List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);
+                resultMap.put("count", page.getTotal());
+                resultMap.put("list", list);
+                result.setData(resultMap);
+            }else {
+                List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);
+                result.setData(list);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

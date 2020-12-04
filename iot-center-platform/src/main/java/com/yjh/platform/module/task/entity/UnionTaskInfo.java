@@ -38,4 +38,10 @@ public class UnionTaskInfo implements Serializable {
 
     private String deviceName;
 
+    private Integer meteKind;
+
+    private String meteKindName;
+
+    private String instanceName;
+
 }

@@ -255,14 +255,6 @@ public class RunAtNowTask implements Runnable{
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     robotTaskInfo.setRobotCode(item);
                     robotTaskInfoList.add(robotTaskInfo);
-                    Map<String,Object> robotStates  = redisTemplate.opsForHash().entries("RobotTaskStatus:"+item);
-                    Map<String,Object> mapForRobotStates=new HashMap<>();
-                    jasonMap.put("type","robotStates");
-                    jasonMap.put("taskId",taskId);
-                    jasonMap.put("robotStates",robotStates.get("value"));
-                    String forRobotStates=JSON.toJSONString(mapForRobotStates);
-                    log.info("发送给前端的机器人状态消息：   "+forRobotStates);
-                    WebSocketServer.sendMsg(forRobotStates);
                 }
                 Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
                 robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
