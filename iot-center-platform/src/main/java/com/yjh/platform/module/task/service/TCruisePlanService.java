@@ -56,6 +56,7 @@ public class TCruisePlanService{
                 for (Map<String, Object> instanceMap:InstanceMapList) {
                     TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
                     tCruisePlanAttr.setPlanId(planId);
+                    if (Objects.nonNull(map.get("subType"))) tCruisePlanAttr.setSubType(Integer.parseInt(String.valueOf(map.get("subType"))));
                     Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
                     tCruisePlanAttr.setInstanceId(instanceId);
                     if (Objects.nonNull(instanceMap.get("cruiseType"))) {

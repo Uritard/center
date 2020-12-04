@@ -114,7 +114,8 @@
         a.ir_temp_box,
         a.create_time,
         a.update_time,
-        a.sub_type
+        a.sub_type,
+        j.dict_note AS sub_type_name
         FROM t_cruise_plan_attr a
         LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
@@ -123,6 +124,7 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business j ON a.sub_type = j.dict_code AND j.col_name = "sub_plan_type"
         where 1 = 1
             and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id
     </select>
