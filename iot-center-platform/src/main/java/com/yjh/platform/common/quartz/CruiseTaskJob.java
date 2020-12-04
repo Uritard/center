@@ -166,7 +166,7 @@ public class CruiseTaskJob extends QuartzJobBean {
             tCruiseTaskResult.setTaskResultId(uuid);
             tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
             //tCruiseTaskResult.setTaskStatus(239);
-            tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
+            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
             tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
             Map<String,String> mapForAbnormal = new HashMap<>();

@@ -216,7 +216,7 @@ public class RunAtNowTask implements Runnable{
             tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
             tCruiseTaskResult.setTaskId(taskId);
             //tCruiseTaskResult.setTaskStatus(239);
-            tCruiseTaskResult.setRunExecute(tCruiseTask.getType().toString());
+            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
             String strForCountAbnormal = "countForAbnormal:"+taskId;
             Map<String,String> mapForAbnormal = new HashMap<>();
             if( !redisTemplate.hasKey(strForCountAbnormal)){//判断任务是否做过 没做->初始化  做了->后续工作直接从redis获取
