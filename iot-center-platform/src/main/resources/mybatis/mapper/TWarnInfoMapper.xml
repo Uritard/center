@@ -57,7 +57,8 @@
         g.dict_note as deal_type_name,
         a.deal_person_id,
         h.user_name as deal_person_name,
-        a.deal_time
+        a.deal_time,
+        a.if_warn_disable
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
@@ -92,7 +93,8 @@
         g.dict_note as deal_type_name,
         h.deal_person_id,
         j.user_name as deal_person_name,
-        h.deal_time
+        h.deal_time,
+        1 as if_warn_disable
         FROM
         t_camera_alarm h
         LEFT JOIN t_camera_info b ON h.camera_id = b.camera_id
@@ -125,7 +127,8 @@
 		h.dict_note as deal_type_name,
         f.deal_person_id,
         k.user_name as deal_person_name,
-        f.deal_time
+        f.deal_time,
+        1 as if_warn_disable
         FROM
         t_robot_alarm f
         LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code

@@ -1,12 +1,12 @@
 package com.yjh.platform.module.task.dao;
 
-import java.util.List;
-import java.util.Date;
-import java.util.Map;
-
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author czh
@@ -43,6 +43,9 @@ public interface TCruiseResultDao {
                                                 @Param(value = "deviceName") String deviceName);
 
     int manualReview(CruiseManualReview cruiseManualReview);
+    Map<String,Object> selectJudgeCondition(@Param(value = "cruiseDataId")Long cruiseDataId);
+    int updateWarnInfo(@Param(value = "taskId")String taskId,
+                       @Param(value = "instanceId")Long instanceId);
     int batchInsert(List<TCruiseResult> list);
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "Start")String Start,

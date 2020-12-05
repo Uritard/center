@@ -75,4 +75,7 @@ public class TWarnInfoDetail implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dealTime;
 
+    @ApiModelProperty(value = "是否审核1.审核0.未审核")
+    private Integer ifWarnDisable;
+
 }
