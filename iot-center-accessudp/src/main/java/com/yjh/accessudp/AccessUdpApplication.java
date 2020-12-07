@@ -17,9 +17,7 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -72,12 +70,14 @@ public class AccessUdpApplication implements CommandLineRunner {
         //读取联动设备的信息
         TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
         devicePath = tSysParam.getContent();
-        log.info("设备文件路径：  ",devicePath);
+        log.info("设备文件路径：  "+devicePath);
         BufferedReader br = null;
-        FileReader reader = null;
+        InputStreamReader in = null;
+        //FileReader reader = null;
         try  {
-            reader = new FileReader(devicePath);
-            br = new BufferedReader(reader);
+            //reader = new FileReader(devicePath);
+            in = new InputStreamReader(new FileInputStream(new File(devicePath)), "UTF-8");
+            br = new BufferedReader(in);
             String line;
             String[] strArray = null;
             List<SYAllInfo> list = new ArrayList<>();
@@ -93,7 +93,8 @@ public class AccessUdpApplication implements CommandLineRunner {
                         if(time.equals(Constant.TIME)){
                             log.info("设备数据时间与上一次时间一致");
                             br.close();
-                            reader.close();
+                            //reader.close();
+                            in.close();
                             return;
                         }else {
                             Constant.TIME =time;
@@ -124,7 +125,8 @@ public class AccessUdpApplication implements CommandLineRunner {
                 }
             }
             br.close();
-            reader.close();
+            //reader.close();
+            in.close();
             tCfgMeteService.deleteAll();
             tCfgMeteService.insertForAll(list);
         } catch (IOException e) {
@@ -133,8 +135,11 @@ public class AccessUdpApplication implements CommandLineRunner {
             if(br != null ){
                 br.close();
             }
-            if(reader != null ){
-                reader.close();
+//            if(reader != null ){
+//                reader.close();
+//            }
+            if(in != null ){
+                in.close();
             }
 
         }
