@@ -65,7 +65,7 @@ public class TCruisePlanService{
         for (TCruisePointInstanceAttr tCruisePointInstanceAttr:tCruisePointInstanceAttrList) {
             TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
             tCruisePlanAttr.setPlanId(planId);
-            if (Objects.nonNull(map.get("subType"))) {
+            if (Objects.nonNull(map.get("subType")) && !Objects.equals(map.get("subType"), "")) {
                 Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
                 tCruisePlanAttr.setSubType(subType);
             }
