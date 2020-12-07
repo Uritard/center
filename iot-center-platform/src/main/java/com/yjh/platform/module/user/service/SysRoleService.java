@@ -271,17 +271,30 @@ public class SysRoleService{
     public int updateRoleMenuRight(Map<String, Object> req) {
         Long roleId = Long.valueOf(String.valueOf(req.get("roleId")));
         sysRoleMenuDao.deleteByRoleId(roleId);
-        List<String> listString = (List<String>) req.get("checked");
-        if (listString.size()>0) {
-            List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
-            for (String menuCode:listString) {
+        List<String> listStringChecked = (List<String>) req.get("checked");
+        List<String> listStringHalfChecked = (List<String>) req.get("halfChecked");
+
+        List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
+        if (listStringChecked.size()>0) {
+            for (String menuCodeChecked:listStringChecked) {
                 SysRoleMenu sysRoleMenu = new SysRoleMenu();
-                sysRoleMenu.setMenuCode(menuCode);
+                sysRoleMenu.setMenuCode(menuCodeChecked);
                 sysRoleMenu.setRoleId(roleId);
+                sysRoleMenu.setElementCode("checked");
                 sysRoleMenuList.add(sysRoleMenu);
             }
-            return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
-        } else {return 0;}
+        }
+        if (listStringHalfChecked.size()>0) {
+            for (String menuCodeHalfchecked:listStringChecked) {
+                SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                sysRoleMenu.setMenuCode(menuCodeHalfchecked);
+                sysRoleMenu.setRoleId(roleId);
+                sysRoleMenu.setElementCode("halfChecked");
+                sysRoleMenuList.add(sysRoleMenu);
+            }
+        }
+        if (sysRoleMenuList.size()>0) return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
+        return 0;
     }
 
 //    @Logs(title = "根据角色ID查询关联的菜单信息", code = "module")

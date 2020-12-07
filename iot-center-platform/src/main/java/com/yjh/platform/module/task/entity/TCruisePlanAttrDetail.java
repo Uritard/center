@@ -60,7 +60,7 @@ public class TCruisePlanAttrDetail implements Serializable {
     private Integer subType;
 
     @ApiModelProperty(value = "任务子类型名称")
-    private Integer subTypeName;
+    private String subTypeName;
 
     @ApiModelProperty(value = "区域ID")
     private String areaId;

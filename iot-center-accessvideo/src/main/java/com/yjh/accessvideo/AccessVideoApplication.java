@@ -66,53 +66,57 @@ public class AccessVideoApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         log.info("videoAccess is running...");
         log.info(Constant.sdkPath);
-        if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return;} else { log.info("init success..");}
+        if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return; }
+        log.info("init success..");
         hCNetSDK.NET_DVR_SetLogToFile(logLevel,sdkLogPath,false);
-        if (register()) {log.info("register success..");}
+        register();
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
         nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService);
     }
 
-    private boolean register() {
+    private void register() {
         if (lUserID > -1) {
-            //先注销
+            //NVR log out first...
             hCNetSDK.NET_DVR_Logout(lUserID);
             lUserID = -1;
         }
         List<RecorderConInfo> recorderConInfoList = cameraConDao.SelectRecords();
-        log.info("recorderConInfoList: "+recorderConInfoList);
-        long recordId = 1234;
-        for (RecorderConInfo recorderConInfo:recorderConInfoList) {
-            recordId = recorderConInfo.getRecordId();
-            String m_sDeviceIP = recorderConInfo.getRecordIp();
-            log.info("register nvr, and ip is "+m_sDeviceIP+", and name is "+recorderConInfo.getRecordName());
-            String m_sUsername = recorderConInfo.getUserName();
-            String m_sPassword = recorderConInfo.getPwd();
-            Short m_port = recorderConInfo.getHttpPort().shortValue();
-            //注册
-            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-            System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
+        log.info("NVR list: "+recorderConInfoList);
+        new Thread(() -> {
+            for (RecorderConInfo recorderConInfo:recorderConInfoList) {
+                long recordId = recorderConInfo.getRecordId();
+                String m_sDeviceIP = recorderConInfo.getRecordIp();
+                String m_sUsername = recorderConInfo.getUserName();
+                String m_sPassword = recorderConInfo.getPwd();
+                Short m_port = recorderConInfo.getHttpPort().shortValue();
+                log.info("register nvr"+recorderConInfo.getRecordName()+", ip is "+m_sDeviceIP+", port is "+m_port);
+                //注册
+                m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+                System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
 
-            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-            System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
+                m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+                System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
 
-            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-            System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
+                m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+                System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
 
-            m_strLoginInfo.wPort = m_port;
+                m_strLoginInfo.wPort = m_port;
 
-            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+                m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
 
-            m_strLoginInfo.write();
-            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-            if (lUserID == -1) {
-                log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
-                return false;
+                m_strLoginInfo.write();
+                lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+                log.info("m_sDeviceIP: "+m_sDeviceIP+", lUserID: "+lUserID);
+                if (lUserID == -1) {
+                    log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
+                } else {
+                    Constant.maps.put(String.valueOf(recordId), lUserID);
+                    log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
+                }
             }
-            Constant.maps.put(String.valueOf(recordId), lUserID);
-            log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
-        }
+            log.info("Constant.maps: "+Constant.maps);
+        }).start();
         //设置HCNetSDKCom组件库所在路径
         String strPathCom = sdkPath;
         HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
@@ -142,7 +146,6 @@ public class AccessVideoApplication implements CommandLineRunner {
         hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
         //IP通道个数
         log.info("The max number of IP channels: "+ m_strDeviceInfo.struDeviceV30.byIPChanNum);
-        return true;
     }
 
 }

@@ -98,7 +98,7 @@
         SELECT b.menu_code AS Id
         FROM sys_role a
         LEFT JOIN sys_role_menu b ON a.role_id = b.role_id
-        WHERE 1 = 1
+        WHERE 1 = 1 AND b.element_code != "halfChecked"
         AND a.role_id = #{roleId, jdbcType=BIGINT}
     </select>
 

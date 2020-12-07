@@ -76,4 +76,6 @@ public interface TCruisePointInstanceDao {
     String selectInstanceName(@Param(value = "instanceId")Long instanceId);
 
     Long selectForPresetId(@Param(value = "presetId")Long presetId);
+
+    List<TCruisePointInstanceAttr> batchSelectInstanceAttr(@Param(value = "list")List<Long> list);
 }

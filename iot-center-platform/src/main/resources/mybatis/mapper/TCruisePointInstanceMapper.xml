@@ -557,5 +557,15 @@
         where a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
 
+    <select id="batchSelectInstanceAttr"  resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceAttr">
+        select a.*, b.instance_name, b.attr_name, b.attr_value
+        from t_cruise_point_instance a
+        LEFT JOIN t_cruise_point_attr b ON a.instance_id = b.instance_id
+        where a.instance_id in
+        <foreach collection="list" open="(" close=")" separator="," item="instanceId">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+    </select>
+
 
 </mapper>

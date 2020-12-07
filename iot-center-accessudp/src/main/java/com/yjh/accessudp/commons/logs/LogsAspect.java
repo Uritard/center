@@ -73,9 +73,8 @@ public class LogsAspect {
                 userId = "18714";
                 userName = request.getParameter("userName");
             }
-
-            ip = IPUtil.getRemoteIP(request);
         }
+        ip = IPUtil.getRemoteIP(request);
         Object result = null;
         if (annotation != null) {
             try {

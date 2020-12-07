@@ -1,25 +1,27 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TCruisePointInstanceAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
-import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
-
-import java.util.*;
-
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TDictBusiness;
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
 
 /**
 * @author tt
@@ -31,65 +33,117 @@ public class TCruisePlanService{
     @Autowired
     private TCruisePlanDao tCruisePlanDao;
     @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TAlgorithmConfDao tAlgorithmConfDao;
 
+    private Logger log = LoggerFactory.getLogger(TCruisePlanService.class);
+
+
     @Logs(title = "新增预案", code = "task",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(Map<String, Object> map) {
-        System.out.println("_____________"+map+"________________");
-        if (map.size()>0) {
-            List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
-            if (InstanceMapList.size()==0){
-                return ResultCodeEnum.CODE10010.getCode();
-            }else {
-                List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
-                TCruisePlan tCruisePlan = new TCruisePlan();
-                tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
-                Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
-                tCruisePlan.setType(planType);
-                this.tCruisePlanDao.insert(tCruisePlan);
-                Long planId = tCruisePlan.getPlanId();
-                for (Map<String, Object> instanceMap:InstanceMapList) {
-                    TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
-                    tCruisePlanAttr.setPlanId(planId);
-                    if (Objects.nonNull(map.get("subType"))) {
-                        Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
-                        tCruisePlanAttr.setSubType(subType);
-                    }
-                    Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
-                    tCruisePlanAttr.setInstanceId(instanceId);
-                    if (Objects.nonNull(instanceMap.get("cruiseType"))) {
-                        Integer cruiseType = Integer.parseInt(String.valueOf(instanceMap.get("cruiseType")));
-                        tCruisePlanAttr.setPointType(cruiseType);
-                    }
-                    if (Objects.nonNull(tCruisePlanAttr.getPointType())) {
-                        switch (tCruisePlanAttr.getPointType()) {
-                            case 228:
-                                TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(instanceId);
-                                tCruisePlanAttr.setRobotId(tRobotInspection.getRobotId());
-                                tCruisePlanAttr.setPosition(String.valueOf(instanceMap.get("cruiseId")));
-                                break;
-                            case 229:
-                            case 230:
-                                Long cruiseAlgorithmId = Long.valueOf(String.valueOf(instanceMap.get("cruiseId")));
-                                TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
-                                tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    tCruisePlanAttrList.add(tCruisePlanAttr);
-                }
-                return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
-            }
+        log.info("add new plan, map content: "+map);
+        if (map.size()==0) return ResultCodeEnum.CODE10010.getCode();
+        List<Long> InstanceMapList = (List<Long>) map.get("instanceList");
+        if (InstanceMapList.size()==0) return ResultCodeEnum.CODE10010.getCode();
 
-        } else{ return ResultCodeEnum.CODE10010.getCode(); }
+        List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
+        TCruisePlan tCruisePlan = new TCruisePlan();
+        tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
+        Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
+        tCruisePlan.setType(planType);
+        this.tCruisePlanDao.insert(tCruisePlan);
+        Long planId = tCruisePlan.getPlanId();
+
+        List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.batchSelectInstanceAttr(InstanceMapList);
+
+        for (TCruisePointInstanceAttr tCruisePointInstanceAttr:tCruisePointInstanceAttrList) {
+            TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
+            tCruisePlanAttr.setPlanId(planId);
+            if (Objects.nonNull(map.get("subType"))) {
+                Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
+                tCruisePlanAttr.setSubType(subType);
+            }
+            tCruisePlanAttr.setInstanceId(tCruisePointInstanceAttr.getInstanceId());
+
+            Integer cruiseType = Integer.parseInt(String.valueOf(tCruisePointInstanceAttr.getCruiseType()));
+            tCruisePlanAttr.setPointType(cruiseType);
+
+            if (Objects.nonNull(tCruisePlanAttr.getPointType())) {
+                switch (tCruisePlanAttr.getPointType()) {
+                    case 228:
+                        TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(tCruisePointInstanceAttr.getCruiseId());
+                        tCruisePlanAttr.setRobotId(tRobotInspection.getRobotId());
+                        tCruisePlanAttr.setPosition(String.valueOf(tCruisePointInstanceAttr.getCruiseId()));
+                        break;
+                    case 229:
+                    case 230:
+                        Long cruiseAlgorithmId = tCruisePointInstanceAttr.getCruiseId();
+                        TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
+                        if (Objects.nonNull(tAlgorithmConf)) tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
+                        break;
+                    default:
+                        break;
+                }
+            }
+            tCruisePlanAttrList.add(tCruisePlanAttr);
+        }
+        return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
     }
+
+//    @Logs(title = "新增预案", code = "task",content = "根据web传入的参数新增")
+//    @Transactional(rollbackFor = Exception.class)
+//    public int insertOld(Map<String, Object> map) {
+//        log.info("add new plan, map content: "+map);
+//        if (map.size()==0) return ResultCodeEnum.CODE10010.getCode();
+//        List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
+//        if (InstanceMapList.size()==0) return ResultCodeEnum.CODE10010.getCode();
+//        List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
+//        TCruisePlan tCruisePlan = new TCruisePlan();
+//        tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
+//        Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
+//        tCruisePlan.setType(planType);
+//        this.tCruisePlanDao.insert(tCruisePlan);
+//        Long planId = tCruisePlan.getPlanId();
+//        for (Map<String, Object> instanceMap:InstanceMapList) {
+//            TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
+//            tCruisePlanAttr.setPlanId(planId);
+//            if (Objects.nonNull(map.get("subType"))) {
+//                Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
+//                tCruisePlanAttr.setSubType(subType);
+//            }
+//            Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
+//            tCruisePlanAttr.setInstanceId(instanceId);
+//            if (Objects.nonNull(instanceMap.get("cruiseType"))) {
+//                Integer cruiseType = Integer.parseInt(String.valueOf(instanceMap.get("cruiseType")));
+//                tCruisePlanAttr.setPointType(cruiseType);
+//            }
+//            if (Objects.nonNull(tCruisePlanAttr.getPointType())) {
+//                switch (tCruisePlanAttr.getPointType()) {
+//                    case 228:
+//                        TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(instanceId);
+//                        tCruisePlanAttr.setRobotId(tRobotInspection.getRobotId());
+//                        tCruisePlanAttr.setPosition(String.valueOf(instanceMap.get("cruiseId")));
+//                        break;
+//                    case 229:
+//                    case 230:
+//                        Long cruiseAlgorithmId = Long.valueOf(String.valueOf(instanceMap.get("cruiseId")));
+//                        TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
+//                        tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//            tCruisePlanAttrList.add(tCruisePlanAttr);
+//        }
+//        return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
+//    }
 
     @Logs(title = "删除", code = "task",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
@@ -105,16 +159,21 @@ public class TCruisePlanService{
         Long planId = Long.valueOf(String.valueOf(planDetailMap.get("planId")));
         tCruisePlan.setPlanId(planId);
         tCruisePlan.setPlanName(String.valueOf(planDetailMap.get("planName")));
-        List<Map<String, Object>> instanceList = (List<Map<String, Object>>) planDetailMap.get("instanceList");
+
+        List<Long> instanceList = (List<Long>) planDetailMap.get("instanceList");
+        if (instanceList.size()==0) return ResultCodeEnum.CODE10010.getCode();
+
+        List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.batchSelectInstanceAttr(instanceList);
+
         List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
         Date date = new Date();
-        for (Map<String, Object> map:instanceList) {
+        for (TCruisePointInstanceAttr tCruisePointInstanceAttr:tCruisePointInstanceAttrList) {
             TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
             tCruisePlanAttr.setPlanId(planId);
-            tCruisePlanAttr.setInstanceId(Long.valueOf(String.valueOf(map.get("instanceId"))));
+            tCruisePlanAttr.setInstanceId(tCruisePointInstanceAttr.getInstanceId());
             tCruisePlanAttr.setUpdateTime(date);
-            if (Objects.nonNull(map.get("subType"))) {
-                Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
+            if (Objects.nonNull(planDetailMap.get("subType"))) {
+                Integer subType = Integer.parseInt(String.valueOf(planDetailMap.get("subType")));
                 tCruisePlanAttr.setSubType(subType);
             }
             tCruisePlanAttrList.add(tCruisePlanAttr);
@@ -135,22 +194,19 @@ public class TCruisePlanService{
     @Logs(title = "查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlan> select(Long planId, String planName, Integer type, String planPointTypes, Date createTime, Date updateTime) {
-        List<TCruisePlan> tCruisePlanList = tCruisePlanDao.select(planId, planName, type, planPointTypes, createTime, updateTime);
-        return tCruisePlanList;
+        return tCruisePlanDao.select(planId, planName, type, planPointTypes, createTime, updateTime);
     }
 
     @Logs(title = "分页查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan) {
-        List<TCruisePlanCount> tCruisePlanList = tCruisePlanDao.selectByPage(tCruisePlan);
-        return tCruisePlanList;
+        return tCruisePlanDao.selectByPage(tCruisePlan);
     }
 
     @Logs(title = "分页查询", code = "task",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanCountByPage> selectByPlanPage(TCruisePlan tCruisePlan) {
-        List<TCruisePlanCountByPage> tCruisePlanList = tCruisePlanDao.selectByPlanPage(tCruisePlan);
-        return tCruisePlanList;
+        return tCruisePlanDao.selectByPlanPage(tCruisePlan);
     }
 
     @Logs(title = "批量插入", code = "task",content = "根据web传入的参数批量插入")
@@ -170,8 +226,7 @@ public class TCruisePlanService{
             }
         }
 //        System.out.print("&&&&&&&&&&&&*"+deviceIdList+"*****************");
-        List<InstanceTree> instanceTreeList = tCruisePlanDao.findInstanceTree(deviceIdList);
-        return instanceTreeList;
+        return tCruisePlanDao.findInstanceTree(deviceIdList);
     }
 
     @Logs(title = "查询巡视类型树", code = "task",content = "查询巡视类型树")

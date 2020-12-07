@@ -59,7 +59,7 @@ public class LogsAspect {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
         HttpServletRequest request = null;
-        String userId = "", userName = "", serviceId = "", ip = "";
+        String userId = null, userName = null, serviceId = null, ip = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
@@ -71,9 +71,8 @@ public class LogsAspect {
                 userId = "18710";
                 userName = request.getParameter("userName");
             }
-
-            ip = IPUtil.getRemoteIP(request);
         }
+        ip = IPUtil.getRemoteIP(request);
         Object result = null;
         if (annotation != null) {
             try {
