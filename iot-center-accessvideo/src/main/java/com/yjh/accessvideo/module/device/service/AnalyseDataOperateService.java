@@ -156,6 +156,11 @@ public class AnalyseDataOperateService {
                              Float lowLimit1,
                              Float highLimit2,
                              Float lowLimit2) {
+        log.info("value",value);
+        log.info("highLimit1",highLimit1);
+        log.info("lowLimit1",lowLimit1);
+        log.info("highLimit2",highLimit2);
+        log.info("lowLimit2",lowLimit2);
         if (value > highLimit1 && value < highLimit2) {
             return 1; //过高
         } else if (value < lowLimit1 && value > lowLimit2) {

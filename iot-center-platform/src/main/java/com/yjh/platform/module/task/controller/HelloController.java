@@ -74,6 +74,12 @@ public class HelloController {
 
 
 
+        String str="";
+        if(name.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")){
+          log.info("计算成功");
+        }else {
+           log.info("计算失败");
+        }
 //        Set<String> keys=redisScan("camera_info:");
 //        for(String key:keys){
 //           redisTemplate.delete(key);
