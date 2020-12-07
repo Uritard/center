@@ -33,14 +33,15 @@ public class RobotController {
     public RobotController(RobotService robotService) { this.robotService = robotService; }
 
     @ApiOperation(value = "发送控制指令接口")
-    @RequestMapping(value = "/command", method = RequestMethod.POST)
+    @RequestMapping(value = "/command", method = RequestMethod.GET)
     public Result feignRobotControl(@RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
                                     @RequestParam(value = "command") String command,
-                                    @RequestParam(value = "Item",required = false) List<Map<String,Object>> Item) {
+                                    @RequestParam(value = "value",required = false) String value,
+                                    @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotControl(robotCode,type,command,Item));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

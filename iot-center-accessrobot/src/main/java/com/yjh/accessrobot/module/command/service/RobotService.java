@@ -41,8 +41,18 @@ public class RobotService {
 
     @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotControl(String robotCode,String type, String command,List<Map<String,Object>> Item){
+    public String feignRobotControl(String robotCode,String type, String command,String value,String direction){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+        List<Map<String,Object>> Item = new LinkedList<>();
+        Map<String,Object> map = new HashMap<>();
+        if(!"".equals(value) || null != value){
+            map.put("value",value);
+        }
+        if(!"".equals(direction) || null != direction) {
+            map.put("direction", direction);
+        }
+        Item.add(map);
+
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode("Server01")
                 .setReceiveCode(robotCode)
@@ -54,7 +64,7 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(  generateByteOrder(xmlString,robotCode));
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat( generateByteOrder(xmlString,robotCode));
         return "success";
     }
     @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
@@ -71,7 +81,7 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(  generateByteOrder(xmlString,robotCode));
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString,robotCode));
 
         return "success";
     }
@@ -80,9 +90,9 @@ public class RobotService {
         long sendSessionId = 0L;
         RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
         log.info("sendId是<start>"+sendId+"<end>");
-        if(sendId != null){
-            sendSessionId = sendSessionId + 1L;//请求报文每次累加1
-        }
+//        if(sendId != null){
+//            sendSessionId = sendSessionId + 1L;//请求报文每次累加1
+//        }
         log.info("发送会话序列号<start>"+sendSessionId+"<end>");
         byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId,0,true,xmlString);//生成发送的报文
 

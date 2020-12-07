@@ -91,7 +91,9 @@ public class TCruiseResultService{
 
 
         //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
+        log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
+        log.info("judgeCondition是==="+judgeCondition);
         int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
         String taskId = judgeCondition.get("task_id").toString();
         Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());

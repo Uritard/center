@@ -6,10 +6,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.module.command.entity.TCruiseDataResult;
-import com.yjh.accessrobot.module.command.entity.TCruiseTask;
-import com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail;
-import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.entity.MessageEntity;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
@@ -411,7 +408,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    Thread thread = new Thread(dataDealThread);
 //                    thread.setDaemon(true);
 //                    thread.start();
-                    robotServerHandlerMap.put(strRobotCode, this);
+                    robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     break;  
                 //心跳指令(发送响应)
                 case "2512":
@@ -714,9 +711,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //根据taskId查询相关内容
 //                    String taskId = cruiseResultList.get(0).get("taskCode");
                     String taskId = cruiseResultMap.get("taskCode");
+                    log.info("taskId是==="+taskId);
                     Map<String,String> relateInfoMap = robotService.selectRelateInfo(taskId);
+                    log.info("relateInfoMap是==="+relateInfoMap);
                     TCruiseTask tCruiseTask = robotService.selectTCruiseTask(taskId);//获取任务
+                    log.info("tCruiseTask是==="+tCruiseTask);
                     String taskResultId = relateInfoMap.get("task_result_id");
+                    log.info("taskResultId是==="+taskResultId);
 
 //
 //                    List<TCruiseTaskResultDetail> TCTRDList = new ArrayList<>();//巡检点状态详细表tctrd
@@ -750,7 +751,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     tCruiseTaskResultMap.put("cruiseStatus",252);
 
                     tCruiseTaskResultMap.put("cruiseType",228);
-                    tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("value"));
+                    tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("value_unit"));
 //                    if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
 //                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("filePath"));
 //                    }
@@ -778,27 +779,56 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     /*
                     判断任务执行情况：暂停、终止、完成批量插入TCDR和TCTRD库，完成和终止更新TCR和TCTR
                     */
+
                     List<TCruiseDataResult> TCDRList = new ArrayList<>();//巡检点数据表tcdr
                     List<TCruiseTaskResultDetail> TCTRDList = new ArrayList<>();//巡检点状态详细表tctrd
 
                     for (String key : robotInfoKeys) {
                         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                         if (cruiseResultMap.get("taskCode").equals(redisInfoMap.get("taskId"))) {
-                            //TCTRD
 
+                            TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                            tCruiseDataResult.setRemark("啥也不是");
+                            TCDRList.add(tCruiseDataResult);//TCDR
+
+                            TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                            tCruiseTaskResultDetail.setRemark("啥玩意啊");
+                            TCTRDList.add(tCruiseTaskResultDetail);//TCTRD
+
+                            TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();//任务点状态表tctr
+                            TCruiseResult tCruiseResult = new TCruiseResult();//巡检任务结果表tcr
+                        }
+                        //读任务状态缓存
+                        Map<String, Object> taskStatus = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode());
+
+                        //完成
+                        if (taskStatus.get("taskState").equals("1")){
+                            log.info("任务执行完成！！！");
+                            //批量插入TCDR库
+                            log.info("TCDRList是===="+TCDRList);
+                            log.info("TCTRDList是===="+TCTRDList);
+                            //批量插入TCTR库
+                            //更新TCR
+                            //更新TCTR
+                        }
+                        //暂停
+                        else if (taskStatus.get("taskState").equals("3")){
+                            log.info("任务暂停！！！");
+                            //批量插入TCDR库
+                            //批量插入TCTR库
+                        }
+                        //终止
+                        else if (taskStatus.get("taskState").equals("4")){
+                            log.info("任务终止！！！");
+                            log.info("TCDRList是===="+TCDRList);
+                            log.info("TCTRDList是===="+TCTRDList);
+                            //批量插入TCDR库
+                            //批量插入TCTR库
+                            //更新TCR
+                            //更新TCTR
                         }
                     }
-                    //读任务状态缓存
-                    Map<String, Object> taskStatus = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode());
-                    if (taskStatus.get("taskState").equals("1")){//已执行
-                        log.info("任务执行完成！！！");
-                    }else if (taskStatus.get("taskState").equals("3")){//暂停
-                        log.info("任务暂停！！！");
 
-                    }else if (taskStatus.get("taskState").equals("4")){//终止
-                        log.info("任务终止！！！");
-
-                    }
 
                     /*TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                     tCruiseTaskResultDetail.setInstanceId(Long.valueOf(instanceId));

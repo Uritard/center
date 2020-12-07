@@ -65,8 +65,7 @@
         LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
-        LEFT JOIN t_std_mete f on f.std_mete_id = a.std_mete_id
-        LEFT JOIN t_std_devicemete k on f.std_mete_id = k.mete_id
+        LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE

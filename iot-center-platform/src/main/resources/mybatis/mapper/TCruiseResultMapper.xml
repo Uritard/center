@@ -110,7 +110,7 @@
         WHERE 1 = 1
         AND	a.cruise_result_id = b.cruise_result_id
         AND b.task_result_id = d.task_result_id
-        <if test="cruiseDataId != null">cruise_data_id = #{cruiseDataId,jdbcType = BIGINT}</if>
+        <if test="cruiseDataId != null">and cruise_data_id = #{cruiseDataId,jdbcType = BIGINT}</if>
     </select>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">
@@ -404,7 +404,7 @@
          a.if_warn_disable = 1
         </set>
         WHERE
-        a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+        a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
 
     </update>
