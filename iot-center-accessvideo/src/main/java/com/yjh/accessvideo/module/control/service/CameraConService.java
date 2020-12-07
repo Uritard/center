@@ -14,6 +14,7 @@ import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
 import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
+import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -414,53 +415,32 @@ public class CameraConService {
         }
     }
 
-    //    //todo NET_DVR_StartVoiceCom_V30(NativeLong lUserID, int dwVoiceChan, boolean bNeedCBNoEncData, FVoiceDataCallBack_V30 fVoiceDataCallBack, Pointer pUser);
-//    @Logs(title = "开始语言对讲", code = "startChat")
+
+//    @Logs(title = "获取nvr信息", code = "getNVRSystemInfo")
 //    @Transactional(rollbackFor = Exception.class)
-//    public int startChat(Long cameraId){
-//        try {
-//
-//            HCNetSDK.FVoiceDataCallBack fVoiceDataCallBack = new HCNetSDK.FVoiceDataCallBack();
-//            hCNetSDK.NET_DVR_StartVoiceCom_V30(Constant.maps.get("lUserID"), 1, 1, fVoiceDataCallBack,null);
-//        }catch (IOException e)
-//            {
-//                log.error("转到预置点失败:", e);
+//    public Map<String,Object> getNVRSystemInfo(){
+//        Map<String,Object> re = new HashMap<>();
+//        List<RecorderConInfo> recorderConInfoList = cameraConDao.SelectRecords();
+//        log.info("recorderConInfoList: "+recorderConInfoList);
+//        long recordId = 1234;
+//        NativeLong iChanNumTem = new NativeLong(0xFFFFFFFF);
+//        for (RecorderConInfo recorderConInfo:recorderConInfoList) {
+//            recordId = recorderConInfo.getRecordId();
+//            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+//            IntByReference intByReference = new IntByReference(0);
+//            HCNetSDK.NET_DVR_HDCFG system = new HCNetSDK.NET_DVR_HDCFG();
+//            system.write();
+//            Pointer m_strIpparaCfgPointer = system.getPointer();
+//            if(!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong,HCNetSDK.NET_DVR_GET_HDCFG,iChanNumTem,m_strIpparaCfgPointer,system.size(),intByReference)){
+//                int iErr = hCNetSDK.NET_DVR_GetLastError();
+//                log.error("get camera status fail, error code: "+iErr);
 //            }
-//        return  1;
+//            system.read();
+//            log.info("system:   ",system);
+//        }
+//        return re;
 //    }
 
-//    class FVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_V30
-//    {
-//        //对对讲的音频数据进行回调操作,以下写入文件操作
-//        public void invoke(NativeLong lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser)
-//        {
-//            //byAudioFlag为0表示本地文件,为1表示设备的音频文件
-//            if (byAudioFlag == 0)
-//            {
-//                try
-//                {
-//                    fLocal.write(pRecvDataBuffer);
-//                    fLocal.flush();
-//                } catch (IOException ex)
-//                {
-//                    java.util.logging.Logger.getLogger(JDialogVoiceTalk.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            } else
-//            {
-//                if (byAudioFlag == 1)
-//                {
-//                    try
-//                    {
-//                        fDevice.write(pRecvDataBuffer);
-//                        fDevice.flush();
-//                    } catch (IOException ex)
-//                    {
-//                        java.util.logging.Logger.getLogger(JDialogVoiceTalk.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 }
 

@@ -72,6 +72,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         //读取联动设备的信息
         TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
         devicePath = tSysParam.getContent();
+        log.info("设备文件路径：  ",devicePath);
         BufferedReader br = null;
         FileReader reader = null;
         try  {
@@ -116,7 +117,7 @@ public class AccessUdpApplication implements CommandLineRunner {
                     syAllInfo.setMeteName(meteName);
                     syAllInfo.setDeviceId(strArray[2]);
                     syAllInfo.setDeviceName(strArray[3]);
-                    Integer meteKind = strArray[4].contains("遥信")?1:(strArray[4].contains("遥测")?2:(strArray[4].contains("遥控")?3:4));
+                    Integer meteKind = strArray[4].contains("遥信")?1:(strArray[4].contains("遥测")?2:(strArray[4].contains("遥控")?3:(strArray[4].contains("遥调")?4:5)));
                     syAllInfo.setMeteKind(meteKind);
                     list.add(syAllInfo);
                     //System.out.println(list);

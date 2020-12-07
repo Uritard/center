@@ -37,7 +37,11 @@ public class TCfgMeteService {
                 tCfgMeteDao.insertForTelecontrol(syAllInfo);
                 continue;
             }
-            tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
+            if(syAllInfo.getMeteKind() == 4){//遥调
+                tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
+                continue;
+            }
+            //tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
         }
         return 1;
     }
@@ -55,7 +59,10 @@ public class TCfgMeteService {
             if(syAllInfo.getMeteKind() == 3){//遥控
                 tCfgMeteDao.updateForTelecontrol(syAllInfo);
             }
+        if(syAllInfo.getMeteKind() == 4){//遥控
             tCfgMeteDao.updateForTeleadjust(syAllInfo);//遥调
+        }
+            //tCfgMeteDao.updateForTeleadjust(syAllInfo);//遥调
         return 1;
     }
 
