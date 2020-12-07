@@ -53,6 +53,9 @@ public class CameraConService {
     @Value("${nvr.capture.Preset}")
     private String capturePresetPath;//预置位路径
 
+    @Value("${spring.redis.host}")
+    private String hostIp;
+
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
@@ -93,7 +96,9 @@ public class CameraConService {
             Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
+            String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
             returnMap.put("rtmpUrl", rtmpUrl);
+            returnMap.put("flvUrl", flvUrl);
             Constant.mapsForCamera.put(String.valueOf(cameraId), rtmpUrl);
             log.info("mapsForCamera: "+Constant.mapsForCamera);
             log.info("returnMap: "+returnMap);
@@ -165,9 +170,11 @@ public class CameraConService {
                 Runtime.getRuntime().exec(transUrl);
                 String[] rtmpUrls = transUrl.split("rtmp");
                 String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
+                String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
                 returnMap.put("rtmpUrl", rtmpUrl);
+                returnMap.put("flvUrl", flvUrl);
                 returnMapList.add(returnMap);
                 Constant.mapsForCamera.put(String.valueOf(cameraConInfo.getCameraId()), rtmpUrl);
                 log.info("mapsForCamera: "+Constant.mapsForCamera);
