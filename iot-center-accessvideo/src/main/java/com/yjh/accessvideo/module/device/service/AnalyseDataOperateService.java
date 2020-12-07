@@ -172,6 +172,10 @@ public class AnalyseDataOperateService {
     @Logs(title = "表计识别-告警判断-文字结果判断",code = "")
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgementTelesignaling(String value,String stateOne,String stateTwo,Integer alarmState){
+        log.info("value"+value);
+        log.info("stateOne"+stateOne);
+        log.info("stateTwo"+stateTwo);
+        log.info("alarmState"+alarmState);
         int finalResult=0;//0-非告警 1-告警
             switch (alarmState){
                 case 0:

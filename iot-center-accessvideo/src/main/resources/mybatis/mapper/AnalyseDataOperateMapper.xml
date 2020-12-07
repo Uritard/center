@@ -683,7 +683,7 @@
     </select>
 
     <select id="selectPointInstance" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
-      SELECT
+      SELECT DISTINCT
         a.instance_id,
         a.device_id,
         b.device_code,

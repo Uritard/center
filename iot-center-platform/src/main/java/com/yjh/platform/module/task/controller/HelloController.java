@@ -74,10 +74,11 @@ public class HelloController {
 
 
 
-        Set<String> keys=redisScan("camera_info:");
-        for(String key:keys){
-           redisTemplate.delete(key);
-        }
+//        Set<String> keys=redisScan("camera_info:");
+//        for(String key:keys){
+//           redisTemplate.delete(key);
+//        }
+
 
 //
 //            Float value=new Float(0.9);
