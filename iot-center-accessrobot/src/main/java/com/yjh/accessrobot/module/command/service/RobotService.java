@@ -288,6 +288,12 @@ public class RobotService {
         System.out.println("结果："+resMap);
         return resMap;
     }
+    @Logs(title = "根据taskId查询相关内容2", code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public TCruiseTask selectTCruiseTask(String taskId) {
+        return tRobotInfoDao.selectTCruiseTask(taskId);
+    }
+
     @Logs(title = "机器人本体告警信息入库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {

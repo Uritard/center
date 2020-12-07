@@ -52,6 +52,7 @@ public interface TRobotInfoDao {
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
     Map<String,String> selectRelateInfo(@Param(value = "taskId") String taskId);
+    TCruiseTask selectTCruiseTask(@Param(value = "taskId") String taskId);
     int insertRobotAlarm(TRobotAlarm tRobotAlarm);
     int batchInsertCruiseDataResult(List<TCruiseDataResult> list);
     int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> list);

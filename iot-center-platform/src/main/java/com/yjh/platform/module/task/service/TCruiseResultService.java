@@ -4,6 +4,8 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.*;
 @Service
 public class TCruiseResultService{
 
+    private Logger log = LoggerFactory.getLogger(TCruiseResultService.class);
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
 
@@ -76,14 +79,25 @@ public class TCruiseResultService{
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
+//        if (result1 == 1) {
+//            //给前端推webSocket
+//            Map<String,Object> jasonMap=new HashMap<>();
+//            jasonMap.put("type","evaluationState");
+//            jasonMap.put("evaluationState",taskId);
+//            String json= JSON.toJSONString(jasonMap);
+//            log.info("发送给前端的消息==="+json);
+//            WebSocketServer.sendMsg(json);
+//        }
+
+
         //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
         String taskId = judgeCondition.get("task_id").toString();
         Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
-        System.out.println("查询的告警条件isWarn是==="+isWarn);
-        System.out.println("查询的告警条件taskId是==="+taskId);
-        System.out.println("查询的告警条件instanceId是==="+instanceId);
+        log.info("查询的告警条件isWarn是==="+isWarn);
+        log.info("查询的告警条件taskId是==="+taskId);
+        log.info("查询的告警条件instanceId是==="+instanceId);
         if ( isWarn == 1){
             tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
         }

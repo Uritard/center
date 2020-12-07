@@ -6,6 +6,9 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.module.command.entity.TCruiseDataResult;
+import com.yjh.accessrobot.module.command.entity.TCruiseTask;
+import com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.entity.MessageEntity;
@@ -712,7 +715,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    String taskId = cruiseResultList.get(0).get("taskCode");
                     String taskId = cruiseResultMap.get("taskCode");
                     Map<String,String> relateInfoMap = robotService.selectRelateInfo(taskId);
-//                    TCruiseTask tCruiseTask = robotService.selectTCruiseTask(taskId);//获取任务
+                    TCruiseTask tCruiseTask = robotService.selectTCruiseTask(taskId);//获取任务
                     String taskResultId = relateInfoMap.get("task_result_id");
 
 //
@@ -723,19 +726,22 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     Map<String,Object> tCruiseTaskResultMap = new HashMap<>();
 
+                    String str = null;
+
                     for (String key : robotInfoKeys){
                         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);//读缓存
                         if (cruiseResultMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
                             String instanceId = redisInfoMap.get("instanceId");
-                            String cruiseTime = redisInfoMap.get("redisInfoMap");
+                            String cruiseTime = redisInfoMap.get("cruiseTime");
                             log.info("该deviceId对应的instanceId是===" + instanceId);
 
-                            String str = "t_cruise_task_result:"+taskId + instanceId;//redis缓存名称
+                            str = "t_cruise_task_result:"+taskId + instanceId;//redis缓存名称
+
                             tCruiseTaskResultMap.put("instanceId",instanceId);
                             tCruiseTaskResultMap.put("cruiseResultId",taskResultId + instanceId);
                             tCruiseTaskResultMap.put("cruiseTime",sdf.parse(cruiseTime));
                             tCruiseTaskResultMap.put("cruiseId",instanceId);
-                            tCruiseTaskResultMap.put("cruisetaskTime",sdf.parse(cruiseTime));
+                            tCruiseTaskResultMap.put("cruiseTaskTime",sdf.parse(cruiseTime));
 
                         }
                     }
@@ -744,10 +750,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     tCruiseTaskResultMap.put("cruiseStatus",252);
 
                     tCruiseTaskResultMap.put("cruiseType",228);
-//                    tCruiseTaskResultMap.put("result_desc",);
-//                    tCruiseTaskResultMap.put("result_num",);
-//                    tCruiseTaskResultMap.put("modify_num",);
-//                    tCruiseTaskResultMap.put("picpath",);
+                    tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("value"));
+//                    if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
+//                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("filePath"));
+//                    }
+
 //                    tCruiseTaskResultMap.put("origpic",);
 //                    tCruiseTaskResultMap.put("state",);
                     tCruiseTaskResultMap.put("evaluationState",257);
@@ -755,22 +762,43 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    tCruiseTaskResultMap.put("is_warn",);
 
                     tCruiseTaskResultMap.put("taskId",taskId);
-//                    tCruiseTaskResultMap.put("task_abnormal",);//
+//                    tCruiseTaskResultMap.put("task_abnormal",);//做完后
 //                    tCruiseTaskResultMap.put("task_alarm",);//做完后
-//                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun());
+                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun());
 
-//                    tCruiseTaskResultMap.put("areaId",tCruiseTask.getAreaId());
-//                    tCruiseTaskResultMap.put("cType",tCruiseTask.getType());
+                    tCruiseTaskResultMap.put("areaId",tCruiseTask.getAreaId());
+                    tCruiseTaskResultMap.put("cType",tCruiseTask.getType());
 //                    tCruiseTaskResultMap.put("cState",);
                     tCruiseTaskResultMap.put("taskCount",robotInfoKeys.size());
-//                    tCruiseTaskResultMap.put("taskWait",all - normal - abnormal);
-//                    tCruiseTaskResultMap.put("create_time",taskStart);
-//                    tCruiseTaskResultMap.put("executeTime",taskStart);
+//                    tCruiseTaskResultMap.put("taskWait",robotInfoKeys.size() - normal - abnormal);
                     tCruiseTaskResultMap.put("taskCode",taskId);
 
+                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
 
+                    /*
+                    判断任务执行情况：暂停、终止、完成批量插入TCDR和TCTRD库，完成和终止更新TCR和TCTR
+                    */
+                    List<TCruiseDataResult> TCDRList = new ArrayList<>();//巡检点数据表tcdr
+                    List<TCruiseTaskResultDetail> TCTRDList = new ArrayList<>();//巡检点状态详细表tctrd
 
+                    for (String key : robotInfoKeys) {
+                        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+                        if (cruiseResultMap.get("taskCode").equals(redisInfoMap.get("taskId"))) {
+                            //TCTRD
 
+                        }
+                    }
+                    //读任务状态缓存
+                    Map<String, Object> taskStatus = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode());
+                    if (taskStatus.get("taskState").equals("1")){//已执行
+                        log.info("任务执行完成！！！");
+                    }else if (taskStatus.get("taskState").equals("3")){//暂停
+                        log.info("任务暂停！！！");
+
+                    }else if (taskStatus.get("taskState").equals("4")){//终止
+                        log.info("任务终止！！！");
+
+                    }
 
                     /*TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                     tCruiseTaskResultDetail.setInstanceId(Long.valueOf(instanceId));
@@ -785,7 +813,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                        TCTRDList.add(tCruiseTaskResultDetail);
 //                    }
 //                    log.info("TCTRDList的内容==="+TCTRDList);
-                   log.info("TCTRD的内容==="+tCruiseTaskResultDetail);*/
+                   log.info("TCTRD的内容==="+tCruiseTaskResultDetail);
 
                     //插表入库
 //                    int res1 = robotService.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetail);//批量插
@@ -815,17 +843,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                        TCDRList.add(tCruiseDataResult);
 //                    }
 //                    log.info("TCDRList的内容==="+TCDRList);
-//                    log.info("TCDR的内容==="+tCruiseDataResult);
+//                    log.info("TCDR的内容==="+tCruiseDataResult);*/
 
-//                  //插表入库
+                    //插表入库
 //                    int res3 = robotService.batchInsertCruiseDataResult(TCDRList);//批量插
 //                    int res4 = robotService.insertTCruiseDataResult(tCruiseDataResult);//单插
-
                     //先不插入这两个表
 //                    List<TCruiseTaskResult> TCTDList = new ArrayList<>();//任务点状态表tctr
 //                    List<TCruiseResult> TCRList = new ArrayList<>();//巡检任务结果表tcr
-
-
                     break;
             }
         }
