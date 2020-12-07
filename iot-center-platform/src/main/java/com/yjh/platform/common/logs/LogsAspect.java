@@ -61,7 +61,7 @@ public class LogsAspect {
         Logs annotation = signature.getMethod().getAnnotation(Logs.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
-        String userId = null, userName = null, serviceId = null, ip = null;
+        String userId = "18711", userName = null, serviceId = null, ip = null;
         HttpServletRequest request = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
@@ -71,7 +71,6 @@ public class LogsAspect {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             } else {
-                userId = "18711";
                 userName = request.getParameter("userName");
             }
         }
