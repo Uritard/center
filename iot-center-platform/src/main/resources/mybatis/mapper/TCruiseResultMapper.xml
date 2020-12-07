@@ -97,6 +97,22 @@
         where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
     </update>
 
+    <select id="selectJudgeCondition" parameterType="java.lang.Long" resultType="java.util.Map">
+        select
+            a.is_warn,
+            b.instance_id,
+            b.task_result_id,
+            d.task_id
+        FROM
+            t_cruise_data_result a,
+            t_cruise_task_result_detail b,
+            t_cruise_result d
+        WHERE 1 = 1
+        AND	a.cruise_result_id = b.cruise_result_id
+        AND b.task_result_id = d.task_result_id
+        <if test="cruiseDataId != null">cruise_data_id = #{cruiseDataId,jdbcType = BIGINT}</if>
+    </select>
+
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">
         delete from t_cruise_result
                 where task_result_id = #{taskResultId, jdbcType=VARCHAR}
@@ -381,6 +397,16 @@
         a.check_date = #{checkDate, jdbcType=TIMESTAMP}
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateWarnInfo">
+        UPDATE t_warn_info a <set>
+         a.if_warn_disable = 1
+        </set>
+        WHERE
+        a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+        and a.instance_id = #{instanceId,jdbcType = BIGINT}
+
     </update>
 
     <select id="selectForTaskId" resultType="com.yjh.platform.module.task.entity.TCruiseResult">

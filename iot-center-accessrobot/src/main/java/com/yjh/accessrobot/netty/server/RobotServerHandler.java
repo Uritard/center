@@ -6,7 +6,6 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.entity.MessageEntity;
@@ -713,13 +712,15 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    String taskId = cruiseResultList.get(0).get("taskCode");
                     String taskId = cruiseResultMap.get("taskCode");
                     Map<String,String> relateInfoMap = robotService.selectRelateInfo(taskId);
+//                    TCruiseTask tCruiseTask = robotService.selectTCruiseTask(taskId);//获取任务
                     String taskResultId = relateInfoMap.get("task_result_id");
 
 //
 //                    List<TCruiseTaskResultDetail> TCTRDList = new ArrayList<>();//巡检点状态详细表tctrd
 //                    for (Map<String,String> map : cruiseResultList) {
-                    TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+
                     Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info*");
+
                     Map<String,Object> tCruiseTaskResultMap = new HashMap<>();
 
                     for (String key : robotInfoKeys){
@@ -729,26 +730,63 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             String cruiseTime = redisInfoMap.get("redisInfoMap");
                             log.info("该deviceId对应的instanceId是===" + instanceId);
 
-                            String str = "t_cruise_task_result:"+taskId + instanceId;
+                            String str = "t_cruise_task_result:"+taskId + instanceId;//redis缓存名称
                             tCruiseTaskResultMap.put("instanceId",instanceId);
-                            tCruiseTaskResultMap.put("cruiseResultId",instanceId);
+                            tCruiseTaskResultMap.put("cruiseResultId",taskResultId + instanceId);
+                            tCruiseTaskResultMap.put("cruiseTime",sdf.parse(cruiseTime));
+                            tCruiseTaskResultMap.put("cruiseId",instanceId);
+                            tCruiseTaskResultMap.put("cruisetaskTime",sdf.parse(cruiseTime));
 
                         }
                     }
+                    tCruiseTaskResultMap.put("taskResultId",taskResultId);
+                    tCruiseTaskResultMap.put("endTime",sdf.parse(cruiseResultMap.get("time")));
+                    tCruiseTaskResultMap.put("cruiseStatus",252);
 
-                    /*tCruiseTaskResultDetail.setInstanceId(Long.valueOf(instanceId));
+                    tCruiseTaskResultMap.put("cruiseType",228);
+//                    tCruiseTaskResultMap.put("result_desc",);
+//                    tCruiseTaskResultMap.put("result_num",);
+//                    tCruiseTaskResultMap.put("modify_num",);
+//                    tCruiseTaskResultMap.put("picpath",);
+//                    tCruiseTaskResultMap.put("origpic",);
+//                    tCruiseTaskResultMap.put("state",);
+                    tCruiseTaskResultMap.put("evaluationState",257);
+                    tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
+//                    tCruiseTaskResultMap.put("is_warn",);
+
+                    tCruiseTaskResultMap.put("taskId",taskId);
+//                    tCruiseTaskResultMap.put("task_abnormal",);//
+//                    tCruiseTaskResultMap.put("task_alarm",);//做完后
+//                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun());
+
+//                    tCruiseTaskResultMap.put("areaId",tCruiseTask.getAreaId());
+//                    tCruiseTaskResultMap.put("cType",tCruiseTask.getType());
+//                    tCruiseTaskResultMap.put("cState",);
+                    tCruiseTaskResultMap.put("taskCount",robotInfoKeys.size());
+//                    tCruiseTaskResultMap.put("taskWait",all - normal - abnormal);
+//                    tCruiseTaskResultMap.put("create_time",taskStart);
+//                    tCruiseTaskResultMap.put("executeTime",taskStart);
+                    tCruiseTaskResultMap.put("taskCode",taskId);
+
+
+
+
+
+                    /*TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                    tCruiseTaskResultDetail.setInstanceId(Long.valueOf(instanceId));
                     tCruiseTaskResultDetail.setCruiseResultId(taskResultId + instanceId);
                     tCruiseTaskResultDetail.setCruiseTime(sdf.parse(cruiseTime));
                     tCruiseTaskResultDetail.setTaskResultId(taskResultId);
                     tCruiseTaskResultDetail.setDeviceId(null);
                     tCruiseTaskResultDetail.setEndTime(sdf.parse(cruiseResultMap.get("time")));
                     tCruiseTaskResultDetail.setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
-                    tCruiseTaskResultDetail.setRemark(null);*/
+                    tCruiseTaskResultDetail.setRemark(null);
 
 //                        TCTRDList.add(tCruiseTaskResultDetail);
 //                    }
 //                    log.info("TCTRDList的内容==="+TCTRDList);
-                   log.info("TCTRD的内容==="+tCruiseTaskResultDetail);
+                   log.info("TCTRD的内容==="+tCruiseTaskResultDetail);*/
+
                     //插表入库
 //                    int res1 = robotService.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetail);//批量插
 //                    int res2 = robotService.insertTCruiseTaskResultDetail(tCruiseTaskResultDetail);//单插

@@ -1,17 +1,14 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.task.dao.TCruiseResultDao;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.task.dao.TCruiseResultDao;
+import com.yjh.platform.module.task.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * @author czh
@@ -78,6 +75,19 @@ public class TCruiseResultService{
         cruiseManualReview.setCheckDate(cruiseCheckDate);
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
+
+        //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
+        Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
+        int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
+        String taskId = judgeCondition.get("task_id").toString();
+        Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
+        System.out.println("查询的告警条件isWarn是==="+isWarn);
+        System.out.println("查询的告警条件taskId是==="+taskId);
+        System.out.println("查询的告警条件instanceId是==="+instanceId);
+        if ( isWarn == 1){
+            tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
+        }
+
         //获取审核后的信息
         String taskResultId1  = cruiseManualReview.getTaskResultId();
         List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskResultId1);
