@@ -172,7 +172,7 @@ public class TCruisePlanService{
             tCruisePlanAttr.setPlanId(planId);
             tCruisePlanAttr.setInstanceId(tCruisePointInstanceAttr.getInstanceId());
             tCruisePlanAttr.setUpdateTime(date);
-            if (Objects.nonNull(planDetailMap.get("subType"))) {
+            if (Objects.nonNull(planDetailMap.get("subType")) && !Objects.equals(planDetailMap.get("subType"), "")) {
                 Integer subType = Integer.parseInt(String.valueOf(planDetailMap.get("subType")));
                 tCruisePlanAttr.setSubType(subType);
             }
