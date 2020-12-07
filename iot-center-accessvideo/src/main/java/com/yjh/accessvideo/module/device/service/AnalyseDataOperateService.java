@@ -124,6 +124,12 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.selectDictCode(colName, dictNote);
     }
 
+    @Logs(title = "查询字典内容",code = "Analysis")
+    @Transactional(rollbackFor = Exception.class)
+    public String selectDictNote(String dictCode,String colName){
+        return analyseDataOperateDao.selectDictNote(dictCode, colName);
+    }
+
     @Logs(title = "查询任务下所有巡视点", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstance> selectCruiseByTask(String taskId) {
@@ -161,6 +167,29 @@ public class AnalyseDataOperateService {
         } else
             return 0;
 
+    }
+
+    @Logs(title = "表计识别-告警判断-文字结果判断",code = "")
+    @Transactional(rollbackFor = Exception.class)
+    public int warnJudgementTelesignaling(String value,String stateOne,String stateTwo,Integer alarmState){
+        int finalResult=0;//0-非告警 1-告警
+            switch (alarmState){
+                case 0:
+                    if(value.equals(stateOne)){
+                        finalResult=1;
+                    }else {
+                       finalResult=0;
+                    }
+                    break;
+                case 1:
+                    if(value.equals(stateTwo)){
+                       finalResult=1;
+                    }else {
+                       finalResult=0;
+                    }
+                    break;
+            }
+            return finalResult;
     }
 
     // TODO: 2020/11/21 表计识别结果告警判断--文字结果判断

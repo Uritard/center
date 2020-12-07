@@ -72,7 +72,7 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "确认时间")
     private Date dealTime;
 
-    @ApiModelProperty(value = "是否告警抑制")
+    @ApiModelProperty(value = "是否审核  0-未审核 1-已审核")
     private Integer ifWarnDisable;
 
     @ApiModelProperty(value = "告警来源")

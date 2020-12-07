@@ -74,27 +74,31 @@ public class HelloController {
 
 
 
+        Set<String> keys=redisScan("camera_info:");
+        for(String key:keys){
+           redisTemplate.delete(key);
+        }
 
-
-            Float value=new Float(0.9);
-            Float highLimit1=new Float(5.5);
-            Float highLimit2=new Float(8.8);
-            Float lowLimit1=new Float(4.5);
-            Float lowLimit2=new Float(1.1);
-       if(value.toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")){
-           if (value > highLimit1 && value < highLimit2) {
-               log.info("结果:"+"过高");
-           } else if (value < lowLimit1 && value > lowLimit2) {
-               log.info("结果:"+"过低");
-           } else if (value > highLimit2) {
-               log.info("结果:"+"超高");
-           } else if (value < lowLimit2) {
-               log.info("结果:"+"超低");
-           } else
-               log.info("结果:"+"正常");
-       }else {
-           log.info("算法结果非数值类型");
-       }
+//
+//            Float value=new Float(0.9);
+//            Float highLimit1=new Float(5.5);
+//            Float highLimit2=new Float(8.8);
+//            Float lowLimit1=new Float(4.5);
+//            Float lowLimit2=new Float(1.1);
+//       if(value.toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")){
+//           if (value > highLimit1 && value < highLimit2) {
+//               log.info("结果:"+"过高");
+//           } else if (value < lowLimit1 && value > lowLimit2) {
+//               log.info("结果:"+"过低");
+//           } else if (value > highLimit2) {
+//               log.info("结果:"+"超高");
+//           } else if (value < lowLimit2) {
+//               log.info("结果:"+"超低");
+//           } else
+//               log.info("结果:"+"正常");
+//       }else {
+//           log.info("算法结果非数值类型");
+//       }
 
 
 

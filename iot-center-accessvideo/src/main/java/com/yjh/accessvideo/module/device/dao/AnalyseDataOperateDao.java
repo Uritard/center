@@ -33,6 +33,7 @@ public interface AnalyseDataOperateDao {
 
     TCruisePointInstance selectPointInstance(@Param(value = "instanceId")Long instanceId);
     String selectDictCode(@Param(value = "colName")String colName,@Param(value = "dictNote")String dictNote);
+    String selectDictNote(@Param(value = "dictCode")String dictCode,@Param(value = "colName")String colName);
     List<TCruisePointInstance> selectCruiseByTaskId(@Param(value = "taskId")String taskId);
 
     int insertDefectInfo(TDefectInfo tDefectInfo);

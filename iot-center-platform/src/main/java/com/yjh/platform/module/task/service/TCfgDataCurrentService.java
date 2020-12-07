@@ -202,6 +202,7 @@ public class TCfgDataCurrentService {
             cLogger.info("联动开始执行");
             //联动记录插库
             tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
+
         }
 
         cLogger.info("联动任务：----"+tCruiseTasks);

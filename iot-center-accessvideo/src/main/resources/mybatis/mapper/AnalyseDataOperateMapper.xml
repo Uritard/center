@@ -709,6 +709,16 @@
       AND dict_note = #{dictNote,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectDictNote"  resultType="java.lang.String">
+        SELECT
+            dict_note
+        FROM
+            t_dict_business
+        WHERE
+            dict_code = #{dictCode,jdbcType=VARCHAR}
+        AND col_name = #{colName,jdbcType=VARCHAR}
+    </select>
+
     <select id="selectCruiseByTaskId" parameterType="java.lang.String" resultType="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
         SELECT
 	       b.instance_id

@@ -278,4 +278,17 @@ public class TWarnInfoController {
         return result;
     }
 
+    @ApiOperation(value = "告警信息计数统计")
+    @RequestMapping(value = "/warnCountsNonIdentify",method = RequestMethod.GET)
+    public Result warnCountsNonIdentify(){
+        Result result=new Result();
+        try{
+            result.setData(tWarnInfoService.selectWarnCountsNonIdentify());
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("数量更新失败",e);
+        }
+        return  result;
+    }
+
 }

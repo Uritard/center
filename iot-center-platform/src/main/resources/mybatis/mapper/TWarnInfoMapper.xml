@@ -544,4 +544,13 @@
         <if test="warnId != null and warnId != ''"> and warn_id = #{warnId, jdbcType=BIGINT}</if>
     </select>
 
+    <select id="selectWarnCountsNonIdentify" resultType="java.lang.Integer">
+        SELECT
+            COUNT(warn_id)
+        FROM
+            t_warn_info
+        WHERE
+            if_warn_disable = 0
+    </select>
+
 </mapper>

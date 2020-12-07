@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.druid.util.StringUtils;
+import com.google.common.collect.Sets;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
@@ -11,10 +13,16 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.task.entity.*;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 /**
 * @author tt
@@ -31,6 +39,8 @@ public class TWarnInfoService{
     private TRobotAlarmDao tRobotAlarmDao;
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private DateTimeUtil dateTimeUtil;
 
@@ -224,6 +234,40 @@ public class TWarnInfoService{
             jieGuo = tWarnInfoDao.update(tWarnInfo);
         }
         return jieGuo;
+    }
+
+    @Logs(title = "查询未审核的告警数量",code = "tWarnInfo")
+    @Transactional(rollbackFor = Exception.class)
+    public Integer selectWarnCountsNonIdentify(){
+        //总告警数量=redis中的数量+数据库中的数量
+        Set<String> warnKeys=redisScan("warnInfo:");
+        Integer finalCounts=warnKeys.size()+tWarnInfoDao.selectWarnCountsNonIdentify();
+        return finalCounts;
+    }
+    //读批量redis
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
     }
 }
 
