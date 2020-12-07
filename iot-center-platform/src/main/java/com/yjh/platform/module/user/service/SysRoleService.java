@@ -285,7 +285,7 @@ public class SysRoleService{
             }
         }
         if (listStringHalfChecked.size()>0) {
-            for (String menuCodeHalfchecked:listStringChecked) {
+            for (String menuCodeHalfchecked:listStringHalfChecked) {
                 SysRoleMenu sysRoleMenu = new SysRoleMenu();
                 sysRoleMenu.setMenuCode(menuCodeHalfchecked);
                 sysRoleMenu.setRoleId(roleId);
