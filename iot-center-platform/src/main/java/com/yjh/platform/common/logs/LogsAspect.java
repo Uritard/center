@@ -67,7 +67,7 @@ public class LogsAspect {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         if (null != servletRequestAttributes) {
             request = servletRequestAttributes.getRequest();
-            if (Objects.nonNull(request.getHeader("userId")) && Objects.equals(request.getHeader("userId"), "undefined")) {
+            if (Objects.nonNull(request.getHeader("userId")) && !Objects.equals(request.getHeader("userId"), "undefined")) {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("account_lock_times:"+userId).get("userName"));
             } else {
