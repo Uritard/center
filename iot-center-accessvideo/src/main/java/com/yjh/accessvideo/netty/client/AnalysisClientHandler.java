@@ -239,6 +239,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                                             log.info("告警MAP：" + warnMap);
                                             try {
                                                 redisTemplate.opsForHash().putAll(warnName, warnMap);
+                                                cruiseResultMap.put("isWarn","1");
                                                 // webSocket通知前端调用巡视监控的接口
                                                 Map<String, Object> jasonMap = new HashMap<>();
                                                 jasonMap.put("type", "newAlarm");
@@ -262,28 +263,32 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                                                 tStdDevicemeteM.getLowLimit1(),
                                                 tStdDevicemeteM.getHighLimit2(),
                                                 tStdDevicemeteM.getLowLimit2());
-                                        log.info("数字结果告警判断结果：" + warnRuleMeter);
                                         if (warnRuleMeter > 0) {
                                             warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "数据异常");
                                             warnMap.put("warnTime", simpleDateFormat.format(new Date()));
+                                            log.info("数字结果告警判断结果：" + warnRuleMeter);
                                             switch (warnRuleMeter) {
                                                 case 1:
-                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
+                                                    warnMap.put("warnContent", "1主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
+                                                    break;
                                                 case 2:
-                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
+                                                    warnMap.put("warnContent", "2主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
                                                     warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1() - resultValueMeter));
+                                                    break;
                                                 case 3:
-                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
+                                                    warnMap.put("warnContent", "3主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
+                                                    break;
 
                                                 case 4:
-                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
+                                                    warnMap.put("warnContent", "4主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
                                                     warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2() - resultValueMeter));
                                                     break;
                                             }
 
                                             redisTemplate.opsForHash().putAll(warnName, warnMap);
+                                            cruiseResultMap.put("isWarn","1");
                                             log.info("告警Map:" + warnMap);
 
                                             // webSocket通知前端调用巡视监控的接口
@@ -437,6 +442,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                 }
 
                 cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
+                if(Objects.isNull(cruiseResultMap.get("isWarn"))){
+                    cruiseResultMap.put("isWarn","0");
+                }
                 // TODO: 2020/11/4 对算法识别结果进行判断并决定再redis中插入哪个值：identifyState- 识别正常&识别异常
                 // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
 
@@ -504,6 +512,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                 tCruiseDataResult.setState(Integer.valueOf(cruiseWorkedMap.get("state").toString()));
                 tCruiseDataResult.setCreatetime(new Date());
                 tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+                tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
                 dataList.add(tCruiseDataResult);
 
             }
@@ -527,9 +536,10 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                     tWarnInfo.setImagePath(warnMap.get("imagePath").toString());
                     tWarnInfo.setAlarmSource(Integer.valueOf(warnMap.get("alarmSource").toString()));
                     tWarnInfo.setWarnName(warnMap.get("warnName").toString());
-                    tWarnInfo.setOutRange(warnMap.get("outRang").toString());
+                    tWarnInfo.setOutRange(warnMap.get("outRange").toString());
                     tWarnInfo.setWarnContent(warnMap.get("warnContent").toString());
                     tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warnMap.get("warnTime").toString()));
+                    log.info("告警数据对象："+tWarnInfo);
                     warnList.add(tWarnInfo);
                 }
             } catch (Exception e) {

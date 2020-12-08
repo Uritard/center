@@ -35,6 +35,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.awt.geom.FlatteningPathIterator;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -66,20 +67,20 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public String sayHello(@ApiParam(value = "ceshi ", required = true) @RequestParam String name, @ApiParam(value = "ceshi ", required = true) @RequestParam String name2) {
+    public String sayHello(@ApiParam(value = "ceshi ", required = true) @RequestParam String name, @ApiParam(value = "ceshi ", required = true) @RequestParam String name2) throws ParseException {
         WebSocketServer.sendMsg(name + "hello！");
         JSONObject jsonObject = JSONObject.fromObject(WebSocketResult.builder().type("1").info(name + "  很好!").build());
         WebSocketServer.sendMsg(jsonObject.toString());
         log.info("转换时间：" + Math.random() * 100);
 
 
-
-        String str="";
-        if(name.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")){
-          log.info("计算成功");
-        }else {
-           log.info("计算失败");
+       Map<String, Object>resultMaps=redisTemplate.opsForHash().entries("warnInfo:6fb4ea91572d468785b4dc8bd399762e635a3ecb7c604d82a004de7c9f2f5b65");
+       log.info("result1:"+resultMaps.get("warnContent"));
+       log.info("result:"+resultMaps.get("alarmContent"));
+        if(Objects.isNull(resultMaps.get("alarmContent"))){
+            log.info("实验成功");
         }
+
 //        Set<String> keys=redisScan("camera_info:");
 //        for(String key:keys){
 //           redisTemplate.delete(key);
