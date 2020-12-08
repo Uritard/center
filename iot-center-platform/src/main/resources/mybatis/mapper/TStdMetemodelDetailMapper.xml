@@ -392,4 +392,15 @@
         select dict_note from t_dict_business where col_name = #{colName,jdbcType = VARCHAR}
     </select>
 
+    <resultMap id="mapResultMap" type="java.util.HashMap">
+        <result property="key" column="id"/>
+        <result property="value" column="value"/>
+    </resultMap>
+    <select id="selectForDictNote" resultMap="mapResultMap">
+        select
+        a.dict_note AS "id",
+        a.dict_code AS "value"
+        from t_dict_business a order by value desc
+    </select>
+
 </mapper>

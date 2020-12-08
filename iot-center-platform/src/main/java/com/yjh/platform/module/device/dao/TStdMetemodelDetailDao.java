@@ -2,11 +2,16 @@ package com.yjh.platform.module.device.dao;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
+import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.MeteModelDetail;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -57,6 +62,8 @@ public interface TStdMetemodelDetailDao {
 
     List<String> selectColumnName();
     List<String> selectForDict(@Param(value = "colName") String colName);
+
+    void selectForDictNote(ResultHandleUtils<String, String> resultHandler);
 
 
 }

@@ -205,16 +205,15 @@
 
     <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.Long">
         SELECT
-        c.instance_id
+        a.instance_id
         FROM
-        t_robot_info a
-        left join t_robot_inspection b on a.robot_id = b.robot_id
-        left join t_cruise_point_instance c on b.inspection_id = c.cruise_id and c.instance_id IN
+        t_cruise_point_instance a
+        WHERE
+        a.cruise_id IN ( SELECT inspection_id FROM t_robot_inspection WHERE ( SELECT robot_id FROM t_robot_info WHERE robot_code = #{robotCode,jdbcType=VARCHAR} ))
+        AND a.instance_id IN
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">
             #{instanceId,jdbcType=BIGINT}
         </foreach>
-        WHERE
-        a.robot_code = #{robotCode,jdbcType=VARCHAR}
     </select>
 
     <select id="selectRobotInspectionIds" resultType="com.yjh.platform.module.task.entity.ConfirmImmediately">

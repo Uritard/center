@@ -1,5 +1,7 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdMeteDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
@@ -7,17 +9,20 @@ import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.dao.TStdMetemodelDao;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -326,11 +331,12 @@ public class TStdMetemodelService {
          return 1;
     }
 
-    @Logs(title = "修改当前模板信息",code = "module",content = "根据页面传入的参数修改数据")
+    @Logs(title = "创建模板信息",code = "module",content = "创建模板信息")
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
         String path = (String) mapForPicModelPath.get("content");
+        //String path = "D:/code/qhTest";
         String fileName = "设备测点模板.xlsx";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
@@ -355,6 +361,7 @@ public class TStdMetemodelService {
 
         cell = row.createCell(0);
         cell.setCellStyle(style);
+        cell.setCellType(CellType.STRING);
         cell.setCellValue("带*为必填项");
         //插入第一行数据的表头
         String[] deviceType = this.tStdMetemodelDetailDao.selectForDict("device_type").toArray(new String[0]);
@@ -368,6 +375,9 @@ public class TStdMetemodelService {
                 }
                 cell = row.createCell(i);
                 cell.setCellStyle(style);
+                if(i == 1){
+                    cell.setCellValue(list.get(i)+"*");
+                }
                 if(i == 2){
                     cell.setCellValue(list.get(i)+"*");
                     // 设置第i列的2-5001行为下拉列表
@@ -380,7 +390,7 @@ public class TStdMetemodelService {
                     continue;
                 }
                 if(i == 3){
-                    cell.setCellValue(list.get(i)+"*");
+                    cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
@@ -402,7 +412,7 @@ public class TStdMetemodelService {
                     continue;
                 }
                 if(i == 8){
-                    cell.setCellValue(list.get(i)+"*");
+                    cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
@@ -413,7 +423,7 @@ public class TStdMetemodelService {
                     continue;
                 }
                 if(i == 12){
-                    cell.setCellValue(list.get(i)+"*");
+                    cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
@@ -429,7 +439,7 @@ public class TStdMetemodelService {
             File file = new File(modelPath + File.separator + modelName);
             try {
         //删除该文件夹下原来的模版文件
-                deleteDir(new File(modelPath + File.separator));
+                deleteDir(new File(modelPath + File.separator+modelName));
         //判断对应的文件夹是否有，无则新建
                 File myPath = new File(modelPath);
                 if (!myPath.exists()) {
@@ -447,4 +457,205 @@ public class TStdMetemodelService {
         return newFile;
     }
 
+    @Logs(title = "测点模板信息导入",code = "module",content = "测点模板信息导入")
+    @Transactional(rollbackFor = Exception.class)
+    public Result insertModel(String pathName) throws Exception  {
+        Result result = new Result();
+
+        //获取自带你表的值
+        ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
+        tStdMetemodelDetailDao.selectForDictNote(resultHandler);
+        Map<String, String> nameMap = resultHandler.getMappedResults();
+        HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream(pathName));//创建工作簿
+        Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
+        int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
+        List<TStdMete> tStdMeteList = new ArrayList<>();
+        StringBuffer errMsg = new StringBuffer();
+        String item = null;
+        for (int i = 1; i <= total; i++) {
+            Row row = sheet.getRow(i);
+            TStdMete tStdMete = new TStdMete();
+            //第2列
+            if(row.getCell(1) == null || row.getCell(1).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(1).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(1).getStringCellValue()))){
+                errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列不能为空<br>");
+                result.setMessage(errMsg.toString());
+                return result;
+            }
+            //第3列
+            if(row.getCell(2) == null || row.getCell(2).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(2).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(2).getStringCellValue()))){
+                errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列不能为空<br>");
+                result.setMessage(errMsg.toString());
+                return result;
+            }
+            //第5列
+            if(row.getCell(4) == null || row.getCell(4).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(4).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(4).getStringCellValue()))){
+                errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列不能为空<br>");
+                result.setMessage(errMsg.toString());
+                return result;
+            }
+            Cell cell = row.getCell(1);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setDeviceType(Integer.valueOf(nameMap.get(item)));
+
+            cell = row.getCell(2);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setMeteType(nameMap.get(item).toString());
+
+            cell = row.getCell(3);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            Integer meteKind = item.contains("遥信")?1:(item.contains("遥测")?2:(item.contains("遥控")?3:(item.contains("遥调")?4:null)));
+            tStdMete.setMeteKind(meteKind);
+
+            cell = row.getCell(4);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setMeteName(item);
+
+            cell = row.getCell(5);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmNote(item);
+
+            cell = row.getCell(6);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmExplain(item);
+
+            cell = row.getCell(7);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmType(nameMap.get(item).toString());
+
+            cell = row.getCell(8);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setUnit(item);
+
+            cell = row.getCell(9);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setUpEffect(Float.valueOf(item));
+
+            cell = row.getCell(10);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setDownEffect(Float.valueOf(item));
+
+            cell = row.getCell(11);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmLevel(Integer.valueOf(nameMap.get(item)));
+
+            cell = row.getCell(12);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmLimit(Integer.valueOf(item));
+
+            cell = row.getCell(13);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmDelay(Integer.valueOf(item));
+
+            cell = row.getCell(14);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setHighLimit1(Float.valueOf(item));
+
+            cell = row.getCell(15);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setLowLimit1(Float.valueOf(item));
+
+            cell = row.getCell(16);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setHighLimit2(Float.valueOf(item));
+
+            cell = row.getCell(17);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setLowLimit2(Float.valueOf(item));
+
+            cell = row.getCell(18);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setHighLimit3(Float.valueOf(item));
+
+            cell = row.getCell(19);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setLowLimit3(Float.valueOf(item));
+
+            cell = row.getCell(20);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setHighLimit4(Float.valueOf(item));
+
+            cell = row.getCell(21);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setLowLimit4(Float.valueOf(item));
+
+            cell = row.getCell(22);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setAlarmCnt(Integer.valueOf(item));
+
+            cell = row.getCell(23);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
+
+            cell = row.getCell(24);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
+
+
+            cell = row.getCell(25);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setModulus(Integer.valueOf(item));
+
+            cell = row.getCell(26);
+            //设置单元格类型
+            cell.setCellType(CellType.STRING);
+            item = cell.getStringCellValue();
+            tStdMete.setRemark(item);
+
+            tStdMeteList.add(tStdMete);
+        }
+        tStdMeteDao.batchAdd(tStdMeteList);
+        result.setData("ok");
+        return result;
+
+    }
 }

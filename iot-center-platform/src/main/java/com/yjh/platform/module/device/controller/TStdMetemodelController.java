@@ -283,5 +283,22 @@ public class TStdMetemodelController {
         return  result;
     }
 
+    @ApiOperation(value = "导入模板")
+    @RequestMapping(value = "insertModel",method = RequestMethod.GET)
+    public Result insertModel (@RequestParam(value = "fileName")String fileName) {
+        Result result =new Result();
+        try {
+            result.setData(tStdMetemodelService.insertModel(fileName));
+        }  catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("生成模板异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("生成模板错误:", e);
+        }
+
+        return  result;
+    }
+
 
 }
