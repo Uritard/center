@@ -117,7 +117,7 @@ public class TSysParamController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "paramId", required = false) Integer paramId,
                                @RequestParam(value = "paramType", required = false) String paramType,
                                @RequestParam(value = "paramName", required = false) String paramName,

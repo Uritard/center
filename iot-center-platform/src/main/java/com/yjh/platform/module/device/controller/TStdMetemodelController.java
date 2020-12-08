@@ -266,6 +266,22 @@ public class TStdMetemodelController {
     }
 
 
+    @ApiOperation(value = "生成模板")
+    @RequestMapping(value = "createModel",method = RequestMethod.GET)
+    public Result createModel () {
+        Result result =new Result();
+        try {
+            result.setData(tStdMetemodelService.createModel());
+        }  catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("生成模板异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("生成模板错误:", e);
+        }
+
+        return  result;
+    }
 
 
 }

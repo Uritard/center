@@ -6,13 +6,24 @@ import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.dao.TStdMetemodelDao;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
 * @author tt
@@ -32,6 +43,8 @@ public class TStdMetemodelService {
 
     @Autowired
     private TStdMeteDao tStdMeteDao;
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
@@ -311,6 +324,127 @@ public class TStdMetemodelService {
 
 
          return 1;
+    }
+
+    @Logs(title = "修改当前模板信息",code = "module",content = "根据页面传入的参数修改数据")
+    @Transactional(rollbackFor = Exception.class)
+    public String createModel(){
+        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
+        String path = (String) mapForPicModelPath.get("content");
+        String fileName = "设备测点模板.xlsx";
+        List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
+       boolean isOk = createModel(name,fileName,path);
+       if(isOk){
+           return path+fileName;
+       }else {
+         return "fail";
+       }
+    }
+    public  boolean createModel(List<String> list, String modelName, String modelPath) {
+        boolean newFile = false;
+        //创建excel工作簿
+            HSSFWorkbook workbook = new HSSFWorkbook();
+        //创建工作表sheet
+            HSSFSheet sheet = workbook.createSheet();
+        //创建第一行
+            HSSFRow row = sheet.createRow(0);
+            HSSFCell cell;
+        //设置样式
+            CellStyle style = workbook.createCellStyle();
+            style.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+
+        cell = row.createCell(0);
+        cell.setCellStyle(style);
+        cell.setCellValue("带*为必填项");
+        //插入第一行数据的表头
+        String[] deviceType = this.tStdMetemodelDetailDao.selectForDict("device_type").toArray(new String[0]);
+        String[] meteType = this.tStdMetemodelDetailDao.selectForDict("mete_type").toArray(new String[0]);
+        String[] meteKind = this.tStdMetemodelDetailDao.selectForDict("mete_kind").toArray(new String[0]);
+        String[] alarmLevel = this.tStdMetemodelDetailDao.selectForDict("alarm_level").toArray(new String[0]);
+        String[] alarmType = this.tStdMetemodelDetailDao.selectForDict("alarm_type").toArray(new String[0]);
+            for (int i = 0; i < list.size(); i++) {
+                if(i ==0 ){
+                    continue;
+                }
+                cell = row.createCell(i);
+                cell.setCellStyle(style);
+                if(i == 2){
+                    cell.setCellValue(list.get(i)+"*");
+                    // 设置第i列的2-5001行为下拉列表
+                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
+                    // 创建下拉列表数据
+                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(deviceType);
+                    // 绑定
+                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    sheet.addValidationData(dataValidation3);
+                    continue;
+                }
+                if(i == 3){
+                    cell.setCellValue(list.get(i)+"*");
+                    // 设置第i列的2-5001行为下拉列表
+                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
+                    // 创建下拉列表数据
+                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(meteType);
+                    // 绑定
+                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    sheet.addValidationData(dataValidation3);
+                    continue;
+                }
+                if(i == 4){
+                    cell.setCellValue(list.get(i)+"*");
+                    // 设置第i列的2-5001行为下拉列表
+                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
+                    // 创建下拉列表数据
+                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(meteKind);
+                    // 绑定
+                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    sheet.addValidationData(dataValidation3);
+                    continue;
+                }
+                if(i == 8){
+                    cell.setCellValue(list.get(i)+"*");
+                    // 设置第i列的2-5001行为下拉列表
+                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
+                    // 创建下拉列表数据
+                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(alarmType);
+                    // 绑定
+                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    sheet.addValidationData(dataValidation3);
+                    continue;
+                }
+                if(i == 12){
+                    cell.setCellValue(list.get(i)+"*");
+                    // 设置第i列的2-5001行为下拉列表
+                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
+                    // 创建下拉列表数据
+                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(alarmLevel);
+                    // 绑定
+                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    sheet.addValidationData(dataValidation3);
+                    continue;
+                }
+               cell.setCellValue(list.get(i));
+            }
+        //创建excel文件
+            File file = new File(modelPath + File.separator + modelName);
+            try {
+        //删除该文件夹下原来的模版文件
+                deleteDir(new File(modelPath + File.separator));
+        //判断对应的文件夹是否有，无则新建
+                File myPath = new File(modelPath);
+                if (!myPath.exists()) {
+                    myPath.mkdir();
+                }
+        //创建新的模版文件
+                newFile = file.createNewFile();
+                //将excel写入
+                FileOutputStream stream = FileUtils.openOutputStream(file);
+                workbook.write(stream);
+                stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newFile;
     }
 
 }

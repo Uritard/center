@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yjh.platform.module.task.entity.TUnionInfo;
 import com.yjh.platform.module.task.entity.UnionTaskInfo;
 import com.yjh.platform.module.task.service.THisTelemeterDataService;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -122,8 +124,8 @@ public class THisTelemeterDataController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    public Result selectByPage(@RequestParam(value = "startTime", required = false) Date startTime,
-                               @RequestParam(value = "endTime", required = false) Date endTime,
+    public Result selectByPage(@RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
+                               @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,
                                @RequestParam(value = "meteKind", required = false) Integer meteKind,
                                @RequestParam(value = "deviceName", required = false) String deviceName,
                                @RequestParam(value = "meteName", required = false) String meteName,
@@ -133,7 +135,7 @@ public class THisTelemeterDataController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TUnionInfo> list = tHisTelemeterDataService.selectAll(startTime, endTime, meteKind, deviceName,meteName);
+            List<TUnionInfo> list = tHisTelemeterDataService.selectAll(startDate, endDate, meteKind, deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -159,18 +161,18 @@ public class THisTelemeterDataController {
 
     @ApiOperation(value = "查询联动任务信息")
     @RequestMapping(value = "/selectUnionTask", method = RequestMethod.GET)
-    public Result selectUnionTask(@RequestParam(value = "startTime", required = false) Date startTime,
-                                  @RequestParam(value = "endTime", required = false) Date endTime,
-                                  @RequestParam(value = "meteName", required = false) String meteName,
+    public Result selectUnionTask(@RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
+                                  @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,
                                   @RequestParam(value = "deviceName", required = false) String deviceName,
                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         //@RequestParam(value = "meteKind", required = false) Integer meteKind,
+        //@RequestParam(value = "meteName", required = false) String meteName,
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<UnionTaskInfo> list = tHisTelemeterDataService.selectUnionTask(startTime, endTime, meteName,deviceName);
+            List<UnionTaskInfo> list = tHisTelemeterDataService.selectUnionTask(startDate, endDate,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

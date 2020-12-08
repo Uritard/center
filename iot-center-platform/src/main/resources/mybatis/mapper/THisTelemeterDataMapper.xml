@@ -175,7 +175,7 @@
         a.union_id,
         g.mete_name,
         i.mete_value,
-        a.create_time as cruiseTime ,
+        a.start_time as cruiseTime ,
         d.result_num,
         d.origpic,
         d.person_check,
@@ -210,6 +210,6 @@
         WHERE 1 =1
         <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName != null and deviceName != ''"> and a.mete_id in (SELECT mete_id from t_cfg_data_current where device_id in (select device_id from t_cfg_device WHERE device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') ))</if>
-        <if test="meteName != null and meteName != ''"> and a.mete_id in (select mete_id from t_cfg_mete where mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%'))</if>
+        order by a.start_time
     </select>
 </mapper>

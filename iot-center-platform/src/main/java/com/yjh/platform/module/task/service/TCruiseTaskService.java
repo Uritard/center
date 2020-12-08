@@ -86,11 +86,11 @@ public class TCruiseTaskService {
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
-    private Long waitTime;
+    private Long waitTime;;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
-
+    //任务超期时间
     private Long tasksAreTime;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
@@ -165,12 +165,15 @@ public class TCruiseTaskService {
             if(tCruiseTask.getIfRun() == 173){
                 //立即执行
                 try {
-                    TSysParam tSysParam = tSysParamDao.selectByParamType("picModelPath");//模板图片路径
-                    picModelPath = tSysParam.getContent();
-                    tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
-                    waitTime = Long.valueOf(tSysParam.getContent());
-                    tSysParam = tSysParamDao.selectByParamType("tasksAreTime");//任务超期时间
-                    tasksAreTime = Long.valueOf(tSysParam.getContent());
+                    //模板图片路径
+                    Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+                    picModelPath = (String) mapForPicModelPath.get("content");
+                    //等待相机转到预置位时间
+                    Map<String,Object> mapForWaitTime  = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
+                    waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+                    //任务超期时间
+                    Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+                    tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                             tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
@@ -477,6 +480,9 @@ public class TCruiseTaskService {
             Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
             Date startTime = sd.parse(mapForGet.get("taskStart"));
             Long taskStartTime = startTime.getTime();
+            //任务超期时间
+            Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+            tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
             Long endTime = taskStartTime + tasksAreTime*24*60*60*1000;
             String s =sd.format(endTime);
             quartzTask.setStartTime(sd.parse(s));
@@ -505,12 +511,15 @@ public class TCruiseTaskService {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(239);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-        TSysParam tSysParam = tSysParamDao.selectByParamType("picModelPath");//模板图片路径
-        picModelPath = tSysParam.getContent();
-        tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
-        waitTime = Long.valueOf(tSysParam.getContent());
-        tSysParam = tSysParamDao.selectByParamType("tasksAreTime");//任务超期时间
-        tasksAreTime = Long.valueOf(tSysParam.getContent());
+        //模板图片路径
+        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+        picModelPath = (String) mapForPicModelPath.get("content");
+        //等待相机转到预置位时间
+        Map<String,Object> mapForWaitTime  = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
+        waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+        //任务超期时间
+        Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+        tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                 tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime,

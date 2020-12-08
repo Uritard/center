@@ -36,7 +36,6 @@ public interface THisTelemeterDataDao {
                               @Param(value = "meteName") String meteName);
     List<UnionTaskInfo> selectUnionTask(@Param(value = "startTime") Date startTime,
                                         @Param(value = "endTime") Date endTime,
-                                        @Param(value = "meteName") String meteName,
                                         @Param(value = "deviceName") String deviceName);
 
 }

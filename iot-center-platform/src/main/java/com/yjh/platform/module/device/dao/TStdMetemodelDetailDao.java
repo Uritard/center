@@ -55,6 +55,8 @@ public interface TStdMetemodelDetailDao {
     List<MeteInfo> selectMeteBlindModel(@Param(value = "modelId")Long modelId);
     int deleteByMeteId(@Param(value ="meteId")Long meteId);
 
+    List<String> selectColumnName();
+    List<String> selectForDict(@Param(value = "colName") String colName);
 
 
 }

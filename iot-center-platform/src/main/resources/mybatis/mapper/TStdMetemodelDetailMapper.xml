@@ -312,7 +312,7 @@
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
-        ORDER BY model_name,mete_kind
+        ORDER BY model_name,mete_kind desc
     </select>
 
     <insert id="batchAdd">
@@ -384,5 +384,12 @@
         DELETE FROM t_std_metemodel_detail WHERE mete_id=#{meteId,jdbcType=BIGINT}
     </delete>
 
+    <select id="selectColumnName" resultType="java.lang.String">
+         select COLUMN_COMMENT from information_schema.COLUMNS where table_name = 't_std_mete'
+    </select>
+
+    <select id="selectForDict" resultType="java.lang.String">
+        select dict_note from t_dict_business where col_name = #{colName,jdbcType = VARCHAR}
+    </select>
 
 </mapper>

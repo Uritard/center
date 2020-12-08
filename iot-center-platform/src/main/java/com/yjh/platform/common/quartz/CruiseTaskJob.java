@@ -16,7 +16,6 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.*;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -63,8 +62,7 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
-    @Autowired
-    private TSysParamDao tSysParamDao;
+
 
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CruiseTaskJob.class);
@@ -83,8 +81,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private String picModelPath;
     //等待相机转到预置位时间
     private Long waitTime;
+    //任务超期时间
     private Long tasksAreTime;
-
 
     /**
      * 巡视任务类
@@ -108,17 +106,20 @@ public class CruiseTaskJob extends QuartzJobBean {
         }else {
 
             //Thread.sleep(10000);
+            //模板图片路径
+            Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+            picModelPath = (String) mapForPicModelPath.get("content");
+            //等待相机转到预置位时间
+            Map<String,Object> mapForWaitTime  = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
+            waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+            //任务超期时间
+            Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+            tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
+
             Long timeIsOk = tasksAreTime*24*60*60*1000;
             Date taskStart = new Date();
             log.info("开始进行任务" +taskStart);
             Long taskIsStart = taskStart.getTime();
-
-            TSysParam tSysParam = tSysParamDao.selectByParamType("picModelPath");//模板图片路径
-            picModelPath = tSysParam.getContent();
-            tSysParam = tSysParamDao.selectByParamType("waitTime");//等待相机转到预置位的时间
-            waitTime = Long.valueOf(tSysParam.getContent());
-            tSysParam = tSysParamDao.selectByParamType("tasksAreTime");//任务超期时间
-            tasksAreTime = Long.valueOf(tSysParam.getContent());
 
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
             //在任务表里新建一条
@@ -445,6 +446,14 @@ public class CruiseTaskJob extends QuartzJobBean {
                         //所有点都做完了
                         tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                         tCruiseTaskResultDao.update(tCruiseTaskResult);
+
+                        Map<String, Object> jsonForLastMap = new HashMap<>();
+                        jsonForLastMap.put("type", "lastOneInstance");
+                        jsonForLastMap.put("taskId", taskId);
+                        String jsonForLast = JSON.toJSONString(jasonMap);
+                        log.info("发送给前端的消息：" + jsonForLast);
+                        WebSocketServer.sendMsg(jsonForLast);
+
                         Thread.sleep(15000);
                         tCruiseResult.setCState(240);
                         tCruiseResultDao.update(tCruiseResult);

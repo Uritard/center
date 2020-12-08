@@ -534,6 +534,14 @@ public class RunAtNowTask implements Runnable{
 
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
+                Map<String, Object> jsonForLastMap = new HashMap<>();
+                jsonForLastMap.put("type", "lastOneInstance");
+                jsonForLastMap.put("taskId", taskId);
+                String jsonForLast = JSON.toJSONString(jasonMap);
+                log.info("发送给前端的消息：" + jsonForLast);
+                WebSocketServer.sendMsg(jsonForLast);
+
                 Thread.sleep(15000);
                 tCruiseResult.setCState(240);
                 tCruiseResultDao.update(tCruiseResult);

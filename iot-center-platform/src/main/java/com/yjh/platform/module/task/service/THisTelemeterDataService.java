@@ -77,8 +77,8 @@ public class THisTelemeterDataService{
 
     @Logs(title = "查询联动任务信息", code = "THisTelemeterData",content = "根据web传入的参数查询联动任务信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<UnionTaskInfo> selectUnionTask(Date startTime, Date endTime,String meteName,String deviceName){
-        return this.tHisTelemeterDataDao.selectUnionTask(startTime,endTime, meteName,deviceName);
+    public List<UnionTaskInfo> selectUnionTask(Date startTime, Date endTime,String deviceName){
+        return this.tHisTelemeterDataDao.selectUnionTask(startTime,endTime,deviceName);
     }
 }
 
