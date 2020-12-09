@@ -9,6 +9,8 @@ import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
@@ -80,13 +82,14 @@ public class TRobotInspectionService{
 
     @Logs(title = "机器人监控", code = "device",content = "查询机器人的任务信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId){
+    public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId) throws Exception{
         List<RobotTaskMessage> re = new ArrayList<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //获取此机器人的巡视点
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
         Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
-        String taskId = (String)mapForRobotInstance.get("taskPatrolled_id");
+        String taskId = (String)mapForRobotInstance.get("taskId");
         String robotState =(String) mapForRobotState.get("value");
         if( !"2".equals(robotState)){
             //机器人未在做任务
@@ -102,7 +105,7 @@ public class TRobotInspectionService{
             RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
             robotTaskMessage.setDeviceName(getName(Long.valueOf(item),1,nameList));
             robotTaskMessage.setInstanceName(getName(Long.valueOf(item),0,nameList));
-            robotTaskMessage.setCruiseTime((Date)mapForRobotTaskMessage.get("cruiseTime"));
+            robotTaskMessage.setCruiseTime(simpleDateFormat.parse(mapForRobotTaskMessage.get("cruiseTime").toString()));
             robotTaskMessage.setResult((String)mapForRobotTaskMessage.get("resultNum"));
             re.add(robotTaskMessage);
         }
@@ -154,10 +157,23 @@ public class TRobotInspectionService{
     @Logs(title = "查询机器人任务进度", code = "device",content = "查询机器人任务进度")
     @Transactional(rollbackFor = Exception.class)
     public Object selectRobotTaskProgress(Long robotId){
-        TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
-        //获取状态信息
-        Map<String,Object> mapTaskProgress  = redisTemplate.opsForHash().entries("RobotTaskStatus:"+tRobotInfo.getRobotCode());
-        return mapTaskProgress.get("taskProgress");
+
+        String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
+        Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
+        String taskId = (String)mapForRobotInstance.get("taskId");
+        String instanceList = (String)mapForRobotInstance.get("instanceIdList");
+        instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
+        String[] instanceIdList = instanceList.split(", ");
+        int i = 0;
+        for (String item:instanceIdList) {
+            Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
+            if(mapForRobotTaskMessage != null){
+                i = i + 1;
+            }
+        }
+        Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue())*100);
+        String result = re.toString()+"%";
+        return result;
     }
 
 }
