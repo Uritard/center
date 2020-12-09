@@ -267,9 +267,9 @@ public class TStdMetemodelController {
     }
 
 
-    @ApiOperation(value = "生成模板")
-    @RequestMapping(value = "createModel",method = RequestMethod.GET)
-    public Result createModel () {
+    @ApiOperation(value = "下载模板")
+    @RequestMapping(value = "downloadModel",method = RequestMethod.GET)
+    public Result download () {
         Result result =new Result();
         try {
             result.setData(tStdMetemodelService.createModel());
@@ -285,11 +285,11 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "导入模板")
-    @RequestMapping(value = "insertModel",method = RequestMethod.POST)
-    public Result insertModel (@ApiParam("fileName") MultipartFile fileName) {
+    @RequestMapping(value = "upload",method = RequestMethod.POST)
+    public Result upload (@ApiParam("fileName") MultipartFile fileName) {
         Result result =new Result();
         try {
-            result.setData(tStdMetemodelService.insertModel(fileName));
+            result=tStdMetemodelService.insertModel(fileName);
         }  catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("生成模板异常:", e);

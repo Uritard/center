@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMete;
+import com.yjh.platform.module.device.entity.TStdMeteDetail;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -45,10 +47,14 @@ public interface TStdMeteDao {
                                 @Param(value = "thresholdPer") BigDecimal thresholdPer,
                                 @Param(value = "modulus") Integer modulus,
                                 @Param(value = "remark") String remark);
-    List<TStdMete> selectByPage(TStdMete tStdMete);
+    List<TStdMeteDetail> selectByPage(@Param(value = "deviceType") Integer deviceType,
+                                      @Param(value = "meteName") String meteName);
     int batchAdd(List<TStdMete> list);
 
     List<MeteInfo> selectByDeviceType(Integer deviceType);
+
+    List<TDictBusiness>selectForDeviceTypeTree(@Param(value = "colName") String colName);
+    int batchDelete(@Param(value = "list")List<String> list);
 
 
 }

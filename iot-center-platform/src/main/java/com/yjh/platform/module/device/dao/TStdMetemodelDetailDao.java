@@ -7,6 +7,7 @@ import java.util.Map;
 import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.MeteModelDetail;
+import com.yjh.platform.module.device.entity.TStdMete;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -64,6 +65,8 @@ public interface TStdMetemodelDetailDao {
     List<String> selectForDict(@Param(value = "colName") String colName);
 
     void selectForDictNote(ResultHandleUtils<String, String> resultHandler);
+
+    List<TStdMete> selectTSTDMeteAll();
 
 
 }

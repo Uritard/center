@@ -234,20 +234,25 @@
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMete" resultType="com.yjh.platform.module.device.entity.TStdMete">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMete" resultType="com.yjh.platform.module.device.entity.TStdMeteDetail">
         select
         a.std_mete_id,
         a.device_type,
+        b.dict_note as deviceTypeName,
         a.mete_type,
+        c.dict_note as meteTypeName,
         a.mete_kind,
+        d.dict_note as meteKindName,
         a.mete_name,
         a.alarm_note,
         a.alarm_explain,
         a.alarm_type,
+        e.dict_note as alarmTypeName,
         a.unit,
         a.up_effect,
         a.down_effect,
         a.alarm_level,
+        f.dict_note as alarmLevelName,
         a.alarm_limit,
         a.high_limit1,
         a.low_limit1,
@@ -264,34 +269,15 @@
         a.modulus,
         a.remark
         from t_std_mete a
+        left join t_dict_business b on a.device_type = b.dict_code and b.col_name = "device_type"
+        left join t_dict_business c on a.mete_type = c.dict_code and c.col_name = "mete_type"
+        left join t_dict_business d on a.mete_kind = d.dict_code and d.col_name = "mete_kind"
+        left join t_dict_business e on a.alarm_type = e.dict_code and e.col_name = "alarm_type"
+        left join t_dict_business f on a.alarm_level = f.dict_code and f.col_name = "alarm_level"
         where 1 = 1
-        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
-        <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
-        <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
-        <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
-        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
-        <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
-        <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
-        <if test="alarmLimit != null "> and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
-        <if test="highLimit1 != null and highLimit1 != ''"> and a.high_limit1 = #{highLimit1, jdbcType=REAL}</if>
-        <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
-        <if test="highLimit2 != null and highLimit2 != ''"> and a.high_limit2 = #{highLimit2, jdbcType=REAL}</if>
-        <if test="lowLimit2 != null and lowLimit2 != ''"> and a.low_limit2 = #{lowLimit2, jdbcType=REAL}</if>
-        <if test="highLimit3 != null and highLimit3 != ''"> and a.high_limit3 = #{highLimit3, jdbcType=REAL}</if>
-        <if test="lowLimit3 != null and lowLimit3 != ''"> and a.low_limit3 = #{lowLimit3, jdbcType=REAL}</if>
-        <if test="highLimit4 != null and highLimit4 != ''"> and a.high_limit4 = #{highLimit4, jdbcType=REAL}</if>
-        <if test="lowLimit4 != null and lowLimit4 != ''"> and a.low_limit4 = #{lowLimit4, jdbcType=REAL}</if>
-        <if test="alarmDelay != null "> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
-        <if test="alarmCnt != null "> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
-        <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
-        <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
-        <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
-        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchAdd">
@@ -362,5 +348,21 @@
         WHERE device_type=#{deviceType,jdbcType=INTEGER}
     </select>
 
+    <select id="selectForDeviceTypeTree" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select *
+        from t_dict_business
+        where  col_name = #{colName,jdbcType = VARCHAR}
+    </select>
+
+    <delete id="batchDelete" >
+        DELETE
+        FROM
+        t_std_mete
+        WHERE
+        std_mete_id in
+        <foreach collection="list" item="stdMeteId"  separator="," open="(" close=")" >
+            #{stdMeteId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
 
 </mapper>

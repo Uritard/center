@@ -403,4 +403,12 @@
         from t_dict_business a order by value desc
     </select>
 
+    <select id="selectTSTDMeteAll" resultType="com.yjh.platform.module.device.entity.TStdMete">
+        select
+            a.device_type,
+            a.mete_type,
+            a.mete_name
+        from t_std_mete a
+    </select>
+
 </mapper>

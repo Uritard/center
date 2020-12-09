@@ -1,12 +1,17 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMete;
 import com.yjh.platform.module.device.dao.TStdMeteDao;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.TStdMeteDetail;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -55,8 +60,8 @@ public class TStdMeteService{
 
     @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdMete> selectByPage(TStdMete tStdMete) {
-        List<TStdMete> tStdMeteList = tStdMeteDao.selectByPage(tStdMete);
+    public List<TStdMeteDetail> selectByPage(Integer deviceType, String meteName) {
+        List<TStdMeteDetail> tStdMeteList = tStdMeteDao.selectByPage(deviceType,meteName);
         return tStdMeteList;
     }
 
@@ -71,6 +76,36 @@ public class TStdMeteService{
     @Transactional(rollbackFor = Exception.class)
     public List<MeteInfo> selectByDeviceType(Integer deviceType){
         return this.tStdMeteDao.selectByDeviceType(deviceType);
+    }
+
+    @Logs(title = "设备类型树",content = "根据页面传入的参数查询数据")
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfo> deviceTypeTree(){
+        List<TDictBusiness> list = tStdMeteDao.selectForDeviceTypeTree("device_type");
+        List<AreaInfo> re = new ArrayList<>();
+        AreaInfo tree = new AreaInfo();
+        tree.setId(1L);
+        tree.setLabel("设备类型树");
+        tree.setInfoType("tree");
+        List<AreaInfo> child = new ArrayList<>();
+        for (TDictBusiness item:list) {
+            AreaInfo areaInfo = new AreaInfo();
+            areaInfo.setUpId(tree.getId());
+            areaInfo.setUpName(tree.getLabel());
+            areaInfo.setInfoType("device_type");
+            areaInfo.setId(Long.valueOf(item.getDictCode()));
+            areaInfo.setLabel(item.getDictNote());
+            child.add(areaInfo);
+        }
+        tree.setChildren(child);
+        re.add(tree);
+        return re;
+    }
+    @Logs(title = "批量删除",code = "module", content = "批量删除测点")
+    @Transactional(rollbackFor = Exception.class)
+    public int batchDelete(String list){
+        List<String> list1= Arrays.asList(list.split(","));
+        return this.tStdMeteDao.batchDelete(list1);
     }
 }
 

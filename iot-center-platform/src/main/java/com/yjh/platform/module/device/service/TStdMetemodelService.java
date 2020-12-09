@@ -348,7 +348,7 @@ public class TStdMetemodelService {
          return "fail";
        }
     }
-    public  boolean createModel(List<String> list, String modelName, String modelPath) {
+    private   boolean createModel(List<String> list, String modelName, String modelPath) {
         boolean newFile = false;
         //创建excel工作簿
             HSSFWorkbook workbook = new HSSFWorkbook();
@@ -459,10 +459,10 @@ public class TStdMetemodelService {
         return newFile;
     }
 
-    public String excelDataImport(MultipartFile file) {
-        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
-        String path = (String) mapForPicModelPath.get("content");
-        //String path = "D:/code/qhTest/66666";
+    private String excelDataImport(MultipartFile file) {
+//        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
+//        String path = (String) mapForPicModelPath.get("content");
+        String path = "D:/code/qhTest/66666";
         String fileName = "copy-meteModel.xlsx";
         // 将上传文件写入
         try {
@@ -481,6 +481,7 @@ public class TStdMetemodelService {
         //获取自带你表的值pathName
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
+        List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
         Map<String, String> nameMap = resultHandler.getMappedResults();
         HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream(pathName));//创建工作簿
         Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
@@ -488,6 +489,7 @@ public class TStdMetemodelService {
         List<TStdMete> tStdMeteList = new ArrayList<>();
         StringBuffer errMsg = new StringBuffer();
         String item = null;
+        String isRepetition = "";
         for (int i = 1; i <= total; i++) {
             Row row = sheet.getRow(i);
             TStdMete tStdMete = new TStdMete();
@@ -737,14 +739,35 @@ public class TStdMetemodelService {
                 item = cell.getStringCellValue();
                 tStdMete.setRemark(item);
             }
-
-
+            if(isIn(meteList,tStdMete)){
+                isRepetition = isRepetition+","+(i+1);
+                continue;
+            }
             tStdMeteList.add(tStdMete);
         }
-        tStdMeteDao.batchAdd(tStdMeteList);
-        result.setData("ok");
+        if(tStdMeteList.size() > 0){
+            tStdMeteDao.batchAdd(tStdMeteList);
+        }
+
+        if("".equals(isRepetition)){
+            result.setData("ok");
+        }else {
+            isRepetition = "第"+isRepetition.replaceFirst(",","")+"行与数据库数据重复，其他数据已导入";
+            result.setData(isRepetition);
+        }
         deleteDir(new File(pathName));
         return result;
 
+    }
+
+    private boolean isIn(List<TStdMete> meteList,TStdMete tStdMete){
+        for (TStdMete item:meteList) {
+            if(item.getDeviceType().equals(tStdMete.getDeviceType())
+            && item.getMeteType().equals(tStdMete.getMeteType())
+            && item.getMeteName().equals(tStdMete.getMeteName())){
+                return true;
+            }
+        }
+        return false;
     }
 }

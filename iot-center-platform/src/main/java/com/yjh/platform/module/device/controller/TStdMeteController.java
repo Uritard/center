@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.module.device.entity.MeteInfo;
+import com.yjh.platform.module.device.entity.TStdMeteDetail;
 import com.yjh.platform.module.device.service.TStdMeteService;
 import com.yjh.platform.module.device.entity.TStdMete;
 
@@ -142,14 +143,18 @@ public class TStdMeteController {
 
     @ApiOperation(value = "分页查询，名称模糊查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TStdMete tStdMete,
+    public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
+                               @RequestParam(value = "meteName", required = false) String meteName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if(deviceType != null && deviceType == -1){
+                deviceType = null;
+            }
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TStdMete> list = tStdMeteService.selectByPage(tStdMete);
+            List<TStdMeteDetail> list = tStdMeteService.selectByPage(deviceType,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -187,5 +192,37 @@ public class TStdMeteController {
 
         return result;
     }
+
+
+    @ApiOperation(value = "设备类型树")
+    @RequestMapping(value = "/deviceTypeTree",method = RequestMethod.GET)
+    public Result deviceTypeTree(){
+        Result result =new Result();
+        try{
+            result.setData(tStdMeteService.deviceTypeTree());
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("设备类型树失败描述：", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "批量删除")
+    @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
+    public Result batchDelete(@RequestParam(value="stdMeteIds")String stdMeteIds){
+        Result result=new Result();
+        try{
+            result.setData(tStdMeteService.batchDelete(stdMeteIds));
+        }catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除设备异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除设备错误:", e);
+        }
+        return result;
+    }
+
 
 }
