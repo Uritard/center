@@ -31,6 +31,8 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.List;
 
+import static com.yjh.accessvideo.hik.HCNetSDK.MAX_DISKNUM_V30;
+
 /**
  * @author tt
  * @since 2020-08-20
@@ -358,7 +360,7 @@ public class CameraConService {
         return true;
     }
 
-    @Logs(title = "获取相机状态", code = "getCameraStatus")
+    @Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> getCameraStatus(Long recordId) {
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
@@ -398,6 +400,47 @@ public class CameraConService {
         return channleStatusMap;
     }
 
+    @Logs(title = "获取NVR存储状态", code = "getNVRStoreInfo", content = "获取NVR存储状态信息")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, String> getNVRStoreInfo(Long recordId) {
+        List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
+        log.info("cameraConInfoMap: "+cameraConInfoMap);
+        NativeLong iChanNumTem = new NativeLong(0);
+        Map<String, String> channleStatusMap = new HashMap<>();
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+            IntByReference ibrBytesReturned = new IntByReference(0);
+            HCNetSDK.NET_DVR_HDCFG m_struHDCfg = new HCNetSDK.NET_DVR_HDCFG();
+            m_struHDCfg.write();
+            Pointer lpPicConfig = m_struHDCfg.getPointer();
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig, m_struHDCfg.size(), ibrBytesReturned)) {
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("get camera status fail, error code: "+iErr);
+                channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
+                return channleStatusMap;
+            }
+            m_struHDCfg.read();
+            int hardCapacityTotal = 0;
+            int hardFreeTotal = 0;
+            for (int i = 0; i < m_struHDCfg.dwHDCount; i++) {
+                String s = "硬盘号" + m_struHDCfg.struHDInfo[i].dwHDNo;
+                HCNetSDK.NET_DVR_SINGLE_HD netDvrSingleHd = m_struHDCfg.struHDInfo[i];
+                int hardNo = netDvrSingleHd.dwHDNo;
+                int hardCapacity = netDvrSingleHd.dwCapacity;
+                hardCapacityTotal = hardCapacityTotal+hardCapacity;
+                int hardFree = netDvrSingleHd.dwFreeSpace;
+                hardFreeTotal = hardFreeTotal+hardFree;
+                log.info(s+"， hardNo: "+hardNo+", hardCapacity: "+hardCapacity+", hardFree"+hardFree);
+            }
+            channleStatusMap.put("recordId", String.valueOf(recordId));
+            channleStatusMap.put("capacityTotal", String.valueOf(hardCapacityTotal));
+            channleStatusMap.put("FreeTotal", String.valueOf(hardFreeTotal));
+            return channleStatusMap;
+        }
+        channleStatusMap.put("errorMessage: " ,"userID is null");
+        return channleStatusMap;
+    }
+
     private NativeLong realPlay(int lChannel, long recordId) {
         m_sClientInfo.lChannel = new NativeLong(lChannel);
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
@@ -421,33 +464,6 @@ public class CameraConService {
             ex.getMessage();
         }
     }
-
-
-//    @Logs(title = "获取nvr信息", code = "getNVRSystemInfo")
-//    @Transactional(rollbackFor = Exception.class)
-//    public Map<String,Object> getNVRSystemInfo(){
-//        Map<String,Object> re = new HashMap<>();
-//        List<RecorderConInfo> recorderConInfoList = cameraConDao.SelectRecords();
-//        log.info("recorderConInfoList: "+recorderConInfoList);
-//        long recordId = 1234;
-//        NativeLong iChanNumTem = new NativeLong(0xFFFFFFFF);
-//        for (RecorderConInfo recorderConInfo:recorderConInfoList) {
-//            recordId = recorderConInfo.getRecordId();
-//            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
-//            IntByReference intByReference = new IntByReference(0);
-//            HCNetSDK.NET_DVR_HDCFG system = new HCNetSDK.NET_DVR_HDCFG();
-//            system.write();
-//            Pointer m_strIpparaCfgPointer = system.getPointer();
-//            if(!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong,HCNetSDK.NET_DVR_GET_HDCFG,iChanNumTem,m_strIpparaCfgPointer,system.size(),intByReference)){
-//                int iErr = hCNetSDK.NET_DVR_GetLastError();
-//                log.error("get camera status fail, error code: "+iErr);
-//            }
-//            system.read();
-//            log.info("system:   ",system);
-//        }
-//        return re;
-//    }
-
 
 }
 

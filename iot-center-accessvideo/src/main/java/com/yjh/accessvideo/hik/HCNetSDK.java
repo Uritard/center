@@ -522,6 +522,7 @@ public interface HCNetSDK extends Library {
     //硬盘管理的参数获取 (NET_DVR_HDCFG结构)
     public static final int NET_DVR_GET_HDCFG = 1054;    //获取硬盘管理配置参数
     public static final int NET_DVR_SET_HDCFG = 1055;    //设置硬盘管理配置参数
+    public static final int NET_DVR_GET_HDCFG_V50 = 4153;
     //盘组管理的参数获取 (NET_DVR_HDGROUP_CFG结构)
     public static final int NET_DVR_GET_HDGROUP_CFG = 1056;    //获取盘组管理配置参数
     public static final int NET_DVR_SET_HDGROUP_CFG = 1057;    //设置盘组管理配置参数

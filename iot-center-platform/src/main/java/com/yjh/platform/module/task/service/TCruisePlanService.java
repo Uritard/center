@@ -96,55 +96,6 @@ public class TCruisePlanService{
         return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
     }
 
-//    @Logs(title = "新增预案", code = "task",content = "根据web传入的参数新增")
-//    @Transactional(rollbackFor = Exception.class)
-//    public int insertOld(Map<String, Object> map) {
-//        log.info("add new plan, map content: "+map);
-//        if (map.size()==0) return ResultCodeEnum.CODE10010.getCode();
-//        List<Map<String, Object>> InstanceMapList = (List<Map<String, Object>>) map.get("instanceList");
-//        if (InstanceMapList.size()==0) return ResultCodeEnum.CODE10010.getCode();
-//        List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
-//        TCruisePlan tCruisePlan = new TCruisePlan();
-//        tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
-//        Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
-//        tCruisePlan.setType(planType);
-//        this.tCruisePlanDao.insert(tCruisePlan);
-//        Long planId = tCruisePlan.getPlanId();
-//        for (Map<String, Object> instanceMap:InstanceMapList) {
-//            TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
-//            tCruisePlanAttr.setPlanId(planId);
-//            if (Objects.nonNull(map.get("subType"))) {
-//                Integer subType = Integer.parseInt(String.valueOf(map.get("subType")));
-//                tCruisePlanAttr.setSubType(subType);
-//            }
-//            Long instanceId = Long.valueOf(String.valueOf(instanceMap.get("instanceId")));
-//            tCruisePlanAttr.setInstanceId(instanceId);
-//            if (Objects.nonNull(instanceMap.get("cruiseType"))) {
-//                Integer cruiseType = Integer.parseInt(String.valueOf(instanceMap.get("cruiseType")));
-//                tCruisePlanAttr.setPointType(cruiseType);
-//            }
-//            if (Objects.nonNull(tCruisePlanAttr.getPointType())) {
-//                switch (tCruisePlanAttr.getPointType()) {
-//                    case 228:
-//                        TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(instanceId);
-//                        tCruisePlanAttr.setRobotId(tRobotInspection.getRobotId());
-//                        tCruisePlanAttr.setPosition(String.valueOf(instanceMap.get("cruiseId")));
-//                        break;
-//                    case 229:
-//                    case 230:
-//                        Long cruiseAlgorithmId = Long.valueOf(String.valueOf(instanceMap.get("cruiseId")));
-//                        TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(cruiseAlgorithmId);
-//                        tCruisePlanAttr.setAlgorithmId(tAlgorithmConf.getAlgorithmId());
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//            tCruisePlanAttrList.add(tCruisePlanAttr);
-//        }
-//        return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
-//    }
-
     @Logs(title = "删除", code = "task",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long planId) {

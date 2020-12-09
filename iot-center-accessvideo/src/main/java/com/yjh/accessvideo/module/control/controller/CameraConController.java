@@ -267,4 +267,19 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "获取NVR存储状态")
+    @RequestMapping(value = "/getNVRStoreInfo", method = RequestMethod.GET)
+    public Result getNVRStoreInfo(@RequestParam(value = "recordId") Long recordId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getNVRStoreInfo(recordId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取NVR存储状态失败:", e);
+        }
+        return result;
+    }
+
 }

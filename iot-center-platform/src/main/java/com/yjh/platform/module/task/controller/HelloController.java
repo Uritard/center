@@ -38,6 +38,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.QrCodeUtils;
+
 
 @RestController
 @Api("HelloController")
@@ -63,6 +67,23 @@ public class HelloController {
 
     //缺陷接口
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+
+    QrCodeUtils qrCodeUtils = new QrCodeUtils();
+
+    @ApiOperation(value = "二维码识别")
+    @RequestMapping(value = "/QrDecode", method = RequestMethod.GET)
+    public Result QrDecode(@RequestParam(value = "filePath") String filePath) {
+        Result result = new Result();
+        try {
+            result.setData(qrCodeUtils.decodeQrCode(filePath));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("二维码识别:", e);
+        }
+        return result;
+    }
 
 
     @ApiOperation("说hello")
