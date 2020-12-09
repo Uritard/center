@@ -20,6 +20,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -284,8 +285,8 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "导入模板")
-    @RequestMapping(value = "insertModel",method = RequestMethod.GET)
-    public Result insertModel (@RequestParam(value = "fileName")String fileName) {
+    @RequestMapping(value = "insertModel",method = RequestMethod.POST)
+    public Result insertModel (@ApiParam("fileName") MultipartFile fileName) {
         Result result =new Result();
         try {
             result.setData(tStdMetemodelService.insertModel(fileName));

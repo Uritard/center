@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
@@ -336,8 +338,8 @@ public class TStdMetemodelService {
     public String createModel(){
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
         String path = (String) mapForPicModelPath.get("content");
-        //String path = "D:/code/qhTest";
-        String fileName = "设备测点模板.xlsx";
+        //String path = "D:/code/qhTest/";
+        String fileName = "meteModel.xlsx";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
@@ -457,12 +459,25 @@ public class TStdMetemodelService {
         return newFile;
     }
 
+    public String excelDataImport(MultipartFile file) {
+        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
+        String path = (String) mapForPicModelPath.get("content");
+        //String path = "D:/code/qhTest/66666";
+        String fileName = "copy-meteModel.xlsx";
+        // 将上传文件写入
+        try {
+            file.transferTo(new File(path +"/"+ fileName));
+        } catch (IOException e) {
+            e.getMessage();
+        }
+        return path +"/"+ fileName;
+    }
     @Logs(title = "测点模板信息导入",code = "module",content = "测点模板信息导入")
     @Transactional(rollbackFor = Exception.class)
-    public Result insertModel(String pathName) throws Exception  {
+    public Result insertModel(MultipartFile file) throws Exception  {
         Result result = new Result();
-
-        //获取自带你表的值
+        String  pathName = excelDataImport(file);
+        //获取自带你表的值pathName
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
         Map<String, String> nameMap = resultHandler.getMappedResults();
@@ -655,6 +670,7 @@ public class TStdMetemodelService {
         }
         tStdMeteDao.batchAdd(tStdMeteList);
         result.setData("ok");
+        deleteDir(new File(pathName));
         return result;
 
     }
