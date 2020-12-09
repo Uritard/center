@@ -338,12 +338,12 @@ public class TStdMetemodelService {
     public String createModel(){
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
         String path = (String) mapForPicModelPath.get("content");
-        //String path = "D:/code/qhTest/";
+        //String path = "D:/code/qhTest";
         String fileName = "meteModel.xlsx";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
-           return path+fileName;
+           return path+"/"+fileName;
        }else {
          return "fail";
        }
@@ -466,6 +466,7 @@ public class TStdMetemodelService {
         String fileName = "copy-meteModel.xlsx";
         // 将上传文件写入
         try {
+            deleteDir(new File(path +"/"+ fileName));
             file.transferTo(new File(path +"/"+ fileName));
         } catch (IOException e) {
             e.getMessage();
@@ -521,150 +522,222 @@ public class TStdMetemodelService {
             tStdMete.setMeteType(nameMap.get(item).toString());
 
             cell = row.getCell(3);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            Integer meteKind = item.contains("遥信")?1:(item.contains("遥测")?2:(item.contains("遥控")?3:(item.contains("遥调")?4:null)));
-            tStdMete.setMeteKind(meteKind);
+            if(cell != null){
+                //设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                Integer meteKind = item.contains("遥信")?1:(item.contains("遥测")?2:(item.contains("遥控")?3:(item.contains("遥调")?4:null)));
+                tStdMete.setMeteKind(meteKind);
+            }
+
 
             cell = row.getCell(4);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setMeteName(item);
+            if(cell != null){
+                //设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setMeteName(item);
+            }
+
 
             cell = row.getCell(5);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmNote(item);
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmNote(item);
+            }
+
 
             cell = row.getCell(6);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmExplain(item);
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmExplain(item);
+            }
+
 
             cell = row.getCell(7);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmType(nameMap.get(item).toString());
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmType(nameMap.get(item).toString());
+            }
+
 
             cell = row.getCell(8);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setUnit(item);
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setUnit(item);
+            }
+
 
             cell = row.getCell(9);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setUpEffect(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setUpEffect(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(10);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setDownEffect(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setDownEffect(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(11);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmLevel(Integer.valueOf(nameMap.get(item)));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmLevel(Integer.valueOf(nameMap.get(item)));
+            }
+
 
             cell = row.getCell(12);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmLimit(Integer.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmLimit(Integer.valueOf(item));
+            }
+
 
             cell = row.getCell(13);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmDelay(Integer.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmDelay(Integer.valueOf(item));
+            }
+
 
             cell = row.getCell(14);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setHighLimit1(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setHighLimit1(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(15);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setLowLimit1(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setLowLimit1(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(16);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setHighLimit2(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setHighLimit2(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(17);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setLowLimit2(Float.valueOf(item));
+            if(cell != null){
+                //设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setLowLimit2(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(18);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setHighLimit3(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setHighLimit3(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(19);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setLowLimit3(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setLowLimit3(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(20);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setHighLimit4(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setHighLimit4(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(21);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setLowLimit4(Float.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setLowLimit4(Float.valueOf(item));
+            }
+
 
             cell = row.getCell(22);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setAlarmCnt(Integer.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setAlarmCnt(Integer.valueOf(item));
+            }
+
 
             cell = row.getCell(23);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
+            }
+
 
             cell = row.getCell(24);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
+            }
+
 
 
             cell = row.getCell(25);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setModulus(Integer.valueOf(item));
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setModulus(Integer.valueOf(item));
+            }
+
 
             cell = row.getCell(26);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            tStdMete.setRemark(item);
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                tStdMete.setRemark(item);
+            }
+
 
             tStdMeteList.add(tStdMete);
         }
