@@ -230,7 +230,10 @@ public class CameraConService {
             Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
+            String flvUrl = "http://"+hostIp+":8000/live/"+historyPath+".flv";
+            returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
+            returnMap.put("flvUrl", flvUrl);
             Constant.mapsForCamera.put(String.valueOf(cameraId), rtmpUrl);
             log.info("mapsForCamera: "+Constant.mapsForCamera);
             log.info("returnMap: "+returnMap);
