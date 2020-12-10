@@ -106,8 +106,11 @@ public class TRobotInspectionService{
             RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
             robotTaskMessage.setDeviceName(getName(Long.valueOf(item),1,nameList));
             robotTaskMessage.setInstanceName(getName(Long.valueOf(item),0,nameList));
-            robotTaskMessage.setCruiseTime(simpleDateFormat.parse(mapForRobotTaskMessage.get("cruiseTime").toString()));
-            robotTaskMessage.setResult((String)mapForRobotTaskMessage.get("resultNum"));
+            if(mapForRobotTaskMessage.get("cruiseTime") != null){
+                Date cruiseTime = simpleDateFormat.parse(mapForRobotTaskMessage.get("cruiseTime").toString());
+                robotTaskMessage.setCruiseTime(cruiseTime);
+                robotTaskMessage.setResult((String)mapForRobotTaskMessage.get("resultNum"));
+            }
             re.add(robotTaskMessage);
         }
         return re;
@@ -149,7 +152,7 @@ public class TRobotInspectionService{
         re.put("mileage",mapForMileage.get("valueUnit"));//里程
         Map<String,String> mapForSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":1");
         Double speed =Double.valueOf(mapForSpeed.get("value")) ;
-        re.put("speed",df.format(speed));//速度
+        re.put("speed",df.format(speed)+mapForSpeed.get("unit"));//速度
         Map<String,Object> mapForCruiseMap  = redisTemplate.opsForHash().entries("RobotRoad:"+robotCode);
         re.put("cruiseMapPath",mapForCruiseMap.get("relativePath"));//巡视路径地图路径
         Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
