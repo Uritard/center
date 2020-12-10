@@ -336,14 +336,17 @@ public class TStdMetemodelService {
     @Logs(title = "创建模板信息",code = "module",content = "创建模板信息")
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
-        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
-        String path = (String) mapForPicModelPath.get("content");
+        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
+        String path = (String) mapForCreatePath.get("content");
+        Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        String returnPath = (String) mapForReturnPath.get("content");
+
         //String path = "D:/code/qhTest";
         String fileName = "meteModel.xlsx";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
-           return path+"/"+fileName;
+           return returnPath+"/"+fileName;
        }else {
          return "fail";
        }
