@@ -68,8 +68,7 @@ public class CameraConService {
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();	// play structure
     private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
     private NativeLong m_lPort =  new NativeLong(-1);
-    private FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
-
+    FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
     @Logs(title = "相机播放", code = "cameraPlay")
     @Transactional(rollbackFor = Exception.class)
@@ -208,13 +207,21 @@ public class CameraConService {
                 Constant.maps.put("historyPath", 123);
             }
             log.info("Constant.maps: "+Constant.maps);
+
+            String startTimeTem = startTime.replace("-", "").replace(":", "").replace(" ", "T")+" ";
+            String stopTimeTem = stopTime.replace("-", "").replace(":", "").replace(" ", "T")+" ";
+            String starttime = startTimeTem.replace(" ", "Z");
+            String endtime = stopTimeTem.replace(" ", "Z");
             ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
             //rtsp://admin:hik12345@192.168.33.2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
             log.info("userName: "+userName+",password: "+password+",cameraIp: "+cameraIp+",cameraPort: " +cameraPort
-                    +",iChanNum: "+iChanNum +",startTime: "+startTime+",stopTime: "+stopTime+",historyPath: "+historyPath);
-            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum,1, startTime, stopTime, historyPath);
+                    +",iChanNum: "+iChanNum +",starttime: "+starttime+",endtime: "+endtime+",historyPath: "+historyPath);
+            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum,1, starttime, endtime, historyPath);
             log.info("transUrl: "+transUrl);
+
+//            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
             Runtime.getRuntime().exec(transUrl);
+
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
             String flvUrl = "http://"+hostIp+":8000/history/"+historyPath+".flv";
