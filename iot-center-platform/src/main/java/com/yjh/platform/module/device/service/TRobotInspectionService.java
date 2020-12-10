@@ -10,6 +10,7 @@ import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -136,6 +137,7 @@ public class TRobotInspectionService{
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectRobotStatus(String robotCode){
         Map<String,Object> re = new HashMap<>();
+        DecimalFormat df = new DecimalFormat("#0.00");
         //获取状态信息
         Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":3");
         re.put("batteryLevel",mapForCell.get("valueUnit"));//电池电量
@@ -145,8 +147,9 @@ public class TRobotInspectionService{
         re.put("robotCoordinate",mapForRobotCoordinate.get("coordinatePixel"));//机器人坐标
         Map<String,Object> mapForMileage  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":2");
         re.put("mileage",mapForMileage.get("valueUnit"));//里程
-        Map<String,Object> mapForSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":1");
-        re.put("speed",mapForSpeed.get("valueUnit"));//速度
+        Map<String,String> mapForSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":1");
+        Double speed =Double.valueOf(mapForSpeed.get("value")) ;
+        re.put("speed",df.format(speed));//速度
         Map<String,Object> mapForCruiseMap  = redisTemplate.opsForHash().entries("RobotRoad:"+robotCode);
         re.put("cruiseMapPath",mapForCruiseMap.get("filePath"));//巡视路径地图路径
         Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
@@ -172,8 +175,7 @@ public class TRobotInspectionService{
             }
         }
         Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue())*100);
-        String result = re.toString()+"%";
-        return result;
+        return re;
     }
 
 }
