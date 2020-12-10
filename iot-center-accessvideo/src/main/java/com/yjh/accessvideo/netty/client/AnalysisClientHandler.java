@@ -188,18 +188,20 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                             cruiseResultMap.put("state", analyseDataOperateService.selectDictCode("data_state", "异常"));
                             ABNORMAL = ABNORMAL + 1;
                         } else {
-                            if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$")) {
+                            if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
                                 cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
                                 cruiseResultMap.put("state", analyseDataOperateService.selectDictCode("data_state", "正常"));
                                 NORMAL = NORMAL + 1;
 
                                 log.info("开始告警预处理");
-                                //单个数值表计识别结果的告警判断与处理
                                 TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                                //单个数值表计识别结果的告警判断与处理
                                 TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
                                 log.info("数据查询初始化");
-                                //初始化告警信息redis表
-                                String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                //满足告警数据结构-进行告警判断
+                                if (Objects.isNull(tStdDevicemeteM.getAlarmState()) && Objects.nonNull(tStdDevicemeteM.getHighLimit1()) || Objects.isNull(tStdDevicemeteM.getAlarmState()) && Objects.isNull(tStdDevicemeteM.getHighLimit1())) {
+                                    //初始化告警信息redis表
+                                    String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
                                 Map<String, String> warnMap = new HashMap<>();
                                 warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
                                 warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
@@ -239,7 +241,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                                             log.info("告警MAP：" + warnMap);
                                             try {
                                                 redisTemplate.opsForHash().putAll(warnName, warnMap);
-                                                cruiseResultMap.put("isWarn","1");
+                                                cruiseResultMap.put("isWarn", "1");
                                                 // webSocket通知前端调用巡视监控的接口
                                                 Map<String, Object> jasonMap = new HashMap<>();
                                                 jasonMap.put("type", "newAlarm");
@@ -269,26 +271,26 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                                             log.info("数字结果告警判断结果：" + warnRuleMeter);
                                             switch (warnRuleMeter) {
                                                 case 1:
-                                                    warnMap.put("warnContent", "1主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
+                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
                                                     break;
                                                 case 2:
-                                                    warnMap.put("warnContent", "2主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
+                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
                                                     warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1() - resultValueMeter));
                                                     break;
                                                 case 3:
-                                                    warnMap.put("warnContent", "3主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
+                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
                                                     break;
 
                                                 case 4:
-                                                    warnMap.put("warnContent", "4主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
+                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
                                                     warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2() - resultValueMeter));
                                                     break;
                                             }
 
                                             redisTemplate.opsForHash().putAll(warnName, warnMap);
-                                            cruiseResultMap.put("isWarn","1");
+                                            cruiseResultMap.put("isWarn", "1");
                                             log.info("告警Map:" + warnMap);
 
                                             // webSocket通知前端调用巡视监控的接口
@@ -305,6 +307,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                                     default:
                                         break;
                                 }
+                            }
                             }else {
                                 cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
                                 cruiseResultMap.put("state", analyseDataOperateService.selectDictCode("data_state", "数据异常"));
@@ -441,7 +444,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
                         break;
                 }
 
-                cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
+//                cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
                 if(Objects.isNull(cruiseResultMap.get("isWarn"))){
                     cruiseResultMap.put("isWarn","0");
                 }

@@ -270,34 +270,42 @@ public class TCruiseTaskResultService {
     @Logs(title = "统计获取当前任务的执行进度", code = "TCruiseTaskResult", content = "统计任务执行进度")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseAdvance(String taskId) {
-        Set<String> keyResult = redisScan("t_cruise_task_result*");
+        Set<String> keyResult = redisScan("t_cruise_task_result:"+taskId);
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
         String cruiseNotExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未执行");
         String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
         String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
 
-        float cruiseCount = 0;//总巡检点数量
+       Long cruiseCount = tCruiseTaskResultDao.selectCruiseCountsByTaskId(taskId);//总巡检点数量
         float cruiseComCount = 0;//执行完成的巡检点数量
-        for (String keys : keyResult) {
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
-            Object values = resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
-            String value = values.toString();
-            String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
-            if (TaskId.equals(value)) {
-                cruiseCount = cruiseCount + 1;
-                if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {   //执行成功
-                    cruiseComCount = cruiseComCount + 1;
-                } else if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed)) {  //执行失败
-                    cruiseComCount = cruiseComCount + 1;
-                } else if (resultMap.get("cruiseStatus").equals(cruiseUnknown)) { //未知
-                    cruiseComCount = cruiseComCount + 1;
-                }
+
+        for(String cruiseKey:keyResult){
+            Map<String,Object> resultMap=redisTemplate.opsForHash().entries(cruiseKey);
+            if(!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) && !(resultMap.get("resultNum").equals("null"))){
+                cruiseComCount=cruiseComCount+1;
             }
         }
+        log.info("执行完成点："+cruiseComCount+"个");
+//        for (String keys : keyResult) {
+//            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
+//            Object values = resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
+//            String value = values.toString();
+//            String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
+//            if (TaskId.equals(value)) {
+//                cruiseCount = cruiseCount + 1;
+//                if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {   //执行成功
+//                    cruiseComCount = cruiseComCount + 1;
+//                } else if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed)) {  //执行失败
+//                    cruiseComCount = cruiseComCount + 1;
+//                } else if (resultMap.get("cruiseStatus").equals(cruiseUnknown)) { //未知
+//                    cruiseComCount = cruiseComCount + 1;
+//                }
+//            }
+//        }
 //        Map<String, Float> Rate = new HashMap<>();
         Map<String, Object> rateAndTaskInfo = new HashMap<>();
-        if (cruiseComCount == 0 || cruiseComCount == 0) {
+        if (cruiseCount == 0 || cruiseComCount == 0) {
             rateAndTaskInfo.put("rate", Float.valueOf("0"));
         } else {
             rateAndTaskInfo.put("rate", cruiseComCount / cruiseCount);

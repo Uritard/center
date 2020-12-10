@@ -31,6 +31,8 @@ public interface TCruiseTaskResultDao {
 
     int batchInsert(List<TCruiseTaskResult> list);
     TaskSimpleInfo selectTaskStateByTaskId(@Param(value = "taskId")String taskId);
+    //统计当前任务下所有点的数量
+    Long selectCruiseCountsByTaskId(@Param(value = "taskId")String taskId);
 
 
 }

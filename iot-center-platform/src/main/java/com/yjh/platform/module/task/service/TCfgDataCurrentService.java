@@ -51,6 +51,90 @@ public class TCfgDataCurrentService {
     @Autowired
     private TCruiseTaskController tCruiseTaskController;
 
+    public static String meteValues(String commintValue){
+        if("返回".equals(commintValue)){
+            return "1";
+        }
+        if("启动".equals(commintValue)){
+            return "0";
+        }
+        if("合".equals(commintValue)){
+            return "1";
+        }
+        if("分".equals(commintValue)){
+            return "0";
+        }
+        if("降".equals(commintValue)){
+            return "1";
+        }
+        if("升".equals(commintValue)){
+            return "0";
+        }
+        if("停".equals(commintValue)){
+            return "2";
+        }
+        if("投入".equals(commintValue)){
+            return "1";
+        }
+        if("退出".equals(commintValue)){
+            return "0";
+        }
+        if("控合".equals(commintValue)){
+            return "1";
+        }
+        if("控分".equals(commintValue)){
+            return "0";
+        }
+        if("未储能".equals(commintValue)){
+            return "1";
+        }
+        if("已储能".equals(commintValue)){
+            return "0";
+        }
+        if("联锁".equals(commintValue)){
+            return "1";
+        }
+        if("解锁".equals(commintValue)){
+            return "0";
+        }
+        if("成功".equals(commintValue)){
+            return "1";
+        }
+        if("失败".equals(commintValue)){
+            return "0";
+        }
+        if("远方".equals(commintValue)){
+            return "1";
+        }
+        if("本地".equals(commintValue)){
+            return "0";
+        }
+        if("合上".equals(commintValue)){
+            return "1";
+        }
+        if("断开".equals(commintValue)){
+            return "0";
+        }
+        if("中断".equals(commintValue)){
+            return "1";
+        }
+        if("恢复".equals(commintValue)){
+            return "0";
+        }
+        if("复归".equals(commintValue)){
+            return "2";
+        }
+        if("上限".equals(commintValue)){
+            return "1";
+        }
+        if("下限".equals(commintValue)){
+            return "0";
+        }
+        if("触发".equals(commintValue)){
+            return "2";
+        }
+        return null;
+    }
 
     @Logs(title = "插入", code = "TCfgDataCurrent",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
@@ -136,6 +220,11 @@ public class TCfgDataCurrentService {
         for (Long meteId : meteIdR) {
             TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
             if (currentDatas != null) {
+                //汉字四遥值映射转换
+                String finalValues=meteValues(currentDatas.getMeteValue());
+                if(Objects.nonNull(finalValues)){
+                    currentDatas.setMeteValue(finalValues);
+                }
                 currents.add(currentDatas);
             }
 

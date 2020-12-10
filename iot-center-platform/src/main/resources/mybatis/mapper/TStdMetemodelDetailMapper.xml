@@ -312,7 +312,7 @@
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
-        ORDER BY model_name,mete_kind desc
+        ORDER BY model_id,custom_id,mete_kind
     </select>
 
     <insert id="batchAdd">

@@ -70,6 +70,7 @@ public class HelloController {
 
     QrCodeUtils qrCodeUtils = new QrCodeUtils();
 
+
     @ApiOperation(value = "二维码识别")
     @RequestMapping(value = "/QrDecode", method = RequestMethod.GET)
     public Result QrDecode(@RequestParam(value = "filePath") String filePath) {
@@ -84,6 +85,7 @@ public class HelloController {
         }
         return result;
     }
+
 
 
     @ApiOperation("说hello")
