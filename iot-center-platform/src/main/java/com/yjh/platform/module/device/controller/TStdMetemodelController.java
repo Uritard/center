@@ -286,10 +286,10 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "导入模板")
     @RequestMapping(value = "upload",method = RequestMethod.POST)
-    public Result upload (@ApiParam("fileName") MultipartFile fileName) {
+    public Result upload (@RequestParam(value="file", required=false) MultipartFile file) {
         Result result =new Result();
         try {
-            result=tStdMetemodelService.insertModel(fileName);
+            result=tStdMetemodelService.insertModel(file);
         }  catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("生成模板异常:", e);

@@ -173,7 +173,7 @@ public class TRobotInspectionService{
         int i = 0;
         for (String item:instanceIdList) {
             Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
-            if(mapForRobotTaskMessage != null){
+            if(mapForRobotTaskMessage.size() != 0){
                 i = i + 1;
             }
         }
