@@ -142,7 +142,7 @@ public class TStdMeteController {
     }
 
     @ApiOperation(value = "分页查询，名称模糊查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
