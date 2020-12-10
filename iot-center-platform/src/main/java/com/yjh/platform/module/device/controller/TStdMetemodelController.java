@@ -268,7 +268,7 @@ public class TStdMetemodelController {
 
 
     @ApiOperation(value = "下载模板")
-    @RequestMapping(value = "downloadModel",method = RequestMethod.GET)
+    @RequestMapping(value = "download",method = RequestMethod.GET)
     public Result download () {
         Result result =new Result();
         try {
