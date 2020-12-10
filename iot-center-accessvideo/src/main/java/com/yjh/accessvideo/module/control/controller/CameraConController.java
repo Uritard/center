@@ -267,6 +267,21 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "获取NVR下挂相机树状态")
+    @RequestMapping(value = "/getCameraTreeStatus", method = RequestMethod.GET)
+    public Result getCameraTreeStatus(@RequestParam(value = "cameraName") String cameraName) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getCameraStatusTree(cameraName));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取NVR下挂相机树失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "获取NVR存储状态")
     @RequestMapping(value = "/getNVRStoreInfo", method = RequestMethod.GET)
     public Result getNVRStoreInfo(@RequestParam(value = "recordId") Long recordId) {

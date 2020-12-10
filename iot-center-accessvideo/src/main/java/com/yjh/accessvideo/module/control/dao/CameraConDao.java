@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.module.control.dao;
 
+import com.yjh.accessvideo.module.control.entity.CameraAreaInfo;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
 import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
 import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
@@ -23,5 +24,7 @@ public interface CameraConDao {
     List<RecorderConInfo> SelectRecords();
 
     List<CameraStatusInfo> cameraInfoByNVR(@Param("recordId") Long recordId);
+
+//    List<CameraAreaInfo> selectCameraTree(@Param("recordId") Long recordId);
 
 }

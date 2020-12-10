@@ -12,6 +12,7 @@ import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
+import com.yjh.accessvideo.module.control.entity.CameraAreaInfo;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
 import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
 import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
@@ -67,9 +68,7 @@ public class CameraConService {
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();	// play structure
     private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
     private NativeLong m_lPort =  new NativeLong(-1);
-    FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
 
     @Logs(title = "相机播放", code = "cameraPlay")
@@ -191,7 +190,7 @@ public class CameraConService {
 
     @Logs(title = "视频回放", code = "cameraPlayBack")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> startPlayBack(Long cameraId, String startTimeString, String stopTimeString) {
+    public Map<String, Object> startPlayBack(Long cameraId, String startTime, String stopTime) {
         Map<String, Object> returnMap = new HashMap<>();
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
@@ -209,33 +208,16 @@ public class CameraConService {
                 Constant.maps.put("historyPath", 123);
             }
             log.info("Constant.maps: "+Constant.maps);
-            Date startTime = simpleDateFormat.parse(startTimeString);
-            Date stopTime = simpleDateFormat.parse(stopTimeString);
-            int yearStart = startTime.getYear()+1900;
-            int monthStart = startTime.getMonth()+1;
-            int dateStart = startTime.getDate();
-            int hourStart = startTime.getHours();
-            int minuteStart = startTime.getMinutes();
-            int secondStart = startTime.getSeconds();
-            String starttime = yearStart+monthStart+dateStart+"T"+hourStart+minuteStart+secondStart+"Z";
-
-            int yearStop = stopTime.getYear()+1900;
-            int monthStop = stopTime.getMonth()+1;
-            int dateStop = stopTime.getDate();
-            int hourStop = stopTime.getHours();
-            int minuteStop = stopTime.getMinutes();
-            int secondStop = stopTime.getSeconds();
-            String endtime = yearStop+monthStop+dateStop+"T"+hourStop+minuteStop+secondStop+"Z";
             ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
             //rtsp://admin:hik12345@192.168.33.2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
             log.info("userName: "+userName+",password: "+password+",cameraIp: "+cameraIp+",cameraPort: " +cameraPort
-                    +",iChanNum: "+iChanNum +",starttime: "+starttime+",endtime: "+endtime+",historyPath: "+historyPath);
-            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum,1, starttime, endtime, historyPath);
+                    +",iChanNum: "+iChanNum +",startTime: "+startTime+",stopTime: "+stopTime+",historyPath: "+historyPath);
+            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum,1, startTime, stopTime, historyPath);
             log.info("transUrl: "+transUrl);
             Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-            String flvUrl = "http://"+hostIp+":8000/live/"+historyPath+".flv";
+            String flvUrl = "http://"+hostIp+":8000/history/"+historyPath+".flv";
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
             returnMap.put("flvUrl", flvUrl);
@@ -406,6 +388,15 @@ public class CameraConService {
         }
         channleStatusMap.put("errorMessage: " ,"userID is null");
         return channleStatusMap;
+    }
+
+    @Logs(title = "获取相机树状态", code = "getCameraStatusTree", content = "获取NVR下挂相机树状态")
+    @Transactional(rollbackFor = Exception.class)
+    public CameraAreaInfo getCameraStatusTree(String cameraName) {
+        if (Objects.nonNull(cameraName)) {}
+        CameraAreaInfo cameraAreaInfo = new CameraAreaInfo();
+        return cameraAreaInfo;
+
     }
 
     @Logs(title = "获取NVR存储状态", code = "getNVRStoreInfo", content = "获取NVR存储状态信息")
