@@ -218,10 +218,7 @@ public class CameraConService {
                     +",iChanNum: "+iChanNum +",starttime: "+starttime+",endtime: "+endtime+",historyPath: "+historyPath);
             String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum,1, starttime, endtime, historyPath);
             log.info("transUrl: "+transUrl);
-
-//            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
-            Runtime.getRuntime().exec(transUrl);
-
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
             String flvUrl = "http://"+hostIp+":8000/history/"+historyPath+".flv";
