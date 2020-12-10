@@ -276,7 +276,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
                 tCruiseTaskResultDetail.setCruiseTime(new Date());
                 String cruiseTime = simpleDateFormat.format(new Date());
-                tCruiseTaskResultDetail.setCruiseStatus(253);
+                //tCruiseTaskResultDetail.setCruiseStatus(253);
 
                 TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                 tCruiseDataResult.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
@@ -345,6 +345,7 @@ public class RunAtNowTask implements Runnable{
                         if(tAlgorithmConf != null){//摄像头配置了算法
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
+                            tCruiseTaskResultDetail.setCruiseStatus(252);
                             Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                             String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
 

@@ -151,7 +151,7 @@ public class TRobotInspectionService{
         Double speed =Double.valueOf(mapForSpeed.get("value")) ;
         re.put("speed",df.format(speed));//速度
         Map<String,Object> mapForCruiseMap  = redisTemplate.opsForHash().entries("RobotRoad:"+robotCode);
-        re.put("cruiseMapPath",mapForCruiseMap.get("filePath"));//巡视路径地图路径
+        re.put("cruiseMapPath",mapForCruiseMap.get("relativePath"));//巡视路径地图路径
         Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
         re.put("robotState",mapForRobotState.get("value"));//机器人状态
         return re;
