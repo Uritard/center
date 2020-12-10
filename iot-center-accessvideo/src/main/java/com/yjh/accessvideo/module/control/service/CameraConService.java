@@ -28,6 +28,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -67,6 +68,8 @@ public class CameraConService {
     private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
     private NativeLong m_lPort =  new NativeLong(-1);
     FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
     @Logs(title = "相机播放", code = "cameraPlay")
@@ -188,7 +191,7 @@ public class CameraConService {
 
     @Logs(title = "视频回放", code = "cameraPlayBack")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> startPlayBack(Long cameraId, Date startTime, Date stopTime) {
+    public Map<String, Object> startPlayBack(Long cameraId, String startTimeString, String stopTimeString) {
         Map<String, Object> returnMap = new HashMap<>();
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
@@ -206,6 +209,8 @@ public class CameraConService {
                 Constant.maps.put("historyPath", 123);
             }
             log.info("Constant.maps: "+Constant.maps);
+            Date startTime = simpleDateFormat.parse(startTimeString);
+            Date stopTime = simpleDateFormat.parse(stopTimeString);
             int yearStart = startTime.getYear()+1900;
             int monthStart = startTime.getMonth()+1;
             int dateStart = startTime.getDate();

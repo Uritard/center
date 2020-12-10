@@ -111,8 +111,8 @@ public class CameraConController {
     @ApiOperation(value = "视频回放")
     @RequestMapping(value = "/startPlayBack", method = RequestMethod.GET)
     public Result startPlayBack(@RequestParam(value = "cameraId") Long cameraId,
-                                @RequestParam(value = "startTime") Date startTime,
-                                @RequestParam(value = "stopTime") Date stopTime) {
+                                @RequestParam(value = "startTime") String startTime,
+                                @RequestParam(value = "stopTime") String stopTime) {
         Result result = new Result();
         try {
             result.setData(cameraConService.startPlayBack(cameraId, startTime, stopTime));
