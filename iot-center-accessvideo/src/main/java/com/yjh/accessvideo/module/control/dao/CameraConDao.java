@@ -25,6 +25,6 @@ public interface CameraConDao {
 
     List<CameraStatusInfo> cameraInfoByNVR(@Param("recordId") Long recordId);
 
-//    List<CameraAreaInfo> selectCameraTree(@Param("recordId") Long recordId);
+    List<CameraAreaInfo> selectCameraTree(@Param("cameraName") String cameraName);
 
 }

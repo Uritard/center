@@ -39,6 +39,9 @@ public class CameraAreaInfo implements Serializable {
     @ApiModelProperty(value = "在线状态")
     private String statusInfo;
 
+    @ApiModelProperty(value = "通道号")
+    private Integer channelNum;
+
     @ApiModelProperty(value = "子类")
     private List<CameraAreaInfo> children;
 
