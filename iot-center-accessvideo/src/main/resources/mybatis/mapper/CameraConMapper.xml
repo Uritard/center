@@ -98,7 +98,7 @@
         FROM t_camera_info b
         LEFT JOIN t_camera_recorder c ON b.record_id = c.record_id
         where 1=1
-        <if test="cameraName != null and cameraName != ''"> and b.camera_name CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
+        <if test="cameraName != null and cameraName != ''"> and b.camera_name like CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
         )
 
     </select>
