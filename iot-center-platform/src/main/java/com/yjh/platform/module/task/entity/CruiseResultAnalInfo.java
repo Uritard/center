@@ -42,9 +42,9 @@ public class CruiseResultAnalInfo implements Serializable {
     @ApiModelProperty(value = "识别图片")
     private String picPath;
     @ApiModelProperty(value = "算法识别结果状态")
-    private int state;
+    private int cruiseResult;
     @ApiModelProperty(value = "算法识别结果状态名称")
-    private String dataStateName;
+    private String cruiseResultName;
 
 
 

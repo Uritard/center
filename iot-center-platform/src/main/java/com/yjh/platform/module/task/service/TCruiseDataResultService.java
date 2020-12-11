@@ -105,8 +105,8 @@ public class TCruiseDataResultService{
              CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
              log.info("CrusieResultAnalMeteInfo:"+cruiseResultAnalMeteInfo);
              deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
-             deviceInfo.setState(cruiseResultAnalMeteInfo.getState());
-             deviceInfo.setStateName(cruiseResultAnalMeteInfo.getStateName());
+             deviceInfo.setCruiseResult(cruiseResultAnalMeteInfo.getCruiseResult());
+             deviceInfo.setCruiseResultName(cruiseResultAnalMeteInfo.getCruiseResultName());
              deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
              deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
              deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
@@ -114,7 +114,7 @@ public class TCruiseDataResultService{
              deviceInfo.setIdentifyResultName(cruiseResultAnalMeteInfo.getIdentifyResultName());
              //根据巡视点的-算法数据结果状态和最终审核结果判断最终的展示状态结果
              if(Objects.isNull(deviceInfo.getIdentifyResult())){
-                 if(deviceInfo.getState()==247){
+                 if(deviceInfo.getCruiseResult()==246){
                      deviceInfo.setFinalState(1);
                  }else {
                      deviceInfo.setFinalState(0);
@@ -156,7 +156,7 @@ public class TCruiseDataResultService{
         List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(cruiseType,cType,deviceMeteId,endDate,startDate);
         for(CruiseResultAnalInfo cruiseResultAnalInfo:cruiseResultAnalInfos){
             if(cruiseResultAnalInfo.getIdentifyResult()==0 || Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())){
-                cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getDataStateName());
+                cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
             }
         }
 

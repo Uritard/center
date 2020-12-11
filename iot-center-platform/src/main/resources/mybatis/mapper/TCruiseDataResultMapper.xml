@@ -14,7 +14,8 @@
         <result column="picpath" jdbcType="VARCHAR" property="picpath" />
         <result column="person_check" jdbcType="VARCHAR" property="personCheck" />
         <result column="origpic" jdbcType="VARCHAR" property="origpic" />
-        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="cruise_abnormal" jdbcType="INTEGER" property="cruiseAbnormal" />
+        <result column="cruise_result" jdbcType="INTEGER" property="cruiseResult" />
         <result column="evaluation_state" jdbcType="INTEGER" property="evaluationState" />
         <result column="identify_state" jdbcType="INTEGER" property="identifyState" />
         <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
@@ -24,7 +25,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        cruise_data_id, cruise_result_id, cruise_id, cruise_type, result_desc, result_num, modify_num, picpath, person_check, origpic, state, evaluation_state, identify_state, identify_result, createtime, remark
+        cruise_data_id, cruise_result_id, cruise_id, cruise_type, result_desc, result_num, modify_num, picpath, person_check, origpic, cruise_abnormal,cruise_result, evaluation_state, identify_state, identify_result, createtime, remark
     </sql>
 
 
@@ -40,7 +41,8 @@
             picpath,
             person_check,
             origpic,
-            state,
+            cruise_abnormal,
+            cruise_result,
             evaluation_state,
             identify_state,
             identify_result,
@@ -57,7 +59,8 @@
                 #{picpath, jdbcType=VARCHAR},
                 #{personCheck, jdbcType=VARCHAR},
                 #{origpic, jdbcType=VARCHAR},
-                #{state, jdbcType=INTEGER},
+                #{cruiseAbnormal, jdbcType=INTEGER},
+                #{cruiseResult, jdbcType=INTEGER},
                 #{evaluationState, jdbcType=INTEGER},
                 #{identifyState, jdbcType=INTEGER},
                 #{identifyResult, jdbcType=INTEGER},
@@ -83,7 +86,8 @@
         <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
         <if test="personCheck != null and personCheck != ''">a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
-        <if test="state != null">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
         <if test="evaluationState != null">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="identifyState != null">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
         <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
@@ -105,7 +109,8 @@
         a.picpath,
         a.person_check,
         a.origpic,
-        a.state,
+        a.cruise_abnormal,
+        a.cruise_result,
         a.evaluation_state,
         a.identify_state,
         a.identify_result,
@@ -129,7 +134,8 @@
         a.picpath,
         a.person_check,
         a.origpic,
-        a.state,
+        a.cruise_abnormal,
+        a.cruise_result,
         a.evaluation_state,
         a.identify_state,
         a.identify_result,
@@ -147,7 +153,8 @@
         <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
         <if test="personCheck != null and personCheck != ''">a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
-        <if test="state != null">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
         <if test="evaluationState != null">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="identifyState != null">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
         <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
@@ -167,7 +174,8 @@
         a.picpath,
         a.person_check,
         a.origpic,
-        a.state,
+        a.cruise_abnormal,
+        a.cruise_result,
         a.evaluation_state,
         a.identify_state,
         a.identify_result,
@@ -185,7 +193,8 @@
         <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
         <if test="personCheck != null and personCheck != ''">a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
-        <if test="state != null">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
         <if test="evaluationState != null">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="identifyState != null">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
         <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
@@ -205,7 +214,8 @@
             picpath,
         person_check,
             origpic,
-            state,
+        cruise_abnormal,
+        cruise_result,
             evaluation_state,
             identify_state,
             identify_result,
@@ -224,7 +234,8 @@
                 #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
                 #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
                 #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
-                #{TCruiseDataResult.state, jdbcType=INTEGER},
+                #{TCruiseDataResult.cruiseAbnormal, jdbcType=INTEGER},
+                #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},
                 #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
                 #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
                 #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
@@ -237,10 +248,10 @@
 
 
     <select id="selectMeteCruiseByDeviceId" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo" >
-      SELECT
+     SELECT
 	b.instance_id,
-	d.state,
-	f.dict_note AS stateName,
+	d.cruise_result,
+	f.dict_note AS cruiseResultName,
 	b.end_time,
 	d.picpath,
     d.identify_result,
@@ -258,8 +269,8 @@
         t_cruise_point_instance a
     LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
     LEFT JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
-    LEFT JOIN t_dict_business f ON d.state = f.dict_code
-    AND f.col_name = 'data_state'
+    LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code
+    AND f.col_name = 'cruise_result'
     LEFT JOIN t_dict_business k ON d.identify_result=k.dict_code and k.col_name='identify_result'
     LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
     LEFT JOIN t_robot_inspection g ON a.cruise_id = g.inspection_id
@@ -284,8 +295,8 @@
         f.identify_result,
         j.dict_note AS identifyResultName,
         f.result_num,
-        f.state,
-        z.dict_note as 'dataStateName',
+        f.cruise_result,
+        z.dict_note as 'cruiseResultName',
         f.picpath,
         (
         CASE
@@ -331,7 +342,7 @@
         AND i.col_name = "plan_type"
         LEFT JOIN t_camera_preset x ON b.cruise_id=x.preset_id
         LEFT JOIN t_robot_inspection y ON b.cruise_id=y.inspection_id
-        LEFT JOIN t_dict_business z ON f.state=z.dict_code AND z.col_name="data_state"
+        LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
         WHERE a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}
 
         <if test="startDate != null " ><if test="endDate != null">and e.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>

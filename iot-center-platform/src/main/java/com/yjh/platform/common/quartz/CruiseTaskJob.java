@@ -264,8 +264,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             }
                             tCruiseResult.setTaskWait(taskWait);
                             tCruiseResultDao.update(tCruiseResult);
-                            tCruiseDataResult.setState(250);
-                            tCruiseDataResult.setIdentifyResult(262);
+                            tCruiseDataResult.setCruiseResult(247);
+                            tCruiseDataResult.setCruiseAbnormal(248);
                             tCruiseDataResultDao.insert(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(254);
                             tCruiseTaskResultDetail.setEndTime(new Date());
@@ -360,8 +360,8 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
-                                tCruiseDataResult.setState(247);
-                                tCruiseDataResult.setIdentifyResult(261);
+                                tCruiseDataResult.setCruiseResult(247);
+                                tCruiseDataResult.setCruiseAbnormal(248);
                                 tCruiseDataResult.setResultNum("已拍照");
                                 tCruiseDataResult.setEvaluationState(257);
                                 tCruiseDataResultDao.insert(tCruiseDataResult);

@@ -21,11 +21,11 @@ public class Constant {
 
     public static String TASKID="";
     public static String INSTANCEID="";
-    public static Integer ABNORMAL=0;
-    public static Integer NORMAL=0;
+    public static AtomicInteger ABNORMAL=new AtomicInteger(0);
+    public static AtomicInteger NORMAL=new AtomicInteger(0);
 //    public static AtomicInteger NORMAL; //线程安全Integer
-    public static Set<String> cruiseKeys=new HashSet<>();
-//    public static CopyOnWriteArraySet<String> cruiseKeys=new CopyOnWriteArraySet<>();//线程安全Set
+//    public static Set<String> cruiseKeys=new HashSet<>();
+    public static CopyOnWriteArraySet<String> cruiseKeys=new CopyOnWriteArraySet<>();//线程安全Set
 
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();

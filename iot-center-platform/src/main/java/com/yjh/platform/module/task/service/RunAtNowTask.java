@@ -313,8 +313,8 @@ public class RunAtNowTask implements Runnable{
                         }
                         tCruiseResult.setTaskWait(taskWait);
                         tCruiseResultDao.update(tCruiseResult);
-                        tCruiseDataResult.setState(250);
-                        tCruiseDataResult.setIdentifyResult(262);
+                        tCruiseDataResult.setCruiseResult(247);
+                        tCruiseDataResult.setCruiseAbnormal(248);
                         tCruiseDataResultDao.insert(tCruiseDataResult);
                         tCruiseTaskResultDetail.setCruiseStatus(254);
                         tCruiseTaskResultDetail.setEndTime(new Date());
@@ -408,8 +408,8 @@ public class RunAtNowTask implements Runnable{
 
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
-                            tCruiseDataResult.setState(247);
-                            tCruiseDataResult.setIdentifyResult(261);
+                            tCruiseDataResult.setCruiseResult(246);
+
                             tCruiseDataResult.setResultNum("已拍照");
                             tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResultDao.insert(tCruiseDataResult);

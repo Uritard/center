@@ -94,7 +94,8 @@
         <result column="picpath" jdbcType="VARCHAR" property="picpath" />
         <result column="person_check" jdbcType="VARCHAR" property="personCheck" />
         <result column="origpic" jdbcType="VARCHAR" property="origpic" />
-        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="cruise_abnormal" jdbcType="INTEGER" property="cruiseAbnormal" />
+        <result column="cruise_result" jdbcType="INTEGER" property="cruiseResult" />
         <result column="evaluation_state" jdbcType="INTEGER" property="evaluationState" />
         <result column="identify_state" jdbcType="INTEGER" property="identifyState" />
         <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
@@ -523,7 +524,8 @@
             picpath,
             person_check,
             origpic,
-            state,
+            cruise_abnormal,
+            cruise_result,
             evaluation_state,
             identify_state,
             identify_result,
@@ -543,7 +545,8 @@
                 #{picpath, jdbcType=VARCHAR},
                 #{personCheck, jdbcType=VARCHAR},
                 #{origpic, jdbcType=VARCHAR},
-                #{state, jdbcType=INTEGER},
+                #{cruiseAbnormal, jdbcType=INTEGER},
+                #{cruiseResult,jdbcType=INTEGER},
                 #{evaluationState, jdbcType=INTEGER},
                 #{identifyState, jdbcType=INTEGER},
                 #{identifyResult, jdbcType=INTEGER},
@@ -567,7 +570,8 @@
         picpath,
         person_check,
         origpic,
-        state,
+        cruise_abnormal,
+        cruise_result,
         evaluation_state,
         identify_state,
         identify_result,
@@ -589,7 +593,8 @@
             #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
             #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
             #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
-            #{TCruiseDataResult.state, jdbcType=INTEGER},
+            #{TCruiseDataResult.cruiseAbnomal, jdbcType=INTEGER},
+            #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},F
             #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
             #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
             #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},

@@ -54,8 +54,11 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "算法原始图片/红外可见光")
     private String origpic;
 
-    @ApiModelProperty(value = "状态 -1数据异常 0未完成 1正常 2异常 3算法超时 4抓图失败 5未识别")
-    private Integer state;
+    @ApiModelProperty(value = "巡视异常类型 -1数据异常  3算法超时 4抓图失败 5异常告警")
+    private Integer cruiseAbnormal;
+
+    @ApiModelProperty(value = "巡视结果  正常、异常")
+    private Integer cruiseResult;
 
     @ApiModelProperty(value = "评价状态 1误报 2漏报")
     private Integer evaluationState;

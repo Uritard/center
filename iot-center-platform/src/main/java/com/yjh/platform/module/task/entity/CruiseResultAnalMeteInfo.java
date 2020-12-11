@@ -25,9 +25,9 @@ public class CruiseResultAnalMeteInfo implements Serializable {
     @ApiModelProperty(value = "测点点位名称")
     private String cruiseName;
     @ApiModelProperty(value = "数据状态")
-    private Integer state;
+    private Integer cruiseResult;
     @ApiModelProperty(value = "数据状态名")
-    private String stateName;
+    private String cruiseResultName;
     @ApiModelProperty(value = "实际结果")
     private Integer identifyResult;
     @ApiModelProperty(value = "实际结果名称")
