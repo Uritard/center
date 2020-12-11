@@ -145,20 +145,54 @@ public class TRobotInspectionService{
         DecimalFormat df = new DecimalFormat("#0.00");
         //获取状态信息
         Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":3");
-        re.put("batteryLevel",mapForCell.get("valueUnit"));//电池电量
+        if(mapForCell.size() != 0){
+            re.put("batteryLevel",mapForCell.get("valueUnit"));//电池电量
+        }else {
+            re.put("batteryLevel","");//电池电量
+        }
+
         Map<String,Object> mapForOnlineState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-        re.put("onlineState",mapForOnlineState.get("value"));//网络状态
+        if(mapForOnlineState.size() != 0){
+            re.put("onlineState",mapForOnlineState.get("value"));//网络状态
+        }else {
+            re.put("onlineState","");//网络状态
+        }
+
         Map<String,Object> mapForRobotCoordinate  = redisTemplate.opsForHash().entries("RobotCoordinate:"+robotCode);
-        re.put("robotCoordinate",mapForRobotCoordinate.get("coordinatePixel"));//机器人坐标
+        if(mapForRobotCoordinate.size() != 0){
+            re.put("robotCoordinate",mapForRobotCoordinate.get("coordinatePixel"));//机器人坐标
+        }else {
+            re.put("robotCoordinate","0,0,0,0");//机器人坐标
+        }
         Map<String,Object> mapForMileage  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":2");
-        re.put("mileage",mapForMileage.get("valueUnit"));//里程
+        if(mapForMileage.size() != 0){
+            re.put("mileage",mapForMileage.get("valueUnit"));//里程
+        }else {
+            re.put("mileage","");//里程
+        }
+
         Map<String,String> mapForSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":1");
-        Double speed =Double.valueOf(mapForSpeed.get("value")) ;
-        re.put("speed",df.format(speed)+mapForSpeed.get("unit"));//速度
+        if(mapForSpeed.size() != 0){
+            Double speed =Double.valueOf(mapForSpeed.get("value")) ;
+            re.put("speed",df.format(speed)+mapForSpeed.get("unit"));//速度
+        }else {
+            re.put("speed","");//速度
+        }
+
         Map<String,Object> mapForCruiseMap  = redisTemplate.opsForHash().entries("RobotRoad:"+robotCode);
-        re.put("cruiseMapPath",mapForCruiseMap.get("relativePath"));//巡视路径地图路径
+        if(mapForCruiseMap.size() != 0){
+            re.put("cruiseMapPath",mapForCruiseMap.get("relativePath"));//巡视路径地图路径
+        }else {
+            re.put("cruiseMapPath","");//巡视路径地图路径
+        }
+
         Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
-        re.put("robotState",mapForRobotState.get("value"));//机器人状态
+        if(mapForRobotState.size() != 0){
+            re.put("robotState",mapForRobotState.get("value"));//机器人状态
+        }else {
+            re.put("robotState","");//机器人状态
+        }
+
         return re;
     }
 
