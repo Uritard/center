@@ -110,9 +110,9 @@ public class TCameraScreenService{
 
     @Logs(title = "摄像机状态树", code = "module",content = "根据页面传入的参数获取摄像机状态树")
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfoDetail> cameraStateTree() {
+    public List<AreaInfoDetail> cameraStateTree(String cameraName,Integer flag) {
         List<AreaInfoDetail> listTree = new ArrayList<>();
-        listTree = tCameraScreenDao.selectCameraTreeDevice();
+        listTree = tCameraScreenDao.selectCameraTreeDevice(cameraName);
         List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
         for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
             AreaInfoDetail areaInfoMap = it.next();
@@ -137,10 +137,10 @@ public class TCameraScreenService{
         for(Map<String,String> item:listForState){
             map.putAll(item);
         }
-        diGui(areaInfoCountryList, listTree,map);
+        diGui(areaInfoCountryList, listTree,map,flag);
         return areaInfoCountryList;
     }
-    private void diGui(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,String> map) {
+    private void diGui(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,String> map,Integer flag) {
         for(AreaInfoDetail areaInfo : areaInfoList){
             List<AreaInfoDetail> childrenList = new ArrayList<>();
             for(Iterator<AreaInfoDetail> it = listTree.iterator();it.hasNext();){
@@ -159,12 +159,21 @@ public class TCameraScreenService{
                             areaInfoTem.setState(0);
                         }
                     }
-                    childrenList.add(areaInfoTem);
+                    if(flag != null && flag == 1){
+                        if("1".equals(map.get(areaInfoMap.getId().toString()))){
+                            //在线
+                            childrenList.add(areaInfoTem);
+                        }else {
+                            continue;
+                        }
+                    }else {
+                        childrenList.add(areaInfoTem);
+                    }
                 }
             }
             if (childrenList.size()>0 ) {
                 areaInfo.setChildren(childrenList);
-                diGui(childrenList, listTree,map);
+                diGui(childrenList, listTree,map,flag);
             }
         }
     }

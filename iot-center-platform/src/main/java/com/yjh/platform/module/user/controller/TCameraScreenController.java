@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import io.swagger.models.auth.In;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -169,10 +170,11 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "摄像机状态树")
     @RequestMapping(value = "/cameraStateTree", method = RequestMethod.GET)
-    public Result cameraStateTree() {
+    public Result cameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
+                                  @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.cameraStateTree());
+            result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

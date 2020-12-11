@@ -28,6 +28,6 @@ public interface TCameraScreenDao {
 
     int batchAdd(List<TCameraScreen> list);
     int batchDelete(List<String> list);
-    List<AreaInfoDetail> selectCameraTreeDevice();
+    List<AreaInfoDetail> selectCameraTreeDevice(@Param(value = "cameraName") String cameraName);
     List<Long> selectRecordId();
 }
