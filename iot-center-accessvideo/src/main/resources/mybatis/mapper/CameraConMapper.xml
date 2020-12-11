@@ -88,15 +88,19 @@
         SELECT
         a.record_id AS Id,
         a.record_name AS label,
+        "-1" As upId,
+        "null" As upName,
         "record" AS infoType,
+        "-1" as channel_num
         FROM t_camera_recorder a
         UNION ALL (
-            SELECT b.camera_id AS Id, b.camera_name AS label, b.record_id AS upId, c.record_name AS upName, "camera" AS infoType, b.channel_num
-              FROM t_camera_info b
-              LEFT JOIN t_camera_recorder c ON b.record_id = c.record_id
+        SELECT b.camera_id AS Id, b.camera_name AS label, b.record_id AS upId, c.record_name AS upName, "camera" AS infoType, b.channel_num
+        FROM t_camera_info b
+        LEFT JOIN t_camera_recorder c ON b.record_id = c.record_id
+        where 1=1
+        <if test="cameraName != null and cameraName != ''"> and b.camera_name CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
         )
-        WHERE 1 = 1
-        <if test="cameraName != null and cameraName != ''"> and c.camera_name CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
+
     </select>
 
 

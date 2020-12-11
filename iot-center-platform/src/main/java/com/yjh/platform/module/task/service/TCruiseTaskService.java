@@ -498,7 +498,7 @@ public class TCruiseTaskService {
                 robotTaskStates(robotTaskStatesMap);
             }
         } catch (Exception e) {
-            log.error("任务暂停异常: ");
+            log.error("任务暂停异常: "+e);
             e.printStackTrace();
         }
 

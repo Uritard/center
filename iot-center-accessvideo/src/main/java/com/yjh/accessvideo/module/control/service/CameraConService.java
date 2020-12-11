@@ -396,11 +396,53 @@ public class CameraConService {
 
     @Logs(title = "获取相机树状态", code = "getCameraStatusTree", content = "获取NVR下挂相机树状态")
     @Transactional(rollbackFor = Exception.class)
-    public CameraAreaInfo getCameraStatusTree(String cameraName) {
-        if (Objects.nonNull(cameraName)) {}
-        CameraAreaInfo cameraAreaInfo = new CameraAreaInfo();
-        return cameraAreaInfo;
+    public List<CameraAreaInfo> getCameraStatusTree(String cameraName) {
+        //if (Objects.nonNull(cameraName)) {}
+        List<CameraAreaInfo> tree = new ArrayList<>();
+        Map<String,String> state = new HashMap<>();
+        List<CameraAreaInfo> listTree = this.cameraConDao.selectCameraTree(cameraName);
+        for(Iterator<CameraAreaInfo> it = listTree.iterator();it.hasNext();){
+            CameraAreaInfo areaInfoMap = it.next();
+            if ( areaInfoMap.getUpId()==-1) {
+                CameraAreaInfo areaInfoCountry = new CameraAreaInfo();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setUpId(areaInfoMap.getUpId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountry.setStatusInfo("1");
+                tree.add(areaInfoCountry);
+                state.putAll(getCameraStatus(areaInfoMap.getId()));
+                //log.info("nvr map：  ",state);
+            }
+        }
+        //log.info("状态map：  ",state);
+        diGui(tree, listTree,state);
+        return tree;
 
+    }
+
+    private void diGui(List<CameraAreaInfo> areaInfoList, List<CameraAreaInfo> listTree,Map<String,String> state) {
+        for(CameraAreaInfo areaInfo : areaInfoList){
+            List<CameraAreaInfo> childrenList = new ArrayList<>();
+            for(Iterator<CameraAreaInfo> it = listTree.iterator();it.hasNext();){
+                CameraAreaInfo areaInfoMap = it.next();
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                    CameraAreaInfo areaInfoTem = new CameraAreaInfo();
+                    areaInfoTem.setId(areaInfoMap.getId());
+                    areaInfoTem.setUpId(areaInfoMap.getUpId());
+                    areaInfoTem.setLabel(areaInfoMap.getLabel());
+                    areaInfoTem.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    areaInfoTem.setChannelNum(areaInfoMap.getChannelNum());
+                    areaInfoTem.setStatusInfo(state.get(areaInfoMap.getId().toString()));
+                    childrenList.add(areaInfoTem);
+                }
+            }
+            if (childrenList.size()>0 ) {
+                areaInfo.setChildren(childrenList);
+                diGui(childrenList, listTree,state);
+            }
+        }
     }
 
     @Logs(title = "获取NVR存储状态", code = "getNVRStoreInfo", content = "获取NVR存储状态信息")

@@ -20,7 +20,7 @@ public class RobotTaskMessage implements Serializable {
     private String instanceName;//巡视点名称
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date cruiseTime;//巡视时间
+    private String cruiseTime;//巡视时间
 
 //    private Long deviceId;//设备id
 

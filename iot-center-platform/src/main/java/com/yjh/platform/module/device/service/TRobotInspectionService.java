@@ -102,14 +102,16 @@ public class TRobotInspectionService{
         List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
         for (String item:instanceIdList) {
             //获取任务数据
-            Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
+            Map<String,String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
             RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
             robotTaskMessage.setDeviceName(getName(Long.valueOf(item),1,nameList));
             robotTaskMessage.setInstanceName(getName(Long.valueOf(item),0,nameList));
             if(mapForRobotTaskMessage.get("cruiseTime") != null){
-                Date cruiseTime = simpleDateFormat.parse(mapForRobotTaskMessage.get("cruiseTime").toString());
-                robotTaskMessage.setCruiseTime(cruiseTime);
-                robotTaskMessage.setResult((String)mapForRobotTaskMessage.get("resultNum"));
+                robotTaskMessage.setCruiseTime(mapForRobotTaskMessage.get("cruiseTime"));
+                robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultNum"));
+            }else {
+                robotTaskMessage.setCruiseTime("");
+                robotTaskMessage.setResult("");
             }
             re.add(robotTaskMessage);
         }

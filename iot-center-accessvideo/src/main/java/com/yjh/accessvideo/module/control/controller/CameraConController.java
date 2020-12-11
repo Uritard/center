@@ -269,7 +269,7 @@ public class CameraConController {
 
     @ApiOperation(value = "获取NVR下挂相机树状态")
     @RequestMapping(value = "/getCameraTreeStatus", method = RequestMethod.GET)
-    public Result getCameraTreeStatus(@RequestParam(value = "cameraName") String cameraName) {
+    public Result getCameraTreeStatus(@RequestParam(value = "cameraName",required = false) String cameraName) {
         Result result = new Result();
         try {
             result.setData(cameraConService.getCameraStatusTree(cameraName));
