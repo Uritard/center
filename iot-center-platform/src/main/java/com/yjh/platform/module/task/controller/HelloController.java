@@ -37,6 +37,7 @@ import java.awt.geom.FlatteningPathIterator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -99,6 +100,18 @@ public class HelloController {
         Map<String, String> map = resultHandler.getMappedResults();
         System.out.println("map = " + map);
         result.setData(map);
+
+        AtomicInteger abnormal=new AtomicInteger(0);
+        AtomicInteger normal=new AtomicInteger(0);
+        abnormal.addAndGet(1);
+        normal.addAndGet(1);
+        abnormal.addAndGet(1);
+        normal.addAndGet(1);
+        log.info("abnormal:"+abnormal);
+        log.info("normal:"+normal);
+        abnormal.addAndGet(1);
+        normal.addAndGet(1);
+        log.info("FinalResult:"+(abnormal.get()+normal.get()));
         return result;
     }
 

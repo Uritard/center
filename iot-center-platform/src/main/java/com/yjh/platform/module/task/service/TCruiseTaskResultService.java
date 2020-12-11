@@ -9,6 +9,7 @@ import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.task.controller.HelloController;
+import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
@@ -72,6 +73,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
+
+    @Autowired
+    private TCruiseTaskAttrDao tCruiseTaskAttrDao;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
@@ -243,14 +247,14 @@ public class TCruiseTaskResultService {
         Collections.sort(cruiseInspectResults, new Comparator<CruiseInspectResult>() {
             @Override
             public int compare(CruiseInspectResult o1, CruiseInspectResult o2) {
-                if(Objects.isNull(o1.getEndTime()) || Objects.isNull(o2.getEndTime())){
-                    int flag=1;
+                if (Objects.isNull(o1.getEndTime()) || Objects.isNull(o2.getEndTime())) {
+                    int flag = 1;
                     return flag;
-                }else {
+                } else {
                     int flag = o1.getEndTime().compareTo(o2.getEndTime());
-                    if(flag == -1){
+                    if (flag == -1) {
                         flag = 1;
-                    }else if(flag == 1){
+                    } else if (flag == 1) {
                         flag = -1;
                     }
                     return flag;
@@ -270,40 +274,23 @@ public class TCruiseTaskResultService {
     @Logs(title = "统计获取当前任务的执行进度", code = "TCruiseTaskResult", content = "统计任务执行进度")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseAdvance(String taskId) {
-        Set<String> keyResult = redisScan("t_cruise_task_result:"+taskId);
+        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
         String cruiseNotExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未执行");
         String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
         String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
 
-       Long cruiseCount = tCruiseTaskResultDao.selectCruiseCountsByTaskId(taskId);//总巡检点数量
+        Long cruiseCount = tCruiseTaskResultDao.selectCruiseCountsByTaskId(taskId);//总巡检点数量
         float cruiseComCount = 0;//执行完成的巡检点数量
 
-        for(String cruiseKey:keyResult){
-            Map<String,Object> resultMap=redisTemplate.opsForHash().entries(cruiseKey);
-            if(!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) && !(resultMap.get("resultNum").equals("null"))){
-                cruiseComCount=cruiseComCount+1;
+        for (String cruiseKey : keyResult) {
+            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(cruiseKey);
+            if (!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) && !(resultMap.get("resultNum").equals("null"))) {
+                cruiseComCount = cruiseComCount + 1;
             }
         }
-        log.info("执行完成点："+cruiseComCount+"个");
-//        for (String keys : keyResult) {
-//            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
-//            Object values = resultMap.get("taskId");//取出每条数据的key值为“taskId”的value值
-//            String value = values.toString();
-//            String TaskId = taskId.toString(); //转化成统一格式进行比较筛选
-//            if (TaskId.equals(value)) {
-//                cruiseCount = cruiseCount + 1;
-//                if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {   //执行成功
-//                    cruiseComCount = cruiseComCount + 1;
-//                } else if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed)) {  //执行失败
-//                    cruiseComCount = cruiseComCount + 1;
-//                } else if (resultMap.get("cruiseStatus").equals(cruiseUnknown)) { //未知
-//                    cruiseComCount = cruiseComCount + 1;
-//                }
-//            }
-//        }
-//        Map<String, Float> Rate = new HashMap<>();
+        log.info("执行完成点：" + cruiseComCount + "个");
         Map<String, Object> rateAndTaskInfo = new HashMap<>();
         if (cruiseCount == 0 || cruiseComCount == 0) {
             rateAndTaskInfo.put("rate", Float.valueOf("0"));
@@ -327,31 +314,34 @@ public class TCruiseTaskResultService {
 
         Set<String> keyResult = redisScan("t_cruise_task_result*");
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
+
         Set<Long> deviceMete = new HashSet<>();//全部标准测点
         Set<Long> deviceMeteAbnormal = new HashSet<>();//结果异常的标准测点
-        Set<Long> deviceMeteNotComp = new HashSet<>();//未执行的标准测点
+        Set<Long> deviceMeteComp = new HashSet<>();//未执行的标准测点
+
+        //查询当前任务下所有点所绑定的测点
+        Set<Long> instanceIds=tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+        for(Long instanceId:instanceIds){
+            deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+        }
+
         for (String keys : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
             String value = (resultMap.get("taskId")).toString();
             String TaskId = taskId.toString();
             Long a = Long.valueOf(resultMap.get("cruiseId").toString());
             if (TaskId.equals(value)) {
-                if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
-                    deviceMete.add(null);
-                } else {
-                    deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
-                }
                 if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
                     if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
                         deviceMeteAbnormal.add(null);
                     } else {
                         deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
                     }
-                } else if (resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) {
+                } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
                     if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
-                        deviceMeteNotComp.add(null);
+                        deviceMeteComp.add(null);
                     } else {
-                        deviceMeteNotComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                        deviceMeteComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
                     }
                 }
             }
@@ -375,10 +365,10 @@ public class TCruiseTaskResultService {
             }
         }
 
-        Integer cruisedCount = deviceMete.size() - deviceMeteNotComp.size();//已执行的标准测点数量
-        cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());
-        cruiseResultCounter.setCruisedCount(cruisedCount);
-        cruiseResultCounter.setCruiseNotCount(deviceMeteNotComp.size());
+        Integer cruisedNotCount = deviceMete.size() - deviceMeteComp.size();//已执行的标准测点数量
+        cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
+        cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
+        cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
 
 
         return cruiseResultCounter;

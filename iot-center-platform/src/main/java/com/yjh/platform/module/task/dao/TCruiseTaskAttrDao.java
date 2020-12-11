@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
@@ -36,4 +37,6 @@ public interface TCruiseTaskAttrDao {
 
     int deleteByInstanceId(@Param(value = "list")List<Long> list);
     List<TCruiseTaskAttr> selectByTaskId(@Param(value = "taskId") String taskId);
+
+    Set<Long> selectInstanceIdByTask(@Param(value = "taskId")String taskId);
 }
