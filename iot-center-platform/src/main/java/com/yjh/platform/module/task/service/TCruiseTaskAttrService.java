@@ -4,6 +4,7 @@ import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,13 @@ public class TCruiseTaskAttrService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseTaskAttr> list) {
         return this.tCruiseTaskAttrDao.batchInsert(list);
+    }
+
+    @Logs(title = "根据Task查询巡视点Id",code = "TCruiseTaskAttr",content = "根据taskId查询InstanceId")
+    @Transactional(rollbackFor = Exception.class)
+    public Set<Long> selectInstanceIdByTask(String taskId){
+        return tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+
     }
 
 }
