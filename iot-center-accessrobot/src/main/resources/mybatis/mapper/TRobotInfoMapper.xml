@@ -363,12 +363,9 @@
         <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=VARCHAR}</if>
     </select>
     <!--查询机器人相关信息-->
-    <select id="selectRelateInfo" resultType="java.util.Map">
+    <select id="selectTaskResultId" resultType="java.lang.String">
         SELECT
-            a.task_id,
-            a.task_result_id,
-            d.cruise_result_id,
-            d.cruise_data_id
+            a.task_result_id
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_data_result d on b.cruise_result_id = d.cruise_result_id

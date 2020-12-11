@@ -230,8 +230,10 @@
         g.cruise_type,
         h.dict_note as cruise_type_name,
         g.result_num,
-        g.state as data_state,
-        j.dict_note as data_state_name,
+        g.cruise_result,
+        j.dict_note as cruise_result_name,
+        g.cruise_abnormal,
+        p.dict_note as abnormal_type,
         g.evaluation_state,
         i.dict_note as evaluation_state_name,
         g.check_user,
@@ -256,10 +258,11 @@
         LEFT JOIN t_cruise_data_result g on g.cruise_result_id = b.cruise_result_id
         LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type
         LEFT JOIN t_dict_business i on i.dict_code = g.evaluation_state
-        LEFT JOIN t_dict_business j on j.dict_code = g.state
+        LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result
         LEFT JOIN t_camera_preset k ON e.cruise_id = k.preset_id
         LEFT JOIN t_robot_inspection m ON m.inspection_id = e.cruise_id
         LEFT JOIN t_std_devicemete n ON n.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
@@ -267,7 +270,7 @@
 
         <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
-        <if test="state != null and state != -1 "> and g.state = #{state, jdbcType=INTEGER}</if>
+        <if test="cruiseAbnormal != null and cruiseAbnormal != -1 "> and g.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER}</if>
         ORDER BY cruise_time DESC
     </select>
 
@@ -350,13 +353,13 @@
     </select>
 
     <!--巡视点结果统计-->
-    <select id="cruiseStatistical" resultType="com.yjh.platform.module.task.entity.StatisticalTools" >
+    <select id="cruiseStatistical" resultType="com.yjh.platform.module.task.entity.CruiseStatistical" >
     select
-        dict_code as state,
-        dict_note as data_state,
+        dict_code as cruise_abnormal,
+        dict_note as abnormal_type,
         (select COUNT(*)
             from t_cruise_data_result
-            WHERE  state = dict_code
+            WHERE  cruise_abnormal = dict_code
         ) AS "count"
     from t_dict_business
     where dict_code IN
@@ -366,6 +369,15 @@
             where col_name = #{colName1}
         )
     ORDER BY dict_code
+    </select>
+    <select id="cruiseStatistical2" resultType="com.yjh.platform.module.task.entity.CruiseStatistical" >
+        SELECT
+             a.cruise_result as cruise_abnormal,
+           b.dict_note as abnormal_type,
+            COUNT(*) as "count"
+        FROM t_cruise_data_result a,t_dict_business b
+        WHERE a.cruise_result = b.dict_code
+        and a.cruise_result = '246'
     </select>
 
     <select id="selectByIdentifyResult" parameterType="java.lang.Integer" resultType="java.lang.String">

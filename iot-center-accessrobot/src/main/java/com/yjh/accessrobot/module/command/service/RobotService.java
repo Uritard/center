@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -118,8 +119,26 @@ public class RobotService {
         String picPath = Constant.filePath+robotMap.get(0).get("mappath").toString();
         log.info("图片路径为："+picPath);
         /*
-        * 将ftp图copy到40环境(还没搞！！！！！！！！)
-        * */
+         * 将ftp图copy到40环境
+         * */
+        String fenGe[] = picPath.split("/");
+        String fileName = fenGe[fenGe.length - 1];
+        String developMap = Constant.imgPath+"/Map";
+        File f=new File(developMap);
+        if (!f.exists()){
+            f.setWritable(true, false);
+            f.mkdirs();
+        }
+
+        try {
+            String url = "cp " + picPath + " "+developMap;
+            log.info("url是==="+url);
+            Runtime.getRuntime().exec(url);
+        }catch (Exception e){
+            e.getMessage();
+        }
+        Map<String, String> ImgMap = redisTemplate.opsForHash().entries("t_sys_param:FTPImagePath");
+        String url = ImgMap.get("content") +"/Map/"+ fileName;
 
 //        TRobotInfo tRobotInfo = new TRobotInfo()
 //                .setRobotName(robotMap.get(0).get("robot_name").toString())
@@ -127,7 +146,7 @@ public class RobotService {
 //                .setRobotFactory(robotMap.get(0).get("manufacturer").toString())
 //                .setRobotPosition(robotPosition)
 //                .setCreateDate(new Date())
-//                .setPhotePath(picPath)
+//                .setPhotePath(url);
 //                .setRobotStatus("在线")
 //                .setRemarks(robotMap.get(0).get("robot_info").toString());
 //        log.info("获得的tRobotInfo是："+tRobotInfo);
@@ -138,7 +157,15 @@ public class RobotService {
 //        if (res1 > 0){
         log.info("机器人code是:"+xmlBaseModel.getSendCode());
             Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
-            log.info("机器人的id是："+robotId);
+        log.info("机器人的id是："+robotId);
+
+        TRobotInfo tRobotInfo = new TRobotInfo()
+                .setRobotId(robotId)
+                .setPhotePath(url);
+        log.info("获得的tRobotInfo是："+tRobotInfo);
+
+        //更新机器人地图信息
+            tRobotInfoDao.update(tRobotInfo);
             //设备模型文件
             List<TRobotInspection> deviceList = new ArrayList<>();
             for (Map<String,Object> deviceMap : deviceMapList){
@@ -193,6 +220,7 @@ public class RobotService {
                 //将instanceIdList放缓存，以备后续使用
                 Map<String,Object> instanceListMap = new HashMap<>();
                 instanceListMap.put("instanceIdList",String.valueOf(instanceIdList));
+                instanceListMap.put("taskId",rTII.getTaskId());
                 redisTemplate.opsForHash().putAll("RobotTaskStatus:"+rTII.getRobotCode(),instanceListMap);
 
                 for (Long instanceId : instanceIdList) {
@@ -204,6 +232,7 @@ public class RobotService {
                     redisInfoMap.put("instanceId",instanceId+"");//缓存中放instanceId
                     redisInfoMap.put("inspectionCode",inspectionCode);//缓存中放inspectionCode
                     redisInfoMap.put("cruiseTime",sdf.format(new Date()));//缓存中放cruiseTime
+                    redisInfoMap.put("taskId",rTII.getTaskId());//缓存中放taskId
                     redisInfoList.add(redisInfoMap);//缓存信息List添加数据
                 }
 
@@ -211,7 +240,7 @@ public class RobotService {
                 //放数据到缓存
                 for (int i = 0; i < redisInfoList.size(); i++) {
                     redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:"+redisInfoList.get(i).get("robotCode")
-                            +":"+i, redisInfoList.get(i));
+                            +":"+redisInfoList.get(i).get("taskId")+i, redisInfoList.get(i));
                 }
 
                 String deviceIdList = str.toString();
@@ -271,6 +300,7 @@ public class RobotService {
         String taskId = robotTaskControlMap.get("taskId").toString();
         //1.任务启动2.任务暂停3.任务继续4.任务停止
         String commandValue = robotTaskControlMap.get("commandValue").toString();
+        Constant.taskStatus = Integer.valueOf(commandValue);//改变任务状态
         String json  = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
         log.info("json是=="+json);
         List<String> robotCodeList = JSON.parseArray(json,String.class);
@@ -293,17 +323,15 @@ public class RobotService {
     }
     @Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,String> selectRelateInfo(String taskId) {
-        Map<String,String> resMap = tRobotInfoDao.selectRelateInfo(taskId);
-        System.out.println("结果："+resMap);
-        return resMap;
+    public String selectTaskResultId(String taskId) {
+        String taskResultId = tRobotInfoDao.selectTaskResultId(taskId);
+        return taskResultId;
     }
     @Logs(title = "根据taskId查询相关内容2", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
-
     @Logs(title = "机器人本体告警信息入库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {

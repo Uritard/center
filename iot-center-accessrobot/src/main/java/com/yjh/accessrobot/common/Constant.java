@@ -2,9 +2,7 @@ package com.yjh.accessrobot.common;
 
 import io.netty.channel.ChannelHandlerContext;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Constant {
@@ -16,5 +14,10 @@ public class Constant {
 
     public static final String filePath = "/home/yjh_iot_center/ftps/";
 
+    public static final String imgPath = "/home/yjh_iot_center/iot-picture/ftpImg";
+
     public static String Packet = "";
+
+    public static Integer taskStatus = 0;
+
 }

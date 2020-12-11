@@ -62,8 +62,8 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "cruiseResult",content = "根据web传递的参数查询巡检点结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultDetail> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer state,String deviceName ) {
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,state,deviceName);
+    public List<CruiseResultDetail> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseAbnormal,String deviceName ) {
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseAbnormal,deviceName);
         return cruiseResultDetailList;
     }
     @Logs(title = "人工复核", code = "cruiseResult",content = "根据web传递的参数进行人工审核")
@@ -180,15 +180,20 @@ public class TCruiseResultService{
     }
     @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据巡视数据状态统计巡检点结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<StatisticalResult> cruiseStatistical() {
+    public List<StatisticalResult2> cruiseStatistical() {
 
-        String colName1 = "data_state";
+        String colName1 = "abnormal_type";
 
-        List<StatisticalResult> taskStatisticalList = new ArrayList<>();
+        List<StatisticalResult2> taskStatisticalList = new ArrayList<>();
 
-        StatisticalResult statisticalResult1 = new StatisticalResult();
-        statisticalResult1.setStatisticalList(tCruiseResultDao.cruiseStatistical(colName1));
-        taskStatisticalList.add(statisticalResult1);
+        StatisticalResult2 statisticalResult2 = new StatisticalResult2();
+        List<CruiseStatistical> list = tCruiseResultDao.cruiseStatistical(colName1);
+
+        CruiseStatistical cruiseStatistical2 = tCruiseResultDao.cruiseStatistical2();
+        list.add(cruiseStatistical2);
+
+        statisticalResult2.setCruiseStatisticalList(list);
+        taskStatisticalList.add(statisticalResult2);
 
         return taskStatisticalList;
     }

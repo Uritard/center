@@ -48,10 +48,15 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "巡视值")
     private String resultNum;
 
-    @ApiModelProperty(value = "巡视结果")
-    private Integer dataState;
-    @ApiModelProperty(value = "巡检数据状态")
-    private String dataStateName;
+    @ApiModelProperty(value = "巡视执行结果")
+    private Integer cruiseResult;
+    @ApiModelProperty(value = "巡视执行结果-字典表")
+    private String cruiseResultName;
+
+    @ApiModelProperty(value = "巡视异常原因")
+    private Integer cruiseAbnormal;
+    @ApiModelProperty(value = "巡视异常原因-字典表")
+    private String abnormalType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")

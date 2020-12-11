@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author YC
@@ -51,7 +50,7 @@ public interface TRobotInfoDao {
     Long selectLastRobotId();
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
-    Map<String,String> selectRelateInfo(@Param(value = "taskId") String taskId);
+    String selectTaskResultId(@Param(value = "taskId") String taskId);
     TCruiseTask selectTCruiseTask(@Param(value = "taskId") String taskId);
     int insertRobotAlarm(TRobotAlarm tRobotAlarm);
     int batchInsertCruiseDataResult(List<TCruiseDataResult> list);

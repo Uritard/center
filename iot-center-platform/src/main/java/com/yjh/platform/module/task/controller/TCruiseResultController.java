@@ -1,25 +1,24 @@
 package com.yjh.platform.module.task.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseResultService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
-import org.springframework.http.HttpRequest;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -172,7 +171,7 @@ public class TCruiseResultController {
     public Result cruiseStatistical() {
         Result result = new Result();
         try {
-            List<StatisticalResult> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
+            List<StatisticalResult2> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
             result.setData(cruiseStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -184,7 +183,7 @@ public class TCruiseResultController {
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
-                                     @RequestParam(value = "state", required = false) Integer state,
+                                     @RequestParam(value = "cruiseAbnormal", required = false) Integer cruiseAbnormal,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
@@ -192,7 +191,7 @@ public class TCruiseResultController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,state,deviceName);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseAbnormal,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

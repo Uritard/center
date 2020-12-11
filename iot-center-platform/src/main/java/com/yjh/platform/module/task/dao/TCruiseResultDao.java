@@ -39,7 +39,7 @@ public interface TCruiseResultDao {
                                                @Param(value = "cState") Integer cState);
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
-                                                @Param(value = "state") Integer state,
+                                                @Param(value = "cruiseAbnormal") Integer cruiseAbnormal,
                                                 @Param(value = "deviceName") String deviceName);
 
     int manualReview(CruiseManualReview cruiseManualReview);
@@ -50,7 +50,9 @@ public interface TCruiseResultDao {
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "Start")String Start,
                                            @Param(value = "End")String End);
-    List<StatisticalTools> cruiseStatistical(@Param(value = "colName1")String colName1);
+    List<CruiseStatistical> cruiseStatistical(@Param(value = "colName1")String colName1);
+    CruiseStatistical cruiseStatistical2();
+
     List<TaskSimpleInfo> selectTaskIsRunning();
 
     String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
