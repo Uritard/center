@@ -18,6 +18,5 @@ public class Constant {
 
     public static String Packet = "";
 
-    public static Integer taskStatus = 0;
 
 }

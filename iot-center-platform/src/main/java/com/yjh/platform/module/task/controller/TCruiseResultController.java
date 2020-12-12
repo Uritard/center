@@ -179,6 +179,8 @@ public class TCruiseResultController {
         }
         return result;
     }
+
+
     @ApiOperation(value = "分页查询--任务结果详细")
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,

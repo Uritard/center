@@ -31,7 +31,6 @@ public class RobotService {
 
     private Logger log = LoggerFactory.getLogger(RobotService.class);
 
-    private static long algorithmMsgId = 100000001;
     private static final String TIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private RedisTemplate redisTemplate;
@@ -300,7 +299,7 @@ public class RobotService {
         String taskId = robotTaskControlMap.get("taskId").toString();
         //1.任务启动2.任务暂停3.任务继续4.任务停止
         String commandValue = robotTaskControlMap.get("commandValue").toString();
-        Constant.taskStatus = Integer.valueOf(commandValue);//改变任务状态
+        
         String json  = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
         log.info("json是=="+json);
         List<String> robotCodeList = JSON.parseArray(json,String.class);

@@ -1,28 +1,29 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.yjh.platform.module.task.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
 * @author tt
@@ -212,7 +213,17 @@ public class TWarnInfoService{
             tRobotAlarm.setAlarmState(275);
             tRobotAlarm.setDealTime(date);
             tRobotAlarm.setDealPersonId(userId);
-            jieGuo = tRobotAlarmDao.update(tRobotAlarm);
+            jieGuo  = tRobotAlarmDao.update(tRobotAlarm);
+            //处理告警完成之后
+            if(jieGuo == 1) {
+            //给前端推webSocket
+                Map<String,Object> jasonMap=new HashMap<>();
+                jasonMap.put("type","finishedOneAlarm");
+                jasonMap.put("alarmId",warnId);
+                String json= JSON.toJSONString(jasonMap);
+                System.out.println(("发送给前端的消息==="+json));
+                WebSocketServer.sendMsg(json);
+            }
         }else if (alarmSource == 888)
         {
             TCameraAlarm tCameraAlarm = new TCameraAlarm();
@@ -223,6 +234,16 @@ public class TWarnInfoService{
             tCameraAlarm.setDealTime(date);
             tCameraAlarm.setDealPersonId(userId);
             jieGuo = tCameraAlarmDao.update(tCameraAlarm);
+            //处理告警完成之后
+            if(jieGuo == 1) {
+                //给前端推webSocket
+                Map<String,Object> jasonMap=new HashMap<>();
+                jasonMap.put("type","finishedOneAlarm");
+                jasonMap.put("alarmId",warnId);
+                String json= JSON.toJSONString(jasonMap);
+                System.out.println(("发送给前端的消息==="+json));
+                WebSocketServer.sendMsg(json);
+            }
         }else{
             TWarnInfo tWarnInfo = new TWarnInfo();
             tWarnInfo.setWarnId(warnId);
@@ -232,6 +253,16 @@ public class TWarnInfoService{
             tWarnInfo.setDealTime(date);
             tWarnInfo.setDealPersonId(userId);
             jieGuo = tWarnInfoDao.update(tWarnInfo);
+            //处理告警完成之后
+            if(jieGuo == 1) {
+                //给前端推webSocket
+                Map<String,Object> jasonMap=new HashMap<>();
+                jasonMap.put("type","finishedOneAlarm");
+                jasonMap.put("alarmId",warnId);
+                String json= JSON.toJSONString(jasonMap);
+                System.out.println(("发送给前端的消息==="+json));
+                WebSocketServer.sendMsg(json);
+            }
         }
         return jieGuo;
     }

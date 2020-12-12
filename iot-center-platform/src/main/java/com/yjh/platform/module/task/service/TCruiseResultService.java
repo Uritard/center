@@ -79,17 +79,6 @@ public class TCruiseResultService{
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
-//        if (result1 == 1) {
-//            //给前端推webSocket
-//            Map<String,Object> jasonMap=new HashMap<>();
-//            jasonMap.put("type","evaluationState");
-//            jasonMap.put("evaluationState",taskId);
-//            String json= JSON.toJSONString(jasonMap);
-//            log.info("发送给前端的消息==="+json);
-//            WebSocketServer.sendMsg(json);
-//        }
-
-
         //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
@@ -124,7 +113,16 @@ public class TCruiseResultService{
         String taskResultId = cruiseManualReview.getTaskResultId();
         Date taskCheckDate =findLastDate(cruiseManualReviewList);
         //更新任务审核人以及审核时间
-        int result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
+        List<String> list = new ArrayList<>();
+        for (CruiseManualReview cMR:cruiseManualReviewList) {
+            if (cMR.getEvaluationState() == 256) {
+                list.add(cMR.getCheckUser());
+            }
+        }
+        int result2 = 0;
+        if (list.size() == cruiseManualReviewList.size()){
+            result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
+        }
         return result1+result2;
     }
     public Date findLastDate(List<CruiseManualReview> list) {
@@ -208,6 +206,6 @@ public class TCruiseResultService{
     public List<TaskSimpleInfo> selectTaskIsRunning(){
         return this.tCruiseResultDao.selectTaskIsRunning();
     }
-
+    
 }
 
