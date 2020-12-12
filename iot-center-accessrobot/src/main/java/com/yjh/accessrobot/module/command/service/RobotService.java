@@ -299,11 +299,12 @@ public class RobotService {
         String taskId = robotTaskControlMap.get("taskId").toString();
         //1.任务启动2.任务暂停3.任务继续4.任务停止
         String commandValue = robotTaskControlMap.get("commandValue").toString();
-        
         String json  = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
         log.info("json是=="+json);
         List<String> robotCodeList = JSON.parseArray(json,String.class);
         log.info("robotCodeList==="+robotCodeList);
+
+        List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
 
         for (String robotCode : robotCodeList){
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -315,9 +316,25 @@ public class RobotService {
                     .setTime(sdf.format(new Date()));
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
+
+            //将机器人任务状态存进缓存以备后用
+            Map<String,String> taskStatusMap = new HashMap<>();
+            taskStatusMap.put("robotCode",robotCode);
+            taskStatusMap.put("taskStatus",commandValue);
+            taskStatusMap.put("taskId",taskId);
+            redisInfoList.add(taskStatusMap);
+
             //根据不同的机器人对应不同的管道发送指令
             RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(  generateByteOrder(xmlString,robotCode));
         }
+
+        log.info("redisInfoList是==="+redisInfoList);
+        //放数据到缓存
+        for (int i = 0; i < redisInfoList.size(); i++) {
+            redisTemplate.opsForHash().putAll("taskStatusRedis:"+redisInfoList.get(i).get("robotCode")
+                    +":"+redisInfoList.get(i).get("taskId"), redisInfoList.get(i));
+        }
+
         return 1;
     }
     @Logs(title = "根据taskId查询相关内容", code = "Robot")

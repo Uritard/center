@@ -4,7 +4,6 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.entity.MessageEntity;
@@ -598,33 +597,19 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //处理机器人异常告警数据
                     Map<String, String> robotAlarmMap = new HashMap<>();
                     robotAlarmMap.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
-                    robotAlarmMap.put("robot_code",xmlBaseModel.getSendCode());
+                    robotAlarmMap.put("robotCode",xmlBaseModel.getSendCode());
                     robotAlarmMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
                     robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get("content").toString());//告警内容
                     log.info("机器人异常告警数据是："+robotAlarmMap);
+
+                    //处理告警数据
+                    AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap,redisTemplate);
+                    TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
                     String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] alarmProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, alarmXmlString);
                     send(ctx, alarmProtocol);
                     log.info("巡视主机给机器人响应了");
-
-                    //根据code获取id
-                    Long robotId = Long.valueOf(robotAlarmMap.get("content"));
-                    TRobotAlarm tRobotAlarm = new TRobotAlarm()
-                            .setRobotId(robotId)
-                            .setAlarmName(robotAlarmMap.get("content"))
-                            .setAlarmLevel(133)
-                            .setAlarmInfo(robotAlarmMap.get("content"))
-                            .setAlarmTime(sdf.parse(robotAlarmMap.get("time")))
-//                            .setPositionOffset()
-//                            .setPositionStationNum()
-                            .setAlarmState(0);
-//                            .setCreateTime()
-//                            .setEndTime()
-                    log.info("tRobotAlarm的内容==="+tRobotAlarm);
-                    //插表入库
-//                    int res = robotService.insertRobotAlarm(tRobotAlarm);
-//                    log.info("插库的结果="+res);
 
                     break;
                 //微气象数据(接收并发送响应)
