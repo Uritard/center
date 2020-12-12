@@ -593,8 +593,8 @@
             #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
             #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
             #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
-            #{TCruiseDataResult.cruiseAbnomal, jdbcType=INTEGER},
-            #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},F
+            #{TCruiseDataResult.cruiseAbnormal, jdbcType=INTEGER},
+            #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},
             #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
             #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
             #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},

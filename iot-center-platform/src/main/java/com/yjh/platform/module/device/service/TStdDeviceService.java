@@ -43,6 +43,12 @@ public class TStdDeviceService{
     private TCameraInfoDao tCameraInfoDao;
 
 
+    @Logs(title = "联合主键查询",code = "module",content = "设备ID和部位ID联合查询设备信息")
+    @Transactional(rollbackFor = Exception.class)
+    public TStdDevice selectByUnionKeys(Long deviceId,String customId){
+        return tStdDeviceDao.selectByUnionKeys(deviceId, customId);
+    }
+
     @Logs(title = "新增", code = "module", content = "新增设备")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDevice tStdDevice) {

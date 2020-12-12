@@ -101,17 +101,11 @@ public class HelloController {
         System.out.println("map = " + map);
         result.setData(map);
 
-        AtomicInteger abnormal=new AtomicInteger(0);
-        AtomicInteger normal=new AtomicInteger(0);
-        abnormal.addAndGet(1);
-        normal.addAndGet(1);
-        abnormal.addAndGet(1);
-        normal.addAndGet(1);
-        log.info("abnormal:"+abnormal);
-        log.info("normal:"+normal);
-        abnormal.addAndGet(1);
-        normal.addAndGet(1);
-        log.info("FinalResult:"+(abnormal.get()+normal.get()));
+        Long beginTime=System.currentTimeMillis();
+
+        Long endTime=System.currentTimeMillis();
+
+
         return result;
     }
 

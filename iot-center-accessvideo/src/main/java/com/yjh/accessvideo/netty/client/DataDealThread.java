@@ -80,6 +80,9 @@ public class DataDealThread implements Runnable {
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
         JSONObject jsonObject = JSON.parseObject(body);
         log.info("JSON对象1：" + jsonObject);
+        if(jsonObject.get("msgType").toString().equals("4")){
+            log.info("注册返回:"+jsonObject);
+        }
         if (jsonObject.get("msgType").toString().equals("2")) {
             JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
             log.info("原生数据****：" + jsonObjectData);
@@ -119,190 +122,174 @@ public class DataDealThread implements Runnable {
 
 
                 log.info("端口号：" + remotePort);
-                switch (remotePort) {
-                    case 13668:
-                        if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
-                            cruiseResultMap.put("resultNum", "缺少标定文件");
-                            cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","异常"));
-                            cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                            ABNORMAL.addAndGet(1);
-                        } else if (jsonObjectResult.get("resultValue").equals("识别失败")) {
-                            cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
-                            cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","异常"));
-                            cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                            ABNORMAL.addAndGet(1);
-                        } else {
-                            if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
-                                cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
-                                cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","正常"));
-                                cruiseResultMap.put("cruiseAbnormal", "--");
-                                NORMAL.addAndGet(1);
-
-                                log.info("开始告警预处理");
-                                TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
-                                //单个数值表计识别结果的告警判断与处理
-                                TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
-                                log.info("数据查询初始化");
-                                //满足告警数据结构-进行告警判断
-                                if (Objects.isNull(tStdDevicemeteM.getAlarmState()) && Objects.nonNull(tStdDevicemeteM.getHighLimit1()) || Objects.isNull(tStdDevicemeteM.getAlarmState()) && Objects.isNull(tStdDevicemeteM.getHighLimit1())) {
-                                    //初始化告警信息redis表
-                                    String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                    Map<String, String> warnMap = new HashMap<>();
-                                    warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
-                                    warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
-                                    warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
-                                    warnMap.put("customId", tCruisePointInstance.getCustomId());
-                                    warnMap.put("instanceId", jsonObjectResult.get("instanceId").toString());
-                                    warnMap.put("stdMeteId", tCruisePointInstance.getDeviceMeteId().toString());
-                                    warnMap.put("taskId", jsonObjectResult.get("taskId").toString());
-                                    warnMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
-                                    warnMap.put("ifWarnDisable", String.valueOf(0));
-                                    warnMap.put("value", jsonObjectResult.get("resultValue").toString());
-                                    warnMap.put("imagePath", cruiseResult.get("picpath").toString());
-                                    warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
-                                    log.info("开始告警判断");
-                                    log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
-                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    switch (tStdDevicemeteM.getMeteKind()) {
-                                        case "1":
-                                            String resultValue = jsonObjectResult.get("resultValue").toString();
-                                            int warnRuleTeleSigning = analyseDataOperateService.warnJudgementTelesignaling(resultValue,
-                                                    tStdDevicemeteM.getStateZero(),
-                                                    tStdDevicemeteM.getStateOne(),
-                                                    tStdDevicemeteM.getAlarmState()
-                                            );
-                                            log.info("告警结果：" + warnRuleTeleSigning);
-                                            if (warnRuleTeleSigning == 1) {
-                                                log.info("告警信息生成");
-                                                warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "状态异常");
-                                                warnMap.put("warnTime", simpleDateFormat.format(new Date()));
-                                                if (tStdDevicemeteM.getAlarmState() == 0) {
-                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateZero() + "状态触发告警");
-                                                } else {
-                                                    warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateOne() + "状态触发告警");
-                                                }
-                                                warnMap.put("outRang", "");
-
-                                                log.info("告警MAP：" + warnMap);
-                                                try {
-                                                    redisTemplate.opsForHash().putAll(warnName, warnMap);
-                                                    cruiseResultMap.put("isWarn", "1");
-                                                    // webSocket通知前端调用巡视监控的接口
-                                                    Map<String, Object> jasonMap = new HashMap<>();
-                                                    jasonMap.put("type", "newAlarm");
-                                                    jasonMap.put("alarmName", warnMap.get("warnName"));
-                                                    jasonMap.put("alarmTime", warnMap.get("warnTime"));
-                                                    jasonMap.put("alarmContent", warnMap.get("warnContent"));
-                                                    String json = JSON.toJSONString(jasonMap);
-                                                    log.info("发送给前端的消息：" + json);
-                                                    WebSocketServer.sendMsg(json);
-                                                } catch (Exception e) {
-                                                    log.info("生成错误", e);
-                                                }
-
-                                                cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","异常"));
-                                                cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
-
-                                            }
-
-                                            break;
-                                        case "2":
-                                            Float resultValueMeter = Float.valueOf(jsonObjectResult.get("resultValue").toString());
-                                            int warnRuleMeter = analyseDataOperateService.warnJudgement(resultValueMeter,
-                                                    tStdDevicemeteM.getHighLimit1(),
-                                                    tStdDevicemeteM.getLowLimit1(),
-                                                    tStdDevicemeteM.getHighLimit2(),
-                                                    tStdDevicemeteM.getLowLimit2());
-                                            if (warnRuleMeter > 0) {
-                                                warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "数据异常");
-                                                warnMap.put("warnTime", simpleDateFormat.format(new Date()));
-                                                log.info("数字结果告警判断结果：" + warnRuleMeter);
-                                                switch (warnRuleMeter) {
-                                                    case 1:
-                                                        warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
-                                                        warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
-                                                        break;
-                                                    case 2:
-                                                        warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
-                                                        warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1() - resultValueMeter));
-                                                        break;
-                                                    case 3:
-                                                        warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
-                                                        warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
-                                                        break;
-
-                                                    case 4:
-                                                        warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
-                                                        warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2() - resultValueMeter));
-                                                        break;
-                                                }
-
-                                                redisTemplate.opsForHash().putAll(warnName, warnMap);
-                                                cruiseResultMap.put("isWarn", "1");
-                                                log.info("告警Map:" + warnMap);
-
-                                                // webSocket通知前端调用巡视监控的接口
-                                                Map<String, Object> jasonMaps = new HashMap<>();
-                                                jasonMaps.put("type", "newAlarm");
-                                                jasonMaps.put("alarmName", warnMap.get("warnName"));
-                                                jasonMaps.put("alarmTime", warnMap.get("warnTime"));
-                                                jasonMaps.put("alarmContent", warnMap.get("warnContent"));
-                                                String jsons = JSON.toJSONString(jasonMaps);
-                                                log.info("发送给前端的消息：" + jsons);
-                                                WebSocketServer.sendMsg(jsons);
-
-                                                cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","异常"));
-                                                cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
-                                            }
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            } else {
-                                cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
-                                cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","异常"));
+                try {
+                    switch (remotePort) {
+                        case 13668:
+                            if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
+                                cruiseResultMap.put("resultNum", "缺少标定文件");
+                                cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                 cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
                                 ABNORMAL.addAndGet(1);
-                            }
-                        }
+                            } else if (jsonObjectResult.get("resultValue").equals("识别失败")) {
+                                cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
+                                cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
+                                cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
+                                ABNORMAL.addAndGet(1);
+                            } else {
+                                if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
+                                    cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
+                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
+                                    cruiseResultMap.put("cruiseAbnormal", "--");
+                                    NORMAL.addAndGet(1);
 
-                        break;
-                    case 13669:
-                        String originResult = jsonObjectResult.get("resultValue").toString();
-                        String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
-                        if (resultValue != "null") {
-                            NORMAL.addAndGet(1);
-                            cruiseResultMap.put("resultNum", resultValue);
-                            cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","正常"));
-                            cruiseResultMap.put("cruiseAbnormal", "--");
-                            //生成缺陷缓存信息（单一缺陷和多元缺陷）
-                            log.info("--------____--------生成缺陷缓存");
-                            String[] resultArr = resultValue.split("\\s+");
-                            if (resultArr.length == 1) {
-                                log.info("--------____--------单一缺陷");
-                                Map<String, String> defectMap = new HashMap<>();
-                                String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
-                                defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_type", resultValue));
-                                defectMap.put("defectContent", resultValue);
-                                defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
-                                defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
-                                TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
-                                defectMap.put("customId", tStdDevicemete.getCustomId());
-                                defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
-                                defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
-                                defectMap.put("imagePath", cruiseResult.get("picpath").toString());
-                                redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
-                            } else if (resultArr.length > 1) {
-                                log.info("--------____--------多元缺陷");
-                                for (int i = 0; i < resultArr.length; i++) {
-                                    log.info("缺陷处理方法：" + resultArr[i]);
+                                    log.info("开始告警预处理");
+                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                                    //单个数值表计识别结果的告警判断与处理
+                                    TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                                    log.info("数据查询初始化");
+                                    //满足告警数据结构-进行告警判断
+                                    if (Objects.isNull(tStdDevicemeteM.getAlarmState()) && Objects.nonNull(tStdDevicemeteM.getHighLimit1()) || Objects.isNull(tStdDevicemeteM.getAlarmState()) && Objects.isNull(tStdDevicemeteM.getHighLimit1())) {
+                                        //初始化告警信息redis表
+                                        String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        Map<String, String> warnMap = new HashMap<>();
+                                        warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
+                                        warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
+                                        warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
+                                        warnMap.put("customId", tCruisePointInstance.getCustomId());
+                                        warnMap.put("instanceId", jsonObjectResult.get("instanceId").toString());
+                                        warnMap.put("stdMeteId", tCruisePointInstance.getDeviceMeteId().toString());
+                                        warnMap.put("taskId", jsonObjectResult.get("taskId").toString());
+                                        warnMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
+                                        warnMap.put("ifWarnDisable", String.valueOf(0));
+                                        warnMap.put("value", jsonObjectResult.get("resultValue").toString());
+                                        warnMap.put("imagePath", cruiseResult.get("picpath").toString());
+                                        warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                        log.info("开始告警判断");
+                                        log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
+                                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        switch (tStdDevicemeteM.getMeteKind()) {
+                                            case "1":
+                                                String resultValue = jsonObjectResult.get("resultValue").toString();
+                                                int warnRuleTeleSigning = analyseDataOperateService.warnJudgementTelesignaling(resultValue,
+                                                        tStdDevicemeteM.getStateZero(),
+                                                        tStdDevicemeteM.getStateOne(),
+                                                        tStdDevicemeteM.getAlarmState()
+                                                );
+                                                log.info("告警结果：" + warnRuleTeleSigning);
+                                                if (warnRuleTeleSigning == 1) {
+                                                    log.info("告警信息生成");
+                                                    warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "状态异常");
+                                                    warnMap.put("warnTime", simpleDateFormat.format(new Date()));
+                                                    if (tStdDevicemeteM.getAlarmState() == 0) {
+                                                        warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateZero() + "状态触发告警");
+                                                    } else {
+                                                        warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateOne() + "状态触发告警");
+                                                    }
+                                                    warnMap.put("outRang", "");
+
+                                                    log.info("告警MAP：" + warnMap);
+                                                    try {
+                                                        redisTemplate.opsForHash().putAll(warnName, warnMap);
+                                                        cruiseResultMap.put("isWarn", "1");
+                                                        // webSocket通知前端调用告警小铃铛的接口
+                                                        Map<String, Object> jasonMap = new HashMap<>();
+                                                        jasonMap.put("type", "newAlarm");
+                                                        jasonMap.put("alarmName", warnMap.get("warnName"));
+                                                        jasonMap.put("alarmTime", warnMap.get("warnTime"));
+                                                        jasonMap.put("alarmContent", warnMap.get("warnContent"));
+                                                        String json = JSON.toJSONString(jasonMap);
+                                                        log.info("发送给前端的消息：" + json);
+                                                        WebSocketServer.sendMsg(json);
+                                                    } catch (Exception e) {
+                                                        log.info("生成错误", e);
+                                                    }
+
+                                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
+                                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
+
+                                                }
+
+                                                break;
+                                            case "2":
+                                                Float resultValueMeter = Float.valueOf(jsonObjectResult.get("resultValue").toString());
+                                                int warnRuleMeter = analyseDataOperateService.warnJudgement(resultValueMeter,
+                                                        tStdDevicemeteM.getHighLimit1(),
+                                                        tStdDevicemeteM.getLowLimit1(),
+                                                        tStdDevicemeteM.getHighLimit2(),
+                                                        tStdDevicemeteM.getLowLimit2());
+                                                if (warnRuleMeter > 0) {
+                                                    warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "数据异常");
+                                                    warnMap.put("warnTime", simpleDateFormat.format(new Date()));
+                                                    log.info("数字结果告警判断结果：" + warnRuleMeter);
+                                                    switch (warnRuleMeter) {
+                                                        case 1:
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
+                                                            warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
+                                                            break;
+                                                        case 2:
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
+                                                            warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1() - resultValueMeter));
+                                                            break;
+                                                        case 3:
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
+                                                            warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
+                                                            break;
+
+                                                        case 4:
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
+                                                            warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2() - resultValueMeter));
+                                                            break;
+                                                    }
+
+                                                    redisTemplate.opsForHash().putAll(warnName, warnMap);
+                                                    cruiseResultMap.put("isWarn", "1");
+                                                    log.info("告警Map:" + warnMap);
+
+                                                    // webSocket通知前端调用巡视监控的接口
+                                                    Map<String, Object> jasonMaps = new HashMap<>();
+                                                    jasonMaps.put("type", "newAlarm");
+                                                    jasonMaps.put("alarmName", warnMap.get("warnName"));
+                                                    jasonMaps.put("alarmTime", warnMap.get("warnTime"));
+                                                    jasonMaps.put("alarmContent", warnMap.get("warnContent"));
+                                                    String jsons = JSON.toJSONString(jasonMaps);
+                                                    log.info("发送给前端的消息：" + jsons);
+                                                    WebSocketServer.sendMsg(jsons);
+
+                                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
+                                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
+                                                }
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                } else {
+                                    cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
+                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
+                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
+                                    ABNORMAL.addAndGet(1);
+                                }
+                            }
+
+                            break;
+                        case 13669:
+                            String originResult = jsonObjectResult.get("resultValue").toString();
+                            String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
+                            if (resultValue != "null") {
+                                NORMAL.addAndGet(1);
+                                cruiseResultMap.put("resultNum", resultValue);
+                                cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
+                                cruiseResultMap.put("cruiseAbnormal", "--");
+                                //生成缺陷缓存信息（单一缺陷和多元缺陷）
+                                log.info("--------____--------生成缺陷缓存");
+                                String[] resultArr = resultValue.split("\\s+");
+                                if (resultArr.length == 1) {
+                                    log.info("--------____--------单一缺陷");
                                     Map<String, String> defectMap = new HashMap<>();
                                     String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
                                     defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
-                                    defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_type", resultArr[i]));
-                                    defectMap.put("defectContent", resultArr[i]);
+                                    defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_type", resultValue));
+                                    defectMap.put("defectContent", resultValue);
                                     defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                     defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
                                     TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
@@ -311,18 +298,38 @@ public class DataDealThread implements Runnable {
                                     defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
                                     defectMap.put("imagePath", cruiseResult.get("picpath").toString());
                                     redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
+                                } else if (resultArr.length > 1) {
+                                    log.info("--------____--------多元缺陷");
+                                    for (int i = 0; i < resultArr.length; i++) {
+                                        log.info("缺陷处理方法：" + resultArr[i]);
+                                        Map<String, String> defectMap = new HashMap<>();
+                                        String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
+                                        defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_type", resultArr[i]));
+                                        defectMap.put("defectContent", resultArr[i]);
+                                        defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
+                                        defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
+                                        TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
+                                        defectMap.put("customId", tStdDevicemete.getCustomId());
+                                        defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
+                                        defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
+                                        defectMap.put("imagePath", cruiseResult.get("picpath").toString());
+                                        redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
+                                    }
+
                                 }
 
+                            } else {
+                                cruiseResultMap.put("resultNum", "--");
+                                cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
+                                cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
+                                ABNORMAL.addAndGet(1);
                             }
 
-                        } else {
-                            cruiseResultMap.put("resultNum", "--");
-                            cruiseResultMap.put("cruiseResult",analyseDataOperateService.selectDictCode("cruise_result","异常"));
-                            cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                            ABNORMAL.addAndGet(1);
-                        }
-
-                        break;
+                            break;
+                    }
+                }catch (Exception e){
+                    log.error("告警/缺陷处理失败："+e);
                 }
 
                 cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
@@ -393,7 +400,11 @@ public class DataDealThread implements Runnable {
                 tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
                 tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
                 tCruiseDataResult.setEvaluationState(Integer.valueOf(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
-                tCruiseDataResult.setCruiseResult(Integer.valueOf(cruiseWorkedMap.get("cruiseResult").toString()));
+                if(cruiseWorkedMap.get("cruiseResult").toString().equals("--")){
+                    tCruiseDataResult.setCruiseResult(null);
+                }else {
+                    tCruiseDataResult.setCruiseResult(Integer.valueOf(cruiseWorkedMap.get("cruiseResult").toString()));
+                }
                 tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
                 tCruiseDataResult.setCreatetime(new Date());
                 tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());

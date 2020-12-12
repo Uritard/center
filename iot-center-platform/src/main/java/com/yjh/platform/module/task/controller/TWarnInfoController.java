@@ -279,12 +279,12 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "告警信息计数统计")
-    @RequestMapping(value = "/warnCountsNonIdentify",method = RequestMethod.GET)
+    @RequestMapping(value = "/warnCountsConfMode",method = RequestMethod.GET)
     public Result warnCountsNonIdentify(){
         Result result=new Result();
         Map<String,Integer> countResult=new HashMap<>();
         try{
-            countResult.put("count",tWarnInfoService.selectWarnCountsNonIdentify());
+            countResult.put("count",tWarnInfoService.warnCountsConfMode());
             result.setData(countResult);
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());

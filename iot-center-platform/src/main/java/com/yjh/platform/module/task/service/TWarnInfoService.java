@@ -238,10 +238,10 @@ public class TWarnInfoService{
 
     @Logs(title = "查询未审核的告警数量",code = "tWarnInfo")
     @Transactional(rollbackFor = Exception.class)
-    public Integer selectWarnCountsNonIdentify(){
+    public Integer warnCountsConfMode(){
         //总告警数量=redis中的数量+数据库中的数量
         Set<String> warnKeys=redisScan("warnInfo:");
-        Integer finalCounts=warnKeys.size()+tWarnInfoDao.selectWarnCountsNonIdentify();
+        Integer finalCounts=warnKeys.size()+tWarnInfoDao.warnCountsConfMode();
         return finalCounts;
     }
     //读批量redis

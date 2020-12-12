@@ -2,16 +2,21 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.controller.TCruiseTaskController;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TUnionTaskService;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -29,6 +34,8 @@ import javax.script.ScriptException;
  */
 @Service
 public class TCfgDataCurrentService {
+
+    private Logger log = LoggerFactory.getLogger(TCfgDataCurrentService.class);
 
     @Autowired
     private TCfgDataCurrentDao tCfgDataCurrentDao;
@@ -50,6 +57,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TCruiseTaskController tCruiseTaskController;
+
+    @Autowired
+    private TStdDeviceService tStdDeviceService;
 
     public static String meteValues(String commintValue){
         if("返回".equals(commintValue)){
@@ -191,6 +201,7 @@ public class TCfgDataCurrentService {
     @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "TCfgDataCurrent",content = "联动规则匹配")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws ScriptException {
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Set<Long> plans = new HashSet<>();//满足触发条件的预案
         Log cLogger = LogFactory.getLog(this.getClass());
         cLogger.info("清华方数据："+meteMap);
@@ -291,6 +302,16 @@ public class TCfgDataCurrentService {
             cLogger.info("联动开始执行");
             //联动记录插库
             tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
+            // TODO: 2020/12/12 待优化WB
+            // webSocket通知前端调用巡视监控的接口（任务完成）
+            Map<String, Object> jasonMap = new HashMap<>();
+            jasonMap.put("type", "newLinkage");
+            jasonMap.put("alarmName", tStdDeviceService.selectByUnionKeys(currents.get(0).getDeviceId(),currents.get(0).getCunstomId()).getDeviceName());
+            jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
+            jasonMap.put("alarmContent", "触发联动");
+            String json = JSON.toJSONString(jasonMap);
+            log.info("发送给前端的消息：" + json);
+            WebSocketServer.sendMsg(json);
 
         }
 

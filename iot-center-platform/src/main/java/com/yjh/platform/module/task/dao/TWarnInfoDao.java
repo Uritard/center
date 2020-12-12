@@ -56,5 +56,5 @@ public interface TWarnInfoDao {
     List<WarnStatistical> countWarnOnMonth(@Param(value = "startTime")String startTime,
                                             @Param(value = "endTime")String endTime);
     //查询未审核告警信息数量
-    Integer selectWarnCountsNonIdentify();
+    Integer warnCountsConfMode();
 }
