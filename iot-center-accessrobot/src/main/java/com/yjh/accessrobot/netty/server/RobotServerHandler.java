@@ -178,7 +178,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
-//        lookByte(bytes);//看指令
+        lookByte(bytes);//看指令
 ////
 
 //        System.arraycopy(bytes,bytes.length-2,endIdentifierByte,0,2);

@@ -58,6 +58,6 @@ public interface TRobotInfoDao {
     int insertTCruiseDataResult(TCruiseDataResult tCruiseDataResult);
     int insertTCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail);
     int updateTCruiseResult(TCruiseResult tCruiseResult);
-    int updateTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
+    int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
 
 }

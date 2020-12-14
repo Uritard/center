@@ -380,8 +380,8 @@ public class RobotService {
     }
     @Logs(title ="TCTR信息更新",code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int updateTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
-        return this.tRobotInfoDao.updateTCruiseTaskResult(tCruiseTaskResult);
+    public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
+        return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
     }
 }
 

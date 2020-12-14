@@ -357,8 +357,7 @@
         FROM
         t_defect_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
-        LEFT JOIN t_std_mete d on a.std_mete_id = d.std_mete_id
-        LEFT JOIN t_std_devicemete k on d.std_mete_id = k.mete_id
+        LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
         LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
