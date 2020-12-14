@@ -96,7 +96,8 @@ public class CameraConService {
             if (cameraType==205) {
                 transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
             } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
-            Runtime.getRuntime().exec(transUrl);
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
+//            Runtime.getRuntime().exec(transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
             String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
@@ -170,7 +171,8 @@ public class CameraConService {
                 if (cameraType==205) {
                     transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
                 } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
-                Runtime.getRuntime().exec(transUrl);
+                Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
+//                Runtime.getRuntime().exec(transUrl);
                 String[] rtmpUrls = transUrl.split("rtmp");
                 String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
                 String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
