@@ -96,8 +96,8 @@ public class CameraConService {
             if (cameraType==205) {
                 transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
             } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
-            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
-//            Runtime.getRuntime().exec(transUrl);
+            Runtime.getRuntime().exec(transUrl);
+            log.info("transUrl: "+transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
             String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
@@ -126,6 +126,7 @@ public class CameraConService {
             }
             log.info("livePath: "+livePath);
             String url = "ps -ef | grep ffmpeg | grep '"+ livePath +"' | grep -v 'grep'";
+            log.info("stopUrl: "+url);
             Process processForId=Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
             processForId.waitFor();
             BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
@@ -171,8 +172,8 @@ public class CameraConService {
                 if (cameraType==205) {
                     transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
                 } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
-                Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
-//                Runtime.getRuntime().exec(transUrl);
+                Runtime.getRuntime().exec(transUrl);
+                log.info("transUrl: "+transUrl);
                 String[] rtmpUrls = transUrl.split("rtmp");
                 String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
                 String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
@@ -390,6 +391,7 @@ public class CameraConService {
                 }
 
             }
+            log.info("channelStatusMap: "+channleStatusMap);
             return channleStatusMap;
         }
         channleStatusMap.put("errorMessage: " ,"userID is null");
