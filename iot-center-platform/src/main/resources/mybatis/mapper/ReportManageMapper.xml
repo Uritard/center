@@ -59,7 +59,7 @@
 		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
 		LEFT JOIN t_cruise_task_result_detail e on e.instance_id = d.instance_id
 		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
-		LEFT JOIN t_dict_business g on g.dict_code = f.state
+		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
 		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
 		LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
 		LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id
@@ -99,7 +99,7 @@
 		LEFT JOIN t_cruise_task_result_detail e on e.instance_id = d.instance_id
 		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
 		LEFT JOIN t_cruise_result q on q.task_result_id = e.task_result_id
-		LEFT JOIN t_dict_business g on g.dict_code = f.state
+		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
 		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
 		LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
 		LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id

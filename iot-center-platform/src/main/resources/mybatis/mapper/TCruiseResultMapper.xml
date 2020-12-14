@@ -102,7 +102,8 @@
             a.is_warn,
             b.instance_id,
             b.task_result_id,
-            d.task_id
+            d.task_id,
+            a.identify_result
         FROM
             t_cruise_data_result a,
             t_cruise_task_result_detail b,
