@@ -1,7 +1,9 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
@@ -83,16 +85,30 @@ public class TCruiseResultService{
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         log.info("judgeCondition是==="+judgeCondition);
-        int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
-        String taskId = judgeCondition.get("task_id").toString();
-        Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
-        log.info("查询的告警条件isWarn是==="+isWarn);
-        log.info("查询的告警条件taskId是==="+taskId);
-        log.info("查询的告警条件instanceId是==="+instanceId);
-        if ( isWarn == 1){
-            tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
+        if(judgeCondition.get("is_warn").toString() != null || judgeCondition.get("is_warn").toString().equals("")){
+            int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
+            String taskId = judgeCondition.get("task_id").toString();
+            Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
+            Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
+            log.info("人工审核的实际结果是==="+identifyResult);
+            log.info("查询的告警条件isWarn是==="+isWarn);
+            log.info("查询的告警条件taskId是==="+taskId);
+            log.info("查询的告警条件instanceId是==="+instanceId);
+            if ( isWarn == 1){
+                tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
+                if (identifyResult == 261){//结果正确
+                    tCruiseResultDao.updateWarnInfo2(taskId,instanceId);//更新告警表信息
+                    Long warnId = tCruiseResultDao.selectWarnId(taskId,instanceId);//根据任务和巡检点id查询告警id
+                    //给前端推webSocket
+                    Map<String,Object> jasonMap=new HashMap<>();
+                    jasonMap.put("type","finishedOneAlarm");
+                    jasonMap.put("alarmId",warnId);
+                    String json= JSON.toJSONString(jasonMap);
+                    System.out.println(("发送给前端的消息==="+json));
+                    WebSocketServer.sendMsg(json);
+                }
+            }
         }
-
         //获取审核后的信息
         String taskResultId1  = cruiseManualReview.getTaskResultId();
         List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskResultId1);

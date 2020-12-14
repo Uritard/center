@@ -420,6 +420,24 @@
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
 
     </update>
+    <update id="updateWarnInfo2">
+        UPDATE t_warn_info a <set>
+        a.if_warn_disable = 1,
+        a.deal_type = 286,
+        a.deal_info = "程序异常,告警误报"
+    </set>
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+        and a.instance_id = #{instanceId,jdbcType = BIGINT}
+    </update>
+    <select id="selectWarnId" resultType="java.lang.Long">
+        SELECT a.warn_id
+        FROM
+		    t_warn_info a
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+        and a.instance_id = #{instanceId,jdbcType = BIGINT}
+    </select>
 
     <select id="selectForTaskId" resultType="com.yjh.platform.module.task.entity.TCruiseResult">
         select
