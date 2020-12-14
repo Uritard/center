@@ -92,7 +92,7 @@ public class CruiseResultDealThread implements Runnable{
                 tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
                 normal = normal + 1;
                 tCruiseTaskResultMap.put("cruiseResult","246");//正常
-                tCruiseTaskResultMap.put("cruiseAbnormal","");
+                tCruiseTaskResultMap.put("cruiseAbnormal","null");
             }else {
                 tCruiseTaskResultMap.put("resultNum","null");
                 tCruiseTaskResultMap.put("cruiseResult","247");//异常
