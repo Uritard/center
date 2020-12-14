@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.StyledEditorKit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -124,9 +126,9 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.selectDictCode(colName, dictNote);
     }
 
-    @Logs(title = "查询字典内容",code = "Analysis")
+    @Logs(title = "查询字典内容", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public String selectDictNote(String dictCode,String colName){
+    public String selectDictNote(String dictCode, String colName) {
         return analyseDataOperateDao.selectDictNote(dictCode, colName);
     }
 
@@ -160,59 +162,80 @@ public class AnalyseDataOperateService {
                              Float lowLimit3,
                              Float highLimit4,
                              Float lowLimit4) {
-        log.info("value"+value);
-        log.info("highLimit1"+highLimit1);
-        log.info("lowLimit1"+lowLimit1);
-        log.info("highLimit2"+highLimit2);
-        log.info("lowLimit2"+lowLimit2);
 
-        if(value<highLimit1 && value>lowLimit1){
-            return 0;//正常
-        }else if (value<=lowLimit4 || value>=highLimit4){
-                return 4;//危急
-        }else if(value<=lowLimit3 || value>=highLimit3){
+        Boolean emergency1 = false;
+        Boolean emergency2 = false;
+        Boolean worse1 = false;
+        Boolean worse2 = false;
+        Boolean general1 = false;
+        Boolean general2 = false;
+        Boolean warns1 = false;
+        Boolean warns2 = false;
+
+        if (Objects.nonNull(lowLimit4))
+            emergency1 = value <= lowLimit4;
+        if (Objects.nonNull(highLimit4))
+            emergency2 = value >= highLimit4;
+        if (Objects.nonNull(lowLimit3))
+            worse1 = value <= lowLimit3;
+        if (Objects.nonNull(highLimit3))
+            worse2 = value >= highLimit3;
+        if (Objects.nonNull(lowLimit2))
+            general1 = value <= lowLimit2;
+        if (Objects.nonNull(highLimit2))
+            general2 = value >= highLimit2;
+        if (Objects.nonNull(lowLimit1))
+            warns1 = value <= lowLimit1;
+        if (Objects.nonNull(highLimit1))
+            warns2 = value >= highLimit1;
+
+        if (emergency1 || emergency2) {
+            return 4;//危急
+        } else if (worse1 || worse2) {
             return 3;//严重
-        }else if(value<=lowLimit2 || value>=highLimit2){
+        } else if (general1 || general2) {
             return 2;//一般
-        }else if(value<=lowLimit1 || value>=highLimit1){
+        } else if (warns1 || warns2) {
             return 1;//预警
+        } else {
+            return 0;//正常
         }
-        return 0;
+
     }
 
-    @Logs(title = "表计识别-告警判断-文字结果判断",code = "")
+    @Logs(title = "表计识别-告警判断-文字结果判断", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public int warnJudgementTelesignaling(String value,String stateOne,String stateTwo,Integer alarmState){
-        log.info("value"+value);
-        log.info("stateOne"+stateOne);
-        log.info("stateTwo"+stateTwo);
-        log.info("alarmState"+alarmState);
-        int finalResult=0;//0-非告警 1-告警
-            switch (alarmState){
-                case 0:
-                    if(value.equals(stateOne)){
-                        finalResult=1;
-                    }else {
-                       finalResult=0;
-                    }
-                    break;
-                case 1:
-                    if(value.equals(stateTwo)){
-                       finalResult=1;
-                    }else {
-                       finalResult=0;
-                    }
-                    break;
-            }
-            return finalResult;
+    public int warnJudgementTelesignaling(String value, String stateOne, String stateTwo, Integer alarmState) {
+        log.info("value" + value);
+        log.info("stateOne" + stateOne);
+        log.info("stateTwo" + stateTwo);
+        log.info("alarmState" + alarmState);
+        int finalResult = 0;//0-非告警 1-告警
+        switch (alarmState) {
+            case 0:
+                if (value.equals(stateOne)) {
+                    finalResult = 1;
+                } else {
+                    finalResult = 0;
+                }
+                break;
+            case 1:
+                if (value.equals(stateTwo)) {
+                    finalResult = 1;
+                } else {
+                    finalResult = 0;
+                }
+                break;
+        }
+        return finalResult;
     }
 
     // TODO: 2020/11/21 表计识别结果告警判断--文字结果判断
-    
-    
+
+
     @Logs(title = "缺陷识别结果解析", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public String  resolveDefectResult(String resultValue) {
+    public String resolveDefectResult(String resultValue) {
         log.info("----缺陷识别结果解析---resultValue:" + resultValue);
         String defectValue = "";
         String value = resultValue;

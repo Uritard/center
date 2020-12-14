@@ -104,28 +104,54 @@ public class HelloController {
 
         Long endTime=System.currentTimeMillis();
 
-        Float value=Float.valueOf("1");
+        Float value=Float.valueOf("16");
         Float highLimit1=Float.valueOf("9.4");
-        Float lowLimit1=null;
+        Float lowLimit1=Float.valueOf("5");
         Float highLimit2=Float.valueOf("15.3");
-        Float lowLimit2=Float.valueOf("4.1");
-        Float highLimit3=Float.valueOf("20");
-        Float lowLimit3=Float.valueOf("2.2");
-        Float highLimit4=Float.valueOf("30");
-        Float lowLimit4=Float.valueOf("1.1");
+        Float lowLimit2=null;
+        Float highLimit3=null;
+        Float lowLimit3=null;
+        Float highLimit4=null;
+        Float lowLimit4=null;
 
-
-        if(value<highLimit1 && value>lowLimit1){
-           log.info("正常");
-        }else if (value<=lowLimit4 || value>=highLimit4){
-            log.info("危急");
-        }else if(value<=lowLimit3 || value>=highLimit3){
-            log.info("严重");
-        }else if(value<=lowLimit2 || value>=highLimit2){
-            log.info("一般");
-        }else if(value<=lowLimit1 || value>=highLimit1){
-            log.info("预警");
-        }
+//        Boolean emergency1 = false;
+//        Boolean emergency2 = false;
+//        Boolean worse1 = false;
+//        Boolean worse2 = false;
+//        Boolean general1 = false;
+//        Boolean general2 = false;
+//        Boolean warns1 = false;
+//        Boolean warns2 = false;
+//
+//        if (Objects.nonNull(lowLimit4))
+//            emergency1 = value <= lowLimit4;
+//        if (Objects.nonNull(highLimit4))
+//            emergency2 = value >= highLimit4;
+//        if (Objects.nonNull(lowLimit3))
+//            worse1 = value <= lowLimit3;
+//        if (Objects.nonNull(highLimit3))
+//            worse2 = value >= highLimit3;
+//        if (Objects.nonNull(lowLimit2))
+//            general1 = value <= lowLimit2;
+//        if (Objects.nonNull(highLimit2))
+//            general2 = value >= highLimit2;
+//        if (Objects.nonNull(lowLimit1))
+//            warns1 = value <= lowLimit1;
+//        if (Objects.nonNull(highLimit1))
+//            warns2 = value >= highLimit1;
+//
+//
+//        if (emergency1 || emergency2) {
+//            log.info("危急");
+//        } else if (worse1 || worse2) {
+//            log.info("严重");
+//        } else if (general1 || general2) {
+//            log.info("一般");
+//        } else if (warns1 || warns2) {
+//            log.info("预警");
+//        } else {
+//            log.info("正常");
+//        }
         return result;
     }
 

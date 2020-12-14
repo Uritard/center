@@ -37,11 +37,11 @@ public class DataDealThread implements Runnable {
     private AnalyseDataOperateService analyseDataOperateService;
     private ChannelHandlerContext ctx;
 
-    public DataDealThread(String body,RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService,ChannelHandlerContext ctx) {
-        this.analyseDataOperateService=analyseDataOperateService;
-        this.redisTemplate=redisTemplate;
+    public DataDealThread(String body, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, ChannelHandlerContext ctx) {
+        this.analyseDataOperateService = analyseDataOperateService;
+        this.redisTemplate = redisTemplate;
         this.body = body;
-        this.ctx=ctx;
+        this.ctx = ctx;
     }
 
     //读批量redis
@@ -71,7 +71,6 @@ public class DataDealThread implements Runnable {
     }
 
 
-
     @SneakyThrows
     @Override
     public void run() {
@@ -80,8 +79,8 @@ public class DataDealThread implements Runnable {
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
         JSONObject jsonObject = JSON.parseObject(body);
         log.info("JSON对象1：" + jsonObject);
-        if(jsonObject.get("msgType").toString().equals("4")){
-            log.info("注册返回:"+jsonObject);
+        if (jsonObject.get("msgType").toString().equals("4")) {
+            log.info("注册返回:" + jsonObject);
         }
         if (jsonObject.get("msgType").toString().equals("2")) {
             JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
@@ -149,7 +148,6 @@ public class DataDealThread implements Runnable {
                                         //初始化告警信息redis表
                                         String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
                                         Map<String, String> warnMap = new HashMap<>();
-                                        warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
                                         warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
                                         warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
                                         warnMap.put("customId", tCruisePointInstance.getCustomId());
@@ -175,6 +173,7 @@ public class DataDealThread implements Runnable {
                                                 log.info("告警结果：" + warnRuleTeleSigning);
                                                 if (warnRuleTeleSigning == 1) {
                                                     log.info("告警信息生成");
+                                                    warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
                                                     warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "状态异常");
                                                     warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                     if (tStdDevicemeteM.getAlarmState() == 0) {
@@ -224,36 +223,40 @@ public class DataDealThread implements Runnable {
                                                     log.info("数字结果告警判断结果：" + warnRuleMeter);
                                                     switch (warnRuleMeter) {
                                                         case 1:
+                                                            warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level","预警"));
                                                             warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "预警");
-                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit1()){
+                                                            if (resultValueMeter >= tStdDevicemeteM.getHighLimit1()) {
                                                                 warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
-                                                            }else {
-                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1()-resultValueMeter));
+                                                            } else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1() - resultValueMeter));
                                                             }
                                                             break;
                                                         case 2:
+                                                            warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level","一般告警"));
                                                             warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "一般");
-                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit2()){
+                                                            if (resultValueMeter >= tStdDevicemeteM.getHighLimit2()) {
                                                                 warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
-                                                            }else {
-                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2()-resultValueMeter));
+                                                            } else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2() - resultValueMeter));
                                                             }
                                                             break;
                                                         case 3:
+                                                            warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level","严重告警"));
                                                             warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "严重");
-                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit3()){
+                                                            if (resultValueMeter >= tStdDevicemeteM.getHighLimit3()) {
                                                                 warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit3()));
-                                                            }else {
-                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit3()-resultValueMeter));
+                                                            } else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit3() - resultValueMeter));
                                                             }
                                                             break;
 
                                                         case 4:
+                                                            warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level","危急告警"));
                                                             warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "危急");
-                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit4()){
+                                                            if (resultValueMeter >= tStdDevicemeteM.getHighLimit4()) {
                                                                 warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit4()));
-                                                            }else {
-                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit4()-resultValueMeter));
+                                                            } else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit4() - resultValueMeter));
                                                             }
                                                             break;
                                                     }
@@ -280,7 +283,7 @@ public class DataDealThread implements Runnable {
                                             default:
                                                 break;
                                         }
-                                    }else {
+                                    } else {
                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                         cruiseResultMap.put("cruiseAbnormal", "--");
                                         NORMAL.addAndGet(1);
@@ -350,8 +353,8 @@ public class DataDealThread implements Runnable {
 
                             break;
                     }
-                }catch (Exception e){
-                    log.error("告警/缺陷处理失败："+e);
+                } catch (Exception e) {
+                    log.error("告警/缺陷处理失败：" + e);
                 }
 
                 cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
@@ -502,8 +505,8 @@ public class DataDealThread implements Runnable {
                 }
                 log.info("两表结束插入");
                 cruiseKeys.clear();
-            }catch (Exception e){
-                log.error("插表错误"+e);
+            } catch (Exception e) {
+                log.error("插表错误" + e);
             }
 
 
@@ -519,7 +522,7 @@ public class DataDealThread implements Runnable {
             //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
             ABNORMAL.addAndGet(abnormal);
             NORMAL.addAndGet(normal);
-            if (ABNORMAL.get()+NORMAL.get()==total) {
+            if (ABNORMAL.get() + NORMAL.get() == total) {
                 //TCTR开始
 
                 Thread.sleep(15000);
@@ -562,7 +565,6 @@ public class DataDealThread implements Runnable {
             NORMAL.set(0);
 
         }
-
 
 
     }
