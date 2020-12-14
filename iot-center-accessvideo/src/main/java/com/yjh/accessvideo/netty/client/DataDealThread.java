@@ -138,9 +138,6 @@ public class DataDealThread implements Runnable {
                             } else {
                                 if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
                                     cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
-                                    cruiseResultMap.put("cruiseAbnormal", "--");
-                                    NORMAL.addAndGet(1);
 
                                     log.info("开始告警预处理");
                                     TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
@@ -206,9 +203,9 @@ public class DataDealThread implements Runnable {
 
                                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
+                                                    ABNORMAL.addAndGet(1);
 
                                                 }
-
                                                 break;
                                             case "2":
                                                 Float resultValueMeter = Float.valueOf(jsonObjectResult.get("resultValue").toString());
@@ -216,28 +213,48 @@ public class DataDealThread implements Runnable {
                                                         tStdDevicemeteM.getHighLimit1(),
                                                         tStdDevicemeteM.getLowLimit1(),
                                                         tStdDevicemeteM.getHighLimit2(),
-                                                        tStdDevicemeteM.getLowLimit2());
+                                                        tStdDevicemeteM.getLowLimit2(),
+                                                        tStdDevicemeteM.getHighLimit3(),
+                                                        tStdDevicemeteM.getLowLimit3(),
+                                                        tStdDevicemeteM.getHighLimit4(),
+                                                        tStdDevicemeteM.getLowLimit4());
                                                 if (warnRuleMeter > 0) {
                                                     warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "数据异常");
                                                     warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                     log.info("数字结果告警判断结果：" + warnRuleMeter);
                                                     switch (warnRuleMeter) {
                                                         case 1:
-                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过高");
-                                                            warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "预警");
+                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit1()){
+                                                                warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
+                                                            }else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1()-resultValueMeter));
+                                                            }
                                                             break;
                                                         case 2:
-                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "过低");
-                                                            warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit1() - resultValueMeter));
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "一般");
+                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit2()){
+                                                                warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
+                                                            }else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2()-resultValueMeter));
+                                                            }
                                                             break;
                                                         case 3:
-                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超高");
-                                                            warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "严重");
+                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit3()){
+                                                                warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit3()));
+                                                            }else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit3()-resultValueMeter));
+                                                            }
                                                             break;
 
                                                         case 4:
-                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "超低");
-                                                            warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit2() - resultValueMeter));
+                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "危急");
+                                                            if(resultValueMeter>=tStdDevicemeteM.getHighLimit4()){
+                                                                warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit4()));
+                                                            }else {
+                                                                warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit4()-resultValueMeter));
+                                                            }
                                                             break;
                                                     }
 
@@ -257,11 +274,16 @@ public class DataDealThread implements Runnable {
 
                                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
+                                                    ABNORMAL.addAndGet(1);
                                                 }
                                                 break;
                                             default:
                                                 break;
                                         }
+                                    }else {
+                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
+                                        cruiseResultMap.put("cruiseAbnormal", "--");
+                                        NORMAL.addAndGet(1);
                                     }
                                 } else {
                                     cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
@@ -366,119 +388,123 @@ public class DataDealThread implements Runnable {
 
         if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1") && redisTemplate.opsForList().index("analysisList:" + TASKID, 1).equals("0")) {  //满足插库条件
             log.info("任务结束-开始数据存储");
-            //满足条件先插巡视点数据
-            List<TCruiseTaskResultDetail> detailList = new ArrayList<>();//TCTRD List对象
-            List<TCruiseDataResult> dataList = new ArrayList<>();//TCDR List对象
-            List<TDefectInfo> defectList = new ArrayList<>();//TDI List对象
-            List<TWarnInfo> warnList = new ArrayList<>();//IWI List对象
-            Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + TASKID);
-            log.info("cruisekeys:" + cruiseKeys);
-            for (String cruiseKey : cruiseKeys) {
-                Map<String, Object> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
-                //TCTRD
-                log.info("TCTRD开始");
-                TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
-                tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
-                tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
-                tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
-                tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
-                tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
-                tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
-                tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
-                detailList.add(tCruiseTaskResultDetail);
-
-                //TCDR
-                log.info("TCRD开始");
-                TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
-                tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
-                tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
-                tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
-                tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
-                tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
-                tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
-                tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
-                tCruiseDataResult.setEvaluationState(Integer.valueOf(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
-                if(cruiseWorkedMap.get("cruiseResult").toString().equals("--")){
-                    tCruiseDataResult.setCruiseResult(null);
-                }else {
-                    tCruiseDataResult.setCruiseResult(Integer.valueOf(cruiseWorkedMap.get("cruiseResult").toString()));
-                }
-                tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
-                tCruiseDataResult.setCreatetime(new Date());
-                tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
-                tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
-                dataList.add(tCruiseDataResult);
-
-            }
-
             try {
-                Set<String> warnKey = redisScan("warnInfo:" + TASKID);
-                for (String key : warnKey) {
-                    Map<String, Object> warnMap = redisTemplate.opsForHash().entries(key);
-                    log.info("TWI开始");
-                    TWarnInfo tWarnInfo = new TWarnInfo();
-                    tWarnInfo.setWarnLevel(Integer.valueOf(warnMap.get("warnLevel").toString()));
-                    tWarnInfo.setWarnType(Integer.valueOf(warnMap.get("warnType").toString()));
-                    tWarnInfo.setDeviceId(Long.valueOf(warnMap.get("deviceId").toString()));
-                    tWarnInfo.setCunstomId(warnMap.get("customId").toString());
-                    tWarnInfo.setInstanceId(Long.valueOf(warnMap.get("instanceId").toString()));
-                    tWarnInfo.setStdMeteId(Long.valueOf(warnMap.get("stdMeteId").toString()));
-                    tWarnInfo.setTaskId(warnMap.get("taskId").toString());
-                    tWarnInfo.setConfMode(Integer.valueOf(warnMap.get("confMode").toString()));
-                    tWarnInfo.setIfWarnDisable(Integer.valueOf(warnMap.get("ifWarnDisable").toString()));
-                    tWarnInfo.setValue(warnMap.get("value").toString());
-                    tWarnInfo.setImagePath(warnMap.get("imagePath").toString());
-                    tWarnInfo.setAlarmSource(Integer.valueOf(warnMap.get("alarmSource").toString()));
-                    tWarnInfo.setWarnName(warnMap.get("warnName").toString());
-                    tWarnInfo.setOutRange(warnMap.get("outRange").toString());
-                    tWarnInfo.setWarnContent(warnMap.get("warnContent").toString());
-                    tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warnMap.get("warnTime").toString()));
-                    log.info("告警数据对象：" + tWarnInfo);
-                    warnList.add(tWarnInfo);
+                //满足条件先插巡视点数据
+                List<TCruiseTaskResultDetail> detailList = new ArrayList<>();//TCTRD List对象
+                List<TCruiseDataResult> dataList = new ArrayList<>();//TCDR List对象
+                List<TDefectInfo> defectList = new ArrayList<>();//TDI List对象
+                List<TWarnInfo> warnList = new ArrayList<>();//IWI List对象
+                Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + TASKID);
+                log.info("cruisekeys:" + cruiseKeys);
+                for (String cruiseKey : cruiseKeys) {
+                    Map<String, Object> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
+                    //TCTRD
+                    log.info("TCTRD开始");
+                    TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                    tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+                    tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
+                    tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
+                    tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
+                    tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
+                    tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
+                    tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
+                    detailList.add(tCruiseTaskResultDetail);
+
+                    //TCDR
+                    log.info("TCRDR开始");
+                    TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                    tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                    tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
+                    tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
+                    tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
+                    tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
+                    tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
+                    tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
+                    tCruiseDataResult.setEvaluationState(Integer.valueOf(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
+                    tCruiseDataResult.setCruiseResult(Integer.valueOf(cruiseWorkedMap.get("cruiseResult").toString()));
+                    if (cruiseWorkedMap.get("cruiseAbnormal").toString().equals("--")) {
+                        tCruiseDataResult.setCruiseAbnormal(null);
+                    } else {
+                        tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
+                    }
+                    tCruiseDataResult.setCreatetime(new Date());
+                    tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
+                    tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
+                    dataList.add(tCruiseDataResult);
+
                 }
-            } catch (Exception e) {
-                log.error("告警信息入库失败" + e);
-            }
 
-
-            Set<String> defectKey = redisScan("defectInfo:" + TASKID);
-            for (String key : defectKey) {
-                Map<String, Object> defectMap = redisTemplate.opsForHash().entries(key);
-                log.info("TDI开始");
-                TDefectInfo tDefectInfo = new TDefectInfo();
-                tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
-                tDefectInfo.setDefectTime(new Date());
-                tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
-                tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
-                tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
-                tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
-                tDefectInfo.setCunstomId(defectMap.get("customId").toString());
-                tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
-                tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
-                tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
-                defectList.add(tDefectInfo);
-            }
-
-            //批量插入两表
-
-            log.info("两表开始插入");
-            analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
-            analyseDataOperateService.batchInsertCruiseDataResult(dataList);
-            if (warnList.size() > 0) {
-                analyseDataOperateService.batchInsertWarnInfo(warnList);
-                //清空redis中的告警信息
-                Set<String> warnKeys = redisScan("warnInfo:");
-                for (String key : warnKeys) {
-                    redisTemplate.delete(key);
+                try {
+                    Set<String> warnKey = redisScan("warnInfo:" + TASKID);
+                    for (String key : warnKey) {
+                        Map<String, Object> warnMap = redisTemplate.opsForHash().entries(key);
+                        log.info("TWI开始");
+                        TWarnInfo tWarnInfo = new TWarnInfo();
+                        tWarnInfo.setWarnLevel(Integer.valueOf(warnMap.get("warnLevel").toString()));
+                        tWarnInfo.setWarnType(Integer.valueOf(warnMap.get("warnType").toString()));
+                        tWarnInfo.setDeviceId(Long.valueOf(warnMap.get("deviceId").toString()));
+                        tWarnInfo.setCunstomId(warnMap.get("customId").toString());
+                        tWarnInfo.setInstanceId(Long.valueOf(warnMap.get("instanceId").toString()));
+                        tWarnInfo.setStdMeteId(Long.valueOf(warnMap.get("stdMeteId").toString()));
+                        tWarnInfo.setTaskId(warnMap.get("taskId").toString());
+                        tWarnInfo.setConfMode(Integer.valueOf(warnMap.get("confMode").toString()));
+                        tWarnInfo.setIfWarnDisable(Integer.valueOf(warnMap.get("ifWarnDisable").toString()));
+                        tWarnInfo.setValue(warnMap.get("value").toString());
+                        tWarnInfo.setImagePath(warnMap.get("imagePath").toString());
+                        tWarnInfo.setAlarmSource(Integer.valueOf(warnMap.get("alarmSource").toString()));
+                        tWarnInfo.setWarnName(warnMap.get("warnName").toString());
+                        tWarnInfo.setOutRange(warnMap.get("outRange").toString());
+                        tWarnInfo.setWarnContent(warnMap.get("warnContent").toString());
+                        tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warnMap.get("warnTime").toString()));
+                        log.info("告警数据对象：" + tWarnInfo);
+                        warnList.add(tWarnInfo);
+                    }
+                } catch (Exception e) {
+                    log.error("告警信息入库失败" + e);
                 }
+
+
+                Set<String> defectKey = redisScan("defectInfo:" + TASKID);
+                for (String key : defectKey) {
+                    Map<String, Object> defectMap = redisTemplate.opsForHash().entries(key);
+                    log.info("TDI开始");
+                    TDefectInfo tDefectInfo = new TDefectInfo();
+                    tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
+                    tDefectInfo.setDefectTime(new Date());
+                    tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
+                    tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
+                    tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
+                    tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
+                    tDefectInfo.setCunstomId(defectMap.get("customId").toString());
+                    tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
+                    tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
+                    tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
+                    defectList.add(tDefectInfo);
+                }
+
+                //批量插入两表
+
+                log.info("两表开始插入");
+                analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
+                analyseDataOperateService.batchInsertCruiseDataResult(dataList);
+                if (warnList.size() > 0) {
+                    analyseDataOperateService.batchInsertWarnInfo(warnList);
+                    //清空redis中的告警信息
+                    Set<String> warnKeys = redisScan("warnInfo:");
+                    for (String key : warnKeys) {
+                        redisTemplate.delete(key);
+                    }
+                }
+                if (defectList.size() > 0) {
+                    analyseDataOperateService.batchInsertDefectInfo(defectList);
+                }
+                log.info("两表结束插入");
+                cruiseKeys.clear();
+            }catch (Exception e){
+                log.error("插表错误"+e);
             }
-            if (defectList.size() > 0) {
-                analyseDataOperateService.batchInsertDefectInfo(defectList);
-            }
-            log.info("两表结束插入");
-            cruiseKeys.clear();
 
 
             // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作

@@ -155,23 +155,29 @@ public class AnalyseDataOperateService {
                              Float highLimit1,
                              Float lowLimit1,
                              Float highLimit2,
-                             Float lowLimit2) {
+                             Float lowLimit2,
+                             Float highLimit3,
+                             Float lowLimit3,
+                             Float highLimit4,
+                             Float lowLimit4) {
         log.info("value"+value);
         log.info("highLimit1"+highLimit1);
         log.info("lowLimit1"+lowLimit1);
         log.info("highLimit2"+highLimit2);
         log.info("lowLimit2"+lowLimit2);
-        if (value > highLimit1 && value < highLimit2) {
-            return 1; //过高
-        } else if (value < lowLimit1 && value > lowLimit2) {
-            return 2; //过低
-        } else if (value > highLimit2) {
-            return 3; //超高
-        } else if (value < lowLimit2) {
-            return 4; //超低
-        } else
-            return 0;
 
+        if(value<highLimit1 && value>lowLimit1){
+            return 0;//正常
+        }else if (value<=lowLimit4 || value>=highLimit4){
+                return 4;//危急
+        }else if(value<=lowLimit3 || value>=highLimit3){
+            return 3;//严重
+        }else if(value<=lowLimit2 || value>=highLimit2){
+            return 2;//一般
+        }else if(value<=lowLimit1 || value>=highLimit1){
+            return 1;//预警
+        }
+        return 0;
     }
 
     @Logs(title = "表计识别-告警判断-文字结果判断",code = "")

@@ -105,6 +105,28 @@ public class HelloController {
 
         Long endTime=System.currentTimeMillis();
 
+        Float value=Float.valueOf("1");
+        Float highLimit1=Float.valueOf("9.4");
+        Float lowLimit1=null;
+        Float highLimit2=Float.valueOf("15.3");
+        Float lowLimit2=Float.valueOf("4.1");
+        Float highLimit3=Float.valueOf("20");
+        Float lowLimit3=Float.valueOf("2.2");
+        Float highLimit4=Float.valueOf("30");
+        Float lowLimit4=Float.valueOf("1.1");
+
+
+        if(value<highLimit1 && value>lowLimit1){
+           log.info("正常");
+        }else if (value<=lowLimit4 || value>=highLimit4){
+            log.info("危急");
+        }else if(value<=lowLimit3 || value>=highLimit3){
+            log.info("严重");
+        }else if(value<=lowLimit2 || value>=highLimit2){
+            log.info("一般");
+        }else if(value<=lowLimit1 || value>=highLimit1){
+            log.info("预警");
+        }
 
         return result;
     }

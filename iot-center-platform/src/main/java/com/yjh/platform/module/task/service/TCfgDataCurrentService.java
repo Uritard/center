@@ -303,15 +303,15 @@ public class TCfgDataCurrentService {
             //联动记录插库
             tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
             // TODO: 2020/12/12 待优化WB
-            // webSocket通知前端调用巡视监控的接口（任务完成）
-            Map<String, Object> jasonMap = new HashMap<>();
-            jasonMap.put("type", "newLinkage");
-            jasonMap.put("alarmName", tStdDeviceService.selectByUnionKeys(currents.get(0).getDeviceId(),currents.get(0).getCunstomId()).getDeviceName());
-            jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
-            jasonMap.put("alarmContent", "触发联动");
-            String json = JSON.toJSONString(jasonMap);
-            log.info("发送给前端的消息：" + json);
-            WebSocketServer.sendMsg(json);
+//            // webSocket通知前端调用巡视监控的接口（任务完成）
+//            Map<String, Object> jasonMap = new HashMap<>();
+//            jasonMap.put("type", "newLinkage");
+//            jasonMap.put("alarmName", tStdDeviceService.selectByUnionKeys(currents.get(0).getDeviceId(),currents.get(0).getCunstomId()).getDeviceName());
+//            jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
+//            jasonMap.put("alarmContent", "触发联动");
+//            String json = JSON.toJSONString(jasonMap);
+//            log.info("发送给前端的消息：" + json);
+//            WebSocketServer.sendMsg(json);
 
         }
 
