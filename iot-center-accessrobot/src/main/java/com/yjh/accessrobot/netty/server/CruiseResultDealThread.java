@@ -216,12 +216,12 @@ public class CruiseResultDealThread implements Runnable{
                 }
                 log.info("tCTRDList的内容是==="+tCTRDList);
                 log.info("tCDRList的内容是==="+tCDRList);
-                /*//批量插入TCTRD库
+                //批量插入TCTRD库
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
                 log.info("res1的内容是==="+res1);
                 //批量插入TCDR库
                 int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
-                log.info("res2的内容是==="+res2);*/
+                log.info("res2的内容是==="+res2);
 
                 //判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表
 
@@ -272,7 +272,7 @@ public class CruiseResultDealThread implements Runnable{
                             .setCState(cState);//任务状态
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     //更新TCR表
-//                    StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+                    StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 
                     // webSocket通知前端调用巡视监控的接口（任务完成）
                     /*Map<String, Object> jasonMap = new HashMap<>();
