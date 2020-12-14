@@ -1,19 +1,18 @@
 package com.yjh.logs.module.log.controller;
 
+import com.yjh.logs.commons.utils.RandomUtil;
 import com.yjh.logs.module.log.entity.SysLogsTime;
 import com.yjh.logs.module.log.service.SysLogsService;
 import com.yjh.logs.module.log.entity.SysLogs;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
+
 import io.swagger.annotations.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 import com.yjh.logs.commons.result.Result;
 import com.yjh.logs.commons.result.ResultCodeEnum;
 import com.yjh.logs.commons.result.BusinessException;
@@ -60,8 +59,13 @@ public class SysLogsController {
             sysLogs.setContent(content);
             sysLogs.setUserId(userId);
             sysLogs.setUserName(userName);
-
-            result.setData(sysLogsService.insert(sysLogs));
+            Random random = new Random();
+            new Thread(() -> {
+                String mathRandom = String.valueOf(random.nextInt(40000));
+                long mathLong = Long.valueOf(mathRandom);
+                try { Thread.sleep(mathLong); } catch (Exception e) {e.getMessage();}
+                result.setData(sysLogsService.insert(sysLogs));
+            }).start();
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

@@ -127,7 +127,7 @@ public class LogsAspect {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-//                serviceRestTemplate.postForObject(LOG_URL, params, String.class);
+                serviceRestTemplate.postForObject(LOG_URL, params, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
