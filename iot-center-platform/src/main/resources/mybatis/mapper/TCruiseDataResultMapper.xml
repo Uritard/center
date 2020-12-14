@@ -268,7 +268,7 @@
     FROM
         t_cruise_point_instance a
     LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
-    LEFT JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
+    JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
     LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code
     AND f.col_name = 'cruise_result'
     LEFT JOIN t_dict_business k ON d.identify_result=k.dict_code and k.col_name='identify_result'

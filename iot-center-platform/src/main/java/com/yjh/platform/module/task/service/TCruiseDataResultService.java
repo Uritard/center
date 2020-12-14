@@ -92,15 +92,16 @@ public class TCruiseDataResultService{
     public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId)  {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos;
         //判断deviceId是否为空 决定 全查/条件查
-        if(deviceId==null){
+        if(Objects.isNull(deviceId)){
             cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMete();
+            log.info("执行完成");
         }else {
             cruiseResultAnalMeteInfos=tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceId);
         }
      //获取同一设备下的有巡检结果的标准测点
 
      for(CruiseResultAnalMeteInfo deviceInfo:cruiseResultAnalMeteInfos){
-
+             log.info("设备信息："+deviceInfo);
              //通过测点ID获取相应的符合条件的巡检点结果
              CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo=tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(),deviceInfo.getDeviceMeteId());
              log.info("CrusieResultAnalMeteInfo:"+cruiseResultAnalMeteInfo);

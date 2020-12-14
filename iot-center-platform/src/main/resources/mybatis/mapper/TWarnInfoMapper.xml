@@ -543,7 +543,7 @@
         <if test="warnId != null and warnId != ''"> and warn_id = #{warnId, jdbcType=BIGINT}</if>
     </select>
 
-    <select id="warnCountsConfMode" resultType="java.lang.Integer">
+    <select id="warnCountsNonIdentify" resultType="java.lang.Integer">
         SELECT
             COUNT(warn_id)
         FROM
