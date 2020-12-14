@@ -69,20 +69,26 @@ public class RobotService {
     }
     @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotTransfer(String robotCode){
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("Server01")
-                .setReceiveCode(robotCode)
-                .setCode("省检018")
-                .setTime(sdf.format(new Date()))
-                .setType("61")
-                .setCommand("1");
-        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-        log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
-        //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString,robotCode));
-
+    public String feignRobotTransfer(){
+        //查询数据库所有的robotCode
+        List<String> robotCodeList = tRobotInfoDao.selectAllRobotCode();
+        for (String robotCode : robotCodeList){
+            SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+            XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                    .setSendCode("Server01")
+                    .setReceiveCode(robotCode)
+                    .setCode("省检018")
+                    .setTime(sdf.format(new Date()))
+                    .setType("61")
+                    .setCommand("1");
+            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+            log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
+            //根据不同的机器人对应不同的管道发送指令
+            RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
+            if (sendId != null){
+                sendId.SendHeartBeat(generateByteOrder(xmlString,robotCode));
+            }
+        }
         return "success";
     }
     //生成发送byte指令，附带测试

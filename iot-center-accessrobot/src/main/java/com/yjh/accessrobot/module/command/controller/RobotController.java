@@ -55,10 +55,10 @@ public class RobotController {
     }
     @ApiOperation(value = "发送模型同步指令接口")
     @RequestMapping(value = "/fileTransfer", method = RequestMethod.GET)
-    public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
+    public Result feignRobotTransfer() {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTransfer(robotCode));
+            result.setData(robotService.feignRobotTransfer());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

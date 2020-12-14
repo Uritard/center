@@ -343,6 +343,12 @@
             )
         </foreach>
     </insert>
+    <!--查询所有的robotCode-->
+    <select id="selectAllRobotCode" resultType="java.lang.String">
+        SELECT a.robot_code
+        FROM t_robot_info a
+        WHERE a.robot_code is not NULL
+    </select>
     <!--查询最新一条数据的机器人id-->
     <select id="selectLastRobotId" resultType="java.lang.Long">
         select robot_id from t_robot_info order by robot_id DESC limit 1

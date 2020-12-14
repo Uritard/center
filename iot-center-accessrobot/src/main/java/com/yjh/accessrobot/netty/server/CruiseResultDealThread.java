@@ -195,14 +195,21 @@ public class CruiseResultDealThread implements Runnable{
                             .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                             .setCruiseId(Long.valueOf(redisInfoMap.get("instanceId")))
                             .setCruiseType(228)//机器人
-                            .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
-                            .setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")))
-                            .setResultNum(redisInfoMap.get("resultNum"))
+
                             .setPicpath(redisInfoMap.get("picpath"))
                             .setOrigpic(redisInfoMap.get("origpic"))
-//                            .setIsWarn(1)
+                            .setIsWarn(1)
                             .setEvaluationState(257)
-                            .setCreatetime(new Date());
+                            .setCreatetime(new Date())
+                            .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                    if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))){
+                        tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                    }
+                    if (!"null".equals(redisInfoMap.get("resultNum"))) {
+                        tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                    }else {
+                        tCruiseDataResult.setResultNum(null);
+                    }
 //                    log.info("TCDR的内容是==="+tCruiseDataResult);
                     tCDRList.add(tCruiseDataResult);
 
@@ -235,7 +242,6 @@ public class CruiseResultDealThread implements Runnable{
                     Thread.sleep(15000);
 
                     TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
-                            .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"))
                             .setTaskId(tCruiseTaskResultMap.get("taskId"))
                             .setTaskAlarm(0)
                             .setTaskAbnormal(abnormalCheckPoint)
@@ -244,7 +250,7 @@ public class CruiseResultDealThread implements Runnable{
                             .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"));
                     log.info("tCruiseTaskResult的内容是==="+tCruiseTaskResult);
                     //插TCTR表
-//                    StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
+                    StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
 //
                     Integer taskWait = totalCheckPoint - tCDRList.size();
                     log.info("待测点数是==="+taskWait);

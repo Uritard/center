@@ -47,6 +47,7 @@ public interface TRobotInfoDao {
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
     int batchInsert(List<TRobotInfo> list);
 
+    List<String> selectAllRobotCode();
     Long selectLastRobotId();
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
