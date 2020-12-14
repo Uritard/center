@@ -92,9 +92,8 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public Result sayHello() throws ParseException {
+    public Result sayHello(@RequestParam(value = "filePath") String filePath) throws ParseException {
         Result result = new Result();
-
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
         Map<String, String> map = resultHandler.getMappedResults();
@@ -127,7 +126,6 @@ public class HelloController {
         }else if(value<=lowLimit1 || value>=highLimit1){
             log.info("预警");
         }
-
         return result;
     }
 

@@ -239,21 +239,27 @@ public class CruiseTaskJob extends QuartzJobBean {
                         tCruiseDataResult.setCruiseType(item.getCruiseType());
                         //视频
                         TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
-                        //1.转到预置位
-                        HashMap<String, Object> map = new HashMap<>();
-                        map.put("presetId", item.getCruiseId());
-                        map.put("cameraId", tCameraPreset.getCameraId());
-                        log.info(map.toString());
-                        move(map);
-                        Thread.sleep(waitTime);//等待摄像头转到预置位
-                        //2.抓图
-                        HashMap<String, Object> map2 = new HashMap<>();
-                        map2.put("cameraId", tCameraPreset.getCameraId());
-                        Result re = picture(map2);
-                        JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
-                        String urlPath = (String) jsonForRe.get("urlPath");
-                        String absPath = (String) jsonForRe.get("absPath");
-                        String isOk = re.getMessage();
+                        String isOk = "";
+                        String urlPath = "";
+                        String absPath = "";
+                        if(tCameraPreset != null){
+                            //1.转到预置位
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put("presetId", item.getCruiseId());
+                            map.put("cameraId", tCameraPreset.getCameraId());
+                            log.info(map.toString());
+                            move(map);
+                            Thread.sleep(waitTime);//等待摄像头转到预置位
+                            //2.抓图
+                            HashMap<String, Object> map2 = new HashMap<>();
+                            map2.put("cameraId", tCameraPreset.getCameraId());
+                            Result re = picture(map2);
+                            JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
+                            //todo 对于相机的返回错误分析  任务异常终止/超期
+                            urlPath = (String) jsonForRe.get("urlPath");
+                            absPath = (String) jsonForRe.get("absPath");
+                            isOk = re.getMessage();
+                        }
                         if( !"success".equals(isOk)){
                             //抓图失败 任务失败
                             taskAbnormal = taskAbnormal+1;

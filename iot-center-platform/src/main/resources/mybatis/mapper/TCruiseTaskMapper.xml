@@ -360,4 +360,171 @@ select *from (
         WHERE
             a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectForSevenDay" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (
+        SELECT
+        curdate( ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 1 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 2 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 3 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 4 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 5 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 6 DAY ) AS timeNode
+        ) a
+        LEFT JOIN (
+        SELECT
+        DATE(start_time) date,
+        start_time,
+        count( 1 ) AS count
+        FROM
+        t_cruise_task
+        WHERE
+        DATEDIFF( now( ), start_time ) &lt;= 7
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date;
+    </select>
+
+    <select id="selectForMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
+        from mysql.help_topic
+        where help_topic_id  &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(start_time) date,
+        start_time,
+        count( 1 ) AS count
+        FROM
+        t_cruise_task
+        WHERE
+        DATEDIFF( now( ), start_time ) &lt;= 31
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date;
+    </select>
+
+    <select id="selectForYear" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        select
+        a.month as timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+         (        SELECT DATE_FORMAT(CURDATE(), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 1 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 2 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 3 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 4 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 5 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 6 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 7 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 8 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 9 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 10 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 11 MONTH), '%Y-%m') AS `month` )a
+        LEFT JOIN
+        (SELECT
+          DATE_FORMAT(start_time,'%Y-%m') timeNode,
+          count(task_id) as count
+        FROM
+          t_cruise_task
+        GROUP BY
+            DATE_FORMAT(start_time,'%Y-%m')) b
+         on a.month = b.timeNode
+    </select>
+
+    <select id="selectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (select date_add(curdate(), interval(cast(help_topic_id as signed )
+        - DATE_FORMAT( DATE_SUB( curdate( ), INTERVAL 1 DAY ), '%d' )) day) timeNode
+        from mysql.help_topic
+        where help_topic_id  &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(start_time) date,
+        start_time,
+        count( 1 ) AS count
+        FROM
+        t_cruise_task
+        WHERE
+        DATEDIFF( now( ), start_time ) &lt;= 31
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date;
+    </select>
+
+    <select id="selectOnWeek" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (SELECT
+        @date := DATE_ADD(@date, INTERVAL + 1 DAY) timeNode
+        FROM
+        (
+        SELECT
+        @date := DATE_ADD(SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1), INTERVAL - 1 DAY)
+        FROM
+        t_cruise_task
+        LIMIT 7
+        ) time) a
+        LEFT JOIN (
+        SELECT
+        DATE(start_time) date,
+        start_time,
+        count( 1 ) AS count
+        FROM
+        t_cruise_task
+        WHERE
+        DATEDIFF(now( ),start_time ) &lt;= 7
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date;
+    </select>
+
+    <select id="selectOnYear" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        select
+            a.mon as timeNode,
+            ifnull( b.count, 0 ) AS count
+            FROM
+             (SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-01') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-02') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-03') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-04') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-05') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-06') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-07') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-08') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-09') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-10') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-11') as mon from  DUAL UNION ALL
+            SELECT CONCAT(DATE_FORMAT(NOW(),'%Y'),'-12') as mon from  DUAL )a
+            LEFT JOIN
+            (SELECT
+              DATE_FORMAT(start_time,'%Y-%m') timeNode,
+              count(task_id) as count
+            FROM
+              t_cruise_task
+            GROUP BY
+                DATE_FORMAT(start_time,'%Y-%m')) b
+             on a.mon = b.timeNode
+    </select>
 </mapper>

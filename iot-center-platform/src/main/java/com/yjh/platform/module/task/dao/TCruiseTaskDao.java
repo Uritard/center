@@ -1,9 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
-import com.yjh.platform.module.task.entity.CruiseInspectResult;
-import com.yjh.platform.module.task.entity.TCruiseTask;
-import com.yjh.platform.module.task.entity.TCruiseTaskCount;
-import com.yjh.platform.module.task.entity.TCruiseTaskList;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -45,4 +42,16 @@ public interface TCruiseTaskDao {
     List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
 
     List<CruiseInspectResult> selectCruiseInspectByTaskId(@Param(value = "taskId")String taskId);
+    
+    List<WarnStatistical> selectForSevenDay();//近七天
+
+    List<WarnStatistical> selectForMonth();//近一个月
+
+    List<WarnStatistical>selectForYear();//近一年
+
+    List<WarnStatistical> selectOnMonth();//本月
+
+    List<WarnStatistical>selectOnWeek();//本周
+
+    List<WarnStatistical>selectOnYear();//本年
 }
