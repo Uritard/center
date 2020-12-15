@@ -73,5 +73,7 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "备用字段3")
     private String remark;
 
+    private Integer isWarn;
+
 
 }

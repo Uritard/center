@@ -159,12 +159,13 @@ public class HelloController {
     @ApiOperation("发任务")
     @PostMapping("/task")
     @ResponseBody
-    public String task() throws Exception {
-        TCruiseTask newTask = tCruiseTaskDao.selectByPrimaryId("c1ce5bf2a4c44d06a5635c847f9e3e66");//获取任务
-        newTask.setTaskId(null);
-        tCruiseTaskDao.insert(newTask);
-        System.out.println(newTask.getTaskId());
-        return newTask.getTaskId();
+    public Result task() throws Exception {
+        Result result = new Result();
+        Map<String,Object> map = new HashMap<>();
+        List<Long> list = new ArrayList<>();
+        map.put("list",list);
+        result.setData(map);
+        return result;
     }
 
 

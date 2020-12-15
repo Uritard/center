@@ -417,6 +417,7 @@ public class RunAtNowTask implements Runnable{
 
                             tCruiseDataResult.setResultNum("已拍照");
                             tCruiseDataResult.setEvaluationState(257);
+                            tCruiseDataResult.setIsWarn(0);
                             tCruiseDataResultDao.insert(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(252);
                             tCruiseTaskResultDetail.setEndTime(new Date());
@@ -498,7 +499,7 @@ public class RunAtNowTask implements Runnable{
                     int re = abnormal+normal;
                     if(re == all){
                         //所有点都做完了
-                        tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
+                        tCruiseTaskResult.setTaskAbnormal(abnormal);
                         tCruiseTaskResultDao.insert(tCruiseTaskResult);
                         Thread.sleep(15000);
                         tCruiseResult.setCState(240);

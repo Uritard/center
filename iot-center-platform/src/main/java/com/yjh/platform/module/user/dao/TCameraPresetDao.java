@@ -42,4 +42,8 @@ public interface TCameraPresetDao {
     TCameraPreset selectLastOne();
 
     List<TCameraPreset>selectAll();
+    List<Long> selectInstanceIdList(@Param(value = "cruiseId")Long cruiseId);
+    int deleteInstance(@Param(value = "list")List<Long> list);
+    int deletePlanInstance(@Param(value = "list")List<Long> list);
+    int deletePointInstance(@Param(value = "list")List<Long> list);
 }

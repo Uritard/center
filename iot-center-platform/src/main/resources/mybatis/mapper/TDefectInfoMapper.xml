@@ -449,4 +449,51 @@
         WHERE 1 = 1
         <if test="defectId != null and defectId != ''"> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
     </select>
+
+    <select id="countByDefectLevel" resultType="java.util.Map">
+        SELECT
+            a.dict_note as defectLevlName,
+            IFNULL(c.count,0) count
+        FROM
+            t_dict_business a
+        left join (select count(1) as count,defect_level from t_defect_info GROUP BY defect_level ) c on a.dict_code = c.defect_level
+        WHERE a.col_name='defect_level'
+    </select>
+
+    <select id="countByAlarmLevel" resultType="java.util.Map">
+        SELECT
+            IFNULL( c.count, 0 ) AS count,
+            b.dict_note as alarmLevelName
+        FROM
+            t_dict_business b
+            LEFT JOIN (
+        SELECT
+            a.alarm_level,
+            count( a.alarm_level ) AS count
+        FROM
+            ( SELECT warn_level AS alarm_level, warn_id FROM t_warn_info UNION ALL ( SELECT alarm_level, robot_alarm_id FROM t_robot_alarm ) ) a
+        GROUP BY
+            a.alarm_level
+            ) c ON c.alarm_level = b.dict_code
+        WHERE
+            b.col_name = 'alarm_level'
+    </select>
+
+    <select id="selectThereWarn" resultType="com.yjh.platform.module.task.entity.WarnInfoForHomePage">
+        SELECT
+        a.warn_time as warnTime,
+        a.warn_content as warnContent,
+        b.device_name as deviceName
+        from t_warn_info a
+        left join (select DISTINCT device_id,device_name from t_std_device) b on a.device_id = b.device_id
+        union all(
+        SELECT
+        c.alarm_time as warnTime,
+        c.alarm_info as warnContent,
+        d.robot_name as deviceName
+        from t_robot_alarm c
+        left join t_robot_info d on c.robot_id = d.robot_id
+        )
+        order by warnTime desc LIMIT 3
+    </select>
 </mapper>

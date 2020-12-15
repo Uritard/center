@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.platform.module.user.entity.TCameraGroup;
 import org.apache.ibatis.annotations.Param;
@@ -27,4 +28,6 @@ public interface TCameraGroupDao {
     int batchDelete(List<String> list);
     TCameraGroup selectIsExit(@Param(value = "groupName") String groupName);
     List<TCameraGroup> selectAll();
+    List<Map<String,Object>>selectGroupName();
+    String selectCameraIdInfo(@Param(value = "groupId") Long groupId);
 }

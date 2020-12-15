@@ -527,4 +527,18 @@ select *from (
                 DATE_FORMAT(start_time,'%Y-%m')) b
              on a.mon = b.timeNode
     </select>
+
+    <select id="selectTaskOnExecute" resultType="com.yjh.platform.module.task.entity.TaskOnExecuteInfo">
+        SELECT
+            a.task_id,
+            c.task_name,
+            c.start_time,
+            b.dict_note AS cruiseTypeName
+        FROM
+            t_cruise_result a
+            LEFT JOIN t_dict_business b ON a.c_type = b.dict_code
+            LEFT JOIN t_cruise_task c ON a.task_id = c.task_id
+        WHERE
+            a.c_state = 239
+    </select>
 </mapper>

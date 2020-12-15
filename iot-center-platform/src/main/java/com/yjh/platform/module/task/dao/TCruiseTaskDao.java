@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -54,4 +55,6 @@ public interface TCruiseTaskDao {
     List<WarnStatistical>selectOnWeek();//本周
 
     List<WarnStatistical>selectOnYear();//本年
+
+    List<TaskOnExecuteInfo> selectTaskOnExecute();
 }
