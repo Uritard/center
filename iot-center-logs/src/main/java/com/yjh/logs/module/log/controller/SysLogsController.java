@@ -61,8 +61,9 @@ public class SysLogsController {
             sysLogs.setUserName(userName);
             Random random = new Random();
             new Thread(() -> {
-                String mathRandom = String.valueOf(random.nextInt(40000));
+                String mathRandom = String.valueOf(random.nextInt(50))+"000";
                 long mathLong = Long.valueOf(mathRandom);
+                log.info("mathLong: "+mathLong);
                 try { Thread.sleep(mathLong); } catch (Exception e) {e.getMessage();}
                 result.setData(sysLogsService.insert(sysLogs));
             }).start();
