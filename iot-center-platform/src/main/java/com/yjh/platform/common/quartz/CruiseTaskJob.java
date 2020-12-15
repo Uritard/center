@@ -168,7 +168,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
                 //tCruiseTaskResult.setTaskStatus(239);
                 tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
-                tCruiseTaskResultDao.insert(tCruiseTaskResult);
+                //tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
                 Map<String,String> mapForAbnormal = new HashMap<>();
                 mapForAbnormal.put("all",taskCount.toString());
@@ -370,6 +370,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseDataResult.setCruiseAbnormal(248);
                                 tCruiseDataResult.setResultNum("已拍照");
                                 tCruiseDataResult.setEvaluationState(257);
+                                tCruiseDataResult.setIsWarn(0);
                                 tCruiseDataResultDao.insert(tCruiseDataResult);
                                 tCruiseTaskResultDetail.setCruiseStatus(252);
                                 tCruiseTaskResultDetail.setEndTime(new Date());
@@ -500,7 +501,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     mapForAbnormal.put("normal",normal.toString());
                     redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
-                    tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
+                    tCruiseTaskResult.setTaskAbnormal(abnormal);
                     tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
                     Thread.sleep(15000);

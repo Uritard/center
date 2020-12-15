@@ -56,4 +56,10 @@ public interface TDefectInfoDao {
     Map<String, Integer> countDefectConfMode();
     List<TJDefectByType>  countByDefectType();
 
+    List<Map<String,Integer>> countByDefectLevel();
+
+    List<Map<String,Object>> countByAlarmLevel();
+
+    List<WarnInfoForHomePage>selectThereWarn();
+
 }

@@ -126,4 +126,19 @@
         from t_camera_group
     </select>
 
+    <select id="selectGroupName" resultType="java.util.Map" >
+        SELECT
+            a.group_id,
+            a.group_name
+        FROM
+            t_camera_group a
+    </select>
+
+    <select id="selectCameraIdInfo" resultType="java.lang.String">
+       SELECT
+            a.camera_ids
+        FROM
+            t_camera_group a
+        where a.group_id = #{groupId,jdbcType=BIGINT}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
@@ -26,6 +27,8 @@ public class TCameraPresetService {
     private TCameraPresetDao tCameraPresetDao;
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
+    @Autowired
+    private TAlgorithmConfDao tAlgorithmConfDao;
 
     @Logs(title = "插入", code = "tCameraPreset",content = "根据web传递的参数插入摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
@@ -36,6 +39,11 @@ public class TCameraPresetService {
     @Logs(title = "删除", code = "tCameraPreset",content = "根据web传递的参数删除摄像机预置位信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long presetId) {
+        List<Long> instanceIdList = tCameraPresetDao.selectInstanceIdList(presetId);
+        tCameraPresetDao.deleteInstance(instanceIdList);//tcpi
+        tCameraPresetDao.deletePlanInstance(instanceIdList);//tcplan
+        tCameraPresetDao.deletePointInstance(instanceIdList);//tcpattr
+        tAlgorithmConfDao.deleteByPrimaryId(presetId);//tac
         return this.tCameraPresetDao.deleteByPrimaryId(presetId);
     }
 
@@ -43,6 +51,9 @@ public class TCameraPresetService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedPreset(String presetIds) {
         List<String> list= Arrays.asList(presetIds.split(","));
+        for (String item:list) {
+            this.deleteByPrimaryId(Long.valueOf(item));
+        }
         return this.tCameraPresetDao.deleteSelectedPreset(list);
     }
 

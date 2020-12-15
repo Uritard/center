@@ -110,8 +110,9 @@ public class TCameraPresetController {
             int resultNum = 0;
             //操作数据库
             if (response.getData().equals(true)){
-             resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
+             log.info("nvr删除预置位失败");
             }
+            resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
             result.setData(resultNum);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());

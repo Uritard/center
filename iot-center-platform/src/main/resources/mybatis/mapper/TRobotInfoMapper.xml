@@ -385,4 +385,18 @@
            ON d.cruise_id=e.inspection_id
            WHERE a.task_id=#{taskId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectRobotInfo" resultType="com.yjh.platform.module.task.entity.RobotInfoForHomePage">
+        select
+        a.robot_code,
+        a.commission_date,
+        b.dict_note as robotFactoryName,
+        c.dict_note as typeName,
+        d.dict_note as position
+        from t_robot_info a
+        left join t_dict_business b on a.robot_factory = b.dict_code
+        left join t_dict_business c on a.robot_type = c.dict_code
+        left join t_dict_business d on a.robot_position = d.dict_code
+        where a.is_use = 166
+    </select>
 </mapper>

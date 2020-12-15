@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.dao;
 import java.util.List;
 import java.util.Date;
 
+import com.yjh.platform.module.task.entity.RobotInfoForHomePage;
 import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -61,5 +62,5 @@ public interface TRobotInfoDao {
 
     List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")String taskId);
 
-
+    List<RobotInfoForHomePage>selectRobotInfo();
 }

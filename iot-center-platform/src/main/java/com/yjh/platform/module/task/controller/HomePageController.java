@@ -27,7 +27,7 @@ public class HomePageController {
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
-    public Result taskInfo(@RequestParam(value = "date", required = false) Integer date) {
+    public Result taskInfo(@RequestParam(value = "date", required = true) Integer date) {
         Result result = new Result();
         try {
             result.setData(homePageService.taskInfo(date));
@@ -36,6 +36,129 @@ public class HomePageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取巡视任务数据概览错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "统计缺陷")
+    @RequestMapping(value = "/countByDefectLevel", method = RequestMethod.GET)
+    public Result countByDefectLevel() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countByDefectLevel());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取巡视任务数据概览错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "正在执行的任务")
+    @RequestMapping(value = "/taskOnExecute", method = RequestMethod.GET)
+    public Result taskOnExecute() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.taskOnExecute());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取正在执行的任务错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "告警级别数据")
+    @RequestMapping(value = "/countByAlarmLevel", method = RequestMethod.GET)
+    public Result countByAlarmLevel() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countByAlarmLevel());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取告警级别数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "告警内容数据")
+    @RequestMapping(value = "/warnInfo", method = RequestMethod.GET)
+    public Result warnInfo() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.selectThereWarn());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取告警内容数据错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "机器人数据")
+    @RequestMapping(value = "/robotInfoForHomePage", method = RequestMethod.GET)
+    public Result robotInfoForHomePage() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.robotInfoForHomePage());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取机器人数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "变电站概况数据")
+    @RequestMapping(value = "/stationInfo", method = RequestMethod.GET)
+    public Result stationInfo() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.stationInfo());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取变电站概况数据错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "获取摄像机分组信息")
+    @RequestMapping(value = "/getCameraGroupInfo", method = RequestMethod.GET)
+    public Result getCameraGroupInfo() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.getCameraGroupInfo());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取变电站概况数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取摄像机id信息")
+    @RequestMapping(value = "/getCameraIdInfo", method = RequestMethod.GET)
+    public Result getCameraIdInfo(@RequestParam(value = "groupId", required = true) Long groupId) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.getCameraIdInfo(groupId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取变电站概况数据错误:", e);
         }
         return result;
     }

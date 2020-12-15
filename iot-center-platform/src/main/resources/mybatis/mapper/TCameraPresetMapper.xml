@@ -56,12 +56,7 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete  t_camera_preset,t_algorithm_conf,t_cruise_point_instance
-        from t_camera_preset left join  t_algorithm_conf
-        on t_camera_preset.preset_id = t_algorithm_conf.preset_id
-        left join t_cruise_point_instance
-        on t_algorithm_conf.preset_id = t_cruise_point_instance.cruise_id
-        and t_cruise_point_instance.cruise_type = 229
+        delete  from t_camera_preset
         where t_camera_preset.preset_id = #{presetId, jdbcType=BIGINT}
     </delete>
 
@@ -271,4 +266,44 @@
     <select id="selectAll" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select * from t_camera_preset
     </select>
+
+    <select id="selectInstanceIdList" resultType="java.lang.Long">
+        SELECT
+            instance_id
+        FROM
+            t_cruise_point_instance
+        WHERE
+            cruise_id = #{cruiseId,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteInstance">
+        DELETE
+        FROM
+            t_cruise_point_instance
+        WHERE
+            instance_id IN
+        <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+    </delete>
+    <delete id="deletePlanInstance">
+        DELETE
+        FROM
+        t_cruise_plan_attr
+        WHERE
+        instance_id IN
+        <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+    </delete>
+    <delete id="deletePointInstance">
+        DELETE
+        FROM
+        t_cruise_point_attr
+        WHERE
+        instance_id IN
+        <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+    </delete>
 </mapper>
