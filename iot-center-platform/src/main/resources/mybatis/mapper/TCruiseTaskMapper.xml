@@ -476,16 +476,14 @@ select *from (
         a.timeNode,
         ifnull( b.count, 0 ) AS count
         FROM
-        (SELECT
-        @date := DATE_ADD(@date, INTERVAL + 1 DAY) timeNode
-        FROM
-        (
-        SELECT
-        @date := DATE_ADD(SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1), INTERVAL - 1 DAY)
-        FROM
-        t_cruise_task
-        LIMIT 7
-        ) time) a
+        (    SELECT @a :=@a + 1 as `index`, DATE(ADDDATE(CURRENT_DATE, INTERVAL @a DAY)) AS `timeNode`
+        FROM mysql.help_topic,(SELECT @a := 0) temp
+        WHERE @a &lt; 6 - WEEKDAY(CURRENT_DATE)
+        UNION
+        SELECT @s :=@s - 1 as `index`, DATE(DATE_SUB(CURRENT_DATE, INTERVAL @s DAY)) AS `timeNode`
+        FROM mysql.help_topic,(SELECT @s := WEEKDAY(CURRENT_DATE) + 1) temp
+        WHERE @s > 0
+        ORDER BY `timeNode`) a
         LEFT JOIN (
         SELECT
         DATE(start_time) date,
