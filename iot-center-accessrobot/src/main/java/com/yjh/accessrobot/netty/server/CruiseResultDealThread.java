@@ -90,9 +90,9 @@ public class CruiseResultDealThread implements Runnable{
             Integer normal = 0;//正常
             if (!"".equals(cruiseResultMap.get("value"))){
                 tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
-                normal = normal + 1;
                 tCruiseTaskResultMap.put("cruiseResult","246");//正常
                 tCruiseTaskResultMap.put("cruiseAbnormal","null");
+                normal = normal + 1;
             }else {
                 tCruiseTaskResultMap.put("resultNum","null");
                 tCruiseTaskResultMap.put("cruiseResult","247");//异常
@@ -102,7 +102,6 @@ public class CruiseResultDealThread implements Runnable{
             if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
                 tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
             }
-//
             tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
             tCruiseTaskResultMap.put("evaluationState","257");
             tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
@@ -123,7 +122,6 @@ public class CruiseResultDealThread implements Runnable{
 //                    tCruiseTaskResultMap.put("taskWait",robotInfoKeys.size() - normal - abnormal);
             tCruiseTaskResultMap.put("taskCode",taskId);
             log.info("tCruiseTaskResultMap是==="+tCruiseTaskResultMap);
-
 
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
 
@@ -195,15 +193,16 @@ public class CruiseResultDealThread implements Runnable{
                             .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                             .setCruiseId(Long.valueOf(redisInfoMap.get("instanceId")))
                             .setCruiseType(228)//机器人
-
                             .setPicpath(redisInfoMap.get("picpath"))
                             .setOrigpic(redisInfoMap.get("origpic"))
-                            .setIsWarn(1)
+                            .setIsWarn(0)
                             .setEvaluationState(257)
                             .setCreatetime(new Date())
                             .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                     if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))){
                         tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                    }else {
+                        tCruiseDataResult.setCruiseAbnormal(null);
                     }
                     if (!"null".equals(redisInfoMap.get("resultNum"))) {
                         tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));

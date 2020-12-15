@@ -1,14 +1,15 @@
 package com.yjh.accessvideo.module.device.entity;
 
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author tt
@@ -54,8 +55,8 @@ public class TStdDevicemete implements Serializable {
     @ApiModelProperty(value = "单位")
     private String unit;
 
-    @ApiModelProperty(value = "是否生成告警 0-生成 1-不生成")
-    private String alarmNote;
+    @ApiModelProperty(value = "是否生成告警提示 0-生成 1-不生成")
+    private Integer alarmNote;
 
     @ApiModelProperty(value = "告警分类")
     private String alarmType;

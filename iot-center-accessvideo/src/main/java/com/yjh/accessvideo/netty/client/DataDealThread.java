@@ -18,16 +18,8 @@ import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yjh.accessvideo.common.Constant.*;
-import static com.yjh.accessvideo.common.Constant.NORMAL;
-
-import static com.yjh.accessvideo.common.Constant.TASKID;
-import static com.yjh.accessvideo.common.Constant.INSTANCEID;
-import static com.yjh.accessvideo.common.Constant.ABNORMAL;
-import static com.yjh.accessvideo.common.Constant.NORMAL;
-import static com.yjh.accessvideo.common.Constant.cruiseKeys;
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {
@@ -296,6 +288,22 @@ public class DataDealThread implements Runnable {
                                                String jsons = JSON.toJSONString(jasonMaps);
                                                log.info("发送给前端的消息：" + jsons);
                                                WebSocketServer.sendMsg(jsons);
+
+                                               //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
+                                               /*if (tStdDevicemeteM.getAlarmNote() != null && tStdDevicemeteM.getAlarmNote() == 0){
+                                                   if (tStdDevicemeteM.getAlarmLevel() == 130){//130.预警131.一般132.严重133.危机
+                                                       TWarnInfoDetail tWarnInfoDetail = new TWarnInfoDetail()
+                                                               .setDeviceName()
+                                                               .setAlarmTime()
+                                                               .setMeteName()
+                                                               .setAlarmLevelName()
+                                                               .setStdMeteId()
+                                                               .setAlarmSource()//279.机器人280.可见光290.红外291.主辅设备
+                                                               .setWarnContent()
+                                                               .setImagePath();
+
+                                                   }
+                                               }*/
 
                                                //删除告警redis
                                                redisTemplate.delete(warnName);

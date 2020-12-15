@@ -13,7 +13,7 @@
         <result column="device_type" jdbcType="INTEGER" property="deviceType" />
         <result column="position_type" jdbcType="VARCHAR" property="positionType" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
-        <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
+        <result column="alarm_note" jdbcType="INTEGER" property="alarmNote" />
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
         <result column="up_effect" jdbcType="REAL" property="upEffect" />
         <result column="down_effect" jdbcType="REAL" property="downEffect" />
@@ -87,7 +87,7 @@
                 #{deviceType, jdbcType=INTEGER},
                 #{positionType, jdbcType=VARCHAR},
                 #{unit, jdbcType=VARCHAR},
-                #{alarmNote, jdbcType=VARCHAR},
+                #{alarmNote, jdbcType=INTEGER},
                 #{alarmType, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
                 #{downEffect, jdbcType=REAL},
@@ -132,7 +132,7 @@
         <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
-        <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
+        <if test="alarmNote != null ">a.alarm_note = #{alarmNote, jdbcType=INTEGER},</if>
         <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
         <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
@@ -252,7 +252,7 @@
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
+        <if test="alarmNote != null "> and a.alarm_note = #{alarmNote, jdbcType=INTEGER}</if>
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
@@ -343,7 +343,7 @@
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
+        <if test="alarmNote != null "> and a.alarm_note = #{alarmNote, jdbcType=INTEGER}</if>
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
@@ -408,7 +408,7 @@
                 #{TStdDevicemete.deviceType, jdbcType=INTEGER},
                 #{TStdDevicemete.positionType, jdbcType=VARCHAR},
                 #{TStdDevicemete.unit, jdbcType=VARCHAR},
-                #{TStdDevicemete.alarmNote, jdbcType=VARCHAR},
+                #{TStdDevicemete.alarmNote, jdbcType=INTEGER},
                 #{TStdDevicemete.alarmType, jdbcType=VARCHAR},
                 #{TStdDevicemete.upEffect, jdbcType=REAL},
                 #{TStdDevicemete.downEffect, jdbcType=REAL},

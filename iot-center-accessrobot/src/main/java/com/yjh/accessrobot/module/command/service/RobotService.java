@@ -92,13 +92,16 @@ public class RobotService {
         return "success";
     }
     //生成发送byte指令，附带测试
-    public byte[]   generateByteOrder(String xmlString,String robotCode){
-        long sendSessionId = 0L;
+    public byte[]  generateByteOrder(String xmlString,String robotCode){
+        long sendSessionId = Constant.sendSessionId;
         RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
         log.info("sendId是<start>"+sendId+"<end>");
-//        if(sendId != null){
-//            sendSessionId = sendSessionId + 1L;//请求报文每次累加1
-//        }
+        if(sendId != null){
+            sendSessionId = sendSessionId + 1L;//请求报文每次累加1
+            Constant.sendSessionId = sendSessionId;//刷新sendSessionId
+        }else {
+            Constant.sendSessionId = 0L;//刷新sendSessionId
+        }
         log.info("发送会话序列号<start>"+sendSessionId+"<end>");
         byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId,0,true,xmlString);//生成发送的报文
 
@@ -126,9 +129,11 @@ public class RobotService {
         /*
          * 将ftp图copy到40环境
          * */
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+
         String fenGe[] = picPath.split("/");
         String fileName = fenGe[fenGe.length - 1];
-        String developMap = Constant.imgPath+"/Map";
+        String developMap = absoluteImgMap.get("content")+"/Map";
         File f=new File(developMap);
         if (!f.exists()){
             f.setWritable(true, false);
@@ -142,8 +147,8 @@ public class RobotService {
         }catch (Exception e){
             e.getMessage();
         }
-        Map<String, String> ImgMap = redisTemplate.opsForHash().entries("t_sys_param:FTPImagePath");
-        String url = ImgMap.get("content") +"/Map/"+ fileName;
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        String developRelativeUrl = relativeImgMap.get("content") +"/Map/"+ fileName;
 
 //        TRobotInfo tRobotInfo = new TRobotInfo()
 //                .setRobotName(robotMap.get(0).get("robot_name").toString())
@@ -166,7 +171,7 @@ public class RobotService {
 
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
-                .setPhotePath(url);
+                .setPhotePath(developRelativeUrl);
         log.info("获得的tRobotInfo是："+tRobotInfo);
 
         //更新机器人地图信息

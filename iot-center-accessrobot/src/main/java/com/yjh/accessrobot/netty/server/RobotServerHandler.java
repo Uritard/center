@@ -371,6 +371,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
+
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
                 //注册指令(发送响应)
@@ -550,13 +554,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         /*
                         将ftp服务器上的文件复制到开发环境
                         * */
-                        String temporaryPath = Constant.filePath+filePath;//临时路径
-                        //开发环境图片绝对路径文件目录
-                        String developAbsoluteUrl = Constant.imgPath  + "/"+ todayTime+ "/"+taskId + "/Road";
-                        //开发环境图片相对路径文件目录
-                        Map<String, String> ImgMap = redisTemplate.opsForHash().entries("t_sys_param:FTPImagePath");
-                        String developRelativeUrl =  ImgMap.get("content") +  "/"+ todayTime+ "/"+ taskId + "/Road";
+                        String temporaryPath = Constant.filePath+filePath;//文件在ftp服务器上的绝对路径
+                        log.info("temporaryPath是==="+temporaryPath);
 
+                        //开发环境图片相对路径文件目录
+                        String developRelativeUrl =  relativeImgMap.get("content") +  "/"+ todayTime+ "/"+ taskId + "/Road";
+                        //开发环境图片绝对路径文件目录
+                        String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime+ "/"+taskId + "/Road";
                         log.info("developAbsoluteUrl是==="+developAbsoluteUrl);
                         File f=new File(developAbsoluteUrl);
                         if (!f.exists()){
@@ -694,12 +698,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     * */
                     String temporaryPath = Constant.filePath+filePath;//文件在ftp服务器上的绝对路径
                     log.info("temporaryPath是==="+temporaryPath);
-                    //开发环境图片绝对路径文件目录
-                    Map<String, String> ImgMap = redisTemplate.opsForHash().entries("t_sys_param:FTPImagePath");
 
-                    String developAbsoluteUrl = Constant.imgPath + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-                    //开发环境图片相对路径文件目录
-                    String developRelativeUrl = ImgMap.get("content")+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                    //开发环境图片绝对路径文件目录
+                    String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                    //开发环境图片相对路径文件目
+                    String developRelativeUrl = relativeImgMap.get("content")+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+
                     if (xmlBaseModel.getItems().get(0).get("file_type").toString().equals("1")){//红外图谱文件
                         developAbsoluteUrl = developAbsoluteUrl + "FIR";
                         developRelativeUrl = developRelativeUrl + "FIR";
@@ -728,7 +732,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     cruiseResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
                     cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+fileName);//绝对路径
-
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());//图像框
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
 
