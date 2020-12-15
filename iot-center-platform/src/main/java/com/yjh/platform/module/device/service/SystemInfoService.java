@@ -32,7 +32,7 @@ public class SystemInfoService {
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
-    @Logs(title = "获取内存信息", code = "module",content = "获取内存信息")
+//    @Logs(title = "获取内存信息", code = "module",content = "获取内存信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> getMemory() throws Exception {
         return systemInfoUtil.getMemUsage();
@@ -52,7 +52,7 @@ public class SystemInfoService {
         }
         return result2;
     }
-    @Logs(title = "获取磁盘信息", code = "module",content = "获取磁盘信息")
+//    @Logs(title = "获取磁盘信息", code = "module",content = "获取磁盘信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getSwap() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getDeskUsage();
@@ -65,20 +65,20 @@ public class SystemInfoService {
         return result2;
     }
 
-    @Logs(title = "获取cpu利用率", code = "module",content = "获取cpu利用率")
+//    @Logs(title = "获取cpu利用率", code = "module",content = "获取cpu利用率")
     @Transactional(rollbackFor = Exception.class)
     public double getCpuOnUse() throws Exception {
         return systemInfoUtil.getCpuOnUse();
     }
 
-    @Logs(title = "获取硬盘利用率", code = "module",content = "获取硬盘利用率")
+//    @Logs(title = "获取硬盘利用率", code = "module",content = "获取硬盘利用率")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> getDeskOnUse() throws Exception {
         return systemInfoUtil.getDeskOnUse();
     }
 
 
-    @Logs(title = "获取关键服务", code = "module",content = "获取关键服务")
+//    @Logs(title = "获取关键服务", code = "module",content = "获取关键服务")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> getServices() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
