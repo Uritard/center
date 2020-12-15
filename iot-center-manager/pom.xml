@@ -47,12 +47,6 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>3.17</version>
@@ -89,17 +83,6 @@
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
             <version>4.1.6</version>
-        </dependency>
-        <!-- api swagger -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.4.0</version>
         </dependency>
 
         <dependency>
