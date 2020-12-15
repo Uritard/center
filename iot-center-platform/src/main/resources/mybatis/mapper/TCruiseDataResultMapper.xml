@@ -249,40 +249,65 @@
 
     <select id="selectMeteCruiseByDeviceId" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo" >
      SELECT
-	b.instance_id,
-	d.cruise_result,
-	f.dict_note AS cruiseResultName,
-	b.end_time,
-	d.picpath,
-    d.identify_result,
-    k.dict_note as 'identifyResultName',
-    (CASE
-    WHEN ISNULL(e.mete_name)AND ISNULL(g.inspection_name)AND ISNULL(h.preset_name)THEN ''
-    WHEN ISNULL(e.mete_name)AND ISNULL(g.inspection_name)THEN h.preset_name
-    WHEN ISNULL(e.mete_name)AND ISNULL(h.preset_name)THEN g.inspection_name
-    WHEN ISNULL(g.inspection_name)AND ISNULL(h.preset_name)THEN e.mete_name
-    WHEN ISNULL(g.inspection_name)THEN CONCAT(e.mete_name,' /',h.preset_name)
-    WHEN ISNULL(h.preset_name)THEN CONCAT(e.mete_name,' /',g.inspection_name)
-    END) AS cruise_name
-
-    FROM
-        t_cruise_point_instance a
-    LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
-    JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
-    LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code
-    AND f.col_name = 'cruise_result'
-    LEFT JOIN t_dict_business k ON d.identify_result=k.dict_code and k.col_name='identify_result'
-    LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
-    LEFT JOIN t_robot_inspection g ON a.cruise_id = g.inspection_id
-    LEFT JOIN t_camera_preset h ON a.cruise_id = h.preset_id
-    LEFT JOIN t_cruise_task_result c ON b.task_result_id = c.task_result_id
-    where
-        a.device_id = #{deviceId,jdbcType=BIGINT}
-    AND a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
-    ORDER BY
-        b.end_time DESC
-       LIMIT 1
-
+            b.instance_id,
+            d.cruise_result,
+            f.dict_note AS cruiseResultName,
+            b.end_time,
+            d.picpath,
+            d.identify_result,
+            k.dict_note AS 'identifyResultName',
+            (
+                CASE
+                WHEN ISNULL(e.mete_name)
+                AND ISNULL(g.inspection_name)
+                AND ISNULL(h.preset_name) THEN
+                    ''
+                WHEN ISNULL(e.mete_name)
+                AND ISNULL(g.inspection_name) THEN
+                    h.preset_name
+                WHEN ISNULL(e.mete_name)
+                AND ISNULL(h.preset_name) THEN
+                    g.inspection_name
+                WHEN ISNULL(g.inspection_name)
+                AND ISNULL(h.preset_name) THEN
+                    e.mete_name
+                WHEN ISNULL(g.inspection_name) THEN
+                    CONCAT(
+                        e.mete_name,
+                        ' /',
+                        h.preset_name
+                    )
+                WHEN ISNULL(h.preset_name) THEN
+                    CONCAT(
+                        e.mete_name,
+                        ' /',
+                        g.inspection_name
+                    )
+                END
+            ) AS cruise_name
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
+        JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
+        LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code
+        AND f.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business k ON d.identify_result = k.dict_code
+        AND k.col_name = 'identify_result'
+        LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
+        LEFT JOIN t_robot_inspection g ON a.cruise_id = g.inspection_id
+        LEFT JOIN t_camera_preset h ON a.cruise_id = h.preset_id
+        LEFT JOIN t_cruise_task_result c ON b.task_result_id = c.task_result_id
+        LEFT JOIN t_cruise_result m ON b.task_result_id = m.task_result_id
+        LEFT JOIN t_dict_business n ON m.c_state = n.dict_code
+        AND n.col_name = 'task_state'
+        WHERE
+          a.device_id = #{deviceId,jdbcType=BIGINT}
+        AND a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+        AND m.c_state != 239
+        AND m.c_state != 241
+        ORDER BY
+            b.end_time DESC
+        LIMIT 1
     </select>
 
     <select id="selectCruiseDataResultByList" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">

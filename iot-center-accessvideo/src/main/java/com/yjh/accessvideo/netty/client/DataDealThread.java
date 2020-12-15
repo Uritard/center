@@ -187,15 +187,6 @@ public class DataDealThread implements Runnable {
                                                     try {
                                                         redisTemplate.opsForHash().putAll(warnName, warnMap);
                                                         cruiseResultMap.put("isWarn", "1");
-                                                        // webSocket通知前端调用告警小铃铛的接口
-                                                        Map<String, Object> jasonMap = new HashMap<>();
-                                                        jasonMap.put("type", "newAlarm");
-                                                        jasonMap.put("alarmName", warnMap.get("warnName"));
-                                                        jasonMap.put("alarmTime", warnMap.get("warnTime"));
-                                                        jasonMap.put("alarmContent", warnMap.get("warnContent"));
-                                                        String json = JSON.toJSONString(jasonMap);
-                                                        log.info("发送给前端的消息：" + json);
-                                                        WebSocketServer.sendMsg(json);
                                                     } catch (Exception e) {
                                                         log.info("生成错误", e);
                                                     }
@@ -265,16 +256,6 @@ public class DataDealThread implements Runnable {
                                                     cruiseResultMap.put("isWarn", "1");
                                                     log.info("告警Map:" + warnMap);
 
-                                                    // webSocket通知前端调用巡视监控的接口
-                                                    Map<String, Object> jasonMaps = new HashMap<>();
-                                                    jasonMaps.put("type", "newAlarm");
-                                                    jasonMaps.put("alarmName", warnMap.get("warnName"));
-                                                    jasonMaps.put("alarmTime", warnMap.get("warnTime"));
-                                                    jasonMaps.put("alarmContent", warnMap.get("warnContent"));
-                                                    String jsons = JSON.toJSONString(jasonMaps);
-                                                    log.info("发送给前端的消息：" + jsons);
-                                                    WebSocketServer.sendMsg(jsons);
-
                                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
                                                     ABNORMAL.addAndGet(1);
@@ -283,6 +264,46 @@ public class DataDealThread implements Runnable {
                                             default:
                                                 break;
                                         }
+                                       try {
+                                           // TODO: 2020/12/15 告警信息插库 并推送
+                                           Map<String, Object> warningMsg = redisTemplate.opsForHash().entries(warnName);
+                                           if(Objects.nonNull(warningMsg)) {
+                                               TWarnInfo tWarnInfo = new TWarnInfo();
+                                               tWarnInfo.setWarnLevel(Integer.valueOf(warningMsg.get("warnLevel").toString()));
+                                               tWarnInfo.setWarnType(Integer.valueOf(warningMsg.get("warnType").toString()));
+                                               tWarnInfo.setDeviceId(Long.valueOf(warningMsg.get("deviceId").toString()));
+                                               tWarnInfo.setCunstomId(warningMsg.get("customId").toString());
+                                               tWarnInfo.setInstanceId(Long.valueOf(warningMsg.get("instanceId").toString()));
+                                               tWarnInfo.setStdMeteId(Long.valueOf(warningMsg.get("stdMeteId").toString()));
+                                               tWarnInfo.setTaskId(warningMsg.get("taskId").toString());
+                                               tWarnInfo.setConfMode(Integer.valueOf(warningMsg.get("confMode").toString()));
+                                               tWarnInfo.setIfWarnDisable(Integer.valueOf(warningMsg.get("ifWarnDisable").toString()));
+                                               tWarnInfo.setValue(warningMsg.get("value").toString());
+                                               tWarnInfo.setImagePath(warningMsg.get("imagePath").toString());
+                                               tWarnInfo.setAlarmSource(Integer.valueOf(warningMsg.get("alarmSource").toString()));
+                                               tWarnInfo.setWarnName(warningMsg.get("warnName").toString());
+                                               tWarnInfo.setOutRange(warningMsg.get("outRange").toString());
+                                               tWarnInfo.setWarnContent(warningMsg.get("warnContent").toString());
+                                               tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime").toString()));
+                                               analyseDataOperateService.insertWarnInfo(tWarnInfo);
+
+                                               // webSocket通知前端调用巡视监控的接口
+                                               Map<String, Object> jasonMaps = new HashMap<>();
+                                               jasonMaps.put("type", "newAlarm");
+                                               jasonMaps.put("alarmName", warningMsg.get("warnName"));
+                                               jasonMaps.put("alarmTime", warningMsg.get("warnTime"));
+                                               jasonMaps.put("alarmContent", warningMsg.get("warnContent"));
+                                               String jsons = JSON.toJSONString(jasonMaps);
+                                               log.info("发送给前端的消息：" + jsons);
+                                               WebSocketServer.sendMsg(jsons);
+
+                                               //删除告警redis
+                                               redisTemplate.delete(warnName);
+                                           }
+                                       }catch (Exception e){
+                                           log.error("告警入库失败"+e);
+                                       }
+
                                     } else {
                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                         cruiseResultMap.put("cruiseAbnormal", "--");
@@ -441,34 +462,34 @@ public class DataDealThread implements Runnable {
 
                 }
 
-                try {
-                    Set<String> warnKey = redisScan("warnInfo:" + TASKID);
-                    for (String key : warnKey) {
-                        Map<String, Object> warnMap = redisTemplate.opsForHash().entries(key);
-                        log.info("TWI开始");
-                        TWarnInfo tWarnInfo = new TWarnInfo();
-                        tWarnInfo.setWarnLevel(Integer.valueOf(warnMap.get("warnLevel").toString()));
-                        tWarnInfo.setWarnType(Integer.valueOf(warnMap.get("warnType").toString()));
-                        tWarnInfo.setDeviceId(Long.valueOf(warnMap.get("deviceId").toString()));
-                        tWarnInfo.setCunstomId(warnMap.get("customId").toString());
-                        tWarnInfo.setInstanceId(Long.valueOf(warnMap.get("instanceId").toString()));
-                        tWarnInfo.setStdMeteId(Long.valueOf(warnMap.get("stdMeteId").toString()));
-                        tWarnInfo.setTaskId(warnMap.get("taskId").toString());
-                        tWarnInfo.setConfMode(Integer.valueOf(warnMap.get("confMode").toString()));
-                        tWarnInfo.setIfWarnDisable(Integer.valueOf(warnMap.get("ifWarnDisable").toString()));
-                        tWarnInfo.setValue(warnMap.get("value").toString());
-                        tWarnInfo.setImagePath(warnMap.get("imagePath").toString());
-                        tWarnInfo.setAlarmSource(Integer.valueOf(warnMap.get("alarmSource").toString()));
-                        tWarnInfo.setWarnName(warnMap.get("warnName").toString());
-                        tWarnInfo.setOutRange(warnMap.get("outRange").toString());
-                        tWarnInfo.setWarnContent(warnMap.get("warnContent").toString());
-                        tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warnMap.get("warnTime").toString()));
-                        log.info("告警数据对象：" + tWarnInfo);
-                        warnList.add(tWarnInfo);
-                    }
-                } catch (Exception e) {
-                    log.error("告警信息入库失败" + e);
-                }
+//                try {
+//                    Set<String> warnKey = redisScan("warnInfo:" + TASKID);
+//                    for (String key : warnKey) {
+//                        Map<String, Object> warnMap = redisTemplate.opsForHash().entries(key);
+//                        log.info("TWI开始");
+//                        TWarnInfo tWarnInfo = new TWarnInfo();
+//                        tWarnInfo.setWarnLevel(Integer.valueOf(warnMap.get("warnLevel").toString()));
+//                        tWarnInfo.setWarnType(Integer.valueOf(warnMap.get("warnType").toString()));
+//                        tWarnInfo.setDeviceId(Long.valueOf(warnMap.get("deviceId").toString()));
+//                        tWarnInfo.setCunstomId(warnMap.get("customId").toString());
+//                        tWarnInfo.setInstanceId(Long.valueOf(warnMap.get("instanceId").toString()));
+//                        tWarnInfo.setStdMeteId(Long.valueOf(warnMap.get("stdMeteId").toString()));
+//                        tWarnInfo.setTaskId(warnMap.get("taskId").toString());
+//                        tWarnInfo.setConfMode(Integer.valueOf(warnMap.get("confMode").toString()));
+//                        tWarnInfo.setIfWarnDisable(Integer.valueOf(warnMap.get("ifWarnDisable").toString()));
+//                        tWarnInfo.setValue(warnMap.get("value").toString());
+//                        tWarnInfo.setImagePath(warnMap.get("imagePath").toString());
+//                        tWarnInfo.setAlarmSource(Integer.valueOf(warnMap.get("alarmSource").toString()));
+//                        tWarnInfo.setWarnName(warnMap.get("warnName").toString());
+//                        tWarnInfo.setOutRange(warnMap.get("outRange").toString());
+//                        tWarnInfo.setWarnContent(warnMap.get("warnContent").toString());
+//                        tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warnMap.get("warnTime").toString()));
+//                        log.info("告警数据对象：" + tWarnInfo);
+//                        warnList.add(tWarnInfo);
+//                    }
+//                } catch (Exception e) {
+//                    log.error("告警信息入库失败" + e);
+//                }
 
 
                 Set<String> defectKey = redisScan("defectInfo:" + TASKID);
@@ -494,14 +515,14 @@ public class DataDealThread implements Runnable {
                 log.info("两表开始插入");
                 analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
                 analyseDataOperateService.batchInsertCruiseDataResult(dataList);
-                if (warnList.size() > 0) {
-                    analyseDataOperateService.batchInsertWarnInfo(warnList);
-                    //清空redis中的告警信息
-                    Set<String> warnKeys = redisScan("warnInfo:");
-                    for (String key : warnKeys) {
-                        redisTemplate.delete(key);
-                    }
-                }
+//                if (warnList.size() > 0) {
+//                    analyseDataOperateService.batchInsertWarnInfo(warnList);
+//                    //清空redis中的告警信息
+//                    Set<String> warnKeys = redisScan("warnInfo:");
+//                    for (String key : warnKeys) {
+//                        redisTemplate.delete(key);
+//                    }
+//                }
                 if (defectList.size() > 0) {
                     analyseDataOperateService.batchInsertDefectInfo(defectList);
                 }
