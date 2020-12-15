@@ -361,6 +361,7 @@ public class DataDealThread implements Runnable {
                 if (Objects.isNull(cruiseResultMap.get("isWarn"))) {
                     cruiseResultMap.put("isWarn", "0");
                 }
+                cruiseResultMap.put("evaluationState",analyseDataOperateService.selectDictCode("evaluation_state","未审核"));
                 // TODO: 2020/11/4 对算法识别结果进行判断并决定再redis中插入哪个值：identifyState- 识别正常&识别异常
                 // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
 
@@ -432,6 +433,7 @@ public class DataDealThread implements Runnable {
                     } else {
                         tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
                     }
+                    tCruiseDataResult.setEvaluationState(Integer.valueOf(cruiseWorkedMap.get("evaluationState").toString()));
                     tCruiseDataResult.setCreatetime(new Date());
                     tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
                     tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
