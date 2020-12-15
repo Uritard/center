@@ -81,7 +81,7 @@ public class TRobotInspectionService{
         return this.tRobotInspectionDao.batchInsert(list);
     }
 
-    @Logs(title = "机器人监控", code = "device",content = "查询机器人的任务信息")
+//    @Logs(title = "机器人监控", code = "device",content = "查询机器人的任务信息")
     @Transactional(rollbackFor = Exception.class)
     public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId) throws Exception{
         List<RobotTaskMessage> re = new ArrayList<>();
@@ -138,7 +138,7 @@ public class TRobotInspectionService{
         return this.tRobotInspectionDao.selectRobotInfo();
     }
 
-    @Logs(title = "查询机器人状态信息", code = "device",content = "查询机器人状态信息")
+//    @Logs(title = "查询机器人状态信息", code = "device",content = "查询机器人状态信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectRobotStatus(String robotCode){
         Map<String,Object> re = new HashMap<>();
