@@ -538,5 +538,6 @@ select *from (
             LEFT JOIN t_cruise_task c ON a.task_id = c.task_id
         WHERE
             a.c_state = 239
+            order by c.start_time desc limit 3
     </select>
 </mapper>

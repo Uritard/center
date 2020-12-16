@@ -143,22 +143,22 @@ public class HomePageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("获取变电站概况数据错误:", e);
+            log.error("获取摄像机分组信息错误:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "获取摄像机id信息")
     @RequestMapping(value = "/getCameraIdInfo", method = RequestMethod.GET)
-    public Result getCameraIdInfo(@RequestParam(value = "groupId", required = true) Long groupId) {
+    public Result getCameraIdInfo() {
         Result result = new Result();
         try {
-            result.setData(homePageService.getCameraIdInfo(groupId));
+            result.setData(homePageService.getCameraIdInfo());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("获取变电站概况数据错误:", e);
+            log.error("获取摄像机id信息错误:", e);
         }
         return result;
     }

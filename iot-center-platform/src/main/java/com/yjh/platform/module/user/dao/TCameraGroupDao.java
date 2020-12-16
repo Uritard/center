@@ -29,5 +29,5 @@ public interface TCameraGroupDao {
     TCameraGroup selectIsExit(@Param(value = "groupName") String groupName);
     List<TCameraGroup> selectAll();
     List<Map<String,Object>>selectGroupName();
-    String selectCameraIdInfo(@Param(value = "groupId") Long groupId);
+    List<Long> selectCameraIdInfo();
 }

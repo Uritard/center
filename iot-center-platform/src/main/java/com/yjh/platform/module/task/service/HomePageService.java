@@ -1,11 +1,16 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
+import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lqh
@@ -40,6 +42,8 @@ public class HomePageService {
     private SystemInfoService systemInfoService;
     @Autowired
     private TCameraGroupDao tCameraGroupDao;
+    @Autowired
+    private TCameraScreenDao tCameraScreenDao;
 
     @Logs(title = "巡视任务概览数据", code = "TaskForHomeService",content = "根据页面参数查询任务数据概览")
     @Transactional(rollbackFor = Exception.class)
@@ -166,6 +170,24 @@ public class HomePageService {
                 mapForRe.put("usedTime",item.get("usedTime"));
             }
         }
+        //电压等级
+        String stationVoltageGrade = redisTemplate.opsForHash().entries("t_sys_param:stationVoltageGrade").get("content").toString();
+        mapForRe.put("stationVoltageGrade",stationVoltageGrade);
+        //所属班所
+        String fromWhatClass = redisTemplate.opsForHash().entries("t_sys_param:fromWhatClass").get("content").toString();
+        mapForRe.put("fromWhatClass",fromWhatClass);
+        //所有人员
+        String allPeople = redisTemplate.opsForHash().entries("t_sys_param:allPeople").get("content").toString();
+        mapForRe.put("allPeople",allPeople);
+        //工作人员
+        String workPeople = redisTemplate.opsForHash().entries("t_sys_param:workPeople").get("content").toString();
+        mapForRe.put("workPeople",workPeople);
+        //所有车辆
+        String allCar = redisTemplate.opsForHash().entries("t_sys_param:allCar").get("content").toString();
+        mapForRe.put("allCar",allCar);
+        //工作车辆
+        String workCar = redisTemplate.opsForHash().entries("t_sys_param:workCar").get("content").toString();
+        mapForRe.put("workCar",workCar);
         return mapForRe;
     }
 
@@ -177,9 +199,38 @@ public class HomePageService {
 
     @Logs(title = "获取摄像机id信息", code = "TaskForHomeService",content = "获取摄像机id信息")
     @Transactional(rollbackFor = Exception.class)
-    public String[] getCameraIdInfo(Long groupId){
-        String[] ids =  tCameraGroupDao.selectCameraIdInfo(groupId).split(", ");
-        return ids;
+    public List<Long> getCameraIdInfo(){
+        Map<String,String> map = new HashMap<>();
+        //获取相机的状态
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            map.putAll((Map<String,String>)re.getData());
+        }
+        List<Long> re =  new ArrayList<>();
+        List<Long> cameraIdList =tCameraGroupDao.selectCameraIdInfo();
+        for (Long item: cameraIdList) {
+            //String str = map.get(item.toString());
+            if("1".equals(map.get(item.toString()))){
+                re.add(item);
+            }
+        }
+        return re;
+    }
+
+    private static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+            }
+        } catch (Exception e) {
+
+        }
+        return re;
     }
 
 

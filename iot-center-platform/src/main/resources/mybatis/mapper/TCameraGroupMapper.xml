@@ -134,11 +134,10 @@
             t_camera_group a
     </select>
 
-    <select id="selectCameraIdInfo" resultType="java.lang.String">
+    <select id="selectCameraIdInfo" resultType="java.lang.Long">
        SELECT
-            a.camera_ids
+            a.camera_id
         FROM
-            t_camera_group a
-        where a.group_id = #{groupId,jdbcType=BIGINT}
+            t_camera_info a
     </select>
 </mapper>
