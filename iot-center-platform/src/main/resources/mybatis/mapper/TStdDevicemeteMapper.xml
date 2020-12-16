@@ -343,7 +343,7 @@
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="alarmNote != null alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
+        <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
