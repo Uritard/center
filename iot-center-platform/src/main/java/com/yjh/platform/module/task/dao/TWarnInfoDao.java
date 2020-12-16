@@ -1,13 +1,16 @@
 package com.yjh.platform.module.task.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import java.util.Map;
-
-import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.TJContentInfoDetail;
+import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.entity.TWarnInfoDetail;
+import com.yjh.platform.module.task.entity.WarnStatistical;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -57,4 +60,6 @@ public interface TWarnInfoDao {
                                             @Param(value = "endTime")String endTime);
     //查询未审核告警信息数量
     Integer warnCountsNonIdentify();
+
+    TWarnInfoDetail selectWarnPopUp(@Param(value = "warnId")Long warnId);
 }

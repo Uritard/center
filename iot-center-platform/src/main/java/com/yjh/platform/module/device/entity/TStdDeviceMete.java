@@ -55,7 +55,7 @@ public class TStdDeviceMete implements Serializable {
     private String unit;
 
     @ApiModelProperty(value = "是否生成告警提示 0-生成 1-不生成")
-    private Integer alarmNote;
+    private String alarmNote;
 
     @ApiModelProperty(value = "告警分类")
     private String alarmType;
@@ -110,7 +110,7 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "系数")
     private Integer modulus;
 
-    @ApiModelProperty(value = "是否生成告警 0-生成 1-不生成")
+    @ApiModelProperty(value = "信号说明")
     private String remark;
 
     @ApiModelProperty(value = "状态一描述")

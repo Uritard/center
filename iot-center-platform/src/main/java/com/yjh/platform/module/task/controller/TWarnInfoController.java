@@ -1,25 +1,25 @@
 package com.yjh.platform.module.task.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-import java.util.Map;
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServlet;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -291,6 +291,19 @@ public class TWarnInfoController {
             log.error("数量更新失败",e);
         }
         return  result;
+    }
+    @ApiOperation(value = "告警弹框")
+    @RequestMapping(value = "/warnPopUp",method = RequestMethod.GET)
+    public Result warnPopUp(@RequestParam(value = "warnId", required = true) Long warnId) {
+        Result result = new Result();
+        try {
+            TWarnInfoDetail tWarnInfoDetail = tWarnInfoService.selectWarnPopUp(warnId);
+            result.setData(tWarnInfoDetail);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
     }
 
 }

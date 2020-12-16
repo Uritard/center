@@ -540,7 +540,7 @@
         SELECT * FROM
         <include refid="TongYong"></include>
         where 1 = 1
-        <if test="warnId != null and warnId != ''"> and warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
     </select>
 
     <select id="warnCountsNonIdentify" resultType="java.lang.Integer">
@@ -550,6 +550,29 @@
             t_dict_business a
         LEFT JOIN t_warn_info b ON a.col_name = 'conf_mode'
         AND dict_note = '已处理'
+    </select>
+    <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+        SELECT
+            a.warn_id,
+            a.device_id,
+            b.device_name,
+            a.warn_time as alarm_time,
+            a.std_mete_id,
+            d.mete_name,
+            a.warn_level as alarm_level,
+            e.dict_note as alarm_level_name,
+            a.warn_content,
+            a.image_path,
+            a.alarm_source,
+            f.dict_note as alarm_source_name
+        FROM t_warn_info a
+        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id
+        LEFT JOIN t_dict_business e on e.dict_code = a.warn_level
+        LEFT JOIN t_dict_business f on f.dict_code = a.alarm_source
+        where 1 = 1
+        <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
+
     </select>
 
 </mapper>

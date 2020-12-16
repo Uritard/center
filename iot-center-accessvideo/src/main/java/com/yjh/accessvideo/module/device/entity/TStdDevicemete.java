@@ -56,7 +56,7 @@ public class TStdDevicemete implements Serializable {
     private String unit;
 
     @ApiModelProperty(value = "是否生成告警提示 0-生成 1-不生成")
-    private Integer alarmNote;
+    private String alarmNote;
 
     @ApiModelProperty(value = "告警分类")
     private String alarmType;

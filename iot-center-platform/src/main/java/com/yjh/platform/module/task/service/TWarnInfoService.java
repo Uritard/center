@@ -275,6 +275,12 @@ public class TWarnInfoService{
         Integer finalCounts=warnKeys.size()+tWarnInfoDao.warnCountsNonIdentify();
         return finalCounts;
     }
+    //告警弹窗
+    @Transactional(rollbackFor = Exception.class)
+    public TWarnInfoDetail selectWarnPopUp(Long warnId){
+        TWarnInfoDetail tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(warnId);
+        return tWarnInfoDetail;
+    }
     //读批量redis
     public Set<String> redisScan(String key) {
         return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
