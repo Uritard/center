@@ -332,17 +332,17 @@ public class TCruiseTaskResultService {
             Long a = Long.valueOf(resultMap.get("cruiseId").toString());
             if (TaskId.equals(value)) {
                 if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
-                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
-                        deviceMeteAbnormal.add(null);
-                    } else {
+//                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
+//                        deviceMeteAbnormal.add(null);
+//                    } else {
                         deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
-                    }
+//                    }
                 } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
-                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
-                        deviceMeteComp.add(null);
-                    } else {
+//                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
+//                        deviceMeteComp.add(null);
+//                    } else {
                         deviceMeteComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
-                    }
+//                    }
                 }
             }
         }
@@ -369,6 +369,9 @@ public class TCruiseTaskResultService {
         cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
         cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
         cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
+
+        log.info("总点数："+deviceMete.size());
+        log.info("已执行点数："+deviceMeteComp.size());
 
 
         return cruiseResultCounter;

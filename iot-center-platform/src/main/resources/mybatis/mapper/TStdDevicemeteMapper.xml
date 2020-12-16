@@ -583,7 +583,7 @@
 	        a.device_mete_id
         FROM
 	        t_cruise_point_instance b
-        JOIN t_std_devicemete a ON b.device_mete_id = a.device_mete_id
+        LEFT JOIN t_std_devicemete a ON b.device_mete_id = a.device_mete_id
         WHERE
 	         b.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>

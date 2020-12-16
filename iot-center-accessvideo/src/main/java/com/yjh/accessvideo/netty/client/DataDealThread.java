@@ -18,8 +18,16 @@ import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yjh.accessvideo.common.Constant.*;
+import static com.yjh.accessvideo.common.Constant.NORMAL;
+
+import static com.yjh.accessvideo.common.Constant.TASKID;
+import static com.yjh.accessvideo.common.Constant.INSTANCEID;
+import static com.yjh.accessvideo.common.Constant.ABNORMAL;
+import static com.yjh.accessvideo.common.Constant.NORMAL;
+import static com.yjh.accessvideo.common.Constant.cruiseKeys;
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {
@@ -279,7 +287,7 @@ public class DataDealThread implements Runnable {
                                                tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime").toString()));
                                                analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
-                                               // webSocket通知前端调用巡视监控的接口
+                                               // webSocket通知前端刷新告警统计数量
                                                Map<String, Object> jasonMaps = new HashMap<>();
                                                jasonMaps.put("type", "newAlarm");
                                                jasonMaps.put("alarmName", warningMsg.get("warnName"));
@@ -288,7 +296,6 @@ public class DataDealThread implements Runnable {
                                                String jsons = JSON.toJSONString(jasonMaps);
                                                log.info("发送给前端的消息：" + jsons);
                                                WebSocketServer.sendMsg(jsons);
-
 
                                                //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                                String alarmNote = tStdDevicemeteM.getAlarmNote();
