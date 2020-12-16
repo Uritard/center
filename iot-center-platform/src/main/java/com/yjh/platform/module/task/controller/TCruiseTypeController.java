@@ -114,6 +114,7 @@ public class TCruiseTypeController {
                 List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
+                resultMap.put("instanceIdList",tCruiseTypeService.selectIdList(subType));
                 result.setData(resultMap);
             }else {
                 List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);

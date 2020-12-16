@@ -140,4 +140,11 @@
             )
     </delete>
 
+    <select id="selectIdList" resultType="java.lang.Long">
+        select  instance_id
+        from t_cruise_type
+        where 1=1
+        <if test="subType != null"> and sub_type = #{subType, jdbcType=INTEGER}</if>
+    </select>
+
 </mapper>

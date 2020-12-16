@@ -85,7 +85,11 @@ public class TCruiseTypeService{
     return this.tCruiseTypeDao.batchDelete(list1);
     }
 
-
+    @Logs(title = "查询类型下的所有id", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectIdList(Integer subType) {
+        return this.tCruiseTypeDao.selectIdList(subType);
+    }
 
 }
 

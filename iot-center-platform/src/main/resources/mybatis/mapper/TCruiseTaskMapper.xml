@@ -482,7 +482,7 @@ select *from (
         UNION
         SELECT @s :=@s - 1 as `index`, DATE(DATE_SUB(CURRENT_DATE, INTERVAL @s DAY)) AS `timeNode`
         FROM mysql.help_topic,(SELECT @s := WEEKDAY(CURRENT_DATE) + 1) temp
-        WHERE @s > 0
+        WHERE @s &gt; 0
         ORDER BY `timeNode`) a
         LEFT JOIN (
         SELECT
