@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -108,11 +109,12 @@ public class HomePageService {
     @Logs(title = "机器人信息", code = "TaskForHomeService",content = "机器人信息")
     @Transactional(rollbackFor = Exception.class)
     public List<RobotInfoForHomePage> robotInfoForHomePage() throws Exception{
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DecimalFormat df = new DecimalFormat("#0");
         List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo();
         for (RobotInfoForHomePage item: robotList) {
             //计算机器人投运时间
-            Date startTime = df.parse(item.getCommissionDate());
+            Date startTime = simpleDateFormat.parse(item.getCommissionDate());
             Date endTime = new Date();
             long diff = endTime.getTime()-startTime.getTime();
             long days = diff / (1000 * 60 * 60 * 24);
@@ -131,13 +133,23 @@ public class HomePageService {
             item.setCommissionDate(usedTime);
             Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+item.getRobotCode()+":3");
             if(mapForCell.size() != 0){
-                item.setBatteryLevel(mapForCell.get("valueUnit").toString());//电池电量
+               Double value = Double.valueOf(mapForCell.get("value").toString());//电池电量
+                String valueUnit = df.format(value)+"%";
+                item.setBatteryLevel(valueUnit);
             }else {
                 item.setBatteryLevel("");
             }
             Map<String,Object> mapForOnlineState  = redisTemplate.opsForHash().entries("RobotStatus:"+item.getRobotCode()+":2");
             if(mapForOnlineState.size() != 0){
-                item.setOnlineState(mapForOnlineState.get("value").toString());//网络状态
+                String state = mapForOnlineState.get("value").toString();
+                if("0".equals(state)){
+                    state = "在线";
+                }else if("1".equals(state)){
+                    state = "离线";
+                }else {
+                    state ="";
+                }
+                item.setOnlineState(state);//网络状态
             }else {
                 item.setOnlineState("");//网络状态
             }
@@ -149,9 +161,40 @@ public class HomePageService {
             }
             Map<String,Object> mapForControlModel  = redisTemplate.opsForHash().entries("RobotStatus:"+item.getRobotCode()+":61");
             if(mapForMileage.size() != 0){
-                item.setControlModel(mapForControlModel.get("value").toString());//控制模式
+                String model = mapForControlModel.get("value").toString();
+                if("1".equals(model)){
+                    model = "任务模式";
+                }else if("2".equals(model)){
+                    model = "紧急定位模式";
+                }else if("3".equals(model)){
+                    model = "后台遥控模式";
+                }else if("4".equals(model)){
+                    model = "手持遥控模式";
+                }else {
+                    model ="";
+                }
+                item.setControlModel(model);//控制模式
             }else {
                 item.setControlModel("");//控制模式
+            }
+
+            Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+item.getRobotCode()+":41");
+            if(mapForRobotState.size() != 0){
+                String state = mapForRobotState.get("value").toString();
+                if("1".equals(state)){
+                    state = "空闲状态";
+                }else if("2".equals(state)){
+                    state = "巡视状态";
+                }else if("3".equals(state)){
+                    state = "充电状态";
+                }else if("4".equals(state)){
+                    state = "检修状态";
+                }else {
+                    state ="";
+                }
+                item.setRobotStates(state);//机器人状态
+            }else {
+                item.setRobotStates("");//机器人状态
             }
         }
         return robotList;
@@ -219,6 +262,31 @@ public class HomePageService {
         }
         return re;
     }
+
+    @Logs(title = "获取分组下摄像机id信息", code = "TaskForHomeService",content = "获取分组下摄像机id信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> getCameraIdInfoForGroup(Long groupId){
+        Map<String,String> map = new HashMap<>();
+        //获取相机的状态
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            map.putAll((Map<String,String>)re.getData());
+        }
+        List<String> re =  new ArrayList<>();
+        String[] cameraIdList =tCameraGroupDao.selectCameraIdInfoForGroup(groupId).split(",");
+        for (String item: cameraIdList) {
+            //String str = map.get(item.toString());
+            if("1".equals(map.get(item))){
+                re.add(item);
+            }
+        }
+        return re;
+    }
+
+
 
     private static Result cameraStates(HashMap map) {
         Result re = null;

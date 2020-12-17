@@ -150,10 +150,15 @@ public class HomePageController {
 
     @ApiOperation(value = "获取摄像机id信息")
     @RequestMapping(value = "/getCameraIdInfo", method = RequestMethod.GET)
-    public Result getCameraIdInfo() {
+    public Result getCameraIdInfo(@RequestParam(value = "groupId", required = false) Long groupId) {
         Result result = new Result();
         try {
-            result.setData(homePageService.getCameraIdInfo());
+            if(groupId == null){
+                result.setData(homePageService.getCameraIdInfo());
+            }else {
+                result.setData(homePageService.getCameraIdInfoForGroup(groupId));
+            }
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

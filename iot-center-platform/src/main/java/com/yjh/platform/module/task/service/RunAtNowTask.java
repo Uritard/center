@@ -3,6 +3,8 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.quartz.JobManager;
+import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
@@ -70,14 +72,14 @@ public class RunAtNowTask implements Runnable{
     //等待相机转到预置位时间
     private Long waitTime;
     //任务超期天数
-    private Long tasksAreTime;
+    private Float tasksAreTime;
 
     private TCruiseTask tCruiseTask;
 
     public RunAtNowTask(TCruiseTask tCruiseTask,Long waitTime ,String picModelPath,RedisTemplate redisTemplate,TCruisePointInstanceDao tCruisePointInstanceDao,
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
-                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Long tasksAreTime,
+                        TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Float tasksAreTime,
                         TRobotInspectionDao tRobotInspectionDao) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
@@ -159,7 +161,6 @@ public class RunAtNowTask implements Runnable{
     public void run() {
         try {
             //Thread.sleep(10000);
-            Long timeIsOk = tasksAreTime*24*60*60*100;
             Date taskStart = new Date();
             log.info("开始进行任务" +taskStart);
             Long taskIsStart = taskStart.getTime();
@@ -230,6 +231,28 @@ public class RunAtNowTask implements Runnable{
             Integer taskAbnormal = 0;//异常数量
             Integer taskNormal = 0;//正常
             List<String> analysisInstanceList = new ArrayList<>();
+
+            try {
+                QuartzTask quartzTaskForAre = new QuartzTask();
+                quartzTaskForAre.setJobName("检查"+tCruiseTask.getTaskName());
+                quartzTaskForAre.setJobGroup("jiancha");
+                SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                //String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
+                Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                Date taskStartTime = sd.parse(mapForGet.get("taskStart"));
+                Long taskStartTimes = taskStartTime.getTime();
+                //任务超期时间
+                Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+                tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
+                //Long endTime = taskStartTimes + tasksAreTime*24*60*60*1000;
+                Long endTime = taskStartTimes + tasksAreTime.longValue()*60*1000;
+                String s =sd.format(endTime);
+                quartzTaskForAre.setStartTime(sd.parse(s));
+                JobManager jobManager =new JobManager();
+                jobManager.checkTaskIsOver(quartzTaskForAre, tCruiseTask.getTaskId());
+                log.info("检查任务超期任务创建成功");
+            } catch (Exception e) {
+                log.info("检查任务超期任务创建失败"+e); }
 
             //找出机器人做任务的巡检点
             List<Long> robotCruiseList = new ArrayList<>();
@@ -302,11 +325,16 @@ public class RunAtNowTask implements Runnable{
                         HashMap<String, Object> map2 = new HashMap<>();
                         map2.put("cameraId", tCameraPreset.getCameraId());
                         Result re = picture(map2);
-                        JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
-                        //todo 对于相机的返回错误分析  任务异常终止/超期
-                         urlPath = (String) jsonForRe.get("urlPath");
-                         absPath = (String) jsonForRe.get("absPath");
-                        isOk = re.getMessage();
+                        if(re == null){
+                            isOk = "";
+                        }else{
+                            JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
+                            //todo 对于相机的返回错误分析  任务异常终止/超期
+                            urlPath = (String) jsonForRe.get("urlPath");
+                            absPath = (String) jsonForRe.get("absPath");
+                            isOk = re.getMessage();
+                        }
+
                     }
                     if( !"success".equals(isOk)){
                         //抓图失败 任务失败
@@ -320,6 +348,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseResultDao.update(tCruiseResult);
                         tCruiseDataResult.setCruiseResult(247);
                         tCruiseDataResult.setCruiseAbnormal(248);
+                        tCruiseDataResult.setResultNum("抓图失败");
                         tCruiseDataResultDao.insert(tCruiseDataResult);
                         tCruiseTaskResultDetail.setCruiseStatus(254);
                         tCruiseTaskResultDetail.setEndTime(new Date());
@@ -350,7 +379,7 @@ public class RunAtNowTask implements Runnable{
                         if(tAlgorithmConf != null){//摄像头配置了算法
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
-                            tCruiseTaskResultDetail.setCruiseStatus(252);
+                            tCruiseTaskResultDetail.setCruiseStatus(253);
                             Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                             String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
 
@@ -456,34 +485,6 @@ public class RunAtNowTask implements Runnable{
                 Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                 TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(tCruiseTask.getTaskId());
                 Long taskEndTime = new Date().getTime();
-                if((taskEndTime - taskIsStart)>timeIsOk){
-                    //任务超期
-                    tCruiseResult.setCState(244);
-                    tCruiseResultDao.update(tCruiseResult);
-                    //任务结束生成结果，
-                    Analysis analysis = new Analysis();
-                    analysis.setTaskId(tCruiseTask.getTaskId());
-                    analysis.setInstanceId(-1L);
-                    //analysis.setPicPath(picUrl);
-                    //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
-                    //analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                    //analysis.setPicModelPath(picModelPath);//模板图片暂时没有
-                    List<Analysis> analysisList = new ArrayList<>();
-                    analysisList.add(analysis);
-                    Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-                    analysisMap.put("list",analysisList);
-                    log.info("算法信息：    "+analysisMap);
-                    analysis(analysisMap);
-                    log.info("任务超期"+tCruiseTask.getTaskId());
-                    Map<String,Object> jsonMap=new HashMap<>();
-                    jsonMap.put("type","taskAre");
-                    jsonMap.put("taskId",taskId);
-                    String jsonForTaskAre= JSON.toJSONString(jsonMap);
-                    log.info("任务超期的消息：   "+jsonForTaskAre);
-                    WebSocketServer.sendMsg(jsonForTaskAre);
-                    return;
-
-                }
                 if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
                     if(tCruiseResultIsPause.getCState() == 242){
                         Map<String,Object> jsonMap=new HashMap<>();
@@ -500,6 +501,7 @@ public class RunAtNowTask implements Runnable{
                     if(re == all){
                         //所有点都做完了
                         tCruiseTaskResult.setTaskAbnormal(abnormal);
+                        tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
                         tCruiseTaskResultDao.insert(tCruiseTaskResult);
                         Thread.sleep(15000);
                         tCruiseResult.setCState(240);
@@ -540,6 +542,7 @@ public class RunAtNowTask implements Runnable{
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
+                tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
                 Map<String, Object> jsonForLastMap = new HashMap<>();

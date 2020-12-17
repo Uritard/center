@@ -20,14 +20,8 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
-import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
-import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.dao.TSysParamDao;
-import com.yjh.platform.module.user.entity.TAlgorithmConf;
-import com.yjh.platform.module.user.entity.TAlgorithmInfo;
-import com.yjh.platform.module.user.entity.TCameraPreset;
-import com.yjh.platform.module.user.entity.TSysParam;
+import com.yjh.platform.module.user.dao.*;
+import com.yjh.platform.module.user.entity.*;
 import lombok.Data;
 import lombok.NonNull;
 import org.quartz.CronExpression;
@@ -83,6 +77,8 @@ public class TCruiseTaskService {
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
     private TSysParamDao tSysParamDao;
+    @Autowired
+    private SysUserDao sysUserDao;
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
@@ -91,7 +87,9 @@ public class TCruiseTaskService {
     @Value("${spring.QingHua.jobName}")
     private String jobName;
     //任务超期时间
-    private Long tasksAreTime;
+    private Float tasksAreTime;
+    //算法接口
+    private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
@@ -173,7 +171,7 @@ public class TCruiseTaskService {
                     waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
                     //任务超期时间
                     Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-                    tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
+                    tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                             tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
@@ -185,6 +183,7 @@ public class TCruiseTaskService {
             }else {
                 //定时
                 quartzTask.setStartTime(tCruiseTask.getStartTime());
+                //quartzTask.setStartTime(new Date());
                 JobManager jobManager = new JobManager();
                 try {
                     jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
@@ -472,22 +471,19 @@ public class TCruiseTaskService {
         tCruiseResult.setCState(241);
         try{
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-            QuartzTask quartzTask = new QuartzTask();
-            quartzTask.setJobName(tCruiseTask.getTaskName());
-            quartzTask.setJobGroup(jobName);
-            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
-            Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            Date startTime = sd.parse(mapForGet.get("taskStart"));
-            Long taskStartTime = startTime.getTime();
-            //任务超期时间
-            Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-            tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
-            Long endTime = taskStartTime + tasksAreTime*24*60*60*1000;
-            String s =sd.format(endTime);
-            quartzTask.setStartTime(sd.parse(s));
-            JobManager jobManager =new JobManager();
-            jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
+            //给算法暂停
+            Analysis analysis = new Analysis();
+            analysis.setTaskId(tCruiseTask.getTaskId());
+            analysis.setInstanceId(-1L);
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+            analysisMap.put("list",analysisList);
+            log.info("算法信息：    "+analysisMap);
+            analysis(analysisMap);
+            log.info("任务暂停"+tCruiseTask.getTaskId());
+
+            Thread.sleep(10000);
             //机器人任务暂停
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
             if(robotCodeList != null && robotCodeList.size()>0){
@@ -519,7 +515,7 @@ public class TCruiseTaskService {
         waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
         //任务超期时间
         Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-        tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
+        tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                 tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime,
@@ -560,9 +556,23 @@ public class TCruiseTaskService {
     }
     @Logs(title = "任务终止", code = "TCruiseTask",content = "任务终止")
     @Transactional(rollbackFor = Exception.class)
-    public int taskShutDown(String taskId) {
+    public int taskShutDown(String taskId) throws Exception{
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(242);
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        //给算法暂停
+        Analysis analysis = new Analysis();
+        analysis.setTaskId(tCruiseTask.getTaskId());
+        analysis.setInstanceId(-1L);
+        List<Analysis> analysisList = new ArrayList<>();
+        analysisList.add(analysis);
+        Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+        analysisMap.put("list",analysisList);
+        log.info("算法信息：    "+analysisMap);
+        analysis(analysisMap);
+        log.info("任务暂停"+tCruiseTask.getTaskId());
+
+        Thread.sleep(10000);
         //机器人任务终止
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
         if(robotCodeList != null && robotCodeList.size()>0){
@@ -834,6 +844,29 @@ public class TCruiseTaskService {
         }
         log.info("listTask: "+listTask);
         return listTask;
+    }
+
+    //表记分析
+    private void analysis(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ALGORITHM_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+
+    @Logs(title = "任务确认下发", code = "TCruiseTask",content = "任务确认下发")
+    @Transactional(rollbackFor = Exception.class)
+    public int taskConfirmation(String userId,String password){
+        SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
+        if(sysUser.getPassword().equals(password)){
+            return 1;
+        }
+        return -1;
     }
 
 

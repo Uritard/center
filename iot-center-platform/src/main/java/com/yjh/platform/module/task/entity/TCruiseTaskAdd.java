@@ -79,4 +79,6 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "定时时间类型（1.周，2.日）")
     private Long periodId;
 
+    private String password;
+
 }

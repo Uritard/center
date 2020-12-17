@@ -140,4 +140,13 @@
         FROM
             t_camera_info a
     </select>
+
+    <select id="selectCameraIdInfoForGroup" resultType="java.lang.String" >
+        SELECT
+            a.camera_ids
+        FROM
+            t_camera_group a
+        where a.group_id = #{groupId,jdbcType=BIGINT}
+    </select>
+
 </mapper>

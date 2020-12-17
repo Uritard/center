@@ -11,6 +11,7 @@ import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
+import com.yjh.platform.module.user.entity.TCameraScreen;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.quartz.CronExpression;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 
@@ -47,8 +49,6 @@ public class TCruiseTaskController {
         this.tCruiseTaskService = tCruiseTaskService;
     }
 
-    @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result insert(@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {
@@ -314,6 +314,49 @@ public class TCruiseTaskController {
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "插入")
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public Result taskConfirmation(HttpServletRequest request,@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
+        Result result = new Result();
+        try {
+            String userId = request.getHeader("userId");
+            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getPassword());
+            if(i == 1){
+//                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+//                tCruiseTaskAdd.setTaskId(taskId);
+//                tCruiseTaskAdd.setTaskName(taskName);
+//                tCruiseTaskAdd.setPlanId(planId);
+//                tCruiseTaskAdd.setAreaId(areaId);
+//                tCruiseTaskAdd.setType(type);
+//                tCruiseTaskAdd.setIfRun(ifRun);
+//                tCruiseTaskAdd.setRobotId(robotId);
+//                tCruiseTaskAdd.setDateType(dateType);
+//                tCruiseTaskAdd.setTaskType(taskType);
+//                tCruiseTaskAdd.setStartTime(startTime);
+//                tCruiseTaskAdd.setCreateTime(createTime);
+//                tCruiseTaskAdd.setMin(min);
+//                tCruiseTaskAdd.setHour(hour);
+//                tCruiseTaskAdd.setDayOfMonth(dayOfMonth);
+//                tCruiseTaskAdd.setMonth(month);
+//                tCruiseTaskAdd.setDayOfWeek(dayOfWeek);
+//                tCruiseTaskAdd.setYear(year);
+//                tCruiseTaskAdd.setPeriodId(periodId);
+                result = this.insert(tCruiseTaskAdd);
+            }else {
+                result.setCode(209);
+                result.setMessage("密码错误");
+            }
+            //result.setData(tCameraScreenService.update(tCameraScreen,userId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
         }
         return result;
     }

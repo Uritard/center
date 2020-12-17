@@ -494,6 +494,6 @@
         from t_robot_alarm c
         left join t_robot_info d on c.robot_id = d.robot_id
         )
-        order by warnTime desc LIMIT 5
+        order by warnTime desc LIMIT 20
     </select>
 </mapper>

@@ -116,10 +116,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                 Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                 tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
 
-                Long timeIsOk = tasksAreTime*24*60*60*1000;
                 Date taskStart = new Date();
                 log.info("开始进行任务" +taskStart);
-                Long taskIsStart = taskStart.getTime();
+                //Long taskIsStart = taskStart.getTime();
 
                 TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
                 //在任务表里新建一条
@@ -174,7 +173,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 mapForAbnormal.put("all",taskCount.toString());
                 mapForAbnormal.put("abnormal","0");
                 mapForAbnormal.put("normal","0");
-                mapForAbnormal.put("taskStart",taskIsStart.toString());
+                mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
                 mapForAbnormal.put("overDay",tasksAreTime.toString());
                 String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
@@ -182,6 +181,28 @@ public class CruiseTaskJob extends QuartzJobBean {
                 Integer taskAbnormal = 0;//异常数量
                 Integer taskNormal = 0;//正常
                 List<String> analysisInstanceList = new ArrayList<>();
+
+                try {
+                    QuartzTask quartzTaskForAre = new QuartzTask();
+                    quartzTaskForAre.setJobName("检查"+tCruiseTask.getTaskName());
+                    quartzTaskForAre.setJobGroup("jiancha");
+                    SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    //String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
+                    Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                    Date taskStartTime = sd.parse(mapForGet.get("taskStart"));
+                    Long taskStartTimes = taskStartTime.getTime();
+                    //任务超期时间
+                    //Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+                    tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
+                    //Long endTime = taskStartTimes + tasksAreTime*24*60*60*1000;
+                    Long endTime = taskStartTimes + tasksAreTime.longValue()*60*1000;
+                    String s =sd.format(endTime);
+                    quartzTaskForAre.setStartTime(sd.parse(s));
+                    JobManager jobManager =new JobManager();
+                    jobManager.checkTaskIsOver(quartzTaskForAre, tCruiseTask.getTaskId());
+                    log.info("检查任务超期任务创建成功");
+                } catch (Exception e) {
+                    log.info("检查任务超期任务创建失败"+e); }
 
                 //找出机器人做任务的巡检点
                 List<Long> robotCruiseList = new ArrayList<>();
@@ -254,11 +275,15 @@ public class CruiseTaskJob extends QuartzJobBean {
                             HashMap<String, Object> map2 = new HashMap<>();
                             map2.put("cameraId", tCameraPreset.getCameraId());
                             Result re = picture(map2);
-                            JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
-                            //todo 对于相机的返回错误分析  任务异常终止/超期
-                            urlPath = (String) jsonForRe.get("urlPath");
-                            absPath = (String) jsonForRe.get("absPath");
-                            isOk = re.getMessage();
+                            if(re == null){
+                                isOk = "";
+                            }else{
+                                JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
+                                //todo 对于相机的返回错误分析  任务异常终止/超期
+                                urlPath = (String) jsonForRe.get("urlPath");
+                                absPath = (String) jsonForRe.get("absPath");
+                                isOk = re.getMessage();
+                            }
                         }
                         if( !"success".equals(isOk)){
                             //抓图失败 任务失败
@@ -272,6 +297,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseResultDao.update(tCruiseResult);
                             tCruiseDataResult.setCruiseResult(247);
                             tCruiseDataResult.setCruiseAbnormal(248);
+                            tCruiseDataResult.setResultNum("抓图失败");
                             tCruiseDataResultDao.insert(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(254);
                             tCruiseTaskResultDetail.setEndTime(new Date());
@@ -303,7 +329,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
 
-                                tCruiseTaskResultDetail.setCruiseStatus(252);
+                                tCruiseTaskResultDetail.setCruiseStatus(253);
                                 Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                                 String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
 
@@ -410,34 +436,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                     TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(tCruiseTask.getTaskId());
                     Long taskEndTime = new Date().getTime();
-                    if((taskEndTime - taskIsStart)>timeIsOk){
-                        //任务超期
-                        tCruiseResult.setCState(244);
-                        tCruiseResultDao.update(tCruiseResult);
-                        //任务结束生成结果，
-                        Analysis analysis = new Analysis();
-                        analysis.setTaskId(tCruiseTask.getTaskId());
-                        analysis.setInstanceId(-1L);
-                        //analysis.setPicPath(picUrl);
-                        //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
-                        //analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                        //analysis.setPicModelPath(picModelPath);//模板图片暂时没有
-                        List<Analysis> analysisList = new ArrayList<>();
-                        analysisList.add(analysis);
-                        Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-                        analysisMap.put("list",analysisList);
-                        log.info("算法信息：    "+analysisMap);
-                        analysis(analysisMap);
-                        log.info("任务超期"+tCruiseTask.getTaskId());
-                        Map<String,Object> jsonMap=new HashMap<>();
-                        jsonMap.put("type","taskAre");
-                        jsonMap.put("taskId",taskId);
-                        String jsonForTaskAre= JSON.toJSONString(jsonMap);
-                        log.info("任务超期的消息：   "+jsonForTaskAre);
-                        WebSocketServer.sendMsg(jsonForTaskAre);
-                        return;
 
-                    }
                     if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
                         if(tCruiseResultIsPause.getCState() == 242){
                             Map<String,Object> jsonMap=new HashMap<>();
@@ -454,7 +453,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                         if(re == all){
                             //所有点都做完了
                             tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
-                            tCruiseTaskResultDao.update(tCruiseTaskResult);
+                            tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+                            tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
                             Map<String, Object> jsonForLastMap = new HashMap<>();
                             jsonForLastMap.put("type", "lastOneInstance");
@@ -502,6 +502,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
                     tCruiseTaskResult.setTaskAbnormal(abnormal);
+                    tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
                     tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
                     Thread.sleep(15000);

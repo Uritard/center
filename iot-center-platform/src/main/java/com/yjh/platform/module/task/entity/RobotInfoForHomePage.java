@@ -32,4 +32,6 @@ public class RobotInfoForHomePage {
     private String controlModel;
 
     private String commissionDate;
+
+    private String robotStates;
 }
