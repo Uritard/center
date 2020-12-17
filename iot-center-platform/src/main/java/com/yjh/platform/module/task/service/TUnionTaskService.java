@@ -1,23 +1,26 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.druid.util.StringUtils;
+import com.google.common.collect.Sets;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
-import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
+import com.yjh.platform.module.task.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
-import java.lang.reflect.Field;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import lombok.SneakyThrows;
-import org.apache.poi.poifs.filesystem.Entry;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author tt
@@ -32,6 +35,8 @@ public class TUnionTaskService{
     private TCfgUnionRuleDao  tCfgUnionRuleDao;
     @Autowired
     private TUnionTaskAttrDao TUnionTaskAttrDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private DateTimeUtil dateTimeUtil;
     @Logs(title = "插入", code = "tUnionTask",content = "根据web传递的参数插入巡检记录")
@@ -308,5 +313,74 @@ public class TUnionTaskService{
         }
         int result02 = TUnionTaskAttrDao.batchInsert(tUnionTaskAttrList);
         return result01+result02;
+    }
+
+    //联动弹窗--联动信息
+    @Transactional(rollbackFor = Exception.class)
+    public LinkageInformation linkageInformation(String taskId) {
+        LinkageInformation linkageInformation = TUnionTaskAttrDao.linkageInformation(taskId);
+        return linkageInformation;
+    }
+
+    //联动弹窗--监测数据
+    @Transactional(rollbackFor = Exception.class)
+    public List<LinkageMonitorData> linkageMonitorData(String taskId) {
+        List<LinkageMonitorData> linkageMonitorDataList = new ArrayList<>();
+        //读缓存
+        Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
+        for (String key : cruiseKey) {
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+
+            Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
+            Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
+            //根据instanceId查询设备相关信息
+            Map<String,Object> deviceInfo = TUnionTaskAttrDao.selectDeviceInfo(instanceId);
+            //根据taskId查询字典表
+            String taskName = TUnionTaskAttrDao.selectTaskName(taskId);
+            //根据cruiseResult查询字典表
+            String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
+
+            LinkageMonitorData linkageMonitorData = new LinkageMonitorData()
+                    .setTaskId(redisInfoMap.get("taskId"))
+                    .setTaskName(taskName)
+                    .setTaskResultId(redisInfoMap.get("taskResultId"))
+                    .setCruiseDataId(Long.valueOf(redisInfoMap.get("cruiseDataId")))
+                    .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
+                    .setInstanceName(deviceInfo.get("instance_name").toString())
+                    .setRealCode(deviceInfo.get("real_code").toString())
+                    .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
+                    .setDeviceName(deviceInfo.get("device_name").toString())
+                    .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
+                    .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
+                    .setCruiseResultName(CruiseResultName)
+                    .setResultNum(redisInfoMap.get("resultNum"));
+            linkageMonitorDataList.add(linkageMonitorData);
+        }
+        return linkageMonitorDataList;
+    }
+    //Redis数据库批量查询Key值游标
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
     }
 }

@@ -294,16 +294,21 @@ public class DataDealThread implements Runnable {
                                                log.info("发送给前端的消息：" + jsons);
                                                WebSocketServer.sendMsg(jsons);
 
+<<<<<<< Updated upstream
                                                //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
+=======
+
+>>>>>>> Stashed changes
                                                String alarmNote = tStdDevicemeteM.getAlarmNote();
                                                Integer alarmLevel = tStdDevicemeteM.getAlarmLevel();
                                                Integer warnLevel = tWarnInfo.getWarnLevel();
-                                               log.info("该测点是否配置了告警提示是==="+alarmNote);
+                                               log.info("该测点是否配置了告警提示的标识是==="+alarmNote);
                                                log.info("该测点告警推送配置的告警等级是==="+alarmLevel);
                                                log.info("产生的该条告警等级是==="+warnLevel);
-                                               if (alarmNote != null && "0".equals(alarmNote)){
-                                                   if (tWarnInfo.getWarnLevel() == tStdDevicemeteM.getAlarmLevel() ||
-                                                           tWarnInfo.getWarnLevel() > tStdDevicemeteM.getAlarmLevel()){
+                                               //判断该测点是否设置了告警推送,若是,然后判断产生的告警等级和配置的告警等级谁大谁小
+                                               if (alarmNote != null && "1".equals(alarmNote)){
+                                                   //产生的告警等级等于或大于配置的告警等级，给前端推弹框
+                                                   if (alarmLevel == warnLevel || warnLevel > alarmLevel){
                                                        //webSocket通知前端调用查询告警弹框的接口
                                                        Map<String, Object> jasonMaps2 = new HashMap<>();
                                                        jasonMaps2.put("type", "alarmPopUp");

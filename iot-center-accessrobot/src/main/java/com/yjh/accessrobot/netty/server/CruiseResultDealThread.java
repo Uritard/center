@@ -94,9 +94,9 @@ public class CruiseResultDealThread implements Runnable{
                 tCruiseTaskResultMap.put("cruiseAbnormal","null");
                 normal = normal + 1;
             }else {
-                tCruiseTaskResultMap.put("resultNum","null");
+                tCruiseTaskResultMap.put("resultNum","--");
                 tCruiseTaskResultMap.put("cruiseResult","247");//异常
-                tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常警告
+                tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                 abnormal = abnormal + 1;
             }
             if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
@@ -171,8 +171,6 @@ public class CruiseResultDealThread implements Runnable{
                     df.parse(overDayTime).getTime() < new Date().getTime()){
                 log.info("任务执行暂停/终止/完成/超期！！！");
 
-                //更新TCR
-                //更新TCTR
                 List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
                 List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
                 Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + taskId);
@@ -204,7 +202,7 @@ public class CruiseResultDealThread implements Runnable{
                     }else {
                         tCruiseDataResult.setCruiseAbnormal(null);
                     }
-                    if (!"null".equals(redisInfoMap.get("resultNum"))) {
+                    if (!"--".equals(redisInfoMap.get("resultNum"))) {
                         tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                     }else {
                         tCruiseDataResult.setResultNum(null);

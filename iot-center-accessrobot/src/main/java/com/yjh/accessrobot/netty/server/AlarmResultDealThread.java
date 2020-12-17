@@ -1,6 +1,8 @@
 package com.yjh.accessrobot.netty.server;
 
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
+import com.yjh.accessrobot.module.command.service.RobotService;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -31,7 +33,9 @@ public class AlarmResultDealThread implements Runnable{
             log.info("传进来的robotAlarmMap是==="+robotAlarmMap);
 
             //根据code获取id
-            Long robotId = Long.valueOf(robotAlarmMap.get("robotCode"));
+            String robotCode = robotAlarmMap.get("robotCode");
+            Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
+            log.info("该robotCode的robotId是==="+robotId);
             TRobotAlarm tRobotAlarm = new TRobotAlarm()
                     .setRobotId(robotId)
                     .setAlarmName(robotAlarmMap.get("content"))
@@ -40,13 +44,13 @@ public class AlarmResultDealThread implements Runnable{
                     .setAlarmTime(sdf.parse(robotAlarmMap.get("time")))
 //                            .setPositionOffset()
 //                            .setPositionStationNum()
-                    .setAlarmState(0);
+                    .setAlarmState(276);
 //                            .setCreateTime()
 //                            .setEndTime()
             log.info("tRobotAlarm的内容==="+tRobotAlarm);
             //插表入库
-//                    int res = robotService.insertRobotAlarm(tRobotAlarm);
-//                    log.info("插库的结果="+res);
+            /*int res = StaticContextAccessor.getBean(RobotService.class).insertRobotAlarm(tRobotAlarm);
+            log.info("插告警表的结果="+res);*/
         } catch (Exception e) {
             e.printStackTrace();
         }

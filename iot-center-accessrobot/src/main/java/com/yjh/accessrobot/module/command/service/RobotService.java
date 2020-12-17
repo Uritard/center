@@ -359,6 +359,14 @@ public class RobotService {
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
+
+    @Logs(title = "根据robotCode查询robotId", code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public Long selectRobotIdByCode(String robotCode) {
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+        return robotId;
+    }
+
     @Logs(title = "机器人本体告警信息入库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {

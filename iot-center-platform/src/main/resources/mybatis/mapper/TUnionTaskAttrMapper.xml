@@ -134,7 +134,73 @@
             )
         </foreach>
     </insert>
-
-
+    <!--联动信息-->
+    <select id="linkageInformation" resultType="com.yjh.platform.module.task.entity.LinkageInformation">
+        SELECT
+            a.union_id,
+            a.mete_id,
+         j.dict_note as mete_kind_name,
+            b.rule_id,
+         b.rule_name,
+            b.plan_id,
+         d.plan_name,
+         a.create_time,
+         b.rule_content,
+         h.device_name,
+         k.mete_value
+        FROM t_union_task a
+        LEFT JOIN t_cfg_union_rule b on a.rule_id = b.rule_id
+        LEFT JOIN t_cruise_plan d on d.plan_id = b.plan_id
+        LEFT JOIN t_union_task_attr f on f.union_id = a.union_id
+        LEFT JOIN t_dict_business j on j.dict_code = a.mete_id and j.col_name = "mete_kind"
+        LEFT JOIN t_cfg_data_current k on k.mete_id = a.mete_id
+        LEFT JOIN t_cfg_device h on h.device_id = k.device_id
+        where 1 = 1
+        <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
+    </select>
+    <!--根据instanceId查询设备相关信息-->
+    <select id="selectDeviceInfo" resultType="java.util.Map">
+        SELECT
+            a.instance_id,
+            a.device_id,
+            a.custom_id,
+            a.device_mete_id,
+            a.cruise_id,
+            b.device_name,
+            d.real_code,
+            (CASE
+                WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
+                WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
+                WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
+                WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
+                WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
+                WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
+                END) AS instance_name
+        FROM	t_cruise_point_instance a
+        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.custom_id = b.custom_id
+        LEFT JOIN t_std_device_attr d on d.device_id = a.device_id
+        LEFT JOIN t_camera_preset k ON a.cruise_id = k.preset_id
+        LEFT JOIN t_robot_inspection m ON m.inspection_id = a.cruise_id
+        LEFT JOIN t_std_devicemete n ON n.device_mete_id = a.device_mete_id
+        WHERE 1 = 1
+        <if test="instanceId != null"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+    </select>
+    <!--根据taskId查询字典表-->
+    <select id="selectTaskName" resultType="java.lang.String">
+        SELECT
+            a.task_name
+        FROM t_cruise_task a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+    <!--根据cruiseResult查询字典表-->
+    <select id="selectCruiseResultName" resultType="java.lang.String">
+        SELECT
+            a.dict_note
+        FROM t_dict_business a
+        WHERE 1 = 1
+        <if test="dictCode != null "> and a.dict_code = #{dictCode, jdbcType=INTEGER}</if>
+        and a.col_name = "cruise_result"
+    </select>
 
 </mapper>

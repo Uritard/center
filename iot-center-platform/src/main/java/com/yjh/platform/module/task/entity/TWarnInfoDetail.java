@@ -40,7 +40,7 @@ public class TWarnInfoDetail implements Serializable {
 
     @ApiModelProperty(value = "告警来源")
     private Integer alarmSource;
-    @ApiModelProperty(value = "告警来源-字典表")
+                    @ApiModelProperty(value = "告警来源-字典表")
     private String alarmSourceName;
 
     @ApiModelProperty(value = "设备id")

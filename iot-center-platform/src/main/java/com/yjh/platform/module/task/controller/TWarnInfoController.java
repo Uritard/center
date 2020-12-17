@@ -301,7 +301,7 @@ public class TWarnInfoController {
             result.setData(tWarnInfoDetail);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("查询告警弹窗内容失败：", e);
         }
         return result;
     }

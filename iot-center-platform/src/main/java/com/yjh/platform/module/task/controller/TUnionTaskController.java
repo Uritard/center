@@ -1,26 +1,27 @@
 package com.yjh.platform.module.task.controller;
 
-import com.yjh.platform.module.task.entity.TUnionTaskExpand;
-import com.yjh.platform.module.task.service.TUnionTaskService;
-import com.yjh.platform.module.task.entity.TUnionTask;
-
-import java.text.SimpleDateFormat;
-import java.time.Year;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.task.entity.LinkageMonitorData;
+import com.yjh.platform.module.task.entity.TUnionTask;
+import com.yjh.platform.module.task.entity.TUnionTaskExpand;
+import com.yjh.platform.module.task.entity.LinkageInformation;
+import com.yjh.platform.module.task.service.TUnionTaskService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -208,6 +209,32 @@ public class TUnionTaskController {
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("统计失败：" + e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "联动弹框--联动信息")
+    @RequestMapping(value = "/linkageInformation",method = RequestMethod.GET)
+    public Result linkageInformation(@RequestParam(value = "taskId", required = true) String taskId) {
+        Result result = new Result();
+        try {
+            LinkageInformation linkageInformation = tUnionTaskService.linkageInformation(taskId);
+            result.setData(linkageInformation);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询联动弹窗内容失败：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "联动弹框--监测数据")
+    @RequestMapping(value = "/linkageMonitorData",method = RequestMethod.GET)
+    public Result linkageMonitorData(@RequestParam(value = "taskId", required = true) String taskId) {
+        Result result = new Result();
+        try {
+            List<LinkageMonitorData> linkageMonitorDataList = tUnionTaskService.linkageMonitorData(taskId);
+            result.setData(linkageMonitorDataList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询联动弹窗内容失败：", e);
         }
         return result;
     }

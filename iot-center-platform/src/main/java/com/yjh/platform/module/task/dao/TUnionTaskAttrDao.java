@@ -1,10 +1,12 @@
 package com.yjh.platform.module.task.dao;
 
-import java.util.List;
-
+import com.yjh.platform.module.task.entity.LinkageInformation;
 import com.yjh.platform.module.task.entity.TUnionTaskAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -29,4 +31,9 @@ public interface TUnionTaskAttrDao {
     List<TUnionTaskAttr> selectByPage(TUnionTaskAttr tUnionTaskAttr);
 
     int batchInsert(List<TUnionTaskAttr> list);
+    LinkageInformation linkageInformation(@Param(value = "taskId")String taskId);
+
+    Map<String,Object> selectDeviceInfo(@Param(value = "instanceId")Long instanceId);
+    String selectTaskName(@Param(value = "taskId")String taskId);
+    String selectCruiseResultName(@Param(value = "taskId")Integer cruiseResult);
 }
