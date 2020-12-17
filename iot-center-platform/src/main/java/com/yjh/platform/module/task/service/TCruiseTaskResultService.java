@@ -286,7 +286,7 @@ public class TCruiseTaskResultService {
 
         for (String cruiseKey : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(cruiseKey);
-            if (!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) && !(resultMap.get("resultNum").equals("null"))) {
+            if (!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted))) {
                 cruiseComCount = cruiseComCount + 1;
             }
         }
@@ -312,7 +312,7 @@ public class TCruiseTaskResultService {
         String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
         String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
 
-        Set<String> keyResult = redisScan("t_cruise_task_result*");
+        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
 
         Set<Long> deviceMete = new HashSet<>();//全部标准测点
@@ -320,49 +320,43 @@ public class TCruiseTaskResultService {
         Set<Long> deviceMeteComp = new HashSet<>();//未执行的标准测点
 
         //查询当前任务下所有点所绑定的测点
-        Set<Long> instanceIds=tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
-        for(Long instanceId:instanceIds){
+        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+        for (Long instanceId : instanceIds) {
             deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
         }
 
         for (String keys : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
-            String value = (resultMap.get("taskId")).toString();
-            String TaskId = taskId.toString();
             Long a = Long.valueOf(resultMap.get("cruiseId").toString());
-            if (TaskId.equals(value)) {
-                if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
+            log.info("redis数据:" + resultMap);
+            if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
 //                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
 //                        deviceMeteAbnormal.add(null);
 //                    } else {
-                        deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
 //                    }
-                } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
+            } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
 //                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
 //                        deviceMeteComp.add(null);
 //                    } else {
-                        deviceMeteComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
+                deviceMeteComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
 //                    }
-                }
             }
         }
 
         //计算运行时间
-        Set<String> keyResult1 = redisScan("t_cruise_task_result*");
+        Set<String> keyResult1 = redisScan("t_cruise_task_result:" + taskId);
         //获取任务开始时间
         for (String keys : keyResult1) {
             Map<String, Object> mapResult = redisTemplate.opsForHash().entries(keys);
 
-            String value = mapResult.get("taskId").toString();
-            if (taskId.equals(value)) {
-                String startTime = mapResult.get("startTime").toString();
-                //将两个时间字符串转为日期类型
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date d1 = simpleDateFormat.parse(startTime);
-                String d2String = simpleDateFormat.format(new Date());
-                Date d2 = simpleDateFormat.parse(d2String);
-                cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
-            }
+            String startTime = mapResult.get("startTime").toString();
+            //将两个时间字符串转为日期类型
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d1 = simpleDateFormat.parse(startTime);
+            String d2String = simpleDateFormat.format(new Date());
+            Date d2 = simpleDateFormat.parse(d2String);
+            cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
         }
 
         Integer cruisedNotCount = deviceMete.size() - deviceMeteComp.size();//已执行的标准测点数量
@@ -370,8 +364,8 @@ public class TCruiseTaskResultService {
         cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
         cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
 
-        log.info("总点数："+deviceMete.size());
-        log.info("已执行点数："+deviceMeteComp.size());
+        log.info("总点数：" + deviceMete.size());
+        log.info("已执行点数：" + deviceMeteComp.size());
 
 
         return cruiseResultCounter;

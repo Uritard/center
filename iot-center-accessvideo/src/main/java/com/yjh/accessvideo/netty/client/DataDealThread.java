@@ -79,9 +79,6 @@ public class DataDealThread implements Runnable {
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
         JSONObject jsonObject = JSON.parseObject(body);
         log.info("JSON对象1：" + jsonObject);
-        if (jsonObject.get("msgType").toString().equals("4")) {
-            log.info("注册返回:" + jsonObject);
-        }
         if (jsonObject.get("msgType").toString().equals("2")) {
             JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
             log.info("原生数据****：" + jsonObjectData);
@@ -431,15 +428,15 @@ public class DataDealThread implements Runnable {
             log.info("心跳处理结束" + taskId);
         }
 
-        if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1") && redisTemplate.opsForList().index("analysisList:" + TASKID, 1).equals("0")) {  //满足插库条件
+        if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1")) {  //满足插库条件
             log.info("任务结束-开始数据存储");
+            log.info("正常点数："+NORMAL);
+            log.info("异常点数："+ABNORMAL);
             try {
                 //满足条件先插巡视点数据
                 List<TCruiseTaskResultDetail> detailList = new ArrayList<>();//TCTRD List对象
                 List<TCruiseDataResult> dataList = new ArrayList<>();//TCDR List对象
                 List<TDefectInfo> defectList = new ArrayList<>();//TDI List对象
-                List<TWarnInfo> warnList = new ArrayList<>();//IWI List对象
-                Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + TASKID);
                 log.info("cruisekeys:" + cruiseKeys);
                 for (String cruiseKey : cruiseKeys) {
                     Map<String, Object> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
@@ -455,6 +452,7 @@ public class DataDealThread implements Runnable {
                     tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
                     tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
                     tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
+                    log.info("TCDRD内容："+tCruiseTaskResultDetail);
                     detailList.add(tCruiseTaskResultDetail);
 
                     //TCDR
@@ -478,6 +476,7 @@ public class DataDealThread implements Runnable {
                     tCruiseDataResult.setCreatetime(new Date());
                     tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
                     tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
+                    log.info("TCDR内容："+tCruiseDataResult);
                     dataList.add(tCruiseDataResult);
 
                 }
@@ -562,6 +561,7 @@ public class DataDealThread implements Runnable {
             Integer total = Integer.valueOf(abnormalCount.get("all").toString());
             Integer abnormal = Integer.valueOf(abnormalCount.get("abnormal").toString());
             Integer normal = Integer.valueOf(abnormalCount.get("normal").toString());
+            log.info("All："+total );
             //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
             ABNORMAL.addAndGet(abnormal);
             NORMAL.addAndGet(normal);
