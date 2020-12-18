@@ -39,7 +39,7 @@
         update t_camera_group a <set>
         <if test="groupId != null and groupId != ''">a.group_id = #{groupId, jdbcType=BIGINT},</if>
         <if test="groupName != null and groupName != ''">a.group_name = #{groupName, jdbcType=VARCHAR},</if>
-        <if test="cameraIds != null and cameraIds != ''">a.camera_ids = #{cameraIds, jdbcType=VARCHAR},</if>
+        <if test="cameraIds != null">a.camera_ids = #{cameraIds, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
     </set>
             where a.group_id = #{groupId, jdbcType=BIGINT}

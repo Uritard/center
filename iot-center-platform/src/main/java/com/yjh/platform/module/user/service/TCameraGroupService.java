@@ -51,7 +51,7 @@ public class TCameraGroupService{
     public TCameraGroupDetail selectByPrimaryId(Long groupId) {
         TCameraGroup tCameraGroup = this.tCameraGroupDao.selectByPrimaryId(groupId);
         List<Camera> list = new ArrayList<>();
-        if(tCameraGroup.getCameraIds() != null) {
+        if(tCameraGroup.getCameraIds() != null && !"".equals(tCameraGroup.getCameraIds())) {
             String[] cameraList = tCameraGroup.getCameraIds().split(",");
             for (String item : cameraList) {
                 TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(item));
