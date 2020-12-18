@@ -104,7 +104,7 @@ public class CameraConController {
     }
 
     @ApiOperation(value = "机器人相机停止播放")
-    @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
+    @RequestMapping(value = "/robotStopRealPlay", method = RequestMethod.GET)
     public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
