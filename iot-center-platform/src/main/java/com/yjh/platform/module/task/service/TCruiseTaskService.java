@@ -862,6 +862,7 @@ public class TCruiseTaskService {
     @Logs(title = "任务确认下发", code = "TCruiseTask",content = "任务确认下发")
     @Transactional(rollbackFor = Exception.class)
     public int taskConfirmation(String userId,String password){
+        //todo 密码的解密
         SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
         if(sysUser.getPassword().equals(password)){
             return 1;

@@ -245,7 +245,8 @@ public class RunAtNowTask implements Runnable{
                 Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                 tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
                 //Long endTime = taskStartTimes + tasksAreTime*24*60*60*1000;
-                Long endTime = taskStartTimes + tasksAreTime.longValue()*60*1000;
+                Float temp = tasksAreTime*60F*1000F;
+                Long endTime = taskStartTimes + temp.longValue();
                 String s =sd.format(endTime);
                 quartzTaskForAre.setStartTime(sd.parse(s));
                 JobManager jobManager =new JobManager();

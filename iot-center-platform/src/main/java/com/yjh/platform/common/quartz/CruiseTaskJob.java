@@ -82,7 +82,7 @@ public class CruiseTaskJob extends QuartzJobBean {
     //等待相机转到预置位时间
     private Long waitTime;
     //任务超期时间
-    private Long tasksAreTime;
+    private Float tasksAreTime;
 
     /**
      * 巡视任务类
@@ -114,7 +114,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
                 //任务超期时间
                 Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-                tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
+                tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
 
                 Date taskStart = new Date();
                 log.info("开始进行任务" +taskStart);
@@ -188,14 +188,15 @@ public class CruiseTaskJob extends QuartzJobBean {
                     quartzTaskForAre.setJobGroup("jiancha");
                     SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     //String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
-                    Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-                    Date taskStartTime = sd.parse(mapForGet.get("taskStart"));
+                    Map<String,String> mapForGetTaskAreTime  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                    Date taskStartTime = sd.parse(mapForGetTaskAreTime.get("taskStart"));
                     Long taskStartTimes = taskStartTime.getTime();
                     //任务超期时间
                     //Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-                    tasksAreTime = Long.valueOf((String) mapForTaskAreTime.get("content"));
+                    tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
                     //Long endTime = taskStartTimes + tasksAreTime*24*60*60*1000;
-                    Long endTime = taskStartTimes + tasksAreTime.longValue()*60*1000;
+                    Float temp = tasksAreTime*60F*1000F;
+                    Long endTime = taskStartTimes + temp.longValue();
                     String s =sd.format(endTime);
                     quartzTaskForAre.setStartTime(sd.parse(s));
                     JobManager jobManager =new JobManager();
