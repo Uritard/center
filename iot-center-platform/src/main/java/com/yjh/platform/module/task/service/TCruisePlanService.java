@@ -186,7 +186,7 @@ public class TCruisePlanService{
         List<AreaInfo> upList = new ArrayList<>();
         AreaInfo up = new AreaInfo();
         up.setId(1L);
-        up.setLabel("巡视类型树");
+        up.setLabel("任务类型树");
         up.setInfoType("cruiseType");
         List<AreaInfo> cruiseTypeTree = new ArrayList<>();
         List<TDictBusiness> cruiseTypeList = this.tCruisePlanDao.selectCruiseType();
@@ -197,7 +197,7 @@ public class TCruisePlanService{
             areaInfo.setLabel(item.getDictNote());
             areaInfo.setInfoType(item.getColName());
             areaInfo.setUpId(1L);
-            areaInfo.setUpName("巡视类型树");
+            areaInfo.setUpName("任务类型树");
             cruiseTypeTree.add(areaInfo);
         }
         for (AreaInfo areaInfoItem: cruiseTypeTree) {

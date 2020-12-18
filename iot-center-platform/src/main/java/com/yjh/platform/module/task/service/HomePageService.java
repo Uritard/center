@@ -108,10 +108,10 @@ public class HomePageService {
 
     @Logs(title = "机器人信息", code = "TaskForHomeService",content = "机器人信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<RobotInfoForHomePage> robotInfoForHomePage() throws Exception{
+    public List<RobotInfoForHomePage> robotInfoForHomePage(String robotPosition) throws Exception{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DecimalFormat df = new DecimalFormat("#0");
-        List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo();
+        List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo(robotPosition);
         for (RobotInfoForHomePage item: robotList) {
             //计算机器人投运时间
             Date startTime = simpleDateFormat.parse(item.getCommissionDate());

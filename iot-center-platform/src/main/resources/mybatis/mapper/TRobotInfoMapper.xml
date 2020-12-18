@@ -390,13 +390,15 @@
         select
         a.robot_code,
         a.commission_date,
+        a.robot_position,
         b.dict_note as robotFactoryName,
         c.dict_note as typeName,
-        d.dict_note as position
+        d.dict_note as positionName
         from t_robot_info a
         left join t_dict_business b on a.robot_factory = b.dict_code
         left join t_dict_business c on a.robot_type = c.dict_code
         left join t_dict_business d on a.robot_position = d.dict_code
         where a.is_use = 166
+        <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
     </select>
 </mapper>

@@ -21,7 +21,9 @@ public class RobotInfoForHomePage {
 
     private String typeName;
 
-    private String position;
+    private String robotPosition;
+
+    private String positionName;
 
     private String mileage;
 

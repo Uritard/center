@@ -62,5 +62,5 @@ public interface TRobotInfoDao {
 
     List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")String taskId);
 
-    List<RobotInfoForHomePage>selectRobotInfo();
+    List<RobotInfoForHomePage>selectRobotInfo(@Param(value = "robotPosition")String robotPosition);
 }

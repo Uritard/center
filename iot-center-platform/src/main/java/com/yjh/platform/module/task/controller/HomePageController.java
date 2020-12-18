@@ -104,10 +104,10 @@ public class HomePageController {
 
     @ApiOperation(value = "机器人数据")
     @RequestMapping(value = "/robotInfoForHomePage", method = RequestMethod.GET)
-    public Result robotInfoForHomePage() {
+    public Result robotInfoForHomePage(@RequestParam(value = "robotPosition", required = false) String robotPosition) {
         Result result = new Result();
         try {
-            result.setData(homePageService.robotInfoForHomePage());
+            result.setData(homePageService.robotInfoForHomePage(robotPosition));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

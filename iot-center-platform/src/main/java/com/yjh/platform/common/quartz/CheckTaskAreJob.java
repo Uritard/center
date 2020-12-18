@@ -109,8 +109,9 @@ public class CheckTaskAreJob extends QuartzJobBean {
 
 
                 //TCDR
-                log.info("TCRDR开始构建");
+                log.info("TCDR开始构建");
                 TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                tCruiseDataResult.setCruiseResultId(mapForCruise.get("cruiseResultId"));
                 tCruiseDataResult.setCruiseId(Long.valueOf(mapForCruise.get("instanceId").toString()));
                 tCruiseDataResult.setPicpath(mapForCruise.get("picpath").toString());
                 //tCruiseDataResult.setResultNum(mapForCruise.get("resultNum").toString());
