@@ -89,7 +89,7 @@ public class CameraConController {
     }
 
     @ApiOperation(value = "机器人相机播放")
-    @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
+    @RequestMapping(value = "/robotStartRealPlay", method = RequestMethod.GET)
     public Result robotStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
