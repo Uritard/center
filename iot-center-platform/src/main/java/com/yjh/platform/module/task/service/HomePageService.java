@@ -250,6 +250,9 @@ public class HomePageService {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
             Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
             map.putAll((Map<String,String>)re.getData());
         }
         List<Long> re =  new ArrayList<>();
@@ -273,6 +276,9 @@ public class HomePageService {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
             Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
             map.putAll((Map<String,String>)re.getData());
         }
         List<String> re =  new ArrayList<>();
