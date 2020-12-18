@@ -49,15 +49,17 @@ public class TCruisePlanService{
     public int insert(Map<String, Object> map) {
         log.info("add new plan, map content: "+map);
         if (map.size()==0) return ResultCodeEnum.CODE10010.getCode();
-        List<Long> InstanceMapList = (List<Long>) map.get("instanceList");
-        if (InstanceMapList.size()==0) return ResultCodeEnum.CODE10010.getCode();
 
         List<TCruisePlanAttr> tCruisePlanAttrList = new ArrayList<>();
         TCruisePlan tCruisePlan = new TCruisePlan();
         tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
         Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
         tCruisePlan.setType(planType);
+        if (Objects.isNull(map.get("instanceList"))) return this.tCruisePlanDao.insert(tCruisePlan);
+        List<Long> InstanceMapList = (List<Long>) map.get("instanceList");
+        if (InstanceMapList.size()==0) return this.tCruisePlanDao.insert(tCruisePlan);
         this.tCruisePlanDao.insert(tCruisePlan);
+
         Long planId = tCruisePlan.getPlanId();
 
         List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.batchSelectInstanceAttr(InstanceMapList);
