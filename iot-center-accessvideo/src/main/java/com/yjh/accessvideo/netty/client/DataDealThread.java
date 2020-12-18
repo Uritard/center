@@ -18,16 +18,8 @@ import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yjh.accessvideo.common.Constant.*;
-import static com.yjh.accessvideo.common.Constant.NORMAL;
-
-import static com.yjh.accessvideo.common.Constant.TASKID;
-import static com.yjh.accessvideo.common.Constant.INSTANCEID;
-import static com.yjh.accessvideo.common.Constant.ABNORMAL;
-import static com.yjh.accessvideo.common.Constant.NORMAL;
-import static com.yjh.accessvideo.common.Constant.cruiseKeys;
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {

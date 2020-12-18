@@ -157,6 +157,10 @@
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
     </select>
 
+    <delete id="deleteAllData">
+        DELETE FROM t_robot_inspection
+    </delete>
+
     <insert id="batchInsert">
         insert into t_robot_inspection(
             inspection_id,

@@ -32,4 +32,5 @@ public interface TRobotInspectionDao {
     List<TRobotInspection> selectByPage(TRobotInspection tRobotInspection);
 
     int batchInsert(List<TRobotInspection> list);
+    int deleteAllData();
 }

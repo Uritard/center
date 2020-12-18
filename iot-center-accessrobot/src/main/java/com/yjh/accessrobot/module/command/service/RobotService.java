@@ -10,7 +10,9 @@ import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.netty.server.OneDealThread;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import com.yjh.accessrobot.thread.TaskExecutePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,18 +177,20 @@ public class RobotService {
         log.info("获得的tRobotInfo是："+tRobotInfo);
 
         //更新机器人地图信息
-            tRobotInfoDao.update(tRobotInfo);
-            //设备模型文件
-            List<TRobotInspection> deviceList = new ArrayList<>();
-            for (Map<String,Object> deviceMap : deviceMapList){
-                TRobotInspection tRobotInspection = new TRobotInspection()
-                        .setInspectionCode(deviceMap.get("device_id").toString())
-                        .setRobotId(robotId)
-                        .setInspectionName(deviceMap.get("device_name").toString());
-                deviceList.add(tRobotInspection);
-            }
-            log.info("获得的deviceList是："+deviceList);
-            int res2 = tRobotInspectionDao.batchInsert(deviceList);//测点数据入库
+        tRobotInfoDao.update(tRobotInfo);
+        //设备模型文件
+        List<TRobotInspection> deviceList = new ArrayList<>();
+        for (Map<String,Object> deviceMap : deviceMapList){
+            TRobotInspection tRobotInspection = new TRobotInspection()
+                    .setInspectionCode(deviceMap.get("device_id").toString())
+                    .setRobotId(robotId)
+                    .setInspectionName(deviceMap.get("device_name").toString());
+            deviceList.add(tRobotInspection);
+        }
+        log.info("获得的deviceList是："+deviceList);
+        //测点数据入库前先清空原来的数据
+        tRobotInspectionDao.deleteAllData();
+        int res2 = tRobotInspectionDao.batchInsert(deviceList);
         return res2;
     }
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
@@ -296,6 +300,18 @@ public class RobotService {
 
                 //根据不同的机器人对应不同的管道发送指令
                 RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).SendHeartBeat(  generateByteOrder(xmlString,rTII.getRobotCode()));
+
+                //启动一个线程
+                Map<String,String> threadMap = new HashMap<>();
+                threadMap.put("instanceIdList",instanceIdList.toString());
+                threadMap.put("taskCode",rTII.getTaskId());
+                threadMap.put("robotCode",rTII.getRobotCode());
+                Constant.flagMap.put(rTII.getTaskId(),0);
+
+                OneDealThread oneDealThread = new OneDealThread(threadMap,redisTemplate);
+                TaskExecutePool.getInstance().execute(oneDealThread);
+
+
             }
 
         }

@@ -453,6 +453,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人收到下发任务指令/控制指令了,这是机器人的响应");
                     //处理任务下发/控制的响应
                     log.info("巡视主机收到的响应是："+xmlBaseModel.toString());
+                    log.info("巡视主机收到响应的type是："+xmlBaseModel.getType());
                     break;
             }
         }else {
@@ -676,6 +677,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 case "61":
                     log.info("巡视主机收到巡视结果了");
                     //处理巡视结果
+
                     Map<String, String> cruiseResultMap = new HashMap<>();
                     cruiseResultMap.put("robotCode",xmlBaseModel.getSendCode());
                     cruiseResultMap.put("taskName",xmlBaseModel.getItems().get(0).get("task_name").toString());

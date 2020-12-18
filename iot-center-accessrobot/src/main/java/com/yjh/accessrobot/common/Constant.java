@@ -20,5 +20,7 @@ public class Constant {
 
     public static long sendSessionId = 0L;//发送会话序列号
 
+    public static Map<String,Integer> flagMap = new HashMap<>();
+
 
 }
