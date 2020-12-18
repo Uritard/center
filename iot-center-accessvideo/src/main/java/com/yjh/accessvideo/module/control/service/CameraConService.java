@@ -148,10 +148,11 @@ public class CameraConService {
     @Logs(title = "相机批量播放", code = "cameraPlay", content = "相机批量播放")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
+        if (Objects.isNull(cameraIds) || cameraIds.length()==0) return returnMapList;
         List<Long> list = new ArrayList<>();
         String[] cameraIdArry = cameraIds.split(",");
         for (String aCameraIdArry : cameraIdArry) list.add(Long.valueOf(aCameraIdArry));
-        List<Map<String, Object>> returnMapList = new ArrayList<>();
         try {
             List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(list);
             for (CameraConInfo cameraConInfo: cameraConInfoList) {
