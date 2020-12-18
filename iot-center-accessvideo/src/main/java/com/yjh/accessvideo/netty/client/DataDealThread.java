@@ -294,11 +294,7 @@ public class DataDealThread implements Runnable {
                                                log.info("发送给前端的消息：" + jsons);
                                                WebSocketServer.sendMsg(jsons);
 
-<<<<<<< Updated upstream
                                                //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
-=======
-
->>>>>>> Stashed changes
                                                String alarmNote = tStdDevicemeteM.getAlarmNote();
                                                Integer alarmLevel = tStdDevicemeteM.getAlarmLevel();
                                                Integer warnLevel = tWarnInfo.getWarnLevel();

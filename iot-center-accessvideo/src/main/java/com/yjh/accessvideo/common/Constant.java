@@ -3,14 +3,17 @@ package com.yjh.accessvideo.common;
 import io.netty.bootstrap.Bootstrap;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Constant {
 
-    public static Map<String, Integer> maps = new HashMap<>();
+    public static Map<String, Integer> maps = new ConcurrentHashMap<>();
 
     public static Map<String, String> mapsForCamera = new HashMap<>();
+
+    public static Map<String, String> mapsForRobot = new HashMap<>();
 
     public static int connectTimeCounts = 0;
 

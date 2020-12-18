@@ -12,10 +12,7 @@ import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
-import com.yjh.accessvideo.module.control.entity.CameraAreaInfo;
-import com.yjh.accessvideo.module.control.entity.CameraConInfo;
-import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
-import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
+import com.yjh.accessvideo.module.control.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +50,12 @@ public class CameraConService {
 
     @Value("${nvr.rtmp.back}")
     private String UrlBackTem;
+
+    @Value("${robot.light.video}")
+    private String robotLightTem;
+
+    @Value("${robot.inferad.video}")
+    private String robotInferadTem;
 
     @Value("${nvr.capture.Preset}")
     private String capturePresetPath;//预置位路径
@@ -142,7 +145,7 @@ public class CameraConService {
         return "stop " + cameraId + " preview success!";
     }
 
-    @Logs(title = "相机批量播放", code = "cameraPlay")
+    @Logs(title = "相机批量播放", code = "cameraPlay", content = "相机批量播放")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
         List<Long> list = new ArrayList<>();
@@ -188,6 +191,99 @@ public class CameraConService {
         } catch (Exception e) {e.getMessage();}
         log.info("returnMapList: "+returnMapList);
         return returnMapList;
+    }
+
+    @Logs(title = "机器人相机播放", code = "robotPlay", content = "机器人相机播放")
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String, Object>> robotStartRealPlay(Long robotId) {
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
+        RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+
+        String lightIp = robotConInfo.getLightIp();
+        String lightPort = robotConInfo.getLightPort();
+        String lightUsername = robotConInfo.getLightUsername();
+        String lightPassword = robotConInfo.getLightPassword();
+        int livePath =110;
+        if (Objects.isNull(Constant.maps.get("livePath"))) {
+            livePath = 123;
+            Constant.maps.put("livePath", 123);
+        }
+        if (Objects.nonNull(Constant.maps.get("livePath"))) {
+            livePath = Constant.maps.get("livePath")+1;
+            Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+        }
+        log.info("Constant.maps: "+Constant.maps);
+        // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10&s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
+        log.info("lightInfo: "+lightUsername+" "+lightPassword+" "+lightIp+" "+lightPort+" "+livePath);
+        String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
+        try { Runtime.getRuntime().exec(transUrlLight); } catch (Exception e) {e.getMessage();}
+        log.info("transUrlLight: "+transUrlLight);
+        String[] rtmpUrls = transUrlLight.split("rtmp");
+        String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
+        String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
+        Map<String, Object> returnLightMap = new HashMap<>();
+        returnLightMap.put("light", String.valueOf(robotId));
+        returnLightMap.put("rtmpUrl", rtmpUrl);
+        returnLightMap.put("flvUrl", flvUrl);
+        Constant.mapsForRobot.put(String.valueOf(robotId)+":light", rtmpUrl);
+        log.info("mapsForRobot: "+Constant.mapsForRobot);
+
+        String inferadIp = robotConInfo.getLnferadIp();
+        Integer inferadPort = robotConInfo.getInferadPort();
+        livePath = Constant.maps.get("livePath")+1;
+        Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+        log.info("Constant.maps: "+Constant.maps);
+        log.info("inferadInfo: "+" "+inferadIp+" "+inferadPort+" "+livePath);
+        String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
+        try { Runtime.getRuntime().exec(transUrlinferad); } catch (Exception e) {e.getMessage();}
+        log.info("transUrlinferad: "+transUrlinferad);
+        String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
+        String rtmpUrlInferad = "rtmp"+rtmpUrlsInferad[rtmpUrls.length-1];
+        String flvUrlInferad = "http://"+hostIp+":8000/live/"+livePath+".flv";
+        Map<String, Object> returnInferadMap = new HashMap<>();
+        returnInferadMap.put("inferad", String.valueOf(robotId));
+        returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
+        returnInferadMap.put("flvUrlInferad", flvUrlInferad);
+        Constant.mapsForRobot.put(String.valueOf(robotId)+":inferad", rtmpUrl);
+        log.info("mapsForRobot: "+Constant.mapsForRobot);
+
+        returnMapList.add(returnLightMap);
+        returnMapList.add(returnInferadMap);
+        log.info("returnMapList: "+returnMapList);
+        return returnMapList;
+    }
+
+    @Logs(title = "机器人停止播放", code = "cameraStopPlay")
+    @Transactional(rollbackFor = Exception.class)
+    public String robotStopRealPlay(Long robotId) {
+        String urlStop = null;
+        String livePath;
+//        for ()
+//        try {
+//            if (Objects.equals(null, rtmpUrl) || rtmpUrl.equals("")) {
+//                String rtmpUrlCamera = Constant.mapsForRobot.get(String.valueOf(robotId+":light"));
+//                String[] rtmpUrlCameras = rtmpUrlCamera.split("/");
+//                livePath = rtmpUrlCameras[rtmpUrlCameras.length-1];
+//            } else {
+//                String[] rtmpUrls = rtmpUrl.split("/");
+//                livePath = rtmpUrls[rtmpUrls.length-1];
+//            }
+//            log.info("livePath: "+livePath);
+//            String url = "ps -ef | grep ffmpeg | grep '"+ livePath +"' | grep -v 'grep'";
+//            log.info("stopUrl: "+url);
+//            Process processForId=Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
+//            processForId.waitFor();
+//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+//            String lineForId = null;
+//            StringBuilder dataBackForId = new StringBuilder();
+//            while ((lineForId = readerForId.readLine()) != null) {
+//                dataBackForId.append(lineForId).append('\n');
+//            }
+//            Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
+//            urlStop = "kill -9 "+processNum;
+//            Runtime.getRuntime().exec(urlStop);
+//        } catch (Exception e) {e.getMessage();}
+        return "stop " + robotId + " preview success!";
     }
 
     @Logs(title = "视频回放", code = "cameraPlayBack")

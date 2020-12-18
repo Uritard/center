@@ -88,6 +88,36 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "机器人相机播放")
+    @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
+    public Result robotStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.robotStartRealPlay(robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人相机播放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "机器人相机停止播放")
+    @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
+    public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.robotStopRealPlay(robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人相机停止播放失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "相机批量停止播放")
     @RequestMapping(value = "/batchStopRealPlay", method = RequestMethod.POST)
     public Result batchStopRealPlay(@RequestBody List<Map<String, String>> list) {

@@ -1,9 +1,6 @@
 package com.yjh.accessvideo.module.control.dao;
 
-import com.yjh.accessvideo.module.control.entity.CameraAreaInfo;
-import com.yjh.accessvideo.module.control.entity.CameraConInfo;
-import com.yjh.accessvideo.module.control.entity.CameraStatusInfo;
-import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
+import com.yjh.accessvideo.module.control.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -26,5 +23,7 @@ public interface CameraConDao {
     List<CameraStatusInfo> cameraInfoByNVR(@Param("recordId") Long recordId);
 
     List<CameraAreaInfo> selectCameraTree(@Param("cameraName") String cameraName);
+
+    RobotConInfo selectRobotConInfo(@Param("robotId") Long robotId);
 
 }
