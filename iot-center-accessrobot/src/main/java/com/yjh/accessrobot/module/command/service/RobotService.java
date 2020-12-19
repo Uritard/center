@@ -10,9 +10,7 @@ import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.entity.*;
-import com.yjh.accessrobot.netty.server.OneDealThread;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
-import com.yjh.accessrobot.thread.TaskExecutePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -302,14 +300,14 @@ public class RobotService {
                 RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).SendHeartBeat(  generateByteOrder(xmlString,rTII.getRobotCode()));
 
                 //启动一个线程
-                Map<String,String> threadMap = new HashMap<>();
-                threadMap.put("instanceIdList",instanceIdList.toString());
-                threadMap.put("taskCode",rTII.getTaskId());
-                threadMap.put("robotCode",rTII.getRobotCode());
-                Constant.flagMap.put(rTII.getTaskId(),0);
-
-                OneDealThread oneDealThread = new OneDealThread(threadMap,redisTemplate);
-                TaskExecutePool.getInstance().execute(oneDealThread);
+//                Map<String,String> threadMap = new HashMap<>();
+//                threadMap.put("instanceIdList",instanceIdList.toString());
+//                threadMap.put("taskCode",rTII.getTaskId());
+//                threadMap.put("robotCode",rTII.getRobotCode());
+//                Constant.flagMap.put(rTII.getTaskId(),0);
+//
+//                OneDealThread oneDealThread = new OneDealThread(threadMap,redisTemplate);
+//                TaskExecutePool.getInstance().execute(oneDealThread);
 
 
             }
@@ -328,40 +326,41 @@ public class RobotService {
         String commandValue = robotTaskControlMap.get("commandValue").toString();
         String json  = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
         log.info("json是=="+json);
-        List<String> robotCodeList = JSON.parseArray(json,String.class);
-        log.info("robotCodeList==="+robotCodeList);
+        if (Objects.nonNull(json))   {
+            List<String> robotCodeList = JSON.parseArray(json,String.class);
+            log.info("robotCodeList==="+robotCodeList);
 
-        List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
+            List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
 
-        for (String robotCode : robotCodeList){
-            XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setType("41")
-                    .setSendCode("Server01")
-                    .setReceiveCode(robotCode)
-                    .setCode(taskId)
-                    .setCommand(commandValue)
-                    .setTime(sdf.format(new Date()));
-            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-            log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
+            for (String robotCode : robotCodeList){
+                XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                        .setType("41")
+                        .setSendCode("Server01")
+                        .setReceiveCode(robotCode)
+                        .setCode(taskId)
+                        .setCommand(commandValue)
+                        .setTime(sdf.format(new Date()));
+                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+                log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
 
-            //将机器人任务状态存进缓存以备后用
-            Map<String,String> taskStatusMap = new HashMap<>();
-            taskStatusMap.put("robotCode",robotCode);
-            taskStatusMap.put("taskStatus",commandValue);
-            taskStatusMap.put("taskId",taskId);
-            redisInfoList.add(taskStatusMap);
+                //将机器人任务状态存进缓存以备后用
+                Map<String,String> taskStatusMap = new HashMap<>();
+                taskStatusMap.put("robotCode",robotCode);
+                taskStatusMap.put("taskStatus",commandValue);
+                taskStatusMap.put("taskId",taskId);
+                redisInfoList.add(taskStatusMap);
 
-            //根据不同的机器人对应不同的管道发送指令
-            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(  generateByteOrder(xmlString,robotCode));
+                //根据不同的机器人对应不同的管道发送指令
+                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(  generateByteOrder(xmlString,robotCode));
+            }
+
+            log.info("redisInfoList是==="+redisInfoList);
+            //放数据到缓存
+            for (int i = 0; i < redisInfoList.size(); i++) {
+                redisTemplate.opsForHash().putAll("taskStatusRedis:"+redisInfoList.get(i).get("robotCode")
+                        +":"+redisInfoList.get(i).get("taskId"), redisInfoList.get(i));
+            }
         }
-
-        log.info("redisInfoList是==="+redisInfoList);
-        //放数据到缓存
-        for (int i = 0; i < redisInfoList.size(); i++) {
-            redisTemplate.opsForHash().putAll("taskStatusRedis:"+redisInfoList.get(i).get("robotCode")
-                    +":"+redisInfoList.get(i).get("taskId"), redisInfoList.get(i));
-        }
-
         return 1;
     }
     @Logs(title = "根据taskId查询相关内容", code = "Robot")

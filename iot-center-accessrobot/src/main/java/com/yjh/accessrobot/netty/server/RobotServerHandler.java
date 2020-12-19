@@ -678,6 +678,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("巡视主机收到巡视结果了");
                     //处理巡视结果
 
+//                    Constant.flagMap.put(xmlBaseModel.getItems().get(0).get("task_code").toString(),1);
+
                     Map<String, String> cruiseResultMap = new HashMap<>();
                     cruiseResultMap.put("robotCode",xmlBaseModel.getSendCode());
                     cruiseResultMap.put("taskName",xmlBaseModel.getItems().get(0).get("task_name").toString());

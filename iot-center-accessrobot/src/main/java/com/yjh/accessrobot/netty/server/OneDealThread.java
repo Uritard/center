@@ -1,7 +1,5 @@
 package com.yjh.accessrobot.netty.server;
 
-import com.yjh.accessrobot.common.Constant;
-import com.yjh.accessrobot.thread.TaskExecutePool;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Map;
@@ -24,11 +22,11 @@ public class OneDealThread  implements Runnable{
     @Override
     public void run() {
         try {
-            String taskId = threadMap.get("taskCode");
+            /*String taskId = threadMap.get("taskCode");
             if (Constant.flagMap.get(taskId) == 0){
                 CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(threadMap,redisTemplate);
                 TaskExecutePool.getInstance().execute(cruiseResultDealThread);
-            }
+            }*/
             return;
         } catch (Exception e) {
             e.printStackTrace();

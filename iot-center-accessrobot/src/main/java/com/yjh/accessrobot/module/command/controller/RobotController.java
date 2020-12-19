@@ -4,6 +4,7 @@ import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
+import com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -98,10 +99,10 @@ public class RobotController {
     /*用完就删*/
     @ApiOperation(value = "方法测试")
     @RequestMapping(value = "/xixixi", method = RequestMethod.POST)
-    public Result xixixi(){
+    public Result xixixi(@RequestBody List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList){
         Result result = new Result();
         try {
-//            result.setData(robotService.xixixixi());
+            result.setData(robotService.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetailList));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
