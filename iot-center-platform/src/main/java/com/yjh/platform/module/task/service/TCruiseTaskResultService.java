@@ -176,7 +176,7 @@ public class TCruiseTaskResultService {
                     } else {
                         cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
                     }
-                    if (resultMap.get("endTime").equals("")) {
+                    if (resultMap.get("endTime").equals("null")) {
                         cruiseInspectResult.setEndTime(null);
                     } else {
                         cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));

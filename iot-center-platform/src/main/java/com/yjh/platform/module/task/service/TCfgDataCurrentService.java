@@ -291,7 +291,7 @@ public class TCfgDataCurrentService {
 //            tCruiseTasks.add(tCruiseTask);
             TCruiseTaskAdd tCruiseTaskAdd=new TCruiseTaskAdd();
             tCruiseTaskAdd.setPlanId(tCruisePlan.getPlanId());
-            tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName());
+            tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName()+simpleDateFormat.format(new Date()));
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
             tCruiseTaskAdd.setTaskType(218);
