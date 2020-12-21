@@ -309,26 +309,26 @@ public class SysUserController {
                     }
                 } else {
                     List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
-
-                    SysUser sysUser = sysUserList.get(0);
-                    String userId = String.valueOf(sysUser.getUserId());
+                     log.info("sysUserList: "+sysUserList);
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                     params.set("logType", "iot-center-platform:module");
                     params.set("ip", request.getRequestURI());
                     params.set("title", "登录");
                     params.set("state", 1);
-                    if (Objects.isNull(userId)) {params.set("userId", "");} else {params.set("userId", userId);}
+                    if (sysUserList.size()==0) {params.set("userId", "");} else {params.set("userId", sysUserList.get(0).getUserId());}
                     params.set("userName", userName);
                     params.set("content", "用户名或密码错误登录失败");
                     LogsAspect logsAspect = new LogsAspect();
                     logsAspect.post(params);
-                    if (sysUserList.size()==0 || Objects.isNull(userId)) {
+                    if (sysUserList.size()==0) {
                         Map<String, Object> mapResult = new HashMap<>();
                         mapResult.put("info", ResultCodeEnum.CODE10101.getName());
                         mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
                         result.setData(mapResult);
                         return result;
                     }
+                    SysUser sysUser = sysUserList.get(0);
+                    String userId = String.valueOf(sysUser.getUserId());
                     String key = Constant.account_lock_times.replace("userAccountID", userId);
                     Integer errorInputTimes = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "errorInputTimes")));
                     Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "expireTime")));
