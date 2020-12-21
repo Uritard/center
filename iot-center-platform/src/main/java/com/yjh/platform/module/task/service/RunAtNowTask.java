@@ -288,12 +288,17 @@ public class RunAtNowTask implements Runnable{
                 log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                 //让机器人做任务
                 robotTask(robotTaskInfoMap);
-                if(isGoOn){
-                    for(Long item:robotTaskInstanceList){
-                        instancesList.remove(item);
+                //获取机器人运行状态
+            }
+
+            if(isGoOn){
+                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+                for (String item: robotCode){
+                    robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
+                    for(Long itemLong:robotTaskInstanceList){
+                        instancesList.remove(itemLong);
                     }
                 }
-                //获取机器人运行状态
             }
 
             log.info("开始巡检"+new Date());
