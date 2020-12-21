@@ -79,8 +79,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
         }
         //获取任务下的所有的点
         List<Long> instanceIdList =  tCruiseTaskAttrDao.selectInstanceId(taskId);
-        int all = instanceIdList.size();
-        int count =0;
+        //int all = instanceIdList.size();
+        //int count =0;
         //获取正常和异常的点数
         String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
         Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
@@ -93,13 +93,13 @@ public class CheckTaskAreJob extends QuartzJobBean {
         for(Long item:instanceIdList){
             Map<String,String> mapForCruise  = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
             if(mapForCruise.size()>0){
-                count = count+1;
+                //count = count+1;
                 if("null".equals(mapForCruise.get("cruiseResult")) ){
                     //这个点超时了
                     mapForCruise.put("cruiseResult","247");
                     mapForCruise.put("cruiseAbnormal","251");
                     mapForCruise.put("cruiseStatus","252");
-                    mapForCruise.put("resultNum","算法超时");
+                    mapForCruise.put("resultNum","超时");
                     //TCTRD
                     log.info("TCTRD开始构建");
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -186,26 +186,25 @@ public class CheckTaskAreJob extends QuartzJobBean {
         log.info("发送给前端的消息："+jsonMessage);
         WebSocketServer.sendMsg(jsonMessage);
 
-        if(count == all){
-            //无机器人的点
-            log.info("此任务无机器人巡视点");
-            Thread.sleep(15000);
 
-            tCruiseResult.setCState(244);
-            tCruiseResultDao.update(tCruiseResult);
 
-            String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
-            //任务状态
-            TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-            tCruiseTaskResult.setTaskResultId(uuid);
-            tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
-            tCruiseTaskResult.setTaskAbnormal(abnormal);
-            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
-            tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
-            tCruiseTaskResult.setTaskStatus(244);
-            tCruiseTaskResult.setCruiseResult(247);
-            tCruiseTaskResultDao.insert(tCruiseTaskResult);
-        }
+        Thread.sleep(15000);
+
+        tCruiseResult.setCState(244);
+        tCruiseResultDao.update(tCruiseResult);
+
+        String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+        //任务状态
+        TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
+        tCruiseTaskResult.setTaskResultId(uuid);
+        tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+        tCruiseTaskResult.setTaskAbnormal(abnormal);
+        tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
+        tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+        tCruiseTaskResult.setTaskStatus(244);
+        tCruiseTaskResult.setCruiseResult(247);
+        tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
 
         } catch (Exception e) {
             log.error("检查任务超期异常: "+e);

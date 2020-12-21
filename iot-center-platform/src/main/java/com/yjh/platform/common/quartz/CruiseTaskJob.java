@@ -244,17 +244,30 @@ public class CruiseTaskJob extends QuartzJobBean {
                 for (TCruisePointInstance item : instancesList) {
 
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
-                    tCruiseTaskResultDetail.setCruiseResultId(uuid+item.getInstanceId().toString());
-                    tCruiseTaskResultDetail.setTaskResultId(uuid);
+                    tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
+                    tCruiseTaskResultDetail.setTaskResultId(tCruiseResult.getTaskResultId());
                     tCruiseTaskResultDetail.setDeviceId(item.getDeviceId());
                     tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
                     tCruiseTaskResultDetail.setCruiseTime(new Date());
                     String cruiseTime = simpleDateFormat.format(new Date());
-                    //tCruiseTaskResultDetail.setCruiseStatus(253);
+                    tCruiseTaskResultDetail.setCruiseStatus(253);
 
                     TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
-                    tCruiseDataResult.setCruiseResultId(uuid+item.getInstanceId().toString());
+                    tCruiseDataResult.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
                     tCruiseDataResult.setCruiseId(item.getInstanceId());
+                    tCruiseDataResult.setCruiseType(item.getCruiseType());
+
+                    Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                    String str = "t_cruise_task_result:"+taskId + item.getInstanceId();
+                    Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                    tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
+                    tCruiseTaskResultDetailMap.put("taskId",taskId);
+                    tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
+                    tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
+                    tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
+                    tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+
+                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                     //一次循环 一个巡检点
                     if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
                         log.info("巡检点开始巡检"+new Date());
@@ -304,9 +317,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetail.setEndTime(new Date());
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
 
-                            Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                            String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
-                            Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                             tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                             str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
+                             tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                             tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -331,10 +344,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseDataResult.setOrigpic(absPath);
 
                                 tCruiseTaskResultDetail.setCruiseStatus(253);
-                                Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                                String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
+                                 tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                                 str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
 
-                                Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                                 tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                                 tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                                 tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -403,9 +416,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseTaskResultDetail.setEndTime(new Date());
                                 tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
 
-                                Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                                String str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
-                                Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                                 tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                                 str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + item.getInstanceId();
+                                 tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                                 tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                                 tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));

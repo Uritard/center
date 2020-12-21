@@ -483,7 +483,7 @@ public class TCruiseTaskService {
             analysis(analysisMap);
             log.info("任务暂停"+tCruiseTask.getTaskId());
 
-            Thread.sleep(10000);
+            //Thread.sleep(10000);
             //机器人任务暂停
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
             if(robotCodeList != null && robotCodeList.size()>0){
