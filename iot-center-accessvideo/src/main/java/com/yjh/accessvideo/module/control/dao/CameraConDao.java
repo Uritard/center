@@ -4,6 +4,7 @@ import com.yjh.accessvideo.module.control.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public interface CameraConDao {
 
     CameraConInfo selectConInfo(@Param(value = "cameraId") Long cameraId, @Param(value = "presetId") Long presetId);
 
-    List<CameraConInfo> batchSelectConInfo(@Param("list") List<Long> list);
+    LinkedList<CameraConInfo> batchSelectConInfo(@Param("list") List<Long> list);
 
     List<RecorderConInfo> SelectRecords();
 

@@ -156,7 +156,7 @@ public class CameraConService {
         for (String aCameraIdArry : cameraIdArry) list.add(Long.valueOf(aCameraIdArry));
         log.info("list: "+list);
         try {
-            List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(list);
+            LinkedList<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(list);
             for (CameraConInfo cameraConInfo: cameraConInfoList) {
                 String userName = cameraConInfo.getUserName();
                 String password = cameraConInfo.getPwd();
