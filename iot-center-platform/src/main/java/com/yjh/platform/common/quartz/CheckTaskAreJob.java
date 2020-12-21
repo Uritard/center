@@ -1,6 +1,7 @@
 package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.websocket.WebSocketServer;
@@ -40,27 +41,15 @@ public class CheckTaskAreJob extends QuartzJobBean {
     @Autowired
     private TCruiseTaskAttrDao tCruiseTaskAttrDao;
     @Autowired
-    private TCruisePointInstanceDao tCruisePointInstanceDao;
-    @Autowired
-    private TCameraPresetDao tCameraPresetDao;
-    @Autowired
-    private TCruiseTaskDelDao tCruiseTaskDelDao;
-    @Autowired
     private TCruiseResultDao tCruiseResultDao;
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
-    @Autowired
-    private TAlgorithmConfDao tAlgorithmConfDao;
-    @Autowired
-    private TAlgorithmInfoDao tAlgorithmInfoDao;
     @Autowired
     private TCruiseTaskResultDao tCruiseTaskResultDao;
     @Autowired
     private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
-    @Autowired
-    private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
 
@@ -82,6 +71,16 @@ public class CheckTaskAreJob extends QuartzJobBean {
         //int all = instanceIdList.size();
         //int count =0;
         //获取正常和异常的点数
+            //机器人任务终止
+        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        if(robotCodeList != null && robotCodeList.size()>0){
+            Map<String,Object> robotTaskStatesMap = new HashMap<>();
+            robotTaskStatesMap.put("taskId",taskId);
+            robotTaskStatesMap.put("commandValue",4);
+            robotTaskStatesMap.put("robotCodeList",robotCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
+        Thread.sleep(1000);
         String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
         Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -107,7 +106,13 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     tCruiseTaskResultDetail.setTaskResultId(mapForCruise.get("taskResultId").toString());
                     tCruiseTaskResultDetail.setDeviceId(Long.valueOf(mapForCruise.get("deviceId").toString()));
                     tCruiseTaskResultDetail.setInstanceId(Long.valueOf(mapForCruise.get("instanceId").toString()));
-                    tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
+                    if(mapForCruise.get("cruiseTime").equals("null")){
+                        tCruiseTaskResultDetail.setCruiseTime(new Date());
+                        mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
+                    }else {
+                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
+                    }
+
                     tCruiseTaskResultDetail.setEndTime(new Date());
                     tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(mapForCruise.get("cruiseStatus").toString()));
                     tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
@@ -143,9 +148,9 @@ public class CheckTaskAreJob extends QuartzJobBean {
 
         }
         //将正常 异常放回redis
-            mapForGet.put("abnormal",abnormal.toString());
-            mapForGet.put("normal",normal.toString());
-            redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForGet);
+        mapForGet.put("abnormal",abnormal.toString());
+        mapForGet.put("normal",normal.toString());
+        redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForGet);
         //查库
         log.info("开始入库");
         if(TCTRDList.size()>0){
@@ -218,6 +223,17 @@ public class CheckTaskAreJob extends QuartzJobBean {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
                 serviceRestTemplate.postForObject(ALGORITHM_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private void robotTaskStates(Map<String,Object> robotTaskStatesMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_STATUS_URL, robotTaskStatesMap, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
