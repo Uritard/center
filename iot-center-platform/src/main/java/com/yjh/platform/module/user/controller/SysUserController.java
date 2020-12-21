@@ -319,15 +319,15 @@ public class SysUserController {
                     params.set("content", "用户名或密码错误登录失败");
                     LogsAspect logsAspect = new LogsAspect();
                     logsAspect.post(params);
-                    if (sysUserList.size()==0) {
+                    SysUser sysUser = sysUserList.get(0);
+                    String userId = String.valueOf(sysUser.getUserId());
+                    if (sysUserList.size()==0 || Objects.isNull(userId)) {
                         Map<String, Object> mapResult = new HashMap<>();
                         mapResult.put("info", ResultCodeEnum.CODE10101.getName());
                         mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
                         result.setData(mapResult);
                         return result;
                     }
-                    SysUser sysUser = sysUserList.get(0);
-                    String userId = String.valueOf(sysUser.getUserId());
                     String key = Constant.account_lock_times.replace("userAccountID", userId);
                     Integer errorInputTimes = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "errorInputTimes")));
                     Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "expireTime")));
