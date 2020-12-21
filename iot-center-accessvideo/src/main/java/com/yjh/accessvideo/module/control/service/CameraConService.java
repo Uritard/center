@@ -141,6 +141,7 @@ public class CameraConService {
             Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
             urlStop = "kill -9 "+processNum;
             Runtime.getRuntime().exec(urlStop);
+            Constant.mapsForCamera.remove(String.valueOf(cameraId));
         } catch (Exception e) {e.getMessage();}
         return "stop " + cameraId + " preview success!";
     }
@@ -256,36 +257,32 @@ public class CameraConService {
         return returnMapList;
     }
 
-    @Logs(title = "机器人停止播放", code = "cameraStopPlay")
+    @Logs(title = "机器人停止播放", code = "robotStopPlay", content = "机器人相机停止播放")
     @Transactional(rollbackFor = Exception.class)
     public String robotStopRealPlay(Long robotId) {
         String urlStop = null;
         String livePath;
-//        for ()
-//        try {
-//            if (Objects.equals(null, rtmpUrl) || rtmpUrl.equals("")) {
-//                String rtmpUrlCamera = Constant.mapsForRobot.get(String.valueOf(robotId+":light"));
-//                String[] rtmpUrlCameras = rtmpUrlCamera.split("/");
-//                livePath = rtmpUrlCameras[rtmpUrlCameras.length-1];
-//            } else {
-//                String[] rtmpUrls = rtmpUrl.split("/");
-//                livePath = rtmpUrls[rtmpUrls.length-1];
-//            }
-//            log.info("livePath: "+livePath);
-//            String url = "ps -ef | grep ffmpeg | grep '"+ livePath +"' | grep -v 'grep'";
-//            log.info("stopUrl: "+url);
-//            Process processForId=Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
-//            processForId.waitFor();
-//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
-//            String lineForId = null;
-//            StringBuilder dataBackForId = new StringBuilder();
-//            while ((lineForId = readerForId.readLine()) != null) {
-//                dataBackForId.append(lineForId).append('\n');
-//            }
-//            Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
-//            urlStop = "kill -9 "+processNum;
-//            Runtime.getRuntime().exec(urlStop);
-//        } catch (Exception e) {e.getMessage();}
+        try {
+            String rtmpUrlCamera = Constant.mapsForRobot.get(String.valueOf(robotId+":light"));
+            String[] rtmpUrlCameras = rtmpUrlCamera.split("/");
+            livePath = rtmpUrlCameras[rtmpUrlCameras.length-1];
+
+            log.info("livePath: "+livePath);
+            String url = "ps -ef | grep ffmpeg | grep '"+ livePath +"' | grep -v 'grep'";
+            log.info("stopUrl: "+url);
+            Process processForId=Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
+            processForId.waitFor();
+            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+            String lineForId = null;
+            StringBuilder dataBackForId = new StringBuilder();
+            while ((lineForId = readerForId.readLine()) != null) {
+                dataBackForId.append(lineForId).append('\n');
+            }
+            Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
+            urlStop = "kill -9 "+processNum;
+            Runtime.getRuntime().exec(urlStop);
+            Constant.mapsForRobot.remove(String.valueOf(robotId+":light"));
+        } catch (Exception e) {e.getMessage();}
         return "stop " + robotId + " preview success!";
     }
 
