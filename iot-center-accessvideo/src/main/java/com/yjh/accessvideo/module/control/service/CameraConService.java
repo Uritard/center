@@ -149,15 +149,15 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
         log.info("cameraIds: "+cameraIds);
-        LinkedList<Map<String, Object>> returnMapList = new LinkedList<>();
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
         if (Objects.isNull(cameraIds) || cameraIds.length()==0) return returnMapList;
-        LinkedList<Long> list = new LinkedList<>();
+        List<Long> list = new ArrayList<>();
         String[] cameraIdArry = cameraIds.split(",");
         for (String aCameraIdArry : cameraIdArry) list.add(Long.valueOf(aCameraIdArry));
         log.info("list: "+list);
         try {
-            LinkedList<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(list);
-            for (CameraConInfo cameraConInfo: cameraConInfoList) {
+            for (Long cameraId: list) {
+                CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
                 String userName = cameraConInfo.getUserName();
                 String password = cameraConInfo.getPwd();
                 String cameraIp = cameraConInfo.getRecordIp();
