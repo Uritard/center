@@ -524,14 +524,6 @@ public class TCruiseTaskService {
         thread.setDaemon(true);
         thread.start();
 
-        for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
-            //找到任务Id
-            if(mapItem.get("taskId").equals(taskId)){
-                //删除定时任务
-                JobManager.removeJob(mapItem.get("jobName").toString(),mapItem.get("jobGroupName").toString(),mapItem.get("triggerName").toString(),mapItem.get("triggerGroupName").toString());
-                Constant.taskMap.remove(mapItem);
-            }
-        }
         //机器人任务继续
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
         if(robotCodeList != null && robotCodeList.size()>0){

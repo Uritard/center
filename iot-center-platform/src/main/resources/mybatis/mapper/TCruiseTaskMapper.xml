@@ -393,7 +393,8 @@ select *from (
         DATEDIFF( now( ), start_time ) &lt;= 7
         GROUP BY
         date
-        ) b ON a.timeNode = b.date;
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
     <select id="selectForMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -416,7 +417,8 @@ select *from (
         DATEDIFF( now( ), start_time ) &lt;= 31
         GROUP BY
         date
-        ) b ON a.timeNode = b.date;
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
     <select id="selectForYear" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -445,6 +447,7 @@ select *from (
         GROUP BY
             DATE_FORMAT(start_time,'%Y-%m')) b
          on a.month = b.timeNode
+         order by timeNode
     </select>
 
     <select id="selectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -468,7 +471,8 @@ select *from (
         DATEDIFF( now( ), start_time ) &lt;= 31
         GROUP BY
         date
-        ) b ON a.timeNode = b.date;
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
     <select id="selectOnWeek" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -495,7 +499,8 @@ select *from (
         DATEDIFF(now( ),start_time ) &lt;= 7
         GROUP BY
         date
-        ) b ON a.timeNode = b.date;
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
     <select id="selectOnYear" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -524,6 +529,7 @@ select *from (
             GROUP BY
                 DATE_FORMAT(start_time,'%Y-%m')) b
              on a.mon = b.timeNode
+             order by timeNode
     </select>
 
     <select id="selectTaskOnExecute" resultType="com.yjh.platform.module.task.entity.TaskOnExecuteInfo">

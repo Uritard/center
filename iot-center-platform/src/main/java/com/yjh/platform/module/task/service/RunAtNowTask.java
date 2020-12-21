@@ -517,6 +517,13 @@ public class RunAtNowTask implements Runnable{
                         //所有点都做完了
                         tCruiseTaskResult.setTaskAbnormal(abnormal);
                         tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+                        tCruiseTaskResult.setTaskStatus(240);
+                        if(abnormal != 0){
+                            tCruiseTaskResult.setCruiseResult(247);
+                        }else {
+                            tCruiseTaskResult.setCruiseResult(246);
+                        }
+
                         tCruiseTaskResultDao.insert(tCruiseTaskResult);
                         Thread.sleep(15000);
                         tCruiseResult.setCState(240);
@@ -558,6 +565,12 @@ public class RunAtNowTask implements Runnable{
 
                 tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                 tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+                tCruiseTaskResult.setTaskStatus(240);
+                if(abnormal != 0){
+                    tCruiseTaskResult.setCruiseResult(247);
+                }else {
+                    tCruiseTaskResult.setCruiseResult(246);
+                }
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
                 Map<String, Object> jsonForLastMap = new HashMap<>();
