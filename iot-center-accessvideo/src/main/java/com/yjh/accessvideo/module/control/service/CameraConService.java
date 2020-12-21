@@ -149,7 +149,7 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
         log.info("cameraIds: "+cameraIds);
-        List<Map<String, Object>> returnMapList = new ArrayList<>();
+        LinkedList<Map<String, Object>> returnMapList = new LinkedList<>();
         if (Objects.isNull(cameraIds) || cameraIds.length()==0) return returnMapList;
         LinkedList<Long> list = new LinkedList<>();
         String[] cameraIdArry = cameraIds.split(",");
