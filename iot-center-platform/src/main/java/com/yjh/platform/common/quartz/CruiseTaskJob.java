@@ -248,7 +248,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTaskResultDetail.setTaskResultId(tCruiseResult.getTaskResultId());
                     tCruiseTaskResultDetail.setDeviceId(item.getDeviceId());
                     tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
-                    tCruiseTaskResultDetail.setCruiseTime(new Date());
+                    //tCruiseTaskResultDetail.setCruiseTime(new Date());
                     String cruiseTime = simpleDateFormat.format(new Date());
                     tCruiseTaskResultDetail.setCruiseStatus(253);
 
@@ -264,8 +264,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTaskResultDetailMap.put("taskId",taskId);
                     tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                     tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
-                    tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
-                    tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                    //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
+                    //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
 
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                     //一次循环 一个巡检点
