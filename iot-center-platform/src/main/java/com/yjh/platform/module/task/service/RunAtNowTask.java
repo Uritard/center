@@ -266,6 +266,7 @@ public class RunAtNowTask implements Runnable{
                 }
             }
             log.info("robotCruiseList   :" +robotCruiseList);
+            List<Long> robotTaskInstanceList = new ArrayList<>();
             if(robotCruiseList.size() != 0  && !isGoOn){
                 List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
@@ -276,7 +277,7 @@ public class RunAtNowTask implements Runnable{
                     robotTaskInfo.setTaskId(taskId);
                     robotTaskInfo.setPriority(4);//优先级 暂定4
                     robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
+                    robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     robotTaskInfo.setRobotCode(item);
                     robotTaskInfoList.add(robotTaskInfo);
@@ -287,6 +288,11 @@ public class RunAtNowTask implements Runnable{
                 log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                 //让机器人做任务
                 robotTask(robotTaskInfoMap);
+                if(isGoOn){
+                    for(Long item:robotTaskInstanceList){
+                        instancesList.remove(item);
+                    }
+                }
                 //获取机器人运行状态
             }
 
@@ -315,6 +321,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetailMap.put("taskId",taskId);
                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                 tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
+                tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId());
                 //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                 //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
 

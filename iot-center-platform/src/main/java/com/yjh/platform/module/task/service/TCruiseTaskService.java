@@ -549,6 +549,7 @@ public class TCruiseTaskService {
     @Logs(title = "任务终止", code = "TCruiseTask",content = "任务终止")
     @Transactional(rollbackFor = Exception.class)
     public int taskShutDown(String taskId) throws Exception{
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(242);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
@@ -562,9 +563,8 @@ public class TCruiseTaskService {
         analysisMap.put("list",analysisList);
         log.info("算法信息：    "+analysisMap);
         analysis(analysisMap);
-        log.info("任务暂停"+tCruiseTask.getTaskId());
+        log.info("任务终止"+tCruiseTask.getTaskId());
 
-        Thread.sleep(10000);
         //机器人任务终止
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
         if(robotCodeList != null && robotCodeList.size()>0){
@@ -574,6 +574,22 @@ public class TCruiseTaskService {
             robotTaskStatesMap.put("robotCodeList",robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
+        Thread.sleep(1000);
+
+        String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+        //任务状态
+        String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
+        Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+        Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
+        TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
+        tCruiseTaskResult.setTaskResultId(uuid);
+        tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+        tCruiseTaskResult.setTaskAbnormal(abnormal);
+        tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
+        tCruiseTaskResult.setCruiseTaskTime(format.parse(mapForGet.get("taskStart")));
+        tCruiseTaskResult.setTaskStatus(242);
+        tCruiseTaskResult.setCruiseResult(247);
+        tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
         return tCruiseResultDao.update(tCruiseResult);
     }
