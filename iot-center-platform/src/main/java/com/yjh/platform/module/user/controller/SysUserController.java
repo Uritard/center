@@ -309,18 +309,19 @@ public class SysUserController {
                     }
                 } else {
                     List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
+
+                    SysUser sysUser = sysUserList.get(0);
+                    String userId = String.valueOf(sysUser.getUserId());
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                     params.set("logType", "iot-center-platform:module");
                     params.set("ip", request.getRequestURI());
                     params.set("title", "登录");
                     params.set("state", 1);
-                    params.set("userId", sysUserList.get(0).getUserId());
+                    if (Objects.isNull(userId)) {params.set("userId", "");} else {params.set("userId", userId);}
                     params.set("userName", userName);
                     params.set("content", "用户名或密码错误登录失败");
                     LogsAspect logsAspect = new LogsAspect();
                     logsAspect.post(params);
-                    SysUser sysUser = sysUserList.get(0);
-                    String userId = String.valueOf(sysUser.getUserId());
                     if (sysUserList.size()==0 || Objects.isNull(userId)) {
                         Map<String, Object> mapResult = new HashMap<>();
                         mapResult.put("info", ResultCodeEnum.CODE10101.getName());
