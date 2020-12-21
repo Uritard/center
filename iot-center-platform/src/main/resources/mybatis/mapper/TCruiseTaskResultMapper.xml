@@ -179,12 +179,9 @@
 
     <select id="selectCruiseCountsByTaskId" parameterType="java.lang.String" resultType="java.lang.Long">
         SELECT
-            count(*)
+        COUNT(b.instance_id)
         FROM
-            t_cruise_task a
-        LEFT JOIN t_cruise_plan b ON a.plan_id = b.plan_id
-        LEFT JOIN t_cruise_plan_attr c ON b.plan_id = c.plan_id
-        LEFT JOIN t_cruise_point_instance d ON c.instance_id = d.instance_id
+        t_cruise_task a LEFT JOIN t_cruise_task_attr b ON a.task_id=b.task_id
         WHERE
             a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>

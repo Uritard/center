@@ -324,11 +324,9 @@ public class TCruiseTaskResultService {
         for (Long instanceId : instanceIds) {
             deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
         }
-
         for (String keys : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
             Long a = Long.valueOf(resultMap.get("cruiseId").toString());
-            log.info("redis数据:" + resultMap);
             if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
 //                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
 //                        deviceMeteAbnormal.add(null);

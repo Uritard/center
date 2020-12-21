@@ -40,9 +40,7 @@ import java.util.concurrent.TimeUnit;
 import static com.yjh.accessvideo.common.Constant.TYPET3;
 import static com.yjh.accessvideo.common.Constant.TASKID;
 import static com.yjh.accessvideo.common.Constant.INSTANCEID;
-import static com.yjh.accessvideo.common.Constant.ABNORMAL;
-import static com.yjh.accessvideo.common.Constant.NORMAL;
-import static com.yjh.accessvideo.common.Constant.cruiseKeys;
+
 
 
 /**

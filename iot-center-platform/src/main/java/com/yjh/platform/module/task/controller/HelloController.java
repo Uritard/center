@@ -104,15 +104,22 @@ public class HelloController {
 
         Long endTime=System.currentTimeMillis();
 
-        Float value=Float.valueOf("16");
-        Float highLimit1=Float.valueOf("9.4");
-        Float lowLimit1=Float.valueOf("5");
-        Float highLimit2=Float.valueOf("15.3");
-        Float lowLimit2=null;
-        Float highLimit3=null;
-        Float lowLimit3=null;
-        Float highLimit4=null;
-        Float lowLimit4=null;
+//
+//        redisTemplate.opsForList().leftPush("constant","helloWorld");
+//        redisTemplate.opsForList().leftPush("constant","JAVA");
+//
+//        List<String> list=redisTemplate.opsForList().range("constant",0,redisTemplate.opsForList().size("constant")-1);
+//        log.info("list:"+list);
+
+        Float value=Float.valueOf("17.612");
+        Float highLimit1=Float.valueOf("20");
+        Float lowLimit1=Float.valueOf("10");
+        Float highLimit2=Float.valueOf("25");
+        Float lowLimit2=Float.valueOf("5");
+        Float highLimit3=Float.valueOf("30");
+        Float lowLimit3=Float.valueOf("4");
+        Float highLimit4=Float.valueOf("40");
+        Float lowLimit4=Float.valueOf("1");
 
         Boolean emergency1 = false;
         Boolean emergency2 = false;
