@@ -74,6 +74,12 @@ public class SysUserService{
         return this.sysUserDao.selectByUserName(userName);
     }
 
+    @Logs(title = "查询", code ="module", content = "根据用户名完全匹配查询用户信息")
+    @Transactional(rollbackFor =Exception.class )
+    public  List<SysUser> selectByUserNameTotal(String userName){
+        return this.sysUserDao.selectByUserNameTotal(userName);
+    }
+
     @Logs(title = "查询", code = "module", content = "用户名查询")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Date invalidTime, Date lastLogin) {

@@ -256,6 +256,7 @@ public class SysUserController {
                 String userName = userMap.get("userName");
                 String password = userMap.get("password");
                 SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
+                log.info("sysUserLogin: "+sysUserLogin);
                 if (!Objects.equals(null, sysUserLogin)) {
                     String appKey = getRandomNickname(10);
                     sysUserLogin.setAppkey(appKey);
@@ -308,8 +309,8 @@ public class SysUserController {
                         redisTemplate.opsForHash().putAll("appKey:"+appKey, mapAppKey);
                     }
                 } else {
-                    List<SysUser> sysUserList = this.sysUserService.selectByUserName(userMap.get("userName"));
-                     log.info("sysUserList: "+sysUserList);
+                    List<SysUser> sysUserList = this.sysUserService.selectByUserNameTotal(userMap.get("userName"));
+                    log.info("sysUserList: "+sysUserList);
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                     params.set("logType", "iot-center-platform:module");
                     params.set("ip", request.getRequestURI());

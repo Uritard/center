@@ -375,6 +375,12 @@
 
     </select>
 
+    <select id="selectByUserNameTotal" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUser">
+        select * from sys_user a
+        WHERE 1=1
+        and a.user_name = #{userName, jdbcType=VARCHAR}
+    </select>
+
     <select id="selectByUserName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUser">
         select * from sys_user a
         WHERE 1=1
