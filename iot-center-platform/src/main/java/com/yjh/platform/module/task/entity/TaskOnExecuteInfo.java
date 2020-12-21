@@ -35,7 +35,7 @@ public class TaskOnExecuteInfo {
     private String cruiseTypeName;
 
     @ApiModelProperty(value = "任务进度" )
-    private Float taskProgress;
+    private Integer taskProgress;
 
     @ApiModelProperty(value = "异常结果个数" )
     private Integer alarmCount;

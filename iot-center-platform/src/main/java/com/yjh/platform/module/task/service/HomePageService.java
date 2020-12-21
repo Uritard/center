@@ -89,7 +89,9 @@ public class HomePageService {
             item.setCruiseNotCount(cruiseResultCounter.getCruiseNotCount());
             item.setRunningTime(cruiseResultCounter.getRunningTime());
             Map<String,Object> map = tCruiseTaskResultService.selectCruiseAdvance(item.getTaskId());
-            item.setTaskProgress((Float) map.get("rate"));
+            Float i = (Float) map.get("rate");
+            i = i*100F;
+            item.setTaskProgress(i.intValue());
         }
         return listTask;
     }
