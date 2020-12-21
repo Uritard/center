@@ -301,15 +301,15 @@ public class TCfgDataCurrentService {
             //联动记录插库
             tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
             // TODO: 2020/12/12 待优化WB
-//            // webSocket通知前端调用巡视监控的接口（任务完成）
-//            Map<String, Object> jasonMap = new HashMap<>();
-//            jasonMap.put("type", "newLinkage");
-//            jasonMap.put("alarmName", tStdDeviceService.selectByUnionKeys(currents.get(0).getDeviceId(),currents.get(0).getCunstomId()).getDeviceName());
-//            jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
-//            jasonMap.put("alarmContent", "触发联动");
-//            String json = JSON.toJSONString(jasonMap);
-//            log.info("发送给前端的消息：" + json);
-//            WebSocketServer.sendMsg(json);
+            // webSocket通知前端产生联动信息
+            Map<String, Object> jasonMap = new HashMap<>();
+            jasonMap.put("type", "newLinkage");
+            jasonMap.put("alarmName", tStdDeviceService.selectByUnionKeys(currents.get(0).getDeviceId(),currents.get(0).getCunstomId()).getDeviceName());
+            jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
+            jasonMap.put("alarmContent", "触发联动");
+            String jsonT = JSON.toJSONString(jasonMap);
+            log.info("发送给前端的消息：" + jsonT);
+            WebSocketServer.sendMsg(jsonT);
 
             //webSocket通知前端调联动弹框的接口
             Map<String, Object> jasonMaps2 = new HashMap<>();
