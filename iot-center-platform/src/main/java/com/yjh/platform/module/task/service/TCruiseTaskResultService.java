@@ -312,33 +312,40 @@ public class TCruiseTaskResultService {
         String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
         String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
 
-        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
-        CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
-
         Set<Long> deviceMete = new HashSet<>();//全部标准测点
         Set<Long> deviceMeteAbnormal = new HashSet<>();//结果异常的标准测点
-        Set<Long> deviceMeteComp = new HashSet<>();//未执行的标准测点
-
-        //查询当前任务下所有点所绑定的测点
-        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
-        for (Long instanceId : instanceIds) {
-            deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+        Set<Long> deviceMeteComp = new HashSet<>();//已执行的标准测点
+        List<Long> deviceMeteIds=new ArrayList<>();//测点对比器
+        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
+        CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
+//        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+//        for (Long instanceId : instanceIds) {
+//            deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+//        }
+        for(String keys:keyResult){
+            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
+            deviceMete.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
+            deviceMeteIds.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
         }
         for (String keys : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
-            Long a = Long.valueOf(resultMap.get("cruiseId").toString());
+//            Long a = Long.valueOf(resultMap.get("cruiseId").toString());
+//            Long deviceMeteId=tStdDevicemeteDao.getdeviceMeteByPointinstance(a);//当前点对应的标准测点
+              Long deviceMeteId=Long.valueOf(resultMap.get("device_mete_id").toString());
+            //巡视点执行失败、未知状态-异常测点
             if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
-//                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
-//                        deviceMeteAbnormal.add(null);
-//                    } else {
-                deviceMeteAbnormal.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
-//                    }
+                deviceMeteIds.remove(deviceMeteId);
+                if(!deviceMeteIds.contains(deviceMeteId)){
+                    deviceMeteComp.add(deviceMeteId);
+                }
+                deviceMeteAbnormal.add(deviceMeteId);
+                //巡视点执行完成
             } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
-//                    if (tStdDevicemeteDao.getdeviceMeteByPointinstance(a).equals(null)) {
-//                        deviceMeteComp.add(null);
-//                    } else {
-                deviceMeteComp.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(a));
-//                    }
+                deviceMeteIds.remove(deviceMeteId);
+                if(!deviceMeteIds.contains(deviceMeteId)){
+                    deviceMeteComp.add(deviceMeteId);
+                }
+
             }
         }
 

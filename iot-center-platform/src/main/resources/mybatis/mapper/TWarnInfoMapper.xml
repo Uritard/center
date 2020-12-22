@@ -544,12 +544,13 @@
     </select>
 
     <select id="warnCountsNonIdentify" resultType="java.lang.Integer">
-        SELECT
-            COUNT(warn_id)
+       SELECT
+            count(*)
         FROM
-            t_dict_business a
-        LEFT JOIN t_warn_info b ON a.col_name = 'conf_mode'
-        AND dict_note = '已处理'
+            t_warn_info a
+        LEFT JOIN t_dict_business b ON a.conf_mode = b.dict_code
+        WHERE
+            b.dict_note = '未处理'
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT
