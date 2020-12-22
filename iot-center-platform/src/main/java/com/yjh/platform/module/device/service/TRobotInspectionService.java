@@ -106,7 +106,7 @@ public class TRobotInspectionService{
             RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
             robotTaskMessage.setDeviceName(getName(Long.valueOf(item),1,nameList));
             robotTaskMessage.setInstanceName(getName(Long.valueOf(item),0,nameList));
-            if(mapForRobotTaskMessage.get("cruiseTime") != null){
+            if(mapForRobotTaskMessage.get("cruiseTime") != null && !"null".equals(mapForRobotTaskMessage.get("cruiseTime"))){
                 robotTaskMessage.setCruiseTime(mapForRobotTaskMessage.get("cruiseTime"));
                 robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultNum"));
             }else {

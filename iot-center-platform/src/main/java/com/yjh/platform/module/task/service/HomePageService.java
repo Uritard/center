@@ -106,8 +106,8 @@ public class HomePageService {
 
     @Logs(title = "告警内容数据", code = "TaskForHomeService",content = "告警内容数据")
     @Transactional(rollbackFor = Exception.class)
-    public List<WarnInfoForHomePage> selectThereWarn(){
-        return tDefectInfoDao.selectThereWarn();
+    public List<WarnInfoForHomePage> selectThereWarn(Integer alarmLevel){
+        return tDefectInfoDao.selectThereWarn(alarmLevel);
     }
 
     @Logs(title = "机器人信息", code = "TaskForHomeService",content = "机器人信息")

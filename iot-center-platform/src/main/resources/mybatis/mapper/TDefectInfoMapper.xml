@@ -486,6 +486,8 @@
         b.device_name as deviceName
         from t_warn_info a
         left join (select DISTINCT device_id,device_name from t_std_device) b on a.device_id = b.device_id
+        where 1=1
+        <if test="alarmLevel != null "> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
         union all(
         SELECT
         c.alarm_time as warnTime,
@@ -493,6 +495,8 @@
         d.robot_name as deviceName
         from t_robot_alarm c
         left join t_robot_info d on c.robot_id = d.robot_id
+        where 1=1
+        <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         )
         order by warnTime desc LIMIT 20
     </select>

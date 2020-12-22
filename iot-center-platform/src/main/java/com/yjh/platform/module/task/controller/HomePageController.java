@@ -88,10 +88,10 @@ public class HomePageController {
 
     @ApiOperation(value = "告警内容数据")
     @RequestMapping(value = "/warnInfo", method = RequestMethod.GET)
-    public Result warnInfo() {
+    public Result warnInfo(@RequestParam(value = "alarmLevel", required = false) Integer alarmLevel) {
         Result result = new Result();
         try {
-            result.setData(homePageService.selectThereWarn());
+            result.setData(homePageService.selectThereWarn(alarmLevel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

@@ -59,7 +59,6 @@ public interface TDefectInfoDao {
     List<Map<String,Integer>> countByDefectLevel();
 
     List<Map<String,Object>> countByAlarmLevel();
-
-    List<WarnInfoForHomePage>selectThereWarn();
+    List<WarnInfoForHomePage>selectThereWarn(@Param(value = "alarmLevel")Integer alarmLevel);
 
 }
