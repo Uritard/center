@@ -176,5 +176,11 @@
             </foreach>
             )
     </delete>
+    
+    <select id="selectByAnalyseType" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        select *
+        from t_algorithm_info
+        where analyse_type = #{analyseType,jdbcType=VARCHAR}
+    </select>
 
 </mapper>

@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.entity.TAlgorithmConf;
+import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -65,11 +67,14 @@ public class TStdDevicemeteService{
         }
         this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
         //配置算法
-        if(tStdDeviceMeteDetail.getAlgorithmId() != null){
+        if(tStdDeviceMeteDetail.getAnalyseType() != null){
+            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(tStdDeviceMeteDetail.getAnalyseType());
             TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
-            tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
-            tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-            tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+            if(tAlgorithmInfo != null){
+                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+            }
         }
         return  1;
     }
@@ -114,24 +119,34 @@ public class TStdDevicemeteService{
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         //修改测点配置的算法
         //配置算法
-        if(tStdDeviceMeteDetail.getAlgorithmId() != null){
+        if(tStdDeviceMeteDetail.getAnalyseType() != null){
             TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             if(tAlgorithmConfBak == null){
                 tAlgorithmConfBak = new TAlgorithmConfBak();
-                tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
-                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+                TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(tStdDeviceMeteDetail.getAnalyseType());
+                if(tAlgorithmInfo != null){
+                    tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                    tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                    tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+                }
+
             }else {
-                tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
-                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                tAlgorithmConfBakDao.update(tAlgorithmConfBak);
+                TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(tStdDeviceMeteDetail.getAnalyseType());
+                if(tAlgorithmInfo != null){
+                    tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                    tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                    tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+                }
             }
         }else {
             TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             if(tAlgorithmConfBak != null){
-                tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
-                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                tAlgorithmConfBakDao.update(tAlgorithmConfBak);
+                TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(tStdDeviceMeteDetail.getAnalyseType());
+                if(tAlgorithmInfo != null){
+                    tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                    tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                    tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+                }
             }
         }
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在

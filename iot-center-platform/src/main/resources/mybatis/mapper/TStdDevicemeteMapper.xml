@@ -326,8 +326,8 @@
         e.device_name as deviceName,
         e.up_region_id,
         h.dict_note as unitName,
-        j.algorithm_id,
-        K.algorithm_Name
+        k.analyse_type,
+        l.dict_note as analyseTypeName
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
         left join t_dict_business f on a.alarm_type= f.dict_code
@@ -338,6 +338,7 @@
         left join t_dict_business i on a.custom_id = i.dict_code
         left join t_algorithm_conf_bak j on a.device_mete_id = j.device_mete_id
         left join t_algorithm_info k on j.algorithm_id = k.algorithm_id
+        left join t_dict_business l on k.analyse_type = l.dict_code and (l.col_name="analyse_type" or l.col_name="defect_type" )
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>

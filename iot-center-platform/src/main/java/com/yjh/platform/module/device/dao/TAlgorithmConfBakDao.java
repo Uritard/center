@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import java.util.List;
 import java.util.Date;
 import com.yjh.platform.module.device.entity.TAlgorithmConfBak;
+import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -31,4 +32,5 @@ public interface TAlgorithmConfBakDao {
 
     int batchAdd(List<TAlgorithmConfBak> list);
     int batchDelete(List<String> list);
+    TAlgorithmInfo selectByAnalyseType(@Param(value = "analyseType") String analyseType);
 }
