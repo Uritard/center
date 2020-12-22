@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TAlgorithmConfBakDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
+        <id column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="algorithm_id" jdbcType="BIGINT" property="algorithmId" />
+        <result column="config_name" jdbcType="VARCHAR" property="configName" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="if_del" jdbcType="INTEGER" property="ifDel" />
+        <result column="if_show" jdbcType="INTEGER" property="ifShow" />
+        <result column="pic_url" jdbcType="VARCHAR" property="picUrl" />
+        <result column="apply_module" jdbcType="INTEGER" property="applyModule" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_mete_id, algorithm_id, config_name, status, if_del, if_show, pic_url, apply_module, create_time, update_time
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
+        insert into t_algorithm_conf_bak(
+            device_mete_id,
+            algorithm_id,
+            config_name,
+            status,
+            if_del,
+            if_show,
+            pic_url,
+            apply_module,
+            create_time,
+            update_time
+        )values(
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{algorithmId, jdbcType=BIGINT},
+                #{configName, jdbcType=VARCHAR},
+                #{status, jdbcType=INTEGER},
+                #{ifDel, jdbcType=INTEGER},
+                #{ifShow, jdbcType=INTEGER},
+                #{picUrl, jdbcType=VARCHAR},
+                #{applyModule, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{updateTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_algorithm_conf_bak
+                where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
+        update t_algorithm_conf_bak a <set>
+        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
+        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
+        <if test="configName != null and configName != ''">a.config_name = #{configName, jdbcType=VARCHAR},</if>
+        <if test="status != null">a.status = #{status, jdbcType=INTEGER},</if>
+        <if test="ifDel != null">a.if_del = #{ifDel, jdbcType=INTEGER},</if>
+        <if test="ifShow != null">a.if_show = #{ifShow, jdbcType=INTEGER},</if>
+        <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
+        <if test="applyModule != null">a.apply_module = #{applyModule, jdbcType=INTEGER},</if>
+        <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
+        select
+        a.device_mete_id,
+        a.algorithm_id,
+        a.config_name,
+        a.status,
+        a.if_del,
+        a.if_show,
+        a.pic_url,
+        a.apply_module,
+        a.create_time,
+        a.update_time
+        from t_algorithm_conf_bak a
+        where 1 = 1
+            and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak" resultType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
+        select
+        a.device_mete_id,
+        a.algorithm_id,
+        a.config_name,
+        a.status,
+        a.if_del,
+        a.if_show,
+        a.pic_url,
+        a.apply_module,
+        a.create_time,
+        a.update_time
+        from t_algorithm_conf_bak a
+        where 1 = 1
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
+        <if test="configName != null and configName != ''"> and a.config_name = #{configName, jdbcType=VARCHAR}</if>
+        <if test="status != null"> and a.status = #{status, jdbcType=INTEGER}</if>
+        <if test="ifDel != null"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
+        <if test="ifShow != null"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
+        <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
+        <if test="applyModule != null"> and a.apply_module = #{applyModule, jdbcType=INTEGER}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak" resultType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
+        select
+        a.device_mete_id,
+        a.algorithm_id,
+        a.config_name,
+        a.status,
+        a.if_del,
+        a.if_show,
+        a.pic_url,
+        a.apply_module,
+        a.create_time,
+        a.update_time
+        from t_algorithm_conf_bak a
+        where 1 = 1
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
+        <if test="configName != null and configName != ''"> and a.config_name = #{configName, jdbcType=VARCHAR}</if>
+        <if test="status != null"> and a.status = #{status, jdbcType=INTEGER}</if>
+        <if test="ifDel != null"> and a.if_del = #{ifDel, jdbcType=INTEGER}</if>
+        <if test="ifShow != null"> and a.if_show = #{ifShow, jdbcType=INTEGER}</if>
+        <if test="picUrl != null and picUrl != ''"> and a.pic_url = #{picUrl, jdbcType=VARCHAR}</if>
+        <if test="applyModule != null"> and a.apply_module = #{applyModule, jdbcType=INTEGER}</if>
+        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_algorithm_conf_bak(
+            device_mete_id,
+            algorithm_id,
+            config_name,
+            status,
+            if_del,
+            if_show,
+            pic_url,
+            apply_module,
+            create_time,
+            update_time
+        )values
+        <foreach collection="list" item="TAlgorithmConfBak" separator=",">
+            (
+                #{TAlgorithmConfBak.deviceMeteId, jdbcType=BIGINT},
+                #{TAlgorithmConfBak.algorithmId, jdbcType=BIGINT},
+                #{TAlgorithmConfBak.configName, jdbcType=VARCHAR},
+                #{TAlgorithmConfBak.status, jdbcType=INTEGER},
+                #{TAlgorithmConfBak.ifDel, jdbcType=INTEGER},
+                #{TAlgorithmConfBak.ifShow, jdbcType=INTEGER},
+                #{TAlgorithmConfBak.picUrl, jdbcType=VARCHAR},
+                #{TAlgorithmConfBak.applyModule, jdbcType=INTEGER},
+                #{TAlgorithmConfBak.createTime, jdbcType=TIMESTAMP},
+                #{TAlgorithmConfBak.updateTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_algorithm_conf_bak
+        where device_mete_id in (
+            <foreach collection="list" item="deviceMeteId" separator=",">
+                #{deviceMeteId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+</mapper>
