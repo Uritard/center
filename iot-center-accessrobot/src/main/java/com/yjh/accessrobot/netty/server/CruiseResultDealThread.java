@@ -110,8 +110,8 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("taskId是==="+taskId);
                 TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(taskId);//获取任务
                 log.info("tCruiseTask是==="+tCruiseTask);
-                String taskResultId = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
-                log.info("taskResultId是==="+taskResultId);
+                TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
+                log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
 
                  //读缓存
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+cruiseResultMap.get("robotCode"));
@@ -132,7 +132,7 @@ public class CruiseResultDealThread implements Runnable{
                         str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + instanceId;//redis缓存名称
 
                         tCruiseTaskResultMap.put("instanceId",instanceId);
-                        tCruiseTaskResultMap.put("cruiseResultId",taskResultId + instanceId);
+                        tCruiseTaskResultMap.put("cruiseResultId",tCruiseResult.getTaskResultId() + instanceId);
                         tCruiseTaskResultMap.put("cruiseTime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("cruiseId",instanceId);
                         tCruiseTaskResultMap.put("cruiseTaskTime",cruiseTime);
@@ -140,7 +140,7 @@ public class CruiseResultDealThread implements Runnable{
                         Map<String,String> map = redisTemplate.opsForHash().entries("countForAbnormal:"+taskId);
                         tCruiseTaskResultMap.put("startTime",map.get("taskStart"));
 
-                        tCruiseTaskResultMap.put("taskResultId",taskResultId);
+                        tCruiseTaskResultMap.put("taskResultId",tCruiseResult.getTaskResultId());
                         tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("cruiseStatus","252");
 
@@ -393,10 +393,8 @@ public class CruiseResultDealThread implements Runnable{
                     //插TCTR表
                     StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
 
-                    TCruiseResult tCruiseResult = new TCruiseResult()
-                            .setTaskWait(taskWait)//待测点数
-                            .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"))
-                            .setCState(240);//任务状态
+                     tCruiseResult.setTaskWait(taskWait);//待测点数
+                     tCruiseResult.setCState(240);//任务状态
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     //更新TCR表
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
@@ -416,10 +414,9 @@ public class CruiseResultDealThread implements Runnable{
                     //更新异常点缓存的数据
                     redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
 
-                    TCruiseResult tCruiseResult = new TCruiseResult()
-                            .setTaskWait(totalCheckPoint - abnormalCheckPoint - normalCheckPoint)//待测点数
-                            .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"))
-                            .setCState(239);//正在执行
+
+                    tCruiseResult.setTaskWait(totalCheckPoint - abnormalCheckPoint - normalCheckPoint);//待测点数
+                    tCruiseResult.setCState(239);//正在执行
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     //更新TCR表
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);

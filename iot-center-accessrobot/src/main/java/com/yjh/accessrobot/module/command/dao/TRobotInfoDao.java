@@ -51,7 +51,7 @@ public interface TRobotInfoDao {
     Long selectLastRobotId();
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
-    String selectTaskResultId(@Param(value = "taskId") String taskId);
+    TCruiseResult selectTaskResultId(@Param(value = "taskId") String taskId);
     TCruiseTask selectTCruiseTask(@Param(value = "taskId") String taskId);
     int insertRobotAlarm(TRobotAlarm tRobotAlarm);
     int batchInsertCruiseDataResult(List<TCruiseDataResult> list);

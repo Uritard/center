@@ -500,13 +500,11 @@ public class RobotService {
                 }
             }
 
-            String taskResultId = selectTaskResultId(taskId);
-            log.info("taskResultId是==="+taskResultId);
+        TCruiseResult tCruiseResult = selectTaskResultId(taskId);
+            log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
 
-            TCruiseResult tCruiseResult = new TCruiseResult()
-                    .setTaskWait(taskWait)//待测点数
-                    .setTaskResultId(taskResultId)
-                    .setCState(cState);//任务状态
+            tCruiseResult.setTaskWait(taskWait);//待测点数
+            tCruiseResult.setCState(cState);//任务状态
             log.info("tCruiseResult的内容是==="+tCruiseResult);
             //更新TCR表
             updateTCruiseResult(tCruiseResult);
@@ -521,9 +519,9 @@ public class RobotService {
     }
     @Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String selectTaskResultId(String taskId) {
-        String taskResultId = tRobotInfoDao.selectTaskResultId(taskId);
-        return taskResultId;
+    public TCruiseResult selectTaskResultId(String taskId) {
+        TCruiseResult tCruiseResult = tRobotInfoDao.selectTaskResultId(taskId);
+        return tCruiseResult;
     }
     @Logs(title = "根据taskId查询相关内容2", code = "Robot")
     @Transactional(rollbackFor = Exception.class)

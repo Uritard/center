@@ -369,9 +369,9 @@
         <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=VARCHAR}</if>
     </select>
     <!--查询机器人相关信息-->
-    <select id="selectTaskResultId" resultType="java.lang.String">
+    <select id="selectTaskResultId" resultType="com.yjh.accessrobot.module.command.entity.TCruiseResult">
         SELECT
-            a.task_result_id
+            *
         FROM t_cruise_result a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
