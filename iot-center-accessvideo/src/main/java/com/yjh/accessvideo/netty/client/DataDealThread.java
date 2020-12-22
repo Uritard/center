@@ -23,7 +23,7 @@ import static com.yjh.accessvideo.common.Constant.*;
 
 import static com.yjh.accessvideo.common.Constant.TASKID;
 import static com.yjh.accessvideo.common.Constant.INSTANCEID;
-
+import static com.yjh.accessvideo.common.Constant.FLAG;
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {
@@ -430,7 +430,6 @@ public class DataDealThread implements Runnable {
 
                 log.info("RedisList修改成功");
 
-
             }
 
         } else if (jsonObject.get("msgType").toString().equals("6")) { //任务结束后发来的心跳信息
@@ -439,7 +438,7 @@ public class DataDealThread implements Runnable {
             log.info("心跳处理结束" + taskId);
         }
 
-        if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1")) {  //满足插库条件
+        if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1")){  //满足插库条件
             log.info("任务结束-开始数据存储");
             //插库时从redis中取出正常、异常点数
             Map<String, Object> taskConstant = redisTemplate.opsForHash().entries("taskConstant:" + TASKID);
@@ -551,6 +550,8 @@ public class DataDealThread implements Runnable {
                 log.info("两表开始插入");
                 analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
                 analyseDataOperateService.batchInsertCruiseDataResult(dataList);
+                redisTemplate.delete("cruiseKeys:" + TASKID);
+                log.info("Loading........清空本任务至此的巡视点");
 //                if (warnList.size() > 0) {
 //                    analyseDataOperateService.batchInsertWarnInfo(warnList);
 //                    //清空redis中的告警信息
@@ -568,61 +569,60 @@ public class DataDealThread implements Runnable {
                 log.error("插表错误" + e);
             }
 
+                // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
+                Map<String, Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:" + TASKID + INSTANCEID);
+                String strForCountAbnormal = "countForAbnormal:" + TASKID;
+                Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                Integer total = Integer.valueOf(abnormalCount.get("all").toString());
+                Integer abnormal = Integer.valueOf(abnormalCount.get("abnormal").toString());
+                Integer normal = Integer.valueOf(abnormalCount.get("normal").toString());
+                log.info("All：" + total);
+                //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
+                tAbnormal = tAbnormal + abnormal;
+                tNormal = tNormal + normal;
+                if (tAbnormal + tNormal == total) {
+                    //TCTR开始
 
-            // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
-            Map<String, Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:" + TASKID + INSTANCEID);
-            String strForCountAbnormal = "countForAbnormal:" + TASKID;
-            Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            Integer total = Integer.valueOf(abnormalCount.get("all").toString());
-            Integer abnormal = Integer.valueOf(abnormalCount.get("abnormal").toString());
-            Integer normal = Integer.valueOf(abnormalCount.get("normal").toString());
-            log.info("All：" + total);
-            //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
-            tAbnormal = tAbnormal + abnormal;
-            tNormal = tNormal + normal;
-            if (tAbnormal + tNormal == total) {
-                //TCTR开始
+                    Thread.sleep(15000);
 
-                Thread.sleep(15000);
-
-                log.info("TCTR开始");
-                TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-                tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
-                tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
-                tCruiseTaskResult.setTaskAbnormal(tAbnormal);
-                tCruiseTaskResult.setTaskAlarm(0);
-                tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
+                    log.info("TCTR开始");
+                    TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
+                    tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
+                    tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
+                    tCruiseTaskResult.setTaskAbnormal(tAbnormal);
+                    tCruiseTaskResult.setTaskAlarm(0);
+                    tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
 //                                tCruiseTaskResult.setCruiseTaskTime();
-                analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+                    analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
 
 
-                //TCR开始
-                log.info("TCR开始");
-                TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
-                tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
-                tCruiseResult.setTaskWait(0);
-                analyseDataOperateService.updateCruiseResult(tCruiseResult);
+                    //TCR开始
+                    log.info("TCR开始");
+                    TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
+                    tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
+                    tCruiseResult.setTaskWait(0);
+                    analyseDataOperateService.updateCruiseResult(tCruiseResult);
 
-                // webSocket通知前端调用巡视监控的接口（任务完成）
-                Map<String, Object> jasonMap = new HashMap<>();
-                jasonMap.put("type", "lastOneInstance");
-                jasonMap.put("taskId", cruiseResult.get("taskId").toString());
-                String json = JSON.toJSONString(jasonMap);
-                log.info("发送给前端的消息：" + json);
-                WebSocketServer.sendMsg(json);
+                    // webSocket通知前端调用巡视监控的接口（任务完成）
+                    Map<String, Object> jasonMap = new HashMap<>();
+                    jasonMap.put("type", "lastOneInstance");
+                    jasonMap.put("taskId", cruiseResult.get("taskId").toString());
+                    String json = JSON.toJSONString(jasonMap);
+                    log.info("发送给前端的消息：" + json);
+                    WebSocketServer.sendMsg(json);
 
-                //任务执行完成 删除当前任务的缓存
-                redisTemplate.delete("taskConstant:" + TASKID);
-                redisTemplate.delete("cruiseKeys:" + TASKID);
+                    //任务执行完成 删除当前任务的缓存
+                    redisTemplate.delete("taskConstant:" + TASKID);
 
-            } else {       // 修改异常点数缓存
-                Map<String, String> mapForAbnormal = new HashMap<>();
-                Integer totAbnormal = tAbnormal + abnormal;
-                Integer totNormal = tNormal + normal;
-                mapForAbnormal.put("abnormal", totAbnormal.toString());
-                mapForAbnormal.put("normal", totNormal.toString());
-                redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
-            }
+
+                } else {       // 修改异常点数缓存
+                    Map<String, String> mapForAbnormal = new HashMap<>();
+                    Integer totAbnormal = tAbnormal + abnormal;
+                    Integer totNormal = tNormal + normal;
+                    mapForAbnormal.put("abnormal", totAbnormal.toString());
+                    mapForAbnormal.put("normal", totNormal.toString());
+                    redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+                }
 
         }
 

@@ -24,6 +24,7 @@ public class Constant {
 
     public static String TASKID="";
     public static String INSTANCEID="";
+    public static  AtomicInteger FLAG;
 //    public static AtomicInteger ABNORMAL=new AtomicInteger(0);
 //    public static AtomicInteger NORMAL=new AtomicInteger(0);
 ////    public static AtomicInteger NORMAL; //线程安全Integer
