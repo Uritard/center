@@ -90,7 +90,7 @@ public class SystemInfoService {
         Date now = new Date();
         for(Map<String,Object> item :re){
            // long createTime = simpleDateFormat.parse((Date)item.get("registerTime"));
-            log.info("registerTime:  "+item.get("registerTime").toString());
+            //log.info("registerTime:  "+item.get("registerTime").toString());
             String used = item.get("registerTime").toString();
             log.info("used:  "+used);
             long diff = now.getTime()-simpleDateFormat.parse(used).getTime();

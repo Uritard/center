@@ -221,14 +221,17 @@ public class HomePageService {
                 String minute = "0";
                 if(time.contains("天")){
                      day = time.split("天")[0];
-                    mapForRe.put("day",day);
+                    mapForRe.put("timeValue",day);
+                    mapForRe.put("timeUnit","天");
                 }else if(time.contains("小时")){
                         hour = time.split("小时")[0];
-                    mapForRe.put("hour",hour);
+                    mapForRe.put("timeValue",hour);
+                    mapForRe.put("timeUnit","小时");
                 }else if(time.contains("分")){
                         minute = time.split("分")[0];
                     Double i = Double.valueOf(minute);
-                    mapForRe.put("hour",df.format(i/60));
+                    mapForRe.put("timeValue",df.format(i/60));
+                    mapForRe.put("timeUnit","小时");
                 }
             }
         }
