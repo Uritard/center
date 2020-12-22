@@ -463,6 +463,7 @@
     <select id="countByAlarmLevel" resultType="java.util.Map">
         SELECT
             IFNULL( c.count, 0 ) AS count,
+            b.dict_code as alarmLevel,
             b.dict_note as alarmLevelName
         FROM
             t_dict_business b

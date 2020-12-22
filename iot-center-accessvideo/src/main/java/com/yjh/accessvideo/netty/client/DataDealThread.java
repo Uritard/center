@@ -20,12 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.yjh.accessvideo.common.Constant.INSTANCEID;
-<<<<<<< Updated upstream
-import static com.yjh.accessvideo.common.Constant.FLAG;
-=======
 import static com.yjh.accessvideo.common.Constant.TASKID;
-
->>>>>>> Stashed changes
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {
