@@ -318,15 +318,17 @@ public class TCruiseTaskResultService {
         List<Long> deviceMeteIds=new ArrayList<>();//测点对比器
         Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
-//        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
-//        for (Long instanceId : instanceIds) {
-//            deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
-//        }
-        for(String keys:keyResult){
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
-            deviceMete.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
-            deviceMeteIds.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
+
+        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+        for (Long instanceId : instanceIds) {
+            deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+            deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
         }
+//        for(String keys:keyResult){
+//            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
+//            deviceMete.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
+//            deviceMeteIds.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
+//        }
         for (String keys : keyResult) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
 //            Long a = Long.valueOf(resultMap.get("cruiseId").toString());
