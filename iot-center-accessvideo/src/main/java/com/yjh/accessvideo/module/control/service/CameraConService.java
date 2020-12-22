@@ -242,13 +242,13 @@ public class CameraConService {
         try { Runtime.getRuntime().exec(transUrlinferad); } catch (Exception e) {e.getMessage();}
         log.info("transUrlinferad: "+transUrlinferad);
         String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
-        String rtmpUrlInferad = "rtmp"+rtmpUrlsInferad[rtmpUrls.length-1];
+        String rtmpUrlInferad = "rtmp"+rtmpUrlsInferad[rtmpUrlsInferad.length-1];
         String flvUrlInferad = "http://"+hostIp+":8000/live/"+livePath+".flv";
         Map<String, Object> returnInferadMap = new HashMap<>();
         returnInferadMap.put("inferad", String.valueOf(robotId));
         returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
         returnInferadMap.put("flvUrlInferad", flvUrlInferad);
-        Constant.mapsForRobot.put(String.valueOf(robotId)+":inferad", rtmpUrl);
+        Constant.mapsForRobot.put(String.valueOf(robotId)+":inferad", rtmpUrlInferad);
         log.info("mapsForRobot: "+Constant.mapsForRobot);
 
         returnMapList.add(returnLightMap);
@@ -291,15 +291,15 @@ public class CameraConService {
             log.info("stopRobotInfraedUrl: "+urlRobot);
             Process processForIdRobot=Runtime.getRuntime().exec(new String[]{"sh", "-c", urlRobot});
             processForIdRobot.waitFor();
-            BufferedReader readerForIdRobot = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+            BufferedReader readerForIdRobot = new BufferedReader(new InputStreamReader(processForIdRobot.getInputStream(), "UTF-8"));
             String lineForIdRobot = null;
             StringBuilder dataBackForIdRobot = new StringBuilder();
             while ((lineForIdRobot = readerForIdRobot.readLine()) != null) {
                 dataBackForIdRobot.append(lineForIdRobot).append('\n');
             }
             Integer processNumRobot = Integer.parseInt(dataBackForIdRobot.substring(9,15).replace(" ",""));
-            urlStop = "kill -9 "+processNumRobot;
-            Runtime.getRuntime().exec(urlStop);
+            String urlStopRobot = "kill -9 "+processNumRobot;
+            Runtime.getRuntime().exec(urlStopRobot);
             Constant.mapsForRobot.remove(String.valueOf(robotId+":light"));
         } catch (Exception e) {e.getMessage();}
         return "stop " + robotId + " preview success!";
