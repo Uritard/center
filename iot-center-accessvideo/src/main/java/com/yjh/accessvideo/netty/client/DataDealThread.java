@@ -299,9 +299,11 @@ public class DataDealThread implements Runnable {
                                                 log.info("该测点是否配置了告警提示是===" + alarmNote);
                                                 log.info("该测点告警推送配置的告警等级是===" + alarmLevel);
                                                 log.info("产生的该条告警等级是===" + warnLevel);
+                                                log.info("一层判断"+(alarmNote != null && "1".equals(alarmNote)));
+                                                log.info("二层判断"+(warnLevel == alarmLevel || warnLevel > alarmLevel));
+
                                                 if (alarmNote != null && "1".equals(alarmNote)) {
-                                                    if (tWarnInfo.getWarnLevel() == tStdDevicemeteM.getAlarmLevel() ||
-                                                            tWarnInfo.getWarnLevel() > tStdDevicemeteM.getAlarmLevel()) {
+                                                    if (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel) {
                                                         //webSocket通知前端调用查询告警弹框的接口
                                                         Map<String, Object> jasonMaps2 = new HashMap<>();
                                                         jasonMaps2.put("type", "alarmPopUp");

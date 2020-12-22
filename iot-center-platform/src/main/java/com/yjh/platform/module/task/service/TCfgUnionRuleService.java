@@ -1,25 +1,23 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.dao.TCfgMeteDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgMete;
+import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
-import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
+import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
-import com.yjh.platform.module.task.entity.TCruisePlan;
-import com.yjh.platform.module.task.entity.TCruisePlanCount;
-import com.yjh.platform.module.user.dao.TDictBusinessDao;
-import com.yjh.platform.module.user.entity.TDictBusiness;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author lqh
@@ -47,7 +45,6 @@ public class TCfgUnionRuleService{
             }
         tCfgUnionRule.setInputParam(list.toString().replaceAll("\\[","")
                 .replaceAll("]",""));
-            tCfgUnionRule.setRuleType("multi");
             return this.tCfgUnionRuleDao.add(tCfgUnionRule);
     }
 

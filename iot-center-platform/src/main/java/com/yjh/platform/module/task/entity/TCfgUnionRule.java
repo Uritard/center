@@ -1,16 +1,16 @@
 package com.yjh.platform.module.task.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author lqh
@@ -35,7 +35,7 @@ public class TCfgUnionRule implements Serializable {
     @ApiModelProperty(value = "规则名称")
     private String ruleName;
 
-    @ApiModelProperty(value = "规则类型 multi／single",example = "multi")
+    @ApiModelProperty(value = "是否生成联动监控弹窗0.不生成   1.生成")
     private String ruleType;
 
     @ApiModelProperty(value = "具体治理规则")
