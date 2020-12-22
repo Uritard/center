@@ -9,9 +9,11 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.device.entity.TAlgorithmConfBak;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
@@ -54,6 +56,7 @@ public class RunAtNowTask implements Runnable{
     private TCruiseTaskResultDao tCruiseTaskResultDao;
     private Boolean isGoOn;
     private TRobotInspectionDao tRobotInspectionDao;
+    private TAlgorithmConfBakDao tAlgorithmConfBakDao;
 
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
@@ -80,7 +83,7 @@ public class RunAtNowTask implements Runnable{
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
                         TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Float tasksAreTime,
-                        TRobotInspectionDao tRobotInspectionDao) {
+                        TRobotInspectionDao tRobotInspectionDao,TAlgorithmConfBakDao tAlgorithmConfBakDao) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
         this.picModelPath = picModelPath;
@@ -97,6 +100,7 @@ public class RunAtNowTask implements Runnable{
         this.isGoOn = isGoOn;//判断是否是任务重启
         this.tasksAreTime = tasksAreTime;
         this.tRobotInspectionDao = tRobotInspectionDao;
+        this.tAlgorithmConfBakDao = tAlgorithmConfBakDao;
     }
 
     //相机抓图
@@ -401,6 +405,8 @@ public class RunAtNowTask implements Runnable{
 
 
                     }else {
+                        //todo  现在是测点配置了算法 从测点寻找算法id
+                        TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(item.getDeviceMeteId());
                         TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
                         if(tAlgorithmConf != null){//摄像头配置了算法
                             tCruiseDataResult.setPicpath(urlPath);
@@ -433,6 +439,7 @@ public class RunAtNowTask implements Runnable{
                             analysis.setTaskId(taskId);
                             analysis.setInstanceId(item.getInstanceId());
                             analysis.setPicPath(absPath);
+                            //todo  TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConfBak.getAlgorithmId());
                             TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());

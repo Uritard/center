@@ -7,9 +7,11 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.device.entity.TAlgorithmConfBak;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
@@ -62,6 +64,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private TAlgorithmConfBakDao tAlgorithmConfBakDao;
 
 
 
@@ -338,6 +342,8 @@ public class CruiseTaskJob extends QuartzJobBean {
 
 
                         }else {
+                            //todo  现在是测点配置了算法 从测点寻找算法id
+                            TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(item.getDeviceMeteId());
                             TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
                             if(tAlgorithmConf != null){//摄像头配置了算法
                                 tCruiseDataResult.setPicpath(urlPath);
@@ -371,6 +377,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 analysis.setTaskId(tCruiseTask.getTaskId());
                                 analysis.setInstanceId(item.getInstanceId());
                                 analysis.setPicPath(absPath);
+                                //todo  TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConfBak.getAlgorithmId());
                                 TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                                 analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                                 analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());

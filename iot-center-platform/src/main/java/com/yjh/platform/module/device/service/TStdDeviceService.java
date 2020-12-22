@@ -527,11 +527,9 @@ public class TStdDeviceService{
     public int batchDelete(String list){
         List<String> list1= Arrays.asList(list.split(","));
         for (String item:list1) {
-            tStdDeviceAttrDao.deleteByPrimaryId(Long.valueOf(item));
-            tStdDevicemeteDao.deleteByDeviceId(Long.valueOf(item));
-            tCruisePointInstanceDao.deleteByDeviceId(Long.valueOf(item));
+            this.deleteByPrimaryId(Long.valueOf(item));
         }
-        return this.tStdDeviceDao.batchDelete(list1);
+        return 1;
     }
 
 }
