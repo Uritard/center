@@ -49,8 +49,8 @@ public class AlarmResultDealThread implements Runnable{
 //                            .setEndTime()
             log.info("tRobotAlarm的内容==="+tRobotAlarm);
             //插表入库
-            /*int res = StaticContextAccessor.getBean(RobotService.class).insertRobotAlarm(tRobotAlarm);
-            log.info("插告警表的结果="+res);*/
+            int res = StaticContextAccessor.getBean(RobotService.class).insertRobotAlarm(tRobotAlarm);
+            log.info("插告警表的结果="+res);
         } catch (Exception e) {
             e.printStackTrace();
         }
