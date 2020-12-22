@@ -124,6 +124,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 }
 
                 tCruiseTaskResultDetail.setEndTime(new Date());
+                mapForCruise.put("endTime",simpleDateFormat.format(new Date()));
                 tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(mapForCruise.get("cruiseStatus").toString()));
                 tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
                 TCTRDList.add(tCruiseTaskResultDetail);

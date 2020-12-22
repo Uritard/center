@@ -212,7 +212,36 @@ public class HomePageService {
         List<Map<String,Object>> mapForTime = systemInfoService.getServices();
         for (Map<String,Object> item: mapForTime) {
             if(platform.equals(item.get("url"))){
-                mapForRe.put("usedTime",item.get("usedTime"));
+                String time = (String)item.get("usedTime");
+                String day = "0";
+                String hour = "0";
+                String minute = "0";
+                if(time.contains("天")){
+                     day = time.split("天")[0];
+                }
+                if(time.contains("小时")){
+                    if(time.contains("天")){
+                        String str = time.split("天")[1];
+                        hour = str.split("小时")[0];
+                    }else {
+                        hour = time.split("小时")[0];
+                    }
+                }
+                if(time.contains("分")){
+                    if(time.contains("小时")){
+                        String str = time.split("小时")[1];
+                        minute = str.split("分")[0];
+                    }else if(time.contains("天")){
+                        String str = time.split("天")[1];
+                        minute = str.split("分")[0];
+                    }else {
+                        minute = time.split("分")[0];
+                    }
+                }
+
+                mapForRe.put("day",day);
+                mapForRe.put("hour",hour);
+                mapForRe.put("minute",minute);
             }
         }
         //电压等级
