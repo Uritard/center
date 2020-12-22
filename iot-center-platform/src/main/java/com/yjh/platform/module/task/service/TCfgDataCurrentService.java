@@ -311,13 +311,17 @@ public class TCfgDataCurrentService {
             log.info("发送给前端的消息：" + jsonT);
             WebSocketServer.sendMsg(jsonT);
 
-            //webSocket通知前端调联动弹框的接口
-            Map<String, Object> jasonMaps2 = new HashMap<>();
-            jasonMaps2.put("type", "linkagePopUp");
-            jasonMaps2.put("unionId", taskId);
-            String json = JSON.toJSONString(jasonMaps2);
-            log.info("发送给前端的消息：" + json);
-            WebSocketServer.sendMsg(json);
+            TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(unionRule.get(0).getRuleId());
+            //根据该规则id是否设置了联动监控推送，若是，则将满足该条规则id产生的联动相关信息推送给前端；不是，不推
+            if ("1".equals(tCfgUnionRule.getRuleType())){
+                //webSocket通知前端调联动弹框的接口
+                Map<String, Object> jasonMaps2 = new HashMap<>();
+                jasonMaps2.put("type", "linkagePopUp");
+                jasonMaps2.put("unionId", taskId);
+                String json = JSON.toJSONString(jasonMaps2);
+                log.info("发送给前端的消息：" + json);
+                WebSocketServer.sendMsg(json);
+            }
         }
 
         cLogger.info("联动任务：----"+tCruiseTasks);
