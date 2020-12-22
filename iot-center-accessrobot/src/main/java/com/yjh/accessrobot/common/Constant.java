@@ -3,6 +3,7 @@ package com.yjh.accessrobot.common;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Constant {
@@ -14,7 +15,7 @@ public class Constant {
 
     public static final String filePath = "/home/yjh_iot_center/ftps/";//基本不会变
 
-//    public static final String imgPath = "/home/yjh_iot_center/iot-picture/ftpImg";
+    //    public static final String filePath = "/home/yjh/ftps/";//基本不会变
 
     public static String Packet = "";
 
@@ -23,7 +24,7 @@ public class Constant {
     public static Integer abnormal = 0;
     public static Integer normal = 0;
 
-//    public static Map<String,Integer> flagMap = new HashMap<>();
+    public static Map<String, List<Long>> flagMap = new HashMap<>();
 
 
 }

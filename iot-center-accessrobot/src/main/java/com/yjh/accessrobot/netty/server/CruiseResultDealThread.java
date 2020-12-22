@@ -179,21 +179,31 @@ public class CruiseResultDealThread implements Runnable{
                         tCruiseTaskResultMap.put("taskCode",taskId);
                         log.info("tCruiseTaskResultMap是==="+tCruiseTaskResultMap);
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
+
+                        //做完一个点给前端推一次webSocket
+                        Map<String, Object> jasonMap = new HashMap<>();
+                        jasonMap.put("type", "finishedOneInstance");
+                        jasonMap.put("taskId", taskId);
+                        String json = JSON.toJSONString(jasonMap);
+                        log.info("发送给前端的消息：" + json);
+                        WebSocketServer.sendMsg(json);
                     }
                 }
 
-//            判断任务执行情况：暂停、终止、完成状态,并且结果有值，批量插入TCDR和TCTRD、更新TCR和TCTR
-            Map<String, String> taskStatusMap = redisTemplate.opsForHash().entries("taskStatusRedis:"+cruiseResultMap.get("robotCode")
+            //判断任务执行情况：暂停、终止、完成状态,并且结果有值，批量插入TCDR和TCTRD、更新TCR和TCTR
+            /*Map<String, String> taskStatusMap = redisTemplate.opsForHash().entries("taskStatusRedis:"+cruiseResultMap.get("robotCode")
                     +":"+cruiseResultMap.get("taskCode"));
             String taskStatus = taskStatusMap.get("taskStatus");
-            log.info("当前任务的状态是==="+taskStatus);
+            log.info("当前任务的状态是==="+taskStatus);*/
 
             //统计机器人返回任务结果的大小
             List<String> resultList = new ArrayList<>();
             Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
             for (String key : cruiseKey) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                resultList.add(redisInfoMap.get("instanceId"));
+                if (redisInfoMap.get("cruiseResult").equals("246") || redisInfoMap.get("cruiseResult").equals("247")){
+                    resultList.add(redisInfoMap.get("instanceId"));
+                }
             }
             log.info("resultList的大小===="+resultList.size());
 
@@ -202,7 +212,11 @@ public class CruiseResultDealThread implements Runnable{
             String instanceList = (String)redisInfoMap2.get("instanceIdList");
             instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
             String[] instanceIdArray = instanceList.split(", ");
-            List<String> instanceIdList = Arrays.asList(instanceIdArray);
+//            List<String> instanceIdList = Arrays.asList(instanceIdArray);
+            List<String> instanceIdList = new ArrayList<>();
+            for (String i : instanceIdArray){
+                instanceIdList.add(i);
+            }
             log.info("instanceIdList的大小===="+instanceIdList.size());
 
             //比较任务相关时间(开始时间，超期时间)
@@ -216,12 +230,21 @@ public class CruiseResultDealThread implements Runnable{
             boolean taskFlag = (df.parse(overDayTime).getTime() < new Date().getTime());
             log.info("是否超期==="+taskFlag);*/
 
-            if (taskStatus == null) {
+            /*if (taskStatus == null) {
                 taskStatus = "";
-            }
-            if (taskStatus.equals("2") || taskStatus.equals("4")
-                    || instanceIdList.size() == resultList.size() ) {
-                log.info("任务执行暂停/终止/完成！！！");
+            }*/
+            /*if (taskStatus.equals("2") || taskStatus.equals("4")
+                    || */
+            if(instanceIdList.size() == resultList.size() ) {
+                log.info("完成！！！");
+
+                List<Long> instanceIDList = Constant.flagMap.get(taskId);
+
+                if (instanceIDList != null && instanceIDList.size() > 0){
+                    for (Long instanceId : instanceIDList){
+                        instanceIdList.remove(instanceId.toString());
+                    }
+                }
 
                 for (String instanceId : instanceIdList) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + instanceId);
@@ -334,10 +357,10 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("总正常点数是===" + normalCheckPoint);
                 Constant.normal = 0;
                 //总待测点数
-                Integer taskWait = totalCheckPoint - tCDRList.size();
+                Integer taskWait = totalCheckPoint - abnormalCheckPoint - normalCheckPoint;
                 log.info("待测点数是==="+taskWait);
 
-                Integer cState  = null;
+                /*Integer cState  = null;
                 if (taskStatus.equals("2")){
                     cState = 241;//任务暂停
                 } else if (taskStatus.equals("4")){
@@ -346,8 +369,14 @@ public class CruiseResultDealThread implements Runnable{
                     cState = 240;//执行完成
                 } else {
                     cState = 243;//未执行
-                }
+                }*/
 
+                //将公共类的instanceIdList清空
+                if (Constant.flagMap.get(taskId) != null && Constant.flagMap.get(taskId).size() > 0){
+                    for (Long instancedId : Constant.flagMap.get(taskId)){
+                        instanceIdList.remove(instancedId.toString());
+                    }
+                }
 
                 if (abnormalCheckPoint + normalCheckPoint == totalCheckPoint){//机器人任务是最后一个
 
@@ -367,7 +396,7 @@ public class CruiseResultDealThread implements Runnable{
                     TCruiseResult tCruiseResult = new TCruiseResult()
                             .setTaskWait(taskWait)//待测点数
                             .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"))
-                            .setCState(cState);//任务状态
+                            .setCState(240);//任务状态
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     //更新TCR表
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);

@@ -373,8 +373,6 @@
         SELECT
             a.task_result_id
         FROM t_cruise_result a
-        LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
-        LEFT JOIN t_cruise_data_result d on b.cruise_result_id = d.cruise_result_id
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
