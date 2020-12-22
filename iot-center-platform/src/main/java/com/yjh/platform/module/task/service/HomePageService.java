@@ -12,11 +12,13 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -205,6 +207,7 @@ public class HomePageService {
     @Logs(title = "变电站概况信息", code = "TaskForHomeService",content = "机器人信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> stationInfo() throws Exception{
+        DecimalFormat df = new DecimalFormat("#0.0");
         Map<String,Object> mapForRe = new HashMap<>();
         //获取投运时间
         //platform
@@ -218,30 +221,15 @@ public class HomePageService {
                 String minute = "0";
                 if(time.contains("天")){
                      day = time.split("天")[0];
-                }
-                if(time.contains("小时")){
-                    if(time.contains("天")){
-                        String str = time.split("天")[1];
-                        hour = str.split("小时")[0];
-                    }else {
+                    mapForRe.put("day",day);
+                }else if(time.contains("小时")){
                         hour = time.split("小时")[0];
-                    }
-                }
-                if(time.contains("分")){
-                    if(time.contains("小时")){
-                        String str = time.split("小时")[1];
-                        minute = str.split("分")[0];
-                    }else if(time.contains("天")){
-                        String str = time.split("天")[1];
-                        minute = str.split("分")[0];
-                    }else {
+                    mapForRe.put("hour",hour);
+                }else if(time.contains("分")){
                         minute = time.split("分")[0];
-                    }
+                    Double i = Double.valueOf(minute);
+                    mapForRe.put("hour",df.format(i/60));
                 }
-
-                mapForRe.put("day",day);
-                mapForRe.put("hour",hour);
-                mapForRe.put("minute",minute);
             }
         }
         //电压等级
