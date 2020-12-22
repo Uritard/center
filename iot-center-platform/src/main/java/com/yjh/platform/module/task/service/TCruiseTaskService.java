@@ -14,6 +14,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -79,6 +80,8 @@ public class TCruiseTaskService {
     private TSysParamDao tSysParamDao;
     @Autowired
     private SysUserDao sysUserDao;
+    @Autowired
+    private TAlgorithmConfBakDao tAlgorithmConfBakDao;
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
@@ -175,7 +178,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                             tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                             tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
-                            tRobotInspectionDao);
+                            tRobotInspectionDao, tAlgorithmConfBakDao);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -519,7 +522,7 @@ public class TCruiseTaskService {
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
                 tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
                 tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,true,tasksAreTime,
-                tRobotInspectionDao);
+                tRobotInspectionDao, tAlgorithmConfBakDao);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
         thread.start();

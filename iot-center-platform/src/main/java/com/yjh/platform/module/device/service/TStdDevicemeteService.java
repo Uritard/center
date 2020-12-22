@@ -1,16 +1,14 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.device.entity.TStdDevice;
-import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
@@ -43,11 +41,15 @@ public class TStdDevicemeteService{
     private TCruiseTaskAttrDao tCruiseTaskAttrDao;
     @Autowired
     private TCruisePlanAttrDao tCruisePlanAttrDao;
+    @Autowired
+    private TAlgorithmConfBakDao tAlgorithmConfBakDao;
 
 
     @Logs(title = "插入", code = "device",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+
+
         //若插入的测点中的deviceId、customId存在于device表中，则不更新device表；否则进行更新
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查看当前设备ID和部位ID下的设备信息
         if(Objects.isNull(tStdDevice)){
@@ -61,12 +63,22 @@ public class TStdDevicemeteService{
 //                tStdDeviceDao.deleteByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),"101");  //删除之前本体部位的设备
 //            }
         }
-        return this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
+        this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
+        //配置算法
+        if(tStdDeviceMeteDetail.getAlgorithmId() != null){
+            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
+            tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
+            tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+            tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+        }
+        return  1;
     }
 
     @Logs(title = "删除", code = "device",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceMeteId) {
+        //删除测点配置的算法
+        tAlgorithmConfBakDao.deleteByPrimaryId(deviceMeteId);
 //        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
 //        Long deviceId=tStdDeviceMete.getDeviceId();
 //        String customId=tStdDeviceMete.getCustomId();
@@ -100,6 +112,28 @@ public class TStdDevicemeteService{
     @Logs(title = "更新", code = "device",content = "根据页面传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        //修改测点配置的算法
+        //配置算法
+        if(tStdDeviceMeteDetail.getAlgorithmId() != null){
+            TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+            if(tAlgorithmConfBak == null){
+                tAlgorithmConfBak = new TAlgorithmConfBak();
+                tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+            }else {
+                tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.update(tAlgorithmConfBak);
+            }
+        }else {
+            TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+            if(tAlgorithmConfBak != null){
+                tAlgorithmConfBak.setAlgorithmId(tStdDeviceMeteDetail.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.update(tAlgorithmConfBak);
+            }
+        }
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在
         if(Objects.isNull(tStdDevice)){
             //新增没有的 修改的部位 的设备
@@ -210,6 +244,7 @@ public class TStdDevicemeteService{
         int deleteCount=0;
         List<String> list1= Arrays.asList(list.split(","));
         for (String item:list1) {
+            tAlgorithmConfBakDao.deleteByPrimaryId(Long.valueOf(item));
             List<Long> haveList = tStdDevicemeteDao.selectHave(Long.valueOf(item));
             tCruisePointInstanceDao.deleteByDeviceMeteId(Long.valueOf(item));//遍历删除巡检点
             //删除关联的表
