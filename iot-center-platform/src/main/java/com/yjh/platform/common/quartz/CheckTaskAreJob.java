@@ -68,6 +68,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
         }
         //获取任务下的所有的点
         List<Long> instanceIdList =  tCruiseTaskAttrDao.selectInstanceId(taskId);
+
+
         //int all = instanceIdList.size();
         //int count =0;
         //获取正常和异常的点数
@@ -80,7 +82,13 @@ public class CheckTaskAreJob extends QuartzJobBean {
             robotTaskStatesMap.put("robotCodeList",robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
-        Thread.sleep(1000);
+        Thread.sleep(10000);
+
+            //获取已经做过的点
+        List<Long> isFinishedInstanceList = tCruiseTaskResultDetailDao.selectInstanceForTaskGoOn(taskId);
+        for(Long finished:isFinishedInstanceList){//删除已经做过的点
+            instanceIdList.remove(finished);
+        }
         String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
         Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -99,51 +107,52 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     mapForCruise.put("cruiseAbnormal","251");
                     mapForCruise.put("cruiseStatus","252");
                     mapForCruise.put("resultNum","超时");
-                    //TCTRD
-                    log.info("TCTRD开始构建");
-                    TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
-                    tCruiseTaskResultDetail.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
-                    tCruiseTaskResultDetail.setTaskResultId(mapForCruise.get("taskResultId").toString());
-                    tCruiseTaskResultDetail.setDeviceId(Long.valueOf(mapForCruise.get("deviceId").toString()));
-                    tCruiseTaskResultDetail.setInstanceId(Long.valueOf(mapForCruise.get("instanceId").toString()));
-                    if(mapForCruise.get("cruiseTime").equals("null")){
-                        tCruiseTaskResultDetail.setCruiseTime(new Date());
-                        mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
-                    }else {
-                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
-                    }
 
-                    tCruiseTaskResultDetail.setEndTime(new Date());
-                    tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(mapForCruise.get("cruiseStatus").toString()));
-                    tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
-                    TCTRDList.add(tCruiseTaskResultDetail);
-
-
-                    //TCDR
-                    log.info("TCDR开始构建");
-                    TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
-                    tCruiseDataResult.setCruiseId(Long.valueOf(mapForCruise.get("instanceId").toString()));
-                    tCruiseDataResult.setPicpath(mapForCruise.get("picpath").toString());
-                    tCruiseDataResult.setResultNum(mapForCruise.get("resultNum").toString());
-                    //tCruiseDataResult.setResultDesc(mapForCruise.get("resultDesc").toString());
-                    tCruiseDataResult.setCruiseType(Integer.valueOf(mapForCruise.get("cruiseType").toString()));
-                    //tCruiseDataResult.setModifyNum(mapForCruise.get("modifyNum").toString());
-                    tCruiseDataResult.setOrigpic(mapForCruise.get("origpic").toString());
-                    tCruiseDataResult.setEvaluationState(257);
-                    tCruiseDataResult.setCruiseResult(Integer.valueOf(mapForCruise.get("cruiseResult").toString()));
-                    if (mapForCruise.get("cruiseAbnormal").toString().equals("--")) {
-                        tCruiseDataResult.setCruiseAbnormal(null);
-                    } else {
-                        tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(mapForCruise.get("cruiseAbnormal").toString()));
-                    }
-                    tCruiseDataResult.setEvaluationState(257);
-                    tCruiseDataResult.setCreatetime(new Date());
-                    tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
-                    tCruiseDataResult.setIsWarn(0);
-                    TCDRList.add(tCruiseDataResult);
-                    redisTemplate.opsForHash().putAll("t_cruise_task_result:"+taskId+item, mapForCruise);
-                    abnormal = abnormal+1;
                 }
+                //TCTRD
+                log.info("TCTRD开始构建");
+                TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                tCruiseTaskResultDetail.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
+                tCruiseTaskResultDetail.setTaskResultId(mapForCruise.get("taskResultId").toString());
+                tCruiseTaskResultDetail.setDeviceId(Long.valueOf(mapForCruise.get("deviceId").toString()));
+                tCruiseTaskResultDetail.setInstanceId(Long.valueOf(mapForCruise.get("instanceId").toString()));
+                if(mapForCruise.get("cruiseTime").equals("null")){
+                    tCruiseTaskResultDetail.setCruiseTime(new Date());
+                    mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
+                }else {
+                    tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
+                }
+
+                tCruiseTaskResultDetail.setEndTime(new Date());
+                tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(mapForCruise.get("cruiseStatus").toString()));
+                tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
+                TCTRDList.add(tCruiseTaskResultDetail);
+
+
+                //TCDR
+                log.info("TCDR开始构建");
+                TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                tCruiseDataResult.setCruiseId(Long.valueOf(mapForCruise.get("instanceId").toString()));
+                tCruiseDataResult.setPicpath(mapForCruise.get("picpath").toString());
+                tCruiseDataResult.setResultNum(mapForCruise.get("resultNum").toString());
+                //tCruiseDataResult.setResultDesc(mapForCruise.get("resultDesc").toString());
+                tCruiseDataResult.setCruiseType(Integer.valueOf(mapForCruise.get("cruiseType").toString()));
+                //tCruiseDataResult.setModifyNum(mapForCruise.get("modifyNum").toString());
+                tCruiseDataResult.setOrigpic(mapForCruise.get("origpic").toString());
+                tCruiseDataResult.setEvaluationState(257);
+                tCruiseDataResult.setCruiseResult(Integer.valueOf(mapForCruise.get("cruiseResult").toString()));
+                if (mapForCruise.get("cruiseAbnormal").toString().equals("--") || mapForCruise.get("cruiseAbnormal").toString().equals("null")) {
+                    tCruiseDataResult.setCruiseAbnormal(null);
+                } else {
+                    tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(mapForCruise.get("cruiseAbnormal").toString()));
+                }
+                tCruiseDataResult.setEvaluationState(257);
+                tCruiseDataResult.setCreatetime(new Date());
+                tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
+                tCruiseDataResult.setIsWarn(0);
+                TCDRList.add(tCruiseDataResult);
+                redisTemplate.opsForHash().putAll("t_cruise_task_result:"+taskId+item, mapForCruise);
+                abnormal = abnormal+1;
             }
 
         }
@@ -210,7 +219,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         tCruiseTaskResult.setCruiseResult(247);
         tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
-
+        log.info("超期完毕");
         } catch (Exception e) {
             log.error("检查任务超期异常: "+e);
             e.printStackTrace();

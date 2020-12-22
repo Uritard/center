@@ -326,10 +326,9 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetailMap.put("taskId",taskId);
                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                 tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
-                tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId());
+                tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
                 //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                 //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
-
                 redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                 //一次循环 一个巡检点
                 if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
