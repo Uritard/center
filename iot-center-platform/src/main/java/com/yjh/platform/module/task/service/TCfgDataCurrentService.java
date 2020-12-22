@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.service.TCfgDeviceService;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.controller.TCruiseTaskController;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
@@ -58,6 +59,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TStdDeviceService tStdDeviceService;
+
+    @Autowired
+    private TCfgDeviceService tCfgDeviceService;
 
     public static String meteValues(String commintValue){
         if("返回".equals(commintValue)){
@@ -304,7 +308,7 @@ public class TCfgDataCurrentService {
             // webSocket通知前端产生联动信息
             Map<String, Object> jasonMap = new HashMap<>();
             jasonMap.put("type", "newLinkage");
-            jasonMap.put("alarmName", tStdDeviceService.selectByUnionKeys(currents.get(0).getDeviceId(),currents.get(0).getCunstomId()).getDeviceName());
+            jasonMap.put("alarmName", tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName());
             jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
             jasonMap.put("alarmContent", "触发联动");
             String jsonT = JSON.toJSONString(jasonMap);

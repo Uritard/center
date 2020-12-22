@@ -111,54 +111,55 @@ public class HelloController {
 //        List<String> list=redisTemplate.opsForList().range("constant",0,redisTemplate.opsForList().size("constant")-1);
 //        log.info("list:"+list);
 
-        Float value=Float.valueOf("17.612");
-        Float highLimit1=Float.valueOf("20");
-        Float lowLimit1=Float.valueOf("10");
-        Float highLimit2=Float.valueOf("25");
-        Float lowLimit2=Float.valueOf("5");
-        Float highLimit3=Float.valueOf("30");
-        Float lowLimit3=Float.valueOf("4");
-        Float highLimit4=Float.valueOf("40");
-        Float lowLimit4=Float.valueOf("1");
 
-        Boolean emergency1 = false;
-        Boolean emergency2 = false;
-        Boolean worse1 = false;
-        Boolean worse2 = false;
-        Boolean general1 = false;
-        Boolean general2 = false;
-        Boolean warns1 = false;
-        Boolean warns2 = false;
-
-        if (Objects.nonNull(lowLimit4))
-            emergency1 = value <= lowLimit4;
-        if (Objects.nonNull(highLimit4))
-            emergency2 = value >= highLimit4;
-        if (Objects.nonNull(lowLimit3))
-            worse1 = value <= lowLimit3;
-        if (Objects.nonNull(highLimit3))
-            worse2 = value >= highLimit3;
-        if (Objects.nonNull(lowLimit2))
-            general1 = value <= lowLimit2;
-        if (Objects.nonNull(highLimit2))
-            general2 = value >= highLimit2;
-        if (Objects.nonNull(lowLimit1))
-            warns1 = value <= lowLimit1;
-        if (Objects.nonNull(highLimit1))
-            warns2 = value >= highLimit1;
-
-
-        if (emergency1 || emergency2) {
-            log.info("危急");
-        } else if (worse1 || worse2) {
-            log.info("严重");
-        } else if (general1 || general2) {
-            log.info("一般");
-        } else if (warns1 || warns2) {
-            log.info("预警");
-        } else {
-            log.info("正常");
-        }
+//        Float value=Float.valueOf("17.612");
+//        Float highLimit1=Float.valueOf("20");
+//        Float lowLimit1=Float.valueOf("10");
+//        Float highLimit2=Float.valueOf("25");
+//        Float lowLimit2=Float.valueOf("5");
+//        Float highLimit3=Float.valueOf("30");
+//        Float lowLimit3=Float.valueOf("4");
+//        Float highLimit4=Float.valueOf("40");
+//        Float lowLimit4=Float.valueOf("1");
+//
+//        Boolean emergency1 = false;
+//        Boolean emergency2 = false;
+//        Boolean worse1 = false;
+//        Boolean worse2 = false;
+//        Boolean general1 = false;
+//        Boolean general2 = false;
+//        Boolean warns1 = false;
+//        Boolean warns2 = false;
+//
+//        if (Objects.nonNull(lowLimit4))
+//            emergency1 = value <= lowLimit4;
+//        if (Objects.nonNull(highLimit4))
+//            emergency2 = value >= highLimit4;
+//        if (Objects.nonNull(lowLimit3))
+//            worse1 = value <= lowLimit3;
+//        if (Objects.nonNull(highLimit3))
+//            worse2 = value >= highLimit3;
+//        if (Objects.nonNull(lowLimit2))
+//            general1 = value <= lowLimit2;
+//        if (Objects.nonNull(highLimit2))
+//            general2 = value >= highLimit2;
+//        if (Objects.nonNull(lowLimit1))
+//            warns1 = value <= lowLimit1;
+//        if (Objects.nonNull(highLimit1))
+//            warns2 = value >= highLimit1;
+//
+//
+//        if (emergency1 || emergency2) {
+//            log.info("危急");
+//        } else if (worse1 || worse2) {
+//            log.info("严重");
+//        } else if (general1 || general2) {
+//            log.info("一般");
+//        } else if (warns1 || warns2) {
+//            log.info("预警");
+//        } else {
+//            log.info("正常");
+//        }
 
         return result;
     }
