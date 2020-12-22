@@ -19,11 +19,13 @@ import redis.clients.jedis.ScanResult;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.yjh.accessvideo.common.Constant.*;
-
-import static com.yjh.accessvideo.common.Constant.TASKID;
 import static com.yjh.accessvideo.common.Constant.INSTANCEID;
+<<<<<<< Updated upstream
 import static com.yjh.accessvideo.common.Constant.FLAG;
+=======
+import static com.yjh.accessvideo.common.Constant.TASKID;
+
+>>>>>>> Stashed changes
 
 @lombok.extern.slf4j.Slf4j
 public class DataDealThread implements Runnable {
@@ -302,7 +304,7 @@ public class DataDealThread implements Runnable {
                                                 log.info("该测点是否配置了告警提示是===" + alarmNote);
                                                 log.info("该测点告警推送配置的告警等级是===" + alarmLevel);
                                                 log.info("产生的该条告警等级是===" + warnLevel);
-                                                if (alarmNote != null && "0".equals(alarmNote)) {
+                                                if (alarmNote != null && "1".equals(alarmNote)) {
                                                     if (tWarnInfo.getWarnLevel() == tStdDevicemeteM.getAlarmLevel() ||
                                                             tWarnInfo.getWarnLevel() > tStdDevicemeteM.getAlarmLevel()) {
                                                         //webSocket通知前端调用查询告警弹框的接口
