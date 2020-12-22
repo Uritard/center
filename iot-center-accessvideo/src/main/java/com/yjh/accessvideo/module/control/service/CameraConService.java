@@ -88,7 +88,7 @@ public class CameraConService {
             int livePath;
             if (Constant.maps.get("livePath") != null) {
                 livePath = Constant.maps.get("livePath")+1;
-                Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+                Constant.maps.put("livePath", livePath);
             } else {
                 livePath = 123;
                 Constant.maps.put("livePath", 123);
@@ -168,7 +168,7 @@ public class CameraConService {
                 int livePath;
                 if (Objects.nonNull(Constant.maps.get("livePath"))) {
                     livePath = Constant.maps.get("livePath")+1;
-                    Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+                    Constant.maps.put("livePath", livePath);
                 } else {
                     livePath = 123;
                     Constant.maps.put("livePath", 123);
@@ -214,10 +214,10 @@ public class CameraConService {
         }
         if (Objects.nonNull(Constant.maps.get("livePath"))) {
             livePath = Constant.maps.get("livePath")+1;
-            Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+            Constant.maps.put("livePath", livePath);
         }
         log.info("Constant.maps: "+Constant.maps);
-        // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10&s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
+        // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
         log.info("lightInfo: "+lightUsername+" "+lightPassword+" "+lightIp+" "+lightPort+" "+livePath);
         String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
         try { Runtime.getRuntime().exec(transUrlLight); } catch (Exception e) {e.getMessage();}
@@ -235,7 +235,7 @@ public class CameraConService {
         String inferadIp = robotConInfo.getLnferadIp();
         Integer inferadPort = robotConInfo.getInferadPort();
         livePath = Constant.maps.get("livePath")+1;
-        Constant.maps.put("livePath", Constant.maps.get("livePath")+1);
+        Constant.maps.put("livePath", livePath);
         log.info("Constant.maps: "+Constant.maps);
         log.info("inferadInfo: "+" "+inferadIp+" "+inferadPort+" "+livePath);
         String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
@@ -300,7 +300,7 @@ public class CameraConService {
             int historyPath;
             if (Objects.nonNull(Constant.maps.get("historyPath"))) {
                 historyPath = Constant.maps.get("historyPath")+1;
-                Constant.maps.put("historyPath", Constant.maps.get("historyPath")+1);
+                Constant.maps.put("historyPath", historyPath);
             } else {
                 historyPath = 123;
                 Constant.maps.put("historyPath", 123);
