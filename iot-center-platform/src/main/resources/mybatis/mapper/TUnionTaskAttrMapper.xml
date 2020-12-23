@@ -152,8 +152,8 @@
         LEFT JOIN t_cfg_union_rule b on a.rule_id = b.rule_id
         LEFT JOIN t_cruise_plan d on d.plan_id = b.plan_id
         LEFT JOIN t_union_task_attr f on f.union_id = a.union_id
-        LEFT JOIN t_dict_business j on j.dict_code = a.mete_id and j.col_name = "mete_kind"
         LEFT JOIN t_cfg_data_current k on k.mete_id = a.mete_id
+        LEFT JOIN t_dict_business j on j.dict_code = k.mete_kind and j.col_name = "mete_kind"
         LEFT JOIN t_cfg_device h on h.device_id = k.device_id
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>

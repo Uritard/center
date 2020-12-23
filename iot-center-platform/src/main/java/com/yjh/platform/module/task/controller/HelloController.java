@@ -2,29 +2,23 @@ package com.yjh.platform.module.task.controller;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.quartz.CruiseTaskJob;
-import com.yjh.platform.common.quartz.JobManager;
-import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.QrCodeUtils;
 import com.yjh.platform.common.utils.ResultHandleUtils;
-import com.yjh.platform.common.websocket.WebSocketResult;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
-import com.yjh.platform.module.task.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -33,15 +27,8 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
-import java.awt.geom.FlatteningPathIterator;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.QrCodeUtils;
 
 
 @RestController
@@ -174,6 +161,26 @@ public class HelloController {
         List<Long> list = new ArrayList<>();
         map.put("list",list);
         result.setData(map);
+        return result;
+    }
+
+
+    @ApiOperation(value = "联动webSocket测试")
+    @RequestMapping(value = "/linkWebSocket", method = RequestMethod.POST)
+    public Result linkWebSocket(@RequestParam String taskId) {
+        Result result = new Result();
+        try {
+            Map<String, Object> jasonMaps2 = new HashMap<>();
+            jasonMaps2.put("type", "linkagePopUp");
+            jasonMaps2.put("unionId", taskId);
+            String json = JSON.toJSONString(jasonMaps2);
+            log.info("发送给前端的消息：" + json);
+            WebSocketServer.sendMsg(json);
+//            result.setData(tCfgDataCurrentService.batchInsert(list));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
+        }
         return result;
     }
 

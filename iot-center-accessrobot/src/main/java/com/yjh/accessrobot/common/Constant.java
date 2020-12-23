@@ -21,8 +21,8 @@ public class Constant {
 
     public static long sendSessionId = 0L;//发送会话序列号
 
-    public static Integer abnormal = 0;
-    public static Integer normal = 0;
+    /*public static Integer abnormal = 0;
+    public static Integer normal = 0;*/
 
     public static Map<String, List<Long>> flagMap = new HashMap<>();
 

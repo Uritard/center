@@ -217,6 +217,7 @@ public class TUnionTaskController {
     public Result linkageInformation(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
+            log.info("linkageInformation的taskId是==="+taskId);
             LinkageInformation linkageInformation = tUnionTaskService.linkageInformation(taskId);
             result.setData(linkageInformation);
         } catch (Exception e) {
@@ -230,6 +231,7 @@ public class TUnionTaskController {
     public Result linkageMonitorData(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
+            log.info("linkageMonitorData的taskId是==="+taskId);
             List<LinkageMonitorData> linkageMonitorDataList = tUnionTaskService.linkageMonitorData(taskId);
             result.setData(linkageMonitorDataList);
         } catch (Exception e) {

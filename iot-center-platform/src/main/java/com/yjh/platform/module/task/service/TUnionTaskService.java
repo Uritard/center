@@ -335,26 +335,27 @@ public class TUnionTaskService{
             Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
             //根据instanceId查询设备相关信息
             Map<String,Object> deviceInfo = TUnionTaskAttrDao.selectDeviceInfo(instanceId);
-            //根据taskId查询字典表
+            //根据taskId查询
             String taskName = TUnionTaskAttrDao.selectTaskName(taskId);
-            //根据cruiseResult查询字典表
-            String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
-
-            LinkageMonitorData linkageMonitorData = new LinkageMonitorData()
-                    .setTaskId(redisInfoMap.get("taskId"))
-                    .setTaskName(taskName)
-                    .setTaskResultId(redisInfoMap.get("taskResultId"))
-                    .setCruiseDataId(Long.valueOf(redisInfoMap.get("cruiseDataId")))
-                    .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
-                    .setInstanceName(deviceInfo.get("instance_name").toString())
-                    .setRealCode(deviceInfo.get("real_code").toString())
-                    .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
-                    .setDeviceName(deviceInfo.get("device_name").toString())
-                    .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
-                    .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
-                    .setCruiseResultName(CruiseResultName)
-                    .setResultNum(redisInfoMap.get("resultNum"));
-            linkageMonitorDataList.add(linkageMonitorData);
+            //根据cruiseResult查询
+            if (Objects.nonNull(cruiseResult)){
+                String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
+                LinkageMonitorData linkageMonitorData = new LinkageMonitorData()
+                        .setTaskId(redisInfoMap.get("taskId"))
+                        .setTaskName(taskName)
+                        .setTaskResultId(redisInfoMap.get("taskResultId"))
+                        .setCruiseDataId(Long.valueOf(redisInfoMap.get("cruiseDataId")))
+                        .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
+                        .setInstanceName(deviceInfo.get("instance_name").toString())
+                        .setRealCode(deviceInfo.get("real_code").toString())
+                        .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
+                        .setDeviceName(deviceInfo.get("device_name").toString())
+                        .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
+                        .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
+                        .setCruiseResultName(CruiseResultName)
+                        .setResultNum(redisInfoMap.get("resultNum"));
+                linkageMonitorDataList.add(linkageMonitorData);
+            }
         }
         return linkageMonitorDataList;
     }

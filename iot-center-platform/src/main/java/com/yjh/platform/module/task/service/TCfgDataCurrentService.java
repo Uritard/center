@@ -308,6 +308,7 @@ public class TCfgDataCurrentService {
             // webSocket通知前端产生联动信息
             Map<String, Object> jasonMap = new HashMap<>();
             jasonMap.put("type", "newLinkage");
+            log.info("cfgDevice:"+currents.get(0).getDeviceId().toString());
             jasonMap.put("alarmName", tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName());
             jasonMap.put("alarmTime",simpleDateFormat.format(new Date()));
             jasonMap.put("alarmContent", "触发联动");

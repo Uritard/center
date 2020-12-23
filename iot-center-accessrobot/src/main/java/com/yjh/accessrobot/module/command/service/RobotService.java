@@ -380,7 +380,6 @@ public class RobotService {
         for (String i : instanceIdArray){
             instanceIdList.add(i);
         }
-//        List<String> instanceIdList = Arrays.asList(instanceIdArray);
         log.info("instanceIdList的大小====" + instanceIdList.size());
 
         List<Long> instanceIDList = Constant.flagMap.get(taskId);
@@ -397,10 +396,26 @@ public class RobotService {
         List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
         List<Long> instancedList = new ArrayList<>();//插过库的点
 
-        Thread.sleep(3000);
+        //读异常点缓存表巡检点
+        String strForCountAbnormal = "countForAbnormal:" + taskId;
+        Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
 
-        Integer abnormal = Constant.abnormal;//异常
-        Integer normal = Constant.normal;//正常
+        //缓存中的异常点
+        Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
+        log.info("总检测点数时==="+totalCheckPoint);
+        //机器人异常点+缓存中的异常点
+        Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString());
+        log.info("异常点数是===" + abnormalCheckPoint);
+        //机器人正常点+缓存中的正常点
+        Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
+        log.info("正常点数是===" + normalCheckPoint);
+        //总待测点数
+        Integer taskWait = totalCheckPoint - abnormalCheckPoint - normalCheckPoint;
+        log.info("待测点数是==="+taskWait);
+
+
+        Integer abnormal = abnormalCheckPoint;//异常
+        Integer normal =normalCheckPoint;//正常
 
         for (String instanceId : instanceIdList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + instanceId);
@@ -413,6 +428,7 @@ public class RobotService {
                         .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
                         .setCruiseTime(sdf.parse(redisInfoMap.get("cruiseTime")))
                         .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
+                        .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
                         .setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
                 tCTRDList.add(tCruiseTaskResultDetail);
                 instancedList.add(Long.valueOf(redisInfoMap.get("instanceId")));
@@ -440,12 +456,11 @@ public class RobotService {
                 tCDRList.add(tCruiseDataResult);
             }
 
-            if (!"".equals(redisInfoMap.get("value"))){
-                Constant.normal = normal + 1;
-            }else{
-                Constant.abnormal = abnormal + 1;
+            if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
+                normal = normal + 1;
+            }else if ("250".equals(redisInfoMap.get("cruiseAbnormal"))){
+                abnormal = abnormal + 1;
             }
-
         }
         log.info("tCTRDList的内容是===" + tCTRDList);
         log.info("tCDRList的内容是===" + tCDRList);
@@ -459,55 +474,37 @@ public class RobotService {
             Constant.flagMap.put(taskId,instancedList);
         }
 
-            //批量插入TCTRD库
-            int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
-            log.info("res1的内容是===" + res1);
-            //批量插入TCDR库
-            int res2 = batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
-            log.info("res2的内容是===" + res2);
+        //批量插入TCTRD库
+        int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
+        log.info("res1的内容是===" + res1);
+        //批量插入TCDR库
+        int res2 = batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
+        log.info("res2的内容是===" + res2);
 
-        log.info("机器人巡检任务产生的异常数是===" + Constant.abnormal);
-        log.info("机器人巡检任务产生的正常数是===" + Constant.normal);
+        log.info("机器人巡检任务产生的异常数是===" + abnormal);
+        log.info("机器人巡检任务产生的正常数是===" + normal);
 
-            //读异常点缓存表巡检点
-            String strForCountAbnormal = "countForAbnormal:" + taskId;
-            Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+        Integer cState = null;
+        if (taskStatus == 2){
+            cState = 241;//任务暂停
 
-            //机器人异常点+缓存中的异常点
-            Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
-            log.info("总检测点数时==="+totalCheckPoint);
-            //机器人异常点+缓存中的异常点
-            Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString()) + Constant.abnormal;
-            log.info("总异常点数是===" + abnormalCheckPoint);
-            Constant.abnormal = 0;
-            //机器人正常点+缓存中的正常点
-            Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) + Constant.normal;
-            log.info("总正常点数是===" + normalCheckPoint);
-            Constant.normal = 0;
-            //总待测点数
-            Integer taskWait = totalCheckPoint - abnormalCheckPoint - normalCheckPoint;
-            log.info("待测点数是==="+taskWait);
-
-            Integer cState = null;
-            if (taskStatus == 2){
-                cState = 241;//任务暂停
-
-            }else if (taskStatus == 4){
-                cState = 242;//任务终止
-                //将公共类的instanceIdList清空
-                for (Long instancedId : Constant.flagMap.get(taskId)){
-                    instanceIdList.remove(instancedId.toString());
-                }
+        }else if (taskStatus == 4){
+            cState = 242;//任务终止
+            //将公共类的instanceIdList清空
+            for (Long instancedId : Constant.flagMap.get(taskId)){
+                instanceIdList.remove(instancedId.toString());
             }
+        }
 
         TCruiseResult tCruiseResult = selectTaskResultId(taskId);
-            log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
+        log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
 
-            tCruiseResult.setTaskWait(taskWait);//待测点数
-            tCruiseResult.setCState(cState);//任务状态
-            log.info("tCruiseResult的内容是==="+tCruiseResult);
-            //更新TCR表
-            updateTCruiseResult(tCruiseResult);
+        tCruiseResult.setTaskWait(taskWait);//待测点数
+        tCruiseResult.setCState(cState);//任务状态
+        log.info("tCruiseResult的内容是==="+tCruiseResult);
+        //更新TCR表
+        int res = updateTCruiseResult(tCruiseResult);
+        log.info("更新TCR的条数===="+res);
 
         Map<String, String> mapForAbnormal = new HashMap<>();
         mapForAbnormal.put("abnormal", abnormalCheckPoint.toString());
