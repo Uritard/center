@@ -151,40 +151,41 @@
         FROM t_union_task a
         LEFT JOIN t_cfg_union_rule b on a.rule_id = b.rule_id
         LEFT JOIN t_cruise_plan d on d.plan_id = b.plan_id
-        LEFT JOIN t_union_task_attr f on f.union_id = a.union_id
         LEFT JOIN t_cfg_data_current k on k.mete_id = a.mete_id
         LEFT JOIN t_dict_business j on j.dict_code = k.mete_kind and j.col_name = "mete_kind"
         LEFT JOIN t_cfg_device h on h.device_id = k.device_id
         where 1 = 1
-        <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''"> and a.union_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
     <!--根据instanceId查询设备相关信息-->
-    <select id="selectDeviceInfo" resultType="java.util.Map">
+    <select id="selectDeviceInfo" resultType="com.yjh.platform.module.task.entity.LinkageMonitorData">
         SELECT
-            a.instance_id,
-            a.device_id,
-            a.custom_id,
-            a.device_mete_id,
-            a.cruise_id,
-            b.device_name,
-            d.real_code,
-            (CASE
-                WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
-                WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
-                WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
-                WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
-                WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
-                WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
-                END) AS instance_name
-        FROM	t_cruise_point_instance a
+        a.task_id,
+        a.instance_id,
+        a.device_id,
+        b.device_name,
+        d.real_code,
+        (CASE
+        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
+        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
+        WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
+        WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
+        WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
+        WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
+        END) AS instance_name
+        FROM
+        t_cruise_task_attr a
         LEFT JOIN t_std_device b on a.device_id = b.device_id and a.custom_id = b.custom_id
         LEFT JOIN t_std_device_attr d on d.device_id = a.device_id
-        LEFT JOIN t_camera_preset k ON a.cruise_id = k.preset_id
-        LEFT JOIN t_robot_inspection m ON m.inspection_id = a.cruise_id
-        LEFT JOIN t_std_devicemete n ON n.device_mete_id = a.device_mete_id
+        LEFT JOIN	t_cruise_point_instance l on l.instance_id = a.instance_id
+        LEFT JOIN t_camera_preset k ON l.cruise_id = k.preset_id
+        LEFT JOIN t_robot_inspection m ON m.inspection_id = l.cruise_id
+        LEFT JOIN t_std_devicemete n ON n.device_mete_id = l.device_mete_id
         WHERE 1 = 1
-        <if test="instanceId != null"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+
     </select>
+
     <!--根据taskId查询字典表-->
     <select id="selectTaskName" resultType="java.lang.String">
         SELECT
