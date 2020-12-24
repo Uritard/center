@@ -314,20 +314,20 @@ public class TCruisePointInstanceService{
                                 TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                                 tCruisePointInstance.setCruiseId(id);
                                 tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
+                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
                             }else {//红外
                                 TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                                 tCruisePointInstance.setCruiseType(230);
                                 tCruisePointInstance.setCruiseId(id);
                                 tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
+                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
                             }
                         }
                         if(cruiseType == 228){//机器人
                             TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
                             tCruisePointInstance.setCruiseId(id);
                             tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tRobotInspection.getInspectionName());
+                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
                         }
 //                if(cruiseType == 230){//红外
 //                    TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
@@ -351,20 +351,20 @@ public class TCruisePointInstanceService{
                             TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                             tCruisePointInstance.setCruiseId(id);
                             tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
+                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
                         }else {//红外
                             TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                             tCruisePointInstance.setCruiseType(230);
                             tCruisePointInstance.setCruiseId(id);
                             tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tCameraPreset.getPresetName());
+                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
                         }
                     }
                     if(cruiseType == 228){//机器人
                         TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
                         tCruisePointInstance.setCruiseId(id);
                         tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
-                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+tRobotInspection.getInspectionName());
+                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
                     }
 //                if(cruiseType == 230){//红外
 //                    TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);

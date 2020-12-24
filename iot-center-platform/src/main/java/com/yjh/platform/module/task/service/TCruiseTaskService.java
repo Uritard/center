@@ -473,18 +473,18 @@ public class TCruiseTaskService {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         tCruiseResult.setCState(241);
         try{
-            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-            //给算法暂停
-            Analysis analysis = new Analysis();
-            analysis.setTaskId(tCruiseTask.getTaskId());
-            analysis.setInstanceId(-1L);
-            List<Analysis> analysisList = new ArrayList<>();
-            analysisList.add(analysis);
-            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-            analysisMap.put("list",analysisList);
-            log.info("算法信息：    "+analysisMap);
-            analysis(analysisMap);
-            log.info("任务暂停"+tCruiseTask.getTaskId());
+            //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+//            //给算法暂停
+//            Analysis analysis = new Analysis();
+//            analysis.setTaskId(tCruiseTask.getTaskId());
+//            analysis.setInstanceId(-1L);
+//            List<Analysis> analysisList = new ArrayList<>();
+//            analysisList.add(analysis);
+//            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+//            analysisMap.put("list",analysisList);
+//            log.info("算法信息：    "+analysisMap);
+//            analysis(analysisMap);
+//            log.info("任务暂停"+tCruiseTask.getTaskId());
 
             //Thread.sleep(10000);
             //机器人任务暂停
