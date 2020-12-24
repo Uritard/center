@@ -128,19 +128,25 @@ public class TCameraInfoService {
                     presetMap.put("id", tCamreaPresetTree.getPresetId());
                     presetMap.put("label", tCamreaPresetTree.getPresetName());
                     presetMap.put("infoType", "preset");
+                    presetMap.put("upId", cameraId);
                     presetList.add(presetMap);
                 }
             }
             cameraPresetTreeTem.put("id", cameraId);
             cameraPresetTreeTem.put("label", tCamrea.getCameraName());
             cameraPresetTreeTem.put("infoType", "camera");
+            cameraPresetTreeTem.put("upId", "-1");
             cameraPresetTreeTem.put("children", presetList);
+            if(presetList.size() ==0  ){
+                continue;
+            }
             cameraPresetTreeTemList.add(cameraPresetTreeTem);
         }
         Map<String, Object> cameraPresetTree = new HashMap<>();
         cameraPresetTree.put("children", cameraPresetTreeTemList);
         cameraPresetTree.put("label", "摄像机预置位树");
         cameraPresetTree.put("id", "-1");
+        cameraPresetTree.put("upId", "null");
         cameraPresetTree.put("infoType", "tree");
         List<Map<String, Object>> cameraPresetList = new ArrayList<>();
         cameraPresetList.add(cameraPresetTree);
