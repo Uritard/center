@@ -286,6 +286,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             HashMap<String, Object> map = new HashMap<>();
                             map.put("presetId", item.getCruiseId());
                             map.put("cameraId", tCameraPreset.getCameraId());
+                            tCruiseTaskResultDetailMap.put("cameraId",tCameraPreset.getCameraId().toString());
+                            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             log.info(map.toString());
                             move(map);
                             Thread.sleep(waitTime);//等待摄像头转到预置位
