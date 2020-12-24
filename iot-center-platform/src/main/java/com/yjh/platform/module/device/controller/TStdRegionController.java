@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -151,7 +152,8 @@ public class TStdRegionController {
     public Result selectRegTreeByRegName(@RequestParam(value = "regionName", required = false) String regionName) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tStdDeviceService.selectRegionTreeByName(regionName);
+            //List<AreaInfo> devTreeList = tStdDeviceService.selectRegionTreeByName(regionName);
+            List<AreaInfoRegionCode> devTreeList = tStdRegionService.selectRegTreeByRegName(regionName);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

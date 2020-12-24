@@ -67,7 +67,7 @@ public class TStdRegionService{
         Integer level = 1;
         for(Iterator<AreaInfoRegionCode> it = listTree.iterator(); it.hasNext();){
             AreaInfoRegionCode areaInfo = it.next();
-            if (areaInfo.getUpId() == null || areaInfo.getUpId() == 0) {
+            if (areaInfo.getUpId() == -1 || areaInfo.getUpId() == 0) {
                 areaInfo.setLevel(1);
                 areaInfoCountryList.add(areaInfo);
             }
