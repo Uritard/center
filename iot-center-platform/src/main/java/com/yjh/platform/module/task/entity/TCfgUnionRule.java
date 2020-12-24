@@ -58,5 +58,11 @@ public class TCfgUnionRule implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "联动监控全景摄像机Id")
+    private Long cameraId;
+
+    @ApiModelProperty(value = "联动监控全景摄像机对应预置位Id")
+    private Long presetId;
+
 
 }

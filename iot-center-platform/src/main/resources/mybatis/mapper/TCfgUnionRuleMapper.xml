@@ -14,11 +14,13 @@
         <result column="input_param" jdbcType="VARCHAR" property="inputParam" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="camera_id" jdbcType="TIMESTAMP" property="cameraId" />
+        <result column="preset_id" jdbcType="TIMESTAMP" property="presetId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        rule_id, plan_id, rule_name, rule_type, rule_content, rule_delay, description, input_param, create_time, update_time
+        rule_id, plan_id, rule_name, rule_type, rule_content, rule_delay, description, input_param, create_time, update_time,camera_id,preset_id
     </sql>
 
 
@@ -33,7 +35,9 @@
             description,
             input_param,
             create_time,
-            update_time
+            update_time,
+            camera_id,
+            preset_id
         )values(
                 #{ruleId, jdbcType=BIGINT},
                 #{planId, jdbcType=BIGINT},
@@ -44,7 +48,9 @@
                 #{description, jdbcType=VARCHAR},
                 #{inputParam, jdbcType=VARCHAR},
                 CURRENT_TIMESTAMP(),
-                CURRENT_TIMESTAMP()
+                CURRENT_TIMESTAMP(),
+                #{cameraId, jdbcType=BIGINT},
+                #{presetId, jdbcType=BIGINT},
         )
     </insert>
 
@@ -64,6 +70,9 @@
         <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
         <if test="inputParam != null and inputParam != ''">a.input_param = #{inputParam, jdbcType=VARCHAR},</if>
         a.update_time =CURRENT_TIMESTAMP(),
+        <if test="cameraId != null ">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
+        <if test="presetId != null ">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+
     </set>
             where a.rule_id = #{ruleId, jdbcType=BIGINT}
     </update>
@@ -79,7 +88,9 @@
         a.description,
         a.input_param,
         a.create_time,
-        a.update_time
+        a.update_time,
+        a.camera_id,
+        a.preset_id
         from t_cfg_union_rule a
         where 1 = 1
             and a.rule_id = #{ruleId, jdbcType=BIGINT}
@@ -97,7 +108,9 @@
         a.description,
         a.input_param,
         a.create_time,
-        a.update_time
+        a.update_time,
+        a.camera_id,
+        a.preset_id
         from t_cfg_union_rule a
         where 1 = 1
         <if test="ruleId != null and ruleId != ''"> and a.rule_id = #{ruleId, jdbcType=BIGINT}</if>
@@ -110,6 +123,9 @@
         <if test="inputParam != null and inputParam != ''"> and a.input_param = #{inputParam, jdbcType=VARCHAR}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="cameraId != null ">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
+        <if test="presetId != null ">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule" resultType="com.yjh.platform.module.task.entity.TCfgUnionRuleDetail">
@@ -124,7 +140,9 @@
         a.input_param,
         a.create_time,
         a.update_time,
-        b.plan_name
+        b.plan_name,
+        a.camera_id,
+        a.preset_id
         from t_cfg_union_rule a
         left join t_cruise_plan b on a.plan_id = b.plan_id
         where 1 = 1
@@ -138,6 +156,8 @@
         <if test="inputParam != null and inputParam != ''"> and a.input_param = #{inputParam, jdbcType=VARCHAR}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+        <if test="cameraId != null ">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
+        <if test="presetId != null ">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
          order by a.rule_id desc
     </select>
 
@@ -152,7 +172,9 @@
             description,
             input_param,
             create_time,
-            update_time
+            update_time,
+            a.camera_id,
+            a.preset_id
         )values
         <foreach collection="list" item="TCfgUnionRule" separator=",">
             (
@@ -165,7 +187,9 @@
                 #{TCfgUnionRule.description, jdbcType=VARCHAR},
                 #{TCfgUnionRule.inputParam, jdbcType=VARCHAR},
                 CURRENT_TIMESTAMP(),
-                CURRENT_TIMESTAMP()
+                CURRENT_TIMESTAMP(),
+                #{TCfgUnionRule.cameraId, jdbcType=BIGINT},
+                #{TCfgUnionRule.presetId, jdbcType=BIGINT}
             )
         </foreach>
     </insert>

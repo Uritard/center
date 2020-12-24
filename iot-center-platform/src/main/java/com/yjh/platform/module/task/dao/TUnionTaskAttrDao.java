@@ -37,5 +37,5 @@ public interface TUnionTaskAttrDao {
 
 
     String selectTaskName(@Param(value = "taskId")String taskId);
-    String selectCruiseResultName(@Param(value = "taskId")Integer cruiseResult);
+    String selectCruiseResultName(@Param(value = "cruiseResult")Integer cruiseResult);
 }

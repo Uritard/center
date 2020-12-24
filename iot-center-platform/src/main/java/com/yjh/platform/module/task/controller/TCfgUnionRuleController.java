@@ -1,27 +1,27 @@
 package com.yjh.platform.module.task.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import com.yjh.platform.module.task.service.TCfgUnionRuleService;
-import com.yjh.platform.module.task.entity.TCfgUnionRule;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-
 import com.yjh.platform.module.task.service.TCruisePlanService;
-import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -117,10 +117,12 @@ public class TCfgUnionRuleController {
                             @RequestParam(value = "description", required = false) String description,
                             @RequestParam(value = "inputParam", required = false) String inputParam,
                             @RequestParam(value = "createTime", required = false) Date createTime,
-                            @RequestParam(value = "updateTime", required = false) Date updateTime) {
+                            @RequestParam(value = "updateTime", required = false) Date updateTime,
+                         @RequestParam(value = "cameraId", required = false) Long cameraId,
+                         @RequestParam(value = "presetId", required = false) Long presetId) {
         Result result = new Result();
         try {
-            List<TCfgUnionRule> list = tCfgUnionRuleService.select(ruleId, planId, ruleName, ruleType, ruleContent, ruleDelay, description, inputParam, createTime, updateTime);
+            List<TCfgUnionRule> list = tCfgUnionRuleService.select(ruleId, planId, ruleName, ruleType, ruleContent, ruleDelay, description, inputParam, createTime, updateTime,cameraId,presetId);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

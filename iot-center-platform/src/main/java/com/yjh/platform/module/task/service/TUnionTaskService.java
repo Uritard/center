@@ -1,22 +1,17 @@
 package com.yjh.platform.module.task.service;
 
-import com.alibaba.druid.util.StringUtils;
-import com.google.common.collect.Sets;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,6 +32,9 @@ public class TUnionTaskService{
     private TUnionTaskAttrDao TUnionTaskAttrDao;
     @Autowired
     private RedisTemplate redisTemplate;
+
+    private Logger log = LoggerFactory.getLogger(TUnionTaskService.class);
+
 
     private DateTimeUtil dateTimeUtil;
     @Logs(title = "插入", code = "tUnionTask",content = "根据web传递的参数插入巡检记录")
@@ -323,19 +321,22 @@ public class TUnionTaskService{
     }
 
     //联动弹窗--监测数据
+    @Logs
     @Transactional(rollbackFor = Exception.class)
-    public List<LinkageMonitorData> linkageMonitorData(String taskId) {
+    public List<LinkageMonitorData> linkageMonitorData(String taskId) throws Exception{
+        Thread.sleep(1000);
         //根据任务Id查询相关内容
         List<LinkageMonitorData> linkageMonitorDataList = TUnionTaskAttrDao.selectDeviceInfo(taskId);
 
         for (LinkageMonitorData lmd : linkageMonitorDataList){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + lmd.getInstanceId());
-            lmd.setEndTime(redisInfoMap.get("endTime"));
-            lmd.setStartTime(redisInfoMap.get("startTime"));
-            lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
-            lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
             if ("246".equals(redisInfoMap.get("cruiseResult"))
                     || "247".equals(redisInfoMap.get("cruiseResult"))){
+                log.info("redisInfoMap==="+redisInfoMap);
+                lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
+                lmd.setEndTime(redisInfoMap.get("endTime"));
+                lmd.setStartTime(redisInfoMap.get("startTime"));
+                lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
                 Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
                 String taskName = TUnionTaskAttrDao.selectTaskName(taskId);
                 String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
@@ -345,34 +346,9 @@ public class TUnionTaskService{
                 lmd.setCruiseResultName(CruiseResultName);
                 lmd.setResultNum(redisInfoMap.get("resultNum"));
                 lmd.setPicpath(redisInfoMap.get("picpath"));
-                linkageMonitorDataList.add(lmd);
             }
         }
+//        log.info("linkageMonitorDataList==="+linkageMonitorDataList);
         return linkageMonitorDataList;
-    }
-    //Redis数据库批量查询Key值游标
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
     }
 }

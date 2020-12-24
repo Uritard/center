@@ -1,14 +1,13 @@
 package com.yjh.platform.module.task.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -30,7 +29,9 @@ public interface TCfgUnionRuleDao {
                                 @Param(value = "description") String description,
                                 @Param(value = "inputParam") String inputParam,
                                 @Param(value = "createTime") Date createTime,
-                                @Param(value = "updateTime") Date updateTime);
+                                @Param(value = "updateTime") Date updateTime,
+                                @Param(value = "cameraId") Long cameraId,
+                                @Param(value = "presetId") Long presetId);
     List<TCfgUnionRuleDetail> selectByPage(TCfgUnionRule tCfgUnionRule);
 
     int batchAdd(List<TCfgUnionRule> list);

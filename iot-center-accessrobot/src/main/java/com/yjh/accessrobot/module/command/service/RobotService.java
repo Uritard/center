@@ -325,8 +325,8 @@ public class RobotService {
         //1.任务启动2.任务暂停3.任务继续4.任务停止
         String commandValue = robotTaskControlMap.get("commandValue").toString();
         String json  = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
-        log.info("json是=="+json);
-        if (Objects.nonNull(json))   {
+        log.info("判断条件是==="+(!"null".equals(json)));
+        if (!"null".equals(json)){
             List<String> robotCodeList = JSON.parseArray(json,String.class);
             log.info("robotCodeList==="+robotCodeList);
 

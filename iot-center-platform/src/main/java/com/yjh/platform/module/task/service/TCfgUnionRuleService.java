@@ -77,8 +77,8 @@ public class TCfgUnionRuleService{
 
     @Logs(title = "查询", code = "TCfgUnionRule",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgUnionRule> select(Long ruleId, Long planId, String ruleName, String ruleType, String ruleContent, Integer ruleDelay, String description, String inputParam, Date createTime, Date updateTime) {
-        List<TCfgUnionRule> tCfgUnionRuleList = tCfgUnionRuleDao.select(ruleId, planId, ruleName, ruleType, ruleContent, ruleDelay, description, inputParam, createTime, updateTime);
+    public List<TCfgUnionRule> select(Long ruleId, Long planId, String ruleName, String ruleType, String ruleContent, Integer ruleDelay, String description, String inputParam, Date createTime, Date updateTime,Long cameraId,Long presetId) {
+        List<TCfgUnionRule> tCfgUnionRuleList = tCfgUnionRuleDao.select(ruleId, planId, ruleName, ruleType, ruleContent, ruleDelay, description, inputParam, createTime, updateTime,cameraId,presetId);
         return tCfgUnionRuleList;
     }
 
