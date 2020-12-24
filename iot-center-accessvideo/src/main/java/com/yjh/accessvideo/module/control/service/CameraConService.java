@@ -300,7 +300,7 @@ public class CameraConService {
             Integer processNumRobot = Integer.parseInt(dataBackForIdRobot.substring(9,15).replace(" ",""));
             String urlStopRobot = "kill -9 "+processNumRobot;
             Runtime.getRuntime().exec(urlStopRobot);
-            Constant.mapsForRobot.remove(String.valueOf(robotId+":light"));
+            Constant.mapsForRobot.remove(String.valueOf(robotId+":inferad"));
         } catch (Exception e) {e.getMessage();}
         return "stop " + robotId + " preview success!";
     }
