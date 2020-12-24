@@ -330,6 +330,10 @@ public class TUnionTaskService{
 
         for (LinkageMonitorData lmd : linkageMonitorDataList){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + lmd.getInstanceId());
+            lmd.setEndTime(redisInfoMap.get("endTime"));
+            lmd.setStartTime(redisInfoMap.get("startTime"));
+            lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
+            lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
             if ("246".equals(redisInfoMap.get("cruiseResult"))
                     || "247".equals(redisInfoMap.get("cruiseResult"))){
                 Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
@@ -337,9 +341,10 @@ public class TUnionTaskService{
                 String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
                 lmd.setTaskName(taskName);
                 lmd.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
-                lmd.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                lmd.setCruiseResult(cruiseResult);
                 lmd.setCruiseResultName(CruiseResultName);
                 lmd.setResultNum(redisInfoMap.get("resultNum"));
+                lmd.setPicpath(redisInfoMap.get("picpath"));
                 linkageMonitorDataList.add(lmd);
             }
         }

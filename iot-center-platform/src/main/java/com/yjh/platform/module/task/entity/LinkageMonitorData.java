@@ -61,5 +61,19 @@ public class LinkageMonitorData {
     @ApiModelProperty(value = "巡检点结果")
     private String resultNum;
 
+    @ApiModelProperty(value = "开始时间")
+    private String startTime;
+
+    @ApiModelProperty(value = "结束时间")
+    private String endTime;
+
+    @ApiModelProperty(value = "摄像机Id")
+    private Long cameraId;
+
+    @ApiModelProperty(value = "预置位Id")
+    private Long presetId;
+
+    @ApiModelProperty(value = "巡检结果照片")
+    private String picpath;
 
 }
