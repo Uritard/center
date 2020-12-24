@@ -55,4 +55,10 @@ public class LinkageInformation {
     @ApiModelProperty(value = "信号量名称")
     private String deviceName;
 
+    @ApiModelProperty(value = "全景摄像机Id")
+    private Long cameraId;
+
+    @ApiModelProperty(value = "全景摄像机预置位Id")
+    private Long presetId;
+
 }

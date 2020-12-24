@@ -50,7 +50,7 @@
                 CURRENT_TIMESTAMP(),
                 CURRENT_TIMESTAMP(),
                 #{cameraId, jdbcType=BIGINT},
-                #{presetId, jdbcType=BIGINT},
+                #{presetId, jdbcType=BIGINT}
         )
     </insert>
 

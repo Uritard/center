@@ -576,7 +576,7 @@
         )
     </insert>
     <!--TCR信息更新-->
-    <update id="updateTCruiseResult">
+    <update id="updateTCruiseResult" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseResult">
         update t_cruise_result a <set>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
@@ -591,7 +591,7 @@
         <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
         a.create_time = #{createTime, jdbcType=TIMESTAMP},
         a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
-        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
+        
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}

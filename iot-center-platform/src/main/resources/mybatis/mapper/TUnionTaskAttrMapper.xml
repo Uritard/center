@@ -143,6 +143,8 @@
             b.rule_id,
          b.rule_name,
             b.plan_id,
+         b.camera_id,
+         b.preset_id,
          d.plan_name,
          a.create_time,
          b.rule_content,
