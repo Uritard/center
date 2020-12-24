@@ -89,7 +89,7 @@
         where 1 = 1
         <if test="paramId != null "> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
         <if test="paramType != null and paramType != ''"> and a.param_type = #{paramType, jdbcType=VARCHAR}</if>
-        <if test="paramName != null and paramName != ''"> and a.param_name = #{paramName, jdbcType=VARCHAR}</if>
+        <if test="paramName != null and paramName != ''"> and a.param_name LIKE CONCAT('%',#{paramName, jdbcType=VARCHAR},'%')</if>
         <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
          order by a.param_name

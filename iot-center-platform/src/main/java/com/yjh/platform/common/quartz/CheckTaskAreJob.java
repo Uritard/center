@@ -109,6 +109,11 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     mapForCruise.put("resultNum","超时");
 
                 }
+                if("247".equals(mapForCruise.get("cruiseResult"))){
+                    abnormal = abnormal+1;
+                }else {
+                    normal = normal+1;
+                }
                 //TCTRD
                 log.info("TCTRD开始构建");
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -153,7 +158,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 tCruiseDataResult.setIsWarn(0);
                 TCDRList.add(tCruiseDataResult);
                 redisTemplate.opsForHash().putAll("t_cruise_task_result:"+taskId+item, mapForCruise);
-                abnormal = abnormal+1;
+
             }
 
         }

@@ -632,6 +632,7 @@ public class RunAtNowTask implements Runnable{
             log.info("完成任务执行"+new Date());
         } catch (Exception e) {
             log.error("立即任务异常" + e);
+            e.printStackTrace();
         }
     }
 }
