@@ -158,17 +158,17 @@ public class TCameraScreenService{
                         }else {
                             areaInfoTem.setState(0);
                         }
-                    }
-                    if(flag != null && flag == 1){
-                        if("1".equals(map.get(areaInfoMap.getId().toString()))){
-                            //在线
-                            childrenList.add(areaInfoTem);
-                        }else {
-                            continue;
+                        if(flag != null && flag == 1){
+                            if("1".equals(map.get(areaInfoMap.getId().toString()))){
+                                //在线
+                                childrenList.add(areaInfoTem);
+                                continue;
+                            }else {
+                                continue;
+                            }
                         }
-                    }else {
-                        childrenList.add(areaInfoTem);
                     }
+                    childrenList.add(areaInfoTem);
                 }
             }
             if (childrenList.size()>0 ) {
