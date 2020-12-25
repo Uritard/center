@@ -69,7 +69,7 @@ public interface TCruisePointInstanceDao {
     List<Long> selectCruiseId(TCruisePointInstanceDetail tCruisePointInstanceDetail);
     List<Long> selectInstanceId(@Param(value = "ids")List<Long> ids,
                           @Param(value = "deviceMeteId") Long deviceMeteId);
-    List<TCruisePointInstance> selectForTask(@Param(value = "list")List<Long> list);
+    List<TCruisePointInstanceNameDetail> selectForTask(@Param(value = "list")List<Long> list);
 
     int deleteByInstanceId(@Param(value = "list")List<Long> list);
 

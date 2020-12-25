@@ -102,10 +102,10 @@ public class TRobotInspectionService{
         List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
         for (String item:instanceIdList) {
             //获取任务数据
-            Map<String,String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
+            Map<String,String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
             RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
-            robotTaskMessage.setDeviceName(getName(Long.valueOf(item),1,nameList));
-            robotTaskMessage.setInstanceName(getName(Long.valueOf(item),0,nameList));
+            robotTaskMessage.setDeviceName(mapForRobotTaskMessage.get("deviceName"));
+            robotTaskMessage.setInstanceName(mapForRobotTaskMessage.get("instanceName"));
             if(mapForRobotTaskMessage.get("cruiseTime") != null && !"null".equals(mapForRobotTaskMessage.get("cruiseTime"))){
                 robotTaskMessage.setCruiseTime(mapForRobotTaskMessage.get("cruiseTime"));
                 robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultNum"));
@@ -208,7 +208,7 @@ public class TRobotInspectionService{
         String[] instanceIdList = instanceList.split(", ");
         int i = 0;
         for (String item:instanceIdList) {
-            Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
+            Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
             if(mapForRobotTaskMessage.size() != 0){
                 i = i + 1;
             }

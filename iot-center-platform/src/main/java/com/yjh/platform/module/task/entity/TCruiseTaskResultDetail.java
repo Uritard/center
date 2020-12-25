@@ -31,13 +31,13 @@ public class TCruiseTaskResultDetail implements Serializable {
     private Long deviceId;
 
     @ApiModelProperty(value = "设备名称")
-    private Long deviceName;
+    private String deviceName;
 
     @ApiModelProperty(value = "巡检点ID")
     private Long instanceId;
 
     @ApiModelProperty(value = "巡检点名称")
-    private Long instanceName;
+    private String instanceName;
 
     @ApiModelProperty(value = "巡检时间")
     private Date cruiseTime;

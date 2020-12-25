@@ -98,7 +98,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         List<TCruiseTaskResultDetail> TCTRDList = new ArrayList();
             List<TCruiseDataResult> TCDRList = new ArrayList();
         for(Long item:instanceIdList){
-            Map<String,String> mapForCruise  = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+item);
+            Map<String,String> mapForCruise  = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
             if(mapForCruise.size()>0){
                 //count = count+1;
                 if("null".equals(mapForCruise.get("cruiseResult")) ){
@@ -157,7 +157,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
                 tCruiseDataResult.setIsWarn(0);
                 TCDRList.add(tCruiseDataResult);
-                redisTemplate.opsForHash().putAll("t_cruise_task_result:"+taskId+item, mapForCruise);
+                redisTemplate.opsForHash().putAll("t_cruise_task_result:"+taskId+":"+item, mapForCruise);
 
             }
 
