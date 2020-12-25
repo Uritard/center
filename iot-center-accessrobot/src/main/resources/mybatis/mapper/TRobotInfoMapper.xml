@@ -441,7 +441,9 @@
         cruise_result_id,
         task_result_id,
         device_id,
+        device_name,
         instance_id,
+        instance_name,
         cruise_time,
         end_time,
         cruise_status,
@@ -452,7 +454,9 @@
             #{TCruiseTaskResultDetail.cruiseResultId, jdbcType=VARCHAR},
             #{TCruiseTaskResultDetail.taskResultId, jdbcType=VARCHAR},
             #{TCruiseTaskResultDetail.deviceId, jdbcType=BIGINT},
+            #{TCruiseTaskResultDetail.deviceName, jdbcType=VARCHAR},
             #{TCruiseTaskResultDetail.instanceId, jdbcType=BIGINT},
+            #{TCruiseTaskResultDetail.instanceName, jdbcType=VARCHAR},
             #{TCruiseTaskResultDetail.cruiseTime, jdbcType=TIMESTAMP},
             #{TCruiseTaskResultDetail.endTime, jdbcType=TIMESTAMP},
             #{TCruiseTaskResultDetail.cruiseStatus, jdbcType=INTEGER},
@@ -466,6 +470,7 @@
         cruise_data_id,
         cruise_result_id,
         cruise_id,
+        cruise_name,
         cruise_type,
         result_desc,
         result_num,
@@ -489,6 +494,7 @@
             #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
             #{TCruiseDataResult.cruiseResultId, jdbcType=VARCHAR},
             #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseName, jdbcType=VARCHAR},
             #{TCruiseDataResult.cruiseType, jdbcType=INTEGER},
             #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
             #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
@@ -509,77 +515,12 @@
             )
         </foreach>
     </insert>
-    <!--TCTRD信息单个入库-->
-    <insert id="insertTCruiseTaskResultDetail" useGeneratedKeys="true" keyProperty="cruiseResultId" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail">
-        insert into t_cruise_task_result_detail(
-            cruise_result_id,
-            task_result_id,
-            device_id,
-            instance_id,
-            cruise_time,
-            end_time,
-            cruise_status,
-            remark
-        )values(
-                #{cruiseResultId, jdbcType=VARCHAR},
-                #{taskResultId, jdbcType=VARCHAR},
-                #{deviceId, jdbcType=BIGINT},
-                #{instanceId, jdbcType=BIGINT},
-                #{cruiseTime, jdbcType=TIMESTAMP},
-                #{endTime, jdbcType=TIMESTAMP},
-                #{cruiseStatus, jdbcType=INTEGER},
-                #{remark, jdbcType=VARCHAR}
-        )
-    </insert>
-    <!--TCDR信息单个入库-->
-    <insert id="insertTCruiseDataResult" useGeneratedKeys="true" keyProperty="cruiseDataId" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseDataResult">
-        insert into t_cruise_data_result(
-            cruise_data_id,
-            cruise_result_id,
-            cruise_id,
-            cruise_type,
-            result_desc,
-            result_num,
-            modify_num,
-            picpath,
-            person_check,
-            origpic,
-            state,
-            evaluation_state,
-            identify_state,
-            identify_result,
-            createtime,
-            remark,
-            check_user,
-            check_date,
-            is_warn
-        )values(
-                #{cruiseDataId, jdbcType=BIGINT},
-                #{cruiseResultId, jdbcType=VARCHAR},
-                #{cruiseId, jdbcType=BIGINT},
-                #{cruiseType, jdbcType=INTEGER},
-                #{resultDesc, jdbcType=VARCHAR},
-                #{resultNum, jdbcType=VARCHAR},
-                #{modifyNum, jdbcType=VARCHAR},
-                #{picpath, jdbcType=VARCHAR},
-                #{personCheck, jdbcType=VARCHAR},
-                #{origpic, jdbcType=VARCHAR},
-                #{state, jdbcType=INTEGER},
-                #{evaluationState, jdbcType=INTEGER},
-                #{identifyState, jdbcType=INTEGER},
-                #{identifyResult, jdbcType=INTEGER},
-                #{createtime, jdbcType=TIMESTAMP},
-                #{remark, jdbcType=VARCHAR},
-                #{checkUser, jdbcType=VARCHAR},
-                #{checkDate, jdbcType=TIMESTAMP},
-                #{isWarn, jdbcType=INTEGER}
-        )
-    </insert>
     <!--TCR信息更新-->
     <update id="updateTCruiseResult" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseResult">
         update t_cruise_result a <set>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
         <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
         <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
@@ -591,7 +532,7 @@
         <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
         a.create_time = #{createTime, jdbcType=TIMESTAMP},
         a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
-        
+        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
@@ -601,6 +542,7 @@
         insert into t_cruise_task_result(
             task_result_id,
             task_id,
+            task_name,
             task_abnormal,
             task_alarm,
             run_execute,
@@ -611,6 +553,7 @@
         )values(
                 #{taskResultId, jdbcType=VARCHAR},
                 #{taskId, jdbcType=VARCHAR},
+                #{taskName, jdbcType=VARCHAR},
                 #{taskAbnormal, jdbcType=INTEGER},
                 #{taskAlarm, jdbcType=INTEGER},
                 #{runExecute, jdbcType=VARCHAR},

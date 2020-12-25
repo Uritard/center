@@ -56,9 +56,8 @@ public interface TRobotInfoDao {
     int insertRobotAlarm(TRobotAlarm tRobotAlarm);
     int batchInsertCruiseDataResult(List<TCruiseDataResult> list);
     int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> list);
-    int insertTCruiseDataResult(TCruiseDataResult tCruiseDataResult);
-    int insertTCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail);
     int updateTCruiseResult(TCruiseResult tCruiseResult);
     int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
+
 
 }

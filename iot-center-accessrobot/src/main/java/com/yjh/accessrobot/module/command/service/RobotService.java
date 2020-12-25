@@ -482,6 +482,10 @@ public class RobotService {
             cState = 241;//任务暂停
         }else if (taskStatus == 4){
             cState = 242;//任务终止
+            //将公共类的instanceIdList清空
+            for (Long instancedId : Constant.flagMap.get(taskId)){
+                instanceIdList.remove(instancedId.toString());
+            }
         }
 
         TCruiseResult tCruiseResult = selectTaskResultId(taskId);
@@ -579,20 +583,10 @@ public class RobotService {
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {
         return this.tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
     }
-    @Logs(title = "TCDR信息入库--单插", code = "Robot")
-    @Transactional(rollbackFor = Exception.class)
-    public int insertTCruiseDataResult(TCruiseDataResult tCruiseDataResult) {
-        return this.tRobotInfoDao.insertTCruiseDataResult(tCruiseDataResult);
-    }
     @Logs(title = "TCDR信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseDataResult(List<TCruiseDataResult> tCruiseDataResultList) {
         return this.tRobotInfoDao.batchInsertCruiseDataResult(tCruiseDataResultList);
-    }
-    @Logs(title = "TCTRD信息入库--单插", code = "Robot")
-    @Transactional(rollbackFor = Exception.class)
-    public int insertTCruiseTaskResultDetail(TCruiseTaskResultDetail tCruiseTaskResultDetail) {
-        return this.tRobotInfoDao.insertTCruiseTaskResultDetail(tCruiseTaskResultDetail);
     }
     @Logs(title = "TCTRD信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)

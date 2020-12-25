@@ -99,10 +99,10 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("cruiseId",instanceId);
                     tCruiseTaskResultMap.put("cruiseTaskTime",cruiseTime);
 
-                    Map<String,String> map = redisTemplate.opsForHash().entries("countForAbnormal:"+taskId);
-                    tCruiseTaskResultMap.put("startTime",map.get("taskStart"));
+//                    Map<String,String> map = redisTemplate.opsForHash().entries("countForAbnormal:"+taskId);
+//                    tCruiseTaskResultMap.put("startTime",map.get("taskStart"));
 
-                    tCruiseTaskResultMap.put("taskResultId",tCruiseResult.getTaskResultId());
+//                    tCruiseTaskResultMap.put("taskResultId",tCruiseResult.getTaskResultId());
                     tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("cruiseStatus","252");
 
@@ -127,15 +127,14 @@ public class CruiseResultDealThread implements Runnable{
 //            tCruiseTaskResultMap.put("is_warn",);
 
                     tCruiseTaskResultMap.put("taskId",taskId);
-                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun().toString());
-
-                    if(tCruiseTask.getAreaId() == null){
-                        tCruiseTaskResultMap.put("areaId","null");
-                    }else {
-                        tCruiseTaskResultMap.put("areaId",tCruiseTask.getAreaId());
-                    }
-                    tCruiseTaskResultMap.put("cType",tCruiseTask.getType().toString());
-                    tCruiseTaskResultMap.put("taskCount",robotInfoKeys.size() + "");
+//                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun().toString());
+//                    if(tCruiseTask.getAreaId() == null){
+//                        tCruiseTaskResultMap.put("areaId","null");
+//                    }else {
+//                        tCruiseTaskResultMap.put("areaId",tCruiseTask.getAreaId());
+//                    }
+//                    tCruiseTaskResultMap.put("cType",tCruiseTask.getType().toString());
+//                    tCruiseTaskResultMap.put("taskCount",robotInfoKeys.size() + "");
                     tCruiseTaskResultMap.put("taskCode",taskId);
                     log.info("tCruiseTaskResultMap是==="+tCruiseTaskResultMap);
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
@@ -288,8 +287,9 @@ public class CruiseResultDealThread implements Runnable{
 
                     Integer taskWait = totalCheckPoint - normal - abnormal;
                     log.info("taskWait的值是=="+ taskWait);
-                    tCruiseResult.setTaskWait(taskWait);//待测点数
-                    tCruiseResult.setCState(240);//任务状态
+                    tCruiseResult.setTaskWait(taskWait);
+                    tCruiseResult.setCState(240);
+                    tCruiseResult.setTaskCode(tCruiseTaskResultMap.get("taskCode"));
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     //更新TCR表
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
@@ -303,8 +303,6 @@ public class CruiseResultDealThread implements Runnable{
                     WebSocketServer.sendMsg(json);
 
                 }else{//不是最后一个
-
-
 
                     Integer taskWait = totalCheckPoint - normal - abnormal;
                     log.info("taskWait的值是=="+ taskWait);
