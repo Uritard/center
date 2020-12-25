@@ -21,6 +21,7 @@ public interface TCruiseResultDao {
     TCruiseResult selectByPrimaryId(@Param(value = "taskResultId") String taskResultId);
     List<TCruiseResult> select(@Param(value = "taskResultId") String taskResultId,
                                @Param(value = "taskId") String taskId,
+                               @Param(value = "taskName") String taskName,
                                @Param(value = "areaId") String areaId,
                                @Param(value = "cType") Integer cType,
                                @Param(value = "cState") Integer cState,

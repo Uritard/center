@@ -30,6 +30,9 @@ public class TCruiseResult implements Serializable {
     @ApiModelProperty(value = "巡检任务ID")
     private String taskId;
 
+    @ApiModelProperty(value = "巡检任务ID")
+    private String taskName;
+
     @ApiModelProperty(value = "区域id")
     private String areaId;
 

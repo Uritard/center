@@ -20,6 +20,7 @@ public interface TCruiseTaskResultDao {
     TCruiseTaskResult selectByPrimaryId(@Param(value = "taskResultId") String taskResultId);
     List<TCruiseTaskResult> select(@Param(value = "taskResultId") String taskResultId,
                                 @Param(value = "taskId") String taskId,
+                                   @Param(value = "taskName") String taskName,
                                 @Param(value = "taskAbnormal") Integer taskAbnormal,
                                 @Param(value = "taskAlarm") Integer taskAlarm,
                                 @Param(value = "runExecute") String runExecute,

@@ -106,6 +106,7 @@ public class TCruiseTaskResultController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                             @RequestParam(value = "taskId", required = false) String taskId,
+                         @RequestParam(value = "taskName", required = false) String taskName,
                             @RequestParam(value = "taskAbnormal", required = false) Integer taskAbnormal,
                             @RequestParam(value = "taskAlarm", required = false) Integer taskAlarm,
                             @RequestParam(value = "runExecute", required = false) String runExecute,
@@ -115,7 +116,7 @@ public class TCruiseTaskResultController {
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TCruiseTaskResult> list = tCruiseTaskResultService.select(taskResultId, taskId, taskAbnormal, taskAlarm, runExecute, cruiseTaskTime, taskStatus, cruiseResult, remark);
+            List<TCruiseTaskResult> list = tCruiseTaskResultService.select(taskResultId, taskId,taskName, taskAbnormal, taskAlarm, runExecute, cruiseTaskTime, taskStatus, cruiseResult, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

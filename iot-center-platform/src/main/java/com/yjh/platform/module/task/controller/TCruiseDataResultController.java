@@ -111,12 +111,13 @@ public class TCruiseDataResultController {
     public Result select(@RequestParam(value = "cruiseDataId", required = false) Long cruiseDataId,
                          @RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
                          @RequestParam(value = "cruiseId", required = false) Long cruiseId,
+                         @RequestParam(value = "cruiseName", required = false) String cruiseName,
                          @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                          @RequestParam(value = "resultDesc", required = false) String resultDesc,
                          @RequestParam(value = "resultNum", required = false) String resultNum,
                          @RequestParam(value = "modifyNum", required = false) String modifyNum,
                          @RequestParam(value = "picpath", required = false) String picpath,
-                         @RequestParam(value = "personcheck", required = false) String personcheck,
+                         @RequestParam(value = "personCheck", required = false) String personCheck,
                          @RequestParam(value = "origpic", required = false) String origpic,
                          @RequestParam(value = "state", required = false) Integer state,
                          @RequestParam(value = "evaluationState", required = false) String evaluationState,
@@ -126,7 +127,7 @@ public class TCruiseDataResultController {
                          @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseType, resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
+            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType, resultDesc, resultNum, modifyNum, picpath, personCheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

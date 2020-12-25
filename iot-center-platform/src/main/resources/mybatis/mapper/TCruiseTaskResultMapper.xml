@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTaskResult">
         <id column="task_result_id" jdbcType="VARCHAR" property="taskResultId" />
         <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="task_name" jdbcType="VARCHAR" property="taskName" />
         <result column="task_abnormal" jdbcType="INTEGER" property="taskAbnormal" />
         <result column="task_alarm" jdbcType="INTEGER" property="taskAlarm" />
         <result column="run_execute" jdbcType="VARCHAR" property="runExecute" />
@@ -25,6 +26,7 @@
         insert into t_cruise_task_result(
             task_result_id,
             task_id,
+            task_name,
             task_abnormal,
             task_alarm,
             run_execute,
@@ -35,6 +37,7 @@
         )values(
                 #{taskResultId, jdbcType=VARCHAR},
                 #{taskId, jdbcType=VARCHAR},
+                #{taskName, jdbcType=VARCHAR},
                 #{taskAbnormal, jdbcType=INTEGER},
                 #{taskAlarm, jdbcType=INTEGER},
                 #{runExecute, jdbcType=VARCHAR},
@@ -54,6 +57,7 @@
         update t_cruise_task_result a <set>
         <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
         <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
         <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
         <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
         <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
@@ -69,6 +73,7 @@
         select
         a.task_result_id,
         a.task_id,
+        a.task_name,
         a.task_abnormal,
         a.task_alarm,
         a.run_execute,
@@ -86,6 +91,7 @@
         select
         a.task_result_id,
         a.task_id,
+        a.task_name,
         a.task_abnormal,
         a.task_alarm,
         a.run_execute,
@@ -95,21 +101,23 @@
         a.remark
         from t_cruise_task_result a
         where 1 = 1
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
-        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
-        <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
-        <if test="cruiseTaskTime != null and cruiseTaskTime != ''">a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},</if>
-        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''">and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="taskAbnormal != null">and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}</if>
+        <if test="taskAlarm != null">and a.task_alarm = #{taskAlarm, jdbcType=INTEGER}</if>
+        <if test="runExecute != null and runExecute != ''">and a.run_execute = #{runExecute, jdbcType=VARCHAR}</if>
+        <if test="cruiseTaskTime != null and cruiseTaskTime != ''">and a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP}</if>
+        <if test="taskStatus != null">and a.task_status = #{taskStatus, jdbcType=INTEGER}</if>
+        <if test="cruiseResult != null">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskResult" resultType="com.yjh.platform.module.task.entity.TCruiseTaskResult">
         select
         a.task_result_id,
         a.task_id,
+        a.task_name,
         a.task_abnormal,
         a.task_alarm,
         a.run_execute,
@@ -119,21 +127,23 @@
         a.remark
         from t_cruise_task_result a
         where 1 = 1
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
-        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
-        <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
-        <if test="cruiseTaskTime != null and cruiseTaskTime != ''">a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},</if>
-        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''">and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="taskAbnormal != null">and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}</if>
+        <if test="taskAlarm != null">and a.task_alarm = #{taskAlarm, jdbcType=INTEGER}</if>
+        <if test="runExecute != null and runExecute != ''">and a.run_execute = #{runExecute, jdbcType=VARCHAR}</if>
+        <if test="cruiseTaskTime != null and cruiseTaskTime != ''">and a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP}</if>
+        <if test="taskStatus != null">and a.task_status = #{taskStatus, jdbcType=INTEGER}</if>
+        <if test="cruiseResult != null">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
         insert into t_cruise_task_result(
             task_result_id,
             task_id,
+            task_name,
             task_abnormal,
             task_alarm,
             run_execute,
@@ -146,6 +156,7 @@
             (
                 #{TCruiseTaskResult.taskResultId, jdbcType=VARCHAR},
                 #{TCruiseTaskResult.taskId, jdbcType=VARCHAR},
+                #{TCruiseTaskResult.taskName, jdbcType=VARCHAR},
                 #{TCruiseTaskResult.taskAbnormal, jdbcType=INTEGER},
                 #{TCruiseTaskResult.taskAlarm, jdbcType=INTEGER},
                 #{TCruiseTaskResult.runExecute, jdbcType=VARCHAR},

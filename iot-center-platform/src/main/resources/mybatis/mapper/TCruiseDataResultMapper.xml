@@ -7,6 +7,7 @@
         <id column="cruise_data_id" jdbcType="BIGINT" property="cruiseDataId" />
         <result column="cruise_result_id" jdbcType="VARCHAR" property="cruiseResultId" />
         <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+        <result column="cruise_name" jdbcType="VARCHAR" property="cruiseName" />
         <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
         <result column="result_desc" jdbcType="VARCHAR" property="resultDesc" />
         <result column="result_num" jdbcType="VARCHAR" property="resultNum" />
@@ -25,7 +26,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        cruise_data_id, cruise_result_id, cruise_id, cruise_type, result_desc, result_num, modify_num, picpath, person_check, origpic, cruise_abnormal,cruise_result, evaluation_state, identify_state, identify_result, createtime, remark
+        cruise_data_id, cruise_result_id, cruise_id,cruise_name, cruise_type, result_desc, result_num, modify_num, picpath, person_check, origpic, cruise_abnormal,cruise_result, evaluation_state, identify_state, identify_result, createtime, remark
     </sql>
 
 
@@ -34,6 +35,7 @@
             cruise_data_id,
             cruise_result_id,
             cruise_id,
+            cruise_name,
             cruise_type,
             result_desc,
             result_num,
@@ -52,6 +54,7 @@
                 #{cruiseDataId, jdbcType=BIGINT},
                 #{cruiseResultId, jdbcType=VARCHAR},
                 #{cruiseId, jdbcType=BIGINT},
+                #{cruiseName, jdbcType=VARCHAR},
                 #{cruiseType, jdbcType=INTEGER},
                 #{resultDesc, jdbcType=VARCHAR},
                 #{resultNum, jdbcType=VARCHAR},
@@ -79,6 +82,7 @@
         <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
         <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
         <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="cruiseName != null and cruiseName != ''">a.cruise_Name = #{cruiseName, jdbcType=VARCHAR},</if>
         <if test="cruiseType != null">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
         <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
         <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
@@ -102,6 +106,7 @@
         a.cruise_data_id,
         a.cruise_result_id,
         a.cruise_id,
+        a.cruise_name,
         a.cruise_type,
         a.result_desc,
         a.result_num,
@@ -127,6 +132,7 @@
         a.cruise_data_id,
         a.cruise_result_id,
         a.cruise_id,
+        a.cruise_name,
         a.cruise_type,
         a.result_desc,
         a.result_num,
@@ -143,23 +149,24 @@
         a.remark
         from t_cruise_data_result a
         where 1 = 1
-        <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
-        <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
-        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
-        <if test="cruiseType != null">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
-        <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
-        <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
-        <if test="modifyNum != null and modifyNum != ''">a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
-        <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
-        <if test="personCheck != null and personCheck != ''">a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
-        <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
-        <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="evaluationState != null">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
-        <if test="identifyState != null">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
-        <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
-        <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
+        <if test="cruiseResultId != null and cruiseResultId != ''">and a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
+        <if test="cruiseId != null and cruiseId != ''">and a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="cruiseName != null and cruiseName != ''">and a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
+        <if test="cruiseType != null">and a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        <if test="resultDesc != null and resultDesc != ''">and a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
+        <if test="resultNum != null and resultNum != ''">and a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
+        <if test="modifyNum != null and modifyNum != ''">and a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picpath != null and picpath != ''">and a.picpath = #{picpath, jdbcType=VARCHAR},</if>
+        <if test="personCheck != null and personCheck != ''">and a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
+        <if test="origpic != null and origpic != ''">and a.origpic = #{origpic, jdbcType=VARCHAR},</if>
+        <if test="cruiseAbnormal != null">and a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null">and a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="identifyState != null">and a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
+        <if test="identifyResult != null">and a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        <if test="createtime != null and createtime != ''">and a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
@@ -167,6 +174,7 @@
         a.cruise_data_id,
         a.cruise_result_id,
         a.cruise_id,
+        a.cruise_name,
         a.cruise_type,
         a.result_desc,
         a.result_num,
@@ -183,23 +191,24 @@
         a.remark
         from t_cruise_data_result a
         where 1 = 1
-        <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
-        <if test="cruiseResultId != null and cruiseResultId != ''">a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
-        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
-        <if test="cruiseType != null">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
-        <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
-        <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
-        <if test="modifyNum != null and modifyNum != ''">a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
-        <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
-        <if test="personCheck != null and personCheck != ''">a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
-        <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
-        <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="evaluationState != null">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
-        <if test="identifyState != null">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
-        <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
-        <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
+        <if test="cruiseResultId != null and cruiseResultId != ''">and a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR},</if>
+        <if test="cruiseId != null and cruiseId != ''">and a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="cruiseName != null and cruiseName != ''">and a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
+        <if test="cruiseType != null">and a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        <if test="resultDesc != null and resultDesc != ''">and a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
+        <if test="resultNum != null and resultNum != ''">and a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
+        <if test="modifyNum != null and modifyNum != ''">and a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picpath != null and picpath != ''">and a.picpath = #{picpath, jdbcType=VARCHAR},</if>
+        <if test="personCheck != null and personCheck != ''">and a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
+        <if test="origpic != null and origpic != ''">and a.origpic = #{origpic, jdbcType=VARCHAR},</if>
+        <if test="cruiseAbnormal != null">and a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null">and a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="identifyState != null">and a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
+        <if test="identifyResult != null">and a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        <if test="createtime != null and createtime != ''">and a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
@@ -207,6 +216,7 @@
             cruise_data_id,
             cruise_result_id,
             cruise_id,
+            cruise_name,
             cruise_type,
             result_desc,
             result_num,
@@ -227,6 +237,7 @@
                 #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
                 #{TCruiseDataResult.cruiseResultId, jdbcType=VARCHAR},
                 #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseName, jdbcType=VARCHAR},
                 #{TCruiseDataResult.cruiseType, jdbcType=INTEGER},
                 #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
                 #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},

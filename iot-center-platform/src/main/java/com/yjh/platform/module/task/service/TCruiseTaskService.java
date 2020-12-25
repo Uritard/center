@@ -508,6 +508,9 @@ public class TCruiseTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId) {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+        if(tCruiseResult.getCState() == 240){
+            return 1;
+        }
         tCruiseResult.setCState(239);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         //模板图片路径

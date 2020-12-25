@@ -32,6 +32,8 @@ public class TCruiseDataResult implements Serializable {
 
     private Long cruiseId;
 
+    private String cruiseName;
+
     @ApiModelProperty(value = "巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹")
     private Integer cruiseType;
 

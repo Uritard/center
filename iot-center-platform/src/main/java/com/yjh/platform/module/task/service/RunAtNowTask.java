@@ -384,6 +384,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseDataResultDao.insert(tCruiseDataResult);
                         tCruiseTaskResultDetail.setCruiseStatus(254);
                         tCruiseTaskResultDetail.setEndTime(new Date());
+                        tCruiseTaskResultDetail.setCruiseTime(date);
                         tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
 
                          tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
@@ -485,6 +486,7 @@ public class RunAtNowTask implements Runnable{
                             tCruiseDataResultDao.insert(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(252);
                             tCruiseTaskResultDetail.setEndTime(new Date());
+                            tCruiseTaskResultDetail.setCruiseTime(date);
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
 
                              tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
