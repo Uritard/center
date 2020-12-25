@@ -30,6 +30,9 @@ public class TCruiseResult implements Serializable {
     @ApiModelProperty(value = "巡检任务ID")
     private String taskId;
 
+    @ApiModelProperty(value = "巡检任务名称")
+    private String taskName;
+
     @ApiModelProperty(value = "区域id")
     private String areaId;
 
@@ -68,9 +71,9 @@ public class TCruiseResult implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "执行时间")
     private Date executeTime;
-/*
+
     @ApiModelProperty(value = "任务编码")
-    private String taskCode;*/
+    private String taskCode;
 
     @ApiModelProperty(value = "备用字段3")
     private String remark;
