@@ -121,6 +121,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 tCruiseTaskResultDetail.setTaskResultId(mapForCruise.get("taskResultId").toString());
                 tCruiseTaskResultDetail.setDeviceId(Long.valueOf(mapForCruise.get("deviceId").toString()));
                 tCruiseTaskResultDetail.setInstanceId(Long.valueOf(mapForCruise.get("instanceId").toString()));
+                tCruiseTaskResultDetail.setInstanceName(mapForCruise.get("instanceName"));
+                tCruiseTaskResultDetail.setDeviceName(mapForCruise.get("deviceName"));
                 if(mapForCruise.get("cruiseTime").equals("null")){
                     tCruiseTaskResultDetail.setCruiseTime(new Date());
                     mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
@@ -145,6 +147,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 tCruiseDataResult.setCruiseType(Integer.valueOf(mapForCruise.get("cruiseType").toString()));
                 //tCruiseDataResult.setModifyNum(mapForCruise.get("modifyNum").toString());
                 tCruiseDataResult.setOrigpic(mapForCruise.get("origpic").toString());
+                tCruiseDataResult.setCruiseName(mapForCruise.get("cruiseName"));
                 tCruiseDataResult.setEvaluationState(257);
                 tCruiseDataResult.setCruiseResult(Integer.valueOf(mapForCruise.get("cruiseResult").toString()));
                 if (mapForCruise.get("cruiseAbnormal").toString().equals("--") || mapForCruise.get("cruiseAbnormal").toString().equals("null")) {

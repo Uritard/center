@@ -40,10 +40,12 @@ public class TCameraPresetService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long presetId) {
         List<Long> instanceIdList = tCameraPresetDao.selectInstanceIdList(presetId);
-        tCameraPresetDao.deleteInstance(instanceIdList);//tcpi
-        tCameraPresetDao.deletePlanInstance(instanceIdList);//tcplan
-        tCameraPresetDao.deletePointInstance(instanceIdList);//tcpattr
-        tAlgorithmConfDao.deleteByPrimaryId(presetId);//tac
+        if(instanceIdList != null && instanceIdList.size() >0){
+            tCameraPresetDao.deleteInstance(instanceIdList);//tcpi
+            tCameraPresetDao.deletePlanInstance(instanceIdList);//tcplan
+            tCameraPresetDao.deletePointInstance(instanceIdList);//tcpattr
+            tAlgorithmConfDao.deleteByPrimaryId(presetId);//tac
+        }
         return this.tCameraPresetDao.deleteByPrimaryId(presetId);
     }
 

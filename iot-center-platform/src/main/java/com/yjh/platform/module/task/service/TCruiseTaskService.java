@@ -590,6 +590,7 @@ public class TCruiseTaskService {
         TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
         tCruiseTaskResult.setTaskResultId(uuid);
         tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+        tCruiseTaskResult.setTaskName(tCruiseTask.getTaskName());
         tCruiseTaskResult.setTaskAbnormal(abnormal);
         tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
         tCruiseTaskResult.setCruiseTaskTime(format.parse(mapForGet.get("taskStart")));
