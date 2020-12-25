@@ -30,7 +30,7 @@
     <sql id="TongYong">
         a.task_result_id,
         a.task_id,
-        b.task_name,
+        a.task_name,
         a.c_type,
         d.dict_note as plan_type,
         a.c_state,
@@ -210,12 +210,11 @@
         select distinct <include refid="TongYong"></include>
         FROM t_cruise_result a
         LEFT JOIN t_dict_business d ON a.c_type = d.dict_code
-        LEFT JOIN t_cruise_task b ON a.task_id = b.task_id
         LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
         LEFT JOIN t_cruise_task_result f ON a.task_result_id = f.task_result_id
         LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
         where 1 = 1
-        <if test="taskName != null and taskName != ''">and b.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
+        <if test="taskName != null and taskName != ''">and a.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
         <if test="cType != null and cType != -1">and a.c_type = #{cType, jdbcType=INTEGER}</if>
         <if test="cState != null and cState != -1">and a.c_state = #{cState, jdbcType=INTEGER}</if>
         and a.c_state != 239 and a.c_state != 241 and e.col_name='task_state'
@@ -227,12 +226,10 @@
         SELECT
         a.task_id,
         b.device_id,
-        d.device_name,
+        b.device_name,
         g.cruise_data_id,
         g.cruise_result_id,
         b.instance_id,
-        e.cruise_id,
-        e.custom_id,
         b.cruise_time,
         f.real_code,
         g.cruise_type,
@@ -250,31 +247,20 @@
         g.identify_result,
         g.identify_state,
         g.person_check,
-        (CASE
-        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
-        WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
-        WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
-        WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
-        WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
-        WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
-        END) AS instance_name
+        b.instance_name
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
-        LEFT JOIN t_std_device d ON b.device_id = d.device_id and d.custom_id = e.custom_id
         LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
         LEFT JOIN t_cruise_data_result g on g.cruise_result_id = b.cruise_result_id
         LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type
         LEFT JOIN t_dict_business i on i.dict_code = g.evaluation_state
         LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result
-        LEFT JOIN t_camera_preset k ON e.cruise_id = k.preset_id
-        LEFT JOIN t_robot_inspection m ON m.inspection_id = e.cruise_id
-        LEFT JOIN t_std_devicemete n ON n.device_mete_id = e.device_mete_id
         LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
-        <if test="deviceName != null and deviceName != ''"> and d.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
+        <if test="deviceName != null and deviceName != ''"> and b.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
 
         <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 

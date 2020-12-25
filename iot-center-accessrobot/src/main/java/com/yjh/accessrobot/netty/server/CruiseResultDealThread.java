@@ -106,17 +106,21 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("cruiseStatus","252");
 
-                    tCruiseTaskResultMap.put("cruiseType","228");
+//                    tCruiseTaskResultMap.put("cruiseType","228");
 
 
                     if (!"".equals(cruiseResultMap.get("value"))){
                         tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
                         tCruiseTaskResultMap.put("cruiseResult","246");//正常
                         tCruiseTaskResultMap.put("cruiseAbnormal","null");
+                        normal = normal + 1;
+                        log.info("这次变化的normal是==="+normal);
                     }else {
                         tCruiseTaskResultMap.put("resultNum","--");
                         tCruiseTaskResultMap.put("cruiseResult","247");//异常
                         tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
+                        abnormal = abnormal + 1;
+                        log.info("这次变化的abnormal是==="+abnormal);
                     }
                     if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
                         tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
@@ -234,13 +238,6 @@ public class CruiseResultDealThread implements Runnable{
                         }
                         tCDRList.add(tCruiseDataResult);
 
-                        if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
-                            normal = normal + 1;
-                            log.info("这次变化的normal是==="+normal);
-                        }else if ("250".equals(redisInfoMap.get("cruiseAbnormal"))){
-                            abnormal = abnormal + 1;
-                            log.info("这次变化的abnormal是==="+abnormal);
-                        }
                     }
                 }
                 log.info("准备更新的abnormal是===" + abnormal);

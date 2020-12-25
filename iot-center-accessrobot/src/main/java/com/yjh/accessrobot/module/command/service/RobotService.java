@@ -491,63 +491,6 @@ public class RobotService {
         TCruiseResult tCruiseResult = selectTaskResultId(taskId);
         log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
 
-        /*TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(taskId);//获取任务
-        if (cState == 242){
-            TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
-                    .setTaskId(tCruiseResult.getTaskId())
-                    .setTaskAlarm(0)
-                    .setTaskAbnormal(abnormal)
-                    .setRunExecute(String.valueOf(tCruiseTask.getIfRun()))
-                    .setCruiseTaskTime(tCruiseResult.getCreateTime())
-                    .setTaskResultId(tCruiseResult.getTaskResultId());
-            log.info("tCruiseTaskResult的内容是==="+tCruiseTaskResult);
-            //插TCTR表
-            StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
-
-            for (String instanceId : instanceIdList) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + instanceId);
-                TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
-                        .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                        .setTaskResultId(redisInfoMap.get("taskResultId"))
-                        .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
-                        .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
-                        .setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
-                tCTRDList.add(tCruiseTaskResultDetail);
-                instancedList.add(Long.valueOf(redisInfoMap.get("instanceId")));
-
-                TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
-                        .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                        .setCruiseId(Long.valueOf(redisInfoMap.get("instanceId")))
-                        .setCruiseType(228)//机器人
-                        .setPicpath(redisInfoMap.get("picpath"))
-                        .setOrigpic(redisInfoMap.get("origpic"))
-                        .setIsWarn(0)
-                        .setEvaluationState(257)
-                        .setCreatetime(new Date())
-                        .setCruiseResult();
-                if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
-                    tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
-                } else {
-                    tCruiseDataResult.setCruiseAbnormal(null);
-                }
-                if (!"--".equals(redisInfoMap.get("resultNum"))) {
-                    tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
-                } else {
-                    tCruiseDataResult.setResultNum(null);
-                }
-                tCDRList.add(tCruiseDataResult);
-
-            }
-            log.info("tCTRDList的内容是===" + tCTRDList);
-            log.info("tCDRList的内容是===" + tCDRList);
-            //批量插入TCTRD库
-            int res3 = batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
-            log.info("res3的内容是===" + res3);
-            //批量插入TCDR库
-            int res4 = batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
-            log.info("res4的内容是===" + res4);
-        }*/
-
         Integer taskWait = totalCheckPoint - normal - abnormal;
         log.info("taskWait的值是=="+ taskWait);
         tCruiseResult.setTaskWait(taskWait);//待测点数
