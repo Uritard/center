@@ -157,14 +157,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        ctx.close().sync();
 //        ctx.flush();
     }
-    //数组倒序
-    public static byte[] reserve( byte[] arr ){
-        byte[] arr1 = new byte[arr.length];
-        for( int x=0;x<arr.length;x++ ){
-            arr1[x] = arr[arr.length-x-1];
-        }
-        return arr1 ;
-    }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //接收机器人发送的指令
@@ -178,63 +170,18 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
-        lookByte(bytes);//看指令
-////
-
-//        System.arraycopy(bytes,bytes.length-2,endIdentifierByte,0,2);
-//        StringBuilder endStr = new StringBuilder();
-//        for (byte byteitem : endIdentifierByte) {
-//            endStr.append(String.format("%02x ", byteitem));
-//        }
-//        if ("eb 90".equals(startStr.toString()) ){
-//            System.arraycopy(bytes,19,xmlByteLengthByte,0,4);
-//            long xmlByteLength2 = PlatformPacketUtil.reserve(xmlByteLengthByte);//xml的字节长度
-//            log.info("xml的字节长度为："+xmlByteLength2);
-//            long len = 2+8+8+1+4+xmlByteLength2+2;
-//            byte[] total = new byte[(int)len];
-//            System.arraycopy(bytes,0,total,0,(int)len);
-//            byte[] shengYu = new byte[bytes.length-total.length];
-//            System.arraycopy(bytes,(int)len,shengYu,0,bytes.length-total.length);
-//        }else {
-//        int xmlByteLength = ByteUtil.bytes2Int(xmlByteLengthByte);
-//        long xmlByteLength4 = PlatformPacketUtil.bytesToLong(sendSessionIdByte);
-//        log.info("xml的字节长度为:"+xmlByteLength);
-//        byte[] xmlByte = new byte[(int)xmlByteLength];//xml的内容
-//        System.arraycopy(bytes,23,xmlByte,0,(int)xmlByteLength);
-//        StringBuilder Str1 = new StringBuilder();
-//        for (byte byteitem : bytes) {
-//            Str1.append(String.format("%02x ", byteitem));
-//        }
-//        log.info("发送的xml内容指令是<start>" + Str1 + "<end>");
-//        int flag = 0;
-//        String bodyTem = null;
-//        if (flag == 0) {
-//            bodyTem = body.substring(22);//21,60
-//            flag++;
-//        } else {
-//            bodyTem = body;
-//        }
-//        String xmlContext = null;
-//        String bdy = bodyTem.replace("</Robot>", "</Robot>flag");
-//        String[] res = bdy.split("flag");
-//        for (int i = 0; i < res.length; i++) {
-//            log.info("截取的内容是:" + res[i]);
-//            if (res[i].startsWith("<?xml") && res[i].endsWith("</Robot>")) {
-//                xmlContext = res[i];
-//                log.info("处理过的xml是|" + xmlContext + "|");
-//                zuoJueDing(bytes,xmlContext);
-//            }
-//        }
-
+//        lookByte(bytes);//看指令
 
         String body = new String(bytes, "UTF-8");
+        String bodyTem = body.substring(21);
 
         log.info("还没处理的Packet="+Packet);
 //        String zzbds = "^(?:(?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[\\W].*))[\\W0-9A-Za-z]{0,}$";
-//        if (!Packet.matches(zzbds)){
-//            Packet = "";
-//        }
-//        log.info("处理过的Packet="+Packet);
+        String zzbds ="^.*<?xml.*";
+        if (!Packet.matches(zzbds)){
+            Packet = "";
+        }
+        log.info("处理过的Packet="+Packet);
 
         log.info("机器人发来的内容="+body);
         String temporaryBody = Packet + body ;//临时
@@ -316,8 +263,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * */
     private void handlingMethod(byte[] bytes,String parameter)throws Exception {
 //        if (null != parameter) {
-//            log.info("Packet+机器人发来的内容总和=：" + parameter);
 
+//            log.info("Packet+机器人发来的内容总和=：" + parameter);
             String hua = null;
 
             if (parameter.contains("开始") || parameter.contains("结束")) {
@@ -334,11 +281,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 wanZheng = matcher1.group();
 //                log.info("匹配到一个完整包的内容=" + wanZheng);
                 stringToXml(bytes, wanZheng);
-//                if (null != parameter) {
                 shengYu = parameter.replace(wanZheng, "");
-//                log.info("除去一个完整包剩余的=" + shengYu);
                 handlingMethod(bytes, shengYu);
-//                }
             } else {
                 Packet = parameter;
 //                log.info("不足一个完整的包：" + Packet);
@@ -398,12 +342,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
 //                    log.info("生成的注册xml是<start>" + registerXmlString + "<end>");
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
-
-//                    StringBuilder Str = new StringBuilder();
-//                    for (byte byteitem : registerProtocol) {
-//                        Str.append(String.format("%02x ", byteitem));
-//                    }
-//                    log.info("发送给机器人的注册指令是<start>" + Str + "<end>");
                     SendHeartBeat(registerProtocol);
                     //启动线程
 //                    DataDealThread dataDealThread = new DataDealThread(this, isThreadStart);
@@ -418,12 +356,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
 //                    log.info("生成的心跳xml是<start>" + heartXmlString + "<end>");
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
-
-//                    StringBuilder Str2 = new StringBuilder();
-//                    for (byte byteitem : heartProtocol) {
-//                        Str2.append(String.format("%02x ", byteitem));
-//                    }
-//                    log.info("发送给机器人的心跳指令是<start>" + Str2 + "<end>");
                     send(ctx, heartProtocol);
                     break;
                 //模型同步指令and任务控制指令(接收响应)
