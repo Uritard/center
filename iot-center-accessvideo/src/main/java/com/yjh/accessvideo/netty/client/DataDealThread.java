@@ -478,7 +478,9 @@ public class DataDealThread implements Runnable {
                         tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
                         tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
                         tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
+                        tCruiseTaskResultDetail.setDeviceName(cruiseWorkedMap.get("deviceName").toString());
                         tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                        tCruiseTaskResultDetail.setInstanceName(cruiseWorkedMap.get("instanceName").toString());
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
                         tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
@@ -491,6 +493,7 @@ public class DataDealThread implements Runnable {
                         log.info("TCRDR开始");
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                         tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
+                        tCruiseDataResult.setCruiseName(cruiseWorkedMap.get("cruiseName").toString());
                         tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
                         tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
                         tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
@@ -606,6 +609,7 @@ public class DataDealThread implements Runnable {
                         TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
                         tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
                         tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
+                        tCruiseTaskResult.setTaskName(cruiseResult.get("taskName").toString());
                         tCruiseTaskResult.setTaskAbnormal(tAbnormal);
                         tCruiseTaskResult.setTaskAlarm(0);
                         tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());

@@ -27,6 +27,8 @@ public class TCruiseTaskResult implements Serializable {
     @ApiModelProperty(value = "巡检任务ID")
     private String taskId;
 
+    private String taskName;
+
     @ApiModelProperty(value = "异常数量")
     private Integer taskAbnormal;
 
