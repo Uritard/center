@@ -169,7 +169,10 @@ public class AnalyseDataOperateService {
             if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") ) { //拆包A
                 if(body.contains("\"msgType\": \"4\"") || body.contains("\"msgType\":\"4\"")){
                     usefulBody="";
-                }else {
+                }else if(body.contains("\"msgType\":\"6\"")){
+                    usefulBody=body;
+                }
+                else {
                     redisTemplate.opsForHash().put("algoResponse", "A", body);
                     log.info("获取上半包数据");
                     usefulBody="";
