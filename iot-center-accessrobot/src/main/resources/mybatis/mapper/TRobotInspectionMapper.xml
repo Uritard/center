@@ -160,6 +160,14 @@
     <delete id="deleteAllData">
         DELETE FROM t_robot_inspection
     </delete>
+    <select id="selectAllByRobotId" resultType="java.lang.String">
+        SELECT
+            a.inspection_code
+        FROM
+            t_robot_inspection a
+        WHERE 1 = 1
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+    </select>
 
     <insert id="batchInsert">
         insert into t_robot_inspection(

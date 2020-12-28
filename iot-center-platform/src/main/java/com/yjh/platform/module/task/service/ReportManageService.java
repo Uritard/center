@@ -30,7 +30,9 @@ public class ReportManageService {
     private Logger log = LoggerFactory.getLogger(ReportManageService.class);
     @Autowired
     private ReportManageDao reportManageDao;
+    @Autowired
     private RedisTemplate redisTemplate;
+
     private DateTimeUtil dateTimeUtil;
     @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
     @Transactional(rollbackFor = Exception.class)

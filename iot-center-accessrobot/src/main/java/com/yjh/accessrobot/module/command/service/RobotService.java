@@ -164,8 +164,19 @@ public class RobotService {
             deviceList.add(tRobotInspection);
         }
         log.info("获得的deviceList是："+deviceList);
+
+        /*List<String> inspectionCodeList = new ArrayList<>();
+        for (TRobotInspection trI : deviceList){
+            inspectionCodeList.add(trI.getInspectionCode());
+        }*/
         //测点数据入库前先清空原来的数据
         tRobotInspectionDao.deleteAllData();
+        //保留之前的数据，将重复的点去除，加入新增的点
+        List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);//该机器人现有的巡检点
+
+        /*List<String> diffList = new ArrayList<>();
+        log.info("最后要插库的list是==="+diffList);*/
+
         int res2 = tRobotInspectionDao.batchInsert(deviceList);
         return res2;
     }

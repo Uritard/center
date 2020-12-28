@@ -33,4 +33,5 @@ public interface TRobotInspectionDao {
 
     int batchInsert(List<TRobotInspection> list);
     int deleteAllData();
+    List<String> selectAllByRobotId(@Param(value = "robotId") Long robotId);
 }
