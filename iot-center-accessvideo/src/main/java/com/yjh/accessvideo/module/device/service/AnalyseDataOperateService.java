@@ -158,7 +158,9 @@ public class AnalyseDataOperateService {
 
     public String nonUnpacking(String body) {
         log.info("body:"+body);
+        body=body.replaceAll("\\s++","");
         String usefulBody=body;
+        log.info("content-length:"+body.length());
         if (body.matches("\\{\"msgData.*?\"2\"}")) { //表计整包
             log.info("整包数据1");
         } else if (body.matches("\\{\"msgType.*?}}}}")) { //缺陷整包

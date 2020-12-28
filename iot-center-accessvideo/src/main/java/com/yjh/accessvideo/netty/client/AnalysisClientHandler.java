@@ -131,6 +131,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     }
 
 //    private void handlerData(String body) throws ParseException, InterruptedException {
+//          analyseDataOperateService.nonUnpacking(body);
+//    }
 //        //TODO 添加线程池
 //        String remoteAdds = ctx.channel().remoteAddress().toString();
 //        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
