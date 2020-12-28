@@ -120,7 +120,12 @@ public class TWarnInfoService{
     @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据设备类型统计告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfoDetail> countByDeviceType(){
-        List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType();
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        String firstTime1 = monthDates.get(0);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType(startTime,endTime);
         System.out.println("tjContentInfoList是："+tjContentInfoList);
         return tjContentInfoList;
     }
@@ -174,10 +179,15 @@ public class TWarnInfoService{
         });
         return list;
     }
-    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警处理状态统计告警个数")
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警处理状态统计告警个数-近一月")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countWarnConfMode() {
-        Map<String, Integer> map = tWarnInfoDao.countWarnConfMode();
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        String firstTime1 = monthDates.get(0);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        Map<String, Integer> map = tWarnInfoDao.countWarnConfMode(startTime,endTime);
         List<TJContentInfo> tjContentInfoList = new ArrayList<>();
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {

@@ -128,80 +128,6 @@ public class ReportManageService {
         log.info("filePath:"+filePath);
         return filePath;
     }
-//    @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
-//    @Transactional(rollbackFor = Exception.class)
-//    public List<TReportInfo> reportSelect(String queryStr,String startTime,String endTime,String reportPath) {
-//        HashMap<String, Object> map = new HashMap<>();
-//        List<TReportInfo> fileNameList = new ArrayList<>();//文件名列表
-//        List<String> folderNameList = new ArrayList<>();//文件夹名列表
-//
-//        String startTimeTemp = DateTimeUtil.changeTime2(startTime);//yyyyMMddHHmmss
-//        String endTimeTemp = DateTimeUtil.changeTime2(endTime);//yyyyMMddHHmmss
-//
-//        String folderPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-////        File f = new File(reportPath+"/");
-//        File f = new File(reportPath);
-//
-//
-//        if (!f.exists()) { //路径不存在
-//            map.put("retType", "1");
-//        }else{
-//            boolean flag = f.isDirectory();
-//            if(flag==false){ //路径为文件
-//                map.put("retType", "2");
-//                map.put("fileName", f.getName());
-//            }else{ //路径为文件夹
-//                map.put("retType", "3");
-//                File fa[] = f.listFiles();
-//                queryStr = queryStr==null ? "" : queryStr;//若queryStr传入为null,则替换为空（indexOf匹配值不能为null）
-//                for (int i = 0; i < fa.length; i++) {
-//                    File fs = fa[i];
-//                    if(fs.getName().indexOf(queryStr) != -1){
-//                        if (fs.isDirectory()) {
-//                            folderNameList.add(fs.getName());
-//                        } else {
-//                            TReportInfo reportForms = new TReportInfo();
-//                            String fileName = fs.getName();
-//                            String str[] = fileName.substring(0,fileName.length()-5).split("-");//根据-分割文件名
-//                            String rName = str[0];
-//                            String rDate = str[1];
-//                            String rType = str[2];
-//                            //没有时间过滤
-//                            if (startTimeTemp == "" && endTimeTemp==""){
-//                                reportForms.setReportName(rName);
-//                                String time2 = DateTimeUtil.changeTime1(rDate);
-////                                reportForms.setGenerateDate(time2);
-//                                reportForms.setReportType(rType);
-//                                fileNameList.add(reportForms);
-//                            }else {
-//                                //时间过滤
-//                                long tTime1 = Long.parseLong(rDate);
-//                                long tTime2 = Long.parseLong(startTimeTemp);
-//                                long tTime3 = Long.parseLong(endTimeTemp);
-//                                if (tTime1 >= tTime2 && tTime1 <= tTime3){
-//                                    reportForms.setReportName(rName);
-//                                    String time2 = DateTimeUtil.changeTime1(rDate);
-////                                    reportForms.setGenerateDate(time2);
-//                                    reportForms.setReportType(rType);
-//                                    fileNameList.add(reportForms);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                map.put("fileNameList", fileNameList);
-//                map.put("folderNameList", folderNameList);
-//            }
-//        }
-//        log.info("<----------map--------->的值为："+map);
-//        log.info("fileNameList是："+fileNameList);
-//        HashMap<String, Object> selectMap = new HashMap<>();
-//        selectMap.put("reportName",queryStr);
-//        selectMap.put("startTime",startTime);
-//        selectMap.put("endTime",endTime);
-//        List<TReportInfo> fileList = reportManageDao.reportSelect(selectMap);
-//        return fileList;
-//    }
     @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TReportInfo> reportSelect(String reportName,String startTime,String endTime){
@@ -318,26 +244,26 @@ public class ReportManageService {
         String taskName = recordData.getTaskVO().getTaskName();
         String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
         String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
-//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/temporaryFiles/";
-        File temporaryFile = new File(temporaryPath);
-        String reportPath2 = null;
-        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
-        {
-            System.out.println("不存在");
-            temporaryFile.mkdir();
-            reportPath2 = temporaryPath+"/"+reportName;
+//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+//        File temporaryFile = new File(temporaryPath);
+//        String reportPath2 = null;
+//        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
+//        {
+//            temporaryFile.mkdir();
+//            reportPath2 = temporaryPath+"/"+reportName;
+//            log.info("不存在，创建的文件路径是==="+reportPath2);
+//            File file = new File(reportPath2);
+//            ContentData contentData = ReportDataRepo.getData(recordData);
+//            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+//                    contentData.getElements(), file);
+//        }else {
+            String reportPath2 = temporaryPath+"/"+reportName;
+            log.info("存在，该文件路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
-        }else {
-            System.out.println("存在");
-            reportPath2 = temporaryPath+"/"+reportName;
-            File file = new File(reportPath2);
-            ContentData contentData = ReportDataRepo.getData(recordData);
-            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                    contentData.getElements(), file);
-        }
+//        }
         return reportPath2;
     }
 }

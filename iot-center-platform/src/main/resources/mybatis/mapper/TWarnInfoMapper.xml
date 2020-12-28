@@ -477,7 +477,9 @@
             (select COUNT(*)
                 from t_std_device a,t_warn_info b
                 where a.device_id = b.device_id
+                and a.custom_id = b.cunstom_id
                 and device_type = dict_code
+                and b.warn_time BETWEEN #{startTime} and #{endTime}
             ) as c_ount
         from t_dict_business
         where dict_code in
@@ -499,19 +501,6 @@
         a.warn_time
         from t_warn_info a
         where 1=1
-
-        union all(
-        select
-        f.alarm_time
-        from t_robot_alarm f
-        where 1=1
-
-        )union all(
-        select
-        h.alarm_time
-        from  t_camera_alarm h
-        where 1=1
-        )
         ) AS Time
         WHERE
         period_diff( date_format( now( ) , '%Y-%m-%d %H:%i:%S' ) , date_format( warn_time, '%Y-%m-%d %H:%i:%S' ) ) =0
@@ -523,16 +512,14 @@
     <!--根据告警处理状态统计告警个数-->
     <select id="countWarnConfMode" resultType="java.util.Map">
         SELECT
-            a.processed+b.processed+d.processed as '已处理',
-            e.untreated+f.untreated+g.untreated as '未处理'
+            a.processed as '已处理',
+            e.untreated as '未处理'
         FROM
         (
-            (select count(conf_mode = 275 or null) as processed from t_warn_info ) a,
-            (select count(alarm_state = 275 or null) as processed from t_robot_alarm ) b,
-            (select count(alarm_state = 275 or null) as processed from t_camera_alarm) d,
-            (select count(conf_mode = 276 or null) as untreated from t_warn_info ) e,
-            (select count(alarm_state = 276 or null) as untreated from t_robot_alarm ) f,
-            (select count(alarm_state = 276 or null) as untreated from t_camera_alarm) g
+            (select count(conf_mode = 275 or null) as processed from t_warn_info
+                where warn_time between #{startTime} and #{endTime}) a,
+            (select count(conf_mode = 276 or null) as untreated from t_warn_info
+                where warn_time between #{startTime} and #{endTime}) e
         )
     </select>
     <!--查看告警处理情况-->
