@@ -9,6 +9,7 @@ import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class ReportManageService {
     private Logger log = LoggerFactory.getLogger(ReportManageService.class);
     @Autowired
     private ReportManageDao reportManageDao;
+    private RedisTemplate redisTemplate;
     private DateTimeUtil dateTimeUtil;
     @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
     @Transactional(rollbackFor = Exception.class)
@@ -231,39 +233,39 @@ public class ReportManageService {
         //2.分项预览
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
         recordData.setCpTypeItems(cpTypeItems);
-        //3.环境监测-暂无
-//        List<EnvironmentResult> evnRecordList = new ArrayList<>();
-//        recordData.setEvnRecordList(evnRecordList);
-//        //4.关联设备-暂无
-//        List<RelationDevice> rcpRecordList = new ArrayList<>();
-//        recordData.setRcpRecordList(rcpRecordList);
         //5.明细-所选设备的所有测点巡检结果详情
 
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         recordData.setTCDRDList(tCDRDList);
-        String taskName = recordData.getTaskVO().getTaskName();
-        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
-        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
+//        String taskName = recordData.getTaskVO().getTaskName();
+//        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
+//        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
+        String reportName =  taskId + ".xlsx";//报表名称
+
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
-//        File temporaryFile = new File(temporaryPath);
-//        String reportPath2 = null;
-//        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
-//        {
-//            temporaryFile.mkdir();
-//            reportPath2 = temporaryPath+"/"+reportName;
-//            log.info("不存在，创建的文件路径是==="+reportPath2);
-//            File file = new File(reportPath2);
-//            ContentData contentData = ReportDataRepo.getData(recordData);
-//            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-//                    contentData.getElements(), file);
-//        }else {
-            String reportPath2 = temporaryPath+"/"+reportName;
-            log.info("存在，该文件路径是==="+reportPath2);
+        File temporaryFile = new File(temporaryPath);
+        String reportPath2 = null;
+        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
+        {
+            temporaryFile.mkdir();
+            reportPath2 = temporaryPath+"/"+reportName;
+            log.info("不存在，创建的文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
-//        }
-        return reportPath2;
+        }else {
+            reportPath2 = temporaryPath+"/"+reportName;
+            log.info("存在，该文件绝对路径是==="+reportPath2);
+            File file = new File(reportPath2);
+            ContentData contentData = ReportDataRepo.getData(recordData);
+            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+                    contentData.getElements(), file);
+        }
+        //从缓存中获取系统参数
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        String fileRelativePath = map.get("content") + "/" + reportName;
+        log.info("该文件相对路径是==="+fileRelativePath);
+        return fileRelativePath;
     }
 }
