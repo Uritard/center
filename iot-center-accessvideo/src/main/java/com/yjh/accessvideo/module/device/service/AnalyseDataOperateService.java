@@ -4,9 +4,11 @@ package com.yjh.accessvideo.module.device.service;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.commons.logs.Logs;
+import net.bytebuddy.asm.Advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,9 @@ import java.util.Set;
 public class AnalyseDataOperateService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
@@ -148,6 +153,60 @@ public class AnalyseDataOperateService {
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertDefectInfo(List<TDefectInfo> list) {
         return this.analyseDataOperateDao.batchInsertDefectInfo(list);
+    }
+
+
+    public String nonUnpacking(String body) {
+        String usefulBody="";
+        if (body.matches("\\{\"msgData.*?\"2\"}")) { //表计整包
+            log.info("整包数据1");
+            usefulBody=body;
+        } else if (body.matches("\\{\"msgType.*?}}}}")) { //缺陷整包
+            log.info("整包数据2");
+            usefulBody=body;
+        } else { //拆包
+            if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) { //拆包A
+                redisTemplate.opsForHash().put("algoResponse", "A", body);
+                log.info("获取上半包数据");
+            } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) { //拆包B
+                redisTemplate.opsForHash().put("algoResponse", "B", body);
+                usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body);
+//                redisTemplate.delete("algoResponse");
+                log.info("success:" + usefulBody);
+            }
+        }
+        return usefulBody;
+
+    }
+
+
+    @Logs(title = "告警配置判断")
+    @Transactional(rollbackFor = Exception.class)
+    public int warnSettings(Integer alarmState,
+                            Float highLimit1,
+                            Float lowLimit1,
+                            Float highLimit2,
+                            Float lowLimit2,
+                            Float highLimit3,
+                            Float lowLimit3,
+                            Float highLimit4,
+                            Float lowLimit4) {
+        Set<Float> alarmMeter = new HashSet<>();
+        alarmMeter.add(highLimit1);
+        alarmMeter.add(lowLimit1);
+        alarmMeter.add(highLimit2);
+        alarmMeter.add(lowLimit2);
+        alarmMeter.add(highLimit3);
+        alarmMeter.add(lowLimit3);
+        alarmMeter.add(highLimit4);
+        alarmMeter.add(lowLimit4);
+        alarmMeter.remove(null);
+        if (Objects.nonNull(alarmState) || alarmMeter.size() > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+
     }
 
 

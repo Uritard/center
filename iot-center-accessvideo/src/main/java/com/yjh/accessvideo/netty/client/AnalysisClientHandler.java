@@ -134,7 +134,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //        //TODO 添加线程池
 //        String remoteAdds = ctx.channel().remoteAddress().toString();
 //        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
-//        JSONObject jsonObject = JSON.parseObject(body);
+//        String usefulBody=body.replaceAll("\\{.*?\\}\\{","{");
+//        JSONObject jsonObject = JSON.parseObject(usefulBody);
 //        log.info("JSON对象1：" + jsonObject);
 //        if (jsonObject.get("msgType").toString().equals("2")) {
 //            JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
@@ -146,6 +147,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //                JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
 //                log.info("数据****：" + jsonObjectResult);//打印resultInfo
 //                //初始化TASKID和INSTANCEID
+//            }
+//        }
+//    }
 //
 //                TASKID = jsonObjectResult.get("taskId").toString();
 //                INSTANCEID = jsonObjectResult.get("instanceId").toString();
@@ -616,6 +620,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         // 发送json字符串
         String registerMsg = "{\n\"msgType\": \"3\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\",\n\"registerKey\": \"yijiahe\"\n}\n}\n";
         sendString(ctx, registerMsg);
+
+        String faker="{\"msgType\":\"1\",\"msgID\":\"100000003\",\"msgData\":{\"data\":{\"pictureInfo1\":{\"instanceId\":\"11000000505\",\"analyseType\":\"3\",\"imagePath\":\"/home/yjh_iot_center/iot-picture/resultImg/251220201017112088835.jpg\",\"modelPath\":\"/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000149\",\"taskId\":\"6d05cd9969d14a22a71c03d7ff10b94a\"}},\"desNode\":\"serverSocket\",\"srcNode\":\"clientSocket001\"}}";
+        sendString(ctx,faker);
         // TODO: 2020/10/22
         //  String registerMsg = "发送假数据";
         //        sendString(ctx, registerMsg);
