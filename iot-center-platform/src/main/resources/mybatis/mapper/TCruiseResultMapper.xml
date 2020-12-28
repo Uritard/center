@@ -224,7 +224,7 @@
 
     <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
         SELECT
-        a.task_id,
+        b.task_result_id,
         b.device_id,
         b.device_name,
         g.cruise_data_id,
@@ -258,7 +258,7 @@
         LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result
         LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal
         WHERE 1 = 1
-        <if test="taskResultId != null and taskResultId != ''">and a.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
+        <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
         <if test="deviceName != null and deviceName != ''"> and b.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
 

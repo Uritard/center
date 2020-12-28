@@ -28,7 +28,7 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "巡视任务结果id")
     private String cruiseResultId;
     @ApiModelProperty(value = "巡检任务id")
-    private String taskId;
+    private String taskResultId;
 
     @ApiModelProperty(value = "设备id")
     private Long deviceId;
