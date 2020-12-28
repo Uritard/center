@@ -554,50 +554,23 @@ public class TCruiseTaskService {
     }
     @Logs(title = "任务终止", code = "TCruiseTask",content = "任务终止")
     @Transactional(rollbackFor = Exception.class)
-    public int taskShutDown(String taskId) throws Exception{
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public int taskShutDown(String taskId) {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
-        tCruiseResult.setCState(242);
-        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
-        //给算法暂停
-        Analysis analysis = new Analysis();
-        analysis.setTaskId(tCruiseTask.getTaskId());
-        analysis.setInstanceId(-1L);
-        List<Analysis> analysisList = new ArrayList<>();
-        analysisList.add(analysis);
-        Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-        analysisMap.put("list",analysisList);
-        log.info("算法信息：    "+analysisMap);
-        analysis(analysisMap);
-        log.info("任务终止"+tCruiseTask.getTaskId());
-
-        //机器人任务终止
-        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-        if(robotCodeList != null && robotCodeList.size()>0){
-            Map<String,Object> robotTaskStatesMap = new HashMap<>();
-            robotTaskStatesMap.put("taskId",taskId);
-            robotTaskStatesMap.put("commandValue",4);
-            robotTaskStatesMap.put("robotCodeList",robotCodeList);
-            robotTaskStates(robotTaskStatesMap);
+        if(tCruiseResult.getCState() == 240){
+            return 1;
         }
-        Thread.sleep(1000);
-
-        //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
-        //任务状态
-        String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
-        Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-        Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
-        TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-        tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
-        tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
-        tCruiseTaskResult.setTaskName(tCruiseTask.getTaskName());
-        tCruiseTaskResult.setTaskAbnormal(abnormal);
-        tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
-        tCruiseTaskResult.setCruiseTaskTime(format.parse(mapForGet.get("taskStart")));
-        tCruiseTaskResult.setTaskStatus(242);
-        tCruiseTaskResult.setCruiseResult(247);
-        tCruiseTaskResultDao.insert(tCruiseTaskResult);
-
+        tCruiseResult.setCState(241);
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        try {
+            QuartzTask quartzTaskForAre = new QuartzTask();
+            quartzTaskForAre.setJobName(tCruiseTask.getTaskName()+"-"+System.currentTimeMillis());
+            quartzTaskForAre.setJobGroup("jiancha");
+            quartzTaskForAre.setStartTime(new Date());
+            JobManager jobManager =new JobManager();
+            jobManager.taskShutDown(quartzTaskForAre, tCruiseTask.getTaskId());
+            log.info("任务终止创建成功");
+        } catch (Exception e) {
+            log.info("任务终止创建失败"+e); }
         return tCruiseResultDao.update(tCruiseResult);
     }
 

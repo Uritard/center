@@ -63,7 +63,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         log.info("tCruiseResult:----"+tCruiseResult);
-        if(tCruiseResult != null && tCruiseResult.getCState() != 239){
+        if(tCruiseResult != null && !(tCruiseResult.getCState() == 239 || tCruiseResult.getCState() == 241 )){
             return;
         }
         //获取任务下的所有的点

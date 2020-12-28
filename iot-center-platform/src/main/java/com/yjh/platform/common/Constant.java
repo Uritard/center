@@ -24,4 +24,6 @@ public class Constant {
 
     public static final String ROBOT_TASK_STATUS_URL = "http://iot-center-accessrobot/robot/v1/taskControl";
 
+    public static final String ALGORITHM_URL ="http://iot-center-accessvideo/analysis/v1/algorithm";
+
 }

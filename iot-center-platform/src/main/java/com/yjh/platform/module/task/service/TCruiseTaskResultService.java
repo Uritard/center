@@ -165,11 +165,11 @@ public class TCruiseTaskResultService {
             cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(cruiseInspectResult.getInstanceId()));
             cruiseInspectResult.setCruiseResultName("--");
             cruiseInspectResult.setEndTime(null);
-            log.info("离谱");
+            //log.info("离谱");
             Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + taskId);
             for (String key : cruiseKeys) {
                 Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
-                log.info("---___---:" + resultMap);
+                //log.info("---___---:" + resultMap);
                 if (resultMap.get("instanceId").toString().equals(cruiseInspectResult.getInstanceId().toString())) {
                     if (resultMap.get("resultNum").toString().equals("") || resultMap.get("resultNum").toString().equals("null")) {
                         cruiseInspectResult.setCruiseResultName("--");
