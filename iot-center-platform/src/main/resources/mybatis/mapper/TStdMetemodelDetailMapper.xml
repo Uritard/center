@@ -249,9 +249,11 @@
         a.alarm_note,
         a.alarm_explain,
         a.alarm_type,
+        k.dict_note as alarmTypeName,
         a.up_effect,
         a.down_effect,
         a.alarm_level,
+        j.dict_note as alarmLevelName,
         a.high_limit1,
         a.low_limit1,
         a.high_limit2,
@@ -281,6 +283,8 @@
         LEFT JOIN t_dict_business e ON d.device_type = e.dict_code
         AND e.col_name = "device_type"
         ) ON a.model_id = d.model_id
+        LEFT JOIN t_dict_business j ON a.alarm_level = j.dict_code
+        LEFT JOIN t_dict_business k ON a.alarm_type = k.dict_code
         where 1=1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
