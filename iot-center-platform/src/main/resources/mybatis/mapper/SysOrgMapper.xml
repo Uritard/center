@@ -153,4 +153,33 @@
                 <if test="orgName != null and orgName != ''"> AND a.org_name LIKE CONCAT('%',#{orgName, jdbcType=VARCHAR},'%')</if>
     </select>
 
+    <select id="selectDownId" resultType="java.lang.Long">
+        SELECT
+        DATA.org_id
+        FROM
+            (
+        SELECT
+            @ids AS _ids,
+            ( SELECT @ids := GROUP_CONCAT( org_id ) FROM sys_org WHERE FIND_IN_SET( up_id, @ids ) ) AS cids,
+            @l := @l + 1 AS LEVEL
+        FROM
+            sys_org,
+            ( SELECT @ids := #{orgId,jdbcType=BIGINT}, @l := 0 ) b
+        WHERE
+            @ids IS NOT NULL
+            ) ID,
+            sys_org DATA WHERE FIND_IN_SET( DATA.org_id, ID._ids )
+        ORDER BY
+            LEVEL,org_id
+    </select>
+
+    <delete id="batchDelete">
+        delete from sys_org
+        where org_id in (
+        <foreach collection="list" item="orgId" separator=",">
+            #{orgId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </delete>
+
 </mapper>

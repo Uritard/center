@@ -582,13 +582,13 @@ public class TCruiseTaskService {
         }
         Thread.sleep(1000);
 
-        String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+        //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
         //任务状态
         String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
         Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
         Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
         TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-        tCruiseTaskResult.setTaskResultId(uuid);
+        tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
         tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
         tCruiseTaskResult.setTaskName(tCruiseTask.getTaskName());
         tCruiseTaskResult.setTaskAbnormal(abnormal);

@@ -34,4 +34,6 @@ public interface SysOrgDao {
 
     List<OrgInfo> selectOrgTree();
     List<OrgInfo> selectOrgTreeByOrgName(@Param(value = "orgName") String orgName);
+    List<Long> selectDownId(@Param(value = "orgId") Long orgId);
+    int batchDelete(@Param(value = "list") List<Long> list);
 }

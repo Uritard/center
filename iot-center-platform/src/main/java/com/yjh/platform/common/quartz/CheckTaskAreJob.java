@@ -217,10 +217,10 @@ public class CheckTaskAreJob extends QuartzJobBean {
         tCruiseResult.setTaskWait(0);
         tCruiseResultDao.update(tCruiseResult);
 
-        String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+        //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
         //任务状态
         TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-        tCruiseTaskResult.setTaskResultId(uuid);
+        tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
         tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
         tCruiseTaskResult.setTaskAbnormal(abnormal);
         tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());

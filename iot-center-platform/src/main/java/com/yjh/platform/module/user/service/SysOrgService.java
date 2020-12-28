@@ -40,7 +40,12 @@ public class SysOrgService{
     @Logs(title = "删除", code = "module", content = "删除组织机构")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long orgId) {
-        return this.sysOrgDao.deleteByPrimaryId(orgId);
+        List<Long> list = sysOrgDao.selectDownId(orgId);
+        if(list != null && list.size() > 0){
+           return sysOrgDao.batchDelete(list);
+        }else {
+            return this.sysOrgDao.deleteByPrimaryId(orgId);
+        }
     }
 
     @Logs(title = "更新", code = "module", content = "更新组织机构")
