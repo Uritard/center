@@ -53,8 +53,10 @@ public interface TWarnInfoDao {
     int batchInsert(List<TWarnInfo> list);
     List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
     Map<String, Integer> countByAlarmSource();
-    List<TJContentInfoDetail>  countByDeviceType();
-    Map<String, Integer> countWarnConfMode();
+    List<TJContentInfoDetail>  countByDeviceType(@Param(value = "startTime")String startTime,
+                                                 @Param(value = "endTime")String endTime);
+    Map<String, Integer> countWarnConfMode(@Param(value = "startTime")String startTime,
+                                           @Param(value = "endTime")String endTime);
     List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
     List<WarnStatistical> countWarnOnMonth(@Param(value = "startTime")String startTime,
                                             @Param(value = "endTime")String endTime);
