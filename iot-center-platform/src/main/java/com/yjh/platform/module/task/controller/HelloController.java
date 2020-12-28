@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -79,7 +80,7 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public Result sayHello(@RequestParam(value = "filePath") String filePath) throws ParseException {
+    public Result sayHello(@RequestParam(value = "filePath") String filePath,@RequestParam String testString)  throws ParseException {
         Result result = new Result();
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
@@ -91,7 +92,75 @@ public class HelloController {
 
         Long endTime=System.currentTimeMillis();
 
-//
+
+        String l1="{\"msgType\": \"4\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"errorCode\": \"0\"}}{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
+        String l3=l1.replaceAll("\\s+","");
+        String l2=l3.replaceAll("\\{.*?\\}\\{","{");
+        log.info("String:"+l2);
+        log.info("String3:"+l3);
+
+
+
+        String meter="{9541}{\"msgData\":{\"data\":{\"resultInfo1\":{\"analyseType\":\"3\",\"instanceId\":\"11000000505\",\"resultValue\":\"--.7--\",\"taskId\":\"6d05cd9969d14a22a71c03d7ff10b94a\"}},\"desNode\":\"clientSocket001\",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000004\",\"msgType\":\"2\"}";
+        String defect="{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
+//        String testString=",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000136\",\"msgType\":\"2\"}\n";
+
+
+
+        log.info("meter:"+meter.replaceAll("\\{\"msgData.*?\"2\"}","hahaha"));
+        log.info("----+++:"+meter.split("\\{\"msgData.*?\"2\"}").length);
+        log.info("defect:"+defect.replaceAll("\\{\"msgType.*?}}}}","123"));
+
+//        log.info("Judge---"+defect.matches("^\\{\"msgType\"+.*?"));
+
+        log.info("Trans1:"+meter.matches("\\{\"msgData.*?\"2\"}"));
+        log.info("Trans2:"+defect.matches("\\{\"msgType.*?}}}}"));
+
+        log.info("Rule1:"+meter.matches("\\{\"msgData.*?"));
+        log.info("Rule2:"+meter.matches(".*?\"2\"}"));
+
+        log.info("result:"+testString.matches(".*?\"2\"}"));
+
+        log.info("testString:"+testString);
+
+
+        String trulyMessage="";
+        if(testString.matches("\\{\"msgData.*?\"2\"}")){ //表计整包
+               log.info("整包数据1");
+        }else if (testString.matches("\\{\"msgType.*?}}}}")){ //缺陷整包
+               log.info("整包数据2");
+        }else { //拆包
+            if(testString.matches("\\{\"msgData.*?") || testString.matches("\\{\"msgType.*?")){ //拆包A
+
+                redisTemplate.opsForHash().put("algoResponse","A",testString);
+                log.info("获取上半包数据");
+            }else if (testString.matches(".*?\"2\"}") || testString.matches(".*?}}}}")){ //拆包B
+
+                redisTemplate.opsForHash().put("algoResponse","B",testString);
+                String success=(redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(testString);
+//                redisTemplate.delete("algoResponse");
+                log.info("success:"+success);
+                trulyMessage=success;
+            }
+        }
+
+      if(trulyMessage!="") {
+          JSONObject jsonObject = JSON.parseObject(trulyMessage);
+          log.info("JSON对象1：" + jsonObject);
+          if (jsonObject.get("msgType").toString().equals("2")) {
+              JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
+              log.info("原生数据****：" + jsonObjectData);
+              Iterator iterator = jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
+              while (iterator.hasNext()) {
+                  Map.Entry entry = (Map.Entry) iterator.next();
+                  //遍历每一个结果子集
+                  JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
+                  log.info("数据****：" + jsonObjectResult);//打印resultInfo
+              }
+          }
+      }
+      
+
 //        redisTemplate.opsForList().leftPush("constant","helloWorld");
 //        redisTemplate.opsForList().leftPush("constant","JAVA");
 //
