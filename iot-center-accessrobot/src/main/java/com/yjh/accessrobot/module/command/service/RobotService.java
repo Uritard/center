@@ -70,7 +70,7 @@ public class RobotService {
     }
     @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public Boolean feignRobotTransfer(String robotCode){
+    public boolean feignRobotTransfer(String robotCode){
         //查询数据库所有的robotCode
 //        List<String> robotCodeList = tRobotInfoDao.selectAllRobotCode();
         boolean res = false;
