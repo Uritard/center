@@ -620,8 +620,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         // 发送json字符串
         String registerMsg = "{\n\"msgType\": \"3\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\",\n\"registerKey\": \"yijiahe\"\n}\n}\n";
         sendString(ctx, registerMsg);
-//        String faker="{\"msgType\":\"1\",\"msgID\":\"100000003\",\"msgData\":{\"data\":{\"pictureInfo1\":{\"instanceId\":\"11000000505\",\"analyseType\":\"3\",\"imagePath\":\"/home/yjh_iot_center/iot-picture/resultImg/251220201017112088835.jpg\",\"modelPath\":\"/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000149\",\"taskId\":\"6d05cd9969d14a22a71c03d7ff10b94a\"}},\"desNode\":\"serverSocket\",\"srcNode\":\"clientSocket001\"}}";
-//        sendString(ctx,faker);
         // TODO: 2020/10/22
         //  String registerMsg = "发送假数据";
         //        sendString(ctx, registerMsg);

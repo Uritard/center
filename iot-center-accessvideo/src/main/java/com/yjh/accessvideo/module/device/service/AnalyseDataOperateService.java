@@ -157,17 +157,21 @@ public class AnalyseDataOperateService {
 
 
     public String nonUnpacking(String body) {
-        String usefulBody="";
+        log.info("body:"+body);
+        String usefulBody=body;
         if (body.matches("\\{\"msgData.*?\"2\"}")) { //表计整包
             log.info("整包数据1");
-            usefulBody=body;
         } else if (body.matches("\\{\"msgType.*?}}}}")) { //缺陷整包
             log.info("整包数据2");
-            usefulBody=body;
         } else { //拆包
-            if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) { //拆包A
-                redisTemplate.opsForHash().put("algoResponse", "A", body);
-                log.info("获取上半包数据");
+            if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") ) { //拆包A
+                if(body.contains("\"msgType\": \"4\"") || body.contains("\"msgType\":\"4\"")){
+                    usefulBody="";
+                }else {
+                    redisTemplate.opsForHash().put("algoResponse", "A", body);
+                    log.info("获取上半包数据");
+                    usefulBody="";
+                }
             } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) { //拆包B
                 redisTemplate.opsForHash().put("algoResponse", "B", body);
                 usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body);
@@ -175,6 +179,7 @@ public class AnalyseDataOperateService {
                 log.info("success:" + usefulBody);
             }
         }
+        log.info("usefulBody:"+usefulBody);
         return usefulBody;
 
     }
