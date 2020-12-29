@@ -153,7 +153,7 @@ public class TStdMeteController {
             if(deviceType != null && deviceType == -1){
                 deviceType = null;
             }
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TStdMeteDetail> list = tStdMeteService.selectByPage(deviceType,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

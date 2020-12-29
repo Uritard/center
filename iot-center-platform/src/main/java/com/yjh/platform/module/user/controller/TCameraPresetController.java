@@ -206,7 +206,7 @@ public class TCameraPresetController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraPreset> list = tCameraPresetService.selectByCameraId(cameraId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -226,7 +226,7 @@ public class TCameraPresetController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraPreset> list = tCameraPresetService.selectByPresetName(presetName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -269,7 +269,7 @@ public class TCameraPresetController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraPresetExpand> list = tCameraPresetService.selectByPage(tCameraPreset);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

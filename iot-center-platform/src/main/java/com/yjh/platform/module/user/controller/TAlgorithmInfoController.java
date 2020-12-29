@@ -133,7 +133,7 @@ public class TAlgorithmInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TAlgorithmInfo> list = tAlgorithmInfoService.selectByPage(tAlgorithmInfo);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

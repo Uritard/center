@@ -165,7 +165,7 @@ public class TCfgAlarmHistoryController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCfgAlarmHistory> list = tCfgAlarmHistoryService.selectByPage(alarmNo, deviceId, cunstomId, meteId, alarmTime, alarmLevel, alarmValue, alarmDesc,
                     clearTime, clearValue, confirmState, confirmPeople, confirmTime, confirmRemark, defect, defectLevel, forceClearReason, meteCode,
                     isClear, showType, updateTime);
@@ -201,7 +201,7 @@ public class TCfgAlarmHistoryController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCfgAlarmHistoryResultInfo> list = tCfgAlarmHistoryService.selectUnionCruiseResult(unionId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

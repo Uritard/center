@@ -132,7 +132,7 @@ public class TRobotInspectionController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TRobotInspection> list = tRobotInspectionService.selectByPage(tRobotInspection);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

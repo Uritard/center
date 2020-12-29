@@ -137,7 +137,7 @@ public class TUnionTaskController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TUnionTask> list = tUnionTaskService.selectByPage(tUnionTask);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -174,7 +174,7 @@ public class TUnionTaskController {
         Date startDateTemp = new Date();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             if (("".equals(endDate) && "".equals(startDate)) || (endDate == null && startDate == null) ) {
                 endDateTemp = null;
                 startDateTemp = null;

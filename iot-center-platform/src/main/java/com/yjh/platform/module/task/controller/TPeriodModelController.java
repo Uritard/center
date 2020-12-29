@@ -155,7 +155,7 @@ public class TPeriodModelController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TPeriodModel> list = tPeriodModelService.selectByPage(tPeriodModel);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

@@ -144,7 +144,7 @@ public class TCruiseDataResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCruiseDataResult> list = tCruiseDataResultService.selectByPage(tCruiseDataResult);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -178,7 +178,7 @@ public class TCruiseDataResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
               List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfos);
@@ -212,7 +212,7 @@ public class TCruiseDataResultController {
                 endDateTemp = dateFormat.parse(endDate);
                 startDateTemp = dateFormat.parse(startDate);
             }
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<CruiseResultAnalInfo> list = (tCruiseDataResultService.selectCruiseDataResultByList(cruiseType, cType, deviceMeteId, endDateTemp, startDateTemp));
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

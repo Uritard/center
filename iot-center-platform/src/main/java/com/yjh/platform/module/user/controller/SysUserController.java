@@ -192,7 +192,7 @@ public class SysUserController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             if (sysUser.getState()==-1) { sysUser.setState(null); }
             List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
             resultMap.put("count", page.getTotal());

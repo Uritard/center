@@ -163,7 +163,7 @@ public class TStdDevicemeteController {
             if (upRegionIds.size() == 0){
                 upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
             }
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

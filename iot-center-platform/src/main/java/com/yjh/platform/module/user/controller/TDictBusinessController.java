@@ -140,7 +140,7 @@ public class TDictBusinessController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TDictBusiness> list = tDictBusinessService.selectByPage(tDictBusiness);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

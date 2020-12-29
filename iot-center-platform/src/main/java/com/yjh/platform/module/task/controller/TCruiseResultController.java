@@ -140,7 +140,7 @@ public class TCruiseResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -192,7 +192,7 @@ public class TCruiseResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseAbnormal,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

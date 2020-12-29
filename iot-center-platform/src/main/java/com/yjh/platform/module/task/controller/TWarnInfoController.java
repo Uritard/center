@@ -147,7 +147,7 @@ public class TWarnInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TWarnInfo> list = tWarnInfoService.selectByPage(tWarnInfo);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -185,7 +185,7 @@ public class TWarnInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TWarnInfoDetail> list = tWarnInfoService.selectWarnByPage(warnLevel, confMode, alarmSource,startTime,endTime,deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

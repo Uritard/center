@@ -122,7 +122,7 @@ public class SysRoleRegionController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<SysRoleRegion> list = sysRoleRegionService.selectByPage(sysRoleRegion);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

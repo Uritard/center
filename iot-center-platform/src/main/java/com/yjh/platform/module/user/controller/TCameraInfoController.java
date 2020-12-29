@@ -131,7 +131,7 @@ public class TCameraInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraInfoByDict> list = tCameraInfoService.selectByRegionId(regionId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -151,7 +151,7 @@ public class TCameraInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraInfoByDict> list = tCameraInfoService.selectByCameraName(cameraName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -206,7 +206,7 @@ public class TCameraInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tCameraInfo.getUpRegionId());
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(tCameraInfo, upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

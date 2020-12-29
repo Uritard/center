@@ -115,7 +115,7 @@ public class TCruiseTypeController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(pageNum != null && pageSize != null){
-                Page page = PageHelper.startPage(pageNum, pageSize);
+                Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
                 List<TCruiseTypeDetail> list = tCruiseTypeService.select(subType);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
@@ -140,7 +140,7 @@ public class TCruiseTypeController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCruiseTypeDetail> list = tCruiseTypeService.selectByPage(tCruiseType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

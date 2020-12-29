@@ -134,7 +134,7 @@ public class THisTelemeterDataController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TUnionInfo> list = tHisTelemeterDataService.selectAll(startDate, endDate, meteKind, deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -171,7 +171,7 @@ public class THisTelemeterDataController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<UnionTaskInfo> list = tHisTelemeterDataService.selectUnionTask(startDate, endDate,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

@@ -129,7 +129,7 @@ public class TCfgDeviceController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<HashMap<String,Object>> list = tCfgDeviceService.selectByPage(tCfgDeviceDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

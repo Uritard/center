@@ -139,7 +139,7 @@ public class TCfgUnionRuleController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCfgUnionRuleDetail> list = tCfgUnionRuleService.selectByPage(ruleName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -201,7 +201,7 @@ public class TCfgUnionRuleController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             TCruisePlan tCruisePlan =new TCruisePlan();
             tCruisePlan.setPlanName(planName);
             List<TCruisePlanCount> list = tCruisePlanService.selectByPage(tCruisePlan);

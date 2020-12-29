@@ -171,7 +171,7 @@ public class TRobotInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TRobotInfo> list = tRobotInfoService.selectByPage(tRobotInfo,upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

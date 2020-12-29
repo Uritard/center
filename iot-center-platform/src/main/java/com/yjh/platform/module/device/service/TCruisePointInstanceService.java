@@ -152,7 +152,7 @@ public class TCruisePointInstanceService{
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
             List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();

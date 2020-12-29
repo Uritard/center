@@ -131,7 +131,7 @@ public class TCruisePlanController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCruisePlanCount> list = tCruisePlanService.selectByPage(tCruisePlan);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -151,7 +151,7 @@ public class TCruisePlanController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCruisePlanCountByPage> list = tCruisePlanService.selectByPlanPage(tCruisePlan);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -191,7 +191,7 @@ public class TCruisePlanController {
             return result;
         }
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             if (deviceIds.equals(-1)) deviceIds = "";
             List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds);
             resultMap.put("count", page.getTotal());

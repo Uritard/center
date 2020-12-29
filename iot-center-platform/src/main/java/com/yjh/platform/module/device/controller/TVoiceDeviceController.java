@@ -125,7 +125,7 @@ public class TVoiceDeviceController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TVoiceDevice> list = tVoiceDeviceService.selectByPage(tVoiceDevice);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
