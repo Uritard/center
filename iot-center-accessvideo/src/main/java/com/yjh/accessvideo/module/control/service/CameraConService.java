@@ -608,7 +608,7 @@ public class CameraConService {
             }
             channleStatusMap.put("recordId", String.valueOf(recordId));
             channleStatusMap.put("capacityTotal", String.valueOf(hardCapacityTotal));
-            channleStatusMap.put("FreeTotal", String.valueOf(hardFreeTotal));
+            channleStatusMap.put("freeTotal", String.valueOf(hardFreeTotal));
             return channleStatusMap;
         }
         channleStatusMap.put("errorMessage: " ,"userID is null");

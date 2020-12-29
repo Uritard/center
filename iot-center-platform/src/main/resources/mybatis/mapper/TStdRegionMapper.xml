@@ -154,4 +154,32 @@
         <if test="regionName != null and regionName != ''"> AND a.region_name LIKE CONCAT('%',#{regionName, jdbcType=VARCHAR},'%')</if>
     </select>
 
+    <select id="selectDownId" resultType="java.lang.Long">
+        SELECT
+        DATA.region_id
+        FROM
+            (
+        SELECT
+            @ids AS _ids,
+            ( SELECT @ids := GROUP_CONCAT( region_id ) FROM t_std_region WHERE FIND_IN_SET( up_region_id, @ids ) ) AS cids,
+            @l := @l + 1 AS LEVEL
+        FROM
+            t_std_region,
+            ( SELECT @ids := #{regionId,jdbcType=BIGINT}, @l := 0 ) b
+        WHERE
+            @ids IS NOT NULL
+            ) ID,
+            t_std_region DATA WHERE FIND_IN_SET( DATA.region_id, ID._ids )
+        ORDER BY
+            LEVEL,region_id
+    </select>
+
+    <delete id="batchDelete">
+        delete from t_std_region
+        where region_id in (
+        <foreach collection="list" item="regionId" separator=",">
+            #{regionId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </delete>
 </mapper>

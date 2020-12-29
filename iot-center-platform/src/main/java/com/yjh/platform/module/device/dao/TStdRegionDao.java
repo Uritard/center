@@ -31,4 +31,6 @@ public interface TStdRegionDao {
     List<TStdRegion> selectByPage(TStdRegion tStdRegion);
     List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
     List<Long> selectRegionIds(Long upRegionId);
+    List<Long> selectDownId(@Param(value = "regionId") Long regionId);
+    int batchDelete(@Param(value = "list") List<Long> list);
 }

@@ -30,7 +30,12 @@ public class TStdRegionService{
     @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long regionId) {
-        return this.tStdRegionDao.deleteByPrimaryId(regionId);
+        List<Long> list = tStdRegionDao.selectDownId(regionId);
+        if(list != null && list.size() > 0){
+            return tStdRegionDao.batchDelete(list);
+        }else {
+            return this.tStdRegionDao.deleteByPrimaryId(regionId);
+        }
     }
 
     @Logs(title = "更新", code = "module",content = "根据页面传入的参数修改数据")

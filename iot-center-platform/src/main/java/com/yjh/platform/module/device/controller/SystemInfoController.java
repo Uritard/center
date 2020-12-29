@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author lqh
  * @since 2020/10/20
@@ -121,6 +124,21 @@ public class SystemInfoController {
         return result;
     }
 
+    @ApiOperation(value = "获取NVR信息")
+    @RequestMapping(value = "/getNVRInfo", method = RequestMethod.GET)
+    public Result getNVRInfo() {
+        Result result = new Result();
+        try {
+            List<Map<String,String>> list = systemInfoService.getNVRInfo();
+            result.setData(list);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取NVR信息错误:", e);
+        }
+        return result;
+    }
 
 
 }

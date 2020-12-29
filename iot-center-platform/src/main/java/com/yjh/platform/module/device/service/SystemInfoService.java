@@ -1,21 +1,26 @@
 package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
+import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.user.dao.TCameraRecorderDao;
+import com.yjh.platform.module.user.entity.TCameraRecorder;
+import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 /**
@@ -29,6 +34,11 @@ public class SystemInfoService {
 
     @Value("${spring.Key.Services.path}")
     private  String SERVICE_URL;
+
+    @Autowired
+    private TCameraRecorderDao tCameraRecorderDao;
+    @Autowired
+    private ServiceRestTemplate serviceRestTemplate;
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
@@ -112,6 +122,42 @@ public class SystemInfoService {
         log.info("resg     "+re);
         return re;
 
+    }
+
+    //获取NVR容量
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,String>> getNVRInfo() {
+        List<TCameraRecorderDetail> list = tCameraRecorderDao.selectIdAndName();
+        List<Map<String,String>> reList = new ArrayList<>();
+        for (TCameraRecorderDetail item:list) {
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",item.getRecordId() );
+            Result re = getNVRInfo(recordIdMap);
+
+            Map<String,String> map = (Map<String,String>)re.getData();
+            if(map.get("errorMessage: ") != null){
+                continue;
+            }
+            Integer use = Integer.valueOf(map.get("freeTotal"));
+            Integer all = Integer.valueOf(map.get("capacityTotal"));
+            Integer other = all - use;
+            map.put("use",other.toString());
+            map.put("recoderName",item.getRecordName());
+            reList.add(map);
+        }
+        return reList;
+    }
+    private static Result getNVRInfo(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,map);
+            }
+        } catch (Exception e) {
+
+        }
+        return re;
     }
 
 }
