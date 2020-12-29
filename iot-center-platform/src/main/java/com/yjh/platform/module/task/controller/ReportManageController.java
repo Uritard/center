@@ -178,4 +178,19 @@ public class ReportManageController {
         }
         return result;
     }
+
+    @ApiOperation(value = "啥也不是")
+    @RequestMapping(value = "/xixixi", method = RequestMethod.GET)
+    public Result test(@RequestParam(value="taskId")String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(reportManageService.test(taskId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("生成报表错误:", e);
+        }
+        return result;
+    }
 }

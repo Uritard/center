@@ -329,7 +329,7 @@ public class TUnionTaskService{
         List<LinkageMonitorData> linkageMonitorDataList = TUnionTaskAttrDao.selectDeviceInfo(taskId);
 
         for (LinkageMonitorData lmd : linkageMonitorDataList){
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + lmd.getInstanceId());
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + lmd.getInstanceId());
             if ("246".equals(redisInfoMap.get("cruiseResult"))
                     || "247".equals(redisInfoMap.get("cruiseResult"))){
                 log.info("redisInfoMap==="+redisInfoMap);

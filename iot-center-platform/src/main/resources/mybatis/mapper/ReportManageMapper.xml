@@ -80,15 +80,8 @@
 		w.dict_note as mete_type_name,
 		f.evaluation_state,
 		x.dict_note as evaluation_state_name,
-		a.device_name ,
-		(CASE
-		WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN ''
-		WHEN ISNULL(n.mete_name) AND ISNULL(m.inspection_name) THEN k.preset_name
-		WHEN ISNULL(n.mete_name) AND ISNULL(k.preset_name) THEN m.inspection_name
-		WHEN ISNULL(m.inspection_name) AND ISNULL(k.preset_name) THEN n.mete_name
-		WHEN ISNULL(m.inspection_name) THEN CONCAT(n.mete_name,'/',k.preset_name)
-		WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
-		END) AS instance_name,
+		e.device_name ,
+        e.instance_name,
 		h.dict_note as identify_result,
 		f.origpic as picpath,
 		g.dict_note as cruise_result,
@@ -101,9 +94,6 @@
 		LEFT JOIN t_cruise_result q on q.task_result_id = e.task_result_id
 		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
 		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
-		LEFT JOIN t_camera_preset k ON d.cruise_id = k.preset_id
-		LEFT JOIN t_robot_inspection m ON m.inspection_id = d.cruise_id
-		LEFT JOIN t_std_devicemete n ON n.device_mete_id = d.device_mete_id
 		LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
 		LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
     </sql>

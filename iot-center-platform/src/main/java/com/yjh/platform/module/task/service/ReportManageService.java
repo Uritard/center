@@ -270,4 +270,11 @@ public class ReportManageService {
         log.info("该文件相对路径是==="+fileRelativePath);
         return fileRelativePath;
     }
+
+    @Logs(title = "啥也不是", code = "test",content = "啥也不是")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruiseDataResultDetail> test(String taskId){
+        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
+        return tCDRDList;
+    }
 }
