@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.netty.server;
 
-import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -318,6 +317,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
 
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
@@ -371,10 +371,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         //处理模型同步的响应
                         String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
                         String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
-                        XMLBaseModel deviceModel = getXmlMessage(Constant.filePath+deviceFile);
+                        XMLBaseModel deviceModel = getXmlMessage(filePathMap.get("content") + "/" +deviceFile);
                         List<Map<String,Object>> deviceMap = deviceModel.getItems();
                         log.info("deviceMap是："+deviceMap);
-                        XMLBaseModel robotModel = getXmlMessage(Constant.filePath+robotFile);
+                        XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + "/" +robotFile);
                         List<Map<String,Object>> robotMap = robotModel.getItems();
                         log.info("robotMap是："+robotMap);
                         robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
@@ -487,7 +487,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         /*
                         将ftp服务器上的文件复制到开发环境
                         * */
-                        String temporaryPath = Constant.filePath+filePath;//文件在ftp服务器上的绝对路径
+                        String temporaryPath = filePathMap.get("content") + "/" +filePath;//文件在ftp服务器上的绝对路径
                         log.info("temporaryPath是==="+temporaryPath);
 
                         //开发环境图片相对路径文件目录
@@ -632,7 +632,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     /*
                     将ftp服务器上的文件复制到开发环境
                     * */
-                    String temporaryPath = Constant.filePath+filePath;//文件在ftp服务器上的绝对路径
+                    String temporaryPath = filePathMap.get("content") + "/" +filePath;//文件在ftp服务器上的绝对路径
                     log.info("temporaryPath是==="+temporaryPath);
 
                     //开发环境图片绝对路径文件目录

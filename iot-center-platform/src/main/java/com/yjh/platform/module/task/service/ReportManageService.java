@@ -36,7 +36,7 @@ public class ReportManageService {
     private DateTimeUtil dateTimeUtil;
     @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
     @Transactional(rollbackFor = Exception.class)
-    public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType,String reportPath) {
+    public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType) {
         List<String> list = Arrays.asList(deviceIdList.split(","));
         //巡检记录报表对象
         ReportData recordData = new ReportData();
@@ -79,9 +79,12 @@ public class ReportManageService {
         String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
 //        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-        String reportPath2 = reportPath+"/"+fileName;
-        log.info("reportPath2:"+reportPath2);
-        File file = new File(reportPath2);
+
+        //从缓存中获取系统参数
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
+        String reportPath = map.get("content")+"/"+fileName;
+        log.info("reportPath:"+reportPath);
+        File file = new File(reportPath);
 
         ContentData contentData = ReportDataRepo.getData(recordData);
 
@@ -121,13 +124,18 @@ public class ReportManageService {
     }
     @Logs(title = "下载报表", code = "reportManage",content = "通过web传递的参数下载报表")
     @Transactional(rollbackFor = Exception.class)
-    public String reportDownload(String reportId,String reportPath) {
+    public String reportDownload(String reportId) {
 //        String time2 =  DateTimeUtil.changeTime2(startTime);
 //        String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
 //        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-        String fileName = reportManageDao.selectReportEnvId(reportId);
-        String filePath = reportPath+"/"+fileName;
 //        String filePath = reportPathA+fileName;
+
+        String fileName = reportManageDao.selectReportEnvId(reportId);
+        //从缓存中获取系统参数
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportRelative");
+        String reportPath = map.get("content");
+        log.info("reportPath:"+reportPath);
+        String filePath = reportPath+"/"+fileName;
 
         log.info("filePath:"+filePath);
         return filePath;
@@ -143,7 +151,12 @@ public class ReportManageService {
     }
     @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
-    public int reportDelete(String reportId,String reportPath) {
+    public int reportDelete(String reportId) {
+        //从缓存中获取系统参数
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
+        String reportPath = map.get("content");
+        log.info("reportPath:"+reportPath);
+
         String url = "ls "+reportPath+" | wc -w";
         long count = 0;
         try {
@@ -212,7 +225,7 @@ public class ReportManageService {
 //    }
     @Logs(title = "下载报告", code = "reportManage",content = "根据巡检任务生成报告并下载")
     @Transactional(rollbackFor = Exception.class)
-    public String reportByTask(String taskId,String temporaryPath){
+    public String reportByTask(String taskId){
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
@@ -245,19 +258,25 @@ public class ReportManageService {
         String reportName =  taskId + ".xlsx";//报表名称
 
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
-        File temporaryFile = new File(temporaryPath);
+
+        //从缓存中获取系统参数
+        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String reportPath = redisMap.get("content");
+        log.info("reportPath:"+reportPath);
+
+        File temporaryFile = new File(reportPath);
         String reportPath2 = null;
         if (!temporaryFile.exists() && !temporaryFile.isDirectory())
         {
             temporaryFile.mkdir();
-            reportPath2 = temporaryPath+"/"+reportName;
+            reportPath2 = reportPath+"/"+reportName;
             log.info("不存在，创建的文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
-            reportPath2 = temporaryPath+"/"+reportName;
+            reportPath2 = reportPath+"/"+reportName;
             log.info("存在，该文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);

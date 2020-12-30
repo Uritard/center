@@ -61,8 +61,7 @@
 
     <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
         update t_robot_inspection a <set>
-        <if test="inspectionId != null and inspectionId != ''">a.inspection_id = #{inspectionId, jdbcType=BIGINT},</if>
-        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
+        <if test="inspectionCode != null and inspectionCode != ''"> a.inspection_code = #{inspectionCode, jdbcType=VARCHAR},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
         <if test="inspectionType != null and inspectionType != ''">a.inspection_type = #{inspectionType, jdbcType=INTEGER},</if>
@@ -74,7 +73,7 @@
         <if test="calibrationStatus != null and calibrationStatus != ''">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
     </set>
-            where a.inspection_id = #{inspectionId, jdbcType=BIGINT}
+            where a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">

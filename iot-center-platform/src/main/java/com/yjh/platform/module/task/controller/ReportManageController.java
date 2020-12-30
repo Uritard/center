@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,13 +37,6 @@ public class ReportManageController {
     @Autowired
     private ReportManageService reportManageService;
 
-    @Value("${nginx.report.reflect}")
-    private String reportAbsolutePath;//报表绝对路径
-    @Value("${nginx.reportRelative.reflect}")
-    private String reportRelativePath;//报表相对路径
-    @Value("${nginx.temporary.reflect}")
-    private String temporaryPath;//临时路径
-
     public ReportManageController(ReportManageService reportManageService) {
         this.reportManageService = reportManageService;
     }
@@ -58,7 +50,7 @@ public class ReportManageController {
                                  @RequestParam(value="reportType")String reportType) {
         Result result = new Result();
         try {
-            int generateResult = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType,reportAbsolutePath);
+            int generateResult = reportManageService.reportGenerate(startTime,endTime,deviceIds,reportName,reportType);
             result.setData(generateResult);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -73,7 +65,7 @@ public class ReportManageController {
     public Result reportDownload(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {
-            String downLoadFilePath = reportManageService.reportDownload(reportId,reportRelativePath);
+            String downLoadFilePath = reportManageService.reportDownload(reportId);
             result.setData(downLoadFilePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -140,7 +132,7 @@ public class ReportManageController {
     public Result reportDelete(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.reportDelete(reportId,reportAbsolutePath));
+            result.setData(reportManageService.reportDelete(reportId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -168,7 +160,7 @@ public class ReportManageController {
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            String filePath = reportManageService.reportByTask(taskId,temporaryPath);
+            String filePath = reportManageService.reportByTask(taskId);
             result.setData(filePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

@@ -13,10 +13,6 @@ public class Constant {
 
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
 
-    public static final String filePath = "/home/yjh_iot_center/ftps/";//基本不会变
-
-    //    public static final String filePath = "/home/yjh/ftps/";//基本不会变
-
     public static String Packet = "";
 
     public static long sendSessionId = 0L;//发送会话序列号

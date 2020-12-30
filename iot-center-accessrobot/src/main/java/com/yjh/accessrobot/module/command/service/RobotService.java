@@ -116,8 +116,10 @@ public class RobotService {
     @Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String,Object>> deviceMapList, List<Map<String,Object>> robotMap,XMLBaseModel xmlBaseModel) {
+        //从缓存中获取系统参数
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         //机器人模型文件
-        String picPath = Constant.filePath+robotMap.get(0).get("mappath").toString();
+        String picPath = filePathMap.get("content") + "/" +robotMap.get(0).get("mappath").toString();
         log.info("图片路径为："+picPath);
         /*
          * 将ftp图copy到40环境
@@ -176,6 +178,7 @@ public class RobotService {
             }else {
                 addList.add(str);
             }
+
         }
         log.info("最后要插库的deviceList是==="+addList);
         log.info("准备要删除的inspectionCodeList是==="+nowList);
@@ -195,6 +198,14 @@ public class RobotService {
             int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
             log.info("TRI插入条数=="+res);
         }
+        if (deviceList.containsAll(addList)) {
+            deviceList.removeAll(addList);
+        }
+        System.out.println("准备更新的deviceList是=="+deviceList);
+        for (TRobotInspection tRobotInspection : deviceList){
+            tRobotInspectionDao.update(tRobotInspection);//更新TRI
+        }
+
         return 1;
     }
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
