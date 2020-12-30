@@ -8,9 +8,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
-import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
-import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +35,6 @@ public class SystemInfoService {
 
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
-    @Autowired
-    private ServiceRestTemplate serviceRestTemplate;
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
