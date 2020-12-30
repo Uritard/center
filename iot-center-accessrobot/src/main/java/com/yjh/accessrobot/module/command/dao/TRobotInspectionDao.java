@@ -31,7 +31,12 @@ public interface TRobotInspectionDao {
                                   @Param(value = "unit") String unit);
     List<TRobotInspection> selectByPage(TRobotInspection tRobotInspection);
 
-    int batchInsert(List<TRobotInspection> list);
-    int deleteAllData();
+    int batchInsertTRobotInspection(List<TRobotInspection> list);
     List<String> selectAllByRobotId(@Param(value = "robotId") Long robotId);
+
+    List<Long> selectInspectionIdList(List<String> list);
+    List<Long> selectInstanceIdList(List<Long> list);
+    int batchDeleteTRobotInspection(List<Long> list);
+    int batchDeleteTCruisePointInstance(List<Long> list);
+    int batchDeleteTCruisePlanAttr(List<Long> list);
 }

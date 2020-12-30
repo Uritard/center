@@ -165,20 +165,37 @@ public class RobotService {
         }
         log.info("获得的deviceList是："+deviceList);
 
-        /*List<String> inspectionCodeList = new ArrayList<>();
-        for (TRobotInspection trI : deviceList){
-            inspectionCodeList.add(trI.getInspectionCode());
-        }*/
-        //测点数据入库前先清空原来的数据
-        tRobotInspectionDao.deleteAllData();
-        //保留之前的数据，将重复的点去除，加入新增的点
+        //对测点数据进行相应的处理
         List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);//该机器人现有的巡检点
+        log.info("机器人现有的deviceList是："+nowList);
 
-        /*List<String> diffList = new ArrayList<>();
-        log.info("最后要插库的list是==="+diffList);*/
+        List<TRobotInspection> addList = new ArrayList<>();
+        for (TRobotInspection str : deviceList){
+            if (nowList.contains(str.getInspectionCode())){
+                nowList.remove(str.getInspectionCode());
+            }else {
+                addList.add(str);
+            }
+        }
+        log.info("最后要插库的deviceList是==="+addList);
+        log.info("准备要删除的inspectionCodeList是==="+nowList);
+        if (nowList != null  && nowList.size() > 0 ){
+            List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
+            log.info("这些inspectionCode对应的inspectionIdList是=="+inspectionIdList);
+            List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
+            log.info("这些inspectionId对应的instanceIdList是=="+instanceIdList);
 
-        int res2 = tRobotInspectionDao.batchInsert(deviceList);
-        return res2;
+            int res1 = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList); //删库TRI
+            int res2 = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);//删库TCPI
+            int res3 = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);//删库TCPA
+            log.info("TRI删除条数=="+res1+",TCPI删除条数=="+res2+",TCPA删除条数=="+res3);
+        }
+        if (addList != null  && addList.size() > 0 ){
+            //插库TRI
+            int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
+            log.info("TRI插入条数=="+res);
+        }
+        return 1;
     }
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)

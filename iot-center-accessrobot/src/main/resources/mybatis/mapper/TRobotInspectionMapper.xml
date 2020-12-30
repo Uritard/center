@@ -157,9 +157,7 @@
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
     </select>
 
-    <delete id="deleteAllData">
-        DELETE FROM t_robot_inspection
-    </delete>
+    <!--机器人测点表中现有的点-->
     <select id="selectAllByRobotId" resultType="java.lang.String">
         SELECT
             a.inspection_code
@@ -168,8 +166,65 @@
         WHERE 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
-
-    <insert id="batchInsert">
+    <!--根据测点编码list查询测点list-->
+    <select id="selectInspectionIdList" resultType="java.lang.Long">
+        SELECT
+        inspection_id
+        FROM
+        t_robot_inspection
+        WHERE 1 = 1 and
+        inspection_code IN
+        <foreach collection="list" item="inspectionCode" open="(" separator="," close=")">
+            #{inspectionCode, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+    <!--根据测点list查询巡检点list-->
+    <select id="selectInstanceIdList" resultType="java.lang.Long">
+        SELECT
+        instance_id
+        FROM
+        t_cruise_point_instance
+        WHERE 1 = 1 and
+        cruise_id IN
+        <foreach collection="list" item="inspectionId" open="(" separator="," close=")">
+            #{inspectionId, jdbcType=BIGINT}
+        </foreach>
+    </select>
+    <!--批量删除机器人测点表数据-->
+    <delete id="batchDeleteTRobotInspection">
+        DELETE
+        FROM
+        t_robot_inspection
+        WHERE
+        inspection_id IN
+        <foreach collection="list" item="inspectionId" open="(" separator="," close=")">
+            #{inspectionId, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+    <!--批量删除巡检点表数据-->
+    <delete id="batchDeleteTCruisePointInstance">
+        DELETE
+        FROM
+        t_cruise_point_instance
+        WHERE
+        instance_id IN
+        <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+    </delete>
+    <!--批量删除巡检预案属性表数据-->
+    <delete id="batchDeleteTCruisePlanAttr">
+        DELETE
+        FROM
+        t_cruise_plan_attr
+        WHERE
+        instance_id IN
+        <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+    </delete>
+    <!--批量删除机器人测点表数据-->
+    <insert id="batchInsertTRobotInspection">
         insert into t_robot_inspection(
             inspection_id,
             inspection_code,

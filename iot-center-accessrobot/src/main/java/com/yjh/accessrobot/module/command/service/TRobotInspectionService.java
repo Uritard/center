@@ -60,7 +60,7 @@ public class TRobotInspectionService {
     @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TRobotInspection> list) {
-        return this.tRobotInspectionDao.batchInsert(list);
+        return this.tRobotInspectionDao.batchInsertTRobotInspection(list);
     }
 
 }
