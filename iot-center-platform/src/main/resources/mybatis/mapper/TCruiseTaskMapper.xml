@@ -289,7 +289,7 @@ select *from (
         LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
         LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
         where a.if_run = 173
-        <if test="startTime != null and endTime != null"> and a.start_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="startTime != null and endTime != null"> and a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} &lt;= #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="taskName != null and taskName != ''"> and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%') </if>
         UNION ALL (
         select

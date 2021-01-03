@@ -38,6 +38,7 @@
         <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
         <if test="screenNum != null and screenNum != ''">a.screen_num = #{screenNum, jdbcType=VARCHAR},</if>
         <if test="cameraIds != null and cameraIds != ''">a.camera_ids = #{cameraIds, jdbcType=VARCHAR},</if>
+        a.create_time=CURRENT_TIME (),
     </set>
             where a.user_id = #{userId, jdbcType=BIGINT}
     </update>

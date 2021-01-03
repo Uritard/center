@@ -6,6 +6,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 
+
 /**
  * @author lqh
  * @since 2020/10/20
@@ -194,7 +195,5 @@ public class SystemInfoUtil {
         }
         return map;
     }
-
-
 
 }

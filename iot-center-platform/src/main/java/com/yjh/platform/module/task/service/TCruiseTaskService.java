@@ -688,7 +688,7 @@ public class TCruiseTaskService {
             log.info("firstDay: "+firstDay);
 
             int lDay=0;
-            calendar.set(Calendar.MONTH, date.getMonth());
+            calendar.set(Calendar.MONTH, date.getMonth()-1);
             //2月的平年瑞年天数
             if(date.getMonth()==1) {
                 lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
@@ -726,7 +726,7 @@ public class TCruiseTaskService {
             calendar.set(Calendar.MONTH, taskStartDate.getMonth());
             calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
             calendar.set(Calendar.DAY_OF_MONTH, lDay);
-            lastDay = sdfF.format(calendar.getTime())+" 00:00:00";
+            lastDay = sdfF.format(calendar.getTime())+" 23:59:59";
             log.info("lastDay: "+lastDay);
         }
 
