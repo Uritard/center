@@ -688,7 +688,7 @@ public class TCruiseTaskService {
             log.info("firstDay: "+firstDay);
 
             int lDay=0;
-            calendar.set(Calendar.MONTH, date.getMonth()-1);
+            calendar.set(Calendar.MONTH, date.getMonth());
             //2月的平年瑞年天数
             if(date.getMonth()==1) {
                 lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
