@@ -29,6 +29,7 @@ public interface TCruiseTaskDao {
                              @Param(value = "robotId") Long robotId,
                              @Param(value = "dateType") String dateType,
                              @Param(value = "taskType") Integer taskType,
+                             @Param(value = "taskLevel") Integer taskLevel,
                              @Param(value = "startTime") Date startTime,
                              @Param(value = "createTime") Date createTime);
     List<TCruiseTask> selectByPage(TCruiseTask tCruiseTask);

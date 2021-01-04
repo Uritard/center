@@ -266,8 +266,8 @@ public class TCruiseTaskService {
 
     @Logs(title = "查询", code = "TCruiseTask",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTask> select(String taskId, String taskName, Long planId, String areaId, Integer type, Integer ifRun, Long robotId, String dateType, Integer taskType, Date startTime, Date createTime) {
-        List<TCruiseTask> tCruiseTaskList = tCruiseTaskDao.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, startTime, createTime);
+    public List<TCruiseTask> select(String taskId, String taskName, Long planId, String areaId, Integer type, Integer ifRun, Long robotId, String dateType, Integer taskType, Integer taskLevel, Date startTime, Date createTime) {
+        List<TCruiseTask> tCruiseTaskList = tCruiseTaskDao.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, taskLevel, startTime, createTime);
         return tCruiseTaskList;
     }
 

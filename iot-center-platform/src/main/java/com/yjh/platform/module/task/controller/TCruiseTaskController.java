@@ -79,6 +79,7 @@ public class TCruiseTaskController {
                     tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
                     tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
                     tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
+                    tCruiseTask.setTaskLevel(tCruiseTaskAdd.getTaskLevel());
                     TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
                     tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
                     tCruiseTask.setType(tCruisePlanCount.getType());
@@ -93,6 +94,7 @@ public class TCruiseTaskController {
                 tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
                 tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
                 tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
+                tCruiseTask.setTaskLevel(tCruiseTaskAdd.getTaskLevel());
                 tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
                 TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
                 tCruiseTask.setType(tCruisePlanCount.getType());
@@ -171,11 +173,12 @@ public class TCruiseTaskController {
                          @RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "dateType", required = false) String dateType,
                          @RequestParam(value = "taskType", required = false) Integer taskType,
+                         @RequestParam(value = "taskLevel", required = false) Integer taskLevel,
                          @RequestParam(value = "startTime", required = false) Date startTime,
                          @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TCruiseTask> list = tCruiseTaskService.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, startTime, createTime);
+            List<TCruiseTask> list = tCruiseTaskService.select(taskId, taskName, planId, areaId, type, ifRun, robotId, dateType, taskType, taskLevel, startTime, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

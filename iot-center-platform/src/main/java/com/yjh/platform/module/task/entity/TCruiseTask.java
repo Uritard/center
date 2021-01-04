@@ -50,6 +50,9 @@ public class TCruiseTask implements Serializable {
     @ApiModelProperty(value = "任务来源：1 日常巡视 2红外普测 3地电波 4机器人监控 5机器人本体任务")
     private Integer taskType;
 
+    @ApiModelProperty(value = "任务等级(从高到低):4级,3级,2级,1级")
+    private Integer taskLevel;
+
     @ApiModelProperty(value = "巡视时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;

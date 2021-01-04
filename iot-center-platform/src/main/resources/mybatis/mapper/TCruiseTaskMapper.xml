@@ -13,13 +13,14 @@
         <result column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="date_type" jdbcType="VARCHAR" property="dateType" />
         <result column="task_type" jdbcType="INTEGER" property="taskType" />
+        <result column="task_level" jdbcType="INTEGER" property="taskLevel" />
         <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        task_id, task_name, plan_id, area_id, type, if_run, robot_id, date_type, task_type, start_time, create_time
+        task_id, task_name, plan_id, area_id, type, if_run, robot_id, date_type, task_type, start_time, create_time, task_level
     </sql>
 
 
@@ -34,6 +35,7 @@
             robot_id,
             date_type,
             task_type,
+            task_level,
             start_time,
             create_time
         )values(
@@ -46,6 +48,7 @@
                 #{robotId, jdbcType=BIGINT},
                 #{dateType, jdbcType=VARCHAR},
                 #{taskType, jdbcType=INTEGER},
+                #{taskLevel, jdbcType=INTEGER},
                 #{startTime, jdbcType=TIMESTAMP},
                 #{createTime, jdbcType=TIMESTAMP}
         )
@@ -67,6 +70,7 @@
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="dateType != null and dateType != ''">a.date_type = #{dateType, jdbcType=VARCHAR},</if>
         <if test="taskType != null">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="taskLevel != null">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
         <if test="startTime != null and startTime != ''">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
         <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
     </set>
@@ -84,6 +88,7 @@
         a.robot_id,
         a.date_type,
         a.task_type,
+        a.task_level,
         a.start_time,
         a.create_time
         from t_cruise_task a
@@ -103,6 +108,7 @@
         a.robot_id,
         a.date_type,
         a.task_type,
+        a.task_level,
         a.start_time,
         a.create_time
         from t_cruise_task a
@@ -116,6 +122,7 @@
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=VARCHAR}</if>
         <if test="taskType != null"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="taskLevel != null">and a.task_level = #{taskLevel, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
@@ -131,6 +138,7 @@
         a.robot_id,
         a.date_type,
         a.task_type,
+        a.task_level,
         a.start_time,
         a.create_time
         from t_cruise_task a
@@ -144,6 +152,7 @@
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="dateType != null and dateType != ''"> and a.date_type = #{dateType, jdbcType=VARCHAR}</if>
         <if test="taskType != null"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="taskLevel != null">and a.task_level = #{taskLevel, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
@@ -159,6 +168,7 @@
             robot_id,
             date_type,
             task_type,
+            task_level,
             start_time,
             create_time
         )values
@@ -173,6 +183,7 @@
                 #{TCruiseTask.robotId, jdbcType=BIGINT},
                 #{TCruiseTask.dateType, jdbcType=VARCHAR},
                 #{TCruiseTask.taskType, jdbcType=INTEGER},
+                #{TCruiseTask.taskLevel, jdbcType=INTEGER},
                 #{TCruiseTask.startTime, jdbcType=TIMESTAMP},
                 #{TCruiseTask.createTime, jdbcType=TIMESTAMP}
             )
