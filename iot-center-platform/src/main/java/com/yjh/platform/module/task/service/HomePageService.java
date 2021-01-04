@@ -1,10 +1,12 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
@@ -13,12 +15,21 @@ import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import io.swagger.models.auth.In;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -314,7 +325,20 @@ public class HomePageService {
         return re;
     }
 
+    @Logs(title = "获取分组下摄像机id信息", code = "TaskForHomeService",content = "获取分组下摄像机id信息")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> getWeatherInfo() throws Exception{
+        //String url = "http://192.168.10.100:18713/format/v1/getWeatherInfo";
+        String url = redisTemplate.opsForHash().entries("t_sys_param:weatherInfoService").get("content").toString();
 
+        String services = HttpClientUtils.getInstance().getUrl(url, null);
+        JSONObject jsonObject =JSONObject.parseObject(services);
+        Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
+        if(re == null || re.size()==0){
+            return null;
+        }
+        return re;
+    }
 
     private static Result cameraStates(HashMap map) {
         Result re = null;
@@ -328,6 +352,5 @@ public class HomePageService {
         }
         return re;
     }
-
 
 }

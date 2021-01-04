@@ -356,12 +356,12 @@ public class TStdMetemodelService {
     private   boolean createModel(List<String> list, String modelName, String modelPath) {
         boolean newFile = false;
         //创建excel工作簿
-            XSSFWorkbook workbook = new XSSFWorkbook();
+        HSSFWorkbook workbook = new HSSFWorkbook();
         //创建工作表sheet
-            XSSFSheet sheet = workbook.createSheet();
+        HSSFSheet sheet = workbook.createSheet();
         //创建第一行
-            XSSFRow row = sheet.createRow(0);
-            XSSFCell cell;
+        HSSFRow row = sheet.createRow(0);
+        HSSFCell cell;
         //设置样式
             CellStyle style = workbook.createCellStyle();
             style.setFillForegroundColor(IndexedColors.AQUA.getIndex());
@@ -488,7 +488,7 @@ public class TStdMetemodelService {
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
         List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
         Map<String, String> nameMap = resultHandler.getMappedResults();
-        XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(pathName));//创建工作簿
+        HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream(pathName));//创建工作簿
         Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
         int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
         List<TStdMete> tStdMeteList = new ArrayList<>();

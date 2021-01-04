@@ -167,4 +167,19 @@ public class HomePageController {
         }
         return result;
     }
+
+    @ApiOperation(value = "获取天气信息")
+    @RequestMapping(value = "/getWeatherInfo", method = RequestMethod.GET)
+    public Result getWeatherInfo()  {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.getWeatherInfo());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取天气信息错误:", e);
+        }
+        return result;
+    }
 }
