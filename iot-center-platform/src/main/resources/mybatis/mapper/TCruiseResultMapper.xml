@@ -91,12 +91,12 @@
     </select>
     <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update t_cruise_data_result set
-        person_check = #{personCheck,jdbcType=VARCHAR},
-        identify_result = #{identifyResult,jdbcType=INTEGER},
+        <if test="personCheck != null and personCheck != ''">person_check = #{personCheck,jdbcType=VARCHAR},</if>
+        <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
         evaluation_state = 256,
-        check_user = #{checkUser,jdbcType=VARCHAR},
-        check_date = #{checkDate,jdbcType=TIMESTAMP},
-        identify_state = #{identifyState,jdbcType=INTEGER}
+        <if test="checkUser != null and checkUser != ''">check_user = #{checkUser,jdbcType=VARCHAR},</if>
+        <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
+        <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
         where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
     </update>
 

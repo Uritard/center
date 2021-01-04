@@ -556,6 +556,7 @@
             a.warn_level as alarm_level,
             e.dict_note as alarm_level_name,
             a.warn_content,
+            g.real_code,
             a.image_path,
             a.alarm_source,
             f.dict_note as alarm_source_name
@@ -564,6 +565,7 @@
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id
         LEFT JOIN t_dict_business e on e.dict_code = a.warn_level
         LEFT JOIN t_dict_business f on f.dict_code = a.alarm_source
+        LEFT JOIN t_std_device_attr g on  g.device_id = a.device_id
         where 1 = 1
         <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
 

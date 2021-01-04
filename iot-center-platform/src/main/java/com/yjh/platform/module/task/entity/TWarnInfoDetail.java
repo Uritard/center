@@ -78,4 +78,7 @@ public class TWarnInfoDetail implements Serializable {
     @ApiModelProperty(value = "是否审核1.审核0.未审核")
     private Integer ifWarnDisable;
 
+    @ApiModelProperty(value = "实物Id")
+    private String realCode;
+
 }
