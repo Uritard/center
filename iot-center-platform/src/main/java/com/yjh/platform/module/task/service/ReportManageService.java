@@ -78,7 +78,7 @@ public class ReportManageService {
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String finalFileName = null;
         try {
-            finalFileName = new String(fileName.getBytes("utf-8"),"utf-8");
+            finalFileName = new String(fileName.getBytes("UTF-8"),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -260,7 +260,7 @@ public class ReportManageService {
 
         String finalFileName = null;
         try {
-            finalFileName = new String(reportName.getBytes("utf-8"),"utf-8");
+            finalFileName = new String(reportName.getBytes("UTF-8"),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
