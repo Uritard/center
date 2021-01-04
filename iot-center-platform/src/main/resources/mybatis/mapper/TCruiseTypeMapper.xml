@@ -147,4 +147,18 @@
         <if test="subType != null"> and sub_type = #{subType, jdbcType=INTEGER}</if>
     </select>
 
+    <delete id="deleteForInstanceId">
+        delete from t_cruise_type
+        where instance_id in (
+        <foreach collection="list" item="instanceId" separator=",">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </delete>
+
+    <select id="selectForInstanceId">
+        select instance_id from t_cruise_point_instance
+                where instance_id = #{instanceId, jdbcType=BIGINT}
+    </select>
+
 </mapper>

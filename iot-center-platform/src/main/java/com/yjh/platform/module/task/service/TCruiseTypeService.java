@@ -27,6 +27,9 @@ public class TCruiseTypeService{
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int add(Integer cruiseType,String instanceList,String remark) {
+        if("".equals(instanceList)){
+           return this.deleteByPrimaryId(cruiseType);
+        }
         List<String> list1= Arrays.asList(instanceList.split(","));
         List<TCruiseType> list = new ArrayList<>();
         for (String item:list1) {

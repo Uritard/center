@@ -24,4 +24,5 @@ public interface TCruiseTypeDao {
     int batchAdd(List<TCruiseType> list);
     int batchDelete(List<String> list);
     List<Long> selectIdList(@Param(value = "subType") Integer subType);
+    int deleteForInstanceId(@Param(value = "list")List<Long> list);
 }

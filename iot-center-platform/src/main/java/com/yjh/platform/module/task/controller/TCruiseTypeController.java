@@ -45,12 +45,7 @@ public class TCruiseTypeController {
                       @RequestParam(value = "subType",required = false) String remake) {
         Result result = new Result();
         try {
-            if("".equals(instanceList)){
-                result.setData("ok");
-            }else {
-                result.setData(tCruiseTypeService.add(cruiseType,instanceList,remake));
-            }
-
+            result.setData(tCruiseTypeService.add(cruiseType,instanceList,remake));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

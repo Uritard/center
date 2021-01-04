@@ -9,6 +9,7 @@ import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import java.math.BigDecimal;
 import java.util.*;
 
+import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
@@ -45,6 +46,8 @@ public class TStdDevicemeteService{
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TAlgorithmConfBakDao tAlgorithmConfBakDao;
+    @Autowired
+    private TCruiseTypeDao tCruiseTypeDao;
 
 
     @Logs(title = "插入", code = "device",content = "根据页面传入的参数新增数据")
@@ -105,11 +108,12 @@ public class TStdDevicemeteService{
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         //tCruisePointInstance.setDeviceMeteId(deviceMeteId);
         List<Long> haveList = tStdDevicemeteDao.selectHave(deviceMeteId);
-        tCruisePointInstanceDao.deleteByDeviceMeteId(deviceMeteId);//删除巡检点
         //删除关联的表
         if(haveList != null && haveList.size()>0){
+            tCruisePointInstanceDao.deleteByInstanceId(haveList);//删除巡检点
             tCruisePlanAttrDao.deleteByInstanceId(haveList);
-            tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+            //tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+            tCruiseTypeDao.deleteForInstanceId(haveList);
         }
         return this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);//删除测点
     }
@@ -265,7 +269,8 @@ public class TStdDevicemeteService{
             //删除关联的表
             if(haveList != null && haveList.size()>0){
                 tCruisePlanAttrDao.deleteByInstanceId(haveList);
-                tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+                //tCruiseTaskAttrDao.deleteByInstanceId(haveList);
+                tCruiseTypeDao.deleteForInstanceId(haveList);
             }
 
 //            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));//根据devicemeteId查测点

@@ -12,6 +12,7 @@ import java.util.*;
 
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
+import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
@@ -55,6 +56,8 @@ public class TCruisePointInstanceService{
 
     @Autowired
     private TCruisePointAttrDao tCruisePointAttrDao;
+    @Autowired
+    private TCruiseTypeDao tCruiseTypeDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -390,7 +393,8 @@ public class TCruisePointInstanceService{
             tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
             tCruisePointAttrDao.deleteByInstanceId(instanceIdList);
             tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
-            tCruiseTaskAttrDao.deleteByInstanceId(instanceIdList);
+            //tCruiseTaskAttrDao.deleteByInstanceId(instanceIdList);
+            tCruiseTypeDao.deleteForInstanceId(instanceIdList);
         }
         return result;
     }

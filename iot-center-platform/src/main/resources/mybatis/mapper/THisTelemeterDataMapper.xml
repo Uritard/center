@@ -167,7 +167,7 @@
         <if test="meteKind != null ">and b.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_id in (select mete_id from t_cfg_mete where mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%'))</if>
         <if test="deviceName != null and deviceName != ''"> and b.device_id in (select device_id from t_cfg_device where device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%'))</if>
-        )  order by record_time desc
+        )  order by mete_name,amerecord_time desc
     </select>
 
     <select id="selectUnionTask"  resultType="com.yjh.platform.module.task.entity.UnionTaskInfo">
@@ -175,7 +175,7 @@
         a.union_id,
         g.mete_name,
         i.mete_value,
-        a.start_time as cruiseTime ,
+        a.start_time as cruiseTime,
         d.result_num,
         d.origpic,
         d.person_check,
@@ -198,6 +198,6 @@
         WHERE 1 =1
         <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName != null and deviceName != ''"> and a.mete_id in (SELECT mete_id from t_cfg_data_current where device_id in (select device_id from t_cfg_device WHERE device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') ))</if>
-        order by a.union_id,a.start_time
+        order by g.mete_name,cruiseTime desc
     </select>
 </mapper>
