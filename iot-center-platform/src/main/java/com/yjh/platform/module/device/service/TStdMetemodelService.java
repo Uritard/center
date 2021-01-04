@@ -22,6 +22,8 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -342,7 +344,7 @@ public class TStdMetemodelService {
         String returnPath = (String) mapForReturnPath.get("content");
 
         //String path = "D:/code/qhTest";
-        String fileName = "meteModel.xlsx";
+        String fileName = "meteModel.xls";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
@@ -354,12 +356,12 @@ public class TStdMetemodelService {
     private   boolean createModel(List<String> list, String modelName, String modelPath) {
         boolean newFile = false;
         //创建excel工作簿
-            HSSFWorkbook workbook = new HSSFWorkbook();
+            XSSFWorkbook workbook = new XSSFWorkbook();
         //创建工作表sheet
-            HSSFSheet sheet = workbook.createSheet();
+            XSSFSheet sheet = workbook.createSheet();
         //创建第一行
-            HSSFRow row = sheet.createRow(0);
-            HSSFCell cell;
+            XSSFRow row = sheet.createRow(0);
+            XSSFCell cell;
         //设置样式
             CellStyle style = workbook.createCellStyle();
             style.setFillForegroundColor(IndexedColors.AQUA.getIndex());
@@ -486,7 +488,7 @@ public class TStdMetemodelService {
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
         List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
         Map<String, String> nameMap = resultHandler.getMappedResults();
-        HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream(pathName));//创建工作簿
+        XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(pathName));//创建工作簿
         Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
         int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
         List<TStdMete> tStdMeteList = new ArrayList<>();
