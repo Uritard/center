@@ -74,11 +74,11 @@ public class ReportManageService {
 //        String fileName = nowTime+"-"+reportType+".xlsx";
         //生成随机的文件名称
 //        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
-        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
+        String fileName = reportName+"_"+reportType+"_"+nowTime+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String finalFileName = null;
         try {
-            finalFileName = new String(fileName.getBytes("ISO-8859-1"),"UTF-8");
+            finalFileName = new String(fileName.getBytes("utf-8"),"utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -128,8 +128,6 @@ public class ReportManageService {
     @Logs(title = "下载报表", code = "reportManage",content = "通过web传递的参数下载报表")
     @Transactional(rollbackFor = Exception.class)
     public String reportDownload(String reportId) {
-//        String time2 =  DateTimeUtil.changeTime2(startTime);
-//        String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
 //        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
 //        String filePath = reportPathA+fileName;
 
@@ -173,8 +171,6 @@ public class ReportManageService {
             e.printStackTrace();
         }
         log.info("删除前文件的个数："+count);
-//        String timeTemp =  DateTimeUtil.changeTime2(startTime);
-//        String fileName = reportName+"-"+timeTemp+"-"+reportType+".xlsx";
         String fileName = reportManageDao.selectReportEnvId(reportId);
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String filePath = reportPath+"/"+fileName;
@@ -255,12 +251,19 @@ public class ReportManageService {
 
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         recordData.setTCDRDList(tCDRDList);
-//        String taskName = recordData.getTaskVO().getTaskName();
-//        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
-//        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
-        String reportName =  taskId + ".xlsx";//报表名称
+        String taskName = recordData.getTaskVO().getTaskName();
+        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
+        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
+//        String reportName =  taskId + ".xlsx";//报表名称
 
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+
+        String finalFileName = null;
+        try {
+            finalFileName = new String(reportName.getBytes("utf-8"),"utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //从缓存中获取系统参数
         Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
@@ -272,14 +275,14 @@ public class ReportManageService {
         if (!temporaryFile.exists() && !temporaryFile.isDirectory())
         {
             temporaryFile.mkdir();
-            reportPath2 = reportPath+"/"+reportName;
+            reportPath2 = reportPath+"/"+finalFileName;
             log.info("不存在，创建的文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
-            reportPath2 = reportPath+"/"+reportName;
+            reportPath2 = reportPath+"/"+finalFileName;
             log.info("存在，该文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);
@@ -288,7 +291,7 @@ public class ReportManageService {
         }
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-        String fileRelativePath = map.get("content") + "/" + reportName;
+        String fileRelativePath = map.get("content") + "/" + finalFileName;
         log.info("该文件相对路径是==="+fileRelativePath);
         return fileRelativePath;
     }
