@@ -13,10 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -76,13 +73,19 @@ public class ReportManageService {
 
 //        String fileName = nowTime+"-"+reportType+".xlsx";
         //生成随机的文件名称
-        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
-//        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
+//        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+        String fileName = reportName+"-"+nowTime+"-"+reportType+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+        String finalFileName = null;
+        try {
+            finalFileName = new String(fileName.getBytes("ISO-8859-1"),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
-        String reportPath = map.get("content")+"/"+fileName;
+        String reportPath = map.get("content")+"/"+finalFileName;
         log.info("reportPath:"+reportPath);
         File file = new File(reportPath);
 
