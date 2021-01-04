@@ -50,10 +50,10 @@ public interface TDefectInfoDao {
     int batchInsert(List<TDefectInfo> list);
     List<TDefectInfoDetail> selectDefectProcess(@Param(value = "defectId")Long defectId);
     List<TDefectInfoDetail> selectAllDefect(HashMap<String,Object> map);
-    List<WarnStatistical> countDefectOnMonth(@Param(value = "startTime")String startTime,
-                                             @Param(value = "endTime")String endTime);
+    List<WarnStatistical> countDefectOnMonth();
 
-    Map<String, Integer> countDefectConfMode();
+    Map<String, Integer> countDefectConfMode(@Param(value = "startTime")String startTime,
+                                             @Param(value = "endTime")String endTime);
     List<TJDefectByType>  countByDefectType();
 
     List<Map<String,Integer>> countByDefectLevel();

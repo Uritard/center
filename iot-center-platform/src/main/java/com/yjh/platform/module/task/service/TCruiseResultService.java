@@ -2,7 +2,6 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.entity.*;
@@ -24,6 +23,8 @@ public class TCruiseResultService{
     private Logger log = LoggerFactory.getLogger(TCruiseResultService.class);
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
+    @Autowired
+    private ReportManageService reportManageService;
 
     @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
@@ -80,6 +81,10 @@ public class TCruiseResultService{
         cruiseManualReview.setCheckDate(cruiseCheckDate);
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
+        
+        //自动生成巡视报告
+        String taskID = cruiseManualReview.getTaskId();
+        reportManageService.cruiseReportGenerate(taskID);
 
         //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
@@ -169,12 +174,16 @@ public class TCruiseResultService{
     }
     @Logs(title = "巡视任务结果统计", code = "cruiseResult",content = "根据巡视类型统计本周和上周的任务结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<StatisticalResult> taskStatistical() {
+    public List<StatisticalResult> taskStatistical() throws Exception{
 
-        String weekStart = DateTimeUtil.getWeekStart();
-        String weekEnd = DateTimeUtil.getWeekEnd();
-        String lastWeekStart = DateTimeUtil.getLastWeekStart();
-        String lastWeekend = DateTimeUtil.getLastWeekend();
+        String weekStart = tCruiseResultDao.selectOnMonday();//本周一的日期
+        String weekEnd = tCruiseResultDao.selectOnSunday();//本周日的日期
+        String lastWeekStart = tCruiseResultDao.selectLastMonday();//上周一的日期
+        String lastWeekend = tCruiseResultDao.selectLastSunday();//上周日的日期
+        log.info("weekStart=="+weekStart);
+        log.info("weekEnd=="+weekEnd);
+        log.info("lastWeekStart=="+lastWeekStart);
+        log.info("lastWeekend=="+lastWeekend);
 
         String colName1 = "plan_type";
 

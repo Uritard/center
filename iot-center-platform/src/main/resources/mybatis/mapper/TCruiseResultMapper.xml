@@ -327,6 +327,22 @@
         ORDER BY d.start_time DESC
 </select>
 
+    <select id="selectOnMonday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1)
+    </select>
+
+    <select id="selectOnSunday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-7)
+    </select>
+
+    <select id="selectLastMonday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+6)
+    </select>
+
+    <select id="selectLastSunday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w'))
+    </select>
+
     <!--巡视任务结果统计-->
     <select id="taskStatistical"  resultType="com.yjh.platform.module.task.entity.StatisticalTools">
     select

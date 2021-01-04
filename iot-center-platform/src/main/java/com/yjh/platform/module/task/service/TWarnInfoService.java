@@ -7,10 +7,11 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
-import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,8 +22,6 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -39,9 +38,9 @@ public class TWarnInfoService{
     @Autowired
     private TRobotAlarmDao tRobotAlarmDao;
     @Autowired
-    private TCruiseResultDao tCruiseResultDao;
-    @Autowired
     private RedisTemplate redisTemplate;
+
+    private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
 
     private DateTimeUtil dateTimeUtil;
 
@@ -125,6 +124,8 @@ public class TWarnInfoService{
         Date startingTime = dateTimeUtil.parse(firstTime1);
         String endTime = dateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
+        log.info("startTime==="+startTime);
+        log.info("endTime==="+endTime);
         List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType(startTime,endTime);
         System.out.println("tjContentInfoList是："+tjContentInfoList);
         return tjContentInfoList;
@@ -132,13 +133,15 @@ public class TWarnInfoService{
     @Logs(title = "统计告警个数", code = "tWarnInfo",content = "统计近一月的所有告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnOnMonth() {
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        /*List<String> monthDates = dateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
         Date startingTime = dateTimeUtil.parse(firstTime1);
         String endTime = dateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
-        List<WarnStatistical> list = tWarnInfoDao.countWarnOnMonth(startTime,endTime);
-        List<WarnStatistical> list1 = new ArrayList<>();
+        log.info("startTime==="+startTime);
+        log.info("endTime==="+endTime);*/
+        List<WarnStatistical> list = tWarnInfoDao.countWarnOnMonth();
+        /*List<WarnStatistical> list1 = new ArrayList<>();
 
         for (int i = 0;i < monthDates.size();i++){
             int flag = 0;
@@ -176,7 +179,7 @@ public class TWarnInfoService{
                 }
                 return flag;
             }
-        });
+        });*/
         return list;
     }
     @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警处理状态统计告警个数-近一月")
@@ -187,6 +190,8 @@ public class TWarnInfoService{
         Date startingTime = dateTimeUtil.parse(firstTime1);
         String endTime = dateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
+        log.info("startTime==="+startTime);
+        log.info("endTime==="+endTime);
         Map<String, Integer> map = tWarnInfoDao.countWarnConfMode(startTime,endTime);
         List<TJContentInfo> tjContentInfoList = new ArrayList<>();
         Iterator<String> iter = map.keySet().iterator();

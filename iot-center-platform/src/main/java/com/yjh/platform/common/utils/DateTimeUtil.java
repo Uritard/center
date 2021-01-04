@@ -3,7 +3,6 @@ package com.yjh.platform.common.utils;
 import com.mysql.jdbc.StringUtils;
 import com.yjh.platform.module.task.entity.TCruiseTaskCron;
 import org.quartz.CronExpression;
-import org.quartz.CronScheduleBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1155,32 +1154,32 @@ public class DateTimeUtil {
     // 获得本周一0点时间
     public static String getWeekStart() {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.WEEK_OF_MONTH, 0);
-        cal.set(Calendar.DAY_OF_WEEK, 2);
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         Date time = cal.getTime();
         return new SimpleDateFormat("yyyy-MM-dd 00:00:00").format(time);
     }
     // 获得本周日24点时间
-    public static String getWeekEnd(){
+    public static String getWeekEnd() throws Exception{
         Calendar cal=Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
-        cal.add(Calendar.DAY_OF_WEEK, 1);
+        cal.setTime(new SimpleDateFormat("yyyy-MM-dd 00:00:00").parse(getWeekStart()));
+        cal.add(Calendar.DAY_OF_WEEK, 7);
         Date time=cal.getTime();
         return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
     }
     //获得上周一0点时间
     public static String getLastWeekStart() {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK,cal.getActualMaximum(Calendar.DAY_OF_WEEK));
-        cal.add(Calendar.DAY_OF_WEEK, -12);
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        cal.add(Calendar.DAY_OF_WEEK, -13);
         Date time=cal.getTime();
         return new SimpleDateFormat("yyyy-MM-dd 00:00:00").format(time);
     }
     //获得上周日24点时间
     public static String getLastWeekend() {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK,cal.getActualMaximum(Calendar.DAY_OF_WEEK));
-        cal.add(Calendar.DAY_OF_WEEK, -6);
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        cal.add(Calendar.DAY_OF_WEEK, -7);
         Date time=cal.getTime();
         return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
     }
