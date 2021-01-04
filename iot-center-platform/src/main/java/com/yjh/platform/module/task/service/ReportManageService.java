@@ -223,9 +223,9 @@ public class ReportManageService {
 //        }
 //        return  true;
 //    }
-    @Logs(title = "下载报告", code = "reportManage",content = "根据巡检任务生成报告并下载")
+    @Logs(title = "生成巡视报告", code = "reportManage",content = "根据巡检任务生成报告")
     @Transactional(rollbackFor = Exception.class)
-    public String reportByTask(String taskId){
+    public String cruiseReportGenerate(String taskId){
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
@@ -290,6 +290,16 @@ public class ReportManageService {
         return fileRelativePath;
     }
 
+    @Logs(title = "下载巡视报告", code = "test",content = "啥也不是")
+    @Transactional(rollbackFor = Exception.class)
+    public String downLoadCruiseReport(String taskId){
+        String reportName = taskId + ".xlsx";//报表名称
+        //从缓存中获取系统参数
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        String fileRelativePath = map.get("content") + "/" + reportName;
+        log.info("该文件相对路径是==="+fileRelativePath);
+        return fileRelativePath;
+    }
     @Logs(title = "啥也不是", code = "test",content = "啥也不是")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> test(String taskId){

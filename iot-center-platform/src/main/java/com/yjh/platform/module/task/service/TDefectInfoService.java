@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -81,13 +79,13 @@ public class TDefectInfoService {
     @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "统计近一月的所有缺陷个数")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countDefectOnMonth() {
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        /*List<String> monthDates = dateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
         Date startingTime = dateTimeUtil.parse(firstTime1);
         String endTime = dateTimeUtil.getDayBefore(startingTime);
-        String startTime = monthDates.get(29);
-        List<WarnStatistical> list = tDefectInfoDao.countDefectOnMonth(startTime,endTime);
-        List<WarnStatistical> list1 = new ArrayList<>();
+        String startTime = monthDates.get(29);*/
+        List<WarnStatistical> list = tDefectInfoDao.countDefectOnMonth();
+        /*List<WarnStatistical> list1 = new ArrayList<>();
 
         for (int i = 0;i < monthDates.size();i++){
             int flag = 0;
@@ -125,7 +123,7 @@ public class TDefectInfoService {
                 }
                 return flag;
             }
-        });
+        });*/
         return list;
     }
     @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "根据缺陷类型统计缺陷个数")
@@ -138,7 +136,12 @@ public class TDefectInfoService {
     @Logs(title = "统计缺陷个数", code = "tDefectInfo",content = "根据缺陷的处理状态统计缺陷个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countDefectConfMode() {
-        Map<String, Integer> map = tDefectInfoDao.countDefectConfMode();
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        String firstTime1 = monthDates.get(0);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        Map<String, Integer> map = tDefectInfoDao.countDefectConfMode(startTime,endTime);
         List<TJContentInfo> tjContentInfoList = new ArrayList<>();
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {

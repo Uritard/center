@@ -204,52 +204,95 @@
         <if test="startDateTemp != null " ><if test="endDateTemp != null">and a.create_time between #{startDateTemp,jdbcType=TIMESTAMP} and #{endDateTemp,jdbcType=TIMESTAMP}</if></if>
         and a.rule_id = b.rule_id
         and b.plan_id = d.plan_id
+        order by create_time DESC
     </select>
 
-    <select id="getHistoryByWeek"  resultType="java.util.Map">
-        select
-            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime2},
-            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime3},
-            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime4},
-            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime5},
-            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime6},
-            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime7},
-            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime8}
-        from t_union_task
+    <select id="getHistoryByWeek"  resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (
+        SELECT
+        curdate( ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 1 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 2 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 3 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 4 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 5 DAY ) AS timeNode UNION ALL
+        SELECT
+        date_sub( curdate( ), INTERVAL 6 DAY ) AS timeNode
+        ) a
+        LEFT JOIN (
+        SELECT
+        DATE(start_time) date,
+        start_time,
+        count( 1 ) AS count
+        FROM
+        t_union_task
+        WHERE
+        DATEDIFF( now( ), start_time ) &lt;= 7
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
-    <select id="getHistoryByYear"  resultType="java.util.Map">
+    <select id="getHistoryByYear"  resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         select
-            COUNT(start_time BETWEEN #{firstTime2} and #{firstTime1} or null) as #{firstTime2},
-            COUNT(start_time BETWEEN #{firstTime3} and #{firstTime2} or null) as #{firstTime3},
-            COUNT(start_time BETWEEN #{firstTime4} and #{firstTime3} or null) as #{firstTime4},
-            COUNT(start_time BETWEEN #{firstTime5} and #{firstTime4} or null) as #{firstTime5},
-            COUNT(start_time BETWEEN #{firstTime6} and #{firstTime5} or null) as #{firstTime6},
-            COUNT(start_time BETWEEN #{firstTime7} and #{firstTime6} or null) as #{firstTime7},
-            COUNT(start_time BETWEEN #{firstTime8} and #{firstTime7} or null) as #{firstTime8},
-            COUNT(start_time BETWEEN #{firstTime9} and #{firstTime8} or null) as #{firstTime9},
-            COUNT(start_time BETWEEN #{firstTime10} and #{firstTime9} or null) as #{firstTime10},
-            COUNT(start_time BETWEEN #{firstTime11} and #{firstTime10} or null) as #{firstTime11},
-            COUNT(start_time BETWEEN #{firstTime12} and #{firstTime11} or null) as #{firstTime12},
-            COUNT(start_time BETWEEN #{firstTime13} and #{firstTime12} or null) as #{firstTime13}
-        from t_union_task
+        a.month as timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+         (        SELECT DATE_FORMAT(CURDATE(), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 1 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 2 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 3 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 4 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 5 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 6 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 7 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 8 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 9 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 10 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 11 MONTH), '%Y-%m') AS `month` )a
+        LEFT JOIN
+        (SELECT
+          DATE_FORMAT(start_time,'%Y-%m') timeNode,
+          count(union_id) as count
+        FROM
+          t_union_task
+        GROUP BY
+            DATE_FORMAT(start_time,'%Y-%m')) b
+         on a.month = b.timeNode
+         order by timeNode
     </select>
     <select id="getHistoryByMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
-        DATE_FORMAT( start_time, '%Y-%m-%d' ) as time_node,
-        count( * ) as count
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
         FROM
-        (
-        select
-        a.start_time
-        from t_union_task a
-        where 1=1
-				) AS Time
-				WHERE
-        period_diff( date_format( now( ) , '%Y-%m-%d %H:%i:%S' ) , date_format( start_time, '%Y-%m-%d %H:%i:%S' ) ) =0
-        and DATE_FORMAT( start_time, '%Y-%m-%d %H:%i:%S' ) BETWEEN #{startTime} and #{endTime}
+        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
+        from mysql.help_topic
+        where help_topic_id  &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(start_time) date,
+        start_time,
+        count( 1 ) AS count
+        FROM
+        t_union_task
+        WHERE
+        DATEDIFF( now( ), start_time ) &lt;= 31
         GROUP BY
-        time_node
+        date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
     <select id="selectUnionDetail" resultType="com.yjh.platform.module.task.entity.TUnionTaskDetail">

@@ -52,6 +52,11 @@ public interface TCruiseResultDao {
     Long selectWarnId(@Param(value = "taskId")String taskId,
                       @Param(value = "instanceId")Long instanceId);
     int batchInsert(List<TCruiseResult> list);
+
+    String selectOnMonday();
+    String selectOnSunday();
+    String selectLastMonday();
+    String selectLastSunday();
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "Start")String Start,
                                            @Param(value = "End")String End);

@@ -493,20 +493,26 @@
     <!--统计近一月内的告警数-->
     <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
-        DATE_FORMAT( warn_time, '%Y-%m-%d' ) as time_node,
-        count( * ) as count
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
         FROM
-        (
-        select
-        a.warn_time
-        from t_warn_info a
-        where 1=1
-        ) AS Time
+        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
+        from mysql.help_topic
+        where help_topic_id  &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(warn_time) date,
+        warn_time,
+        count( 1 ) AS count
+        FROM
+        t_warn_info
         WHERE
-        period_diff( date_format( now( ) , '%Y-%m-%d %H:%i:%S' ) , date_format( warn_time, '%Y-%m-%d %H:%i:%S' ) ) =0
-        and DATE_FORMAT( warn_time, '%Y-%m-%d %H:%i:%S' ) BETWEEN #{startTime} and #{endTime}
+        DATEDIFF( now( ), warn_time )  &lt;= 31
         GROUP BY
-        time_node
+        date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
 
     <!--根据告警处理状态统计告警个数-->

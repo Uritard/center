@@ -155,12 +155,12 @@ public class ReportManageController {
 //        }
 //        return result;
 //    }
-    @ApiOperation(value = "根据任务生成巡检记录报告")
+    @ApiOperation(value = "审核完成后根据任务生成巡检记录报告")
     @RequestMapping(value = "/reportByTask", method = RequestMethod.GET)
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            String filePath = reportManageService.reportByTask(taskId);
+            String filePath = reportManageService.cruiseReportGenerate(taskId);
             result.setData(filePath);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -170,7 +170,20 @@ public class ReportManageController {
         }
         return result;
     }
-
+    @ApiOperation(value = "下载巡视报告")
+    @RequestMapping(value = "/downLoadCruiseReport", method = RequestMethod.GET)
+    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(reportManageService.downLoadCruiseReport(taskId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("生成报表错误:", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "啥也不是")
     @RequestMapping(value = "/xixixi", method = RequestMethod.GET)
     public Result test(@RequestParam(value="taskId")String taskId) {

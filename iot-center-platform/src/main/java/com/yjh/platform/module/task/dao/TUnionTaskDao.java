@@ -1,12 +1,11 @@
 package com.yjh.platform.module.task.dao;
 
-import java.util.List;
-import java.util.Date;
-import java.util.Map;
-
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -41,27 +40,7 @@ public interface TUnionTaskDao {
     List<TUnionTaskDetail> selectUnionDetail(@Param(value = "ruleId")Long  ruleId);
     int insertRecordDetail(List<TUnionTaskAttr> tUnionTaskAttrList);
 
-    Map<String,Integer> getHistoryByWeek(@Param(value = "firstTime1")String firstTime1,
-                                         @Param(value = "firstTime2")String firstTime2,
-                                         @Param(value = "firstTime3")String firstTime3,
-                                         @Param(value = "firstTime4")String firstTime4,
-                                         @Param(value = "firstTime5")String firstTime5,
-                                         @Param(value = "firstTime6")String firstTime6,
-                                         @Param(value = "firstTime7")String firstTime7,
-                                         @Param(value = "firstTime8")String firstTime8);
-    Map<String,Integer> getHistoryByYear(@Param(value = "firstTime1")String firstTime1,
-                                         @Param(value = "firstTime2")String firstTime2,
-                                         @Param(value = "firstTime3")String firstTime3,
-                                         @Param(value = "firstTime4")String firstTime4,
-                                         @Param(value = "firstTime5")String firstTime5,
-                                         @Param(value = "firstTime6")String firstTime6,
-                                         @Param(value = "firstTime7")String firstTime7,
-                                         @Param(value = "firstTime8")String firstTime8,
-                                         @Param(value = "firstTime9")String firstTime9,
-                                         @Param(value = "firstTime10")String firstTime10,
-                                         @Param(value = "firstTime11")String firstTime11,
-                                         @Param(value = "firstTime12")String firstTime12,
-                                         @Param(value = "firstTime13")String firstTime13);
-    List<WarnStatistical> getHistoryByMonth(@Param(value = "startTime")String startTime,
-                                            @Param(value = "endTime")String endTime);
+    List<WarnStatistical> getHistoryByWeek();
+    List<WarnStatistical> getHistoryByYear();
+    List<WarnStatistical> getHistoryByMonth();
 }

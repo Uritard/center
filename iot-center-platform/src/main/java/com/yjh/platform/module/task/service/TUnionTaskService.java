@@ -13,9 +13,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -100,8 +101,8 @@ public class TUnionTaskService{
     }
     @Logs(title = "联动历史记录统计--近一周", code = "tUnionTask",content = "统计近一周发生的联动次数")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> historyStatisticalByWeek() {
-        List<String> weekDates = dateTimeUtil.getDayDateList(8);
+    public List<WarnStatistical> historyStatisticalByWeek() {
+        /*List<String> weekDates = dateTimeUtil.getDayDateList(8);
 
         String firstTime1 = weekDates.get(0);
         String firstTime2 = weekDates.get(1);
@@ -110,12 +111,11 @@ public class TUnionTaskService{
         String firstTime5 = weekDates.get(4);
         String firstTime6 = weekDates.get(5);
         String firstTime7 = weekDates.get(6);
-        String firstTime8 = weekDates.get(7);
+        String firstTime8 = weekDates.get(7);*/
 
 
-        Map<String,Integer> map = tUnionTaskDao.getHistoryByWeek(firstTime1,firstTime2,firstTime3,firstTime4,
-                firstTime5,firstTime6,firstTime7,firstTime8);
-        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+        List<WarnStatistical> list = tUnionTaskDao.getHistoryByWeek();
+        /*List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
 
         Iterator<String> iter = map.keySet().iterator();
         while(iter.hasNext()){
@@ -149,13 +149,13 @@ public class TUnionTaskService{
                 }
                 return flag;
             }
-        });
-        return tutHistoryStatisticalList;
+        });*/
+        return list;
     }
     @Logs(title = "联动历史记录统计--近一年", code = "tUnionTask",content = "统计近一年发生的联动次数")
     @Transactional(rollbackFor = Exception.class)
-    public List<TutHistoryStatistical> historyStatisticalByYear() {
-        List<String> yearDates = dateTimeUtil.getYearDateList1(13);
+    public List<WarnStatistical> historyStatisticalByYear() {
+        /*List<String> yearDates = dateTimeUtil.getYearDateList1(13);
 
         String firstTime1 = yearDates.get(0);
         String firstTime2 = yearDates.get(1);
@@ -169,12 +169,10 @@ public class TUnionTaskService{
         String firstTime10 = yearDates.get(9);
         String firstTime11 = yearDates.get(10);
         String firstTime12 = yearDates.get(11);
-        String firstTime13 = yearDates.get(12);
+        String firstTime13 = yearDates.get(12);*/
 
-        Map<String,Integer> map = tUnionTaskDao.getHistoryByYear(firstTime1,firstTime2,firstTime3,firstTime4,
-                firstTime5,firstTime6,firstTime7,firstTime8,firstTime9,
-                firstTime10,firstTime11,firstTime12,firstTime13);
-        List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
+        List<WarnStatistical> list = tUnionTaskDao.getHistoryByYear();
+        /*List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
 
         Iterator<String> iter = map.keySet().iterator();
         while(iter.hasNext()){
@@ -186,8 +184,8 @@ public class TUnionTaskService{
             tutHistoryStatistical.setTimeNode(timeNode);
             tutHistoryStatistical.setCount(mapValue);
             tutHistoryStatisticalList.add(tutHistoryStatistical);
-        }
-        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
+        }*/
+        /*Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
             @Override
             public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
@@ -208,57 +206,13 @@ public class TUnionTaskService{
                 }
                 return flag;
             }
-        });
-        return tutHistoryStatisticalList;
+        });*/
+        return list;
     }
     @Logs(title = "联动历史记录统计--近一月", code = "tUnionTask",content = "统计近一月发生的联动次数")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> historyStatisticalByMonth() {
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
-        String firstTime1 = monthDates.get(0);
-        Date startingTime = dateTimeUtil.parse(firstTime1);
-        String endTime = dateTimeUtil.getDayBefore(startingTime);
-        String startTime = monthDates.get(29);
-        List<WarnStatistical> list = tUnionTaskDao.getHistoryByMonth(startTime,endTime);
-        List<WarnStatistical> list1 = new ArrayList<>();
-
-        for (int i = 0;i < monthDates.size();i++){
-            int flag = 0;
-            for (int j = 0;j < list.size();j++){
-                if (monthDates.get(i).substring(0, 10).equals(list.get(j).getTimeNode())){
-                    flag++;
-                }
-            }
-            if (flag == 0){
-                WarnStatistical ws = new WarnStatistical();
-                ws.setCount(0);
-                ws.setTimeNode(monthDates.get(i).substring(0, 10));
-                list1.add(ws);
-            }
-        }
-        list.addAll(list1);
-        Collections.sort(list, new Comparator<WarnStatistical>() {
-            @Override
-            public int compare(WarnStatistical o1, WarnStatistical o2) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                Date date1 = null;
-                Date date2 = null;
-                try {
-                    date1 = simpleDateFormat.parse(o1.getTimeNode());
-                    date2 = simpleDateFormat.parse(o2.getTimeNode());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                int flag = date1.compareTo(date2);
-                if (flag == -1) {
-                    flag = -1;
-                } else if (flag == 1) {
-                    flag = 1;
-                }
-                return flag;
-            }
-        });
+        List<WarnStatistical> list = tUnionTaskDao.getHistoryByMonth();
         return list;
     }
     @Logs(title = "联动记录存储", code = "tUnionTask",content = "触发联动进行记录存储")

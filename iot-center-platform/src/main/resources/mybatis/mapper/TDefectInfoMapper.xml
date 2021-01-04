@@ -373,20 +373,26 @@
     <!--统计近一月的所有缺陷个数-->
     <select id="countDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
-        DATE_FORMAT( defect_time, '%Y-%m-%d' ) as time_node,
-        count( * ) as count
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
         FROM
-        (
-        select
-        a.defect_time
-        from t_defect_info a
-        where 1=1
-				) AS Time
-				WHERE
-        period_diff( date_format( now( ) , '%Y-%m-%d %H:%i:%S' ) , date_format( defect_time, '%Y-%m-%d %H:%i:%S' ) ) =0
-        and DATE_FORMAT( defect_time, '%Y-%m-%d %H:%i:%S' ) BETWEEN  #{startTime} and #{endTime}
+        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
+        from mysql.help_topic
+        where help_topic_id &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(defect_time) date,
+        defect_time,
+        count( 1 ) AS count
+        FROM
+        t_defect_info
+        WHERE
+        DATEDIFF( now( ), defect_time )  &lt;= 31
         GROUP BY
-        time_node
+        date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
     </select>
     <!--根据缺陷类型统计缺陷数据-->
     <select id="countByDefectType" resultType="com.yjh.platform.module.task.entity.TJDefectByType">
@@ -413,8 +419,10 @@
             b.untreated as unProcessed
         FROM
         (
-            (select count(conf_mode = 275 or null) as processed from t_defect_info ) a,
-            (select count(conf_mode = 276 or null) as untreated from t_defect_info ) b
+            (select count(conf_mode = 275 or null) as processed from t_defect_info
+                where defect_time between #{startTime} and #{endTime}) a,
+            (select count(conf_mode = 276 or null) as untreated from t_defect_info
+                where defect_time between #{startTime} and #{endTime}) b
         )
     </select>
     <!--查看缺陷处理情况-->
