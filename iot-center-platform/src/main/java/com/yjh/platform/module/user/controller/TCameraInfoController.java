@@ -127,7 +127,7 @@ public class TCameraInfoController {
     @RequestMapping(value = "/selectByRegionId", method = RequestMethod.GET)
     public Result selectByRegionId(@RequestParam(value = "regionId", required = false) Long regionId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -147,7 +147,7 @@ public class TCameraInfoController {
     @RequestMapping(value = "/selectByCameraName", method = RequestMethod.GET)
     public Result selectByCameraName(@RequestParam(value = "cameraName", required = false) String cameraName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                     @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -201,7 +201,7 @@ public class TCameraInfoController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCameraInfo tCameraInfo,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

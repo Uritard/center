@@ -135,7 +135,7 @@ public class TCfgUnionRuleController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "ruleName", required = false) String ruleName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -197,7 +197,7 @@ public class TCfgUnionRuleController {
     @RequestMapping(value = "/selectForTCPlan", method = RequestMethod.GET)
     public Result selectForTCPlan(@RequestParam(value = "planName", required = false) String planName,
                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                  @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                  @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

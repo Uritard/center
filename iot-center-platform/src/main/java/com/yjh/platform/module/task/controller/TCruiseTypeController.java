@@ -105,7 +105,7 @@ public class TCruiseTypeController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "subType", required = true) Integer subType,
                          @RequestParam(value = "pageNum", required = false) Integer pageNum,
-                         @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+                         @RequestParam(value = "pageSize", required = false,defaultValue = "0") Integer pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -131,7 +131,7 @@ public class TCruiseTypeController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruiseType tCruiseType,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

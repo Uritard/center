@@ -161,7 +161,7 @@ public class TCfgAlarmHistoryController {
                                @RequestParam(value = "showType", required = false) String showType,
                                @RequestParam(value = "updateTime", required = false) Date updateTime,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -197,7 +197,7 @@ public class TCfgAlarmHistoryController {
     @RequestMapping(value = "/selectUnionCruiseResult", method = RequestMethod.GET)
     public Result selectUnionCruiseResult(@RequestParam(value = "unionId", required = false) String  unionId,
                                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                          @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                          @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

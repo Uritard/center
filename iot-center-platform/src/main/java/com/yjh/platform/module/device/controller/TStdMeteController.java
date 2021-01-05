@@ -146,7 +146,7 @@ public class TStdMeteController {
     public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

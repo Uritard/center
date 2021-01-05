@@ -202,7 +202,7 @@ public class TCameraPresetController {
     @RequestMapping(value = "/selectByCameraId", method = RequestMethod.GET)
     public Result selectByCameraId(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -222,7 +222,7 @@ public class TCameraPresetController {
     @RequestMapping(value = "/selectByPresetName", method = RequestMethod.GET)
     public Result selectByPresetName(@RequestParam(value = "presetName", required = false) String presetName,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -265,7 +265,7 @@ public class TCameraPresetController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCameraPreset tCameraPreset,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

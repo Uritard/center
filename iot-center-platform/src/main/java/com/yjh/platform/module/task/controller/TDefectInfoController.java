@@ -142,7 +142,7 @@ public class TDefectInfoController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TDefectInfo tDefectInfo,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -179,7 +179,7 @@ public class TDefectInfoController {
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
                                      @RequestParam(value = "meteName", required = false) String meteName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                     @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

@@ -127,7 +127,7 @@ public class TCruisePlanController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruisePlan tCruisePlan,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -147,7 +147,7 @@ public class TCruisePlanController {
     @RequestMapping(value = "/selectByPlanPage", method = RequestMethod.POST)
     public Result selectByPlanPage(@RequestBody TCruisePlan tCruisePlan,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -180,7 +180,7 @@ public class TCruisePlanController {
     @RequestMapping(value = "/findInstances", method = RequestMethod.GET)
     public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         if (Objects.equals(null,deviceIds) || Objects.equals("",deviceIds)) {

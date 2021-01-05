@@ -130,7 +130,7 @@ public class THisTelemeterDataController {
                                @RequestParam(value = "deviceName", required = false) String deviceName,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -165,7 +165,7 @@ public class THisTelemeterDataController {
                                   @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,
                                   @RequestParam(value = "deviceName", required = false) String deviceName,
                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                  @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                  @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         //@RequestParam(value = "meteKind", required = false) Integer meteKind,
         //@RequestParam(value = "meteName", required = false) String meteName,
         Result result = new Result();

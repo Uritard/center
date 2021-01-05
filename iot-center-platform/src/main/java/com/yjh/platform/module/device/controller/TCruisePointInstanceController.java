@@ -138,7 +138,7 @@ public class TCruisePointInstanceController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -158,7 +158,7 @@ public class TCruisePointInstanceController {
     @RequestMapping(value = "/selectCruisePointByPage", method = RequestMethod.POST)
     public Result selectCruisePointByPage(@RequestBody TStdDeviceMete tStdDeviceMete,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         return tCruisePointInstanceService.selectCruisePointByPage(tStdDeviceMete,pageNum,pageSize);
     }
 
@@ -166,7 +166,7 @@ public class TCruisePointInstanceController {
     @RequestMapping(value = "/selectSYCruisePointByPage", method = RequestMethod.POST)
     public Result selectSYCruisePointByPage(@RequestBody TCfgMeteForPointDetail tCfgMeteForPointDetail,
                                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                          @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                          @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         return tCruisePointInstanceService.selectSYCruisePointByPage(tCfgMeteForPointDetail,pageNum,pageSize);
     }
     @ApiOperation(value = "批量插入")

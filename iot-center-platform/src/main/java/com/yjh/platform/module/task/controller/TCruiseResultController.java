@@ -135,7 +135,7 @@ public class TCruiseResultController {
                                    @RequestParam(value = "cState", required = false) Integer cState,
                                    @RequestParam(value = "cType", required = false) Integer cType,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
 
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -188,7 +188,7 @@ public class TCruiseResultController {
                                      @RequestParam(value = "cruiseAbnormal", required = false) Integer cruiseAbnormal,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                     @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {

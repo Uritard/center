@@ -151,7 +151,7 @@ public class TCruisePointInstanceService{
     }
     @Logs(title = "巡检点分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
-    public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,int pageSize) {
+    public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
