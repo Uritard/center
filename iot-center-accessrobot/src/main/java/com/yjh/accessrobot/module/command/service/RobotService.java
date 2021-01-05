@@ -113,6 +113,18 @@ public class RobotService {
         log.info("发送给机器人的指令是<start>" + Str + "<end>");
         return requestProtocol;
     }
+    @Logs(title = "机器人在线状态更新", code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public int updateRobotInfo(String robotCode,String robotStatus){
+        log.info("机器人code是:"+robotCode);
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+        log.info("机器人的id是："+robotId);
+        TRobotInfo tRobotInfo = new TRobotInfo()
+                .setRobotId(robotId)
+                .setRobotStatus(robotStatus);
+        int res = tRobotInfoDao.update(tRobotInfo);
+        return res;
+    }
     @Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String,Object>> deviceMapList, List<Map<String,Object>> robotMap,XMLBaseModel xmlBaseModel) {

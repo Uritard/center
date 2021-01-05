@@ -17,20 +17,12 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ApiModel(value = "StatisticalTools对象", description = "统计实体类")
 public class StatisticalTools  implements Serializable {
-
     private static final long serialVersionUID = 1L;
-
     @ApiModelProperty(value = "字典编码")
-    private Integer cType;
+    private Integer dictCode;
 
     @ApiModelProperty(value = "字典描述")
-    private String planType;
-
-    @ApiModelProperty(value = "字典编码")
-    private Integer state;
-
-    @ApiModelProperty(value = "字典描述")
-    private String dataState;
+    private String dictNote;
 
     @ApiModelProperty(value = "次数")
     private Integer count;

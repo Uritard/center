@@ -2,6 +2,9 @@ package com.yjh.platform.module.user.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -44,6 +47,7 @@ public class TCameraRecorderController {
         Result result = new Result();
         try {
             result.setData(tCameraRecorderService.insert(tCameraRecorder));
+            sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -91,6 +95,7 @@ public class TCameraRecorderController {
         Result result = new Result();
         try {
             result.setData(tCameraRecorderService.update(tCameraRecorder));
+            sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
@@ -188,6 +193,18 @@ public class TCameraRecorderController {
             log.error("查询Id和name失败：" + e);
         }
         return result;
+    }
+    public Result sendPostRequest(String url,Long recordId) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.getForObject(url, Result.class,recordId);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
     }
 
 }

@@ -158,7 +158,6 @@ public class TCruiseResultController {
         Result result = new Result();
         try {
             List<StatisticalResult> taskStatisticalList = tCruiseResultService.taskStatistical();
-
             result.setData(taskStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -171,7 +170,33 @@ public class TCruiseResultController {
     public Result cruiseStatistical() {
         Result result = new Result();
         try {
-            List<StatisticalResult2> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
+            List<CruiseStatistical> cruiseStatisticalList = tCruiseResultService.cruiseStatistical();
+            result.setData(cruiseStatisticalList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视点结果统计--根据正常异常状态统计")
+    @RequestMapping(value = "/cruiseStatisticalByStatus", method = RequestMethod.GET)
+    public Result cruiseStatisticalByStatus() {
+        Result result = new Result();
+        try {
+            List<StatisticalTools> statisticalToolsList = tCruiseResultService.cruiseStatisticalByStatus();
+            result.setData(statisticalToolsList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视点结果统计--根据异常分类统计")
+    @RequestMapping(value = "/cruiseStatisticalByAbnormal", method = RequestMethod.GET)
+    public Result cruiseStatisticalByAbnormal() {
+        Result result = new Result();
+        try {
+            List<CruiseStatistical> cruiseStatisticalList = tCruiseResultService.cruiseStatisticalByAbnormal();
             result.setData(cruiseStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -185,7 +210,7 @@ public class TCruiseResultController {
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
-                                     @RequestParam(value = "cruiseAbnormal", required = false) Integer cruiseAbnormal,
+                                     @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -193,7 +218,7 @@ public class TCruiseResultController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseAbnormal,deviceName);
+            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

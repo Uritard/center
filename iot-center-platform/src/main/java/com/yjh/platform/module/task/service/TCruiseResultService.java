@@ -65,8 +65,8 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "cruiseResult",content = "根据web传递的参数查询巡检点结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultDetail> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseAbnormal,String deviceName ) {
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseAbnormal,deviceName);
+    public List<CruiseResultDetail> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,String deviceName ) {
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceName);
         return cruiseResultDetailList;
     }
     @Logs(title = "人工复核", code = "cruiseResult",content = "根据web传递的参数进行人工审核")
@@ -83,8 +83,8 @@ public class TCruiseResultService{
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
         
         //自动生成巡视报告
-        String taskID = cruiseManualReview.getTaskId();
-        reportManageService.cruiseReportGenerate(taskID);
+        /*String taskID = cruiseManualReview.getTaskId();
+        reportManageService.cruiseReportGenerate(taskID);*/
 
         //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
@@ -203,22 +203,25 @@ public class TCruiseResultService{
     }
     @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据巡视数据状态统计巡检点结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<StatisticalResult2> cruiseStatistical() {
-
+    public List<CruiseStatistical> cruiseStatistical() {
         String colName1 = "abnormal_type";
 
-        List<StatisticalResult2> taskStatisticalList = new ArrayList<>();
-
-        StatisticalResult2 statisticalResult2 = new StatisticalResult2();
         List<CruiseStatistical> list = tCruiseResultDao.cruiseStatistical(colName1);
-
-        CruiseStatistical cruiseStatistical2 = tCruiseResultDao.cruiseStatistical2();
-        list.add(cruiseStatistical2);
-
-        statisticalResult2.setCruiseStatisticalList(list);
-        taskStatisticalList.add(statisticalResult2);
-
-        return taskStatisticalList;
+        CruiseStatistical cruiseStatistical = tCruiseResultDao.cruiseStatistical2();
+        list.add(cruiseStatistical);
+        return list;
+    }
+    @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据正常异常状态统计")
+    @Transactional(rollbackFor = Exception.class)
+    public List<StatisticalTools> cruiseStatisticalByStatus() {
+        List<StatisticalTools> statisticalToolsList = tCruiseResultDao.cruiseStatisticalByStatus();
+        return statisticalToolsList;
+    }
+    @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据异常分类统计")
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseStatistical> cruiseStatisticalByAbnormal() {
+        List<CruiseStatistical> tsList = tCruiseResultDao.cruiseStatisticalByAbnormal();
+        return tsList;
     }
     @Logs(title = "批量插入", code = "cruiseResult")
     @Transactional(rollbackFor = Exception.class)

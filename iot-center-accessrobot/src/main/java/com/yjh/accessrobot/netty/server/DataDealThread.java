@@ -7,16 +7,18 @@ public class DataDealThread implements Runnable {
 
     private volatile boolean isThreadStart;
 
-    public DataDealThread(RobotServerHandler robotServerHandler, boolean isThreadStart) {
+    private String robotCode;
+    public DataDealThread(RobotServerHandler robotServerHandler, boolean isThreadStart,String robotCode) {
         this.isThreadStart = isThreadStart;
         this.robotServerHandler = robotServerHandler;
+        this.robotCode = robotCode;
     }
 
     @Override
     public void run() {
         while (isThreadStart) {
             try {
-                robotServerHandler.ProcSend();
+                robotServerHandler.ProcSend(robotCode);
                 if (!robotServerHandler.getIsThreadStart()) {
                     isThreadStart = false;
                     log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());

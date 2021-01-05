@@ -550,6 +550,9 @@
             a.warn_id,
             a.device_id,
             b.device_name,
+            a.instance_id,
+            h.cruise_id as presetId,
+            k.camera_id,
             a.warn_time as alarm_time,
             a.std_mete_id,
             d.mete_name,
@@ -566,6 +569,8 @@
         LEFT JOIN t_dict_business e on e.dict_code = a.warn_level
         LEFT JOIN t_dict_business f on f.dict_code = a.alarm_source
         LEFT JOIN t_std_device_attr g on  g.device_id = a.device_id
+        LEFT JOIN t_cruise_point_instance h on h.instance_id = a.instance_id
+        LEFT JOIN t_camera_preset k on k.preset_id = h.cruise_id
         where 1 = 1
         <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
 

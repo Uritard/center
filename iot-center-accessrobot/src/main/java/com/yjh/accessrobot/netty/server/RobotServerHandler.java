@@ -328,7 +328,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     List<Map<String, Object>> ItemsList = new ArrayList<>();
                     Map<String, Object> Items = new HashMap<>();
                     Items.put("heart_beat_interval", "5");//心跳间隔
-                    Items.put("robot_run_interval", "6");//机器人运行数据间隔
+                    Items.put("robot_run_interval", "3");//机器人运行数据间隔
                     Items.put("weather_interval", "7");//微气象数据间隔
                     ItemsList.add(Items);
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
@@ -344,10 +344,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
                     SendHeartBeat(registerProtocol);
                     //启动线程
-//                    DataDealThread dataDealThread = new DataDealThread(this, isThreadStart);
-//                    Thread thread = new Thread(dataDealThread);
-//                    thread.setDaemon(true);
-//                    thread.start();
+                    DataDealThread dataDealThread = new DataDealThread(this, isThreadStart,xmlBaseModel.getSendCode());
+                    Thread thread = new Thread(dataDealThread);
+                    thread.setDaemon(true);
+                    thread.start();
                     robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     break;  
                 //心跳指令(发送响应)
@@ -357,6 +357,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    log.info("生成的心跳xml是<start>" + heartXmlString + "<end>");
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
                     send(ctx, heartProtocol);
+                    //若心跳能够正常收发，将机器人置为在线状态
+                    robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -714,17 +716,17 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     private void handlerData() { }
 
-    void ProcSend() {
+    void ProcSend(String robotCode) {
         // 心跳报文(客户端,服务端均可发起测试);
 //        if (istimeout(HEARTBEAT, hisT3, false)) {
 //            SendHeartBeat();
 //            hisT3 = System.currentTimeMillis();
 //        }
-        if (istimeout(hisT3)){
-            //发送心跳响应报文
-        }else {
+        if (!istimeout(hisT3)){
             //没有接收到心跳报文的处理方法
             log.info("没有收到心跳报文......");
+            robotServerHandlerMap.remove(strRobotCode);
+            robotService.updateRobotInfo(robotCode,"离线");
 //                try {
 //                    ctx.close().sync();
 //                    ctx.flush();
@@ -733,6 +735,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    isThreadStart = false;
 //                    log.error("clientDisconnect: " + e.getMessage());
 //                }
+        }else {
+            //发送心跳响应报文
+            log.info("收到心跳报文......");
         }
 
     }
