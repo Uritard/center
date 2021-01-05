@@ -28,4 +28,6 @@ public class Constant {
 
     public static final String NVR_URL = "http://iot-center-accessvideo/camera/v1/getNVRStoreInfo?recordId={recordId}";
 
+    public static Map<String,Object> weatherInfo = new HashMap<>();
+
 }
