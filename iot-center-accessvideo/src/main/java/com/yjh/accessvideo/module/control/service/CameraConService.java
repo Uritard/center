@@ -1,10 +1,7 @@
 package com.yjh.accessvideo.module.control.service;
 
-import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import com.sun.jna.examples.win32.W32API;
-import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
@@ -17,20 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.stream.FileImageOutputStream;
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
-import static com.yjh.accessvideo.hik.HCNetSDK.MAX_DISKNUM_V30;
 
 /**
  * @author tt
@@ -41,8 +34,6 @@ public class CameraConService {
 
     private Logger log = LoggerFactory.getLogger(CameraConService.class);
 
-    @Autowired
-    private RedisTemplate redisTemplate;
     @Autowired
     private CameraConDao cameraConDao;
     @Value("${nvr.rtmp.video}")
@@ -62,6 +53,9 @@ public class CameraConService {
 
     @Value("${spring.redis.host}")
     private String hostIp;
+
+    @Value("${realtime.video.definition}")
+    private String videoDefinition;
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
@@ -97,7 +91,7 @@ public class CameraConService {
             log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+cameraType+" "+livePath);
             String transUrl = "";
             if (cameraType==205) {
-                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
+                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,videoDefinition, livePath);
             } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
             Runtime.getRuntime().exec(transUrl);
             log.info("transUrl: "+transUrl);
@@ -177,7 +171,7 @@ public class CameraConService {
                 log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+cameraType+" "+livePath);
                 String transUrl = "";
                 if (cameraType==205) {
-                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,2, livePath);
+                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,videoDefinition, livePath);
                 } else if (cameraType==206) {transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,1, livePath);}
                 Runtime.getRuntime().exec(transUrl);
                 log.info("transUrl: "+transUrl);
