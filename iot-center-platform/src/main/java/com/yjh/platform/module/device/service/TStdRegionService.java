@@ -5,6 +5,7 @@ import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,18 +68,51 @@ public class TStdRegionService{
     @Logs(title = "根据区域名称模糊查询区域树", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfoRegionCode> selectRegTreeByRegName(String regionName) {
-        List<AreaInfoRegionCode> listTree = this.tStdRegionDao.selectRegTreeByRegName(regionName);
-        List<AreaInfoRegionCode> areaInfoCountryList = new ArrayList<>();
-        Integer level = 1;
-        for(Iterator<AreaInfoRegionCode> it = listTree.iterator(); it.hasNext();){
-            AreaInfoRegionCode areaInfo = it.next();
-            if (areaInfo.getUpId() == -1 || areaInfo.getUpId() == 0) {
-                areaInfo.setLevel(1);
-                areaInfoCountryList.add(areaInfo);
+
+        List<AreaInfoRegionCode> listTree = new ArrayList<>();
+        List<AreaInfoRegionCode> listTreeAll = this.tStdRegionDao.selectAreaTree();
+        if (Objects.equals(null, regionName) || regionName.equals("")) {
+            List<AreaInfoRegionCode> areaInfoRegionCodeList = new ArrayList<>();
+            Integer level = 1;
+            for (AreaInfoRegionCode areaInfoRegionCode:listTreeAll) {
+                if (areaInfoRegionCode.getUpId()==null || areaInfoRegionCode.getUpId()==-1) {
+                    areaInfoRegionCode.setLevel(level);
+                    areaInfoRegionCodeList.add(areaInfoRegionCode);
+                }
+            }
+            diGui(areaInfoRegionCodeList, listTreeAll, level);
+            return areaInfoRegionCodeList;
+        }
+
+        List<AreaInfoRegionCode> listTreeByName = this.tStdRegionDao.selectRegTreeByRegName(regionName);;
+        if (listTreeByName.size()>0) {
+            for (AreaInfoRegionCode areaInfoRegionCode : listTreeByName) {
+                listTree.add(areaInfoRegionCode);
+                if (areaInfoRegionCode.getUpId() != null && areaInfoRegionCode.getUpId() != -1) {
+                    Long areaInfoRegionCodeUpId = areaInfoRegionCode.getUpId();
+                    System.out.println("areaInfoRegionCodeUpId: "+areaInfoRegionCodeUpId);
+                    for (AreaInfoRegionCode areaInfoRegionCodeAll : listTreeAll) {
+                        if (Objects.equals(areaInfoRegionCodeUpId, areaInfoRegionCodeAll.getId())) {
+                            listTree.add(areaInfoRegionCodeAll);
+                            diGuiMoHu(areaInfoRegionCodeAll, listTreeAll, listTree);
+                        }
+                    }
+                }
             }
         }
-        diGui(areaInfoCountryList, listTree, level);
-        return areaInfoCountryList;
+        listTree = listTree.stream().distinct().collect(Collectors.toList());
+        System.out.println("listTree: "+listTree);
+        List<AreaInfoRegionCode> areaInfoRegionCodeStartList = new ArrayList<>();
+        Integer level = 1;
+        for (AreaInfoRegionCode areaInfoRegionCode:listTree) {
+            if (areaInfoRegionCode.getUpId()==null || areaInfoRegionCode.getUpId()==-1) {
+                areaInfoRegionCode.setLevel(level);
+                areaInfoRegionCodeStartList.add(areaInfoRegionCode);
+            }
+        }
+        diGui(areaInfoRegionCodeStartList, listTree, level);
+        return areaInfoRegionCodeStartList;
+
     }
 
     private void diGui(List<AreaInfoRegionCode> areaInfoList, List<AreaInfoRegionCode> listTree, Integer level) {
@@ -93,6 +127,18 @@ public class TStdRegionService{
             if (childrenList.size()>0 ) {
                 areaInfo.setChildren(childrenList);
                 diGui(childrenList, listTree, level);
+            }
+        }
+    }
+
+    private void diGuiMoHu(AreaInfoRegionCode areaInfoRegionCodeAll, List<AreaInfoRegionCode> listTreeAll, List<AreaInfoRegionCode> listTree) {
+        if (areaInfoRegionCodeAll.getUpId() != null && areaInfoRegionCodeAll.getUpId() != -1) {
+            Long areaInfoRegionCodeAllUpId = areaInfoRegionCodeAll.getUpId();
+            for (AreaInfoRegionCode areaInfoRegionCode : listTreeAll) {
+                if (Objects.equals(areaInfoRegionCodeAllUpId, areaInfoRegionCode.getId())) {
+                    listTree.add(areaInfoRegionCode);
+                    diGuiMoHu(areaInfoRegionCode, listTreeAll, listTree);
+                }
             }
         }
     }

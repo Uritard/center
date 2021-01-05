@@ -28,6 +28,8 @@ public interface TStdRegionDao {
                                 @Param(value = "stationId") String stationId,
                                 @Param(value = "state") Integer state,
                                 @Param(value = "createTime") Date createTime);
+    List<AreaInfoRegionCode> selectAreaTree();
+
     List<TStdRegion> selectByPage(TStdRegion tStdRegion);
     List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
     List<Long> selectRegionIds(Long upRegionId);
