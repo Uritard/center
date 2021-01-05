@@ -173,7 +173,7 @@ public class HomePageController {
         return result;
     }
 
-    //@ApiOperation(value = "获取天气信息")
+    @ApiOperation(value = "用来接受微气象服务数据的接口")
     @RequestMapping(value = "/getWeatherInfoForService", method = RequestMethod.GET)
     public Result getWeatherInfoForService(@RequestParam String map)  {
         Result result = new Result();

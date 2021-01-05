@@ -55,6 +55,9 @@ public class TCameraGroupService{
             String[] cameraList = tCameraGroup.getCameraIds().split(",");
             for (String item : cameraList) {
                 TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(item));
+                if(tCameraInfo == null){
+                    continue;
+                }
                 Camera camera = new Camera();
                 camera.setCameraId(item);
                 camera.setCameraName(tCameraInfo.getCameraName());
