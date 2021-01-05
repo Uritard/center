@@ -137,6 +137,14 @@
         limit 1
     </select>
 
+    <select id="selectByRecordId" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.RecorderConInfo">
+        select a.record_id, a.record_name, a.record_ip, a.protocol, a.http_port, a.trans_port, a.rtsp_port, a.user_name, a.pwd, a.max_channel
+        from t_camera_recorder a
+        where 1 = 1
+        and a.record_id = #{recordId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
 
 
 </mapper>

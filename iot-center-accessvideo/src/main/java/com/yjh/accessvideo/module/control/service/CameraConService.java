@@ -67,6 +67,12 @@ public class CameraConService {
     private NativeLong m_lPort =  new NativeLong(-1);
     FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
+    private int lUserID;//用户句柄
+    //设备登录信息
+    private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
+    //设备信息
+    private HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
+
     @Logs(title = "相机播放", code = "cameraPlay")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startRealPlay(Long cameraId) {
@@ -607,6 +613,47 @@ public class CameraConService {
         }
         channleStatusMap.put("errorMessage: " ,"userID is null");
         return channleStatusMap;
+    }
+
+    @Logs(title = "NVR注册", code = "NVRRegister")
+    @Transactional(rollbackFor = Exception.class)
+    public String registerNVR(Long recordId) {
+
+        RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
+
+        if (lUserID > -1) {
+            //NVR log out first...
+            hCNetSDK.NET_DVR_Logout(lUserID);
+            lUserID = -1;
+        }
+        String m_sDeviceIP = recorderConInfo.getRecordIp();
+        String m_sUsername = recorderConInfo.getUserName();
+        String m_sPassword = recorderConInfo.getPwd();
+        Short m_port = recorderConInfo.getHttpPort().shortValue();
+        log.info("register nvr"+recorderConInfo.getRecordName()+", ip is "+m_sDeviceIP+", port is "+m_port);
+        //注册
+        m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+        System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
+        m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+        System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
+        m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+        System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
+
+        m_strLoginInfo.wPort = m_port;
+        m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+
+        m_strLoginInfo.write();
+        lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+        log.info("m_sDeviceIP: "+m_sDeviceIP+", lUserID: "+lUserID);
+        if (lUserID == -1) {
+            log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
+            return recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError();
+        } else {
+            Constant.maps.put(String.valueOf(recordId), lUserID);
+            log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
+            return "NVR "+recorderConInfo.getRecordName()+" register success.";
+        }
+
     }
 
     private NativeLong realPlay(int lChannel, long recordId) {

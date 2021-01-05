@@ -328,4 +328,19 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "NVR注册接口")
+    @RequestMapping(value = "/registerNVR", method = RequestMethod.GET)
+    public Result registerNVR(@RequestParam(value = "recordId") Long recordId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.registerNVR(recordId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("NVR注册失败:", e);
+        }
+        return result;
+    }
+
 }

@@ -26,4 +26,6 @@ public interface CameraConDao {
 
     RobotConInfo selectRobotConInfo(@Param("robotId") Long robotId);
 
+    RecorderConInfo selectByRecordId(@Param(value = "recordId") Long recordId);
+
 }
