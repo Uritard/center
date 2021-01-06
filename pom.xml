@@ -12,6 +12,7 @@
         <module>iot-center-accessrobot</module>
         <module>iot-center-accessvideo</module>
         <module>iot-center-accessudp</module>
+        <module>iot-center-accessatmosphere</module>
         <module>iot-center-device</module>
         <module>iot-center-platform</module>
         <module>iot-center-etl</module>
@@ -83,23 +84,6 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-redis</artifactId>
-            <version>1.0.1.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session-data-redis</artifactId>
-            <version>2.0.6.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
         </dependency>
 
         <!-- api swagger -->
