@@ -198,7 +198,11 @@ public class RunAtNowTask implements Runnable{
                 }
             }
             Integer taskCount = instanceIdList.size();
-            List<TCruisePointInstanceNameDetail> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
+            List<TCruisePointInstanceNameDetail> instancesList = new ArrayList<>();
+            if(taskCount != 0){
+                 instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
+            }
+
             //开始任务
             TCruiseResult tCruiseResult = new TCruiseResult();
             tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);

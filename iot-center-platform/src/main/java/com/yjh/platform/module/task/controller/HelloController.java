@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -12,6 +13,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.QrCodeUtils;
 import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
@@ -44,6 +46,8 @@ public class HelloController {
     private TCruiseTaskDao tCruiseTaskDao;
     @Autowired
     TStdMetemodelDetailDao tStdMetemodelDetailDao;
+    @Autowired
+    TCruisePointInstanceDao tCruisePointInstanceDao;
 
 
     //相机抓图selectForDictNote
@@ -58,6 +62,16 @@ public class HelloController {
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
 
     QrCodeUtils qrCodeUtils = new QrCodeUtils();
+
+    @ApiOperation(value = "测试一切")
+    @RequestMapping(value = "/testAnything", method = RequestMethod.GET)
+    public Result QrDecode() {
+        Result result = new Result();
+        List<Long> list = new ArrayList<>();
+        tCruisePointInstanceDao.selectForTask(list);
+        result.setData(666);
+        return result;
+    }
 
 
     @ApiOperation(value = "二维码识别")

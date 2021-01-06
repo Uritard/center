@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -207,6 +208,7 @@ public class HomePageController {
                 windDirection = "西北";
             }
             mapa.put("windDirection",windDirection);
+            mapa.put("getTime",new Date());
             Constant.weatherInfo = mapa;
             result.setData(1);
         } catch (BusinessException b) {
