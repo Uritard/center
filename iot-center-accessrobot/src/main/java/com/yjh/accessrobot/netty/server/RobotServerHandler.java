@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.server;
 
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -314,10 +315,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
-
+        log.info("robotServerHandlerMap==="+robotServerHandlerMap);
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
+        Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
+        Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
+
 
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
@@ -327,9 +332,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     List<Map<String, Object>> ItemsList = new ArrayList<>();
                     Map<String, Object> Items = new HashMap<>();
-                    Items.put("heart_beat_interval", "5");//心跳间隔
-                    Items.put("robot_run_interval", "3");//机器人运行数据间隔
-                    Items.put("weather_interval", "7");//微气象数据间隔
+
+                    Items.put("heart_beat_interval", heartbeatIntervalMap.get("content"));//心跳间隔
+                    Items.put("robot_run_interval", runDataIntervalMap.get("content"));//机器人运行数据间隔
+                    Items.put("weather_interval", weatherDataIntervalMap.get("content"));//微气象数据间隔
                     ItemsList.add(Items);
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
                             .setSendCode("Server01")
@@ -342,9 +348,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
 //                    log.info("生成的注册xml是<start>" + registerXmlString + "<end>");
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
-                    SendHeartBeat(registerProtocol);
+                    SendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
                     //启动线程
-                    DataDealThread dataDealThread = new DataDealThread(this, isThreadStart,xmlBaseModel.getSendCode());
+                    HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate);
                     Thread thread = new Thread(dataDealThread);
                     thread.setDaemon(true);
                     thread.start();
@@ -356,9 +362,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
 //                    log.info("生成的心跳xml是<start>" + heartXmlString + "<end>");
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
-                    send(ctx, heartProtocol);
+                    send(ctx, heartProtocol,xmlBaseModel.getSendCode());
                     //若心跳能够正常收发，将机器人置为在线状态
-                    robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
+                    Constant.heartNum = 0;
+                    Constant.flag = 1;
+                    int res = robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -416,7 +424,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] statusProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, statusXmlString);
-                    send(ctx, statusProtocol);
+                    send(ctx, statusProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -443,7 +451,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] operationProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, operationXmlString);
-                    send(ctx, operationProtocol);
+                    send(ctx, operationProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -469,7 +477,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] coordinateProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, coordinateXmlString);
-                    send(ctx, coordinateProtocol);
+                    send(ctx, coordinateProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -526,7 +534,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] roadProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, roadXmlString);
-                    send(ctx, roadProtocol);
+                    send(ctx, roadProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -547,7 +555,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] alarmProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, alarmXmlString);
-                    send(ctx, alarmProtocol);
+                    send(ctx, alarmProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -574,7 +582,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] weatherProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, weatherXmlString);
-                    send(ctx, weatherProtocol);
+                    send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -603,7 +611,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, taskStatusXmlString);
-                    send(ctx, taskStatusProtocol);
+                    send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -684,7 +692,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, cruiseResultXmlString);
-                    send(ctx, cruiseResultProtocol);
+                    send(ctx, cruiseResultProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
                     break;
@@ -717,16 +725,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private void handlerData() { }
 
     void ProcSend(String robotCode) {
-        // 心跳报文(客户端,服务端均可发起测试);
-//        if (istimeout(HEARTBEAT, hisT3, false)) {
-//            SendHeartBeat();
-//            hisT3 = System.currentTimeMillis();
-//        }
-        if (!istimeout(hisT3)){
-            //没有接收到心跳报文的处理方法
-            log.info("没有收到心跳报文......");
-            robotServerHandlerMap.remove(strRobotCode);
-            robotService.updateRobotInfo(robotCode,"离线");
+        log.info("没有收到心跳报文......");
+        robotServerHandlerMap.remove(robotCode);//断开链接
+        return;
 //                try {
 //                    ctx.close().sync();
 //                    ctx.flush();
@@ -735,14 +736,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //                    isThreadStart = false;
 //                    log.error("clientDisconnect: " + e.getMessage());
 //                }
-        }else {
-            //发送心跳响应报文
-            log.info("收到心跳报文......");
-        }
-
     }
 
-    private void send(ChannelHandlerContext ctx, byte[] bytes) {
+    private void send(ChannelHandlerContext ctx, byte[] bytes,String strRobotCode) {
         ByteBuf byteBuf = ctx.alloc().buffer();
         byteBuf.writeBytes(bytes);
         StringBuilder Str = new StringBuilder();
@@ -757,7 +753,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private boolean istimeout(long value) {
+    private boolean isTimeout(long value) {
         if ((System.currentTimeMillis() - value) < T3) {
             hisT3 = System.currentTimeMillis();
             return true;
@@ -766,8 +762,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    public void SendHeartBeat (byte[] protocolBytes) {
-        send(ctx,protocolBytes);
+    public void SendHeartBeat (byte[] protocolBytes,String robotCode) {
+        send(ctx,protocolBytes,robotCode);
     }
 
     public static Map<String, Object> getMessage(String messageXML) throws Exception {

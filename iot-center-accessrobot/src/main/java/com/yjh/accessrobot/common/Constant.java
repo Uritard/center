@@ -12,7 +12,8 @@ public class Constant {
     public static final byte HEARTBEAT = 0x03;
 
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
-
+    public static int heartNum = 0;
+    public static int flag = 0;
     public static String Packet = "";
 
     public static long sendSessionId = 0L;//发送会话序列号

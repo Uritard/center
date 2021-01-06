@@ -10,7 +10,6 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.user.entity.SysRoleRobot;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -19,12 +18,12 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -66,7 +65,6 @@ public class TCameraPresetController {
                     HashMap<String,Long> params = new HashMap<>();
                     params.put("cameraId",tCameraPreset1.getCameraId());
                     params.put("presetId",tCameraPreset1.getPresetId());
-//                System.out.println("params是："+params);
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
 //                System.out.println("data是："+response1.getData());
@@ -76,13 +74,15 @@ public class TCameraPresetController {
                         tCameraPreset1.setPresetImg((String) json.get("urlPath"));
 //                    System.out.println("PresetImg是："+json.get("urlPath"));
                         tCameraPresetService.update(tCameraPreset1);//存图
+                        result.setData(resultNum);
                     } else {
                         tCameraPresetService.deleteByPrimaryId(tCameraPreset1.getPresetId());
                         resultNum = 0;
+                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                        result.setData(resultNum);
                     }
                 }
             }
-            result.setData(resultNum);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
