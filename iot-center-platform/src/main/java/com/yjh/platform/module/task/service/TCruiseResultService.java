@@ -3,6 +3,10 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
@@ -25,6 +29,10 @@ public class TCruiseResultService{
     private TCruiseResultDao tCruiseResultDao;
     @Autowired
     private ReportManageService reportManageService;
+    @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TStdDeviceAttrDao tStdDeviceAttrDao;
 
     @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
@@ -144,6 +152,13 @@ public class TCruiseResultService{
         if (list.size() == cruiseManualReviewList.size()){
             result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
         }
+//        insert QrDecode as device's real code. by tt.
+        TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
+        TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
+        tStdDeviceAttr.setDeviceId(tCruisePointInstance.getDeviceId());
+        tStdDeviceAttr.setRealCode(cruiseManualReview.getPersonCheck());
+        tStdDeviceAttrDao.update(tStdDeviceAttr);
+
         return result1+result2;
     }
     public Date findLastDate(List<CruiseManualReview> list) {
