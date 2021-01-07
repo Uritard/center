@@ -338,7 +338,7 @@ public class TStdMetemodelService {
     @Logs(title = "创建模板信息",code = "module",content = "创建模板信息")
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
-        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
+        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForCreatePath.get("content");
         Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String returnPath = (String) mapForReturnPath.get("content");
@@ -353,7 +353,7 @@ public class TStdMetemodelService {
          return "fail";
        }
     }
-    private   boolean createModel(List<String> list, String modelName, String modelPath) {
+    private  boolean createModel(List<String> list, String modelName, String modelPath) {
         boolean newFile = false;
         //创建excel工作簿
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -465,7 +465,7 @@ public class TStdMetemodelService {
     }
 
     private String excelDataImport(MultipartFile file) {
-        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:temporaryReflect");
+        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForPicModelPath.get("content");
         //String path = "D:/code/qhTest/66666";
         String fileName = "copy-meteModel.xlsx";

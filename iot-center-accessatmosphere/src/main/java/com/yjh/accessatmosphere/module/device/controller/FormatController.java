@@ -4,11 +4,13 @@ import com.yjh.accessatmosphere.common.Constant;
 import com.yjh.accessatmosphere.commons.result.BusinessException;
 import com.yjh.accessatmosphere.commons.result.Result;
 import com.yjh.accessatmosphere.commons.result.ResultCodeEnum;
+import com.yjh.accessatmosphere.commons.utils.weatherUtils.ParamConfig;
 import com.yjh.accessatmosphere.module.device.service.FormatService;
 import com.yjh.accessatmosphere.module.device.entity.Format;
 import java.util.HashMap;
 import java.util.List;
 
+import com.yjh.accessatmosphere.thread.ListerThread;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,6 +157,27 @@ public class FormatController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("设置接受信息服务的ip失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "设置微气象设备的相关信息")
+    @RequestMapping(value = "/setConf", method = RequestMethod.GET)
+    public Result setConf(@RequestParam(value = "serialNumber",required = false,defaultValue = "COM3") String serialNumber,
+                          @RequestParam(value = "baudRate",required = false,defaultValue = "19200") int baudRate,
+                          @RequestParam(value = "checkoutBit",required = false,defaultValue = "0") int checkoutBit,
+                          @RequestParam(value = "dataBit",required = false,defaultValue = "8") int dataBit,
+                          @RequestParam(value = "stopBit",required = false,defaultValue = "1") int stopBit) {
+        Result result = new Result();
+        try {
+            ParamConfig paramConfig = new ParamConfig(serialNumber, baudRate, checkoutBit, dataBit, stopBit);
+            Constant.serialPort.closeSerialPort();
+            Thread thread = new ListerThread(paramConfig);
+            thread.start();
+            result.setData("ok");
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("设置微气象设备的相关信息失败描述：", e);
         }
         return result;
     }

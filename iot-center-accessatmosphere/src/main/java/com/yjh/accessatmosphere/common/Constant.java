@@ -1,5 +1,7 @@
 package com.yjh.accessatmosphere.common;
 
+import com.yjh.accessatmosphere.commons.utils.weatherUtils.SerialPortUtils;
+
 public class Constant {
 
     public static final String USER_COUNT = "statistics:userCount";
@@ -55,4 +57,6 @@ public class Constant {
     public static String weatherInfo="";
 
     public static String path = "";
+
+    public static SerialPortUtils serialPort;
 }

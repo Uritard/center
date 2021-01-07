@@ -1,9 +1,11 @@
 package com.yjh.platform.common.quartz;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -79,6 +81,8 @@ public class TaskShutDownJob extends QuartzJobBean {
 
     public void executeInternal(JobExecutionContext context) {
         try {
+
+
             String taskId = context.getMergedJobDataMap().getString("taskId");
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
             //给算法暂停
@@ -92,6 +96,13 @@ public class TaskShutDownJob extends QuartzJobBean {
             log.info("算法信息：    "+analysisMap);
             analysis(analysisMap);
             log.info("任务终止"+tCruiseTask.getTaskId());
+
+            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+            jasonMapOnFinished.put("type","finishedOneInstance");
+            jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
+            String jsonMessage= JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息："+jsonMessage);
+            WebSocketServer.sendMsg(jsonMessage);
 
             //机器人任务终止
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
@@ -250,6 +261,7 @@ public class TaskShutDownJob extends QuartzJobBean {
             tCruiseTaskResult.setTaskStatus(242);
             tCruiseTaskResult.setCruiseResult(247);
             tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
         } catch (Exception e) {
             log.error("任务终止异常: " + e);
             e.printStackTrace();

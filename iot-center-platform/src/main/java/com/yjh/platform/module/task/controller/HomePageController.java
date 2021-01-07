@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -178,6 +179,7 @@ public class HomePageController {
     @RequestMapping(value = "/getWeatherInfoForService", method = RequestMethod.GET)
     public Result getWeatherInfoForService(@RequestParam String map)  {
         Result result = new Result();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             log.info("天气信息"+map);
             Map mapa = JSON.parseObject(map);
@@ -208,7 +210,7 @@ public class HomePageController {
                 windDirection = "西北";
             }
             mapa.put("windDirection",windDirection);
-            mapa.put("getTime",new Date());
+            mapa.put("getTime",simpleDateFormat.format(new Date()));
             Constant.weatherInfo = mapa;
             result.setData(1);
         } catch (BusinessException b) {

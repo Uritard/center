@@ -1,5 +1,6 @@
 package com.yjh.accessatmosphere;
 
+import com.yjh.accessatmosphere.commons.utils.weatherUtils.ParamConfig;
 import com.yjh.accessatmosphere.thread.ListerThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -31,7 +32,8 @@ public class AccessAtmosphereApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        Thread thread = new ListerThread();
+        ParamConfig paramConfig = new ParamConfig("COM3", 19200, 0, 8, 1);
+        Thread thread = new ListerThread(paramConfig);
         thread.start();
 //        String url = getLocalIp();
 //        log.info("accessatmosphere is running, url is : " + url);
