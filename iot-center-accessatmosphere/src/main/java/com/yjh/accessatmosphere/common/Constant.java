@@ -53,4 +53,6 @@ public class Constant {
     public static final String TYPE_104 = "104";
 
     public static String weatherInfo="";
+
+    public static String path = "";
 }

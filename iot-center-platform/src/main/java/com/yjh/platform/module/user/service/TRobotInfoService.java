@@ -106,6 +106,9 @@ public class TRobotInfoService{
             robotPresetTreeTem.put("id", robotId);
             robotPresetTreeTem.put("label", tRobot.getRobotName());
             robotPresetTreeTem.put("position", tRobot.getRobotPosition());
+            if(presetList == null || presetList.size()==0){
+                continue;
+            }
             robotPresetTreeTem.put("children", presetList);
             robotPresetTreeTem.put("infoType", "robot");
             robotPresetTreeTemList.add(robotPresetTreeTem);

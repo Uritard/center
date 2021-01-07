@@ -559,7 +559,7 @@ public class TCruiseTaskService {
         if(tCruiseResult.getCState() == 240){
             return 1;
         }
-        tCruiseResult.setCState(241);
+        tCruiseResult.setCState(242);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         try {
             QuartzTask quartzTaskForAre = new QuartzTask();

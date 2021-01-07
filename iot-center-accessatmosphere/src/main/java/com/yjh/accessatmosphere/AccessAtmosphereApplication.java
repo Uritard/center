@@ -1,5 +1,6 @@
 package com.yjh.accessatmosphere;
 
+import com.yjh.accessatmosphere.thread.ListerThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,8 +31,10 @@ public class AccessAtmosphereApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        String url = getLocalIp();
-        log.info("accessatmosphere is running, url is : " + url);
+        Thread thread = new ListerThread();
+        thread.start();
+//        String url = getLocalIp();
+//        log.info("accessatmosphere is running, url is : " + url);
     }
 
     private static String getLocalIp() throws SocketException {

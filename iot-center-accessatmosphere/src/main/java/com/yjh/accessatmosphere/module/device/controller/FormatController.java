@@ -1,5 +1,6 @@
 package com.yjh.accessatmosphere.module.device.controller;
 
+import com.yjh.accessatmosphere.common.Constant;
 import com.yjh.accessatmosphere.commons.result.BusinessException;
 import com.yjh.accessatmosphere.commons.result.Result;
 import com.yjh.accessatmosphere.commons.result.ResultCodeEnum;
@@ -143,15 +144,17 @@ public class FormatController {
         return result;
     }
 
-    @ApiOperation(value = "获取获取气象数据")
-    @RequestMapping(value = "/getWeatherInfo", method = RequestMethod.POST)
-    public Result getWeatherInfo() {
+    @ApiOperation(value = "设置接受信息服务的ip")
+    @RequestMapping(value = "/setPath", method = RequestMethod.GET)
+    public Result getWeatherInfo(@RequestParam(value = "path") String path) {
         Result result = new Result();
         try {
-            result.setData(formatService.saveInfo());
+            Constant.path = path;
+            log.info("设置成功");
+            result.setData(1);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("获取获取气象数据失败描述：", e);
+            log.error("设置接受信息服务的ip失败描述：", e);
         }
         return result;
     }
