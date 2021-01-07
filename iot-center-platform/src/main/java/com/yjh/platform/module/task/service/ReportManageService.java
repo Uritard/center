@@ -251,10 +251,10 @@ public class ReportManageService {
 
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         recordData.setTCDRDList(tCDRDList);
-        String taskName = recordData.getTaskVO().getTaskName();
-        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
-        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
-//        String reportName =  taskId + ".xlsx";//报表名称
+//        String taskName = recordData.getTaskVO().getTaskName();
+//        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
+//        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
+        String reportName =  taskId + ".xlsx";//报表名称
 
 //        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
 
@@ -277,7 +277,7 @@ public class ReportManageService {
             temporaryFile.mkdir();
             reportPath2 = reportPath+"/"+finalFileName;
             log.info("不存在，创建的文件绝对路径是==="+reportPath2);
-            File file = new File(reportPath2);
+            File file = new File(reportPath);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);

@@ -100,6 +100,19 @@ public class TWarnInfoService{
         map.put("meteName", meteName);
         return tWarnInfoDao.selectAllWarn(map);
     }
+    @Logs(title = "告警确认", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TWarnInfoDetail> WarnConfirm(Integer warnLevel, Integer confMode, Date startTime, Date endTime, String deviceName,Integer defectType,String meteName) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("warnLevel", warnLevel);
+        map.put("confMode", confMode);
+        map.put("defectType", defectType);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("deviceName", deviceName);
+        map.put("meteName", meteName);
+        return tWarnInfoDao.WarnConfirm(map);
+    }
     @Logs(title = "统计告警数据", code = "tWarnInfo",content = "根据告警来源统计告警个数")
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countByAlarmSource() {

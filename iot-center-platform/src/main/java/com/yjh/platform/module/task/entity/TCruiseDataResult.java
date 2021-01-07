@@ -1,14 +1,16 @@
 package com.yjh.platform.module.task.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author czh
@@ -70,12 +72,22 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "实际结果 1正常 2异常")
     private Integer identifyResult;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createtime;
 
     @ApiModelProperty(value = "备用字段3")
     private String remark;
 
+    @ApiModelProperty(value = "是否产生告警1.是0.否")
     private Integer isWarn;
+
+    @ApiModelProperty(value = "审核人")
+    private String checkUser;
+
+    @ApiModelProperty(value = "审核时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date checkDate;
+
 
 
 }

@@ -230,6 +230,7 @@
         <include refid="TongYong2"></include>
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
+        ORDER by cruise_time
     </select>
     <select id="selectMeteNumByTask" resultType="java.lang.Integer">
         SELECT COUNT(device_mete_id or null) as mete_num

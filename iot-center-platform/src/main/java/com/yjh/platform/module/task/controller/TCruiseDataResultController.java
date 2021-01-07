@@ -1,30 +1,26 @@
 package com.yjh.platform.module.task.controller;
 
-import com.google.gson.internal.$Gson$Preconditions;
-import com.yjh.platform.module.task.entity.BrokenLineInfo;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
-import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import io.swagger.annotations.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ibatis.jdbc.Null;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -113,21 +109,28 @@ public class TCruiseDataResultController {
                          @RequestParam(value = "cruiseId", required = false) Long cruiseId,
                          @RequestParam(value = "cruiseName", required = false) String cruiseName,
                          @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+                         @RequestParam(value = "cruiseAbnormal", required = false) Integer cruiseAbnormal,
                          @RequestParam(value = "resultDesc", required = false) String resultDesc,
                          @RequestParam(value = "resultNum", required = false) String resultNum,
                          @RequestParam(value = "modifyNum", required = false) String modifyNum,
                          @RequestParam(value = "picpath", required = false) String picpath,
                          @RequestParam(value = "personCheck", required = false) String personCheck,
                          @RequestParam(value = "origpic", required = false) String origpic,
-                         @RequestParam(value = "state", required = false) Integer state,
                          @RequestParam(value = "evaluationState", required = false) String evaluationState,
                          @RequestParam(value = "identifyState", required = false) Integer identifyState,
                          @RequestParam(value = "identifyResult", required = false) Integer identifyResult,
                          @RequestParam(value = "createtime", required = false) Date createtime,
-                         @RequestParam(value = "remark", required = false) String remark) {
+                         @RequestParam(value = "remark", required = false) String remark,
+                         @RequestParam(value = "checkUser", required = false) String checkUser,
+                         @RequestParam(value = "checkDate", required = false) Date checkDate,
+                         @RequestParam(value = "isWarn", required = false) Integer isWarn,
+                         @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult) {
+
         Result result = new Result();
         try {
-            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType, resultDesc, resultNum, modifyNum, picpath, personCheck, origpic, state, evaluationState, identifyState, identifyResult, createtime, remark);
+            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,cruiseAbnormal, resultDesc, resultNum, modifyNum, picpath,
+                    personCheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,
+                    checkUser,checkDate,isWarn,cruiseResult);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

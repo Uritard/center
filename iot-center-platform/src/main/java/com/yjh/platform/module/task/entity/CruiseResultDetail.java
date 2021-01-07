@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "CruiseResultDetail对象", description = "巡视点结果详情")
-public class CruiseResultDetail {
+public class CruiseResultDetail extends TStdDeviceMete {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "实物编码")
@@ -63,6 +64,11 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "巡视时间")
     private Date cruiseTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "巡视结束时间")
+    private Date endTime;
+
     @ApiModelProperty(value = "评价状态")
     private Integer evaluationState;
     @ApiModelProperty(value = "评价状态-字典表")
@@ -91,8 +97,14 @@ public class CruiseResultDetail {
     @ApiModelProperty(value = "巡检分析图片")
     private String picPath;
 
+    @ApiModelProperty(value = "摄像机id")
+    private Long cameraId;
 
+    @ApiModelProperty(value = "预置位id")
+    private Long presetId;
 
+    @ApiModelProperty(value = "是否产生告警")
+    private Integer isWarn;
 
 }
 

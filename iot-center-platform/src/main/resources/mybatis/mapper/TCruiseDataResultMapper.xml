@@ -49,7 +49,10 @@
             identify_state,
             identify_result,
             createtime,
-            remark
+            remark,
+            check_user,
+            check_date,
+            is_warn
         )values(
                 #{cruiseDataId, jdbcType=BIGINT},
                 #{cruiseResultId, jdbcType=VARCHAR},
@@ -68,7 +71,10 @@
                 #{identifyState, jdbcType=INTEGER},
                 #{identifyResult, jdbcType=INTEGER},
                 #{createtime, jdbcType=TIMESTAMP},
-                #{remark, jdbcType=VARCHAR}
+                #{remark, jdbcType=VARCHAR},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{isWarn, jdbcType=INTEGER}
         )
     </insert>
 
@@ -97,6 +103,9 @@
         <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
         a.createtime = #{createtime, jdbcType=TIMESTAMP},
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="isWarn != null ">a.remark = #{isWarn, jdbcType=INTEGER},</if>
     </set>
             where a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
     </update>
@@ -120,7 +129,10 @@
         a.identify_state,
         a.identify_result,
         a.createtime,
-        a.remark
+        a.remark,
+        check_user,
+        check_date,
+        is_warn
         from t_cruise_data_result a
         where 1 = 1
             and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
@@ -146,7 +158,11 @@
         a.identify_state,
         a.identify_result,
         a.createtime,
-        a.remark
+        a.remark,
+        check_user,
+        check_date,
+        is_warn,
+        cruise_result
         from t_cruise_data_result a
         where 1 = 1
         <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
@@ -167,6 +183,11 @@
         <if test="identifyResult != null">and a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
         <if test="createtime != null and createtime != ''">and a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
         <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+        <if test="isWarn != null ">and a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null ">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
@@ -188,7 +209,11 @@
         a.identify_state,
         a.identify_result,
         a.createtime,
-        a.remark
+        a.remark,
+        check_user,
+        check_date,
+        is_warn,
+        cruise_result
         from t_cruise_data_result a
         where 1 = 1
         <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
@@ -209,6 +234,10 @@
         <if test="identifyResult != null">and a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
         <if test="createtime != null and createtime != ''">and a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
         <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+        <if test="isWarn != null ">and a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null ">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
     </select>
 
     <insert id="batchInsert">
@@ -230,7 +259,10 @@
             identify_state,
             identify_result,
             createtime,
-            remark
+            remark,
+        check_user,
+        check_date,
+        is_warn
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
@@ -251,7 +283,10 @@
                 #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
                 #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
                 #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
-                #{TCruiseDataResult.remark, jdbcType=VARCHAR}
+                #{TCruiseDataResult.remark, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

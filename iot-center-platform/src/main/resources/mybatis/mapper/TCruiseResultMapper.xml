@@ -225,18 +225,15 @@
     <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
         SELECT
         b.task_result_id,
-        b.device_id,
-        b.device_name,
-        g.cruise_data_id,
-        g.cruise_result_id,
-        b.instance_id,
-        b.cruise_time,
         f.real_code,
+        b.device_name,
+        b.instance_name,
         g.cruise_type,
         h.dict_note as cruise_type_name,
         g.result_num,
         g.cruise_result,
         j.dict_note as cruise_result_name,
+        b.cruise_time,
         g.cruise_abnormal,
         p.dict_note as abnormal_type,
         g.evaluation_state,
@@ -247,7 +244,28 @@
         g.identify_result,
         g.identify_state,
         g.person_check,
-        b.instance_name
+        b.device_id,
+        g.cruise_data_id,
+        g.cruise_result_id,
+        b.instance_id,
+        e.device_mete_id,
+        q.state_zero,
+        q.state_one,
+        q.high_limit1,
+        q.high_limit2,
+        q.high_limit3,
+        q.high_limit4,
+        q.low_limit1,
+        q.low_limit2,
+        q.low_limit3,
+        q.low_limit4,
+        q.mete_kind,
+        m.dict_note as mete_kind_name,
+        e.cruise_id as preset_id,
+        k.camera_id,
+        b.cruise_time,
+        b.end_time,
+        g.is_warn
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
@@ -257,6 +275,9 @@
         LEFT JOIN t_dict_business i on i.dict_code = g.evaluation_state
         LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result
         LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal
+        LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
+        LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 

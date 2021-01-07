@@ -89,10 +89,6 @@ public class TCruiseResultService{
         cruiseManualReview.setCheckDate(cruiseCheckDate);
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
-        
-        //自动生成巡视报告
-        /*String taskID = cruiseManualReview.getTaskId();
-        reportManageService.cruiseReportGenerate(taskID);*/
 
         //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
@@ -151,6 +147,10 @@ public class TCruiseResultService{
         int result2 = 0;
         if (list.size() == cruiseManualReviewList.size()){
             result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
+
+            //自动生成巡视报告
+            String taskID = cruiseManualReview.getTaskId();
+            reportManageService.cruiseReportGenerate(taskID);
         }
 //        insert QrDecode as device's real code. by tt.
         TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
