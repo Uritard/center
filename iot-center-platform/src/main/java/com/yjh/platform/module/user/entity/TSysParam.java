@@ -25,8 +25,13 @@ public class TSysParam implements Serializable {
     @TableId(value = "param_id", type = IdType.AUTO)
     private Integer paramId;
 
+    @ApiModelProperty(value = "参数编码")
+    private String paramCode;
+
     @ApiModelProperty(value = "参数类型")
-    private String paramType;
+    private Integer paramType;
+
+    private String paramTypeName;
 
     @ApiModelProperty(value = "参数名称")
     private String paramName;

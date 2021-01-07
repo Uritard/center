@@ -101,13 +101,14 @@ public class TSysParamController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "paramId", required = false) Integer paramId,
-                            @RequestParam(value = "paramType", required = false) String paramType,
+                         @RequestParam(value = "paramCode", required = false) String paramCode,
+                            @RequestParam(value = "paramType", required = false) Integer paramType,
                             @RequestParam(value = "paramName", required = false) String paramName,
                             @RequestParam(value = "content", required = false) String content,
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TSysParam> list = tSysParamService.select(paramId, paramType, paramName, content, remark);
+            List<TSysParam> list = tSysParamService.select(paramId,paramCode, paramType, paramName, content, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -119,7 +120,8 @@ public class TSysParamController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "paramId", required = false) Integer paramId,
-                               @RequestParam(value = "paramType", required = false) String paramType,
+                               @RequestParam(value = "paramCode", required = false) String paramCode,
+                               @RequestParam(value = "paramType", required = false) Integer paramType,
                                @RequestParam(value = "paramName", required = false) String paramName,
                                @RequestParam(value = "content", required = false) String content,
                                @RequestParam(value = "remark", required = false) String remark,
@@ -129,7 +131,7 @@ public class TSysParamController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TSysParam> list = tSysParamService.selectByPage(paramId, paramType, paramName, content, remark);
+            List<TSysParam> list = tSysParamService.selectByPage(paramId,paramCode, paramType, paramName, content, remark);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

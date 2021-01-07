@@ -97,12 +97,6 @@ public class TaskShutDownJob extends QuartzJobBean {
             analysis(analysisMap);
             log.info("任务终止"+tCruiseTask.getTaskId());
 
-            Map<String,Object> jasonMapOnFinished=new HashMap<>();
-            jasonMapOnFinished.put("type","finishedOneInstance");
-            jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
-            String jsonMessage= JSON.toJSONString(jasonMapOnFinished);
-            log.info("发送给前端的消息："+jsonMessage);
-            WebSocketServer.sendMsg(jsonMessage);
 
             //机器人任务终止
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
@@ -261,6 +255,13 @@ public class TaskShutDownJob extends QuartzJobBean {
             tCruiseTaskResult.setTaskStatus(242);
             tCruiseTaskResult.setCruiseResult(247);
             tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
+            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+            jasonMapOnFinished.put("type","finishedOneInstance");
+            jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
+            String jsonMessage= JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息："+jsonMessage);
+            WebSocketServer.sendMsg(jsonMessage);
 
         } catch (Exception e) {
             log.error("任务终止异常: " + e);

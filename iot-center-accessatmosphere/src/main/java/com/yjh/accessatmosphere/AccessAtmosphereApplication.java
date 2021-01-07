@@ -35,34 +35,6 @@ public class AccessAtmosphereApplication implements CommandLineRunner {
         ParamConfig paramConfig = new ParamConfig("COM3", 19200, 0, 8, 1);
         Thread thread = new ListerThread(paramConfig);
         thread.start();
-//        String url = getLocalIp();
-//        log.info("accessatmosphere is running, url is : " + url);
-    }
-
-    private static String getLocalIp() throws SocketException {
-        String ip = "";
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                String name = intf.getName();
-                if (!name.contains("docker") && !name.contains("lo")) {
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        if (!inetAddress.isLoopbackAddress()) {
-                            String ipaddress = inetAddress.getHostAddress();
-                            if (!ipaddress.contains("::") && !ipaddress.contains("0:0:") && !ipaddress.contains("fe80")) {
-                                log.info(ipaddress);
-                                ip = ipaddress;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            ip = "127.0.0.1";
-            ex.getMessage();
-        }
-        return ip;
     }
 
 }

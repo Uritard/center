@@ -5,7 +5,8 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TSysParam">
         <id column="param_id" jdbcType="INTEGER" property="paramId" />
-        <result column="param_type" jdbcType="VARCHAR" property="paramType" />
+        <result column="param_code" jdbcType="VARCHAR" property="paramCode" />
+        <result column="param_type" jdbcType="INTEGER" property="paramType" />
         <result column="param_name" jdbcType="VARCHAR" property="paramName" />
         <result column="content" jdbcType="VARCHAR" property="content" />
         <result column="remark" jdbcType="VARCHAR" property="remark" />
@@ -13,20 +14,22 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        param_id, param_type, param_name, content, remark
+        param_id,param_code, param_type, param_name, content, remark
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="paramId" parameterType="com.yjh.platform.module.user.entity.TSysParam">
         insert into t_sys_param(
             param_id,
+            param_code,
             param_type,
             param_name,
             content,
             remark
         )values(
                 #{paramId, jdbcType=INTEGER},
-                #{paramType, jdbcType=VARCHAR},
+                #{paramCode, jdbcType=VARCHAR},
+                #{paramType, jdbcType=INTEGER},
                 #{paramName, jdbcType=VARCHAR},
                 #{content, jdbcType=VARCHAR},
                 #{remark, jdbcType=VARCHAR}
@@ -41,7 +44,8 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TSysParam">
         update t_sys_param a <set>
         <if test="paramId != null ">a.param_id = #{paramId, jdbcType=INTEGER},</if>
-        <if test="paramType != null and paramType != ''">a.param_type = #{paramType, jdbcType=VARCHAR},</if>
+        <if test="paramCode != null and paramCode != ''">a.param_code = #{paramCode, jdbcType=VARCHAR},</if>
+        <if test="paramType != null ">a.param_type = #{paramType, jdbcType=INTEGER},</if>
         <if test="paramName != null and paramName != ''">a.param_name = #{paramName, jdbcType=VARCHAR},</if>
         <if test="content != null and content != ''">a.content = #{content, jdbcType=VARCHAR},</if>
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
@@ -52,6 +56,7 @@
     <select id="selectByPrimaryId" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.TSysParam">
         select
         a.param_id,
+        a.param_code,
         a.param_type,
         a.param_name,
         a.content,
@@ -65,6 +70,7 @@
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TSysParam" resultType="com.yjh.platform.module.user.entity.TSysParam">
         select
         a.param_id,
+        a.param_code,
         a.param_type,
         a.param_name,
         a.content,
@@ -72,7 +78,8 @@
         from t_sys_param a
         where 1 = 1
         <if test="paramId != null "> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
-        <if test="paramType != null and paramType != ''"> and a.param_type = #{paramType, jdbcType=VARCHAR}</if>
+        <if test="paramCode != null and paramCode != ''"> and a.param_code = #{paramCode, jdbcType=VARCHAR}</if>
+        <if test="paramType != null "> and a.param_type = #{paramType, jdbcType=INTEGER}</if>
         <if test="paramName != null and paramName != ''"> and a.param_name = #{paramName, jdbcType=VARCHAR}</if>
         <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
@@ -81,14 +88,18 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TSysParam" resultType="com.yjh.platform.module.user.entity.TSysParam">
         select
         a.param_id,
+        a.param_code,
         a.param_type,
+        b.dict_note as paramTypeName,
         a.param_name,
         a.content,
         a.remark
         from t_sys_param a
+        left join t_dict_business b on a.param_type = b.dict_code and b.col_name = "param_type"
         where 1 = 1
         <if test="paramId != null "> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
-        <if test="paramType != null and paramType != ''"> and a.param_type = #{paramType, jdbcType=VARCHAR}</if>
+        <if test="paramCode != null and paramCode != ''"> and a.param_code = #{paramCode, jdbcType=VARCHAR}</if>
+        <if test="paramType != null "> and a.param_type = #{paramType, jdbcType=INTEGER}</if>
         <if test="paramName != null and paramName != ''"> and a.param_name LIKE CONCAT('%',#{paramName, jdbcType=VARCHAR},'%')</if>
         <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
@@ -98,6 +109,7 @@
     <insert id="batchInsert">
         insert into t_sys_param(
             param_id,
+        a.param_code,
             param_type,
             param_name,
             content,
@@ -106,7 +118,8 @@
         <foreach collection="list" item="TSysParam" separator=",">
             (
                 #{TSysParam.paramId, jdbcType=INTEGER},
-                #{TSysParam.paramType, jdbcType=VARCHAR},
+            #{TSysParam.paramCode, jdbcType=VARCHAR},
+                #{TSysParam.paramType, jdbcType=INTEGER},
                 #{TSysParam.paramName, jdbcType=VARCHAR},
                 #{TSysParam.content, jdbcType=VARCHAR},
                 #{TSysParam.remark, jdbcType=VARCHAR}
