@@ -480,7 +480,8 @@
             a.alarm_level,
             count( a.alarm_level ) AS count
         FROM
-            ( SELECT warn_level AS alarm_level, warn_id FROM t_warn_info UNION ALL ( SELECT alarm_level, robot_alarm_id FROM t_robot_alarm ) ) a
+            ( SELECT warn_level AS alarm_level, warn_id FROM t_warn_info UNION ALL ( SELECT alarm_level, robot_alarm_id FROM t_robot_alarm )
+            UNION ALL (SELECT alarm_level, camera_alarm_id FROM t_camera_alarm)) a
         GROUP BY
             a.alarm_level
             ) c ON c.alarm_level = b.dict_code

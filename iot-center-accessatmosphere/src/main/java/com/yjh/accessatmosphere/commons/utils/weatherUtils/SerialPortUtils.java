@@ -1,13 +1,22 @@
 package com.yjh.accessatmosphere.commons.utils.weatherUtils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessatmosphere.common.Constant;
 import gnu.io.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,7 +44,7 @@ public class SerialPortUtils implements SerialPortEventListener {
     // 保存串口返回信息
     private String data ="";
     // 保存串口返回信息十六进制
-    private String dataHex = "http://www.baidu.com";
+    private String dataHex = "";
 
     /**
      * 初始化串口
@@ -127,8 +136,8 @@ public class SerialPortUtils implements SerialPortEventListener {
                 // 直接获取到的数据
                 dataHex = bytesToHexString(readBuffer);
                 if(dataHex.startsWith("3052302C")){
-                    System.out.println("data:" + data);
-                    //saveInfo(data);
+                    System.out.println("接收微气象设备的数据： " + data);
+                    saveInfo(data);
                     Constant.weatherInfo = data;
                     data = "";
                 }
@@ -145,37 +154,71 @@ public class SerialPortUtils implements SerialPortEventListener {
             logger.info("读取串口数据时发生IO异常");
         }
     }
+    public String getUrl(String url, String json) throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        String result = "";
+        try {
+            URI uri = new URIBuilder(url).setParameter("map", json).build();
+            HttpGet httpGet = new HttpGet(uri);
+            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+            httpGet.setHeader("Accept", "application/json");
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {e.getMessage();}
+        return result;
+    }
 
-    private void saveInfo(String data){
+    private Map<String,Object> saveInfo(String data){
         if("".equals(data)){
-            return;
+            return null;
         }
-        DecimalFormat df = new DecimalFormat("#0.######");
+        DecimalFormat df = new DecimalFormat("#0.0");
         String[] str = data.split(",");
         Map<String,Object> info = new HashMap<>();
-        String windDirection = str[2];//风向 Dn=000D
+        String windDirection = str[3];//风向 Dx=000D
+        windDirection =windDirection.replaceAll("Dx=","").replaceAll("D","");
+        info.put("windDirection",windDirection);
 
         String windSpeed = str[5];//风速 Sm=000.0M
         windSpeed =windSpeed.replaceAll("Sm=","").replaceAll("M","");
         Double temp = Double.valueOf(windSpeed);
-        info.put("windSpeed",df.format(temp).toString()+"m/s");
+        info.put("windSpeed",df.format(temp).toString());
+        info.put("windSpeedUnit","m/s");
 
-        String temperature = str[7];//大气温度 Ta=021.2C
+        String temperature = str[7].replaceAll("Ta=","").replaceAll("C","");//大气温度 Ta=021.2C
         temp = Double.valueOf(temperature);
-        info.put("temperature",df.format(temp).toString()+"℃");
+        info.put("temperature",df.format(temp).toString());
+        info.put("temperatureUnit","℃");
 
-        String humidity = str[8];//湿度 Ua=015.7P
+        String humidity = str[8].replaceAll("Ua=","").replaceAll("P","");//湿度 Ua=015.7P
         temp = Double.valueOf(humidity);
-        info.put("humidity",df.format(temp).toString()+"%RH");
+        info.put("humidity",df.format(temp).toString());
+        info.put("humidityUnit","%RH");
 
-        String airPressure = str[9];//气压 Pa=0.001022.4H;
-        temp = Double.valueOf(airPressure);
-        info.put("airPressure",df.format(temp).toString()+"hPa");
+        String airPressure = str[9].replaceAll("Pa=","").replaceAll("H","");//气压 Pa=001022.4H;
+        temp = Double.valueOf(airPressure)/1000;
+        info.put("airPressure",df.format(temp).toString());
+        info.put("airPressureUnit","kPa");
 
-        String precipitation = str[10];//降雨量 Rc=0000.0m
+        String precipitation = str[10].replaceAll("Rc=","").replaceAll("M","");//降雨量 Rc=0000.0M
         temp = Double.valueOf(precipitation);
-        info.put("precipitation",df.format(temp).toString()+"mm");
+        info.put("precipitation",df.format(temp).toString());
+        info.put("precipitationUnit","mm");
         //Constant.weatherInfo = info;
+        logger.info("发送的信息： "+info);
+
+        JSONObject jsonObj=new JSONObject(info);
+        try {
+            if("".equals(Constant.path)){
+                Constant.path = "192.168.9.40";
+            }
+            logger.info("发送给： "+Constant.path);
+            getUrl("http://"+Constant.path+":18711/homePage/v1/getWeatherInfoForService",jsonObj.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return info;
 
 
     }
