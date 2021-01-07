@@ -79,4 +79,6 @@ public interface TCruiseResultDao {
                     @Param(value = "checkDate")Date checkDate);
 
     TCruiseResult selectForTaskId(@Param(value = "taskId") String taskId);
+
+    String selectAlgorithmType(@Param(value = "presetId") Long presetId);
 }

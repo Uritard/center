@@ -517,4 +517,10 @@
         where a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectAlgorithmType" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT b.analyse_type FROM t_algorithm_conf a
+	        LEFT JOIN t_algorithm_info b ON a.algorithm_id = b.algorithm_id
+	        WHERE a.preset_id = #{presetId, jdbcType = BIGINT}
+    </select>
+
 </mapper>
