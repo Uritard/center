@@ -28,4 +28,6 @@ public interface CameraConDao {
 
     RecorderConInfo selectByRecordId(@Param(value = "recordId") Long recordId);
 
+    List<Long> selectUnableCameraIds();
+
 }

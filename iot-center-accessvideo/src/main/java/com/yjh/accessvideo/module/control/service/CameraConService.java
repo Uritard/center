@@ -6,6 +6,9 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.logs.Logs;
+import com.yjh.accessvideo.commons.result.BusinessException;
+import com.yjh.accessvideo.commons.result.Result;
+import com.yjh.accessvideo.commons.result.ResultCodeEnum;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
@@ -678,6 +681,18 @@ public class CameraConService {
             log.info("Exception: " + ex);
             ex.getMessage();
         }
+    }
+
+//    judge is camera controlled. by tt.
+    public Result isCameraControlled (Long cameraId) {
+        Result result = new Result();
+        List<Long> unableCameraList = cameraConDao.selectUnableCameraIds();
+        for (Long unableCameraId:unableCameraList) {
+            if (Objects.equals(unableCameraId, cameraId)) {
+                throw new BusinessException("this camera is unable to control.");
+            }
+        }
+        return result;
     }
 
 }

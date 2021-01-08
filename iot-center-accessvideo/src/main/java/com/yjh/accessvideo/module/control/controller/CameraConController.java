@@ -256,7 +256,9 @@ public class CameraConController {
                             @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
+            cameraConService.isCameraControlled(cameraId);
+            log.info("ss");
+//            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

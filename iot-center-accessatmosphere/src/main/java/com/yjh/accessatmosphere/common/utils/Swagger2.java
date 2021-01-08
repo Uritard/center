@@ -36,7 +36,7 @@ public class Swagger2 {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("智慧变电项目 RESTful API")   //标题
-                .description("智慧变电项目机器人api接口文档")   //描述
+                .description("智慧变电项目微气象api接口文档")   //描述
                 .version("1.0")
                 .build();
     }
