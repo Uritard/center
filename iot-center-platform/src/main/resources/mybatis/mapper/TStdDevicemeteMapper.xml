@@ -552,7 +552,7 @@
             b.device_mete_id DESC
     </select>
 
-    <select id="selectDeviceMeteByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
+    <select id="selectDeviceMeteByDeviceId" parameterType="java.util.List" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo">
         SELECT DISTINCT
             b.device_mete_id AS "deviceMeteId",
             b.device_id AS "deviceId",
@@ -573,7 +573,10 @@
         LEFT JOIN t_dict_business g ON f.c_state = g.dict_code
         AND g.col_name = 'task_state'
         WHERE
-             b.device_id = #{deviceId,jdbcType=BIGINT}
+             b.device_id IN
+             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                 #{deviceIds,jdbcType=BIGINT}
+             </foreach>
         AND f.c_state != 239
         AND f.c_state != 241
         ORDER BY

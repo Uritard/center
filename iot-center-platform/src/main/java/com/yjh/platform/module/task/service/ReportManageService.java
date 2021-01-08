@@ -4,7 +4,11 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Report.ReportDataRepo;
 import com.yjh.platform.common.utils.Report.ReportHelper;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
+import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,12 @@ public class ReportManageService {
     private ReportManageDao reportManageDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
+    private TCruiseDataResultDao tCruiseDataResultDao;
 
     private DateTimeUtil dateTimeUtil;
     @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
@@ -311,5 +321,76 @@ public class ReportManageService {
     public List<TCruiseDataResultDetail> test(String taskId){
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         return tCDRDList;
+    }
+
+    @Logs(title = "巡视结果分析报表生成下载",code = "reportManage",content = "分析报表下载")
+    @Transactional(rollbackFor = Exception.class)
+    public String cruiseResultAnalyseReporter(Long deviceMeteId){
+
+        ResultAnalyseReport resultAnalyseReport=new ResultAnalyseReport();
+        DeviceBaseReport deviceBaseReport=tStdDeviceDao.selectDeviceBase(deviceMeteId);
+        DeviceMeteBaseReport deviceMeteBaseReport=tStdDeviceDao.selectDeviceMeteBase(deviceMeteId);
+        List<CruiseResultDetailReport> cruiseResultDetailReports=new ArrayList<>();
+        List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(-1,-1,deviceMeteId,null,null);
+        for(CruiseResultAnalInfo cruiseTem:cruiseResultAnalInfos){
+            CruiseResultDetailReport cruiseResultDetailReport=new CruiseResultDetailReport();
+            cruiseResultDetailReport.setCruiseName(cruiseTem.getCruiseName());
+            cruiseResultDetailReport.setCruiseTypeName(cruiseTem.getCruiseTypeName());
+            cruiseResultDetailReport.setResultNum(cruiseTem.getResultNum());
+            cruiseResultDetailReport.setEndTime(cruiseTem.getEndTime());
+            cruiseResultDetailReport.setIdentifyResultName(cruiseTem.getIdentifyResultName());
+            cruiseResultDetailReport.setCTypeName(cruiseTem.getCTypeName());
+            cruiseResultDetailReport.setPicPath(cruiseTem.getPicPath());
+            cruiseResultDetailReports.add(cruiseResultDetailReport);
+        }
+
+        resultAnalyseReport.setDeviceBaseR(deviceBaseReport);
+        resultAnalyseReport.setDeivceMeteBaseR(deviceMeteBaseReport);
+        resultAnalyseReport.setCRDR(cruiseResultDetailReports);
+
+
+        String deviceMeteName=deviceMeteBaseReport.getDeviceMeteName();
+        String cruiseDate = dateTimeUtil.format(cruiseResultDetailReports.get(0).getEndTime());
+        String reportName =  deviceMeteName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
+
+
+        String finalFileName = null;
+        try {
+            finalFileName = new String(reportName.getBytes("UTF-8"),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        //从缓存中获取系统参数
+        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String reportPath = redisMap.get("content");
+        log.info("reportPath:"+reportPath);
+
+        File temporaryFile = new File(reportPath);
+        String reportPath2 = null;
+        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
+        {
+            temporaryFile.mkdir();
+            reportPath2 = reportPath+"/"+finalFileName;
+            log.info("不存在，创建的文件绝对路径是==="+reportPath2);
+            File file = new File(reportPath2);
+//            ContentData contentData = ReportDataRepo.getData(resultAnalyseReport);
+//            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+//                    contentData.getElements(), file);
+        }else {
+            reportPath2 = reportPath+"/"+finalFileName;
+            log.info("存在，该文件绝对路径是==="+reportPath2);
+            File file = new File(reportPath2);
+//            ContentData contentData = ReportDataRepo.getData(resultAnalyseReport);
+//            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
+//                    contentData.getElements(), file);
+        }
+        //从缓存中获取系统参数
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        String fileRelativePath = map.get("content") + "/" + finalFileName;
+        log.info("该文件相对路径是==="+fileRelativePath);
+        return fileRelativePath;
+
+
     }
 }

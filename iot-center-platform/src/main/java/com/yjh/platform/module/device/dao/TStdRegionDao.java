@@ -35,4 +35,8 @@ public interface TStdRegionDao {
     List<Long> selectRegionIds(Long upRegionId);
     List<Long> selectDownId(@Param(value = "regionId") Long regionId);
     int batchDelete(@Param(value = "list") List<Long> list);
+
+    //根据上层ID查询子层区域ID
+    List<Long> selectRegionByUpId(List<Long> upRegionIds);
+
 }

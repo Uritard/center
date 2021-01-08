@@ -188,4 +188,16 @@
         </foreach>
         )
     </delete>
+
+    <select id="selectRegionByUpId" parameterType="java.util.List" resultType="java.lang.Long">
+        SELECT
+        region_id
+        FROM
+        t_std_region
+        WHERE
+        up_region_id IN
+        <foreach collection="list" item="upRegionIds" separator="," open="(" close=")" index="index">
+            #{upRegionIds,jdbcType=BIGINT}
+        </foreach>
+    </select>
 </mapper>

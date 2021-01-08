@@ -198,4 +198,18 @@ public class ReportManageController {
         }
         return result;
     }
+
+    @ApiOperation(value = "巡视结果分析报表生成")
+    @RequestMapping(value = "/cruiseResultAnalyseReporter",method = RequestMethod.GET)
+    public Result cruiseResultAnalyseReporter(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
+        Result result=new Result();
+        try {
+            result.setData(reportManageService.cruiseResultAnalyseReporter(deviceMeteId));
+
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("报表生成失败："+e);
+        }
+        return result;
+    }
 }

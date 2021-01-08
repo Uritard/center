@@ -17,6 +17,9 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
+import com.yjh.platform.module.task.entity.TCruiseTask;
+import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.service.TWarnInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -31,6 +34,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -47,6 +51,7 @@ public class HelloController {
     @Autowired
     TStdMetemodelDetailDao tStdMetemodelDetailDao;
     @Autowired
+
     TCruisePointInstanceDao tCruisePointInstanceDao;
 
 
@@ -106,74 +111,88 @@ public class HelloController {
 
         Long endTime=System.currentTimeMillis();
 
+        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
+        log.info("djkhwqedkfe:"+maps.get("remark"));
+        TCruiseTask tCruiseTask=new TCruiseTask();
+        tCruiseTask.setTaskId(maps.get("remark").toString());
+//        log.info("class.....:"+testString.getClass());
+//        log.info("content-length:"+testString.length());
+//
+//        log.info("Content表计:"+testString.matches("\\{\"msgData.*?\"2\"}"));
+//        log.info("Content缺陷:"+testString.matches("\\{\"msgType.*?}}}}"));
 
-        String l1="{\"msgType\": \"4\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"errorCode\": \"0\"}}{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
-        String l3=l1.replaceAll("\\s+","");
-        String l2=l3.replaceAll("\\{.*?\\}\\{","{");
-        log.info("String:"+l2);
-        log.info("String3:"+l3);
-
-
-
-        String meter="{9541}{\"msgData\":{\"data\":{\"resultInfo1\":{\"analyseType\":\"3\",\"instanceId\":\"11000000505\",\"resultValue\":\"--.7--\",\"taskId\":\"6d05cd9969d14a22a71c03d7ff10b94a\"}},\"desNode\":\"clientSocket001\",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000004\",\"msgType\":\"2\"}";
-        String defect="{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
-//        String testString=",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000136\",\"msgType\":\"2\"}\n";
-
-
-
-        log.info("meter:"+meter.replaceAll("\\{\"msgData.*?\"2\"}","hahaha"));
-        log.info("----+++:"+meter.split("\\{\"msgData.*?\"2\"}").length);
-        log.info("defect:"+defect.replaceAll("\\{\"msgType.*?}}}}","123"));
-
-//        log.info("Judge---"+defect.matches("^\\{\"msgType\"+.*?"));
-
-        log.info("Trans1:"+meter.matches("\\{\"msgData.*?\"2\"}"));
-        log.info("Trans2:"+defect.matches("\\{\"msgType.*?}}}}"));
-
-        log.info("Rule1:"+meter.matches("\\{\"msgData.*?"));
-        log.info("Rule2:"+meter.matches(".*?\"2\"}"));
-
-        log.info("result:"+testString.matches(".*?\"2\"}"));
-
-        log.info("testString:"+testString);
+//        log.info("Content前半:"+testString.matches());
+//        log.info("Content后半:"+testString.matches());
 
 
-        String trulyMessage="";
-        if(testString.matches("\\{\"msgData.*?\"2\"}")){ //表计整包
-               log.info("整包数据1");
-        }else if (testString.matches("\\{\"msgType.*?}}}}")){ //缺陷整包
-               log.info("整包数据2");
-        }else { //拆包
-            if(testString.matches("\\{\"msgData.*?") || testString.matches("\\{\"msgType.*?")){ //拆包A
 
-                redisTemplate.opsForHash().put("algoResponse","A",testString);
-                log.info("获取上半包数据");
-            }else if (testString.matches(".*?\"2\"}") || testString.matches(".*?}}}}")){ //拆包B
-
-                redisTemplate.opsForHash().put("algoResponse","B",testString);
-                String success=(redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(testString);
-//                redisTemplate.delete("algoResponse");
-                log.info("success:"+success);
-                trulyMessage=success;
-            }
-        }
-
-      if(trulyMessage!="") {
-          JSONObject jsonObject = JSON.parseObject(trulyMessage);
-          log.info("JSON对象1：" + jsonObject);
-          if (jsonObject.get("msgType").toString().equals("2")) {
-              JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
-              log.info("原生数据****：" + jsonObjectData);
-              Iterator iterator = jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
-              while (iterator.hasNext()) {
-                  Map.Entry entry = (Map.Entry) iterator.next();
-                  //遍历每一个结果子集
-                  JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
-                  log.info("数据****：" + jsonObjectResult);//打印resultInfo
-              }
-          }
-      }
-      
+//        String l1="{\"msgType\": \"4\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"errorCode\": \"0\"}}{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
+//        String l3=l1.replaceAll("\\s+","");
+//        String l2=l3.replaceAll("\\{.*?\\}\\{","{");
+//        log.info("String:"+l2);
+//        log.info("String3:"+l3);
+//
+//
+//
+//        String meter="{9541}{\"msgData\":{\"data\":{\"resultInfo1\":{\"analyseType\":\"3\",\"instanceId\":\"11000000505\",\"resultValue\":\"--.7--\",\"taskId\":\"6d05cd9969d14a22a71c03d7ff10b94a\"}},\"desNode\":\"clientSocket001\",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000004\",\"msgType\":\"2\"}";
+//        String defect="{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
+////        String testString=",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000136\",\"msgType\":\"2\"}\n";
+//
+//
+//
+//        log.info("meter:"+meter.replaceAll("\\{\"msgData.*?\"2\"}","hahaha"));
+//        log.info("----+++:"+meter.split("\\{\"msgData.*?\"2\"}").length);
+//        log.info("defect:"+defect.replaceAll("\\{\"msgType.*?}}}}","123"));
+//
+////        log.info("Judge---"+defect.matches("^\\{\"msgType\"+.*?"));
+//
+//        log.info("Trans1:"+meter.matches("\\{\"msgData.*?\"2\"}"));
+//        log.info("Trans2:"+defect.matches("\\{\"msgType.*?}}}}"));
+//
+//        log.info("Rule1:"+meter.matches("\\{\"msgData.*?"));
+//        log.info("Rule2:"+meter.matches(".*?\"2\"}"));
+//
+//        log.info("result:"+testString.matches(".*?\"2\"}"));
+//
+//        log.info("testString:"+testString);
+//
+//
+//        String trulyMessage="";
+//        if(testString.matches("\\{\"msgData.*?\"2\"}")){ //表计整包
+//               log.info("整包数据1");
+//        }else if (testString.matches("\\{\"msgType.*?}}}}")){ //缺陷整包
+//               log.info("整包数据2");
+//        }else { //拆包
+//            if(testString.matches("\\{\"msgData.*?") || testString.matches("\\{\"msgType.*?")){ //拆包A
+//
+//                redisTemplate.opsForHash().put("algoResponse","A",testString);
+//                log.info("获取上半包数据");
+//            }else if (testString.matches(".*?\"2\"}") || testString.matches(".*?}}}}")){ //拆包B
+//
+//                redisTemplate.opsForHash().put("algoResponse","B",testString);
+//                String success=(redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(testString);
+////                redisTemplate.delete("algoResponse");
+//                log.info("success:"+success);
+//                trulyMessage=success;
+//            }
+//        }
+//
+//      if(trulyMessage!="") {
+//          JSONObject jsonObject = JSON.parseObject(trulyMessage);
+//          log.info("JSON对象1：" + jsonObject);
+//          if (jsonObject.get("msgType").toString().equals("2")) {
+//              JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
+//              log.info("原生数据****：" + jsonObjectData);
+//              Iterator iterator = jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
+//              while (iterator.hasNext()) {
+//                  Map.Entry entry = (Map.Entry) iterator.next();
+//                  //遍历每一个结果子集
+//                  JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
+//                  log.info("数据****：" + jsonObjectResult);//打印resultInfo
+//              }
+//          }
+//      }
+//
 
 //        redisTemplate.opsForList().leftPush("constant","helloWorld");
 //        redisTemplate.opsForList().leftPush("constant","JAVA");

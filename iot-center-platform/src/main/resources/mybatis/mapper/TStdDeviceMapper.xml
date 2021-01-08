@@ -604,4 +604,63 @@
         WHERE
 	       col_name = "custom_type"
     </select>
+
+    <select id="selectDeviceBase" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.DeviceBaseReport">
+       SELECT
+            b.up_region_name AS 'deviceRegion',
+            b.device_name,
+            b.device_code,
+            c.dict_note AS 'deviceTypeName',
+            b.custom_name,
+            (
+                SELECT
+                    count(*)
+                FROM
+                    t_std_devicemete d
+                LEFT JOIN t_std_device e ON d.device_id = e.device_id
+                WHERE
+                    d.device_mete_id = a.device_mete_id
+            ) AS 'meteCounts'
+        FROM
+            t_std_devicemete a
+        LEFT JOIN t_std_device b ON a.custom_id = b.custom_id
+        AND a.device_id = b.device_id
+        LEFT JOIN t_dict_business c ON b.device_type = c.dict_code
+        WHERE
+            a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+
+    </select>
+
+    <select id="selectDeviceMeteBase" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.DeviceMeteBaseReport">
+         SELECT
+            a.mete_name AS 'deviceMeteName',
+            b.dict_note AS 'meteTypeName',
+            (
+                SELECT
+                    count(*)
+                FROM
+                    t_std_devicemete c
+                LEFT JOIN t_cruise_point_instance d ON c.device_mete_id = d.device_mete_id
+                WHERE
+                    c.device_mete_id = a.device_mete_id
+            ) AS 'cruiseCounts'
+        FROM
+            t_std_devicemete a
+        LEFT JOIN t_dict_business b ON a.mete_type = b.dict_code
+        WHERE
+            a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+
+    </select>
+
+    <select id="selectDeviceIdsByRegion" parameterType="java.util.List" resultType="java.lang.Long">
+        SELECT DISTINCT
+        device_id
+        FROM
+        t_std_device
+        WHERE up_region_id IN
+        <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+            #{regionIds,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
 </mapper>

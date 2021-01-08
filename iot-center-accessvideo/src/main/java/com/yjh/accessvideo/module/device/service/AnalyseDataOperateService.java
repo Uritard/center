@@ -156,35 +156,63 @@ public class AnalyseDataOperateService {
     }
 
 
+//    public String nonUnpacking(String body) {
+//        log.info("body:"+body);
+//        body=body.replaceAll("\\s++","");
+//        String usefulBody=body;
+//        log.info("content-length:"+body.length());
+//        if (body.matches("\\{\"msgData.*?\"2\"}")) { //表计整包
+//            log.info("整包数据1");
+//        } else if (body.matches("\\{\"msgType.*?}}}}")) { //缺陷整包
+//            log.info("整包数据2");
+//        } else { //拆包
+//            if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") ) { //拆包A
+//                if(body.contains("\"msgType\": \"4\"") || body.contains("\"msgType\":\"4\"")){
+//                    usefulBody="";
+//                }else if(body.contains("\"msgType\":\"6\"")){
+//                    usefulBody=body;
+//                }
+//                else {
+//                    redisTemplate.opsForHash().put("algoResponse", "A", body);
+//                    log.info("获取上半包数据");
+//                    usefulBody="";
+//                }
+//            } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) { //拆包B
+//                redisTemplate.opsForHash().put("algoResponse", "B", body);
+//                usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body);
+////                redisTemplate.delete("algoResponse");
+//                log.info("success:" + usefulBody);
+//            }
+//        }
+//        log.info("usefulBody:"+usefulBody);
+//        return usefulBody;
+//
+//    }
+
     public String nonUnpacking(String body) {
-        log.info("body:"+body);
-        body=body.replaceAll("\\s++","");
-        String usefulBody=body;
-        log.info("content-length:"+body.length());
-        if (body.matches("\\{\"msgData.*?\"2\"}")) { //表计整包
-            log.info("整包数据1");
-        } else if (body.matches("\\{\"msgType.*?}}}}")) { //缺陷整包
-            log.info("整包数据2");
-        } else { //拆包
-            if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") ) { //拆包A
-                if(body.contains("\"msgType\": \"4\"") || body.contains("\"msgType\":\"4\"")){
-                    usefulBody="";
-                }else if(body.contains("\"msgType\":\"6\"")){
-                    usefulBody=body;
-                }
-                else {
-                    redisTemplate.opsForHash().put("algoResponse", "A", body);
-                    log.info("获取上半包数据");
-                    usefulBody="";
-                }
-            } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) { //拆包B
-                redisTemplate.opsForHash().put("algoResponse", "B", body);
-                usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body);
-//                redisTemplate.delete("algoResponse");
-                log.info("success:" + usefulBody);
+        //body清除空格
+        body = body.replaceAll("\\s++", "");
+        String usefulBody = "";//处理结果初始化
+        if (body.matches("\\{\"msgData.*?\"2\"}") || body.matches("\\{\"msgType.*?}}}}")) { //数据结果整包
+            log.info("整包数据...");
+            usefulBody = body;
+        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) {  //结果半包
+            if (body.contains("\"msgType\":\"4\"")) { //注册消息
+
+            } else if (body.contains("\"msgType\":\"6\"")) {  //结束消息
+                usefulBody = body;
+            } else {                                         //数据结果（上半包）
+                redisTemplate.opsForHash().put("algoResponse", "A", body);
+                log.info("获取上半包数据");
             }
+
+        } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) {   //数据结果（下半包）
+            redisTemplate.opsForHash().put("algoResponse", "B", body);
+            usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
+//                redisTemplate.delete("algoResponse");
+            log.info("success:" + usefulBody);
         }
-        log.info("usefulBody:"+usefulBody);
+        log.info("usefulBody:" + usefulBody);
         return usefulBody;
 
     }
@@ -211,6 +239,7 @@ public class AnalyseDataOperateService {
         alarmMeter.add(highLimit4);
         alarmMeter.add(lowLimit4);
         alarmMeter.remove(null);
+        log.info("alarmMeter:"+alarmMeter);
         if (Objects.nonNull(alarmState) || alarmMeter.size() > 0) {
             return 1;
         } else {

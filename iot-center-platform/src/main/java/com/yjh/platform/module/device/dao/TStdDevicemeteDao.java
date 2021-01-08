@@ -61,12 +61,14 @@ public interface TStdDevicemeteDao {
     List<TStdDeviceMete>selectPreDeviceMete(@Param(value ="modelId")Long modelId,@Param(value = "deviceId")Long deviceId,@Param(value = "customType")Long customType);
     int batchDelete(@Param(value = "list") List<String> list);
 
-    List<CruiseResultAnalMeteInfo> selectDeviceMeteByDeviceId(@Param(value = "deviceId")Long deviceId);
+    List<CruiseResultAnalMeteInfo> selectDeviceMeteByDeviceId(List<Long> deviceIds);
     List<CruiseResultAnalMeteInfo> selectDeviceMete();
    //通过巡检点Id查询标准测点
     Long getdeviceMeteByPointinstance(@Param(value = "instanceId")Long instanceId);
     List<Long> selectByDevId(@Param(value = "deviceId")Long deviceId);
 
     List<Long> selectHave(@Param(value = "deviceMeteId")Long deviceMeteId);
+
+
 
 }

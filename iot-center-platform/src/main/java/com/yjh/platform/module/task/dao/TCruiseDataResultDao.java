@@ -4,6 +4,11 @@ import com.yjh.platform.module.task.entity.BrokenLineInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
+
+import java.util.List;
+import java.util.Date;
+
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -18,45 +23,54 @@ import java.util.List;
 public interface TCruiseDataResultDao {
 
     int insert(TCruiseDataResult tCruiseDataResult);
+
     int deleteByPrimaryId(@Param(value = "cruiseDataId") Long cruiseDataId);
+
     int update(TCruiseDataResult tCruiseDataResult);
+
     TCruiseDataResult selectByPrimaryId(@Param(value = "cruiseDataId") Long cruiseDataId);
+
     List<TCruiseDataResult> select(@Param(value = "cruiseDataId") Long cruiseDataId,
-                                @Param(value = "cruiseResultId") String cruiseResultId,
-                                @Param(value = "cruiseId") Long cruiseId,
+                                   @Param(value = "cruiseResultId") String cruiseResultId,
+                                   @Param(value = "cruiseId") Long cruiseId,
                                    @Param(value = "cruiseName") String cruiseName,
-                                @Param(value = "cruiseType") Integer cruiseType,
+                                   @Param(value = "cruiseType") Integer cruiseType,
                                    @Param(value = "cruiseAbnormal") Integer cruiseAbnormal,
                                    @Param(value = "resultDesc") String resultDesc,
-                                @Param(value = "resultNum") String resultNum,
-                                @Param(value = "modifyNum") String modifyNum,
-                                @Param(value = "picpath") String picpath,
-                                @Param(value = "personCheck") String personCheck,
-                                @Param(value = "origpic") String origpic,
-                                @Param(value = "evaluationState") String evaluationState,
-                                @Param(value = "identifyState") Integer identifyState,
-                                @Param(value = "identifyResult") Integer identifyResult,
-                                @Param(value = "createtime") Date createtime,
-                                @Param(value = "remark") String remark,
+                                   @Param(value = "resultNum") String resultNum,
+                                   @Param(value = "modifyNum") String modifyNum,
+                                   @Param(value = "picpath") String picpath,
+                                   @Param(value = "personCheck") String personCheck,
+                                   @Param(value = "origpic") String origpic,
+                                   @Param(value = "evaluationState") String evaluationState,
+                                   @Param(value = "identifyState") Integer identifyState,
+                                   @Param(value = "identifyResult") Integer identifyResult,
+                                   @Param(value = "createtime") Date createtime,
+                                   @Param(value = "remark") String remark,
                                    @Param(value = "checkUser") String checkUser,
                                    @Param(value = "checkDate") Date checkDate,
                                    @Param(value = "isWarn") Integer isWarn,
                                    @Param(value = "cruiseResult") Integer cruiseResult
-                                   );
+    );
+
     List<TCruiseDataResult> selectByPage(TCruiseDataResult tCruiseDataResult);
 
     int batchInsert(List<TCruiseDataResult> list);
-    CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId")Long deviceId,
-                                                        @Param(value = "deviceMeteId")Long deviceMeteId);
-    List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "cruiseType")Integer cruiseType,
-                                                            @Param(value = "cType")Integer cType,
-                                                            @Param(value = "deviceMeteId")Long deviceMeteId,
-                                                            @Param(value = "endDate")Date endDate,
-                                                            @Param(value = "startDate")Date startDate);
 
-    List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType")Integer cruiseType,
-                                          @Param(value = "cType")Integer cType,
-                                          @Param(value = "deviceMeteId")Long deviceMeteId,
-                                          @Param(value = "endDate")Date endDate,
-                                          @Param(value = "startDate")Date startDate);
+    CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId") Long deviceId,
+                                                        @Param(value = "deviceMeteId") Long deviceMeteId);
+
+    List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "cruiseType") Integer cruiseType,
+                                                            @Param(value = "cType") Integer cType,
+                                                            @Param(value = "deviceMeteId") Long deviceMeteId,
+                                                            @Param(value = "endDate") Date endDate,
+                                                            @Param(value = "startDate") Date startDate);
+
+    List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType") Integer cruiseType,
+                                          @Param(value = "cType") Integer cType,
+                                          @Param(value = "deviceMeteId") Long deviceMeteId,
+                                          @Param(value = "endDate") Date endDate,
+                                          @Param(value = "startDate") Date startDate);
+
+//    List<CruiseResultDetailReport> selectCruiseResultDetail(@Param(value = "deviceMeteId")Long deviceMeteId);
 }

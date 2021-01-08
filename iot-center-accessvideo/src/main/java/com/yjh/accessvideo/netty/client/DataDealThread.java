@@ -183,7 +183,7 @@ public class DataDealThread implements Runnable {
                                                         } else {
                                                             warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateOne() + "状态触发告警");
                                                         }
-                                                        warnMap.put("outRang", "");
+                                                        warnMap.put("outRang", "-——-");
 
                                                         log.info("告警MAP：" + warnMap);
                                                         try {
@@ -197,6 +197,11 @@ public class DataDealThread implements Runnable {
                                                         cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
                                                         tAbnormal++;
 
+                                                    }else {
+                                                        //未达到告警值(遥信)
+                                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
+                                                        cruiseResultMap.put("cruiseAbnormal", "--");
+                                                        tNormal++;
                                                     }
                                                     break;
                                                 case "2":
@@ -262,7 +267,7 @@ public class DataDealThread implements Runnable {
                                                         cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
                                                         tAbnormal++;
                                                     } else {
-                                                        //未达到告警值
+                                                        //未达到告警值（遥测）
                                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                                         cruiseResultMap.put("cruiseAbnormal", "--");
                                                         tNormal++;
@@ -363,7 +368,7 @@ public class DataDealThread implements Runnable {
                                         Map<String, String> defectMap = new HashMap<>();
                                         String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
                                         defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
-                                        defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_type", resultValue));
+                                        defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
                                         defectMap.put("defectContent", resultValue);
                                         defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                         defectMap.put("instanceId", cruiseResult.get("instanceId").toString());

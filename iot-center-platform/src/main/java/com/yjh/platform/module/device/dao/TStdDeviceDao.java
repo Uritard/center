@@ -10,6 +10,8 @@ import com.yjh.platform.module.device.entity.CustomInfo;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.task.entity.DeviceBaseReport;
+import com.yjh.platform.module.task.entity.DeviceMeteBaseReport;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -103,4 +105,12 @@ public interface TStdDeviceDao {
     List<CustomInfo> selectCustomInfoByDict();
 
     List<AreaInfo> selectAllRegion();
+
+    //查询巡视结果分析报表所需基本设备信息
+    DeviceBaseReport selectDeviceBase(@Param(value = "deviceMeteId")Long deviceMete);
+    //查询巡视结果分析表所需基本测点信息
+    DeviceMeteBaseReport selectDeviceMeteBase(@Param(value = "deviceMeteId")Long deviceMeteId);
+
+    //根据UpRegion查询设备ID
+    List<Long> selectDeviceIdsByRegion(List<Long> regionIds);
 }
