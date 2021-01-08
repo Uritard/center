@@ -171,4 +171,17 @@ public class TAlgorithmConfBakController {
     }
 
 
+    @ApiOperation(value = "获取已有的算法分析类型")
+    @RequestMapping(value = "/selectAnalyseType", method = RequestMethod.GET)
+    public Result selectAnalyseType() {
+        Result result = new Result();
+        try {
+            result.setData(tAlgorithmConfBakService.selectAnalyseType());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }

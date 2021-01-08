@@ -183,4 +183,12 @@
         where analyse_type = #{analyseType,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectAnalyseType" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        SELECT distinct
+            b.*
+        FROM
+            t_algorithm_info a
+        left join t_dict_business b on a.analyse_type = b.dict_code and (b.col_name = "analyse_type" or b.col_name = "defect_type")
+        where  a.analyse_type IS NOT NULL
+    </select>
 </mapper>

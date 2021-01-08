@@ -421,8 +421,8 @@ public class RunAtNowTask implements Runnable{
                     }else {
                         //todo  现在是测点配置了算法 从测点寻找算法id
                         TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(item.getDeviceMeteId());
-                        TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
-                        if(tAlgorithmConf != null){//摄像头配置了算法
+                        //TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
+                        if(tAlgorithmConfBak != null){//配置了算法
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             tCruiseTaskResultDetail.setCruiseStatus(253);
@@ -453,8 +453,9 @@ public class RunAtNowTask implements Runnable{
                             analysis.setTaskId(taskId);
                             analysis.setInstanceId(item.getInstanceId());
                             analysis.setPicPath(absPath);
-                            //todo  TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConfBak.getAlgorithmId());
-                            TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
+                            //todo
+                            TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConfBak.getAlgorithmId());
+                            //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
                             analysis.setIsAi(tAlgorithmInfo.getIsAi());

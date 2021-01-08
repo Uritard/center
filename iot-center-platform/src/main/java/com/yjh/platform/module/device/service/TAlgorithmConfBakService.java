@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Arrays;
 
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -73,6 +74,11 @@ public class TAlgorithmConfBakService{
     return this.tAlgorithmConfBakDao.batchDelete(list1);
     }
 
+    @Logs(title = "获取已有的算法类型", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TDictBusiness> selectAnalyseType() {
+        return this.tAlgorithmConfBakDao.selectAnalyseType();
+    }
 
 
 }

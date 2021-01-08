@@ -139,18 +139,13 @@ public class TStdDevicemeteService{
                 if(tAlgorithmInfo != null){
                     tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
                     tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                    tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+                    tAlgorithmConfBakDao.update(tAlgorithmConfBak);
                 }
             }
         }else {
             TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             if(tAlgorithmConfBak != null){
-                TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(tStdDeviceMeteDetail.getAnalyseType());
-                if(tAlgorithmInfo != null){
-                    tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
-                    tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                    tAlgorithmConfBakDao.add(tAlgorithmConfBak);
-                }
+                tAlgorithmConfBakDao.deleteByPrimaryId(tAlgorithmConfBak.getDeviceMeteId());
             }
         }
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在
