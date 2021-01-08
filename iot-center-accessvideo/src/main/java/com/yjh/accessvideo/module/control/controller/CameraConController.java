@@ -165,6 +165,7 @@ public class CameraConController {
                              @RequestParam(value = "speed") int speed) {
         Result result = new Result();
         try {
+            cameraConService.isCameraControlled(cameraId);
             result.setData(cameraConService.pTZControl(dwPTZCommand, cameraId, dStop, speed));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -181,6 +182,7 @@ public class CameraConController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            cameraConService.isCameraControlled(cameraId);
             int max=9999,min=1;
             int ran = (int) (Math.random()*(max-min)+min);
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
@@ -204,6 +206,35 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "任务中相机抓图")
+    @RequestMapping(value = "/capturePictureForTask", method = RequestMethod.GET)
+    public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            int max=9999,min=1;
+            int ran = (int) (Math.random()*(max-min)+min);
+            SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
+            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
+            String filePath = captureResultPath + filePathTem;
+            log.info("filePath: "+filePath);
+            String message = cameraConService.capturePicture(filePath, cameraId);
+            String urlPath = capturePath+filePathTem;
+            resultMap.put("urlPath", urlPath);
+            resultMap.put("absPath", filePath);
+            String url = "chmod 777 "+ filePath;
+            Runtime.getRuntime().exec(url);
+            result.setData(resultMap);
+            result.setMessage(message);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务中相机抓图失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "预置位抓图")
     @RequestMapping(value = "/capturePresetPicture", method = RequestMethod.GET)
     public Result capturePresetPicture(@RequestParam(value = "presetId") Long presetId,
@@ -211,6 +242,7 @@ public class CameraConController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            cameraConService.isCameraControlled(cameraId);
             String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
             String mkdir = "mkdir "+capturePresetPath+"/"+presetId;
@@ -240,12 +272,29 @@ public class CameraConController {
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
+            cameraConService.isCameraControlled(cameraId);
             result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("转到预置点失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "任务中转到预置点")
+    @RequestMapping(value = "/moveToPresetForTask", method = RequestMethod.GET)
+    public Result moveToPresetForTask(@RequestParam(value = "presetId") Long presetId,
+                               @RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务转到预置点失败:", e);
         }
         return result;
     }
@@ -257,8 +306,7 @@ public class CameraConController {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
-            log.info("ss");
-//            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
+            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -274,6 +322,7 @@ public class CameraConController {
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
+            cameraConService.isCameraControlled(cameraId);
             result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.CLE_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
