@@ -113,4 +113,5 @@ public interface TStdDeviceDao {
 
     //根据UpRegion查询设备ID
     List<Long> selectDeviceIdsByRegion(List<Long> regionIds);
+
 }

@@ -176,13 +176,14 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "巡视结果分析--测点查询")
     @RequestMapping(value = "/selectCruiseResultAnal", method = RequestMethod.GET)
     public Result selectCruiseResultAnal(@RequestParam(value = "deviceId", required = false) Long deviceId,
+                                         @RequestParam(value = "resultSwitch")String resultSwitch,
                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                          @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-              List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId);
+              List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId,resultSwitch);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfos);
             result.setData(resultMap);

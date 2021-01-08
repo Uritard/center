@@ -158,7 +158,8 @@
         from t_std_device a
         where 1 = 1
             and a.device_id = #{deviceId, jdbcType=BIGINT}
-        limit 1
+            GROUP BY a.device_id
+
     </select>
 
     <select id="selectByPrimaryIdAll" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">

@@ -96,7 +96,7 @@ public class TCruiseDataResultService {
 
     @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId) {
+    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId,String resultSwitch) {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=new ArrayList<>();
         List<Long> deviceIds = new ArrayList<>();
 
@@ -129,10 +129,13 @@ public class TCruiseDataResultService {
                             break;
                     }
 
-                    if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
-                        deviceIds = tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
-                        log.info("jumpOut:" + deviceIds.size());
+                    if(regionIds.size()!=0){
+                        if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
+                            deviceIds = tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
+                            log.info("jumpOut:" + deviceIds.size());
+                        }
                     }
+
 
                 }
             }
@@ -146,7 +149,7 @@ public class TCruiseDataResultService {
             }
         }
         //获取同一设备下的有巡检结果的标准测点
-
+       List<CruiseResultAnalMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalMeteInfo deviceInfo : cruiseResultAnalMeteInfos) {
             log.info("设备信息：" + deviceInfo);
             //通过测点ID获取相应的符合条件的巡检点结果
@@ -175,7 +178,17 @@ public class TCruiseDataResultService {
                 }
 
             }
+
+
+            log.info("resultSwitch-------------------------------:"+resultSwitch);
+            if(resultSwitch.equals("abnormal")){
+                if(deviceInfo.getFinalState()==1){
+                    abnormalFilters.add(deviceInfo);
+                }
+            }
         }
+
+        cruiseResultAnalMeteInfos.removeAll(abnormalFilters);
 
         //按时间降序排列
 //        Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
