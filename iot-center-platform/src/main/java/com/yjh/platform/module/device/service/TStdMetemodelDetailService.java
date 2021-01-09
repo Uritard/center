@@ -6,6 +6,7 @@ import com.yjh.platform.module.device.entity.MeteModelDetail;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 
+import java.beans.IntrospectionException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -53,8 +54,8 @@ public class TStdMetemodelDetailService{
 
     @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdMeteModelDetail> select(Long modelId, Long meteId, String customType, String customTypeName,  String meteName, String meteType, Integer meteKind,String unit, String alarmNote, String alarmExplain, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2,Float highLimit3, Float lowLimit3,Float highLimit4, Float lowLimit4, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus) {
-        List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.select(modelId, meteId, customType, customTypeName,  meteName, meteType, meteKind,unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
+    public List<TStdMeteModelDetail> select(Long modelId, Long meteId, String customType, String customTypeName, String meteName, String meteType, Integer meteKind, Integer analyseType,String unit, String alarmNote, String alarmExplain, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Float highLimit3, Float lowLimit3, Float highLimit4, Float lowLimit4, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus) {
+        List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.select(modelId, meteId, customType, customTypeName,  meteName, meteType, meteKind,analyseType,unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
         return tStdMeteModelDetailList;
     }
 

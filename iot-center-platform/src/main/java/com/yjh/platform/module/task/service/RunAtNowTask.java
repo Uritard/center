@@ -62,9 +62,9 @@ public class RunAtNowTask implements Runnable{
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
     //相机抓图
-    private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePicture?cameraId={cameraId}";
+    private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}";
     //相机转到预置位
-    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPreset?presetId={presetId}&cameraId={cameraId}";
+    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
     //算法接口
     private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
     //缺陷接口
@@ -420,9 +420,10 @@ public class RunAtNowTask implements Runnable{
 
                     }else {
                         //todo  现在是测点配置了算法 从测点寻找算法id
-                        TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(item.getDeviceMeteId());
+                        //TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(item.getDeviceMeteId());
                         //TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
-                        if(tAlgorithmConfBak != null){//配置了算法
+                        TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByAnalyseType(item.getAnalyseType());
+                        if(tAlgorithmInfo != null){//配置了算法
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             tCruiseTaskResultDetail.setCruiseStatus(253);
@@ -454,7 +455,6 @@ public class RunAtNowTask implements Runnable{
                             analysis.setInstanceId(item.getInstanceId());
                             analysis.setPicPath(absPath);
                             //todo
-                            TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConfBak.getAlgorithmId());
                             //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
                             analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
                             analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());

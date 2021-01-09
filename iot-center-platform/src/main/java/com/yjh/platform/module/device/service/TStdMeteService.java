@@ -53,8 +53,8 @@ public class TStdMeteService{
 
     @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdMete> select(Long stdMeteId, Integer deviceType, String meteType, String meteName, String alarmNote, String alarmExplain, String alarmType, String unit, Float upEffect, Float lowEffect, Integer alarmLevel, Integer alarmLimit, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2,Float highLimit3, Float lowLimit3,Float highLimit4, Float lowLimit4,Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark) {
-        List<TStdMete> tStdMeteList = tStdMeteDao.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, unit, upEffect, lowEffect, alarmLevel, alarmLimit,highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
+    public List<TStdMete> select(Long stdMeteId, Integer deviceType, String meteType, String meteName, String alarmNote, String alarmExplain, String alarmType,Integer analyseType, String unit, Float upEffect, Float lowEffect, Integer alarmLevel, Integer alarmLimit, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2,Float highLimit3, Float lowLimit3,Float highLimit4, Float lowLimit4,Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark) {
+        List<TStdMete> tStdMeteList = tStdMeteDao.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, analyseType, unit, upEffect, lowEffect, alarmLevel, alarmLimit,highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
         return tStdMeteList;
     }
 

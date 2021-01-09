@@ -12,6 +12,7 @@
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
         <result column="alarm_explain" jdbcType="VARCHAR" property="alarmExplain" />
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
+        <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="up_effect" jdbcType="REAL" property="upEffect" />
         <result column="down_effect" jdbcType="REAL" property="downEffect" />
@@ -36,7 +37,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
 
-        std_mete_id, device_type,  mete_type, mete_kind, mete_name, alarm_note, alarm_explain, alarm_type, unit, up_effect, down_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
+        std_mete_id, device_type,  mete_type, mete_kind, mete_name, alarm_note, alarm_explain, alarm_type,analyse_type, unit, up_effect, down_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
 
     </sql>
 
@@ -51,6 +52,7 @@
             alarm_note,
             alarm_explain,
             alarm_type,
+            analyse_type,
             unit,
             up_effect,
             down_effect,
@@ -79,6 +81,7 @@
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmExplain, jdbcType=VARCHAR},
                 #{alarmType, jdbcType=VARCHAR},
+                #{analyseType, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
                 #{downEffect, jdbcType=REAL},
@@ -116,6 +119,7 @@
         <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
         <if test="alarmExplain != null and alarmExplain != ''">a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR},</if>
         <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
+        <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
@@ -149,6 +153,7 @@
         a.alarm_note,
         a.alarm_explain,
         a.alarm_type,
+        a.analyse_type,
         a.unit,
         a.up_effect,
         a.down_effect,
@@ -184,6 +189,7 @@
         a.alarm_note,
         a.alarm_explain,
         a.alarm_type,
+        a.analyse_type,
         a.unit,
         a.up_effect,
         a.down_effect,
@@ -213,6 +219,7 @@
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
+        <if test="analyseType != null "> and a.analyse_type = #{analyseType, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
@@ -248,6 +255,8 @@
         a.alarm_explain,
         a.alarm_type,
         e.dict_note as alarmTypeName,
+        a.analyse_type,
+        j.dict_note as analyseTypeName,
         a.unit,
         a.up_effect,
         a.down_effect,
@@ -274,6 +283,7 @@
         left join t_dict_business d on a.mete_kind = d.dict_code and d.col_name = "mete_kind"
         left join t_dict_business e on a.alarm_type = e.dict_code and e.col_name = "alarm_type"
         left join t_dict_business f on a.alarm_level = f.dict_code and f.col_name = "alarm_level"
+        left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name = "defect_type")
         where 1 = 1
 
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
@@ -291,6 +301,7 @@
             alarm_note,
             alarm_explain,
             alarm_type,
+        analyse_type,
             unit,
             up_effect,
             down_effect,
@@ -321,6 +332,7 @@
                 #{TStdMete.alarmNote, jdbcType=VARCHAR},
                 #{TStdMete.alarmExplain, jdbcType=VARCHAR},
                 #{TStdMete.alarmType, jdbcType=VARCHAR},
+            #{TStdMete.analyseType, jdbcType=INTEGER},
                 #{TStdMete.unit, jdbcType=VARCHAR},
                 #{TStdMete.upEffect, jdbcType=REAL},
                 #{TStdMete.downEffect, jdbcType=REAL},

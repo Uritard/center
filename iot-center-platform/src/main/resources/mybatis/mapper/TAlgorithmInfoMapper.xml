@@ -146,6 +146,13 @@
         </foreach>
     </insert>
 
+    <select id="selectByAnalyseType" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
+        select
+        a.algorithm_id
+        from t_algorithm_info a
+        where a.analyse_type = #{analyseType, jdbcType=VARCHAR},
+    </select>
+
 
 
 </mapper>

@@ -185,8 +185,8 @@ public class TStdDevicemeteService{
 
     @Logs(title = "查询", code = "device",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId,String cusomId,Long meteId, String meteKind,String meteType, String meteName, Integer deviceType,  String positionType, String unit, String alarmNote, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark,String stateZero,String stateOne,Integer  alarmState) {
-        List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId,cusomId, meteId, meteKind, meteType,meteName, deviceType,  positionType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
+    public List<TStdDeviceMete> select(Long deviceMeteId, Long deviceId,String cusomId,Long meteId, String meteKind,String meteType, String meteName, Integer deviceType,  String positionType,Integer analyseType, String unit, String alarmNote, String alarmType, Float upEffect, Float downEffect, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Integer alarmDelay, Integer alarmCnt, BigDecimal thresholdAbs, BigDecimal thresholdPer, Integer modulus, String remark,String stateZero,String stateOne,Integer  alarmState) {
+        List<TStdDeviceMete> tStdDeviceMeteList = tStdDevicemeteDao.select(deviceMeteId, deviceId,cusomId, meteId, meteKind, meteType,meteName, deviceType,  positionType,analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
 
         return tStdDeviceMeteList;
     }

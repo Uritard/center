@@ -111,6 +111,7 @@ public class TStdMeteController {
                             @RequestParam(value = "alarmNote", required = false) String alarmNote,
                             @RequestParam(value = "alarmExplain", required = false) String alarmExplain,
                             @RequestParam(value = "alarmType", required = false) String alarmType,
+                         @RequestParam(value = "analyseType", required = false) Integer analyseType,
                             @RequestParam(value = "unit", required = false) String unit,
                             @RequestParam(value = "upEffect", required = false) Float upEffect,
                             @RequestParam(value = "lowEffect", required = false) Float lowEffect,
@@ -132,7 +133,7 @@ public class TStdMeteController {
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
-            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, unit, upEffect, lowEffect, alarmLevel, alarmLimit,highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
+            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, analyseType, unit, upEffect, lowEffect, alarmLevel, alarmLimit,highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

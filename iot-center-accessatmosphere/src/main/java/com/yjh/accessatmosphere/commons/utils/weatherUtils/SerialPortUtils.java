@@ -175,7 +175,7 @@ public class SerialPortUtils implements SerialPortEventListener {
         }
         DecimalFormat df = new DecimalFormat("#0.0");
         String[] str = data.split(",");
-        Map<String,Object> info = new HashMap<>();
+        Map<String,Object> info = new HashMap<String, Object>();
         String windDirection = str[3];//风向 Dx=000D
         windDirection =windDirection.replaceAll("Dx=","").replaceAll("D","");
         info.put("windDirection",windDirection);
