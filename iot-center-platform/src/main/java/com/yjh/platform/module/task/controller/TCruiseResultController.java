@@ -247,7 +247,24 @@ public class TCruiseResultController {
         }
         return result;
     }
-
+    @ApiOperation(value = "根据过滤条件生成巡视报告并下载")
+    @RequestMapping(value = "/reportByCondition", method = RequestMethod.GET)
+    public Result reportByCondition(@RequestParam(value = "taskId",required = false) String taskId,
+                                    @RequestParam(value = "deviceType",required = false) Integer deviceType,
+                                    @RequestParam(value = "cruiseType",required = false) Integer cruiseType,
+                                    @RequestParam(value = "startTime",required = false) String startTime,
+                                    @RequestParam(value = "endTime",required = false) String endTime) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseResultService.reportByCondition(taskId,deviceType,cruiseType,startTime,endTime));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("根据过滤条件生成巡视报告并下载发生错误:", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     public Result batchInsert(@RequestBody List<TCruiseResult> list) {

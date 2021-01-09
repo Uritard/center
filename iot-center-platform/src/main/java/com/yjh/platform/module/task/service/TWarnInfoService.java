@@ -70,8 +70,8 @@ public class TWarnInfoService{
 
     @Logs(title = "查询", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfo> select(Long warnId, Integer warnLevel, Date warnTime, Integer warnType, String warnName, String warnContent, Long deviceId, String cunstomId, Long instanceId, Long stdMeteId, Integer confMode, Integer isWarn, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, Integer ifWarnDisable, Integer alarmSource, Integer warnSubtype, String deviceCode, String imagePath, String videoPath, String value, String outRange, String linkMessage) {
-        List<TWarnInfo> tWarnInfoList = tWarnInfoDao.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, ifWarnDisable, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, linkMessage);
+    public List<TWarnInfo> select(Long warnId, Integer warnLevel, Date warnTime, Integer warnType, String warnName, String warnContent, Long deviceId, String cunstomId, Long instanceId, Long stdMeteId, Integer confMode, Integer isWarn, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, Integer defectModel, Integer alarmSource, Integer warnSubtype, String deviceCode, String imagePath, String videoPath, String value, String outRange, String taskId) {
+        List<TWarnInfo> tWarnInfoList = tWarnInfoDao.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, defectModel, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, taskId);
         return tWarnInfoList;
     }
 
@@ -223,6 +223,31 @@ public class TWarnInfoService{
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfoDetail> selectAlarmProcess(Long warnId) {
         return tWarnInfoDao.selectAlarmProcess(warnId);
+    }
+    @Logs(title = "告警核查", code = "tWarnInfo",content = "根据web传递的参数进行告警核查")
+    @Transactional(rollbackFor = Exception.class)
+    public int warnReview(Long warnId,String dealInfo,Integer dealType,String userId,Integer defectModel) {
+        Date date = new Date();
+        TWarnInfo tWarnInfo = new TWarnInfo()
+                .setWarnId(warnId)
+                .setDealInfo(dealInfo)
+                .setDealType(dealType)
+                .setConfMode(275)
+                .setDealTime(date)
+                .setDefectModel(defectModel)
+                .setDealPersonId(userId);
+        int jieGuo = tWarnInfoDao.update(tWarnInfo);
+        //处理告警完成之后
+        if (jieGuo == 1) {
+            //给前端推webSocket
+            Map<String, Object> jasonMap = new HashMap<>();
+            jasonMap.put("type", "finishedOneAlarm");
+            jasonMap.put("alarmId", warnId);
+            String json = JSON.toJSONString(jasonMap);
+            System.out.println(("发送给前端的消息===" + json));
+            WebSocketServer.sendMsg(json);
+        }
+        return jieGuo;
     }
     @Logs(title = "进行告警处理", code = "tWarnInfo",content = "根据web传递的参数进行告警处理")
     @Transactional(rollbackFor = Exception.class)

@@ -119,7 +119,7 @@ public class TWarnInfoController {
                             @RequestParam(value = "dealInfo", required = false) String dealInfo,
                             @RequestParam(value = "dealPersonId", required = false) String dealPersonId,
                             @RequestParam(value = "dealTime", required = false) Date dealTime,
-                            @RequestParam(value = "ifWarnDisable", required = false) Integer ifWarnDisable,
+                            @RequestParam(value = "defectModel", required = false) Integer defectModel,
                             @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
                             @RequestParam(value = "warnSubtype", required = false) Integer warnSubtype,
                             @RequestParam(value = "deviceCode", required = false) String deviceCode,
@@ -127,10 +127,10 @@ public class TWarnInfoController {
                             @RequestParam(value = "videoPath", required = false) String videoPath,
                             @RequestParam(value = "value", required = false) String value,
                             @RequestParam(value = "outRange", required = false) String outRange,
-                            @RequestParam(value = "linkMessage", required = false) String linkMessage) {
+                            @RequestParam(value = "taskId", required = false) String taskId) {
         Result result = new Result();
         try {
-            List<TWarnInfo> list = tWarnInfoService.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, ifWarnDisable, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, linkMessage);
+            List<TWarnInfo> list = tWarnInfoService.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, defectModel, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, taskId);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -221,6 +221,27 @@ public class TWarnInfoController {
         }
         return result;
     }
+    @ApiOperation(value = "告警核查")
+    @RequestMapping(value = "/warnReview",method = RequestMethod.GET)
+    public Result warnReview(@RequestParam(value = "warnId", required = false) Long warnId,
+                             @RequestParam(value = "dealInfo", required = false) String dealInfo,
+                             @RequestParam(value = "dealType", required = false) Integer dealType,
+                             @RequestParam(value = "defectModel", required = false) Integer defectModel,
+                             HttpServletRequest request) {
+        Result result = new Result();
+        String userId = request.getHeader("userId");
+        try {
+            result.setData(tWarnInfoService.warnReview(warnId, dealInfo,dealType,userId,defectModel));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("告警核查发生异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("告警核查发生错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "根据告警来源统计告警个数")
     @RequestMapping(value = "/countByAlarmSource", method = RequestMethod.GET)
     public Result countByAlarmSource(){
@@ -295,10 +316,10 @@ public class TWarnInfoController {
             result.setData(tWarnInfoService.alarmProcess(tWarnInfo,userId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新异常:", e);
+            log.error("进行告警处理发生异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("更新错误:", e);
+            log.error("进行告警处理发生错误:", e);
         }
         return result;
     }

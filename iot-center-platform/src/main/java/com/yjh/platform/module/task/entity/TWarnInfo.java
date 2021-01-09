@@ -1,14 +1,16 @@
 package com.yjh.platform.module.task.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author tt
@@ -30,6 +32,7 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "告警等级")
     private Integer warnLevel;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "告警时间")
     private Date warnTime;
 
@@ -69,11 +72,12 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "确认人ID")
     private String dealPersonId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "确认时间")
     private Date dealTime;
 
-    @ApiModelProperty(value = "是否告警抑制")
-    private Integer ifWarnDisable;
+    @ApiModelProperty(value = "缺陷类型")
+    private Integer defectModel;
 
     @ApiModelProperty(value = "告警来源")
     private Integer alarmSource;
@@ -94,8 +98,8 @@ public class TWarnInfo implements Serializable {
 
     private String outRange;
 
-    @ApiModelProperty(value = "联动信息")
-    private String linkMessage;
+    @ApiModelProperty(value = "任务ID")
+    private String taskId;
 
 
 }

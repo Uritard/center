@@ -39,7 +39,7 @@ public interface TWarnInfoDao {
                                 @Param(value = "dealInfo") String dealInfo,
                                 @Param(value = "dealPersonId") String dealPersonId,
                                 @Param(value = "dealTime") Date dealTime,
-                                @Param(value = "ifWarnDisable") Integer ifWarnDisable,
+                                @Param(value = "defectModel") Integer defectModel,
                                 @Param(value = "alarmSource") Integer alarmSource,
                                 @Param(value = "warnSubtype") Integer warnSubtype,
                                 @Param(value = "deviceCode") String deviceCode,
@@ -47,7 +47,7 @@ public interface TWarnInfoDao {
                                 @Param(value = "videoPath") String videoPath,
                                 @Param(value = "value") String value,
                                 @Param(value = "outRange") String outRange,
-                                @Param(value = "linkMessage") String linkMessage);
+                                @Param(value = "taskId") String taskId);
     List<TWarnInfo> selectByPage(TWarnInfo tWarnInfo);
 
     int batchInsert(List<TWarnInfo> list);

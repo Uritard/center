@@ -75,9 +75,6 @@ public class TWarnInfoDetail implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dealTime;
 
-    @ApiModelProperty(value = "是否审核1.审核0.未审核")
-    private Integer ifWarnDisable;
-
     @ApiModelProperty(value = "实物Id")
     private String realCode;
 
@@ -90,4 +87,9 @@ public class TWarnInfoDetail implements Serializable {
     @ApiModelProperty(value = "巡检点ID")
     private Long instanceId;
 
+    @ApiModelProperty(value = "缺陷类型")
+    private Integer defectModel;
+
+    @ApiModelProperty(value = "缺陷类型--字典表")
+    private String defectModelName;
 }

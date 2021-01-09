@@ -83,8 +83,8 @@ public class ReportManageService {
 
 //        String fileName = nowTime+"-"+reportType+".xlsx";
         //生成随机的文件名称
-//        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
-        String fileName = reportName+"_"+reportType+"_"+nowTime+".xlsx";
+        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+//        String fileName = reportName+"_"+reportType+"_"+nowTime+".xlsx";
 //        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String finalFileName = null;
         try {
@@ -266,7 +266,7 @@ public class ReportManageService {
 //        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
         String reportName =  taskId + ".xlsx";//报表名称
 
-//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
 
         String finalFileName = null;
         try {
@@ -276,23 +276,23 @@ public class ReportManageService {
         }
 
         //从缓存中获取系统参数
-        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String reportPath = redisMap.get("content");
-        log.info("reportPath:"+reportPath);
+//        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+//        String reportPath = redisMap.get("content");
+//        log.info("reportPath:"+reportPath);
 
-        File temporaryFile = new File(reportPath);
+        File temporaryFile = new File(filePath);
         String reportPath2 = null;
         if (!temporaryFile.exists() && !temporaryFile.isDirectory())
         {
             temporaryFile.mkdir();
-            reportPath2 = reportPath+"/"+finalFileName;
+            reportPath2 = filePath+"/"+finalFileName;
             log.info("不存在，创建的文件绝对路径是==="+reportPath2);
-            File file = new File(reportPath);
+            File file = new File(filePath);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
-            reportPath2 = reportPath+"/"+finalFileName;
+            reportPath2 = filePath+"/"+finalFileName;
             log.info("存在，该文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);

@@ -5,6 +5,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
@@ -33,6 +34,8 @@ public class TCruiseResultService{
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TStdDeviceAttrDao tStdDeviceAttrDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
@@ -189,6 +192,13 @@ public class TCruiseResultService{
             }
         }
         return cruiseManualReview.getCheckDate();
+    }
+    @Logs(title = "根据过滤条件生成巡视报告并下载", code = "cruiseResult",content = "根据过滤条件生成巡视报告并下载")
+    @Transactional(rollbackFor = Exception.class)
+    public String reportByCondition(String taskId,Integer deviceType,Integer cruiseType,String startTime,String endTime) {
+//        List<Long> regionIdList = tStdRegionDao.selectDownId();
+        String jj = "";
+        return jj;
     }
     @Logs(title = "巡视任务结果统计", code = "cruiseResult",content = "根据巡视类型统计本周和上周的任务结果")
     @Transactional(rollbackFor = Exception.class)

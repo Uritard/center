@@ -20,7 +20,7 @@
         <result column="deal_info" jdbcType="VARCHAR" property="dealInfo" />
         <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId" />
         <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
-        <result column="if_warn_disable" jdbcType="INTEGER" property="ifWarnDisable" />
+        <result column="defect_model" jdbcType="INTEGER" property="defectModel" />
         <result column="alarm_source" jdbcType="INTEGER" property="alarmSource" />
         <result column="warn_subtype" jdbcType="INTEGER" property="warnSubtype" />
         <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
@@ -28,12 +28,11 @@
         <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
         <result column="value" jdbcType="VARCHAR" property="value" />
         <result column="out_range" jdbcType="VARCHAR" property="outRange" />
-        <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        warn_id, warn_level, warn_time, warn_type, warn_name, warn_content, device_id, cunstom_id, instance_id, std_mete_id, conf_mode, is_warn, deal_type, deal_info, deal_person_id, deal_time, if_warn_disable, alarm_source, warn_subtype, device_code, image_path, video_path, value, out_range, link_message
+        warn_id, warn_level, warn_time, warn_type, warn_name, warn_content, device_id, cunstom_id, instance_id, std_mete_id, conf_mode, is_warn, deal_type, deal_info, deal_person_id, deal_time, defect_model, alarm_source, warn_subtype, device_code, image_path, video_path, value, out_range, link_message
     </sql>
     <sql id="TongYong">
            (
@@ -58,7 +57,7 @@
             a.deal_person_id,
             h.user_name as deal_person_name,
             a.deal_time,
-            a.if_warn_disable,
+            a.defect_model,
             j.real_code
             FROM
             t_warn_info a
@@ -95,7 +94,7 @@
             h.deal_person_id,
             j.user_name as deal_person_name,
             h.deal_time,
-            1 as if_warn_disable,
+            1 as defect_model,
             h.camera_id as real_code
             FROM
             t_camera_alarm h
@@ -130,7 +129,7 @@
             f.deal_person_id,
             k.user_name as deal_person_name,
             f.deal_time,
-            1 as if_warn_disable,
+            1 as defect_model,
             f.robot_id as real_code
             FROM
             t_robot_alarm f
@@ -163,7 +162,7 @@
             deal_info,
             deal_person_id,
             deal_time,
-            if_warn_disable,
+            defect_model,
             alarm_source,
             warn_subtype,
             device_code,
@@ -171,7 +170,7 @@
             video_path,
             value,
             out_range,
-            link_message
+            task_id
         )values(
                 #{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
@@ -189,7 +188,7 @@
                 #{dealInfo, jdbcType=VARCHAR},
                 #{dealPersonId, jdbcType=VARCHAR},
                 #{dealTime, jdbcType=TIMESTAMP},
-                #{ifWarnDisable, jdbcType=INTEGER},
+                #{defectModel, jdbcType=INTEGER},
                 #{alarmSource, jdbcType=INTEGER},
                 #{warnSubtype, jdbcType=INTEGER},
                 #{deviceCode, jdbcType=VARCHAR},
@@ -197,7 +196,7 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{linkMessage, jdbcType=VARCHAR}
+                #{taskId, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -224,7 +223,7 @@
         <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
         <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
-        <if test="ifWarnDisable != null ">a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER},</if>
+        <if test="defectModel != null ">a.defect_model = #{defectModel, jdbcType=INTEGER},</if>
         <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
         <if test="warnSubtype != null ">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
         <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
@@ -232,7 +231,7 @@
         <if test="videoPath != null and videoPath != ''">a.video_path = #{videoPath, jdbcType=VARCHAR},</if>
         <if test="value != null and value != ''">a.value = #{value, jdbcType=VARCHAR},</if>
         <if test="outRange != null and outRange != ''">a.out_range = #{outRange, jdbcType=VARCHAR},</if>
-        <if test="linkMessage != null and linkMessage != ''">a.link_message = #{linkMessage, jdbcType=VARCHAR},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
     </set>
             where a.warn_id = #{warnId, jdbcType=BIGINT}
     </update>
@@ -255,7 +254,7 @@
         a.deal_info,
         a.deal_person_id,
         a.deal_time,
-        a.if_warn_disable,
+        a.defect_model,
         a.alarm_source,
         a.warn_subtype,
         a.device_code,
@@ -263,7 +262,7 @@
         a.video_path,
         a.value,
         a.out_range,
-        a.link_message
+        a.task_id
         from t_warn_info a
         where 1 = 1
             and a.warn_id = #{warnId, jdbcType=BIGINT}
@@ -288,7 +287,7 @@
         a.deal_info,
         a.deal_person_id,
         a.deal_time,
-        a.if_warn_disable,
+        a.defect_model,
         a.alarm_source,
         a.warn_subtype,
         a.device_code,
@@ -296,7 +295,7 @@
         a.video_path,
         a.value,
         a.out_range,
-        a.link_message
+        a.task_id
         from t_warn_info a
         where 1 = 1
         <if test="warnId != null "> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
@@ -315,7 +314,7 @@
         <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
         <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
         <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
-        <if test="ifWarnDisable != null "> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
+        <if test="defectModel != null "> and a.defect_model = #{defectModel, jdbcType=INTEGER}</if>
         <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="warnSubtype != null "> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
@@ -323,7 +322,7 @@
         <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
         <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
         <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
-        <if test="linkMessage != null and linkMessage != ''"> and a.link_message = #{linkMessage, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TWarnInfo" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
@@ -344,7 +343,7 @@
         a.deal_info,
         a.deal_person_id,
         a.deal_time,
-        a.if_warn_disable,
+        a.defect_model,
         a.alarm_source,
         a.warn_subtype,
         a.device_code,
@@ -352,7 +351,7 @@
         a.video_path,
         a.value,
         a.out_range,
-        a.link_message
+        a.task_id
         from t_warn_info a
         where 1 = 1
         <if test="warnId != null "> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
@@ -371,7 +370,7 @@
         <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
         <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
         <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
-        <if test="ifWarnDisable != null "> and a.if_warn_disable = #{ifWarnDisable, jdbcType=INTEGER}</if>
+        <if test="defectModel != null "> and a.defect_model = #{defectModel, jdbcType=INTEGER}</if>
         <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="warnSubtype != null "> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
@@ -379,7 +378,7 @@
         <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
         <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
         <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
-        <if test="linkMessage != null and linkMessage != ''"> and a.link_message = #{linkMessage, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
@@ -400,7 +399,7 @@
             deal_info,
             deal_person_id,
             deal_time,
-            if_warn_disable,
+            defect_model,
             alarm_source,
             warn_subtype,
             device_code,
@@ -408,7 +407,7 @@
             video_path,
             value,
             out_range,
-            link_message
+            task_id
         )values
         <foreach collection="list" item="TWarnInfo" separator=",">
             (
@@ -428,7 +427,7 @@
                 #{TWarnInfo.dealInfo, jdbcType=VARCHAR},
                 #{TWarnInfo.dealPersonId, jdbcType=VARCHAR},
                 #{TWarnInfo.dealTime, jdbcType=TIMESTAMP},
-                #{TWarnInfo.ifWarnDisable, jdbcType=INTEGER},
+                #{TWarnInfo.defectModel, jdbcType=INTEGER},
                 #{TWarnInfo.alarmSource, jdbcType=INTEGER},
                 #{TWarnInfo.warnSubtype, jdbcType=INTEGER},
                 #{TWarnInfo.deviceCode, jdbcType=VARCHAR},
@@ -436,7 +435,7 @@
                 #{TWarnInfo.videoPath, jdbcType=VARCHAR},
                 #{TWarnInfo.value, jdbcType=VARCHAR},
                 #{TWarnInfo.outRange, jdbcType=VARCHAR},
-                #{TWarnInfo.linkMessage, jdbcType=VARCHAR}
+                #{TWarnInfo.taskId, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -463,33 +462,33 @@
     <!--告警确认-->
     <select id="WarnConfirm" parameterType="java.util.Map" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT
-                a.warn_id,
-                a.device_id,
-        b.device_name,
-        k.mete_name,
-        a.warn_content,
-        a.warn_level AS alarm_level,
-        c.dict_note AS alarm_level_name,
-        a.alarm_source,
-        d.dict_note AS alarm_source_name,
-        a.warn_time AS alarm_time,
-        a.conf_mode,
-        e.dict_note AS conf_mode_name,
-        a.deal_person_id,
-        h.user_name as deal_person_name,
-        a.deal_time,
-                a.std_mete_id,
-        m.real_code,
-        a.image_path,
-        a.deal_info,
-        a.deal_type,
-        g.dict_note as deal_type_name,
-        a.if_warn_disable,
-                        a.instance_id,
-        n.cruise_id as preset_id,
-        j.camera_id
+            a.warn_id,
+            a.device_id,
+            b.device_name,
+            k.mete_name,
+            a.warn_content,
+            a.warn_level AS alarm_level,
+            c.dict_note AS alarm_level_name,
+            a.alarm_source,
+            d.dict_note AS alarm_source_name,
+            a.warn_time AS alarm_time,
+            a.conf_mode,
+            e.dict_note AS conf_mode_name,
+            a.deal_person_id,
+            h.user_name as deal_person_name,
+            a.deal_time,
+            a.std_mete_id,
+            m.real_code,
+            a.image_path,
+            a.deal_info,
+            a.deal_type,
+            g.dict_note as deal_type_name,
+            a.defect_model,
+            a.instance_id,
+            n.cruise_id as preset_id,
+            j.camera_id
         FROM
-                t_warn_info a
+            t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
@@ -502,11 +501,11 @@
         LEFT JOIN t_camera_preset j on j.preset_id = n.cruise_id
         WHERE
         1 = 1
-        <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnLevel != null"> and warn_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
-        <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="startTime != null and endTime != null"> and warn_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="defectType != null">and defect_type = #{defectType,jdbcType=INTEGER}</if>
         ORDER BY alarm_time DESC
     </select>

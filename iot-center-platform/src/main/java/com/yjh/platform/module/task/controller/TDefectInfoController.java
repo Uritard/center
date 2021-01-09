@@ -173,7 +173,7 @@ public class TDefectInfoController {
     @ApiOperation(value = "查询所有缺陷")
     @RequestMapping(value = "/selectDefectByPage", method = RequestMethod.GET)
     public Result selectDefectByPage(@RequestParam(value = "confMode", required = false) Integer confMode,
-                                     @RequestParam(value = "defectType", required = false) Integer defectType,
+                                     @RequestParam(value = "defectModel", required = false) Integer defectModel,
                                      @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                      @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                      @RequestParam(value = "deviceName", required = false) String deviceName,
@@ -184,7 +184,7 @@ public class TDefectInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TDefectInfoDetail> list = tDefectInfoService.selectDefectByPage(confMode,defectType,startTime,endTime,deviceName,meteName);
+            List<TDefectInfoDetail> list = tDefectInfoService.selectDefectByPage(confMode,defectModel,startTime,endTime,deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

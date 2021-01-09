@@ -66,10 +66,10 @@ public class TDefectInfoService {
     }
     @Logs(title = "查询所有缺陷", code = "tDefectInfo",content = "根据web传递的参数查询缺陷记录")
     @Transactional(rollbackFor = Exception.class)
-    public List<TDefectInfoDetail> selectDefectByPage(Integer confMode, Integer defectType, Date startTime, Date endTime, String deviceName,String meteName) {
+    public List<TDefectInfoDetail> selectDefectByPage(Integer confMode, Integer defectModel, Date startTime, Date endTime, String deviceName,String meteName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("confMode", confMode);
-        map.put("defectType", defectType);
+        map.put("defectModel", defectModel);
         map.put("startTime", startTime);
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
