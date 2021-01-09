@@ -34,6 +34,7 @@ public interface TStdMetemodelDetailDao {
                                      @Param(value = "meteName") String meteName,
                                      @Param(value = "meteType") String meteType,
                                      @Param(value = "meteKind") Integer meteKind,
+                                     @Param(value = "analyseType") Integer analyseType,
                                      @Param(value = "unit") String unit,
                                      @Param(value = "alarmNote") String alarmNote,
                                      @Param(value = "alarmExplain") String alarmExplain,
@@ -63,6 +64,7 @@ public interface TStdMetemodelDetailDao {
 
     List<String> selectColumnName();
     List<String> selectForDict(@Param(value = "colName") String colName);
+    List<String> selectForDictByanalyseType(@Param(value = "list") List<String> list);
 
     void selectForDictNote(ResultHandleUtils<String, String> resultHandler);
 

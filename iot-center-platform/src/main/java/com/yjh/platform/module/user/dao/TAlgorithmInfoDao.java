@@ -27,4 +27,5 @@ public interface TAlgorithmInfoDao {
     List<TAlgorithmInfo> selectByPage(TAlgorithmInfo tAlgorithmInfo);
 
     int batchInsert(List<TAlgorithmInfo> list);
+    TAlgorithmInfo selectByAnalyseType(@Param(value = "analyseType") String analyseType);
 }

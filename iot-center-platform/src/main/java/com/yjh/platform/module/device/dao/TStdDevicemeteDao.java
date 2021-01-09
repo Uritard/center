@@ -31,6 +31,7 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "meteName") String meteName,
                                 @Param(value = "deviceType") Integer deviceType,
                                 @Param(value = "positionType") String positionType,
+                                @Param(value = "analyseType") Integer analyseType,
                                 @Param(value = "unit") String unit,
                                 @Param(value = "alarmNote") String alarmNote,
                                 @Param(value = "alarmType") String alarmType,

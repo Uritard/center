@@ -10,6 +10,7 @@
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
         <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
+        <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
         <result column="alarm_explain" jdbcType="VARCHAR" property="alarmExplain" />
@@ -34,7 +35,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        model_id, mete_id, custom_id, mete_name, mete_type,mete_kind, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
+        model_id, mete_id, custom_id, mete_name, mete_type,mete_kind,analyse_type, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
     </sql>
 
 
@@ -46,6 +47,7 @@
             mete_name,
             mete_type,
             mete_kind,
+            analyse_type,
             unit,
             alarm_note,
             alarm_explain,
@@ -73,6 +75,7 @@
                 #{meteName, jdbcType=VARCHAR},
                 #{meteType, jdbcType=VARCHAR},
                 #{meteKind, jdbcType=INTEGER},
+                #{analyse_type, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR},
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmExplain, jdbcType=VARCHAR},
@@ -110,6 +113,7 @@
         <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
         <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
         <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="analyseType != null"> a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
         <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
         <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
         <if test="alarmExplain != null and alarmExplain != ''">a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR},</if>
@@ -144,6 +148,8 @@
         a.mete_name,
         a.mete_type,
         a.mete_kind,
+        a.analyse_type,
+        j.dict_note AS "analyseTypeName",
         a.unit,
         a.alarm_note,
         a.alarm_explain,
@@ -167,7 +173,7 @@
        FROM
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
-
+        left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name = "defect_type")
       WHERE a.model_id = #{modelId, jdbcType=BIGINT}
     </select>
 
@@ -180,6 +186,8 @@
         a.mete_name,
         a.mete_type,
         a.mete_kind,
+        a.analyse_type,
+        j.dict_note AS "analyseTypeName",
         a.unit,
         a.alarm_note,
         a.alarm_explain,
@@ -202,6 +210,7 @@
         a.modulus
         from t_std_metemodel_detail a
         left join t_dict_business b ON a.custom_id = b.dict_code
+        left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name = "defect_type")
         where 1 = 1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
@@ -209,7 +218,8 @@
         <if test="customTypeName != null "> and b.dict_note = #{customTypeName, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteKind != null">and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="analyseType != null">and a.analyse_type = #{analyseType, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
@@ -245,6 +255,8 @@
         a.mete_name,
         a.mete_type,
         a.mete_kind,
+        a.analyse_type,
+        j.dict_note AS "analyseTypeName",
         a.unit,
         a.alarm_note,
         a.alarm_explain,
@@ -253,7 +265,7 @@
         a.up_effect,
         a.down_effect,
         a.alarm_level,
-        j.dict_note as alarmLevelName,
+        l.dict_note as alarmLevelName,
         a.high_limit1,
         a.low_limit1,
         a.high_limit2,
@@ -285,6 +297,7 @@
         ) ON a.model_id = d.model_id
         LEFT JOIN t_dict_business j ON a.alarm_level = j.dict_code
         LEFT JOIN t_dict_business k ON a.alarm_type = k.dict_code
+        left join t_dict_business l on a.analyse_type = l.dict_code and (l.col_name = "analyse_type" or l.col_name = "defect_type")
         where 1=1
         <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
@@ -295,7 +308,8 @@
         <if test="deviceTypeName != null "> and e.dict_note = #{deviceTypeName, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT ('%',#{meteName, jdbcType=VARCHAR},'%')</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteKind != null">and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="analyseType != null">and a.analyse_type = #{analyseType, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
         <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
@@ -327,6 +341,7 @@
         mete_name,
         mete_type,
         mete_kind,
+        analyse_type
         unit,
         alarm_note,
         alarm_explain,
@@ -356,6 +371,7 @@
             #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.analyse_type, jdbcType=INTEGER},
             #{TStdMeteModelDetail.unit, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.alarmNote, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.alarmExplain, jdbcType=VARCHAR},
@@ -394,6 +410,14 @@
 
     <select id="selectForDict" resultType="java.lang.String">
         select dict_note from t_dict_business where col_name = #{colName,jdbcType = VARCHAR}
+    </select>
+
+    <select id="selectForDictByanalyseType" resultType="java.lang.String">
+        select dict_note from t_dict_business where col_name in
+        <foreach collection="list" item="colName" separator=",">
+            #{colName,jdbcType = VARCHAR}
+        </foreach>
+
     </select>
 
     <resultMap id="mapResultMap" type="java.util.HashMap">

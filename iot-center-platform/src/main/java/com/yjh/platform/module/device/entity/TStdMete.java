@@ -106,5 +106,9 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    private Integer analyseType;
+
+    private String analyseTypeName;
+
 
 }

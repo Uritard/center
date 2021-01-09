@@ -506,6 +506,7 @@
         )
         END
         ) AS instanceName,
+        b.analyse_type,
         f.device_name,
         IFNULL(c.inspection_name,d.preset_name) as cruiseName
         FROM

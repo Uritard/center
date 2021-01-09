@@ -12,6 +12,7 @@ import net.sf.json.JSONString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +32,8 @@ public class HomePageController {
 
     @Autowired
     private HomePageService homePageService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
@@ -211,6 +214,7 @@ public class HomePageController {
             }
             mapa.put("windDirection",windDirection);
             mapa.put("getTime",simpleDateFormat.format(new Date()));
+            redisTemplate.opsForHash().putAll("weatherInfoForLastValue",mapa);
             Constant.weatherInfo = mapa;
             result.setData(1);
         } catch (BusinessException b) {
@@ -227,7 +231,12 @@ public class HomePageController {
     public Result getWeatherInfo()  {
         Result result = new Result();
         try {
-            result.setData(Constant.weatherInfo);
+            if(Constant.weatherInfo == null || Constant.weatherInfo.size() ==0){
+                Map<String,String> map  = redisTemplate.opsForHash().entries("weatherInfoForLastValue");
+                result.setData(map);
+            }else {
+                result.setData(Constant.weatherInfo);
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

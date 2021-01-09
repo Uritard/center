@@ -17,5 +17,7 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String deviceName;
     private String instanceName;
     private String cruiseName;
+    private String analyseType;
+
 
 }

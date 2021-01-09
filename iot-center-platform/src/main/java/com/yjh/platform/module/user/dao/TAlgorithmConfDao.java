@@ -31,4 +31,5 @@ public interface TAlgorithmConfDao {
     List<TAlgorithmConfDetail> selectByPage(TAlgorithmConfDetail tAlgorithmConfDetail);
 
     int batchAdd(List<TAlgorithmConf> list);
+
 }
