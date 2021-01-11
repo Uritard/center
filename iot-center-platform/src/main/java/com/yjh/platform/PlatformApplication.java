@@ -41,6 +41,7 @@ public class PlatformApplication  implements CommandLineRunner {
 //        quartzTask.setJobName("PlatformScheduler");
 //        quartzTask.setJobGroup("Platform");
 //        jobManager.addJob(quartzTask);
+//        sss
         tSysParamService.insertIntoRedis();
     }
 
