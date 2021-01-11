@@ -278,6 +278,7 @@ public class TStdDeviceController {
         try {
 //            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceDetail.getUpRegionId());
             List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tStdDeviceDetail.getUpRegionId());
+            log.info("upRegionIds:"+upRegionIds);
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail, upRegionIds);
             resultMap.put("count", page.getTotal());

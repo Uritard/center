@@ -532,5 +532,11 @@ public class TStdDeviceService{
         return 1;
     }
 
+    @Logs(title = "根据区域Id批量查询设备Id")
+    public List<Long> selectDeviceIdsByRegion(List<Long> regionIds){
+        return tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
+    }
+
+
 }
 

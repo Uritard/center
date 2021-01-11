@@ -325,7 +325,7 @@ public class TWarnInfoService{
     public Integer warnCountsNonIdentify(){
         //总告警数量=redis中的数量+数据库中的数量
         Set<String> warnKeys=redisScan("warnInfo:");
-        Integer finalCounts=warnKeys.size()+Integer.valueOf(countWarnConfMode().get(0).getCount().toString());
+        Integer finalCounts=warnKeys.size()+tWarnInfoDao.warnCountsNonIdentify();
         return finalCounts;
     }
     //告警弹窗

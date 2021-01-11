@@ -324,7 +324,7 @@ public class TWarnInfoController {
         return result;
     }
 
-    @ApiOperation(value = "告警信息计数统计")
+    @ApiOperation(value = "告警信息计数统计(未核查)")
     @RequestMapping(value = "/warnCountsNonIdentify",method = RequestMethod.GET)
     public Result warnCountsNonIdentify(){
         Result result=new Result();

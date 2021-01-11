@@ -10,6 +10,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.QrCodeUtils;
 import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.common.websocket.WebSocketServer;
@@ -107,14 +108,20 @@ public class HelloController {
         System.out.println("map = " + map);
         result.setData(map);
 
+
+        List<String> answer=new ArrayList<>();
+        answer=DateTimeUtil.getDayDateList(10);
+        log.info("Date："+answer);
+
+
         Long beginTime=System.currentTimeMillis();
 
         Long endTime=System.currentTimeMillis();
 
-        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
-        log.info("djkhwqedkfe:"+maps.get("remark"));
-        TCruiseTask tCruiseTask=new TCruiseTask();
-        tCruiseTask.setTaskId(maps.get("remark").toString());
+//        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
+//        log.info("djkhwqedkfe:"+maps.get("remark"));
+//        TCruiseTask tCruiseTask=new TCruiseTask();
+//        tCruiseTask.setTaskId(maps.get("remark").toString());
 //        log.info("class.....:"+testString.getClass());
 //        log.info("content-length:"+testString.length());
 //
@@ -158,6 +165,7 @@ public class HelloController {
 //
 //
 //        String trulyMessage="";
+//        log.info("testString:"+testString);
 //        if(testString.matches("\\{\"msgData.*?\"2\"}")){ //表计整包
 //               log.info("整包数据1");
 //        }else if (testString.matches("\\{\"msgType.*?}}}}")){ //缺陷整包
@@ -167,7 +175,7 @@ public class HelloController {
 //
 //                redisTemplate.opsForHash().put("algoResponse","A",testString);
 //                log.info("获取上半包数据");
-//            }else if (testString.matches(".*?\"2\"}") || testString.matches(".*?}}}}")){ //拆包B
+//            }else if (testString.matches(".*?\"2\"}") || testString.matches(".*?}}}}") |testString.matches("}")){ //拆包B
 //
 //                redisTemplate.opsForHash().put("algoResponse","B",testString);
 //                String success=(redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(testString);

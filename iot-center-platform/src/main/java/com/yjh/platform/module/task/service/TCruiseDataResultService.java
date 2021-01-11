@@ -96,54 +96,54 @@ public class TCruiseDataResultService {
 
     @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(Long deviceId,String resultSwitch) {
+    public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(List<Long>deviceIds,String resultSwitch) {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=new ArrayList<>();
-        List<Long> deviceIds = new ArrayList<>();
+//        List<Long> deviceIds = new ArrayList<>();
 
         //判断deviceId是否为空 决定 全查/条件查
-        if (Objects.isNull(deviceId)) {
+        if (deviceIds.size()>0&&deviceIds.get(0)==996) {
             cruiseResultAnalMeteInfos = tStdDevicemeteDao.selectDeviceMete();
             log.info("执行完成");
         } else {
-            if (Objects.nonNull(tStdDeviceDao.selectByPrimaryId(deviceId))) {
-                deviceIds.add(deviceId);
-            } else {
-                List<Long> regionIds = new ArrayList<>();
-                regionIds.add(deviceId);
-                if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
-                    log.info("case1");
-                    deviceIds.addAll(tStdDeviceDao.selectDeviceIdsByRegion(regionIds));
-                } else {
-                    log.info("case2");
-                    regionIds.clear();
-                    List<Long> upRegionIds = new ArrayList<>();//组织区域上层ID
-                    List<Long> upRegionIdsTem=new ArrayList<>();
-                    upRegionIds.add(deviceId);
-                    regionIds.addAll(tStdRegionDao.selectRegionByUpId(upRegionIds));
-                    upRegionIdsTem.addAll(tStdRegionDao.selectRegionByUpId(upRegionIds));
-                    while (upRegionIdsTem.size()!=0){
-                        upRegionIdsTem.addAll(tStdRegionDao.selectRegionByUpId(upRegionIdsTem));
-                        regionIds.addAll(tStdRegionDao.selectRegionByUpId(upRegionIdsTem));
-                        upRegionIdsTem.removeAll(regionIds);
-                        if(upRegionIdsTem.size()==0)
-                            break;
-                    }
-
-                    if(regionIds.size()!=0){
-                        if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
-                            deviceIds = tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
-                            log.info("jumpOut:" + deviceIds.size());
-                        }
-                    }
-
-
-                }
-            }
-
-
-            for (Long deviceId1 : deviceIds) {
-                log.info("device:-----" + deviceId1);
-            }
+//            if (Objects.nonNull(tStdDeviceDao.selectByPrimaryId(deviceId))) {
+//                deviceIds.add(deviceId);
+//            } else {
+//                List<Long> regionIds = new ArrayList<>();
+//                regionIds.add(deviceId);
+//                if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
+//                    log.info("case1");
+//                    deviceIds.addAll(tStdDeviceDao.selectDeviceIdsByRegion(regionIds));
+//                } else {
+//                    log.info("case2");
+//                    regionIds.clear();
+//                    List<Long> upRegionIds = new ArrayList<>();//组织区域上层ID
+//                    List<Long> upRegionIdsTem=new ArrayList<>();
+//                    upRegionIds.add(deviceId);
+//                    regionIds.addAll(tStdRegionDao.selectRegionByUpId(upRegionIds));
+//                    upRegionIdsTem.addAll(tStdRegionDao.selectRegionByUpId(upRegionIds));
+//                    while (upRegionIdsTem.size()!=0){
+//                        upRegionIdsTem.addAll(tStdRegionDao.selectRegionByUpId(upRegionIdsTem));
+//                        regionIds.addAll(tStdRegionDao.selectRegionByUpId(upRegionIdsTem));
+//                        upRegionIdsTem.removeAll(regionIds);
+//                        if(upRegionIdsTem.size()==0)
+//                            break;
+//                    }
+//
+//                    if(regionIds.size()!=0){
+//                        if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
+//                            deviceIds = tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
+//                            log.info("jumpOut:" + deviceIds.size());
+//                        }
+//                    }
+//
+//
+//                }
+//            }
+//
+//
+//            for (Long deviceId1 : deviceIds) {
+//                log.info("device:-----" + deviceId1);
+//            }
             if(deviceIds.size()>0){
                 cruiseResultAnalMeteInfos = tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceIds);
             }
@@ -178,8 +178,6 @@ public class TCruiseDataResultService {
                 }
 
             }
-
-
             log.info("resultSwitch-------------------------------:"+resultSwitch);
             if(resultSwitch.equals("abnormal")){
                 if(deviceInfo.getFinalState()==1){

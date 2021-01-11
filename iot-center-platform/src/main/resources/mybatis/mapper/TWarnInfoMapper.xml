@@ -590,13 +590,37 @@
     </select>
 
     <select id="warnCountsNonIdentify" resultType="java.lang.Integer">
-       SELECT
-            count(*)
+              SELECT
+            (
+                a.countNum + b.countNum + d.countNum
+            ) AS total
         FROM
-            t_warn_info a
-        LEFT JOIN t_dict_business b ON a.conf_mode = b.dict_code
-        WHERE
-            b.dict_note = '未处理'
+            (
+                (
+                    SELECT
+                        count(*) AS countNum
+                    FROM
+                        t_warn_info
+                    WHERE
+                        conf_mode = 276
+                ) a,
+                (
+                    SELECT
+                        count(*) AS countNum
+                    FROM
+                        t_robot_alarm
+                    WHERE
+                        alarm_state = 276
+                ) b,
+                (
+                    SELECT
+                        count(*) AS countNum
+                    FROM
+                        t_camera_alarm
+                    WHERE
+                        alarm_state = 276
+                ) d
+            )
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT

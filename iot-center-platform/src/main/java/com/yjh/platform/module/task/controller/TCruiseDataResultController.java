@@ -5,6 +5,8 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
@@ -17,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -36,6 +35,9 @@ public class TCruiseDataResultController {
     private final TCruiseDataResultService tCruiseDataResultService;
 
     private Logger log = LoggerFactory.getLogger(TCruiseDataResultController.class);
+
+    @Autowired
+    private TStdDeviceService tStdDeviceService;
 
     public TCruiseDataResultController(TCruiseDataResultService tCruiseDataResultService) {
         this.tCruiseDataResultService = tCruiseDataResultService;
@@ -128,9 +130,9 @@ public class TCruiseDataResultController {
 
         Result result = new Result();
         try {
-            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,cruiseAbnormal, resultDesc, resultNum, modifyNum, picpath,
+            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType, cruiseAbnormal, resultDesc, resultNum, modifyNum, picpath,
                     personCheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,
-                    checkUser,checkDate,isWarn,cruiseResult);
+                    checkUser, checkDate, isWarn, cruiseResult);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -147,7 +149,7 @@ public class TCruiseDataResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TCruiseDataResult> list = tCruiseDataResultService.selectByPage(tCruiseDataResult);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -176,14 +178,27 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "巡视结果分析--测点查询")
     @RequestMapping(value = "/selectCruiseResultAnal", method = RequestMethod.GET)
     public Result selectCruiseResultAnal(@RequestParam(value = "deviceId", required = false) Long deviceId,
-                                         @RequestParam(value = "resultSwitch")String resultSwitch,
+                                         @RequestParam(value = "resultSwitch") String resultSwitch,
                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                          @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
         Result result = new Result();
+        List<Long> regionIds = new ArrayList<>();
+        List<Long> deviceIds = new ArrayList<>();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-              List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceId,resultSwitch);
+            if(Objects.nonNull(deviceId)){
+                if (Objects.nonNull(tStdDeviceService.selectByPrimaryId(deviceId))) {
+                    deviceIds.add(deviceId);
+                } else {
+                    regionIds = tStdDeviceService.selectRegionIdTree(deviceId);
+                    deviceIds = tStdDeviceService.selectDeviceIdsByRegion(regionIds);
+                }
+              log.info("regionIds-----------:"+regionIds);
+            }else {
+                deviceIds.add(Long.valueOf(996));
+            }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos = tCruiseDataResultService.selectCruiseResultAnal(deviceIds, resultSwitch);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfos);
             result.setData(resultMap);
@@ -216,7 +231,7 @@ public class TCruiseDataResultController {
                 endDateTemp = dateFormat.parse(endDate);
                 startDateTemp = dateFormat.parse(startDate);
             }
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<CruiseResultAnalInfo> list = (tCruiseDataResultService.selectCruiseDataResultByList(cruiseType, cType, deviceMeteId, endDateTemp, startDateTemp));
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
