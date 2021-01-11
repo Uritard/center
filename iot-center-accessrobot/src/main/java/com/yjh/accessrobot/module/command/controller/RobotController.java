@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -38,14 +41,17 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.GET)
-    public Result feignRobotControl(@RequestParam(value = "robotCode") String robotCode,
+    public Result feignRobotControl(HttpServletRequest request,
+                                    @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
+                                    @RequestParam(value = "type") String key,
                                     @RequestParam(value = "command") String command,
                                     @RequestParam(value = "value",required = false) String value,
                                     @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction));
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

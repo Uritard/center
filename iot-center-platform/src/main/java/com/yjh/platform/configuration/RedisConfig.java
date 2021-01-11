@@ -81,7 +81,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         // hash的key也采用String的序列化方式
         template.setHashKeySerializer(stringRedisSerializer);
         template.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
-        template.setHashValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
+        template.setHashValueSerializer(stringRedisSerializer);
         template.afterPropertiesSet();
         return template;
 

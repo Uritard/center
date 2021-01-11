@@ -286,18 +286,9 @@ public class SysUserController {
         try {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
-            //  sysUser.setPassword("123456");
-            String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
-            if (sysUser.getPassword().contains(sysUser.getUserName())) {
-                result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
-                return result;
-            } else if (!sysUser.getPassword().matches(PW_PATTERN)) {
-                result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
-                return result;
-            } else {
-                sysUserService.insert(sysUser);
-                result.setData(sysUser);
-            }
+            sysUser.setPassword("Yjh@123!");
+            sysUserService.insert(sysUser);
+            result.setData(sysUser);
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_username") != -1) {
                 result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名重复");

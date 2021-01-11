@@ -1,10 +1,13 @@
 package com.yjh.accessrobot.common;
 
 import io.netty.channel.ChannelHandlerContext;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Constant {
 
@@ -20,5 +23,9 @@ public class Constant {
 
     public static Map<String, List<Long>> flagMap = new HashMap<>();
 
-
+    public static  ExpiringMap<String, String> map = ExpiringMap.builder()
+            .maxSize(100)
+            .expiration(120000, TimeUnit.MILLISECONDS)
+            .expirationPolicy(ExpirationPolicy.CREATED)
+            .build();
 }

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,10 +42,22 @@ public class RobotService {
 
     @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotControl(String robotCode,String type, String command,String value,String direction){
+    public String feignRobotControl(String robotCode,String type, String command,String value,String direction,String key,Long userId){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         List<Map<String,Object>> Item = new LinkedList<>();
         Map<String,Object> map = new HashMap<>();
+        String keys=Constant.map.get(userId);
+        if(StringUtils.isNoneBlank(key)&&keys==null){
+            String random=String.valueOf((int) (Math.random()*1000000000+1));
+            return random;
+        }else if(StringUtils.isNoneBlank(key)&&keys!=null) {
+            return "请输入密钥";
+        }else if(keys==null){
+            String random=String.valueOf((int) (Math.random()*1000000000+1));
+            return random;
+        }else if(!key.equals(keys)){
+            return  "密钥不正确,请重新输入";
+        }
         if(!"".equals(value) || null != value){
             map.put("value",value);
         }

@@ -11,11 +11,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @author tt
  * @since 2020-07-23
  */
+@Valid
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -23,7 +28,6 @@ import lombok.experimental.Accessors;
 public class SysUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
 
     @ApiModelProperty(value = "用户id")
     @TableId(value = "user_id", type = IdType.AUTO)
