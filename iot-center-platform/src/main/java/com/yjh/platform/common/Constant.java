@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Constant {
-
     public static final String account_lock_times = "account_lock_times:userAccountID";
 
     public static final String SET_PRESET_URL = "http://iot-center-accessvideo/camera/v1/setPreset?cameraId={cameraId}&presetId={presetId}";
@@ -31,5 +30,8 @@ public class Constant {
     public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
 
     public static Map<String,Object> weatherInfo = new HashMap<>();
+
+    public static final String account_lock_time = "account_lock_time:userAccountID";
+
 
 }

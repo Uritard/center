@@ -1,16 +1,33 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.RedisAndYxsjUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.user.controller.SysUserController;
+import com.yjh.platform.module.user.dao.SysRoleMenuDao;
+import com.yjh.platform.module.user.dao.SysUserBackUpDao;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.dao.SysUserDao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
+import com.yjh.platform.module.user.entity.SysUserBackUp;
 import com.yjh.platform.module.user.entity.SysUserLogin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -18,17 +35,30 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
-* @author tt
-* @since 2020-07-23
-*/
+ * @author tt
+ * @since 2020-07-23
+ */
 @Service
-public class SysUserService{
+public class SysUserService {
 
     @Autowired
     private SysUserDao sysUserDao;
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @Resource
+    private SysRoleMenuDao sysRoleMenuDao;
+    @Resource
+    private SysUserBackUpDao SysUserBackUpDao;
+
+    @Resource
+    private  RedisAndYxsjUtil redisAndYxsjUtil;
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+
 
     @Logs(title = "新增", code = "sysUser", content = "新增用户")
     @Transactional(rollbackFor = Exception.class)
@@ -36,7 +66,11 @@ public class SysUserService{
         Date date = new Date();
         sysUser.setCreateTime(date);
         sysUser.setUpdateTime(date);
-        return this.sysUserDao.insert(sysUser);
+        int total= sysUserDao.insert(sysUser);
+        SysUserBackUp sysUserBackUp=new SysUserBackUp();
+        BeanUtils.copyProperties(sysUser,sysUserBackUp);
+        SysUserBackUpDao.insert(sysUserBackUp);
+        return total;
     }
 
     @Logs(title = "删除", code = "module", content = "删除用户")
@@ -53,6 +87,166 @@ public class SysUserService{
         return this.sysUserDao.update(sysUser);
     }
 
+    @Logs(title = "登陆", code = "module", content = "用户登陆")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException {
+        Map<String, Object> mapResult = new HashMap<>();
+        if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
+            String userName = userMap.get("userName");
+            String password = userMap.get("password");
+            SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
+            if (!Objects.equals(null, sysUserLogin)) {
+                String appKey = getRandomNickname(10);
+                sysUserLogin.setAppkey(appKey);
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "iot-center-platform:module");
+                params.set("ip", request.getRequestURI());
+                params.set("title", "登录");
+                params.set("state", 1);
+                params.set("userId", sysUserLogin.getUserId());
+                params.set("userName", userName);
+                params.set("content", "用户登录");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
+                String userIds = String.valueOf(sysUserLogin.getUserId());
+                String keys = Constant.account_lock_time.replace("userAccountID", userIds);
+                //系统当前时间
+                String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = sdf.parse(timeStr1);
+                int yxTime = DateTimeUtil.daysBetween(sysUserLogin.getInvalidTime(), date);
+                if (redisTemplate.hasKey(keys)) {//如果key存在
+                    redisTemplate.delete(keys);
+                }
+                if (sysUserLogin.getState() == 2) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    //锁定时间
+                    Calendar calendarOne = Calendar.getInstance();
+                    calendarOne.setTime(sysUserLogin.getUpdateTime());
+                    Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
+                    if (lockTime < redisAndYxsjUtil.getLoginTime()) { //如果锁定时间小于1200S
+                        mapResult.put("errorCount", "账户已被锁定！");
+                        mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                        return mapResult;
+                    } else {
+                        if (yxTime > redisAndYxsjUtil.getYxsjTime()) {
+                            mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
+                        }
+                        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+                        mapResult.put("roleMenuList", sysRoleMenuList);
+                        mapResult.put("sysUserLogin", sysUserLogin);
+                        String userId = String.valueOf(sysUserLogin.getUserId());
+                        Map<String, Object> mapAccount = new HashMap<>();
+                        Map<String, Object> mapAppKey = new HashMap<>();
+                        mapAccount.put("userId", userId);
+                        mapAccount.put("userName", userName);
+                        mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+                        mapAccount.put("appKey", appKey);
+                        mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                        mapAccount.put("errorInputTimes", "0");
+                        String key = Constant.account_lock_times.replace("userAccountID", userId);
+                        redisTemplate.opsForHash().putAll(key, mapAccount);
+                        mapAppKey.put("userId", userId);
+                        mapAppKey.put("userName", userName);
+                        mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+                        mapAppKey.put("appKey", appKey);
+                        mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                        redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
+                    }
+
+                }
+                if (sysUserLogin.getState() == 0) {
+                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                    return mapResult;
+                }
+                if (sysUserLogin.getState() == 1) {
+                    if (yxTime > redisAndYxsjUtil.getLoginTime()) {
+                        mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
+                    }
+                    List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+                    mapResult.put("roleMenuList", sysRoleMenuList);
+                    mapResult.put("sysUserLogin", sysUserLogin);
+                    String userId = String.valueOf(sysUserLogin.getUserId());
+                    Map<String, Object> mapAccount = new HashMap<>();
+                    Map<String, Object> mapAppKey = new HashMap<>();
+                    mapAccount.put("userId", userId);
+                    mapAccount.put("userName", userName);
+                    mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+                    mapAccount.put("appKey", appKey);
+                    mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                    mapAccount.put("errorInputTimes", "0");
+                    String key = Constant.account_lock_times.replace("userAccountID", userId);
+                    redisTemplate.opsForHash().putAll(key, mapAccount);
+                    mapAppKey.put("userId", userId);
+                    mapAppKey.put("userName", userName);
+                    mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+                    mapAppKey.put("appKey", appKey);
+                    mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                    redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
+                }
+            } else {
+                //登陆错误判断用户是否存在
+                List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userMap.get("userName"));
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "iot-center-platform:module");
+                params.set("ip", request.getRequestURI());
+                params.set("title", "登录");
+                params.set("state", 1);
+                if (sysUserList.size() == 0) {
+                    params.set("userId", "");
+                } else {
+                    params.set("userId", sysUserList.get(0).getUserId());
+                }
+                params.set("userName", userName);
+                params.set("content", "用户名或密码错误登录失败");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
+                if (sysUserList.size() == 0) {
+                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+//                        result.setData(mapResult);
+                    return mapResult;
+                }
+                SysUser sysUser = sysUserList.get(0);
+                String userId = String.valueOf(sysUser.getUserId());
+                String key = Constant.account_lock_time.replace("userAccountID", userId);
+                Integer num = (Integer) redisTemplate.opsForValue().get(key);
+                if (num == null) { //第一次访问错误
+                    redisTemplate.opsForValue().set(key, 1);
+                    num=1;
+                } else if (num >= redisAndYxsjUtil.getLoginNum()) {//超过10次账户锁定
+                    if (!userId.equals("10001")) { //admin用户不可锁定
+                        sysUser.setState(2);
+                        Date date = new Date();
+                        sysUser.setUpdateTime(date);
+                        sysUserDao.update(sysUser);
+                    }
+                    redisTemplate.opsForValue().increment(key, 1);
+                    num=num+1;
+                } else {
+                    redisTemplate.opsForValue().increment(key, 1);
+                    num=num+1;
+                }
+                mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                mapResult.put("errorCount", "已输入错误" + String.valueOf(num) + "次！");
+                return mapResult;
+
+            }
+        } else {
+            mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
+            mapResult.put("info", ResultCodeEnum.CODE10103.getName());
+            return mapResult;
+        }
+
+        return mapResult;
+    }
+
+
+
     @Logs(title = "查询", code = "module", content = "根据用户ID查询用户")
     @Transactional(rollbackFor = Exception.class)
     public SysUser selectByPrimaryId(Long userId) {
@@ -62,21 +256,21 @@ public class SysUserService{
     @Logs(title = "查询", code = "module", content = "用户状态查询")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> selectByUserState(Integer state) {
-        if(state.equals(-1)){
+        if (state.equals(-1)) {
             return this.sysUserDao.selectUser();
         }
         return this.sysUserDao.selectByUserState(state);
     }
 
-    @Logs(title = "查询", code ="module", content = "根据用户名查询用户信息")
-    @Transactional(rollbackFor =Exception.class )
-    public  List<SysUser> selectByUserName(String userName){
+    @Logs(title = "查询", code = "module", content = "根据用户名查询用户信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<SysUser> selectByUserName(String userName) {
         return this.sysUserDao.selectByUserName(userName);
     }
 
-    @Logs(title = "查询", code ="module", content = "根据用户名完全匹配查询用户信息")
-    @Transactional(rollbackFor =Exception.class )
-    public  List<SysUser> selectByUserNameTotal(String userName){
+    @Logs(title = "查询", code = "module", content = "根据用户名完全匹配查询用户信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<SysUser> selectByUserNameTotal(String userName) {
         return this.sysUserDao.selectByUserNameTotal(userName);
     }
 
@@ -89,7 +283,7 @@ public class SysUserService{
     @Logs(title = "分页查询", code = "module", content = "分页查询用户信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, String>> selectByPage(SysUser sysUser) {
-        if (sysUser.getUserStatus() != null && sysUser.getUserStatus()==-1) {
+        if (sysUser.getUserStatus() != null && sysUser.getUserStatus() == -1) {
             sysUser.setUserStatus(null);
         }
         return sysUserDao.selectByPage(sysUser);
@@ -112,7 +306,7 @@ public class SysUserService{
     public List<AreaInfo> selectRelationAuthor(Long userId) {
         List<AreaInfo> areaInfoCountryList = new ArrayList<>();
         List<Map<String, String>> list = this.sysUserDao.selectRelationAuthor(userId);
-        for(Iterator<Map<String, String>> it = list.iterator();it.hasNext();){
+        for (Iterator<Map<String, String>> it = list.iterator(); it.hasNext(); ) {
             Map<String, String> areaInfoMap = it.next();
             if (Objects.equals(areaInfoMap.get("upId"), null) || Objects.equals(areaInfoMap.get("upId"), "")) {
                 AreaInfo areaInfoCountry = new AreaInfo();
@@ -128,7 +322,9 @@ public class SysUserService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public SysUserLogin userLogin(String userName, String password) { return this.sysUserDao.selectByUserNameL(userName, password); }
+    public SysUserLogin userLogin(String userName, String password) {
+        return this.sysUserDao.selectByUserNameL(userName, password);
+    }
 
     @Logs(title = "用户登出", code = "module", content = "用户登出")
     @Transactional(rollbackFor = Exception.class)
@@ -159,13 +355,16 @@ public class SysUserService{
         sysUser.setPassword(map.get("newPassword"));
         Date date = new Date();
         sysUser.setUpdateTime(date);
+        SysUserBackUp sysUserBackUp=new SysUserBackUp();
+        BeanUtils.copyProperties(sysUser,sysUserBackUp);
+        SysUserBackUpDao.update(sysUserBackUp);
         return this.sysUserDao.update(sysUser);
     }
 
     private void diGui(List<AreaInfo> areaInfoList, List<Map<String, String>> listTree) {
-        for(AreaInfo areaInfo : areaInfoList){
+        for (AreaInfo areaInfo : areaInfoList) {
             List<AreaInfo> childrenList = new ArrayList<>();
-            for(Iterator<Map<String, String>> it = listTree.iterator();it.hasNext();){
+            for (Iterator<Map<String, String>> it = listTree.iterator(); it.hasNext(); ) {
                 Map<String, String> areaInfoMap = it.next();
                 if (Objects.equals(areaInfo.getId(), areaInfoMap.get("upId"))) {
                     AreaInfo areaInfoTem = new AreaInfo();
@@ -177,11 +376,23 @@ public class SysUserService{
                     childrenList.add(areaInfoTem);
                 }
             }
-            if (childrenList.size()>0 ) {
+            if (childrenList.size() > 0) {
                 areaInfo.setChildren(childrenList);
                 diGui(childrenList, listTree);
             }
         }
+    }
+
+    /**
+     * java生成随机数字10位数
+     */
+    public static String getRandomNickname(int length) {
+        String val = "";
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            val += String.valueOf(random.nextInt(10));
+        }
+        return val;
     }
 
 }

@@ -6,15 +6,15 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
-import com.yjh.platform.module.user.entity.SysOrg;
-import com.yjh.platform.module.user.entity.SysRoleMenu;
-import com.yjh.platform.module.user.entity.SysUserLogin;
+import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.service.SysUserBackUpService;
 import com.yjh.platform.module.user.service.SysUserService;
-import com.yjh.platform.module.user.entity.SysUser;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import io.swagger.annotations.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mysql.jdbc.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -47,6 +48,7 @@ public class SysUserController {
     private UserManager userManager;
     @Autowired
     private SysRoleMenuDao sysRoleMenuDao;
+
 
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
     @Autowired
@@ -120,12 +122,12 @@ public class SysUserController {
 
     @ApiOperation(value = "用户状态查询")
     @RequestMapping(value = "/selectByUserState", method = RequestMethod.GET)
-    public Result selectByUserState(@RequestParam(value ="state",required = true)Integer state){
-        Result result =new Result();
-        try{
-            List<SysUser> sysUser =sysUserService.selectByUserState(state);
+    public Result selectByUserState(@RequestParam(value = "state", required = true) Integer state) {
+        Result result = new Result();
+        try {
+            List<SysUser> sysUser = sysUserService.selectByUserState(state);
             result.setData(sysUser);
-        }catch(Exception e){
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
@@ -134,12 +136,12 @@ public class SysUserController {
 
     @ApiOperation(value = "用户名查询")
     @RequestMapping(value = "/selectByUserName", method = RequestMethod.GET)
-    public Result selectByUserName(@RequestParam(value = "userName",required = true)String userName){
-        Result result=new Result();
-        try{
-            List<SysUser> sysUsers =sysUserService.selectByUserName(userName);
+    public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
+        Result result = new Result();
+        try {
+            List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
             result.setData(sysUsers);
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
@@ -192,8 +194,10 @@ public class SysUserController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            if (sysUser.getState()==-1) { sysUser.setState(null); }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            if (sysUser.getState() == -1) {
+                sysUser.setState(null);
+            }
             List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -252,113 +256,10 @@ public class SysUserController {
     public Result userLogin(HttpServletRequest request, @RequestBody Map<String, String> userMap) {
         Result result = new Result();
         try {
-            if (userMap.size()>0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
-                String userName = userMap.get("userName");
-                String password = userMap.get("password");
-                SysUserLogin sysUserLogin = this.sysUserService.userLogin(userName, password);
-                if (!Objects.equals(null, sysUserLogin)) {
-                    String appKey = getRandomNickname(10);
-                    sysUserLogin.setAppkey(appKey);
-                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                    params.set("logType", "iot-center-platform:module");
-                    params.set("ip", request.getRequestURI());
-                    params.set("title", "登录");
-                    params.set("state", 1);
-                    params.set("userId", sysUserLogin.getUserId());
-                    params.set("userName", userName);
-                    params.set("content", "用户登录");
-                    LogsAspect logsAspect = new LogsAspect();
-                    logsAspect.post(params);
-                    if (sysUserLogin.getState()==2) {
-                        Map<String, Object> mapResult = new HashMap<>();
-                        mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                        mapResult.put("info", ResultCodeEnum.CODE10102.getName());
-                        result.setData(mapResult);
-                        return result;
-                    }
-                    if (sysUserLogin.getState()==0) {
-                        Map<String, Object> mapResult = new HashMap<>();
-                        mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-                        mapResult.put("info", ResultCodeEnum.CODE10101.getName());
-                        result.setData(mapResult);
-                        return result;
-                    }
-                    if (sysUserLogin.getState()==1) {
-                        Map<String, Object> mapResult = new HashMap<>();
-                        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
-                        mapResult.put("roleMenuList", sysRoleMenuList);
-                        mapResult.put("sysUserLogin", sysUserLogin);
-                        result.setData(mapResult);
-                        String userId = String.valueOf(sysUserLogin.getUserId());
-                        Map<String, Object> mapAccount = new HashMap<>();
-                        Map<String, Object> mapAppKey = new HashMap<>();
-                        mapAccount.put("userId", userId);
-                        mapAccount.put("userName", userName);
-                        mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                        mapAccount.put("appKey", appKey);
-                        mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        mapAccount.put("errorInputTimes", "0");
-                        String key = Constant.account_lock_times.replace("userAccountID", userId);
-                        redisTemplate.opsForHash().putAll(key, mapAccount);
-                        mapAppKey.put("userId", userId);
-                        mapAppKey.put("userName", userName);
-                        mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                        mapAppKey.put("appKey", appKey);
-                        mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        redisTemplate.opsForHash().putAll("appKey:"+appKey, mapAppKey);
-                    }
-                } else {
-                    List<SysUser> sysUserList = this.sysUserService.selectByUserNameTotal(userMap.get("userName"));
-                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                    params.set("logType", "iot-center-platform:module");
-                    params.set("ip", request.getRequestURI());
-                    params.set("title", "登录");
-                    params.set("state", 1);
-                    if (sysUserList.size()==0) {params.set("userId", "");} else {params.set("userId", sysUserList.get(0).getUserId());}
-                    params.set("userName", userName);
-                    params.set("content", "用户名或密码错误登录失败");
-                    LogsAspect logsAspect = new LogsAspect();
-                    logsAspect.post(params);
-                    if (sysUserList.size()==0) {
-                        Map<String, Object> mapResult = new HashMap<>();
-                        mapResult.put("info", ResultCodeEnum.CODE10101.getName());
-                        mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-                        result.setData(mapResult);
-                        return result;
-                    }
-                    SysUser sysUser = sysUserList.get(0);
-                    String userId = String.valueOf(sysUser.getUserId());
-                    String key = Constant.account_lock_times.replace("userAccountID", userId);
-                    Integer errorInputTimes = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "errorInputTimes")));
-                    Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get(key, "expireTime")));
-                    errorInputTimes +=1;
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("userId", userId);
-                    map.put("userName", userName);
-                    map.put("roleId", String.valueOf(sysUser.getRoleId()));
-                    map.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                    map.put("errorInputTimes", String.valueOf(errorInputTimes));
-                    redisTemplate.opsForHash().putAll(key, map);
-                    if (errorInputTimes>=3 && System.currentTimeMillis()-expireTime<=1800000) {
-                        sysUser.setState(2);
-                        this.sysUserService.update(sysUser);
-                    }
-                    Map<String, Object> mapResult = new HashMap<>();
-                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
-                    mapResult.put("errorCount", "已输入错误"+String.valueOf(errorInputTimes)+"次！");
-                    result.setData(mapResult);
-                    return result;
-                }
-            } else {
-                Map<String, Object> mapResult = new HashMap<>();
-                mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
-                mapResult.put("info", ResultCodeEnum.CODE10103.getName());
-                result.setData(mapResult);
-                return result;
-            }
+            Map resultHasLogin = this.sysUserService.userLogin(request, userMap);
+            result.setData(resultHasLogin);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("登录失败:", e);
         }
         return result;
@@ -385,9 +286,18 @@ public class SysUserController {
         try {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
-            sysUser.setPassword("123456");
-            sysUserService.insert(sysUser);
-            result.setData(sysUser);
+            //  sysUser.setPassword("123456");
+            String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
+            if (sysUser.getPassword().contains(sysUser.getUserName())) {
+                result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                return result;
+            } else if (!sysUser.getPassword().matches(PW_PATTERN)) {
+                result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                return result;
+            } else {
+                sysUserService.insert(sysUser);
+                result.setData(sysUser);
+            }
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_username") != -1) {
                 result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名重复");
@@ -415,12 +325,12 @@ public class SysUserController {
                 mapCache.put("errorInputTimes", "0");
                 String key = Constant.account_lock_times.replace("userAccountID", map.get("lockedUserId"));
                 redisTemplate.opsForHash().putAll(key, mapCache);
-            } else if (!password.equals(sysUserCurrent.getPassword())){
+            } else if (!password.equals(sysUserCurrent.getPassword())) {
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10106.getName());
                 result.setData(mapResult);
-            } else if (sysUserCurrent.getRoleId() != 1234){
+            } else if (sysUserCurrent.getRoleId() != 1234) {
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10008.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10008.getName());
@@ -441,16 +351,30 @@ public class SysUserController {
     public Result changePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+//           Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+            Long userId= Long.valueOf(10025);
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             String oldPassword = map.get("oldPassword");
+            String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (sysUserCurrent.getPassword().equals(oldPassword)) {
-                result.setData(sysUserService.changePassword(userId, map));
+                if (sysUserCurrent.getPassword().equals(map.get("newPassword"))) {
+                    result.setMessage("新密码不能和旧密码重复");
+                    return result;
+                } else if (map.get("newPassword").contains(sysUserCurrent.getUserName())) {
+                    result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                    return result;
+                } else if (!map.get("newPassword").matches(PW_PATTERN)) {
+                    result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                    return result;
+                } else {
+                    result.setData(sysUserService.changePassword(userId, map));
+                }
             } else {
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10106.getName());
-                result.setData(mapResult);}
+                result.setData(mapResult);
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("用户修改密码异常:", e);

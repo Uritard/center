@@ -53,11 +53,21 @@ public class SysUserBackUp implements Serializable {
     @ApiModelProperty(value = "工号")
     private String workNo;
 
+    @ApiModelProperty(value = "人脸ID")
+    private String faceId;
+
+    @ApiModelProperty(value = "指纹ID")
+    private String fingerId;
+
+    @ApiModelProperty(value = "声纹ID")
+    private String voiceId;
+
     @ApiModelProperty(value = "1 正常，0 删除，2 锁定")
     private Integer state;
 
-    @ApiModelProperty(value = "用户级别")
-    private Integer userLevel;
+    @ApiModelProperty(value = "用户职称")
+    private String userTitle;
+
 
     @ApiModelProperty(value = "创建人")
     private Long creatorId;
@@ -65,8 +75,6 @@ public class SysUserBackUp implements Serializable {
     @ApiModelProperty(value = "用户appkey 建议使用10位随机数——用户ID")
     private String appkey;
 
-    @ApiModelProperty(value = "校验码")
-    private String secret;
 
     @ApiModelProperty(value = "头像路径")
     private String imageUrl;
@@ -87,6 +95,10 @@ public class SysUserBackUp implements Serializable {
     @ApiModelProperty(value = "修改日期",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    @ApiModelProperty(value = "失效时间",example = "2018-10-01 12:18:48")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date invalidTime;
 
     @ApiModelProperty(value = "最后登录时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

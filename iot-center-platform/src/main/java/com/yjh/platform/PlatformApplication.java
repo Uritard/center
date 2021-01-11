@@ -1,10 +1,6 @@
 package com.yjh.platform;
 
-import com.yjh.platform.common.quartz.JobManager;
-import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.module.user.controller.TSysParamController;
-import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.service.TSysParamService;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +16,13 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import java.net.InetSocketAddress;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
@@ -33,6 +32,14 @@ public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired
     private TSysParamService tSysParamService;
+    @Bean
+    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate redisTemplate = new RedisTemplate();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
+        return redisTemplate;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
