@@ -30,6 +30,7 @@ public class Constant {
     public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
 
     public static Map<String,Object> weatherInfo = new HashMap<>();
+
     public static final String account_lock_time = "account_lock_time:userAccountID";
 
 

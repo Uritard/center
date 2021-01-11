@@ -4,10 +4,13 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+
+import javax.annotation.Resource;
 
 @Data
 @Configuration
-@PropertySource(value = "classpath:province.properties", encoding = "utf-8")
+//@PropertySource(value = "classpath:application-dev.properties", encoding = "utf-8")
 public class RedisAndYxsjUtil {
         //登陆错误redis缓存最大失败次数
         @Value("${lot.login.num}")
