@@ -196,7 +196,7 @@ public class AnalyseDataOperateService {
         if (body.matches("\\{\"msgData.*?\"2\"}") || body.matches("\\{\"msgType.*?}}}}")) { //数据结果整包
             log.info("整包数据...");
             usefulBody = body;
-        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) {  //结果半包
+        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") || body.matches("}")) {  //结果半包
             if (body.contains("\"msgType\":\"4\"")) { //注册消息
 
             } else if (body.contains("\"msgType\":\"6\"")) {  //结束消息
