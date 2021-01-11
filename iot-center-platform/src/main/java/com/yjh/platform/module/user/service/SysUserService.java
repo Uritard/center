@@ -189,7 +189,7 @@ public class SysUserService {
                 }
             } else {
                 //登陆错误判断用户是否存在
-                List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userMap.get("userName"));
+                 List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userMap.get("userName"));
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "iot-center-platform:module");
                 params.set("ip", request.getRequestURI());

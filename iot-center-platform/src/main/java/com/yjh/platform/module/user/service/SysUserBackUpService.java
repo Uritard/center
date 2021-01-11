@@ -38,10 +38,10 @@ import java.util.*;
 @Service
 public class SysUserBackUpService {
 
-    @Resource
-    private SysUserBackUpDao sysUserBackUpDao;
+        @Resource
+        private SysUserBackUpDao sysUserBackUpDao;
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+        private Logger log = LoggerFactory.getLogger(this.getClass());
 
 
 

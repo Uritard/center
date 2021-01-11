@@ -352,7 +352,7 @@ public class SysUserController {
         Result result = new Result();
         try {
 //           Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
-            Long userId= Long.valueOf(10025);
+             Long userId= Long.valueOf(10025);
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             String oldPassword = map.get("oldPassword");
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";

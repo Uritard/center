@@ -91,7 +91,7 @@
         )
         <selectKey resultType="long" keyProperty="userId" order="AFTER">
             <!-- 当前连接中最后产生的id号 -->
-            select last_insert_id()
+        select last_insert_id()
         </selectKey>
     </insert>
 

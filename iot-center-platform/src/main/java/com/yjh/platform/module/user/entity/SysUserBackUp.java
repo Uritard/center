@@ -75,7 +75,6 @@ public class SysUserBackUp implements Serializable {
     @ApiModelProperty(value = "用户appkey 建议使用10位随机数——用户ID")
     private String appkey;
 
-
     @ApiModelProperty(value = "头像路径")
     private String imageUrl;
 

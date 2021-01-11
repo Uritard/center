@@ -17,8 +17,8 @@ import java.util.Map;
  */
 @Repository
 public interface SysUserBackUpDao {
-    int insert(SysUserBackUp sysUserBackUp);
+        int insert(SysUserBackUp sysUserBackUp);
 
-    int update(SysUserBackUp sysUserBackUp);
+        int update(SysUserBackUp sysUserBackUp);
 
 }

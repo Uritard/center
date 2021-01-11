@@ -32,14 +32,14 @@ public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired
     private TSysParamService tSysParamService;
-    @Bean
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
-        return redisTemplate;
-    }
+        @Bean
+        public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+            RedisTemplate redisTemplate = new RedisTemplate();
+            redisTemplate.setConnectionFactory(redisConnectionFactory);
+            redisTemplate.setKeySerializer(new StringRedisSerializer());
+            redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
+            return redisTemplate;
+        }
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
