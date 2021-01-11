@@ -2,13 +2,10 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
-import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.RedisAndYxsjUtil;
+import com.yjh.platform.configuration.RedisAndYxsjUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.user.controller.SysUserController;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.dao.SysUserBackUpDao;
 import com.yjh.platform.module.user.entity.SysOrg;
@@ -20,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import com.yjh.platform.module.user.entity.SysUserBackUp;
 import com.yjh.platform.module.user.entity.SysUserLogin;
@@ -56,7 +52,7 @@ public class SysUserService {
     private SysUserBackUpDao SysUserBackUpDao;
 
     @Resource
-    private  RedisAndYxsjUtil redisAndYxsjUtil;
+    private RedisAndYxsjUtil redisAndYxsjUtil;
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
 

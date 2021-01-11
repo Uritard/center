@@ -13,7 +13,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import java.lang.reflect.Method;
 
 @Configuration
@@ -80,8 +80,8 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.setKeySerializer(stringRedisSerializer);
         // hash的key也采用String的序列化方式
         template.setHashKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(stringRedisSerializer);
-        template.setHashValueSerializer(stringRedisSerializer);
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
+        template.setHashValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
         template.afterPropertiesSet();
         return template;
 
