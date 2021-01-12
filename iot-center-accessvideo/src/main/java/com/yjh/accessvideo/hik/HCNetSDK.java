@@ -4251,6 +4251,7 @@ EMAIL参数结构
     boolean  NET_DVR_TransPTZ_Other(NativeLong lUserID, NativeLong lChannel, String pPTZCodeBuf, int dwBufSize);
     boolean  NET_DVR_PTZPreset(NativeLong lRealHandle, int dwPTZPresetCmd, int dwPresetIndex);
     boolean  NET_DVR_PTZPreset_Other(NativeLong lUserID, NativeLong lChannel, int dwPTZPresetCmd, int dwPresetIndex);
+    boolean  NET_DVR_PTZPreset_Other(NativeLong lUserID, int lChannel, int dwPTZPresetCmd, int dwPresetIndex);
     boolean  NET_DVR_TransPTZ_EX(NativeLong lRealHandle, String pPTZCodeBuf, int dwBufSize);
     boolean  NET_DVR_PTZControl_EX(NativeLong lRealHandle, int dwPTZCommand, int dwStop);
     boolean  NET_DVR_PTZPreset_EX(NativeLong lRealHandle, int dwPTZPresetCmd, int dwPresetIndex);
