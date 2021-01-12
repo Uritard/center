@@ -58,7 +58,7 @@ public class TSysParamService{
 
     @Logs(title = "查询", code = "module", content = "查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TSysParam> select(Integer paramId,String paramCode, Integer paramType, String paramName, String content, String remark) {
+    public List<TSysParam> select(Integer paramId,String paramCode, String paramType, String paramName, String content, String remark) {
         List<TSysParam> tSysParamList = tSysParamDao.select(paramId,paramCode,paramType, paramName, content, remark);
         return tSysParamList;
     }
@@ -66,7 +66,7 @@ public class TSysParamService{
 
     @Logs(title = "分页查询", code = "module", content = "分页查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TSysParam> selectByPage(Integer paramId,String paramCode, Integer paramType, String paramName, String content, String remark) {
+    public List<TSysParam> selectByPage(Integer paramId,String paramCode, String paramType, String paramName, String content, String remark) {
         List<TSysParam> tSysParamList = tSysParamDao.selectByPage(paramId,paramCode, paramType, paramName, content, remark);
         return tSysParamList;
     }

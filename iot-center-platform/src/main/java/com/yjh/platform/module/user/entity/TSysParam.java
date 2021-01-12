@@ -29,7 +29,7 @@ public class TSysParam implements Serializable {
     private String paramCode;
 
     @ApiModelProperty(value = "参数类型")
-    private Integer paramType;
+    private String paramType;
 
     private String paramTypeName;
 

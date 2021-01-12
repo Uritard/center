@@ -102,12 +102,13 @@ public class TSysParamController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "paramId", required = false) Integer paramId,
                          @RequestParam(value = "paramCode", required = false) String paramCode,
-                            @RequestParam(value = "paramType", required = false) Integer paramType,
+                            @RequestParam(value = "paramType", required = false) String paramType,
                             @RequestParam(value = "paramName", required = false) String paramName,
                             @RequestParam(value = "content", required = false) String content,
                             @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
+
             List<TSysParam> list = tSysParamService.select(paramId,paramCode, paramType, paramName, content, remark);
             result.setData(list);
         } catch (Exception e) {
@@ -121,7 +122,7 @@ public class TSysParamController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "paramId", required = false) Integer paramId,
                                @RequestParam(value = "paramCode", required = false) String paramCode,
-                               @RequestParam(value = "paramType", required = false) Integer paramType,
+                               @RequestParam(value = "paramType", required = false) String paramType,
                                @RequestParam(value = "paramName", required = false) String paramName,
                                @RequestParam(value = "content", required = false) String content,
                                @RequestParam(value = "remark", required = false) String remark,

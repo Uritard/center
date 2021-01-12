@@ -314,7 +314,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        }
 
     }
-    private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
+    private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception  {
         log.info("robotServerHandlerMap==="+robotServerHandlerMap);
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");

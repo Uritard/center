@@ -18,13 +18,13 @@ public interface TSysParamDao {
     TSysParam selectByPrimaryId(@Param(value = "paramId") Integer paramId);
     List<TSysParam> select(@Param(value = "paramId") Integer paramId,
                            @Param(value = "paramCode") String paramCode,
-                                @Param(value = "paramType") Integer paramType,
+                                @Param(value = "paramType") String paramType,
                                 @Param(value = "paramName") String paramName,
                                 @Param(value = "content") String content,
                                 @Param(value = "remark") String remark);
     List<TSysParam> selectByPage(@Param(value = "paramId") Integer paramId,
                                  @Param(value = "paramCode") String paramCode,
-                                 @Param(value = "paramType") Integer paramType,
+                                 @Param(value = "paramType") String paramType,
                                  @Param(value = "paramName") String paramName,
                                  @Param(value = "content") String content,
                                  @Param(value = "remark") String remark);
