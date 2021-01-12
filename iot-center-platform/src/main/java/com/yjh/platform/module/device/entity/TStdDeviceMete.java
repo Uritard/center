@@ -7,7 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -23,7 +25,8 @@ public class TStdDeviceMete implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @NotEmpty(message = "deviceMeteId不为空")
+    @Length(max = 50,message = "deviceMeteId长度必须在小于{max}")
     @ApiModelProperty(value = "设备测点实例ID")
     @TableId(value = "device_mete_id", type = IdType.AUTO)
     private Long deviceMeteId;
@@ -41,8 +44,14 @@ public class TStdDeviceMete implements Serializable {
 
     private String meteKindName;
 
+    @ApiModelProperty(value = "表计类型")
+    private Integer meterType;
+
     @ApiModelProperty(value = "设备名称")
     private String meteName;
+
+    @ApiModelProperty(value = "外观类型")
+    private Integer appearanceType;
 
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
@@ -121,10 +130,7 @@ public class TStdDeviceMete implements Serializable {
 
     private Integer alarmState;
 
-    @ApiModelProperty(value = "表计类型")
-    private Integer meterType;
-    @ApiModelProperty(value = "外观类型")
-    private Integer appearanceType;
+
 
 
 }

@@ -31,6 +31,7 @@ import com.mysql.jdbc.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 
 /**
@@ -281,7 +282,7 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insertUser(@RequestBody SysUser sysUser) {
+    public Result insertUser(@Valid @RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
             Long creatorId = userManager.getCreatorId();
@@ -386,5 +387,6 @@ public class SysUserController {
         }
         return val;
     }
+
 
 }

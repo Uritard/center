@@ -36,6 +36,8 @@ public class RobotController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+
+
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
     public RobotController(RobotService robotService) { this.robotService = robotService; }
@@ -45,14 +47,15 @@ public class RobotController {
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
-                                    @RequestParam(value = "type") String key,
                                     @RequestParam(value = "command") String command,
                                     @RequestParam(value = "value",required = false) String value,
+                                    @RequestParam(value = "key",required = false) String key,
+                                    @RequestParam(value = "password",required = false) String password,
                                     @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

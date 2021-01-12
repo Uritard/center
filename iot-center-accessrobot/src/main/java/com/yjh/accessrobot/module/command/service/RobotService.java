@@ -7,6 +7,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.logs.Logs;
+import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.entity.*;
@@ -18,6 +19,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.Resource;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -39,46 +42,69 @@ public class RobotService {
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Resource
+    private SysUserDao sysUserDao;
 
     @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotControl(String robotCode,String type, String command,String value,String direction,String key,Long userId){
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
-        List<Map<String,Object>> Item = new LinkedList<>();
-        Map<String,Object> map = new HashMap<>();
-        String keys=Constant.map.get(userId);
-        if(StringUtils.isNoneBlank(key)&&keys==null){
-            String random=String.valueOf((int) (Math.random()*1000000000+1));
-            return random;
-        }else if(StringUtils.isNoneBlank(key)&&keys!=null) {
-            return "请输入密钥";
-        }else if(keys==null){
-            String random=String.valueOf((int) (Math.random()*1000000000+1));
-            return random;
-        }else if(!key.equals(keys)){
-            return  "密钥不正确,请重新输入";
-        }
-        if(!"".equals(value) || null != value){
-            map.put("value",value);
-        }
-        if(!"".equals(direction) || null != direction) {
-            map.put("direction", direction);
-        }
-        Item.add(map);
+    public String feignRobotControl(String robotCode,String type, String command,String value,String direction,String key,Long userId,String password){
+        if(command.equals("1")&&type.equals("1")){
+           String zcz=this.booleanZcz(key,userId,password);
+           if(!zcz.equals("1")){
+               return  zcz;
+           }
+        }else if(command.equals("3")&&type.equals("1")){
+            String zcz=this.booleanZcz(key,userId,password);
+            if(!zcz.equals("1")){
+                return  zcz;
+            }
+        }else if(command.equals("5")&&type.equals("1")){
+            String zcz=this.booleanZcz(key,userId,password);
+            if(!zcz.equals("1")){
+                return  zcz;
+            }
+        }else if(command.equals("6")&&type.equals("1")){
+            String zcz=this.booleanZcz(key,userId,password);
+            if(!zcz.equals("1")){
+                return  zcz;
+            }
+        }else if(command.equals("9")&&type.equals("3")){
+            String zcz=this.booleanZcz(key,userId,password);
+            if(!zcz.equals("1")){
+                return  zcz;
+            }
+        }else if(command.equals("8")&&type.equals("22")){
+            String zcz=this.booleanZcz(key,userId,password);
+            if(!zcz.equals("1")){
+                return  zcz;
+            }
+        }else {
+            SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+            List<Map<String, Object>> Item = new LinkedList<>();
+            Map<String, Object> map = new HashMap<>();
+            if (!"".equals(value) || null != value) {
+                map.put("value", value);
+            }
+            if (!"".equals(direction) || null != direction) {
+                map.put("direction", direction);
+            }
+            Item.add(map);
 
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("Server01")
-                .setReceiveCode(robotCode)
-                .setCode("省检018")
-                .setTime(sdf.format(new Date()))
-                .setType(type)
-                .setCommand(command)
-                .setItems(Item);
-        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-        log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
-        //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat( generateByteOrder(xmlString,robotCode),robotCode);
-        return "success";
+            XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                    .setSendCode("Server01")
+                    .setReceiveCode(robotCode)
+                    .setCode("省检018")
+                    .setTime(sdf.format(new Date()))
+                    .setType(type)
+                    .setCommand(command)
+                    .setItems(Item);
+            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+            log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
+            //根据不同的机器人对应不同的管道发送指令
+            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+        }
+            return "success";
+
     }
     @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
@@ -592,5 +618,27 @@ public class RobotService {
     public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
     }
+
+    public  String booleanZcz(String  key,Long userId,String password){
+        SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
+        String keys=Constant.map.get(String.valueOf(userId));
+        if(StringUtils.isEmpty(key)&&keys==null){
+            String random=String.valueOf((int) (Math.random()*1000000000+1));
+            Constant.map.put(String.valueOf(userId),random);
+            return random;
+        }else if(StringUtils.isEmpty(key)&&keys!=null) {
+            return "请输入密钥";
+        }else if(keys==null){
+            String random=String.valueOf((int) (Math.random()*1000000000+1));
+            Constant.map.put(String.valueOf(userId),random);
+            return random;
+        }else if(!key.equals(keys)){
+            return  "密钥不正确,请重新输入";
+        }else if(!sysUserCurrent.getPassword().equals(password)){
+            return "用户密码错误，请重新输入";
+        }
+        return  "1";
+    }
+
 }
 

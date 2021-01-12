@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.SysUserDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.SysUser">
+        <id column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+        <result column="true_name" jdbcType="VARCHAR" property="trueName" />
+        <result column="user_type" jdbcType="INTEGER" property="userType" />
+        <result column="sex" jdbcType="INTEGER" property="sex" />
+        <result column="e_mail" jdbcType="VARCHAR" property="eMail" />
+        <result column="mobile_phone" jdbcType="VARCHAR" property="mobilePhone" />
+        <result column="work_no" jdbcType="VARCHAR" property="workNo" />
+        <result column="face_id" jdbcType="VARCHAR" property="faceId" />
+        <result column="finger_id" jdbcType="VARCHAR" property="fingerId" />
+        <result column="voice_id" jdbcType="VARCHAR" property="voiceId" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="user_title" jdbcType="VARCHAR" property="userTitle" />
+        <result column="creator_id" jdbcType="BIGINT" property="creatorId" />
+        <result column="appkey" jdbcType="VARCHAR" property="appkey" />
+        <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+        <result column="role_id" jdbcType="BIGINT" property="roleId" />
+        <result column="org_id" jdbcType="BIGINT" property="orgId" />
+        <result column="user_status" jdbcType="INTEGER" property="userStatus" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
+        <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, user_name, PASSWORD, true_name, user_type, sex, e_mail, mobile_phone, work_no, face_id, finger_id, voice_id, state, user_title, creator_id, appkey, image_url, role_id, org_id, user_status, create_time, update_time, invalid_time, last_login
+    </sql>
+
+
+
+
+
+
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.SysUser">
+        select
+        a.user_id,
+        a.user_name,
+        a.PASSWORD,
+        a.true_name,
+        a.user_type,
+        a.sex,
+        a.e_mail,
+        a.mobile_phone,
+        a.work_no,
+        a.face_id,
+        a.finger_id,
+        a.voice_id,
+        a.state,
+        a.user_title,
+        a.creator_id,
+        a.appkey,
+        a.image_url,
+        a.role_id,
+        a.org_id,
+        a.user_status,
+        a.create_time,
+        a.update_time,
+        a.invalid_time,
+        a.last_login
+        from sys_user a
+        where 1 = 1
+            and a.user_id = #{userId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+
+</mapper>

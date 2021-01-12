@@ -41,7 +41,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private Long upRegionId;
     private List<Long> ids;
 
-    private String analyseType;
+    private Integer analyseType;
     private String analyseTypeName;
 
 }

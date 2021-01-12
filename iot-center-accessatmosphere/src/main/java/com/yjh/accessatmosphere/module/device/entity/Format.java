@@ -23,10 +23,10 @@ public class Format implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotEmpty(message = "Id不为空")
-    @Length(min=1,max = 10,message = "Id长度必须在{min}-{max}之间")
+    @Length(max = 50,message = "Id长度必须在小于{max}")
     @ApiModelProperty(value = "主键ID")
     private String testId;
-    @Length(min=1,max = 10,message = "testType长度必须在{min}-{max}之间")
+    @Length(max = 50,message = "testType长度必须小于 {max}")
     @ApiModelProperty(value = "分类标志")
     private String testType;
 
