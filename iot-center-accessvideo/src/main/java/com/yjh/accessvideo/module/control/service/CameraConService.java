@@ -690,9 +690,11 @@ public class CameraConService {
     public Result isCameraControlled (Long cameraId) {
         Result result = new Result();
         List<Long> unableCameraList = cameraConDao.selectUnableCameraIds();
-        for (Long unableCameraId:unableCameraList) {
-            if (Objects.equals(unableCameraId, cameraId)) {
-                throw new BusinessException("this camera is unable to control.");
+        if (Objects.nonNull(unableCameraList)) {
+            for (Long unableCameraId:unableCameraList) {
+                if (Objects.equals(unableCameraId, cameraId)) {
+                    throw new BusinessException("this camera is unable to control.");
+                }
             }
         }
         return result;
