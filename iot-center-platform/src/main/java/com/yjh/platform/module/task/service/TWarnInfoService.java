@@ -218,6 +218,29 @@ public class TWarnInfoService{
         }
         return tjContentInfoList;
     }
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警处理状态统计告警个数-近一月")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TJContentInfo> countWarnConfMode2() {
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        String firstTime1 = monthDates.get(0);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        log.info("startTime==="+startTime);
+        log.info("endTime==="+endTime);
+        Map<String, Integer> map = tWarnInfoDao.countWarnConfMode2(startTime,endTime);
+        List<TJContentInfo> tjContentInfoList = new ArrayList<>();
+        Iterator<String> iter = map.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            Number mapValue =  (Number)map.get(key);
+            TJContentInfo tjContentInfo = new TJContentInfo();
+            tjContentInfo.setCount(mapValue);
+            tjContentInfo.setContent(key);
+            tjContentInfoList.add(tjContentInfo);
+        }
+        return tjContentInfoList;
+    }
 
     @Logs(title = "查看告警处理情况", code = "tWarnInfo",content = "根据web传递的参数查看告警处理情况")
     @Transactional(rollbackFor = Exception.class)

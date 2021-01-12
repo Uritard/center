@@ -41,7 +41,10 @@ public interface TCruiseResultDao {
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "cruiseResult") Integer cruiseResult,
-                                                @Param(value = "deviceName") String deviceName);
+                                                @Param(value = "deviceType") Integer deviceType,
+                                                @Param(value = "startTime") String startTime,
+                                                @Param(value = "endTime") String endTime,
+                                                 List<Long> list);
 
     int manualReview(CruiseManualReview cruiseManualReview);
     Map<String,Object> selectJudgeCondition(@Param(value = "cruiseDataId")Long cruiseDataId);
@@ -60,7 +63,7 @@ public interface TCruiseResultDao {
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "Start")String Start,
                                            @Param(value = "End")String End);
-    List<CruiseStatistical> cruiseStatistical(@Param(value = "colName1")String colName1);
+    List<CruiseStatistical> cruiseStatistical();
     CruiseStatistical cruiseStatistical2();
 
     List<StatisticalTools> cruiseStatisticalByStatus();

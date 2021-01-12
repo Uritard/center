@@ -1,14 +1,13 @@
 package com.yjh.platform.module.device.dao;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author tt
@@ -28,7 +27,9 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "meteId") Long meteId,
                                 @Param(value = "meteKind") String meteKind,
                                 @Param(value = "meteType") String meteType,
+                                @Param(value = "meterType") Integer meterType,
                                 @Param(value = "meteName") String meteName,
+                                @Param(value = "appearanceType") Integer appearanceType,
                                 @Param(value = "deviceType") Integer deviceType,
                                 @Param(value = "positionType") String positionType,
                                 @Param(value = "analyseType") Integer analyseType,

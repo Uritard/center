@@ -6,6 +6,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.ReportManageService;
 import com.yjh.platform.module.task.service.TCruiseResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +33,9 @@ public class TCruiseResultController {
 
     @Autowired
     private final TCruiseResultService tCruiseResultService;
+
+    @Autowired
+    private ReportManageService reportManageService;
 
     private Logger log = LoggerFactory.getLogger(TCruiseResultController.class);
 
@@ -129,7 +133,7 @@ public class TCruiseResultController {
         return result;
     }
 
-    @ApiOperation(value = "分页查询--巡视结果确认")
+    @ApiOperation(value = "分页查询--巡视结果任务查询")
     @RequestMapping(value = "/selectTaskByPage", method = RequestMethod.GET)
     public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
                                    @RequestParam(value = "cState", required = false) Integer cState,
@@ -206,21 +210,21 @@ public class TCruiseResultController {
     }
 
 
-    @ApiOperation(value = "分页查询--任务结果详细")
+    @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
-                                     @RequestParam(value = "deviceName", required = false) String deviceName,
+                                     @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                     @RequestParam(value = "startTime",required = false) String startTime,
+                                     @RequestParam(value = "endTime",required = false) String endTime,
+                                     @RequestParam(value = "regionId",required = false) Long regionId,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<CruiseResultDetail> list = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceName);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
+            resultMap = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,regionId,pageNum,pageSize);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -247,7 +251,7 @@ public class TCruiseResultController {
         }
         return result;
     }
-    @ApiOperation(value = "根据过滤条件生成巡视报告并下载")
+    /*@ApiOperation(value = "根据过滤条件生成巡视报告并下载")
     @RequestMapping(value = "/reportByCondition", method = RequestMethod.GET)
     public Result reportByCondition(@RequestParam(value = "taskId",required = false) String taskId,
                                     @RequestParam(value = "deviceType",required = false) Integer deviceType,
@@ -256,7 +260,7 @@ public class TCruiseResultController {
                                     @RequestParam(value = "endTime",required = false) String endTime) {
         Result result = new Result();
         try {
-            result.setData(tCruiseResultService.reportByCondition(taskId,deviceType,cruiseType,startTime,endTime));
+            result.setData(reportManageService.reportByCondition(taskId,deviceType,cruiseType,startTime,endTime));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -264,7 +268,7 @@ public class TCruiseResultController {
             log.error("根据过滤条件生成巡视报告并下载发生错误:", e);
         }
         return result;
-    }
+    }*/
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     public Result batchInsert(@RequestBody List<TCruiseResult> list) {

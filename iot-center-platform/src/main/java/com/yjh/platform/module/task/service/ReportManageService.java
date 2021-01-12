@@ -6,7 +6,6 @@ import com.yjh.platform.common.utils.Report.ReportDataRepo;
 import com.yjh.platform.common.utils.Report.ReportHelper;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
-import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
@@ -232,7 +231,7 @@ public class ReportManageService {
 //        }
 //        return  true;
 //    }
-    @Logs(title = "生成巡视报告", code = "reportManage",content = "根据巡检任务生成报告")
+    @Logs(title = "审核完成后根据任务生成巡检记录报告", code = "reportManage",content = "根据巡检任务生成报告")
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
         ReportData recordData = new ReportData();
@@ -266,7 +265,7 @@ public class ReportManageService {
 //        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
         String reportName =  taskId + ".xlsx";//报表名称
 
-        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
 
         String finalFileName = null;
         try {
@@ -276,23 +275,23 @@ public class ReportManageService {
         }
 
         //从缓存中获取系统参数
-//        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-//        String reportPath = redisMap.get("content");
-//        log.info("reportPath:"+reportPath);
+        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String reportPath = redisMap.get("content");
+        log.info("reportPath:"+reportPath);
 
-        File temporaryFile = new File(filePath);
+        File temporaryFile = new File(reportPath);
         String reportPath2 = null;
         if (!temporaryFile.exists() && !temporaryFile.isDirectory())
         {
             temporaryFile.mkdir();
-            reportPath2 = filePath+"/"+finalFileName;
+            reportPath2 = reportPath+"/"+finalFileName;
             log.info("不存在，创建的文件绝对路径是==="+reportPath2);
-            File file = new File(filePath);
+            File file = new File(reportPath);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
-            reportPath2 = filePath+"/"+finalFileName;
+            reportPath2 = reportPath+"/"+finalFileName;
             log.info("存在，该文件绝对路径是==="+reportPath2);
             File file = new File(reportPath2);
             ContentData contentData = ReportDataRepo.getData(recordData);
@@ -315,6 +314,12 @@ public class ReportManageService {
         String fileRelativePath = map.get("content") + "/" + reportName;
         log.info("该文件相对路径是==="+fileRelativePath);
         return fileRelativePath;
+    }
+    @Logs(title = "根据过滤条件生成巡视报告并下载", code = "cruiseResult",content = "根据过滤条件生成巡视报告并下载")
+    @Transactional(rollbackFor = Exception.class)
+    public String reportByCondition(String taskId,Integer deviceType,Integer cruiseType,String startTime,String endTime) {
+//        List<Long> regionIdList = tStdRegionDao.selectDownId();
+        return "";
     }
     @Logs(title = "啥也不是", code = "test",content = "啥也不是")
     @Transactional(rollbackFor = Exception.class)

@@ -58,6 +58,8 @@ public interface TWarnInfoDao {
                                                  @Param(value = "endTime")String endTime);
     Map<String, Integer> countWarnConfMode(@Param(value = "startTime")String startTime,
                                            @Param(value = "endTime")String endTime);
+    Map<String, Integer> countWarnConfMode2(@Param(value = "startTime")String startTime,
+                                           @Param(value = "endTime")String endTime);
     List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
     List<WarnStatistical> countWarnOnMonth();
     //查询未审核告警信息数量(查询所有未被核查的告警信息条数)

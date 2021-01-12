@@ -1,10 +1,15 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
@@ -36,6 +41,8 @@ public class TCruiseResultService{
     private TStdDeviceAttrDao tStdDeviceAttrDao;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
 
     @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
@@ -76,11 +83,30 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "cruiseResult",content = "根据web传递的参数查询巡检点结果")
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultDetail> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,String deviceName ) {
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceName);
-        return cruiseResultDetailList;
+    public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId ,int pageNum,int pageSize) {
+
+        List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId子节点
+        log.info("regionIdList是==="+regionIdList);
+        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+        log.info("deviceIdList是==="+deviceIdList);
+
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultDetailList);
+
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+
+//        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList);
+        return resultMap;
     }
-    @Logs(title = "人工复核", code = "cruiseResult",content = "根据web传递的参数进行人工审核")
+    @Logs(title = "人工修正", code = "cruiseResult",content = "根据web传递的参数进行人工修正")
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview,String userId) {
         //获取审核人
@@ -93,7 +119,7 @@ public class TCruiseResultService{
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
-        //判断该巡检点是否产生告警；若是，则修改告警表if_warn_disable字段
+        //判断该巡检点是否产生告警；若是，则将该条告警设置为已核查
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         log.info("judgeCondition是==="+judgeCondition);
@@ -193,13 +219,6 @@ public class TCruiseResultService{
         }
         return cruiseManualReview.getCheckDate();
     }
-    @Logs(title = "根据过滤条件生成巡视报告并下载", code = "cruiseResult",content = "根据过滤条件生成巡视报告并下载")
-    @Transactional(rollbackFor = Exception.class)
-    public String reportByCondition(String taskId,Integer deviceType,Integer cruiseType,String startTime,String endTime) {
-//        List<Long> regionIdList = tStdRegionDao.selectDownId();
-        String jj = "";
-        return jj;
-    }
     @Logs(title = "巡视任务结果统计", code = "cruiseResult",content = "根据巡视类型统计本周和上周的任务结果")
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalResult> taskStatistical() throws Exception{
@@ -232,10 +251,8 @@ public class TCruiseResultService{
     @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据巡视数据状态统计巡检点结果")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseStatistical> cruiseStatistical() {
-        String colName1 = "abnormal_type";
-
-        List<CruiseStatistical> list = tCruiseResultDao.cruiseStatistical(colName1);
-        CruiseStatistical cruiseStatistical = tCruiseResultDao.cruiseStatistical2();
+        List<CruiseStatistical> list = tCruiseResultDao.cruiseStatistical();//异常
+        CruiseStatistical cruiseStatistical = tCruiseResultDao.cruiseStatistical2();//正常
         list.add(cruiseStatistical);
         return list;
     }

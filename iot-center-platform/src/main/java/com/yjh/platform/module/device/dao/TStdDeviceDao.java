@@ -1,19 +1,13 @@
 package com.yjh.platform.module.device.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import java.util.Map;
-
-import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.device.entity.CustomInfo;
-import com.yjh.platform.module.device.entity.TStdDevice;
-import com.yjh.platform.module.device.entity.TStdDeviceDetail;
-import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.DeviceBaseReport;
 import com.yjh.platform.module.task.entity.DeviceMeteBaseReport;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -113,5 +107,8 @@ public interface TStdDeviceDao {
 
     //根据UpRegion查询设备ID
     List<Long> selectDeviceIdsByRegion(List<Long> regionIds);
+
+    List<Long> selectDeviceIdListByRegion(List<Long> list);
+
 
 }
