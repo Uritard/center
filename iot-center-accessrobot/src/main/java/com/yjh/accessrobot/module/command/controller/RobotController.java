@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -105,7 +106,7 @@ public class RobotController {
     /*用完就删*/
     @ApiOperation(value = "方法测试")
     @RequestMapping(value = "/xixixi", method = RequestMethod.POST)
-    public Result xixixi(@RequestBody TCruiseResult tCruiseResult){
+    public Result xixixi(@Valid @RequestBody TCruiseResult tCruiseResult){
         Result result = new Result();
         try {
             result.setData(robotService.updateTCruiseResult(tCruiseResult));

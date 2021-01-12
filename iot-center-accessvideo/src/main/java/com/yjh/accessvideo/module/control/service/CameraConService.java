@@ -459,15 +459,18 @@ public class CameraConService {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,presetId);
         int iChanNum = cameraConInfo.getChannelNum()+32;
         int iPreset = cameraConInfo.getPresetNum();
-        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
-        if (m_lRealPlayHandle.intValue() == -1) {
-            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
-            return false;
-        }
-        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPlayHandle, presetCmd, iPreset)) {
-            log.error("set presetPoint fail, presetId：" + iPreset+", error code: "+hCNetSDK.NET_DVR_GetLastError());
-            return false;
-        }
+
+        hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
+
+//        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
+//        if (m_lRealPlayHandle.intValue() == -1) {
+//            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
+//            return false;
+//        }
+//        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPlayHandle, presetCmd, iPreset)) {
+//            log.error("set presetPoint fail, presetId：" + iPreset+", error code: "+hCNetSDK.NET_DVR_GetLastError());
+//            return false;
+//        }
         if (presetCmd==9) {
             String delPresetPic = "rm -rf "+capturePresetPath + "/"+presetId;
             try { Runtime.getRuntime().exec(delPresetPic); } catch (Exception e) { e.getMessage(); }
