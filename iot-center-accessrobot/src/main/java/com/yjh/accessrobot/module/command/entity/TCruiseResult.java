@@ -43,23 +43,23 @@ public class TCruiseResult implements Serializable {
     @ApiModelProperty(value = "区域id")
     private String areaId;
 
-    @Range(min=1,max = 11,message = "cType长度必须在{min}-{max}之间")
+    @Range(min=0,max = 11,message = "cType长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "巡检类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
     private Integer cType;
 
-    @Range(min=1,max = 11,message = "cState长度必须在{min}-{max}之间")
+    @Range(min=0,max = 11,message = "cState长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "当前状态  -1.数据异常 0.正在执行 1.执行完成 2.任务暂停 3.任务终止 4任务异常终止5. 任务超期")
     private Integer cState;
 
-    @Range(min=1,max = 11,message = "modifyState长度必须在{min}-{max}之间")
+    @Range(min=0,max = 11,message = "modifyState长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "状态修正值")
     private Integer modifyState;
 
-    @Range(min=1,max = 11,message = "taskCount长度必须在{min}-{max}之间")
+    @Range(min=0,max = 11,message = "taskCount长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "检测点数")
     private Integer taskCount;
 
-    @Range(min=1,max = 11,message = "taskWait长度必须在{min}-{max}之间")
+    @Range(min=0,max = 11,message = "taskWait长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "待检测点数")
     private Integer taskWait;
 
