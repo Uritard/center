@@ -687,6 +687,8 @@ public class CameraConService {
     }
 
 //    judge is camera controlled. by tt.
+    @Logs(title = "获取相机当前控制状态", code = "isCameraControlled", content = "获取相机当前控制状态")
+    @Transactional(rollbackFor = Exception.class)
     public Result isCameraControlled (Long cameraId) {
         Result result = new Result();
         List<Long> unableCameraList = cameraConDao.selectUnableCameraIds();
