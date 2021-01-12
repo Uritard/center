@@ -41,6 +41,8 @@ public class TStdDeviceService{
     private TStdDevicemeteService tStdDevicemeteService;
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
+    @Autowired
+    private TDeviceMaintenanceDao tDeviceMaintenanceDao;
 
 
     @Logs(title = "联合主键查询",code = "module",content = "设备ID和部位ID联合查询设备信息")
@@ -161,6 +163,7 @@ public class TStdDeviceService{
         for (Long item: devList) {
             tStdDevicemeteService.deleteByPrimaryId(item);
         }
+        tDeviceMaintenanceDao.deleteByDeviceId(deviceId);
         return this.tStdDeviceDao.deleteByPrimaryId(deviceId);//删除设备
     }
 

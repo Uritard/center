@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TDeviceMaintenanceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TDeviceMaintenance">
+        <id column="maintenance_id" jdbcType="BIGINT" property="maintenanceId" />
+        <result column="maintenance_name" jdbcType="VARCHAR" property="maintenanceName" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+        <result column="maintenance_start" jdbcType="TIMESTAMP" property="maintenanceStart" />
+        <result column="maintenance_stop" jdbcType="TIMESTAMP" property="maintenanceStop" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        maintenance_id, maintenance_name, device_id, is_valid, maintenance_start, maintenance_stop
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="maintenanceId" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
+        insert into t_device_maintenance(
+            maintenance_id,
+            maintenance_name,
+            device_id,
+            is_valid,
+            maintenance_start,
+            maintenance_stop
+        )values(
+                #{maintenanceId, jdbcType=BIGINT},
+                #{maintenanceName, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{isValid, jdbcType=INTEGER},
+                #{maintenanceStart, jdbcType=TIMESTAMP},
+                #{maintenanceStop, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_device_maintenance
+                where maintenance_id = #{maintenanceId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
+        update t_device_maintenance a <set>
+        <if test="maintenanceId != null and maintenanceId != ''">a.maintenance_id = #{maintenanceId, jdbcType=BIGINT},</if>
+        <if test="maintenanceName != null and maintenanceName != ''">a.maintenance_name = #{maintenanceName, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="isValid != null ">a.is_valid = #{isValid, jdbcType=INTEGER},</if>
+        <if test="maintenanceStart != null ">a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP},</if>
+        <if test="maintenanceStop != null ">a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP},</if>
+    </set>
+            where a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
+        select
+        a.maintenance_id,
+        a.maintenance_name,
+        a.device_id,
+        a.is_valid,
+        a.maintenance_start,
+        a.maintenance_stop
+        from t_device_maintenance a
+        where 1 = 1
+            and a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance" resultType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
+        select
+        a.maintenance_id,
+        a.maintenance_name,
+        a.device_id,
+        a.is_valid,
+        a.maintenance_start,
+        a.maintenance_stop
+        from t_device_maintenance a
+        where 1 = 1
+        <if test="maintenanceId != null and maintenanceId != ''"> and a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}</if>
+        <if test="maintenanceName != null and maintenanceName != ''"> and a.maintenance_name LIKE CONCAT('%',#{maintenanceName, jdbcType=VARCHAR},'%')</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="isValid != null "> and a.is_valid = #{isValid, jdbcType=INTEGER}</if>
+        <if test="maintenanceStart != null"> and a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP}</if>
+        <if test="maintenanceStop != null "> and a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP}</if>
+         group by a.maintenance_id
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance" resultType="com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail">
+        select
+        a.maintenance_id,
+        a.maintenance_name,
+        a.device_id,
+        a.is_valid,
+        a.maintenance_start,
+        a.maintenance_stop
+        from t_device_maintenance a
+        where 1 = 1
+        <if test="maintenanceName != null and maintenanceName != ''"> and a.maintenance_name LIKE CONCAT('%',#{maintenanceName, jdbcType=VARCHAR},'%') </if>
+        group by a.maintenance_id
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_device_maintenance(
+            maintenance_id,
+            maintenance_name,
+            device_id,
+            is_valid,
+            maintenance_start,
+            maintenance_stop
+        )values
+        <foreach collection="list" item="TDeviceMaintenance" separator=",">
+            (
+                #{TDeviceMaintenance.maintenanceId, jdbcType=BIGINT},
+                #{TDeviceMaintenance.maintenanceName, jdbcType=VARCHAR},
+                #{TDeviceMaintenance.deviceId, jdbcType=BIGINT},
+                #{TDeviceMaintenance.isValid, jdbcType=INTEGER},
+                #{TDeviceMaintenance.maintenanceStart, jdbcType=TIMESTAMP},
+                #{TDeviceMaintenance.maintenanceStop, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_device_maintenance
+        where maintenance_id in (
+            <foreach collection="list" item="maintenanceId" separator=",">
+                #{maintenanceId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+    <select id="selectIdAndName" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
+        select DISTINCT
+        a.device_id as id,
+		b.device_name as name
+        from t_device_maintenance a
+		left join t_std_device b on a.device_id = b.device_id
+        where 1 = 1
+            and a.maintenance_id =#{maintenanceId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
+        select DISTINCT
+        	e.device_id as id,
+	        e.device_name as name
+	    from t_std_device e
+	    where e.up_region_id = #{upRegionId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectInstance" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
+        SELECT
+            (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
+             WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
+             WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
+             WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
+             WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
+             WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
+        END) AS name,
+        a.device_id as id
+		FROM t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+		WHERE a.device_id = #{deviceId, jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByDeviceId" >
+         delete from t_device_maintenance
+                where device_id = #{deviceDd, jdbcType=BIGINT}
+    </delete>
+</mapper>

@@ -192,6 +192,8 @@ public class TaskShutDownJob extends QuartzJobBean {
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + item.getInstanceId(), mapForCruise);
 
                     } else {
+                        //未放入缓存的点 未开始巡视的点。
+                        taskWait = taskWait + 1;
                         TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                         tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId() + item.getInstanceId().toString());
                         tCruiseTaskResultDetail.setTaskResultId(tCruiseResult.getTaskResultId());

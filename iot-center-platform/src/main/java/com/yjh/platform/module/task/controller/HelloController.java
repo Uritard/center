@@ -73,9 +73,9 @@ public class HelloController {
     @RequestMapping(value = "/testAnything", method = RequestMethod.GET)
     public Result QrDecode() {
         Result result = new Result();
-        List<Long> list = new ArrayList<>();
-        tCruisePointInstanceDao.selectForTask(list);
-        result.setData(666);
+//        //List<Long> list = tCruiseTaskDao.selectTimeIsIn(new Date());
+//        tCruisePointInstanceDao.selectForTask(list);
+//        result.setData(list);
         return result;
     }
 

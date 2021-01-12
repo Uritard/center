@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import com.yjh.platform.module.device.entity.*;
@@ -78,4 +79,5 @@ public interface TCruisePointInstanceDao {
     Long selectForPresetId(@Param(value = "presetId")Long presetId);
 
     List<TCruisePointInstanceAttr> batchSelectInstanceAttr(@Param(value = "list")List<Long> list);
+    List<Long> selectTimeIsIn(@Param(value = "time") Date time);
 }

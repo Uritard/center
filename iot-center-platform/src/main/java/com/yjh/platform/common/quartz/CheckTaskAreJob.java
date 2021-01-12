@@ -105,7 +105,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     //这个点超时了
                     mapForCruise.put("cruiseResult","247");
                     mapForCruise.put("cruiseAbnormal","251");
-                    mapForCruise.put("cruiseStatus","252");
+                    mapForCruise.put("cruiseStatus","254");
                     mapForCruise.put("resultNum","超时");
 
                 }

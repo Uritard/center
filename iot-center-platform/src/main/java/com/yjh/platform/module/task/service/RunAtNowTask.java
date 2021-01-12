@@ -256,7 +256,7 @@ public class RunAtNowTask implements Runnable{
                 tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
                 //Long endTime = taskStartTimes + tasksAreTime*24*60*60*1000;
                 //Float temp = tasksAreTime*24F*60F*60F*1000F;
-                Float temp = tasksAreTime*24F*60F*60F*1000F;
+                Float temp = tasksAreTime*60F*60F*1000F;
                 Long endTime = taskStartTimes + temp.longValue();
                 String s =sd.format(endTime);
                 quartzTaskForAre.setStartTime(sd.parse(s));
@@ -341,6 +341,29 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                 tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
                 tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
+
+                Date now = new Date();
+                List<Long>  overhaul= tCruisePointInstanceDao.selectTimeIsIn(now);
+                if(overhaul != null && overhaul.size()>0){//判断是否检修
+                    if(overhaul.contains(item)){
+                        Integer taskWait = tCruiseResult.getTaskWait()-1;
+                        if(taskWait == 0 ){
+                            tCruiseResult.setCState(240);
+                        }
+                        taskAbnormal = taskAbnormal+1;
+                        tCruiseResult.setTaskWait(taskWait);
+                        tCruiseResultDao.update(tCruiseResult);
+                        tCruiseDataResult.setCruiseResult(247);
+                        tCruiseDataResult.setCruiseAbnormal(410);
+                        tCruiseDataResult.setResultNum("设备检修中");
+                        tCruiseDataResultDao.insert(tCruiseDataResult);
+                        tCruiseTaskResultDetail.setCruiseStatus(255);
+                        tCruiseTaskResultDetail.setEndTime(new Date());
+                        tCruiseTaskResultDetail.setCruiseTime(date);
+                        tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                    }
+                    continue;
+                }
 
                 //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                 //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
