@@ -281,11 +281,19 @@
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
-        <if test="deviceName != null and deviceName != ''"> and b.device_name like concat ('%',#{deviceName,jdbcType=VARCHAR},'%')</if>
+
 
         <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
+        <if test="startTime != null and endTime != null"> and cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+
         <if test="cruiseResult != null and cruiseResult != -1 "> and g.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+
+        <if test="list != null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
         ORDER BY cruise_time DESC
     </select>
 
@@ -399,18 +407,26 @@
         (
             select dict_code
             from t_dict_business
-            where col_name = #{colName1}
+            where col_name = 'abnormal_type'
         )
     ORDER BY dict_code
     </select>
     <select id="cruiseStatistical2" resultType="com.yjh.platform.module.task.entity.CruiseStatistical" >
-        SELECT
-             a.cruise_result as cruise_abnormal,
-           b.dict_note as abnormal_type,
-            COUNT(*) as "count"
-        FROM t_cruise_data_result a,t_dict_business b
-        WHERE a.cruise_result = b.dict_code
-        and a.cruise_result = '246'
+       select
+        dict_code as cruise_abnormal,
+        dict_note as abnormal_type,
+        (select COUNT(*)
+            from t_cruise_data_result
+            WHERE  cruise_abnormal = dict_code
+        ) AS "count"
+    from t_dict_business
+    where dict_code IN
+        (
+            select dict_code
+            from t_dict_business
+            where col_name = 'cruise_result' and dict_code = 246
+        )
+    ORDER BY dict_code
     </select>
 
     <select id="cruiseStatisticalByStatus" resultType="com.yjh.platform.module.task.entity.StatisticalTools">
@@ -491,7 +507,7 @@
 
     <update id="updateWarnInfo">
         UPDATE t_warn_info a <set>
-         a.if_warn_disable = 1
+         a.conf_mode = 275
         </set>
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
@@ -500,7 +516,7 @@
     </update>
     <update id="updateWarnInfo2">
         UPDATE t_warn_info a <set>
-        a.if_warn_disable = 1,
+        a.conf_mode = 275,
         a.deal_type = 286,
         a.deal_info = "程序异常,告警误报"
     </set>

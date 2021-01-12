@@ -146,7 +146,7 @@
     </select>
     <select id="selectStationName" resultType="java.lang.String">
         SELECT
-            a.station_name
+            a.region_name
         FROM
             t_std_region a
         WHERE

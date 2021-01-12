@@ -1,28 +1,26 @@
 package com.yjh.platform.module.device.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
-import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
-
-import com.yjh.platform.module.device.service.TStdMeteService;
-import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
 import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -118,7 +116,9 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "meteId", required = false) Long meteId,
                          @RequestParam(value = "meteKind", required = false) String meteKind,
                          @RequestParam(value = "meteType", required = false) String meteType,
+                         @RequestParam(value = "meterType", required = false) Integer meterType,
                          @RequestParam(value = "meteName", required = false) String meteName,
+                         @RequestParam(value = "appearanceType", required = false) Integer appearanceType,
                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                          @RequestParam(value = "positionType", required = false) String positionType,
                          @RequestParam(value = "analyseType", required = false) Integer analyseType,
@@ -143,7 +143,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "alarmState", required = false) Integer alarmState) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId,customId, meteId, meteKind,meteType, meteName, deviceType,  positionType,analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId,customId, meteId, meteKind,meteType, meterType,meteName, deviceType, appearanceType, positionType,analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

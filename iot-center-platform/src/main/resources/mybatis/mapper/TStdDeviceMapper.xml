@@ -664,4 +664,17 @@
         </foreach>
     </select>
 
+    <select id="selectDeviceIdListByRegion" parameterType="java.util.List" resultType="java.lang.Long">
+        SELECT DISTINCT
+        device_id
+        FROM
+        t_std_device
+        WHERE 1 = 1
+        <if test="list != null and list.size() > 0">and up_region_id IN
+            <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+                #{regionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+
 </mapper>

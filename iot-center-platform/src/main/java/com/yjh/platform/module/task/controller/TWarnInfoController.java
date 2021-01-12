@@ -294,6 +294,19 @@ public class TWarnInfoController {
         }
         return result;
     }
+    @ApiOperation(value = "根据告警处理状态统计告警个数-饼图2")
+    @RequestMapping(value = "/countWarnConfMode2", method = RequestMethod.GET)
+    public Result countWarnConfMode2(){
+        Result result = new Result();
+        try {
+            List<TJContentInfo> list = tWarnInfoService.countWarnConfMode2();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "查看告警处理情况")
     @RequestMapping(value = "/selectAlarmProcess", method = RequestMethod.GET)
     public Result selectAlarmProcess(@RequestParam(value = "warnId") Long warnId){

@@ -121,4 +121,10 @@ public class TStdDeviceMete implements Serializable {
 
     private Integer alarmState;
 
+    @ApiModelProperty(value = "表计类型")
+    private Integer meterType;
+    @ApiModelProperty(value = "外观类型")
+    private Integer appearanceType;
+
+
 }
