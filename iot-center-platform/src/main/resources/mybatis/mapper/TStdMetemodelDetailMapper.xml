@@ -417,7 +417,6 @@
         <foreach collection="list" item="colName" separator=",">
             #{colName,jdbcType = VARCHAR}
         </foreach>
-
     </select>
 
     <resultMap id="mapResultMap" type="java.util.HashMap">
