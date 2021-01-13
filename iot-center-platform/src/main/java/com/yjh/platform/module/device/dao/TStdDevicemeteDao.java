@@ -28,9 +28,9 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "meteId") Long meteId,
                                 @Param(value = "meteKind") String meteKind,
                                 @Param(value = "meteType") String meteType,
-                                @Param(value = "meterType") Integer meterType,
+
                                 @Param(value = "meteName") String meteName,
-                                @Param(value = "appearanceType") Integer appearanceType,
+
                                 @Param(value = "deviceType") Integer deviceType,
                                 @Param(value = "positionType") String positionType,
                                 @Param(value = "analyseType") Integer analyseType,
@@ -52,7 +52,10 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "remark") String remark,
                                 @Param(value = "stateZero") String stateZero,
                                 @Param(value = "stateOne") String stateOne,
-                                @Param(value = "alarmState") Integer alarmState);
+                                @Param(value = "alarmState") Integer alarmState,
+                                @Param(value = "meterType") Integer meterType,
+                                @Param(value = "appearanceType") Integer appearanceType
+                                );
     List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
     List<Long> selectDeviceMeteByDeviceCustom(@Param("deviceId")Long deviceId,@Param("customId")String customId);
