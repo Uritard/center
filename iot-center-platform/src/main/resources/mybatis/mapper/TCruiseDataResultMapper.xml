@@ -356,6 +356,122 @@
         LIMIT 1
     </select>
 
+    <select id="selectMeteCruiseByDeviceId2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo" >
+        SELECT
+        b.instance_id,
+        d.cruise_result,
+        f.dict_note AS cruise_result_name,
+        b.end_time,
+        d.picpath,
+        d.identify_result,
+        k.dict_note AS identify_result_name,
+        b.instance_name as cruise_name
+        FROM
+        t_cruise_point_instance a
+        LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
+        JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
+        LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code AND f.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business k ON d.identify_result = k.dict_code AND k.col_name = 'identify_result'
+        LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
+        LEFT JOIN t_cruise_task_result c ON b.task_result_id = c.task_result_id
+        LEFT JOIN t_cruise_result m ON b.task_result_id = m.task_result_id
+        LEFT JOIN t_dict_business n ON m.c_state = n.dict_code AND n.col_name = 'task_state'
+        WHERE 1 = 1
+        <if test="deviceId != null">and a.device_id= #{deviceId,jdbcType=BIGINT}</if>
+        <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
+        AND m.c_state != 239
+        AND m.c_state != 241
+        ORDER BY
+            b.end_time DESC
+        LIMIT 1
+
+    </select>
+    <select id="selectCruiseDataResultByList2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
+        SELECT
+            e.cruise_result_id,
+            f.cruise_data_id,
+            a.device_mete_id,
+            e.cruise_time,
+            b.cruise_type,
+            h.dict_note as cruise_type_name,
+            e.instance_name,
+            g.c_type,
+            i.dict_note AS c_type_name,
+            f.result_num,
+            f.identify_result,
+            j.dict_note AS identify_result_name,
+            f.cruise_result,
+            z.dict_note as cruise_result_name,
+            f.picpath as picPath,
+            a.mete_type,
+            m.dict_note as mete_type_name,
+            a.meter_type,
+            n.dict_note as meter_type_name
+        FROM
+        t_std_devicemete a
+        LEFT JOIN t_cruise_point_instance b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
+        LEFT JOIN t_cruise_task_result_detail e ON b.instance_id = e.instance_id
+        LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
+        LEFT JOIN t_cruise_result g ON e.task_result_id = g.task_result_id
+        LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code AND j.col_name = "identify_result"
+        LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
+        LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
+        LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
+        WHERE 1 = 1
+        <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
+        <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
+        <if test="cType != -1 ">and g.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != -1 ">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
+        ORDER BY e.cruise_time DESC
+    </select>
+    <select id="selectCruiseDataReport" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
+        SELECT
+        a.device_mete_id,
+        e.cruise_time,
+        b.cruise_type,
+        h.dict_note as cruise_type_name,
+        e.instance_name,
+        g.c_type,
+        i.dict_note AS c_type_name,
+        f.result_num,
+        f.identify_result,
+        j.dict_note AS identify_result_name,
+        f.cruise_result,
+        z.dict_note as cruise_result_name,
+        f.picpath as picPath,
+        a.mete_type,
+        m.dict_note as mete_type_name,
+        a.meter_type,
+        n.dict_note as meter_type_name
+        FROM
+        t_std_devicemete a
+        LEFT JOIN t_cruise_point_instance b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
+        LEFT JOIN t_cruise_task_result_detail e ON b.instance_id = e.instance_id
+        LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
+        LEFT JOIN t_cruise_result g ON e.task_result_id = g.task_result_id
+        LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code AND j.col_name = "identify_result"
+        LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
+        LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
+        LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
+        WHERE 1 = 1
+        <if test="list != null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
+        <if test="cType != -1 ">and g.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
+        <if test="instanceName != null and instanceName != '' ">and e.instance_name LIKE CONCAT('%',#{instanceName, jdbcType=VARCHAR},'%')</if>
+        ORDER BY e.cruise_time DESC
+    </select>
     <select id="selectCruiseDataResultByList" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalInfo">
         SELECT
         e.end_time,
@@ -425,7 +541,7 @@
 
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
-        c.end_time,
+        c.cruise_time,
         d.result_num,
         b.cruise_type,
         h.dict_note as cruiseTypeName,
@@ -449,9 +565,9 @@
         ) ON b.instance_id = c.instance_id
         WHERE
         a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
-        <if test="startDate != null " ><if test="endDate != null">and c.end_time between #{startDate,jdbcType=TIMESTAMP} and #{endDate,jdbcType=TIMESTAMP}</if></if>
+        <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime != ''">and c.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
         <if test="cruiseType != -1 " >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
         <if test="cType != -1" >and i.c_type=#{cType,jdbcType=INTEGER}</if>
-        ORDER BY c.end_time ASC
+        ORDER BY c.cruise_time ASC
     </select>
 </mapper>

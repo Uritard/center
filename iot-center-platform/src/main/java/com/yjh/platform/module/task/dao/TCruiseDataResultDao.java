@@ -1,13 +1,5 @@
 package com.yjh.platform.module.task.dao;
 
-import com.yjh.platform.module.task.entity.BrokenLineInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-
-import java.util.List;
-import java.util.Date;
-
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -59,18 +51,32 @@ public interface TCruiseDataResultDao {
 
     CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId") Long deviceId,
                                                         @Param(value = "deviceMeteId") Long deviceMeteId);
-
+    CruiseResultAnalyzeMeteInfo selectMeteCruiseByDeviceId2(@Param(value = "deviceId") Long deviceId,
+                                                        @Param(value = "deviceMeteId") Long deviceMeteId);
     List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "cruiseType") Integer cruiseType,
                                                             @Param(value = "cType") Integer cType,
                                                             @Param(value = "deviceMeteId") Long deviceMeteId,
                                                             @Param(value = "endDate") Date endDate,
                                                             @Param(value = "startDate") Date startDate);
-
+    List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(@Param(value = "cruiseType") Integer cruiseType,
+                                                                @Param(value = "cType") Integer cType,
+                                                                @Param(value = "deviceMeteId") Long deviceMeteId,
+                                                                @Param(value = "meteType") String meteType,
+                                                                @Param(value = "meterType") Integer meterType,
+                                                                @Param(value = "endTime") String endTime,
+                                                                @Param(value = "startTime") String startTime);
+    List<CruiseResultAnalyzeInfo> selectCruiseDataReport(@Param(value = "cType") Integer cType,
+                                                        @Param(value = "meteType") String meteType,
+                                                        @Param(value = "meterType") Integer meterType,
+                                                        @Param(value = "endTime") String endTime,
+                                                        @Param(value = "startTime") String startTime,
+                                                        @Param(value = "list") List<Long> list,
+                                                        @Param(value = "instanceName") String instanceName);
     List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType") Integer cruiseType,
                                           @Param(value = "cType") Integer cType,
                                           @Param(value = "deviceMeteId") Long deviceMeteId,
-                                          @Param(value = "endDate") Date endDate,
-                                          @Param(value = "startDate") Date startDate);
+                                          @Param(value = "startTime") String startTime,
+                                          @Param(value = "endTime") String endTime);
 
 //    List<CruiseResultDetailReport> selectCruiseResultDetail(@Param(value = "deviceMeteId")Long deviceMeteId);
 }

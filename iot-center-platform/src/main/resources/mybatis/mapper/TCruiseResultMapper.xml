@@ -265,10 +265,13 @@
         k.camera_id,
         b.cruise_time,
         b.end_time,
-        g.is_warn
+        g.is_warn,
+        b.instance_id,
+        n.device_type
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
+        LEFT JOIN t_std_device n on n.device_id = e.device_id and n.custom_id = e.custom_id
         LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
         LEFT JOIN t_cruise_data_result g on g.cruise_result_id = b.cruise_result_id
         LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type
@@ -281,7 +284,7 @@
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
-
+        <if test="deviceType != null and deviceType != -1"> and n.cruise_type = #{deviceType, jdbcType=INTEGER}</if>
 
         <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 

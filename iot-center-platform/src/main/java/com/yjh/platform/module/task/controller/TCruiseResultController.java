@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -208,8 +205,6 @@ public class TCruiseResultController {
         }
         return result;
     }
-
-
     @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @RequestMapping(value = "/selectCruiseByPage", method = RequestMethod.GET)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
@@ -224,7 +219,17 @@ public class TCruiseResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+//            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            if (Objects.isNull(startTime) || "".equals(startTime)){
+                startTime = null;
+            }
+            if (Objects.isNull(endTime) || "".equals(endTime)){
+                endTime = null;
+            }
             resultMap = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,regionId,pageNum,pageSize);
+//            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,regionId,pageNum,pageSize);
+//            resultMap.put("count",page.getTotal());
+//            resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

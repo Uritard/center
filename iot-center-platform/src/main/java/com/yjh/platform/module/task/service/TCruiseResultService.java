@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
@@ -83,27 +81,20 @@ public class TCruiseResultService{
     }
     @Logs(title = "分页查询--任务结果详细", code = "cruiseResult",content = "根据web传递的参数查询巡检点结果")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId ,int pageNum,int pageSize) {
+    public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId,int pageNum,int pageSize) {
 
         List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId子节点
         log.info("regionIdList是==="+regionIdList);
         List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
         log.info("deviceIdList是==="+deviceIdList);
 
-        Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", cruiseResultDetailList);
 
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
-        }
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList);
 
-//        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList);
+        resultMap.put("count",page.getTotal());
+        resultMap.put("list", cruiseResultDetailList);
         return resultMap;
     }
     @Logs(title = "人工修正", code = "cruiseResult",content = "根据web传递的参数进行人工修正")

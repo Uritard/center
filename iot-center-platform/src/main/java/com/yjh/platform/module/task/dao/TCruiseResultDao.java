@@ -44,7 +44,7 @@ public interface TCruiseResultDao {
                                                 @Param(value = "deviceType") Integer deviceType,
                                                 @Param(value = "startTime") String startTime,
                                                 @Param(value = "endTime") String endTime,
-                                                 List<Long> list);
+                                                @Param(value = "list") List<Long> list);
 
     int manualReview(CruiseManualReview cruiseManualReview);
     Map<String,Object> selectJudgeCondition(@Param(value = "cruiseDataId")Long cruiseDataId);

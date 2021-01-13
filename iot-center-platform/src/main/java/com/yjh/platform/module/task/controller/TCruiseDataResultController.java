@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
@@ -208,7 +207,92 @@ public class TCruiseDataResultController {
         }
         return result;
     }
+    @ApiOperation(value = "巡视结果分析--测点查询2")
+    @RequestMapping(value = "/selectCruiseResultAnalyze", method = RequestMethod.GET)
+    public Result selectCruiseResultAnalyze(@RequestParam(value = "regionId", required = false) Long regionId,
+                                         @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                         @RequestParam(value = "meteType", required = false) String meteType,
+                                         @RequestParam(value = "meterType", required = false) Integer meterType,
+                                         @RequestParam(value = "cruiseRes", required = false) Integer cruiseRes,
+                                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                         @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+//            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            resultMap = tCruiseDataResultService.selectCruiseResultAnalyze(regionId,deviceType,meteType,meterType,cruiseRes,pageNum,pageSize);
 
+//            List<CruiseResultAnalMeteInfo> list = tCruiseDataResultService.selectCruiseResultAnalyze(regionId,deviceType,meteType,meterType,cruiseRes);
+//            resultMap.put("count", page.getTotal());
+//            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+
+        return result;
+    }
+    @ApiOperation(value = "巡视报表")
+    @RequestMapping(value = "/selectCruiseDataReport", method = RequestMethod.GET)
+    public Result selectCruiseDataReport(@RequestParam(value = "cType", required = false) Integer cType,
+                                        @RequestParam(value = "meteType", required = false) String meteType,
+                                        @RequestParam(value = "meterType", required = false) Integer meterType,
+                                        @RequestParam(value = "regionId", required = false) Long regionId,
+                                        @RequestParam(value = "instanceName", required = false) String instanceName,
+                                        @RequestParam(value = "endTime", required = false) String endTime,
+                                        @RequestParam(value = "startTime", required = false) String startTime,
+                                        @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                        @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            if (Objects.isNull(startTime) || "".equals(startTime)){
+                startTime = null;
+            }
+            if (Objects.isNull(endTime) || "".equals(endTime)){
+                endTime = null;
+            }
+            resultMap = (tCruiseDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,regionId,instanceName,pageNum,pageSize));
+            result.setData(resultMap);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视结果分析--巡检点结果列表")
+    @RequestMapping(value = "/selectCruiseDataResultByList2", method = RequestMethod.GET)
+    public Result selectCruiseDataResultByList2(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+                                               @RequestParam(value = "cType", required = false) Integer cType,
+                                               @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
+                                                @RequestParam(value = "meteType", required = false) String meteType,
+                                                @RequestParam(value = "meterType", required = false) Integer meterType,
+                                                @RequestParam(value = "instanceName", required = false) String instanceName,
+                                                @RequestParam(value = "endTime", required = false) String endTime,
+                                               @RequestParam(value = "startTime", required = false) String startTime,
+                                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+//            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            if (Objects.isNull(startTime) || "".equals(startTime)){
+                startTime = null;
+            }
+            if (Objects.isNull(endTime) || "".equals(endTime)){
+                endTime = null;
+            }
+            resultMap = (tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize));
+//            resultMap.put("count", page.getTotal());
+//            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
     @RequestMapping(value = "/selectCruiseDataResultByList", method = RequestMethod.GET)
     public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
@@ -248,22 +332,17 @@ public class TCruiseDataResultController {
     public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                    @RequestParam(value = "cType", required = false) Integer cType,
                                    @RequestParam(value = "deviceMeteId") Long deviceMeteId,
-                                   @RequestParam(value = "endDate", required = false) String endDate,
-                                   @RequestParam(value = "startDate", required = false) String startDate) {
+                                   @RequestParam(value = "endTime", required = false) String endTime,
+                                   @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
-        //时间数据类型转换
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date endDateTemp;
-        Date startDateTemp;
         try {
-            if (endDate.equals("") && startDate.equals("")) {
-                endDateTemp = null;
-                startDateTemp = null;
-            } else {
-                endDateTemp = dateFormat.parse(endDate);
-                startDateTemp = dateFormat.parse(startDate);
+            if (Objects.isNull(startTime) || "".equals(startTime)){
+                startTime = null;
             }
-            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, endDateTemp, startDateTemp));
+            if (Objects.isNull(endTime) || "".equals(endTime)){
+                endTime = null;
+            }
+            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

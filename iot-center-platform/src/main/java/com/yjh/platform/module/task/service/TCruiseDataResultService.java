@@ -1,28 +1,21 @@
 package com.yjh.platform.module.task.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
-import com.yjh.platform.module.task.controller.TCruiseDataResultController;
-import com.yjh.platform.module.task.entity.BrokenLineInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * @author czh
@@ -93,6 +86,64 @@ public class TCruiseDataResultService {
         return this.tCruiseDataResultDao.batchInsert(list);
     }
 
+    @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
+
+        List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+        log.info("regionIdList是==="+regionIdList);
+        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+        log.info("deviceIdList是==="+deviceIdList);
+        Map<String, Object> resultMap = new HashMap<>();
+
+        List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
+        if (deviceIdList != null && deviceIdList.size() > 0){
+            cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
+        }
+
+        log.info("cruiseResultAnalMeteInfoList第一次==="+cruiseResultAnalMeteInfoList);
+        //获取同一设备下的有巡检结果的标准测点
+        List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
+        for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
+            log.info("设备信息：" + deviceInfo);
+            //通过测点ID获取相应的符合条件的巡检点结果
+            CruiseResultAnalyzeMeteInfo cruiseResultAnalMeteInfo = tCruiseDataResultDao.selectMeteCruiseByDeviceId2(deviceInfo.getDeviceId(), deviceInfo.getDeviceMeteId());
+            log.info("CrusieResultAnalMeteInfo:" + cruiseResultAnalMeteInfo);
+            deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
+            deviceInfo.setCruiseResult(cruiseResultAnalMeteInfo.getCruiseResult());
+            deviceInfo.setCruiseResultName(cruiseResultAnalMeteInfo.getCruiseResultName());
+            deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
+            deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
+            deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
+            deviceInfo.setIdentifyResult(cruiseResultAnalMeteInfo.getIdentifyResult());
+            deviceInfo.setIdentifyResultName(cruiseResultAnalMeteInfo.getIdentifyResultName());
+            //根据巡视点的-算法数据结果状态和最终审核结果判断最终的展示状态结果
+            if (Objects.isNull(deviceInfo.getIdentifyResult())) {
+                if (deviceInfo.getCruiseResult() == 246) {
+                    deviceInfo.setFinalState(1);
+                } else {
+                    deviceInfo.setFinalState(0);
+                }
+            } else {
+                if (deviceInfo.getIdentifyResult() == 261) {
+                    deviceInfo.setFinalState(1);
+                } else {
+                    deviceInfo.setFinalState(0);
+                }
+            }
+            /*//cruiseRes:-1全部,1正常,0异常
+            if (cruiseRes != -1 && cruiseRes != deviceInfo.getFinalState()){
+                abnormalFilters.add(deviceInfo);
+            }*/
+        }
+        log.info("abnormalFilters==="+abnormalFilters);
+        cruiseResultAnalMeteInfoList.removeAll(abnormalFilters);
+        log.info("cruiseResultAnalMeteInfoList==="+cruiseResultAnalMeteInfoList);
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+        resultMap.put("count",page.getTotal());
+        resultMap.put("list", cruiseResultAnalMeteInfoList);
+        return resultMap;
+    }
 
     @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
@@ -222,14 +273,52 @@ public class TCruiseDataResultService {
         return cruiseResultAnalInfos;
     }
 
+    @Logs(title = "获取当前测点下的巡检结果", code = "TCruiseDataResult", content = "获取测点巡检结果")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectCruiseDataReport( Integer cType, String meteType, Integer meterType, String endTime, String startTime,Long regionId,String instanceName,int pageNum,int pageSize) {
+
+        List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+        log.info("regionIdList是===" + regionIdList);
+        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+        log.info("deviceIdList是===" + deviceIdList);
+
+        Map<String, Object> resultMap = new HashMap<>();
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
+        if (deviceIdList != null && deviceIdList.size() > 0) {
+            cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
+        }
+        resultMap.put("count", page.getTotal());
+        resultMap.put("list", cruiseResultAnalyzeInfoList);
+
+        return resultMap;
+    }
+    @Logs(title = "获取当前测点下的巡检结果", code = "TCruiseDataResult", content = "获取测点巡检结果")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime,int pageNum,int pageSize){
+
+        Map<String, Object> resultMap = new HashMap<>();
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId,meteType ,meterType,endTime, startTime);
+        for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
+            if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult()) || cruiseResultAnalInfo.getIdentifyResult() == 0) {
+                cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
+            }
+        }
+        resultMap.put("count", page.getTotal());
+        resultMap.put("list", cruiseResultAnalyzeInfoList);
+
+        return resultMap;
+    }
     @Logs(title = "获取折线图元素信息", code = "TCruiseDataResult", content = "获取折线图信息")
     @Transactional(rollbackFor = Exception.class)
     public List<BrokenLineInfo> selectBrokenLine(Integer cruiseType,
                                                  Integer cType,
                                                  Long deviceMeteId,
-                                                 Date endDate,
-                                                 Date startDate) {
-        List<BrokenLineInfo> brokenLineInfos = tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, endDate, startDate);
+                                                 String startTime,
+                                                 String endTime) {
+        List<BrokenLineInfo> brokenLineInfos = tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime);
         return brokenLineInfos;
     }
 

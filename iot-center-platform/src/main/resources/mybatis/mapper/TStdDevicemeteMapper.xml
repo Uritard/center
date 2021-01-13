@@ -35,15 +35,13 @@
         <result column="stateZero" jdbcType="VARCHAR" property="stateZero" />
         <result column="stateOne" jdbcType="VARCHAR" property="stateOne" />
         <result column="alarmState" jdbcType="INTEGER" property="alarmState" />
-        <result column="meterType" jdbcType="INTEGER" property="meterType" />
-        <result column="appearanceType" jdbcType="INTEGER" property="appearanceType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, position_type,analyse_type, unit, alarm_note, alarm
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
-        mete_type, modulus, remark,state_zero,state_one,alarm_state,meter_type,appearance_type
+        mete_type, modulus, remark,state_zero,state_one,alarm_state
     </sql>
 
 
@@ -169,6 +167,7 @@
         <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR},</if>
         <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR},</if>
         <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
@@ -203,9 +202,9 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        a.state_zero,
-        a.state_one,
-        a.alarm_state
+        state_zero,
+        state_one,
+        alarm_state
         from t_std_devicemete a
         where 1 = 1
             and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
@@ -245,9 +244,9 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        a.state_zero,
-        a.state_one,
-        a.alarm_state,
+        state_zero,
+        state_one,
+        alarm_state,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
         i.dict_note as customTypeName,
@@ -296,9 +295,9 @@
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
-        <if test="stateZero != null and stateZero != ''">and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
-        <if test="stateOne != null and stateOne != ''">and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
-        <if test="alarmState != null">and a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
+        <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
+        <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
+        <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and g.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
 <!--        <if test="upRegionId != null and upRegionId != '' and upRegionId != 1 "> and e.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>-->
     </select>
@@ -345,9 +344,9 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        a.state_zero,
-        a.state_one,
-        a.alarm_state,
+        state_zero,
+        state_one,
+        alarm_state,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
         i.dict_note as customTypeName,
@@ -623,6 +622,46 @@
             d.device_id,
             b.device_mete_id DESC
 
+    </select>
+
+    <!--巡检结果分析展示-->
+    <select id="selectCruiseResultAnalyze" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo">
+        SELECT DISTINCT
+        b.device_mete_id,
+        b.device_id,
+        b.mete_name,
+        b.mete_type,
+        p.dict_note as mete_type_name,
+        b.meter_type,
+        q.dict_note as meter_type_name
+        FROM
+        t_std_device a
+        JOIN t_std_devicemete b ON a.device_id = b.device_id
+        LEFT JOIN t_dict_business e on e.dict_code = a.device_type and e.col_name = 'device_type'
+        LEFT JOIN t_dict_business f on f.dict_code = b.meter_type and f.col_name = 'meter_type'
+        LEFT JOIN t_dict_business g on g.dict_code = b.mete_type and g.col_name = 'mete_type'
+        JOIN t_cruise_point_instance h on b.device_mete_id = h.device_mete_id
+        JOIN  t_cruise_task_result_detail d on d.instance_id = h.instance_id
+        LEFT JOIN t_cruise_data_result j on j.cruise_result_id = d.cruise_result_id
+        LEFT JOIN t_cruise_result k on d.task_result_id = k.task_result_id and  k.c_state != 239 AND k.c_state != 241
+        LEFT JOIN t_dict_business m on m.dict_code = k.c_state and m.col_name = 'task_state'
+        LEFT JOIN t_dict_business p on p.dict_code = b.mete_type and p.col_name = 'mete_type'
+        LEFT JOIN t_dict_business q on q.dict_code = b.meter_type and q.col_name = 'meter_type'
+        WHERE 1 = 1
+        <if test="deviceType != -1">and a.device_type = #{deviceType,jdbcType = INTEGER} </if>
+        <if test="meterType != -1">and b.meter_type = #{meterType,jdbcType = INTEGER} </if>
+        <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
+        <if test="list != null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        AND k.c_state != 239
+        AND k.c_state != 241
+        ORDER BY
+        d.cruise_time,
+        d.device_id,
+        b.device_mete_id DESC
     </select>
 
     <select id="getdeviceMeteByPointinstance" parameterType="java.lang.Long" resultType="java.lang.Long">
