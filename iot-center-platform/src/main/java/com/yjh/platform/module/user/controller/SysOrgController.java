@@ -8,6 +8,7 @@ import com.yjh.platform.module.user.entity.SysOrg;
 import java.util.*;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -40,7 +41,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "新增组织机构")
     @RequestMapping(value = "/addOrg", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysOrg sysOrg) {
+    public Result insert(@RequestBody  @Validated SysOrg sysOrg) {
         Result result = new Result();
         try {
             if (sysOrg.getOrgCode().equals("")) {

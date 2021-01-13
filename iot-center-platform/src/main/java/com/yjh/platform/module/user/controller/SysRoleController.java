@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -42,7 +43,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "插入用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysRole sysRole) {
+    public Result insert(@RequestBody @Validated SysRole sysRole) {
         Result result = new Result();
         try {
             result.setData(sysRoleService.insert(sysRole));

@@ -8,6 +8,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author tt
@@ -21,20 +25,25 @@ public class SysRoleMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @NotNull(message = "rpId不为空")
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "菜单ID")
     @TableId(value = "rp_id", type = IdType.AUTO)
     private Long rpId;
 
+    @Length(max = 20,message = "menuCode长度必须小于等于20")
     @ApiModelProperty(value = "菜单编码")
     private String menuCode;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "菜单排序")
     private Integer sort;
 
+    @Length(max = 255,message = "elementCode长度必须小于等于255")
     @ApiModelProperty(value = "元素编码列表")
     private String elementCode;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "角色id")
     private Long roleId;
 

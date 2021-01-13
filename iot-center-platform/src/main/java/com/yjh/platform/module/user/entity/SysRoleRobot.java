@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -20,10 +22,13 @@ public class SysRoleRobot implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @NotNull(message = "roleId不为空")
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "角色ID")
     private Long roleId;
 
+    @NotNull(message = "roleId不为空")
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人ID")
     private Long robotId;
 

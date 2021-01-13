@@ -11,6 +11,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 /**
  * @author tt
@@ -24,21 +29,26 @@ public class SysRole implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @NotNull(message = "roleId不为空")
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "主键")
     @TableId(value = "role_id", type = IdType.AUTO)
     private Long roleId;
 
+    @Length(max = 20,message = "roleName长度必须小于等于20")
     @ApiModelProperty(value = "角色名称")
     private String roleName;
 
+    @Past
     @ApiModelProperty(value = "创建时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "创建人")
     private Long creatorId;
 
+    @Max(value=9)
     @ApiModelProperty(value = "1系统权限，0非系统权限")
     private Integer sysState;
 

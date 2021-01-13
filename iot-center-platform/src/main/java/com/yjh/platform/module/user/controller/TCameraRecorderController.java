@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCameraRecorder tCameraRecorder) {
+    public Result insert(@RequestBody @Validated TCameraRecorder tCameraRecorder) {
         Result result = new Result();
         try {
             result.setData(tCameraRecorderService.insert(tCameraRecorder));

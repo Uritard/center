@@ -6,6 +6,7 @@ import com.yjh.platform.module.user.entity.SysRoleMenu;
 import java.util.HashMap;
 import java.util.List;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -39,7 +40,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysRoleMenu sysRoleMenu) {
+    public Result insert(@RequestBody @Validated SysRoleMenu sysRoleMenu) {
         Result result = new Result();
         try {
             result.setData(sysRoleMenuService.insert(sysRoleMenu));

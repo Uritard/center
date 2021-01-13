@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -42,7 +43,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TCameraGroup tCameraGroup) {
+    public Result add(@RequestBody @Validated TCameraGroup tCameraGroup) {
         Result result = new Result();
         try {
             result.setData(tCameraGroupService.add(tCameraGroup));

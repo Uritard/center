@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -61,7 +62,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysUser sysUser) {
+    public Result insert(@RequestBody @Validated SysUser sysUser) {
         Result result = new Result();
         try {
             result.setData(sysUserService.insert(sysUser));
@@ -282,7 +283,7 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insertUser(@Valid @RequestBody SysUser sysUser) {
+    public Result insertUser( @RequestBody @Validated SysUser sysUser) {
         Result result = new Result();
         try {
             Long creatorId = userManager.getCreatorId();

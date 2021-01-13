@@ -12,6 +12,7 @@ import java.util.List;
 import io.swagger.annotations.*;
 
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -48,7 +49,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCameraInfo tCameraInfo) {
+    public Result insert(@RequestBody @Validated TCameraInfo tCameraInfo) {
         Result result = new Result();
         try {
             result.setData(tCameraInfoService.insert(tCameraInfo));

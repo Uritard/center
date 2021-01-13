@@ -6,6 +6,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author lqh
@@ -19,16 +23,20 @@ public class TCameraGroup implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @NotNull(message = "groupId不为空")
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "分组ID")
     private Long groupId;
 
+    @Length(max = 128,message = "groupName长度必须小于等于128")
     @ApiModelProperty(value = "分组名称")
     private String groupName;
 
+    @Length(max = 255,message = "cameraIds长度必须小于等于255")
     @ApiModelProperty(value = "相机ID")
     private String cameraIds;
 
+    @Length(max = 64,message = "remarks长度必须小于等于64")
     @ApiModelProperty(value = "备注")
     private String remarks;
 

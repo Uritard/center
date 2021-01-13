@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -40,7 +41,7 @@ public class SysRoleCameraController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysRoleCamera sysRoleCamera) {
+    public Result insert(@RequestBody @Validated SysRoleCamera sysRoleCamera) {
         Result result = new Result();
         try {
             result.setData(sysRoleCameraService.insert(sysRoleCamera));
