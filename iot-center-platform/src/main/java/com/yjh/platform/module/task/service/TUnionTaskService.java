@@ -269,13 +269,14 @@ public class TUnionTaskService{
 
     //联动弹窗--联动信息
     @Transactional(rollbackFor = Exception.class)
+    @Logs(title = "联动记录信息", code = "linkageInformation",content = "联动记录信息存储")
     public LinkageInformation linkageInformation(String taskId) {
         LinkageInformation linkageInformation = TUnionTaskAttrDao.linkageInformation(taskId);
         return linkageInformation;
     }
 
     //联动弹窗--监测数据
-    @Logs
+    @Logs(title = "联动监测数据", code = "linkageMonitorData",content = "联动监测数据存储")
     @Transactional(rollbackFor = Exception.class)
     public List<LinkageMonitorData> linkageMonitorData(String taskId) throws Exception{
         Thread.sleep(1000);
