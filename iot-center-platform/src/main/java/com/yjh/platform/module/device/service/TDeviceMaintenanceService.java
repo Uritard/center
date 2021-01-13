@@ -187,14 +187,14 @@ public class TDeviceMaintenanceService{
 
     @Logs(title = "查询区域下的设备", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<IdAndNameDetail> selectDevice(Long upRegionId) {
-        return this.tDeviceMaintenanceDao.selectDevice(upRegionId);
+    public List<IdAndNameDetail> selectDevice(List<Long> list,String deviceName) {
+        return this.tDeviceMaintenanceDao.selectDevice(list, deviceName);
     }
 
     @Logs(title = "查询设备下的巡视点", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<IdAndNameDetail> selectInstance(Long deviceId) {
-        return this.tDeviceMaintenanceDao.selectInstance(deviceId);
+    public List<IdAndNameDetail> selectInstance(List<Long> list) {
+        return this.tDeviceMaintenanceDao.selectInstance(list);
     }
 
 }

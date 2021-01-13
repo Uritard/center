@@ -3,6 +3,7 @@ package com.yjh.platform.common.utils;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -107,6 +108,11 @@ public class SystemInfoUtil {
                         if("".equals(strArray[0])){
                             strArray= Arrays.copyOfRange(strArray,1,strArray.length);
                         }
+//                        log.info("每一行： "+str);
+//                        log.info("数组：",strArray.toString());
+//                        for ( String item:strArray) {
+//                            log.info(item);
+//                        }
                         Map<String,String> map = new HashMap<>();
                         map.put("pid",strArray[2]);
                         map.put("read",strArray[3]);
