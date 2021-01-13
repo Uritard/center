@@ -26,9 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
-* @author tt
-* @since 2020-08-20
-*/
+ * @author tt
+ * @since 2020-08-20
+ */
 @Service
 public class RobotService {
 
@@ -47,68 +47,71 @@ public class RobotService {
 
     @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public String feignRobotControl(String robotCode,String type, String command,String value,String direction,String key,Long userId,String password){
-        if(command.equals("1")&&type.equals("1")){
-           String zcz=this.booleanZcz(key,userId,password);
-           if(!zcz.equals("1")){
-               return  zcz;
-           }
-        }else if(command.equals("3")&&type.equals("1")){
-            String zcz=this.booleanZcz(key,userId,password);
-            if(!zcz.equals("1")){
-                return  zcz;
+    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) {
+        Map scmap = new HashMap();
+        if (command.equals("1") && type.equals("1")) {
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            if (zcz.get("code") != null) {
+                return zcz;
             }
-        }else if(command.equals("5")&&type.equals("1")){
-            String zcz=this.booleanZcz(key,userId,password);
-            if(!zcz.equals("1")){
-                return  zcz;
+        } else if (command.equals("3") && type.equals("1")) {
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            if (zcz.get("code") != null) {
+                return zcz;
             }
-        }else if(command.equals("6")&&type.equals("1")){
-            String zcz=this.booleanZcz(key,userId,password);
-            if(!zcz.equals("1")){
-                return  zcz;
+        } else if (command.equals("5") && type.equals("1")) {
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            if (zcz.get("code") != null) {
+                return zcz;
             }
-        }else if(command.equals("9")&&type.equals("3")){
-            String zcz=this.booleanZcz(key,userId,password);
-            if(!zcz.equals("1")){
-                return  zcz;
+        } else if (command.equals("6") && type.equals("1")) {
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            if (zcz.get("code") != null) {
+                return zcz;
             }
-        }else if(command.equals("8")&&type.equals("22")){
-            String zcz=this.booleanZcz(key,userId,password);
-            if(!zcz.equals("1")){
-                return  zcz;
+        } else if (command.equals("9") && type.equals("3")) {
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            if (zcz.get("code") != null) {
+                return zcz;
             }
-        }else {
-            SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
-            List<Map<String, Object>> Item = new LinkedList<>();
-            Map<String, Object> map = new HashMap<>();
-            if (!"".equals(value) || null != value) {
-                map.put("value", value);
+        } else if (command.equals("8") && type.equals("22")) {
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            if (zcz.get("code") != null) {
+                return zcz;
             }
-            if (!"".equals(direction) || null != direction) {
-                map.put("direction", direction);
-            }
-            Item.add(map);
-
-            XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode("Server01")
-                    .setReceiveCode(robotCode)
-                    .setCode("省检018")
-                    .setTime(sdf.format(new Date()))
-                    .setType(type)
-                    .setCommand(command)
-                    .setItems(Item);
-            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-            log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
-            //根据不同的机器人对应不同的管道发送指令
-            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         }
-            return "success";
+        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+        List<Map<String, Object>> Item = new LinkedList<>();
+        Map<String, Object> map = new HashMap<>();
+        if (!"".equals(value) || null != value) {
+            map.put("value", value);
+        }
+        if (!"".equals(direction) || null != direction) {
+            map.put("direction", direction);
+        }
+        Item.add(map);
+
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setSendCode("Server01")
+                .setReceiveCode(robotCode)
+                .setCode("省检018")
+                .setTime(sdf.format(new Date()))
+                .setType(type)
+                .setCommand(command)
+                .setItems(Item);
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+        log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
+        //根据不同的机器人对应不同的管道发送指令
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+        scmap.put("code", 3);
+        scmap.put("result", "success");
+        return scmap;
 
     }
+
     @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public boolean feignRobotTransfer(String robotCode) throws Exception{
+    public boolean feignRobotTransfer(String robotCode) throws Exception {
         boolean res = false;
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -121,30 +124,31 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
         Constant.flag = 0;
-        RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
-        log.info("sendId是<start>"+sendId+"<end>");
-        if (sendId != null){
-            sendId.SendHeartBeat(generateByteOrder(xmlString,robotCode),robotCode);
+        RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
+        log.info("sendId是<start>" + sendId + "<end>");
+        if (sendId != null) {
+            sendId.SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         }
         Thread.sleep(500);
-        if (Constant.flag == 1){
+        if (Constant.flag == 1) {
             res = true;
         }
         return res;
     }
+
     //生成发送byte指令，附带测试
-    public byte[]  generateByteOrder(String xmlString,String robotCode){
+    public byte[] generateByteOrder(String xmlString, String robotCode) {
         long sendSessionId = Constant.sendSessionId;
-        RobotServerHandler sendId =  RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
-        log.info("sendId是<start>"+sendId+"<end>");
-        if(sendId != null){
+        RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
+        log.info("sendId是<start>" + sendId + "<end>");
+        if (sendId != null) {
             sendSessionId = sendSessionId + 1L;//请求报文每次累加1
             Constant.sendSessionId = sendSessionId;//刷新sendSessionId
-        }else {
+        } else {
             Constant.sendSessionId = 0L;//刷新sendSessionId
         }
-        log.info("发送会话序列号<start>"+sendSessionId+"<end>");
-        byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId,0,true,xmlString);//生成发送的报文
+        log.info("发送会话序列号<start>" + sendSessionId + "<end>");
+        byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);//生成发送的报文
 
         StringBuilder Str = new StringBuilder();
         for (byte byteitem : requestProtocol) {
@@ -153,26 +157,28 @@ public class RobotService {
         log.info("发送给机器人的指令是<start>" + Str + "<end>");
         return requestProtocol;
     }
+
     @Logs(title = "机器人在线状态更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int updateRobotInfo(String robotCode,String robotStatus){
-        log.info("机器人code是:"+robotCode);
+    public int updateRobotInfo(String robotCode, String robotStatus) {
+        log.info("机器人code是:" + robotCode);
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-        log.info("机器人的id是："+robotId);
+        log.info("机器人的id是：" + robotId);
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setRobotStatus(robotStatus);
         int res = tRobotInfoDao.update(tRobotInfo);
         return res;
     }
+
     @Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int robotFileIntoDB(List<Map<String,Object>> deviceMapList, List<Map<String,Object>> robotMap,XMLBaseModel xmlBaseModel) {
+    public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
         //从缓存中获取系统参数
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         //机器人模型文件
-        String picPath = filePathMap.get("content") + "/" +robotMap.get(0).get("mappath").toString();
-        log.info("图片路径为："+picPath);
+        String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
+        log.info("图片路径为：" + picPath);
         /*
          * 将ftp图copy到40环境
          * */
@@ -180,96 +186,97 @@ public class RobotService {
 
         String fenGe[] = picPath.split("/");
         String fileName = fenGe[fenGe.length - 1];
-        String developMap = absoluteImgMap.get("content")+"/Map";
-        File f=new File(developMap);
-        if (!f.exists()){
+        String developMap = absoluteImgMap.get("content") + "/Map";
+        File f = new File(developMap);
+        if (!f.exists()) {
             f.setWritable(true, false);
             f.mkdirs();
         }
 
         try {
-            String url = "cp " + picPath + " "+developMap;
-            log.info("url是==="+url);
+            String url = "cp " + picPath + " " + developMap;
+            log.info("url是===" + url);
             Runtime.getRuntime().exec(url);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.getMessage();
         }
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-        String developRelativeUrl = relativeImgMap.get("content") +"/Map/"+ fileName;
+        String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
 
-        log.info("机器人code是:"+xmlBaseModel.getSendCode());
-            Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
-        log.info("机器人的id是："+robotId);
+        log.info("机器人code是:" + xmlBaseModel.getSendCode());
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
+        log.info("机器人的id是：" + robotId);
 
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
-        log.info("获得的tRobotInfo是："+tRobotInfo);
+        log.info("获得的tRobotInfo是：" + tRobotInfo);
 
         //更新机器人地图信息
         tRobotInfoDao.update(tRobotInfo);
         //设备模型文件
         List<TRobotInspection> deviceList = new ArrayList<>();
-        for (Map<String,Object> deviceMap : deviceMapList){
+        for (Map<String, Object> deviceMap : deviceMapList) {
             TRobotInspection tRobotInspection = new TRobotInspection()
                     .setInspectionCode(deviceMap.get("device_id").toString())
                     .setRobotId(robotId)
                     .setInspectionName(deviceMap.get("device_name").toString());
             deviceList.add(tRobotInspection);
         }
-        log.info("获得的deviceList是："+deviceList);
+        log.info("获得的deviceList是：" + deviceList);
 
         //对测点数据进行相应的处理
         List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);//该机器人现有的巡检点
-        log.info("机器人现有的deviceList是："+nowList);
+        log.info("机器人现有的deviceList是：" + nowList);
 
         List<TRobotInspection> addList = new ArrayList<>();
-        for (TRobotInspection str : deviceList){
-            if (nowList.contains(str.getInspectionCode())){
+        for (TRobotInspection str : deviceList) {
+            if (nowList.contains(str.getInspectionCode())) {
                 nowList.remove(str.getInspectionCode());
-            }else {
+            } else {
                 addList.add(str);
             }
 
         }
-        log.info("最后要插库的deviceList是==="+addList);
-        log.info("准备要删除的inspectionCodeList是==="+nowList);
-        if (nowList != null  && nowList.size() > 0 ){
+        log.info("最后要插库的deviceList是===" + addList);
+        log.info("准备要删除的inspectionCodeList是===" + nowList);
+        if (nowList != null && nowList.size() > 0) {
             List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
-            log.info("这些inspectionCode对应的inspectionIdList是=="+inspectionIdList);
+            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
             List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
-            log.info("这些inspectionId对应的instanceIdList是=="+instanceIdList);
+            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
 
             int res1 = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList); //删库TRI
             int res2 = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);//删库TCPI
             int res3 = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);//删库TCPA
-            log.info("TRI删除条数=="+res1+",TCPI删除条数=="+res2+",TCPA删除条数=="+res3);
+            log.info("TRI删除条数==" + res1 + ",TCPI删除条数==" + res2 + ",TCPA删除条数==" + res3);
         }
-        if (addList != null  && addList.size() > 0 ){
+        if (addList != null && addList.size() > 0) {
             //插库TRI
             int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
-            log.info("TRI插入条数=="+res);
+            log.info("TRI插入条数==" + res);
         }
         if (deviceList.containsAll(addList)) {
             deviceList.removeAll(addList);
         }
-        System.out.println("准备更新的deviceList是=="+deviceList);
-        for (TRobotInspection tRobotInspection : deviceList){
+        System.out.println("准备更新的deviceList是==" + deviceList);
+        for (TRobotInspection tRobotInspection : deviceList) {
             tRobotInspectionDao.update(tRobotInspection);//更新TRI
         }
 
         return 1;
     }
+
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotTaskIssued(Map<String,List<RobotTaskInstanceInfo>> ItemMap) {
-        log.info("传来的ItemMap是=="+ItemMap);
+    public int feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
+        log.info("传来的ItemMap是==" + ItemMap);
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
 
         if (null != ItemMap) {
             List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
             List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
-            log.info("rTIIList是==="+rTIIList);
+            log.info("rTIIList是===" + rTIIList);
             for (RobotTaskInstanceInfo rTII : rTIIList) {
                 //巡视类型
                 Integer planType = null;
@@ -296,32 +303,32 @@ public class RobotService {
                 //根据instanceIdList查询inspectionCodeList
                 StringJoiner str = new StringJoiner(",");
                 List<Long> instanceIdList = rTII.getInstanceList();
-                log.info("instanceIdList是==="+instanceIdList);
+                log.info("instanceIdList是===" + instanceIdList);
 
                 //将instanceIdList放缓存，以备后续使用
-                Map<String,Object> instanceListMap = new HashMap<>();
-                instanceListMap.put("instanceIdList",String.valueOf(instanceIdList));
-                instanceListMap.put("taskId",rTII.getTaskId());
-                redisTemplate.opsForHash().putAll("RobotTaskStatus:"+rTII.getRobotCode(),instanceListMap);
+                Map<String, Object> instanceListMap = new HashMap<>();
+                instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
+                instanceListMap.put("taskId", rTII.getTaskId());
+                redisTemplate.opsForHash().putAll("RobotTaskStatus:" + rTII.getRobotCode(), instanceListMap);
 
                 for (Long instanceId : instanceIdList) {
                     String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
                     str.add(inspectionCode);
 
                     Map<String, String> redisInfoMap = new HashMap<>();//缓存信息map
-                    redisInfoMap.put("robotCode",rTII.getRobotCode());//缓存中放robotCode
-                    redisInfoMap.put("instanceId",instanceId+"");//缓存中放instanceId
-                    redisInfoMap.put("inspectionCode",inspectionCode);//缓存中放inspectionCode
-                    redisInfoMap.put("cruiseTime",sdf.format(new Date()));//缓存中放cruiseTime
-                    redisInfoMap.put("taskId",rTII.getTaskId());//缓存中放taskId
+                    redisInfoMap.put("robotCode", rTII.getRobotCode());//缓存中放robotCode
+                    redisInfoMap.put("instanceId", instanceId + "");//缓存中放instanceId
+                    redisInfoMap.put("inspectionCode", inspectionCode);//缓存中放inspectionCode
+                    redisInfoMap.put("cruiseTime", sdf.format(new Date()));//缓存中放cruiseTime
+                    redisInfoMap.put("taskId", rTII.getTaskId());//缓存中放taskId
                     redisInfoList.add(redisInfoMap);//缓存信息List添加数据
                 }
 
-                log.info("redisInfoList是==="+redisInfoList);
+                log.info("redisInfoList是===" + redisInfoList);
                 //放数据到缓存
                 for (int i = 0; i < redisInfoList.size(); i++) {
-                    redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:"+redisInfoList.get(i).get("robotCode")
-                            +":"+redisInfoList.get(i).get("taskId")+i, redisInfoList.get(i));
+                    redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
+                            + ":" + redisInfoList.get(i).get("taskId") + i, redisInfoList.get(i));
                 }
 
                 String deviceIdList = str.toString();
@@ -366,7 +373,7 @@ public class RobotService {
                 log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
 
                 //根据不同的机器人对应不同的管道发送指令
-                RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).SendHeartBeat(  generateByteOrder(xmlString,rTII.getRobotCode()),rTII.getRobotCode());
+                RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).SendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
 
                 //启动一个线程
 //                Map<String,String> threadMap = new HashMap<>();
@@ -383,24 +390,25 @@ public class RobotService {
         }
         return 1;
     }
+
     @Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap)throws Exception {
-        log.info("robotTaskControlMap==="+robotTaskControlMap);
+    public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap) throws Exception {
+        log.info("robotTaskControlMap===" + robotTaskControlMap);
 
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         String taskId = robotTaskControlMap.get("taskId").toString();
         //1.任务启动2.任务暂停3.任务继续4.任务停止
         String commandValue = robotTaskControlMap.get("commandValue").toString();
-        String json  = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
-        log.info("判断条件是==="+(!"null".equals(json)));
-        if (!"null".equals(json)){
-            List<String> robotCodeList = JSON.parseArray(json,String.class);
-            log.info("robotCodeList==="+robotCodeList);
+        String json = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
+        log.info("判断条件是===" + (!"null".equals(json)));
+        if (!"null".equals(json)) {
+            List<String> robotCodeList = JSON.parseArray(json, String.class);
+            log.info("robotCodeList===" + robotCodeList);
 
             List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
 
-            for (String robotCode : robotCodeList){
+            for (String robotCode : robotCodeList) {
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("41")
                         .setSendCode("Server01")
@@ -412,10 +420,10 @@ public class RobotService {
                 log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
 
                 //根据不同的机器人对应不同的管道发送指令
-                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(  generateByteOrder(xmlString,robotCode),robotCode);
+                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
 
-                if (commandValue.equals("2") || commandValue.equals("4")){
-                    insertForPause(robotCode,taskId,Integer.valueOf(commandValue));
+                if (commandValue.equals("2") || commandValue.equals("4")) {
+                    insertForPause(robotCode, taskId, Integer.valueOf(commandValue));
                 }
             }
         }
@@ -423,7 +431,7 @@ public class RobotService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int insertForPause(String robotCode,String taskId,Integer taskStatus) throws Exception {
+    public int insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
 
         //统计巡视主机下发给机器人的巡检点大小
         Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
@@ -431,7 +439,7 @@ public class RobotService {
         instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
         String[] instanceIdArray = instanceList.split(", ");
         List<String> instanceIdList = new ArrayList<>();
-        for (String i : instanceIdArray){
+        for (String i : instanceIdArray) {
             instanceIdList.add(i);
         }
         log.info("instanceIdList的大小====" + instanceIdList.size());
@@ -444,7 +452,7 @@ public class RobotService {
                 instanceIdList.remove(instanceId.toString());
             }
         }
-        log.info("准备遍历的点是==="+instanceIdList);
+        log.info("准备遍历的点是===" + instanceIdList);
         List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
         List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
         List<Long> instancedList = new ArrayList<>();//插过库的点
@@ -455,20 +463,20 @@ public class RobotService {
 
         //缓存中的总检测点
         Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
-        log.info("总检测点数是==="+totalCheckPoint);
+        log.info("总检测点数是===" + totalCheckPoint);
         //缓存中的异常点
         Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString());
         log.info("异常点数是===" + abnormalCheckPoint);
         //缓存中的正常点
-        Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
+        Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString());
         log.info("正常点数是===" + normalCheckPoint);
 
 
         Integer abnormal = abnormalCheckPoint;//异常
-        Integer normal =normalCheckPoint;//正常
+        Integer normal = normalCheckPoint;//正常
 
         for (String instanceId : instanceIdList) {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId +":"+ instanceId);
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
             log.info("cruiseResult 是 ===" + redisInfoMap.get("cruiseResult"));
             if (redisInfoMap.get("cruiseResult").equals("246") ||
                     redisInfoMap.get("cruiseResult").equals("247")) {//缓存中该巡检点有结果
@@ -508,12 +516,12 @@ public class RobotService {
                 }
                 tCDRList.add(tCruiseDataResult);
 
-                if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
+                if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                     normal = normal + 1;
-                    log.info("这次变化的normal是==="+normal);
-                }else if ("250".equals(redisInfoMap.get("cruiseAbnormal"))){
+                    log.info("这次变化的normal是===" + normal);
+                } else if ("250".equals(redisInfoMap.get("cruiseAbnormal"))) {
                     abnormal = abnormal + 1;
-                    log.info("这次变化的abnormal是==="+abnormal);
+                    log.info("这次变化的abnormal是===" + abnormal);
                 }
             }
         }
@@ -531,13 +539,13 @@ public class RobotService {
         log.info("instancedList的内容是===" + instancedList);
 
         //将插过库的点放进公共类
-        if (instanceIDList != null && instanceIDList.size() > 0){
+        if (instanceIDList != null && instanceIDList.size() > 0) {
             log.info("将插过库的点放进公共类");
             instanceIDList.addAll(instancedList);
             Constant.flagMap.put(taskId, instancedList);
-        }else {
+        } else {
             log.info("不用放");
-            Constant.flagMap.put(taskId,instancedList);
+            Constant.flagMap.put(taskId, instancedList);
         }
 
         //批量插入TCTRD库
@@ -549,37 +557,39 @@ public class RobotService {
 
 
         Integer cState = null;
-        if (taskStatus == 2){
+        if (taskStatus == 2) {
             cState = 241;//任务暂停
-        }else if (taskStatus == 4){
+        } else if (taskStatus == 4) {
             cState = 242;//任务终止
             //将公共类的instanceIdList清空
-            for (Long instancedId : Constant.flagMap.get(taskId)){
+            for (Long instancedId : Constant.flagMap.get(taskId)) {
                 instanceIdList.remove(instancedId.toString());
             }
         }
 
         TCruiseResult tCruiseResult = selectTaskResultId(taskId);
-        log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
+        log.info("taskResultId是===" + tCruiseResult.getTaskResultId());
 
         Integer taskWait = totalCheckPoint - normal - abnormal;
-        log.info("taskWait的值是=="+ taskWait);
+        log.info("taskWait的值是==" + taskWait);
         tCruiseResult.setTaskWait(taskWait);
         tCruiseResult.setCState(cState);
         tCruiseResult.setTaskCode(taskId);
-        log.info("tCruiseResult的内容是==="+tCruiseResult);
+        log.info("tCruiseResult的内容是===" + tCruiseResult);
         //更新TCR表
         int res = updateTCruiseResult(tCruiseResult);
-        log.info("更新TCR的条数===="+res);
+        log.info("更新TCR的条数====" + res);
 
         return 1;
     }
+
     @Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectTaskResultId(String taskId) {
         TCruiseResult tCruiseResult = tRobotInfoDao.selectTaskResultId(taskId);
         return tCruiseResult;
     }
+
     @Logs(title = "根据taskId查询相关内容2", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
@@ -598,46 +608,61 @@ public class RobotService {
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {
         return this.tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
     }
+
     @Logs(title = "TCDR信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseDataResult(List<TCruiseDataResult> tCruiseDataResultList) {
         return this.tRobotInfoDao.batchInsertCruiseDataResult(tCruiseDataResultList);
     }
+
     @Logs(title = "TCTRD信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList) {
         return this.tRobotInfoDao.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetailList);
     }
-    @Logs(title ="TCR信息更新",code = "Robot")
+
+    @Logs(title = "TCR信息更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int updateTCruiseResult(TCruiseResult tCruiseResult){
+    public int updateTCruiseResult(TCruiseResult tCruiseResult) {
         return this.tRobotInfoDao.updateTCruiseResult(tCruiseResult);
     }
-    @Logs(title ="TCTR信息更新",code = "Robot")
+
+    @Logs(title = "TCTR信息更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult){
+    public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
     }
 
-    public  String booleanZcz(String  key,Long userId,String password){
+    public Map<String, Object> booleanZcz(String key, Long userId, String password) {
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
-        String keys=Constant.map.get(String.valueOf(userId));
-        if(StringUtils.isEmpty(key)&&keys==null){
-            String random=String.valueOf((int) (Math.random()*1000000000+1));
-            Constant.map.put(String.valueOf(userId),random);
-            return random;
-        }else if(StringUtils.isEmpty(key)&&keys!=null) {
-            return "请输入密钥";
-        }else if(keys==null){
-            String random=String.valueOf((int) (Math.random()*1000000000+1));
-            Constant.map.put(String.valueOf(userId),random);
-            return random;
-        }else if(!key.equals(keys)){
-            return  "密钥不正确,请重新输入";
-        }else if(!sysUserCurrent.getPassword().equals(password)){
-            return "用户密码错误，请重新输入";
+        Map map = new HashMap();
+        String keys = Constant.map.get(String.valueOf(userId));
+        if (StringUtils.isEmpty(key) && keys == null) {
+            String random = String.valueOf((int) (Math.random() * 1000000000 + 1));
+            Constant.map.put(String.valueOf(userId), random);
+            map.put("code", 1);
+            map.put("result", random);
+            return map;
+        } else if (StringUtils.isEmpty(key) && keys != null) {
+            map.put("code", 2);
+            map.put("result", "请输入密钥");
+            return map;
+        } else if (keys == null) {
+            String random = String.valueOf((int) (Math.random() * 1000000000 + 1));
+            Constant.map.put(String.valueOf(userId), random);
+            map.put("code", 1);
+            map.put("result", random);
+            return map;
+        } else if (!key.equals(keys)) {
+            map.put("code", 2);
+            map.put("result", "密钥不正确,请重新输入");
+            return map;
+        } else if (!sysUserCurrent.getPassword().equals(password)) {
+            map.put("code", 2);
+            map.put("result", "用户密码错误，请重新输入");
+            return map;
         }
-        return  "1";
+        return map;
     }
 
 }
