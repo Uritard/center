@@ -62,8 +62,6 @@
             position_type,
             analyse_type,
             unit,
-            meter_type,
-            appearance_type,
             alarm_note,
             alarm_type,
             up_effect,
@@ -100,8 +98,6 @@
                 #{positionType, jdbcType=VARCHAR},
                 #{analyseType, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR},
-                #{meterType, jdbcType=INTEGER},
-                #{appearanceType, jdbcType=INTEGER},
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmType, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
@@ -173,8 +169,6 @@
         <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR},</if>
         <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR},</if>
         <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
-        <if test="meterType != null">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
-        <if test="appearanceType != null">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
@@ -209,11 +203,9 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        state_zero,
-        state_one,
-        alarm_state,
-        meter_type,
-        appearance_type
+        a.state_zero,
+        a.state_one,
+        a.alarm_state
         from t_std_devicemete a
         where 1 = 1
             and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
@@ -253,11 +245,9 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        a.appearance_type,
-        a.meter_type,
-        state_zero,
-        state_one,
-        alarm_state,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
         i.dict_note as customTypeName,
@@ -309,8 +299,6 @@
         <if test="stateZero != null and stateZero != ''">and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
         <if test="stateOne != null and stateOne != ''">and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
         <if test="alarmState != null">and a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
-        <if test="meterType != null">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
-        <if test="appearanceType != null">and a.appearance_type = #{appearanceType, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and g.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
 <!--        <if test="upRegionId != null and upRegionId != '' and upRegionId != 1 "> and e.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>-->
     </select>
@@ -357,11 +345,9 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        a.appearance_type,
-        a.meter_type,
-        state_zero,
-        state_one,
-        alarm_state,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
         i.dict_note as customTypeName,
@@ -414,8 +400,6 @@
         <if test="stateZero != null and stateZero != ''">and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
         <if test="stateOne != null and stateOne != ''">and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
         <if test="alarmState != null"> and a.alarm_state = #{alarmState, jdbcType=INTEGER}</if>
-        <if test="meterType != null"> and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
-        <if test="appearanceType != null"> and a.appearance_type = #{appearanceType, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
          order by a.device_mete_id desc
     </select>
@@ -434,8 +418,6 @@
             position_type,
         analyse_type,
             unit,
-            meter_type,
-            appearance_type,
             alarm_note,
             alarm_type,
             up_effect,
@@ -470,8 +452,6 @@
                 #{TStdDevicemete.positionType, jdbcType=VARCHAR},
             #{TStdDevicemete.analyseType, jdbcType=INTEGER},
                 #{TStdDevicemete.unit, jdbcType=VARCHAR},
-                #{TStdDevicemete.meterType, jdbcType=INTEGER},
-                #{TStdDevicemete.appearanceType, jdbcType=INTEGER},
                 #{TStdDevicemete.alarmNote, jdbcType=VARCHAR},
                 #{TStdDevicemete.alarmType, jdbcType=VARCHAR},
                 #{TStdDevicemete.upEffect, jdbcType=REAL},
