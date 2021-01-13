@@ -4,45 +4,48 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdMete">
-        <id column="std_mete_id" jdbcType="BIGINT" property="stdMeteId" />
-        <result column="device_type" jdbcType="INTEGER" property="deviceType" />
-        <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
-        <result column="mete_kind" jdbcType="INTEGER" property="meteKind" />
-        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
-        <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
-        <result column="alarm_explain" jdbcType="VARCHAR" property="alarmExplain" />
-        <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
-        <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
-        <result column="unit" jdbcType="VARCHAR" property="unit" />
-        <result column="up_effect" jdbcType="REAL" property="upEffect" />
-        <result column="down_effect" jdbcType="REAL" property="downEffect" />
-        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
-        <result column="alarm_limit" jdbcType="INTEGER" property="alarmLimit" />
-        <result column="high_limit1" jdbcType="REAL" property="highLimit1" />
-        <result column="low_limit1" jdbcType="REAL" property="lowLimit1" />
-        <result column="high_limit2" jdbcType="REAL" property="highLimit2" />
-        <result column="low_limit2" jdbcType="REAL" property="lowLimit2" />
-        <result column="high_limit3" jdbcType="REAL" property="highLimit3" />
-        <result column="low_limit3" jdbcType="REAL" property="lowLimit3" />
-        <result column="high_limit4" jdbcType="REAL" property="highLimit4" />
-        <result column="low_limit4" jdbcType="REAL" property="lowLimit4" />
-        <result column="alarm_delay" jdbcType="INTEGER" property="alarmDelay" />
-        <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt" />
-        <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs" />
-        <result column="threshold_per" jdbcType="NUMERIC" property="thresholdPer" />
-        <result column="modulus" jdbcType="INTEGER" property="modulus" />
-        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <id column="std_mete_id" jdbcType="BIGINT" property="stdMeteId"/>
+        <result column="device_type" jdbcType="INTEGER" property="deviceType"/>
+        <result column="mete_type" jdbcType="VARCHAR" property="meteType"/>
+        <result column="mete_kind" jdbcType="INTEGER" property="meteKind"/>
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName"/>
+        <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote"/>
+        <result column="alarm_explain" jdbcType="VARCHAR" property="alarmExplain"/>
+        <result column="alarm_type" jdbcType="VARCHAR" property="alarmType"/>
+        <result column="analyse_type" jdbcType="INTEGER" property="analyseType"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="up_effect" jdbcType="REAL" property="upEffect"/>
+        <result column="down_effect" jdbcType="REAL" property="downEffect"/>
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel"/>
+        <result column="alarm_limit" jdbcType="INTEGER" property="alarmLimit"/>
+        <result column="high_limit1" jdbcType="REAL" property="highLimit1"/>
+        <result column="low_limit1" jdbcType="REAL" property="lowLimit1"/>
+        <result column="high_limit2" jdbcType="REAL" property="highLimit2"/>
+        <result column="low_limit2" jdbcType="REAL" property="lowLimit2"/>
+        <result column="high_limit3" jdbcType="REAL" property="highLimit3"/>
+        <result column="low_limit3" jdbcType="REAL" property="lowLimit3"/>
+        <result column="high_limit4" jdbcType="REAL" property="highLimit4"/>
+        <result column="low_limit4" jdbcType="REAL" property="lowLimit4"/>
+        <result column="alarm_delay" jdbcType="INTEGER" property="alarmDelay"/>
+        <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt"/>
+        <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs"/>
+        <result column="threshold_per" jdbcType="NUMERIC" property="thresholdPer"/>
+        <result column="modulus" jdbcType="INTEGER" property="modulus"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="state_zero" jdbcType="VARCHAR" property="stateZero"/>
+        <result column="state_one" jdbcType="VARCHAR" property="stateOne"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
 
-        std_mete_id, device_type,  mete_type, mete_kind, mete_name, alarm_note, alarm_explain, alarm_type,analyse_type, unit, up_effect, down_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark
+        std_mete_id, device_type,  mete_type, mete_kind, mete_name, alarm_note, alarm_explain, alarm_type,analyse_type, unit, up_effect, down_effect, alarm_level, alarm_limit,high_limit1,low_limit1,high_limit2,low_limit2,high_limit3,low_limit3,high_limit4,low_limit4,alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus, remark,state_zero,state_one
 
     </sql>
 
 
-    <insert id="add" useGeneratedKeys="true" keyProperty="stdMeteId" parameterType="com.yjh.platform.module.device.entity.TStdMete">
+    <insert id="add" useGeneratedKeys="true" keyProperty="stdMeteId"
+            parameterType="com.yjh.platform.module.device.entity.TStdMete">
         insert into t_std_mete(
             std_mete_id,
             device_type,
@@ -54,6 +57,8 @@
             alarm_type,
             analyse_type,
             unit,
+            state_zero,
+            state_one,
             up_effect,
             down_effect,
             alarm_level,
@@ -83,6 +88,8 @@
                 #{alarmType, jdbcType=VARCHAR},
                 #{analyseType, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR},
+                #{stateZero, jdbcType=VARCHAR},
+                #{stateOne, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
                 #{downEffect, jdbcType=REAL},
                 #{alarmLevel, jdbcType=INTEGER},
@@ -110,40 +117,50 @@
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdMete">
-        update t_std_mete a <set>
-        <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
-        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
-        <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
-        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
-        <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
-        <if test="alarmExplain != null and alarmExplain != ''">a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR},</if>
-        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
-        <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
-        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
-        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
-        <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
-        <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
-        <if test="alarmLimit != null ">a.alarm_limit = #{alarmLimit, jdbcType=INTEGER},</if>
-        <if test="highLimit1 != null and highLimit1 != ''">a.high_limit1 = #{highLimit1, jdbcType=REAL},</if>
-        <if test="lowLimit1 != null and lowLimit1 != ''">a.low_limit1 = #{lowLimit1, jdbcType=REAL},</if>
-        <if test="highLimit2 != null and highLimit2 != ''">a.high_limit2 = #{highLimit2, jdbcType=REAL},</if>
-        <if test="lowLimit2 != null and lowLimit2 != ''">a.low_limit2 = #{lowLimit2, jdbcType=REAL},</if>
-        <if test="highLimit3 != null and highLimit2 != ''">a.high_limit3 = #{highLimit3, jdbcType=REAL},</if>
-        <if test="lowLimit3 != null and lowLimit2 != ''">a.low_limit3 = #{lowLimit3, jdbcType=REAL},</if>
-        <if test="highLimit4 != null and highLimit2 != ''">a.high_limit4 = #{highLimit4, jdbcType=REAL},</if>
-        <if test="lowLimit4 != null and lowLimit2 != ''">a.low_limit4 = #{lowLimit4, jdbcType=REAL},</if>
-        <if test="alarmDelay != null ">a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},</if>
-        <if test="alarmCnt != null ">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
-        <if test="thresholdAbs != null and thresholdAbs != ''">a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},</if>
-        <if test="thresholdPer != null and thresholdPer != ''">a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},</if>
-        <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
-    </set>
-            where a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}
+        update t_std_mete a
+        <set>
+            <if test="stdMeteId != null and stdMeteId != ''">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+            <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+            <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
+            <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+            <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+            <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
+            <if test="alarmExplain != null and alarmExplain != ''">a.alarm_explain =
+                #{alarmExplain, jdbcType=VARCHAR},
+            </if>
+            <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
+            <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
+            <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+            <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR},</if>
+            <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR},</if>
+            <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
+            <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
+            <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+            <if test="alarmLimit != null ">a.alarm_limit = #{alarmLimit, jdbcType=INTEGER},</if>
+            <if test="highLimit1 != null and highLimit1 != ''">a.high_limit1 = #{highLimit1, jdbcType=REAL},</if>
+            <if test="lowLimit1 != null and lowLimit1 != ''">a.low_limit1 = #{lowLimit1, jdbcType=REAL},</if>
+            <if test="highLimit2 != null and highLimit2 != ''">a.high_limit2 = #{highLimit2, jdbcType=REAL},</if>
+            <if test="lowLimit2 != null and lowLimit2 != ''">a.low_limit2 = #{lowLimit2, jdbcType=REAL},</if>
+            <if test="highLimit3 != null and highLimit2 != ''">a.high_limit3 = #{highLimit3, jdbcType=REAL},</if>
+            <if test="lowLimit3 != null and lowLimit2 != ''">a.low_limit3 = #{lowLimit3, jdbcType=REAL},</if>
+            <if test="highLimit4 != null and highLimit2 != ''">a.high_limit4 = #{highLimit4, jdbcType=REAL},</if>
+            <if test="lowLimit4 != null and lowLimit2 != ''">a.low_limit4 = #{lowLimit4, jdbcType=REAL},</if>
+            <if test="alarmDelay != null ">a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},</if>
+            <if test="alarmCnt != null ">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
+            <if test="thresholdAbs != null and thresholdAbs != ''">a.threshold_abs =
+                #{thresholdAbs, jdbcType=NUMERIC},
+            </if>
+            <if test="thresholdPer != null and thresholdPer != ''">a.threshold_per =
+                #{thresholdPer, jdbcType=NUMERIC},
+            </if>
+            <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
+            <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        </set>
+        where a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdMete">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.device.entity.TStdMete">
         select
         a.std_mete_id,
         a.device_type,
@@ -155,6 +172,8 @@
         a.alarm_type,
         a.analyse_type,
         a.unit,
+        a.state_zero,
+        a.state_one,
         a.up_effect,
         a.down_effect,
         a.alarm_level,
@@ -179,7 +198,8 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdMete" resultType="com.yjh.platform.module.device.entity.TStdMete">
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdMete"
+            resultType="com.yjh.platform.module.device.entity.TStdMete">
         select
         a.std_mete_id,
         a.device_type,
@@ -208,40 +228,50 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
-        a.remark
+        a.remark,
+        a.state_zero,
+        a.state_one
         from t_std_mete a
         where 1 = 1
-        <if test="stdMeteId != null and stdMeteId != ''"> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-        <if test="meteKind != null and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
-        <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
-        <if test="alarmNote != null and alarmNote != ''"> and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
-        <if test="alarmExplain != null and alarmExplain != ''"> and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}</if>
-        <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
-        <if test="analyseType != null "> and a.analyse_type = #{analyseType, jdbcType=INTEGER}</if>
-        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
-        <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
-        <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
-        <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
-        <if test="alarmLimit != null "> and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
-        <if test="highLimit1 != null and highLimit1 != ''"> and a.high_limit1 = #{highLimit1, jdbcType=REAL}</if>
-        <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
-        <if test="highLimit2 != null and highLimit2 != ''"> and a.high_limit2 = #{highLimit2, jdbcType=REAL}</if>
-        <if test="lowLimit2 != null and lowLimit2 != ''"> and a.low_limit2 = #{lowLimit2, jdbcType=REAL}</if>
-        <if test="highLimit3 != null and highLimit3 != ''"> and a.high_limit3 = #{highLimit3, jdbcType=REAL}</if>
-        <if test="lowLimit3 != null and lowLimit3 != ''"> and a.low_limit3 = #{lowLimit3, jdbcType=REAL}</if>
-        <if test="highLimit4 != null and highLimit4 != ''"> and a.high_limit4 = #{highLimit4, jdbcType=REAL}</if>
-        <if test="lowLimit4 != null and lowLimit4 != ''"> and a.low_limit4 = #{lowLimit4, jdbcType=REAL}</if>
-        <if test="alarmDelay != null "> and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
-        <if test="alarmCnt != null "> and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
-        <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
-        <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
-        <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
-        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="stdMeteId != null and stdMeteId != ''">and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="deviceType != null ">and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="meteType != null and meteType != ''">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meteKind != null and meteKind != ''">and a.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
+        <if test="meteName != null and meteName != ''">and a.mete_name LIKE
+            CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')
+        </if>
+        <if test="alarmNote != null and alarmNote != ''">and a.alarm_note = #{alarmNote, jdbcType=VARCHAR}</if>
+        <if test="alarmExplain != null and alarmExplain != ''">and a.alarm_explain = #{alarmExplain, jdbcType=VARCHAR}
+        </if>
+        <if test="alarmType != null and alarmType != ''">and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
+        <if test="analyseType != null ">and a.analyse_type = #{analyseType, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''">and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="upEffect != null and upEffect != ''">and a.up_effect = #{upEffect, jdbcType=REAL}</if>
+        <if test="downEffect != null and downEffect != ''">and a.down_effect = #{downEffect, jdbcType=REAL}</if>
+        <if test="alarmLevel != null ">and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        <if test="alarmLimit != null ">and a.alarm_limit = #{alarmLimit, jdbcType=INTEGER}</if>
+        <if test="highLimit1 != null and highLimit1 != ''">and a.high_limit1 = #{highLimit1, jdbcType=REAL}</if>
+        <if test="lowLimit1 != null and lowLimit1 != ''">and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
+        <if test="highLimit2 != null and highLimit2 != ''">and a.high_limit2 = #{highLimit2, jdbcType=REAL}</if>
+        <if test="lowLimit2 != null and lowLimit2 != ''">and a.low_limit2 = #{lowLimit2, jdbcType=REAL}</if>
+        <if test="highLimit3 != null and highLimit3 != ''">and a.high_limit3 = #{highLimit3, jdbcType=REAL}</if>
+        <if test="lowLimit3 != null and lowLimit3 != ''">and a.low_limit3 = #{lowLimit3, jdbcType=REAL}</if>
+        <if test="highLimit4 != null and highLimit4 != ''">and a.high_limit4 = #{highLimit4, jdbcType=REAL}</if>
+        <if test="lowLimit4 != null and lowLimit4 != ''">and a.low_limit4 = #{lowLimit4, jdbcType=REAL}</if>
+        <if test="alarmDelay != null ">and a.alarm_delay = #{alarmDelay, jdbcType=INTEGER}</if>
+        <if test="alarmCnt != null ">and a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER}</if>
+        <if test="thresholdAbs != null and thresholdAbs != ''">and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}
+        </if>
+        <if test="thresholdPer != null and thresholdPer != ''">and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}
+        </if>
+        <if test="modulus != null ">and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="stateZero != null and stateZero != ''">and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
+        <if test="stateOne != null and stateOne != ''">and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMete" resultType="com.yjh.platform.module.device.entity.TStdMeteDetail">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMete"
+            resultType="com.yjh.platform.module.device.entity.TStdMeteDetail">
         select
         a.std_mete_id,
         a.device_type,
@@ -276,87 +306,97 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
-        a.remark
+        a.remark,
+        a.state_zero,
+        a.state_one
         from t_std_mete a
         left join t_dict_business b on a.device_type = b.dict_code and b.col_name = "device_type"
         left join t_dict_business c on a.mete_type = c.dict_code and c.col_name = "mete_type"
         left join t_dict_business d on a.mete_kind = d.dict_code and d.col_name = "mete_kind"
         left join t_dict_business e on a.alarm_type = e.dict_code and e.col_name = "alarm_type"
         left join t_dict_business f on a.alarm_level = f.dict_code and f.col_name = "alarm_level"
-        left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name = "defect_type")
+        left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name =
+        "defect_type")
         where 1 = 1
 
-        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="meteName != null and meteName != ''"> and a.mete_name LIKE CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')</if>
-         order by a.device_type,a.mete_kind ,a.mete_type desc
+        <if test="deviceType != null ">and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="meteName != null and meteName != ''">and a.mete_name LIKE
+            CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')
+        </if>
+        order by a.device_type,a.mete_kind ,a.mete_type desc
     </select>
 
     <insert id="batchAdd">
         insert into t_std_mete(
-            std_mete_id,
-            device_type,
-            mete_type,
-            mete_kind,
-            mete_name,
-            alarm_note,
-            alarm_explain,
-            alarm_type,
+        std_mete_id,
+        device_type,
+        mete_type,
+        mete_kind,
+        mete_name,
+        alarm_note,
+        alarm_explain,
+        alarm_type,
         analyse_type,
-            unit,
-            up_effect,
-            down_effect,
-            alarm_level,
-            alarm_limit,
-            high_limit1,
-            low_limit1,
-            high_limit2,
-            low_limit2,
-            high_limit3,
-            low_limit3,
-            high_limit4,
-            low_limit4,
-            alarm_delay,
-            alarm_cnt,
-            threshold_abs,
-            threshold_per,
-            modulus,
-            remark
+        unit,
+        up_effect,
+        down_effect,
+        alarm_level,
+        alarm_limit,
+        high_limit1,
+        low_limit1,
+        high_limit2,
+        low_limit2,
+        high_limit3,
+        low_limit3,
+        high_limit4,
+        low_limit4,
+        alarm_delay,
+        alarm_cnt,
+        threshold_abs,
+        threshold_per,
+        modulus,
+        remark,
+        state_zero,
+        state_one
         )values
         <foreach collection="list" item="TStdMete" separator=",">
             (
-                #{TStdMete.stdMeteId, jdbcType=BIGINT},
-                #{TStdMete.deviceType, jdbcType=INTEGER},
-                #{TStdMete.meteType, jdbcType=VARCHAR},
-                #{TStdMete.meteKind, jdbcType=INTEGER},
-                #{TStdMete.meteName, jdbcType=VARCHAR},
-                #{TStdMete.alarmNote, jdbcType=VARCHAR},
-                #{TStdMete.alarmExplain, jdbcType=VARCHAR},
-                #{TStdMete.alarmType, jdbcType=VARCHAR},
+            #{TStdMete.stdMeteId, jdbcType=BIGINT},
+            #{TStdMete.deviceType, jdbcType=INTEGER},
+            #{TStdMete.meteType, jdbcType=VARCHAR},
+            #{TStdMete.meteKind, jdbcType=INTEGER},
+            #{TStdMete.meteName, jdbcType=VARCHAR},
+            #{TStdMete.alarmNote, jdbcType=VARCHAR},
+            #{TStdMete.alarmExplain, jdbcType=VARCHAR},
+            #{TStdMete.alarmType, jdbcType=VARCHAR},
             #{TStdMete.analyseType, jdbcType=INTEGER},
-                #{TStdMete.unit, jdbcType=VARCHAR},
-                #{TStdMete.upEffect, jdbcType=REAL},
-                #{TStdMete.downEffect, jdbcType=REAL},
-                #{TStdMete.alarmLevel, jdbcType=INTEGER},
-                #{TStdMete.alarmLimit, jdbcType=INTEGER},
-                #{TStdMete.highLimit1, jdbcType=REAL},
-                #{TStdMete.lowLimit1, jdbcType=REAL},
-                #{TStdMete.highLimit2, jdbcType=REAL},
-                #{TStdMete.lowLimit2, jdbcType=REAL},
-                #{TStdMete.highLimit3, jdbcType=REAL},
-                #{TStdMete.lowLimit3, jdbcType=REAL},
-                #{TStdMete.highLimit4, jdbcType=REAL},
-                #{TStdMete.lowLimit4, jdbcType=REAL},
-                #{TStdMete.alarmDelay, jdbcType=INTEGER},
-                #{TStdMete.alarmCnt, jdbcType=INTEGER},
-                #{TStdMete.thresholdAbs, jdbcType=NUMERIC},
-                #{TStdMete.thresholdPer, jdbcType=NUMERIC},
-                #{TStdMete.modulus, jdbcType=INTEGER},
-                #{TStdMete.remark, jdbcType=VARCHAR}
+            #{TStdMete.unit, jdbcType=VARCHAR},
+            #{TStdMete.upEffect, jdbcType=REAL},
+            #{TStdMete.downEffect, jdbcType=REAL},
+            #{TStdMete.alarmLevel, jdbcType=INTEGER},
+            #{TStdMete.alarmLimit, jdbcType=INTEGER},
+            #{TStdMete.highLimit1, jdbcType=REAL},
+            #{TStdMete.lowLimit1, jdbcType=REAL},
+            #{TStdMete.highLimit2, jdbcType=REAL},
+            #{TStdMete.lowLimit2, jdbcType=REAL},
+            #{TStdMete.highLimit3, jdbcType=REAL},
+            #{TStdMete.lowLimit3, jdbcType=REAL},
+            #{TStdMete.highLimit4, jdbcType=REAL},
+            #{TStdMete.lowLimit4, jdbcType=REAL},
+            #{TStdMete.alarmDelay, jdbcType=INTEGER},
+            #{TStdMete.alarmCnt, jdbcType=INTEGER},
+            #{TStdMete.thresholdAbs, jdbcType=NUMERIC},
+            #{TStdMete.thresholdPer, jdbcType=NUMERIC},
+            #{TStdMete.modulus, jdbcType=INTEGER},
+            #{TStdMete.remark, jdbcType=VARCHAR}
+            #{TStdMete.stateZero, jdbcType=VARCHAR}
+            #{TStdMete.stateOne, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
 
-    <select id="selectByDeviceType" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.device.entity.MeteInfo">
+    <select id="selectByDeviceType" parameterType="java.lang.Integer"
+            resultType="com.yjh.platform.module.device.entity.MeteInfo">
        SELECT std_mete_id as meteId,mete_name as meteName FROM t_std_mete
         WHERE device_type=#{deviceType,jdbcType=INTEGER}
     </select>
@@ -367,13 +407,13 @@
         where  col_name = #{colName,jdbcType = VARCHAR}
     </select>
 
-    <delete id="batchDelete" >
+    <delete id="batchDelete">
         DELETE
         FROM
         t_std_mete
         WHERE
         std_mete_id in
-        <foreach collection="list" item="stdMeteId"  separator="," open="(" close=")" >
+        <foreach collection="list" item="stdMeteId" separator="," open="(" close=")">
             #{stdMeteId,jdbcType=BIGINT}
         </foreach>
     </delete>

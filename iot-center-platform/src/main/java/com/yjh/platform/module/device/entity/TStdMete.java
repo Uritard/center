@@ -1,9 +1,12 @@
 package com.yjh.platform.module.device.entity;
 
 import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
@@ -64,29 +67,29 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "告警门限")
     private Integer alarmLimit;
 
-   @ApiModelProperty(value = "告警上限1")
+    @ApiModelProperty(value = "告警上限1")
     private Float highLimit1;
 
-   @ApiModelProperty(value = "告警下限1")
-    private  Float lowLimit1;
+    @ApiModelProperty(value = "告警下限1")
+    private Float lowLimit1;
 
     @ApiModelProperty(value = "告警上限2")
     private Float highLimit2;
 
     @ApiModelProperty(value = "告警下限2")
-    private  Float lowLimit2;
+    private Float lowLimit2;
 
     @ApiModelProperty(value = "告警上限3")
     private Float highLimit3;
 
     @ApiModelProperty(value = "告警下限3")
-    private  Float lowLimit3;
+    private Float lowLimit3;
 
     @ApiModelProperty(value = "告警上限4")
     private Float highLimit4;
 
     @ApiModelProperty(value = "告警下限4")
-    private  Float lowLimit4;
+    private Float lowLimit4;
 
     @ApiModelProperty(value = "告警延时")
     private Integer alarmDelay;
@@ -110,5 +113,7 @@ public class TStdMete implements Serializable {
 
     private String analyseTypeName;
 
+    private String stateZero;
 
+    private String stateOne;
 }

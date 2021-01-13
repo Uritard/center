@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -105,35 +106,38 @@ public class TStdMeteController {
     @ApiOperation(value = "查询，名称模糊查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "stdMeteId", required = false) Long stdMeteId,
-                            @RequestParam(value = "deviceType", required = false) Integer deviceType,
-                            @RequestParam(value = "meteType", required = false) String meteType,
-                            @RequestParam(value = "meteName", required = false) String meteName,
-                            @RequestParam(value = "alarmNote", required = false) String alarmNote,
-                            @RequestParam(value = "alarmExplain", required = false) String alarmExplain,
-                            @RequestParam(value = "alarmType", required = false) String alarmType,
+                         @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                         @RequestParam(value = "meteType", required = false) String meteType,
+                         @RequestParam(value = "meteName", required = false) String meteName,
+                         @RequestParam(value = "alarmNote", required = false) String alarmNote,
+                         @RequestParam(value = "alarmExplain", required = false) String alarmExplain,
+                         @RequestParam(value = "alarmType", required = false) String alarmType,
                          @RequestParam(value = "analyseType", required = false) Integer analyseType,
-                            @RequestParam(value = "unit", required = false) String unit,
-                            @RequestParam(value = "upEffect", required = false) Float upEffect,
-                            @RequestParam(value = "lowEffect", required = false) Float lowEffect,
-                            @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
-                            @RequestParam(value = "alarmLimit", required = false) Integer alarmLimit,
-                            @RequestParam(value = "highLimit1", required = false) Float highLimit1,
-                            @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
-                            @RequestParam(value = "highLimit2", required = false) Float highLimit2,
-                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit2,
-                            @RequestParam(value = "highLimit2", required = false) Float highLimit3,
-                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit3,
-                            @RequestParam(value = "highLimit2", required = false) Float highLimit4,
-                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit4,
-                            @RequestParam(value = "alarmDelay", required = false) Integer alarmDelay,
-                            @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
-                            @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
-                            @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
-                            @RequestParam(value = "modulus", required = false) Integer modulus,
-                            @RequestParam(value = "remark", required = false) String remark) {
+                         @RequestParam(value = "unit", required = false) String unit,
+                         @RequestParam(value = "upEffect", required = false) Float upEffect,
+                         @RequestParam(value = "lowEffect", required = false) Float lowEffect,
+                         @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
+                         @RequestParam(value = "alarmLimit", required = false) Integer alarmLimit,
+                         @RequestParam(value = "highLimit1", required = false) Float highLimit1,
+                         @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
+                         @RequestParam(value = "highLimit2", required = false) Float highLimit2,
+                         @RequestParam(value = "lowLimit2", required = false) Float lowLimit2,
+                         @RequestParam(value = "highLimit2", required = false) Float highLimit3,
+                         @RequestParam(value = "lowLimit2", required = false) Float lowLimit3,
+                         @RequestParam(value = "highLimit2", required = false) Float highLimit4,
+                         @RequestParam(value = "lowLimit2", required = false) Float lowLimit4,
+                         @RequestParam(value = "alarmDelay", required = false) Integer alarmDelay,
+                         @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
+                         @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
+                         @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
+                         @RequestParam(value = "modulus", required = false) Integer modulus,
+                         @RequestParam(value = "remark", required = false) String remark,
+                         @RequestParam(value = "stateZero", required = false) String stateZero,
+                         @RequestParam(value = "stateOne", required = false) String stateOne,
+                         @RequestParam(value = "meteKind", required = false) Integer meteKind) {
         Result result = new Result();
         try {
-            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, analyseType, unit, upEffect, lowEffect, alarmLevel, alarmLimit,highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark);
+            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, analyseType, unit, upEffect, lowEffect, alarmLevel, alarmLimit, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark, stateZero, stateOne,meteKind);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -146,16 +150,16 @@ public class TStdMeteController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
                                @RequestParam(value = "meteName", required = false) String meteName,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            if(deviceType != null && deviceType == -1){
+            if (deviceType != null && deviceType == -1) {
                 deviceType = null;
             }
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TStdMeteDetail> list = tStdMeteService.selectByPage(deviceType,meteName);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<TStdMeteDetail> list = tStdMeteService.selectByPage(deviceType, meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -171,22 +175,22 @@ public class TStdMeteController {
     public Result batchAdd(@RequestBody List<TStdMete> list) {
         Result result = new Result();
         try {
-        result.setData(tStdMeteService.batchAdd(list));
+            result.setData(tStdMeteService.batchAdd(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("系统测点批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("系统测点批量插入失败：" + e);
         }
         return result;
     }
 
     @ApiOperation(value = "根据设备类型查询mete")
-    @RequestMapping(value = "/selectByDeviceType",method = RequestMethod.GET)
-    public Result selectByDeviceType(@RequestParam (value = "deviceType",required = true) Integer deviceType){
-        Result result =new Result();
-        try{
-            List<MeteInfo> mete=tStdMeteService.selectByDeviceType(deviceType);
+    @RequestMapping(value = "/selectByDeviceType", method = RequestMethod.GET)
+    public Result selectByDeviceType(@RequestParam(value = "deviceType", required = true) Integer deviceType) {
+        Result result = new Result();
+        try {
+            List<MeteInfo> mete = tStdMeteService.selectByDeviceType(deviceType);
             result.setData(mete);
-        }catch (Exception e) {
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("系统测点失败描述：", e);
         }
@@ -196,12 +200,12 @@ public class TStdMeteController {
 
 
     @ApiOperation(value = "设备类型树")
-    @RequestMapping(value = "/deviceTypeTree",method = RequestMethod.GET)
-    public Result deviceTypeTree(){
-        Result result =new Result();
-        try{
+    @RequestMapping(value = "/deviceTypeTree", method = RequestMethod.GET)
+    public Result deviceTypeTree() {
+        Result result = new Result();
+        try {
             result.setData(tStdMeteService.deviceTypeTree());
-        }catch (Exception e) {
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("设备类型树失败描述：", e);
         }
@@ -210,12 +214,12 @@ public class TStdMeteController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
-    public Result batchDelete(@RequestParam(value="stdMeteIds")String stdMeteIds){
-        Result result=new Result();
-        try{
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    public Result batchDelete(@RequestParam(value = "stdMeteIds") String stdMeteIds) {
+        Result result = new Result();
+        try {
             result.setData(tStdMeteService.batchDelete(stdMeteIds));
-        }catch (BusinessException e) {
+        } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除设备异常:", e);
         } catch (Exception e) {
