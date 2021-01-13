@@ -171,4 +171,12 @@
          delete from t_device_maintenance
                 where device_id = #{deviceDd, jdbcType=BIGINT}
     </delete>
+    <select id="selectUpRegionIdList" resultType="java.lang.Long">
+        select DISTINCT
+        b.up_region_id
+        from t_device_maintenance a
+		left join t_std_device b on a.device_id = b.device_id
+        where 1 = 1
+            and a.maintenance_id =#{maintenanceId, jdbcType=BIGINT}
+    </select>
 </mapper>

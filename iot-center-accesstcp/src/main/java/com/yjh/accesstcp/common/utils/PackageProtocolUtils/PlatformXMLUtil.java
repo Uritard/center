@@ -77,15 +77,21 @@ public class PlatformXMLUtil {
     public static String generateXml(XMLBaseModel xmlBaseModel){
         Document document = DocumentHelper.createDocument();
         //todo 记得改
-        Element rss = document.addElement("Robot");//根节点
+        Element rss = document.addElement("PatrolHost");//根节点
         Element childNode1 = rss.addElement("SendCode");//生成子节点（必有）
         childNode1.setText(xmlBaseModel.getSendCode());//子节点内容
 
         Element childNode2 = rss.addElement("ReceiveCode");//必有
-        childNode2.setText(xmlBaseModel.getReceiveCode());
+        if (StringUtils.isNotEmpty(xmlBaseModel.getReceiveCode())){
+            childNode2.setText(xmlBaseModel.getReceiveCode());
+        }
+
 
         Element childNode3 = rss.addElement("Type");//必有
-        childNode3.setText(xmlBaseModel.getType());
+        if (StringUtils.isNotEmpty(xmlBaseModel.getType())){
+            childNode3.setText(xmlBaseModel.getType());
+        }
+
 
         Element childNode4 = rss.addElement("Code");//非必有
         if (StringUtils.isNotEmpty(xmlBaseModel.getCode())){ childNode4.setText(xmlBaseModel.getCode()); }
@@ -104,7 +110,10 @@ public class PlatformXMLUtil {
             }
         }
         Element childNode7 = rss.addElement("Command");//必有
-        childNode7.setText(xmlBaseModel.getCommand());
+        if (StringUtils.isNotEmpty(xmlBaseModel.getCommand())){
+            childNode7.setText(xmlBaseModel.getCommand());
+        }
+
         String xmlString = document.asXML();
 
         return xmlString;

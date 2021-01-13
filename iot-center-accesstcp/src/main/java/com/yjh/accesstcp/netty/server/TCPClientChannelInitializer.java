@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.netty.server;
 
+import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -15,9 +16,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class TCPClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private RedisTemplate redisTemplate;
+    private SendToUpSystemServices sendToUpSystemServices;
 
-    public TCPClientChannelInitializer(RedisTemplate redisTemplate) {
+    public TCPClientChannelInitializer(RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices) {
         this.redisTemplate =redisTemplate;
+        this.sendToUpSystemServices = sendToUpSystemServices;
     }
 
     @Override
@@ -25,7 +28,7 @@ public class TCPClientChannelInitializer extends ChannelInitializer<SocketChanne
         ChannelPipeline p = socketChannel.pipeline();
         //p.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
         //p.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        p.addLast(new TCPClientHandler(redisTemplate));
+        p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices));
     }
 
     @Override

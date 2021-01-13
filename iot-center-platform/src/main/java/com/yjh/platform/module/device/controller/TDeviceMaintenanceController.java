@@ -199,5 +199,17 @@ public class TDeviceMaintenanceController {
         return result;
     }
 
-
+    @ApiOperation(value = "查询数据")
+    @RequestMapping(value = "/selectDeviceDetail", method = RequestMethod.GET)
+    public Result selectDeviceDetail(@RequestParam(value = "maintenanceId", required = true)Long maintenanceId) {
+        Result result = new Result();
+        try {
+            Map<String,Object> list = tDeviceMaintenanceService.selectDeviceDetail(maintenanceId);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

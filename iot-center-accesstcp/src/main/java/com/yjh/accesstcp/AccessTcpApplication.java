@@ -1,5 +1,6 @@
 package com.yjh.accesstcp;
 
+import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.NettyClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,8 @@ public class AccessTcpApplication implements CommandLineRunner {
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private SendToUpSystemServices sendToUpSystemServices;
 
     private NettyClient nettyClient = new NettyClient();
 
@@ -53,7 +56,7 @@ public class AccessTcpApplication implements CommandLineRunner {
         loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(serverUrl, port);
         log.info("accesstcp is running, url is : " + url);
-        nettyClient.start(address,redisTemplate);
+        nettyClient.start(address,redisTemplate, sendToUpSystemServices);
     }
     public void loadDeviceInfo()throws IOException{
 

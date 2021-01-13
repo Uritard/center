@@ -48,5 +48,5 @@ public interface TCfgMeteDao {
     int insertIntoTHisSignalData(THisSignalData tHisSignalData);
     int insertIntoTHisTelemeterData(THisTelemeterData tHisTelemeterData);
 
-    TSysParam selectByParamType(@Param(value = "paramType") String paramType);
+    TSysParam selectByParamType(@Param(value = "paramCode") String paramCode);
 }

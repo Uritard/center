@@ -4,12 +4,11 @@ import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenance;
 import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
-import java.util.Arrays;
+import java.awt.image.ImageProducer;
+import java.util.*;
 
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
+import org.apache.bcel.generic.ANEWARRAY;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -164,10 +163,22 @@ public class TDeviceMaintenanceService{
                 continue;
             }
             List<IdAndNameDetail> list = this.tDeviceMaintenanceDao.selectIdAndName(item.getMaintenanceId());
+            item.setUpRegionList(this.tDeviceMaintenanceDao.selectUpRegionIdList(item.getMaintenanceId()));
             item.setDeviceInfo(list);
             re.add(item);
             //&& endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0)
         }
+        return re;
+    }
+
+    @Logs(title = "查询区域下的设备", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectDeviceDetail(Long maintenanceId){
+        Map<String,Object> re = new HashMap<>();
+        List<IdAndNameDetail> list1 = this.tDeviceMaintenanceDao.selectIdAndName(maintenanceId);
+        re.put("deviceInfo",list1);
+        List<Long> list2 = this.tDeviceMaintenanceDao.selectUpRegionIdList(maintenanceId);
+        re.put("upRegionIdList",list2);
         return re;
     }
 

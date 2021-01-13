@@ -17,4 +17,5 @@ import java.util.List;
 @ApiModel(value = "TDeviceMaintenance对象", description = "设备区域检修表扩展")
 public class TDeviceMaintenanceDetail extends TDeviceMaintenance{
     private List<IdAndNameDetail> deviceInfo;
+    private List<Long> upRegionList;
 }

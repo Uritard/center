@@ -4,7 +4,9 @@ import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
+import com.yjh.accesstcp.thread.WeatherThread;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,20 +25,26 @@ public class DataDealThread implements Runnable {
     private byte[] data;
     private TCPClientHandler tcpClientHandler;
     private RedisTemplate redisTemplate;
+    private SendToUpSystemServices sendToUpSystemServices;
 
-    public DataDealThread(byte[] data,TCPClientHandler tcpClientHandler,RedisTemplate redisTemplate) {
+    public DataDealThread(byte[] data, TCPClientHandler tcpClientHandler, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices) {
         this.data =data;
         this.redisTemplate = redisTemplate;
         this.tcpClientHandler = tcpClientHandler;
+        this.sendToUpSystemServices = sendToUpSystemServices;
     }
 
     @Override
     public void run() {
-        StringBuilder dataString = new StringBuilder();
+        try{
+        StringBuilder dataByte = new StringBuilder();
         for (byte byteitem : data) {
-            dataString.append(String.format("%02x ", byteitem));
+            dataByte.append(String.format("%02x ", byteitem));
         }
-        System.out.println("我在处理数据了"+dataString);
+        log.info("我在处理数据-字节"+dataByte);
+
+        String dataString = new String(data, "UTF-8");
+        log.info("我在处理数据-字符串"+dataString);
         //处理毡包问题
         String zzbds ="^.*<?xml.*";
         if (!Packet.matches(zzbds)){
@@ -46,11 +54,10 @@ public class DataDealThread implements Runnable {
         String temporaryBody = Packet + dataString ;//临时
         String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
         String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
-        try{
-            handlingMethod(data,finalBody);
-        }catch (Exception e){}
-
-
+        handlingMethod(data,finalBody);
+        }catch (Exception e){
+            log.info("解析报文出错："+e);
+        }
     }
     //拆包 解决毡包
     private void handlingMethod(byte[] bytes,String parameter)throws Exception {
@@ -61,10 +68,9 @@ public class DataDealThread implements Runnable {
             hua = parameter;
         } else {
             String bian = parameter.replace("<?xml version='1.0' encoding='UTF-8'?>", "开始<?xml version='1.0' encoding='UTF-8'?>");
-            //todo 记得改
-            hua = bian.replace("</Robot>", "</Robot>结束");
+            hua = bian.replace("</PatrolHost>", "</PatrolHost>结束");
         }
-        Pattern pattern1 = Pattern.compile("(\\<\\?xml version='1.0' encoding='UTF-8'?[^>])([\\s\\S]*?)(</Robot>)");
+        Pattern pattern1 = Pattern.compile("(\\<\\?xml version='1.0' encoding='UTF-8'?[^>])([\\s\\S]*?)(</PatrolHost>)");
         Matcher matcher1 = pattern1.matcher(hua);
         String wanZheng = null;
         String shengYu = null;
@@ -75,6 +81,7 @@ public class DataDealThread implements Runnable {
             shengYu = parameter.replace(wanZheng, "");
             handlingMethod(bytes, shengYu);
         } else {
+            log.info("不完整啊，小老弟");
             Packet = parameter;
 //                log.info("不足一个完整的包：" + Packet);
         }
@@ -103,10 +110,11 @@ public class DataDealThread implements Runnable {
         //解析的xml文件
         if ("251".equals(xmlBaseModel.getType())) {
             if ("4".equals(xmlBaseModel.getCommand())) {//响应注册
-                if ("100".equals(xmlBaseModel.getCommand())) {
+                log.info("---注册响应---");
+                if ("100".equals(xmlBaseModel.getCode())) {
                     //需要重发注册消息
                     tcpClientHandler.sendRegister();
-                } else if ("200".equals(xmlBaseModel.getCommand())) {
+                } else if ("200".equals(xmlBaseModel.getCode())) {
                     //服务端响应 我方开启心跳
 
                     List<Map<String, Object>> items = xmlBaseModel.getItems();
@@ -114,18 +122,27 @@ public class DataDealThread implements Runnable {
                         return;
                     }
                     for (Map<String, Object> item : items) {
-
+                        if(item.get("heart_beat_interval") != null){
+                            Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());//心跳间隔
+                        }
+                        if(item.get("patroldevice_run_interval") != null){
+                            Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
+                        }
+                        if(item.get("weather_interval") != null){
+                            Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                        }
                     }
-                    Constant.paramMap.put("heart_beat_interval", "");//心跳间隔
-                    Constant.paramMap.put("patroldevice_run_interval", "");//巡视设备运行数据间隔间隔
-                    Constant.paramMap.put("weather_interval", "");//微气象数据间隔
                     //将数据放入redis 做个保存
                     redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
                     //todo 记得做 启动响应线程处理响应业务
 
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(tcpClientHandler, true);
+                    //天气线程发天气
+                    WeatherThread weatherThread = new WeatherThread(tcpClientHandler,redisTemplate,true,sendToUpSystemServices);
+
                     TaskExecutePool.getInstance().execute(heartBeatThead);
+                    TaskExecutePool.getInstance().execute(weatherThread);
 
                 } else {
                     return;
@@ -134,7 +151,26 @@ public class DataDealThread implements Runnable {
             }
 
             if ("3".equals(xmlBaseModel.getCommand())) {//响应心跳
+                log.info("--心跳响应--");
+                List<Map<String, Object>> items = xmlBaseModel.getItems();
+                if (items == null || items.size() == 0) {
+                    return;
+                }
+                for (Map<String, Object> item : items) {
+                    if(item.get("heart_beat_interval") != null){
+                        Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());//心跳间隔
+                    }
+                    if(item.get("patroldevice_run_interval") != null){
+                        Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
+                    }
+                    if(item.get("weather_interval") != null){
+                        Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                    }
+                }
+                //将数据放入redis 做个保存
+                redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
             }
         }
+
     }
 }

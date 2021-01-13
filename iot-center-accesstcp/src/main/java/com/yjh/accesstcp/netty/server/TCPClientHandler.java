@@ -7,6 +7,7 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -40,8 +41,11 @@ import java.util.concurrent.TimeUnit;
 public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     private RedisTemplate redisTemplate;
-    public TCPClientHandler(RedisTemplate redisTemplate) {
+    private SendToUpSystemServices sendToUpSystemServices;
+
+    public TCPClientHandler(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices) {
         this.redisTemplate = redisTemplate;
+        this.sendToUpSystemServices = sendToUpSystemServices;
 
     }
     private boolean isThreadStart = true;
@@ -129,7 +133,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         byteBuf.readBytes(bytes);
         try {
             //处理接收到的数据
-            DataDealThread dataDealThread=new DataDealThread(bytes,this,redisTemplate);
+            DataDealThread dataDealThread=new DataDealThread(bytes,this,redisTemplate, sendToUpSystemServices);
             TaskExecutePool.getInstance().execute(dataDealThread);
 
         } catch (Exception e) {
