@@ -30,8 +30,9 @@ public interface TDeviceMaintenanceDao {
 
     int batchAdd(List<TDeviceMaintenance> list);
     int batchDelete(List<String> list);
-    List<IdAndNameDetail> selectDevice(@Param(value = "upRegionId") Long upRegionId);
-    List<IdAndNameDetail> selectInstance(@Param(value = "deviceId") Long deviceId);
+    List<IdAndNameDetail> selectDevice(@Param(value = "list") List<Long> list,
+                                       @Param(value = "deviceName") String deviceName);
+    List<IdAndNameDetail> selectInstance(@Param(value = "list") List<Long> list);
     List<IdAndNameDetail> selectIdAndName(@Param(value = "maintenanceId") Long maintenanceId);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
 

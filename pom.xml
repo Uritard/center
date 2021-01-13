@@ -12,6 +12,7 @@
         <module>iot-center-accessrobot</module>
         <module>iot-center-accessvideo</module>
         <module>iot-center-accessudp</module>
+        <module>iot-center-accesstcp</module>
         <module>iot-center-accessatmosphere</module>
         <module>iot-center-device</module>
         <module>iot-center-platform</module>

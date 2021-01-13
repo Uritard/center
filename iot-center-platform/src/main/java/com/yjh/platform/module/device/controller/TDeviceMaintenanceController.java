@@ -173,10 +173,11 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询区域下的设备")
     @RequestMapping(value = "/selectDevice", method = RequestMethod.GET)
-    public Result selectDevice(@RequestParam(value = "upRegionId", required = true) Long upRegionId) {
+    public Result selectDevice(@RequestParam(value = "upRegionIds", required = true) List<Long> upRegionIds,
+                               @RequestParam(value = "deviceName", required = true) String deviceName) {
         Result result = new Result();
         try {
-            List<IdAndNameDetail> list = tDeviceMaintenanceService.selectDevice(upRegionId);
+            List<IdAndNameDetail> list = tDeviceMaintenanceService.selectDevice(upRegionIds,deviceName);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
@@ -187,10 +188,10 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询设备下的巡视点")
     @RequestMapping(value = "/selectInstance", method = RequestMethod.GET)
-    public Result selectInstance(@RequestParam(value = "deviceId", required = true) Long deviceId) {
+    public Result selectInstance(@RequestParam(value = "deviceIds", required = true) List<Long> deviceIds) {
         Result result = new Result();
         try {
-            List<IdAndNameDetail> list = tDeviceMaintenanceService.selectInstance(deviceId);
+            List<IdAndNameDetail> list = tDeviceMaintenanceService.selectInstance(deviceIds);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
