@@ -37,6 +37,7 @@ import redis.clients.jedis.ScanResult;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @RestController
@@ -76,6 +77,41 @@ public class HelloController {
 //        //List<Long> list = tCruiseTaskDao.selectTimeIsIn(new Date());
 //        tCruisePointInstanceDao.selectForTask(list);
 //        result.setData(list);
+        return result;
+    }
+
+    @ApiOperation(value = "webSocketBroadcast测试")
+    @RequestMapping(value = "/webSocketBroadcast", method = RequestMethod.POST)
+    public Result webSocketBroadcast() {
+        Result result = new Result();
+        try {
+            Map<String, Object> jasonMaps2 = new HashMap<>();
+            jasonMaps2.put("type", "linkagePopUp");
+            jasonMaps2.put("unionId", 1111);
+            String json = JSON.toJSONString(jasonMaps2);
+            log.info("发送给前端的消息：" + json);
+            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
+            for (String userId :webSocketMap.keySet()) {
+                webSocketMap.get(userId).sendMessage(json);
+            }
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("webSocketBroadcast测试失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "webSocketgetUserId测试")
+    @RequestMapping(value = "/webSocketgetUserId", method = RequestMethod.POST)
+    public Result webSocketgetUserId() {
+        Result result = new Result();
+        try {
+            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
+            log.info("webSocketMap：" + webSocketMap);
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("webSocketgetUserId测试失败：" + e);
+        }
         return result;
     }
 

@@ -29,10 +29,17 @@ public class WebSocketServer {
     private static int onlineCount = 0;
     /**concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。*/
     private static ConcurrentHashMap<String,WebSocketServer> webSocketMap = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, WebSocketServer> getWebSocketMap() { return webSocketMap; }
     /**与某个客户端的连接会话，需要通过它来给客户端发送数据*/
     private Session session;
     /**接收userId*/
     private String userId="";
+
+    //初始化类
+    private final static WebSocketServer webSocketServer = new WebSocketServer();
+    public static WebSocketServer getInstance() {
+        return webSocketServer;
+    }
 
     /**
      * 连接建立成功调用的方法*/
@@ -119,7 +126,7 @@ public class WebSocketServer {
      * 实现服务器主动推送
      */
     public void sendMessage(String message) throws IOException {
-        System.out.println("发送消息到:"+userId+"，报文:"+message);
+        log.info("发送消息到:"+userId+"，报文:"+message);
         this.session.getBasicRemote().sendText(message);
     }
 
