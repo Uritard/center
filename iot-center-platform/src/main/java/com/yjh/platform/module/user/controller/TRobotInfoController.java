@@ -7,6 +7,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import java.util.*;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -46,7 +47,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(HttpServletRequest request, @RequestBody TRobotInfo tRobotInfo) {
+    public Result insert(HttpServletRequest request, @RequestBody @Validated  TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
