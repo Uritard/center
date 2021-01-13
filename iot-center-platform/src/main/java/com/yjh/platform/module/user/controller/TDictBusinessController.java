@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -45,7 +46,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TDictBusiness tDictBusiness) {
+    public Result insert(@RequestBody @Validated TDictBusiness tDictBusiness) {
         Result result = new Result();
         try {
             result.setData(tDictBusinessService.insert(tDictBusiness));

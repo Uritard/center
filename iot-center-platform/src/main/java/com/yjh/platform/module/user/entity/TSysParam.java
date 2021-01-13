@@ -8,6 +8,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author tt
@@ -21,24 +25,31 @@ public class TSysParam implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @NotNull(message = "paramId不为空")
+    @Max(value=999999999)
     @ApiModelProperty(value = "参数ID")
     @TableId(value = "param_id", type = IdType.AUTO)
     private Integer paramId;
 
+    @Length(max = 11,message = "paramCode长度必须小于等于11")
     @ApiModelProperty(value = "参数编码")
     private String paramCode;
 
+    @Length(max = 50,message = "paramType长度必须小于等于50")
     @ApiModelProperty(value = "参数类型")
     private String paramType;
 
     private String paramTypeName;
 
+    @Length(max = 50,message = "paramName长度必须小于等于50")
     @ApiModelProperty(value = "参数名称")
     private String paramName;
 
+    @Length(max = 1000,message = "content长度必须小于等于1000")
     @ApiModelProperty(value = "参数内容")
     private String content;
 
+    @Length(max = 128,message = "remark长度必须小于等于128")
     @ApiModelProperty(value = "描述")
     private String remark;
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
 import io.swagger.models.auth.In;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -42,7 +43,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TCameraScreen tCameraScreen) {
+    public Result add(@RequestBody @Validated TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
             result.setData(tCameraScreenService.add(tCameraScreen));
