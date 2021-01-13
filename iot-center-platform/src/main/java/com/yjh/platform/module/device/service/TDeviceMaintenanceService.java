@@ -188,7 +188,7 @@ public class TDeviceMaintenanceService{
     @Logs(title = "查询区域下的设备", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<IdAndNameDetail> selectDevice(String deviceIds) {
-        String[] list = deviceIds.split(", ");
+        String[] list = deviceIds.split(",");
         List<Long> idList = new ArrayList<>();
         for (String item: list) {
             idList.add(Long.valueOf(item));

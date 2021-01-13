@@ -414,7 +414,7 @@
 
     <select id="selectForDictByanalyseType" resultType="java.lang.String">
         select dict_note from t_dict_business where col_name in
-        <foreach collection="list" item="colName" separator=",">
+        <foreach collection="list" item="colName"  open="(" separator="," close=")">
             #{colName,jdbcType = VARCHAR}
         </foreach>
     </select>
