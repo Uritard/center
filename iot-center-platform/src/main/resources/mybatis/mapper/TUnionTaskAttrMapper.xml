@@ -158,6 +158,7 @@
         LEFT JOIN t_cfg_device h on h.device_id = k.device_id
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.union_id = #{taskId, jdbcType=VARCHAR}</if>
+        limit 1
     </select>
     <!--根据instanceId查询设备相关信息-->
     <select id="selectDeviceInfo" resultType="com.yjh.platform.module.task.entity.LinkageMonitorData">
