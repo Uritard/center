@@ -144,11 +144,9 @@
         	e.device_id as id,
 	        e.device_name as name
 	    from t_std_device e
-	    where 1 = 1
-        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id in<foreach collection="list" item="upRegionId" open="(" separator="," close=")">
-            #{upRegionId, jdbcType=BIGINT}
-        </foreach> </if>
-        <if test="deviceName != null and deviceName != ''"> and a.device_name LIKE CONCAT('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
+	    where 1 = 1 and e.device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
+            #{deviceId, jdbcType=BIGINT}
+        </foreach>
     </select>
 
     <select id="selectInstance" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
@@ -166,9 +164,7 @@
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
 		WHERE 1=1
-        <if test="deviceId != null and deviceId != ''"> and a.device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
-            #{deviceId, jdbcType=BIGINT}
-        </foreach> </if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id =  #{deviceId, jdbcType=BIGINT} </if>
     </select>
 
     <delete id="deleteByDeviceId" >

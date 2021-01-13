@@ -187,14 +187,22 @@ public class TDeviceMaintenanceService{
 
     @Logs(title = "查询区域下的设备", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<IdAndNameDetail> selectDevice(List<Long> list,String deviceName) {
-        return this.tDeviceMaintenanceDao.selectDevice(list, deviceName);
+    public List<IdAndNameDetail> selectDevice(String deviceIds) {
+        String[] list = deviceIds.split(", ");
+        List<Long> idList = new ArrayList<>();
+        for (String item: list) {
+            idList.add(Long.valueOf(item));
+        }
+        if(idList != null && idList.size() != 0){
+            return this.tDeviceMaintenanceDao.selectDevice(idList);
+        }
+        return null;
     }
 
     @Logs(title = "查询设备下的巡视点", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<IdAndNameDetail> selectInstance(List<Long> list) {
-        return this.tDeviceMaintenanceDao.selectInstance(list);
+    public List<IdAndNameDetail> selectInstance(Long deviceId) {
+        return this.tDeviceMaintenanceDao.selectInstance(deviceId);
     }
 
 }
