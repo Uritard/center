@@ -51,8 +51,8 @@ public class SendToUpSystemServices {
             type = "62";
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("Client02)")
-                .setReceiveCode("Srerver02")
+                .setSendCode("Client02")
+                .setReceiveCode("Server02")
                 .setType(type)
                 .setItems(list);
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
