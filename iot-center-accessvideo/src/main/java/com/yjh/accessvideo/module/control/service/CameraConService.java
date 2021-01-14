@@ -580,7 +580,7 @@ public class CameraConService {
         }
     }
 
-    @Logs(title = "获取NVR存储状态", code = "getNVRStoreInfo", content = "获取NVR存储状态信息")
+//    @Logs(title = "获取NVR存储状态", code = "getNVRStoreInfo", content = "获取NVR存储状态信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> getNVRStoreInfo(Long recordId) {
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
