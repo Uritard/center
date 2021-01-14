@@ -6,18 +6,17 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-//@PropertySource(value = "classpath:application-dev.properties", encoding = "utf-8")
 public class RedisAndYxsjUtil {
-        //登陆错误redis缓存最大失败次数
-        @Value("${lot.login.num}")
-        private int  loginNum;
+    //登陆错误redis缓存最大失败次数
+    @Value("${lot.login.num}")
+    private int loginNum;
 
-        //锁定时间
-        @Value("${lot.login.time}")
-        private int loginTime;
+    //锁定时间
+    @Value("${lot.login.time}")
+    private int loginTime;
 
-        //密码有效时间
-        @Value("${lot.yxsj.time}")
-        private int yxsjTime;
+    //密码有效时间
+    @Value("${lot.yxsj.time}")
+    private int yxsjTime;
 
 }

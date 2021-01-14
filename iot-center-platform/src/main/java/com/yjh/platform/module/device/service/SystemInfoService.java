@@ -14,9 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -35,12 +37,22 @@ public class SystemInfoService {
 
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
 //    @Logs(title = "获取内存信息", code = "module",content = "获取内存信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> getMemory() throws Exception {
+        Map<String,String> menUsage=systemInfoUtil.getMemUsage();
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:MemoryFreeMin");
+        Double cpuFreeMin=Double.parseDouble(map.get("content"));
+        if(Double.parseDouble(map.get("free"))/Double.parseDouble(map.get("total"))*100<cpuFreeMin){
+            menUsage.put("code","01");
+        }else{
+            menUsage.put("code","02");
+        }
         return systemInfoUtil.getMemUsage();
     }
 //    @Logs(title = "获取cpu信息", code = "module",content = "获取cpu信息")
@@ -73,14 +85,32 @@ public class SystemInfoService {
 
 //    @Logs(title = "获取cpu利用率", code = "module",content = "获取cpu利用率")
     @Transactional(rollbackFor = Exception.class)
-    public double getCpuOnUse() throws Exception {
-        return systemInfoUtil.getCpuOnUse();
+    public  Map<String,Object> getCpuOnUse() throws Exception {
+        Map<String,Object> cpuOnUsemap=new HashMap<>();
+        Double cpuOnUse=systemInfoUtil.getCpuOnUse();
+        cpuOnUsemap.put("use",cpuOnUse);
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:cpuFreeMin");
+        Double cpuFreeMin=Double.parseDouble(map.get("content"));
+        if((100-cpuOnUse)<cpuFreeMin){
+            cpuOnUsemap.put("code","01");
+        }else{
+            cpuOnUsemap.put("code","02");
+        }
+        return cpuOnUsemap;
     }
 
 //    @Logs(title = "获取硬盘利用率", code = "module",content = "获取硬盘利用率")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> getDeskOnUse() throws Exception {
-        return systemInfoUtil.getDeskOnUse();
+        Map<String,Object> deskOnUse=systemInfoUtil.getDeskOnUse();
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:DiskFreeMin");
+        Double diskFreeMin=Double.parseDouble(map.get("content"));
+        if(Double.parseDouble(map.get("use").toString())/Double.parseDouble(map.get("all").toString())*100>(100-diskFreeMin)){
+            deskOnUse.put("code","01");
+        }else{
+            deskOnUse.put("code","02");
+        }
+        return deskOnUse;
     }
 
 

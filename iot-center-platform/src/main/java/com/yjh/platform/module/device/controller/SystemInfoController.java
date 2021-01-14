@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -9,11 +10,13 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +38,7 @@ public class SystemInfoController {
     public SystemInfoController(SystemInfoService systemInfoService) {
         this.systemInfoService = systemInfoService;
     }
+
 
     @ApiOperation(value = "获取内存信息")
     @RequestMapping(value = "/getMemory", method = RequestMethod.GET)

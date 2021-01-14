@@ -1,5 +1,6 @@
 package com.yjh.platform.common;
 
+import javax.validation.constraints.Max;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,8 +33,5 @@ public class Constant {
     public static Map<String,Object> weatherInfo = new HashMap<>();
 
     public static final String account_lock_time = "account_lock_time:userAccountID";
-
-
-
 
 }
