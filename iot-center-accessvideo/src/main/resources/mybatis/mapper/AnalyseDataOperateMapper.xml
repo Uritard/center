@@ -19,7 +19,7 @@
         <result column="deal_info" jdbcType="VARCHAR" property="dealInfo" />
         <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId" />
         <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
-        <result column="if_warn_disable" jdbcType="INTEGER" property="ifWarnDisable" />
+        <result column="defect_model" jdbcType="INTEGER" property="defectModel" />
         <result column="alarm_source" jdbcType="INTEGER" property="alarmSource" />
         <result column="warn_subtype" jdbcType="INTEGER" property="warnSubtype" />
         <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
@@ -204,7 +204,7 @@
             deal_info,
             deal_person_id,
             deal_time,
-            if_warn_disable,
+            defect_model,
             alarm_source,
             warn_subtype,
             device_code,
@@ -230,7 +230,7 @@
                 #{dealInfo, jdbcType=VARCHAR},
                 #{dealPersonId, jdbcType=VARCHAR},
                 #{dealTime, jdbcType=TIMESTAMP},
-                #{ifWarnDisable, jdbcType=INTEGER},
+                #{defectModel,jdbcType=INTEGER},
                 #{alarmSource, jdbcType=INTEGER},
                 #{warnSubtype, jdbcType=INTEGER},
                 #{deviceCode, jdbcType=VARCHAR},

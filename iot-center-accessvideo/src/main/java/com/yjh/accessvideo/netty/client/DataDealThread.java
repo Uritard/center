@@ -162,6 +162,7 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("value", jsonObjectResult.get("resultValue").toString());
                                             warnMap.put("imagePath", cruiseResult.get("picpath").toString());
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                            warnMap.put("defectModel",analyseDataOperateService.selectDictCode("defect_model","其他"));
                                             log.info("开始告警判断");
                                             log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
                                             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -290,13 +291,13 @@ public class DataDealThread implements Runnable {
                                                     tWarnInfo.setStdMeteId(Long.valueOf(warningMsg.get("stdMeteId").toString()));
                                                     tWarnInfo.setTaskId(warningMsg.get("taskId").toString());
                                                     tWarnInfo.setConfMode(Integer.valueOf(warningMsg.get("confMode").toString()));
-                                                    tWarnInfo.setIfWarnDisable(Integer.valueOf(warningMsg.get("ifWarnDisable").toString()));
                                                     tWarnInfo.setValue(warningMsg.get("value").toString());
                                                     tWarnInfo.setImagePath(warningMsg.get("imagePath").toString());
                                                     tWarnInfo.setAlarmSource(Integer.valueOf(warningMsg.get("alarmSource").toString()));
                                                     tWarnInfo.setWarnName(warningMsg.get("warnName").toString());
                                                     tWarnInfo.setOutRange(warningMsg.get("outRange").toString());
                                                     tWarnInfo.setWarnContent(warningMsg.get("warnContent").toString());
+                                                    tWarnInfo.setDefectModel(Integer.valueOf(warningMsg.get("defectModel").toString()));
                                                     tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime").toString()));
                                                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
@@ -371,7 +372,7 @@ public class DataDealThread implements Runnable {
                                         log.info("--------____--------单一缺陷");
                                         Map<String, String> defectMap = new HashMap<>();
                                         String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                        defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
+                                        defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
                                         defectMap.put("defectContent", resultValue);
                                         defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
@@ -381,6 +382,7 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
                                         defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
                                         defectMap.put("imagePath", cruiseResult.get("picpath").toString());
+                                        defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
@@ -388,7 +390,7 @@ public class DataDealThread implements Runnable {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
                                             String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
+                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectContent", resultArr[i]);
                                             defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
@@ -398,6 +400,7 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
                                             defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
                                             defectMap.put("imagePath", cruiseResult.get("picpath").toString());
+                                            defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
                                         }
 
@@ -541,6 +544,7 @@ public class DataDealThread implements Runnable {
                         tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
                         tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
                         tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
+                        tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
                         defectList.add(tDefectInfo);
                     }
 

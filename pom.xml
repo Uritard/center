@@ -20,7 +20,7 @@
         <module>iot-center-logs</module>
         <module>iot-center-manager</module>
         <module>iot-center-gateway</module>
-        <module>iot-center-accessVQD</module>
+        <module>iot-center-accessvqd</module>
     </modules>
 
     <properties>
