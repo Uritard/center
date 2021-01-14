@@ -128,6 +128,7 @@ public class RobotController {
     public Result upSystemCommand(@RequestBody XMLBaseModel xmlBaseModel){
         Result result = new Result();
         try {
+            log.info("--站端控制数据--"+xmlBaseModel);
             result.setData(robotService.upSystemCommand(xmlBaseModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
