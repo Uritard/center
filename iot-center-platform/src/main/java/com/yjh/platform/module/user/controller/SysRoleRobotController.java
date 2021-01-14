@@ -41,7 +41,7 @@ public class SysRoleRobotController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated SysRoleRobot sysRoleRobot) {
+    public Result insert(@Validated @RequestBody SysRoleRobot sysRoleRobot) {
         Result result = new Result();
         try {
             result.setData(sysRoleRobotService.insert(sysRoleRobot));

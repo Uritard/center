@@ -47,7 +47,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCameraPreset tCameraPreset) {
+    public Result insert(@Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
             int resultNum = 0;

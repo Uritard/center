@@ -40,7 +40,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated SysRoleMenu sysRoleMenu) {
+    public Result insert(@Validated @RequestBody  SysRoleMenu sysRoleMenu) {
         Result result = new Result();
         try {
             result.setData(sysRoleMenuService.insert(sysRoleMenu));

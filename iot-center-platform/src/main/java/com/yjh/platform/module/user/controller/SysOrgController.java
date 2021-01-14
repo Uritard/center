@@ -41,7 +41,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "新增组织机构")
     @RequestMapping(value = "/addOrg", method = RequestMethod.POST)
-    public Result insert(@RequestBody  @Validated SysOrg sysOrg) {
+    public Result insert(@Validated @RequestBody SysOrg sysOrg) {
         Result result = new Result();
         try {
             if (sysOrg.getOrgCode().equals("")) {
@@ -111,15 +111,15 @@ public class SysOrgController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "orgId", required = false) Long orgId,
-                            @RequestParam(value = "orgName", required = false) String orgName,
-                            @RequestParam(value = "orgCode", required = false) String orgCode,
-                            @RequestParam(value = "upId", required = false) Long upId,
-                            @RequestParam(value = "sort", required = false) Integer sort,
-                            @RequestParam(value = "createTime", required = false) Date createTime,
-                            @RequestParam(value = "creatorId", required = false) Long creatorId,
-                            @RequestParam(value = "orgLevel", required = false) Integer orgLevel,
-                            @RequestParam(value = "orgPath", required = false) String orgPath,
-                            @RequestParam(value = "deptName", required = false) String deptName) {
+                         @RequestParam(value = "orgName", required = false) String orgName,
+                         @RequestParam(value = "orgCode", required = false) String orgCode,
+                         @RequestParam(value = "upId", required = false) Long upId,
+                         @RequestParam(value = "sort", required = false) Integer sort,
+                         @RequestParam(value = "createTime", required = false) Date createTime,
+                         @RequestParam(value = "creatorId", required = false) Long creatorId,
+                         @RequestParam(value = "orgLevel", required = false) Integer orgLevel,
+                         @RequestParam(value = "orgPath", required = false) String orgPath,
+                         @RequestParam(value = "deptName", required = false) String deptName) {
         Result result = new Result();
         try {
             List<SysOrg> list = sysOrgService.select(orgId, orgName, orgCode, upId, sort, createTime, creatorId, orgLevel, orgPath, deptName);
@@ -134,12 +134,12 @@ public class SysOrgController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody SysOrg sysOrg,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<SysOrg> list = sysOrgService.selectByPage(sysOrg);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.module.user.service.TSysParamService;
 import com.yjh.platform.module.user.entity.TSysParam;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -40,7 +42,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated TSysParam tSysParam) {
+    public Result insert(@Validated @RequestBody TSysParam tSysParam) {
         Result result = new Result();
         try {
             result.setData(tSysParamService.insert(tSysParam));
@@ -103,14 +105,14 @@ public class TSysParamController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "paramId", required = false) Integer paramId,
                          @RequestParam(value = "paramCode", required = false) String paramCode,
-                            @RequestParam(value = "paramType", required = false) String paramType,
-                            @RequestParam(value = "paramName", required = false) String paramName,
-                            @RequestParam(value = "content", required = false) String content,
-                            @RequestParam(value = "remark", required = false) String remark) {
+                         @RequestParam(value = "paramType", required = false) String paramType,
+                         @RequestParam(value = "paramName", required = false) String paramName,
+                         @RequestParam(value = "content", required = false) String content,
+                         @RequestParam(value = "remark", required = false) String remark) {
         Result result = new Result();
         try {
 
-            List<TSysParam> list = tSysParamService.select(paramId,paramCode, paramType, paramName, content, remark);
+            List<TSysParam> list = tSysParamService.select(paramId, paramCode, paramType, paramName, content, remark);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -127,13 +129,13 @@ public class TSysParamController {
                                @RequestParam(value = "paramName", required = false) String paramName,
                                @RequestParam(value = "content", required = false) String content,
                                @RequestParam(value = "remark", required = false) String remark,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TSysParam> list = tSysParamService.selectByPage(paramId,paramCode, paramType, paramName, content, remark);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<TSysParam> list = tSysParamService.selectByPage(paramId, paramCode, paramType, paramName, content, remark);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -149,10 +151,10 @@ public class TSysParamController {
     public Result batchInsert(@RequestBody List<TSysParam> list) {
         Result result = new Result();
         try {
-        result.setData(tSysParamService.batchInsert(list));
+            result.setData(tSysParamService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("系统参数批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("系统参数批量插入失败：" + e);
         }
         return result;
     }

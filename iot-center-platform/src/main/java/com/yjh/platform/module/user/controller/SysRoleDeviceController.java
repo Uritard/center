@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.service.SysRoleDeviceService;
 import com.yjh.platform.module.user.entity.SysRoleDevice;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -41,7 +43,7 @@ public class SysRoleDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated  SysRoleDevice sysRoleDevice) {
+    public Result insert(@Validated @RequestBody SysRoleDevice sysRoleDevice) {
         Result result = new Result();
         try {
             result.setData(sysRoleDeviceService.insert(sysRoleDevice));
@@ -103,7 +105,7 @@ public class SysRoleDeviceController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "roleId", required = false) Long roleId,
-                            @RequestParam(value = "deviceId", required = false) Long deviceId) {
+                         @RequestParam(value = "deviceId", required = false) Long deviceId) {
         Result result = new Result();
         try {
             List<SysRoleDevice> list = sysRoleDeviceService.select(roleId, deviceId);
@@ -118,12 +120,12 @@ public class SysRoleDeviceController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody SysRoleDevice sysRoleDevice,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<SysRoleDevice> list = sysRoleDeviceService.selectByPage(sysRoleDevice);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

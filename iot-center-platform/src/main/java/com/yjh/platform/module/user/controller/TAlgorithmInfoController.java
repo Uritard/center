@@ -41,7 +41,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated TAlgorithmInfo tAlgorithmInfo) {
+    public Result insert( @Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
         Result result = new Result();
         try {
             result.setData(tAlgorithmInfoService.insert(tAlgorithmInfo));

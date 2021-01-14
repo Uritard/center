@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 
 
-
 /**
  * @author tt
  * @since 2020-08-05
@@ -47,25 +46,25 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(HttpServletRequest request, @RequestBody @Validated  TRobotInfo tRobotInfo) {
+    public Result insert(HttpServletRequest request, @Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
             tRobotInfo.setCreateBy(userId);
 
-            if(tRobotInfo.getRobotIp()!= null && !"".equals(tRobotInfo.getRobotIp())){
+            if (tRobotInfo.getRobotIp() != null && !"".equals(tRobotInfo.getRobotIp())) {
                 String robotIp = tRobotInfo.getRobotIp();
                 if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
                     result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
                 }
             }
-            if(tRobotInfo.getRobotPort()!=null && !"".equals(tRobotInfo.getRobotPort())){
+            if (tRobotInfo.getRobotPort() != null && !"".equals(tRobotInfo.getRobotPort())) {
                 String robotPort = tRobotInfo.getRobotPort().toString();
                 if (!robotPort.matches("^([1-9]|[1-9]\\d{1,3}|[1-6][0-5][0-5][0-3][0-5])$")) {
                     result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
                 }
             }
-           result.setData(tRobotInfoService.insert(tRobotInfo));
+            result.setData(tRobotInfoService.insert(tRobotInfo));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -172,8 +171,8 @@ public class TRobotInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TRobotInfo> list = tRobotInfoService.selectByPage(tRobotInfo,upRegionIds);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<TRobotInfo> list = tRobotInfoService.selectByPage(tRobotInfo, upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

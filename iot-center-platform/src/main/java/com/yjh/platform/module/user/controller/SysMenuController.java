@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.service.SysMenuService;
 import com.yjh.platform.module.user.entity.SysMenu;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -41,7 +43,7 @@ public class SysMenuController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated SysMenu sysMenu) {
+    public Result insert(@Validated @RequestBody SysMenu sysMenu) {
         Result result = new Result();
         try {
             result.setData(sysMenuService.insert(sysMenu));
@@ -103,20 +105,20 @@ public class SysMenuController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "menuId", required = false) Long menuId,
-                            @RequestParam(value = "menuName", required = false) String menuName,
-                            @RequestParam(value = "menuCode", required = false) String menuCode,
-                            @RequestParam(value = "upId", required = false) Long upId,
-                            @RequestParam(value = "iconCode", required = false) String iconCode,
-                            @RequestParam(value = "iconUrl", required = false) String iconUrl,
-                            @RequestParam(value = "menuType", required = false) Integer menuType,
-                            @RequestParam(value = "menuLevel", required = false) Integer menuLevel,
-                            @RequestParam(value = "elementCode", required = false) String elementCode,
-                            @RequestParam(value = "state", required = false) Integer state,
-                            @RequestParam(value = "sort", required = false) Integer sort,
-                            @RequestParam(value = "linkType", required = false) Integer linkType,
-                            @RequestParam(value = "url", required = false) String url,
-                            @RequestParam(value = "creatorId", required = false) Long creatorId,
-                            @RequestParam(value = "sysState", required = false) Integer sysState) {
+                         @RequestParam(value = "menuName", required = false) String menuName,
+                         @RequestParam(value = "menuCode", required = false) String menuCode,
+                         @RequestParam(value = "upId", required = false) Long upId,
+                         @RequestParam(value = "iconCode", required = false) String iconCode,
+                         @RequestParam(value = "iconUrl", required = false) String iconUrl,
+                         @RequestParam(value = "menuType", required = false) Integer menuType,
+                         @RequestParam(value = "menuLevel", required = false) Integer menuLevel,
+                         @RequestParam(value = "elementCode", required = false) String elementCode,
+                         @RequestParam(value = "state", required = false) Integer state,
+                         @RequestParam(value = "sort", required = false) Integer sort,
+                         @RequestParam(value = "linkType", required = false) Integer linkType,
+                         @RequestParam(value = "url", required = false) String url,
+                         @RequestParam(value = "creatorId", required = false) Long creatorId,
+                         @RequestParam(value = "sysState", required = false) Integer sysState) {
         Result result = new Result();
         try {
             List<SysMenu> list = sysMenuService.select(menuId, menuName, menuCode, upId, iconCode, iconUrl, menuType, menuLevel, elementCode, state, sort, linkType, url, creatorId, sysState);
@@ -131,12 +133,12 @@ public class SysMenuController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody SysMenu sysMenu,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<SysMenu> list = sysMenuService.selectByPage(sysMenu);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

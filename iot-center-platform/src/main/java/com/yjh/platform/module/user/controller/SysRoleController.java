@@ -43,7 +43,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "插入用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated SysRole sysRole) {
+    public Result insert(@Validated @RequestBody SysRole sysRole) {
         Result result = new Result();
         try {
             result.setData(sysRoleService.insert(sysRole));

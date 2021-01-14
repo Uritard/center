@@ -43,7 +43,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody @Validated TCameraScreen tCameraScreen) {
+    public Result add(@Validated @RequestBody TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
             result.setData(tCameraScreenService.add(tCameraScreen));

@@ -62,7 +62,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody @Validated SysUser sysUser) {
+    public Result insert(@Validated @RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
             result.setData(sysUserService.insert(sysUser));
@@ -283,7 +283,7 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insertUser( @RequestBody @Validated SysUser sysUser) {
+    public Result insertUser(@Validated @RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
             Long creatorId = userManager.getCreatorId();
@@ -344,7 +344,7 @@ public class SysUserController {
     public Result changePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
-           Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+            Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             String oldPassword = map.get("oldPassword");
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";

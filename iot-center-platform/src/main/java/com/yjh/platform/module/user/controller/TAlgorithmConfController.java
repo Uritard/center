@@ -41,7 +41,7 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody @Validated TAlgorithmConf tAlgorithmConf) {
+    public Result add( @Validated @RequestBody TAlgorithmConf tAlgorithmConf) {
         Result result = new Result();
         try {
             result.setData(tAlgorithmConfService.add(tAlgorithmConf));
