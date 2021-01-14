@@ -11,6 +11,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.QrCodeUtils;
 import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.common.websocket.WebSocketServer;
@@ -26,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +36,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -55,6 +58,9 @@ public class HelloController {
     @Autowired
 
     TCruisePointInstanceDao tCruisePointInstanceDao;
+
+    @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/queryStatus")
+    private String URL;
 
 
     //相机抓图selectForDictNote
@@ -144,13 +150,6 @@ public class HelloController {
         Map<String, String> map = resultHandler.getMappedResults();
         System.out.println("map = " + map);
         result.setData(map);
-
-
-        List<String> answer=new ArrayList<>();
-        answer=DateTimeUtil.getDayDateList(10);
-        log.info("Date："+answer);
-
-
         Long beginTime=System.currentTimeMillis();
 
         Long endTime=System.currentTimeMillis();

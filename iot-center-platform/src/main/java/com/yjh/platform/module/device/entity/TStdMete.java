@@ -91,6 +91,12 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "告警下限4")
     private Float lowLimit4;
 
+    @ApiModelProperty(value = "状态一")
+    private String stateZero;
+
+    @ApiModelProperty(value ="状态二")
+    private String stateOne;
+
     @ApiModelProperty(value = "告警延时")
     private Integer alarmDelay;
 
@@ -113,7 +119,5 @@ public class TStdMete implements Serializable {
 
     private String analyseTypeName;
 
-    private String stateZero;
 
-    private String stateOne;
 }

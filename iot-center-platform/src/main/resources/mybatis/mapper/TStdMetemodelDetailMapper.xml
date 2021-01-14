@@ -17,6 +17,8 @@
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
         <result column="up_effect" jdbcType="REAL" property="upEffect" />
         <result column="down_effect" jdbcType="REAL" property="downEffect" />
+        <result column="state_zero" jdbcType="VARCHAR" property="stateZero"/>
+        <result column="state_one" jdbcType="VARCHAR" property="stateOne"/>
         <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
         <result column="high_limit1" jdbcType="REAL" property="highLimit1" />
         <result column="low_limit1" jdbcType="REAL" property="lowLimit1" />
@@ -35,7 +37,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        model_id, mete_id, custom_id, mete_name, mete_type,mete_kind,analyse_type, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
+        model_id, mete_id, custom_id, mete_name, mete_type,mete_kind,analyse_type, unit, alarm_note, alarm_explain, alarm_type, up_effect, down_effect,state_zero ,state_one,alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, high_limit3, low_limit3, high_limit4, low_limit4, alarm_delay, alarm_cnt, threshold_abs, threshold_per, modulus
     </sql>
 
 
@@ -54,6 +56,8 @@
             alarm_type,
             up_effect,
             down_effect,
+            state_zero,
+            state_one,
             alarm_level,
             high_limit1,
             low_limit1,
@@ -82,6 +86,8 @@
                 #{alarmType, jdbcType=VARCHAR},
                 #{upEffect, jdbcType=REAL},
                 #{downEffect, jdbcType=REAL},
+                #{stateZero,jdbcType=VARCHAR},
+                #{stateOne,jdbcType=VARCHAR},
                 #{alarmLevel, jdbcType=INTEGER},
                 #{highLimit1, jdbcType=REAL},
                 #{lowLimit1, jdbcType=REAL},
@@ -120,6 +126,8 @@
         <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
         <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=REAL},</if>
+        <if test="stateZero !=null and stateZero !=''">a.state_zero =#{stateZero,jdbcType=VARCHAR},</if>
+        <if test="stateOne !=null and stateOne !=''">a.state_one =#{stateOne,jdbcType=VARCHAR},</if>
         <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="highLimit1 != null ">a.high_limit1 = #{highLimit1, jdbcType=REAL},</if>
         <if test="lowLimit1 != null ">a.low_limit1 = #{lowLimit1, jdbcType=REAL},</if>
@@ -156,6 +164,8 @@
         a.alarm_type,
         a.up_effect,
         a.down_effect,
+        a.state_zero,
+        a.state_one,
         a.alarm_level,
         a.high_limit1,
         a.low_limit1,
@@ -264,6 +274,8 @@
         k.dict_note as alarmTypeName,
         a.up_effect,
         a.down_effect,
+        a.state_zero,
+        a.state_one,
         a.alarm_level,
         l.dict_note as alarmLevelName,
         a.high_limit1,
@@ -316,6 +328,8 @@
         <if test="alarmType != null and alarmType != ''"> and a.alarm_type = #{alarmType, jdbcType=VARCHAR}</if>
         <if test="upEffect != null and upEffect != ''"> and a.up_effect = #{upEffect, jdbcType=REAL}</if>
         <if test="downEffect != null and downEffect != ''"> and a.down_effect = #{downEffect, jdbcType=REAL}</if>
+        <if test="stateZero != null and stateZero != ''"> and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
+        <if test="stateOne != null and stateOne != ''"> and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
         <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
         <if test="highLimit1 != null and highLimit1 != ''"> and a.high_limit1 = #{highLimit1, jdbcType=REAL}</if>
         <if test="lowLimit1 != null and lowLimit1 != ''"> and a.low_limit1 = #{lowLimit1, jdbcType=REAL}</if>
@@ -348,6 +362,8 @@
         alarm_type,
         up_effect,
         down_effect,
+        state_zero,
+        state_one,
         alarm_level,
         high_limit1,
         low_limit1,
@@ -378,6 +394,8 @@
             #{TStdMeteModelDetail.alarmType, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.upEffect, jdbcType=REAL},
             #{TStdMeteModelDetail.downEffect, jdbcType=REAL},
+            #{TStdMete.stateZero,jdbcType=VARCHAR},
+            #{TStdMete.stateOne,jdbcType=VARCHAR},
             #{TStdMeteModelDetail.alarmLevel, jdbcType=INTEGER},
             #{TStdMeteModelDetail.highLimit1, jdbcType=REAL},
             #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},

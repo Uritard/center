@@ -190,7 +190,8 @@ public class TStdMetemodelService {
           detail.setThresholdAbs(mete.getThresholdAbs());
           detail.setThresholdPer(mete.getThresholdPer());
           detail.setModulus(mete.getModulus());
-
+          detail.setStateZero(mete.getStateZero());
+          detail.setStateOne(mete.getStateOne());
           tStdMetemodelDetailDao.add(detail);
 
       }
@@ -277,6 +278,8 @@ public class TStdMetemodelService {
                 detail.setThresholdAbs(mete.getThresholdAbs());
                 detail.setThresholdPer(mete.getThresholdPer());
                 detail.setModulus(mete.getModulus());
+                detail.setStateZero(mete.getStateZero());
+                detail.setStateOne(mete.getStateOne());
 
                 tStdMetemodelDetailDao.add(detail);
 
@@ -314,6 +317,8 @@ public class TStdMetemodelService {
                     detail.setThresholdAbs(mete.getThresholdAbs());
                     detail.setThresholdPer(mete.getThresholdPer());
                     detail.setModulus(mete.getModulus());
+                    detail.setStateZero(mete.getStateZero());
+                    detail.setStateOne(mete.getStateOne());
 
                     tStdMetemodelDetailDao.add(detail);
                 }

@@ -114,6 +114,7 @@ public class DataDealThread implements Runnable {
 
 
                     log.info("端口号：" + remotePort);
+
                     try {
                         switch (remotePort) {
                             case 13668:
@@ -197,7 +198,7 @@ public class DataDealThread implements Runnable {
                                                         cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
                                                         tAbnormal++;
 
-                                                    }else {
+                                                    } else {
                                                         //未达到告警值(遥信)
                                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                                         cruiseResultMap.put("cruiseAbnormal", "--");
@@ -355,11 +356,14 @@ public class DataDealThread implements Runnable {
                             case 13669:
                                 String originResult = jsonObjectResult.get("resultValue").toString();
                                 String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
+                                // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形 
                                 if (resultValue != "null") {
-                                    tNormal++;
-                                    cruiseResultMap.put("resultNum", resultValue);
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
-                                    cruiseResultMap.put("cruiseAbnormal", "--");
+                                   //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
+                                    cruiseResultMap.put("resultNum", "--");
+                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
+                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "缺陷异常"));
+                                    tAbnormal++;
+
                                     //生成缺陷缓存信息（单一缺陷和多元缺陷）
                                     log.info("--------____--------生成缺陷缓存");
                                     String[] resultArr = resultValue.split("\\s+");
@@ -375,7 +379,7 @@ public class DataDealThread implements Runnable {
                                         TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
                                         defectMap.put("customId", tStdDevicemete.getCustomId());
                                         defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
-                                        defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
+                                        defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
                                         defectMap.put("imagePath", cruiseResult.get("picpath").toString());
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
                                     } else if (resultArr.length > 1) {
@@ -385,7 +389,7 @@ public class DataDealThread implements Runnable {
                                             Map<String, String> defectMap = new HashMap<>();
                                             String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("defect_level", "一般"));
-                                            defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_type", resultArr[i]));
+                                            defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectContent", resultArr[i]);
                                             defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                             defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
@@ -399,11 +403,11 @@ public class DataDealThread implements Runnable {
 
                                     }
 
-                                } else {
-                                    cruiseResultMap.put("resultNum", "--");
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                                    tAbnormal++;
+                                } else {  //未产生缺陷
+                                    tNormal++;
+                                    cruiseResultMap.put("resultNum", resultValue);
+                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
+                                    cruiseResultMap.put("cruiseAbnormal", "--");
                                 }
 
                                 break;
@@ -520,35 +524,6 @@ public class DataDealThread implements Runnable {
                         dataList.add(tCruiseDataResult);
 
                     }
-
-//                try {
-//                    Set<String> warnKey = redisScan("warnInfo:" + TASKID);
-//                    for (String key : warnKey) {
-//                        Map<String, Object> warnMap = redisTemplate.opsForHash().entries(key);
-//                        log.info("TWI开始");
-//                        TWarnInfo tWarnInfo = new TWarnInfo();
-//                        tWarnInfo.setWarnLevel(Integer.valueOf(warnMap.get("warnLevel").toString()));
-//                        tWarnInfo.setWarnType(Integer.valueOf(warnMap.get("warnType").toString()));
-//                        tWarnInfo.setDeviceId(Long.valueOf(warnMap.get("deviceId").toString()));
-//                        tWarnInfo.setCunstomId(warnMap.get("customId").toString());
-//                        tWarnInfo.setInstanceId(Long.valueOf(warnMap.get("instanceId").toString()));
-//                        tWarnInfo.setStdMeteId(Long.valueOf(warnMap.get("stdMeteId").toString()));
-//                        tWarnInfo.setTaskId(warnMap.get("taskId").toString());
-//                        tWarnInfo.setConfMode(Integer.valueOf(warnMap.get("confMode").toString()));
-//                        tWarnInfo.setIfWarnDisable(Integer.valueOf(warnMap.get("ifWarnDisable").toString()));
-//                        tWarnInfo.setValue(warnMap.get("value").toString());
-//                        tWarnInfo.setImagePath(warnMap.get("imagePath").toString());
-//                        tWarnInfo.setAlarmSource(Integer.valueOf(warnMap.get("alarmSource").toString()));
-//                        tWarnInfo.setWarnName(warnMap.get("warnName").toString());
-//                        tWarnInfo.setOutRange(warnMap.get("outRange").toString());
-//                        tWarnInfo.setWarnContent(warnMap.get("warnContent").toString());
-//                        tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warnMap.get("warnTime").toString()));
-//                        log.info("告警数据对象：" + tWarnInfo);
-//                        warnList.add(tWarnInfo);
-//                    }
-//                } catch (Exception e) {
-//                    log.error("告警信息入库失败" + e);
-//                }
 
 
                     Set<String> defectKey = redisScan("defectInfo:" + TASKID);
