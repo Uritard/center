@@ -551,12 +551,16 @@
         ) big_table
         WHERE
         1 = 1
-        <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="warnLevel != -1"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != -1"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
-        <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="defectType != null">and defect_model = #{defectType,jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != ''">
+            <if test="endTime != null and endTime != ''">
+                and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        <if test="defectType != -1">and defect_model = #{defectType,jdbcType=INTEGER}</if>
         ORDER BY alarm_time DESC
     </select>
     <!--根据告警来源统计告警数据-->
@@ -572,7 +576,7 @@
             (select count(*) as countNum from t_camera_alarm) d
         )
     </select>
-    <!--根据设备类型统计告警数据-->
+    <!--根据设备类型统计告警个数-->
     <select id="countByDeviceType" resultType="com.yjh.platform.module.task.entity.TJContentInfoDetail">
         select
             dict_code as device_type,
@@ -593,6 +597,61 @@
             )
          ORDER BY c_ount desc
     </select>
+    <!--根据设备类型统计告警和缺陷个数-->
+    <select id="countAlarmByDeviceType" resultType="com.yjh.platform.module.task.entity.TJContentInfoDetail">
+        select
+            dict_code as device_type,
+            dict_note as device_type_name,
+            (
+                (select COUNT(*)
+                    from t_std_device a,t_warn_info b
+                    where a.device_id = b.device_id
+                    and a.custom_id = b.cunstom_id
+                    and device_type = dict_code
+                    and b.warn_time BETWEEN #{startTime} and #{endTime}
+                ) +
+                (select COUNT(*)
+                    from t_std_device a,t_defect_info b
+                    where a.device_id = b.device_id
+                    and a.custom_id = b.cunstom_id
+                    and device_type = dict_code
+                    and b.defect_time BETWEEN #{startTime} and #{endTime}
+                )
+            ) as c_ount
+        from t_dict_business
+        where dict_code in
+            (
+                select dict_code
+                from t_dict_business
+                where col_name = 'device_type'
+            )
+         ORDER BY c_ount desc
+    </select>
+    <!--统计近一月的所有告警和缺陷个数-->
+    <select id="countWarnAndDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
+        from mysql.help_topic
+        where help_topic_id  &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(warn_time) date,
+        warn_time,
+        count( 1 ) AS count
+        FROM
+        t_warn_info
+        WHERE
+        DATEDIFF( now( ), warn_time )  &lt;= 31
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
+    </select>
+
     <!--统计近一月内的告警数-->
     <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
@@ -631,8 +690,8 @@
                 where warn_time between #{startTime} and #{endTime}) e
         )
     </select>
-    <!--根据告警处理状态统计告警个数2-->
-    <select id="countWarnConfMode2" resultType="java.util.Map">
+    <!--根据告警和缺陷处理状态统计告警个数-->
+    <select id="countWarnDefectConfMode" resultType="java.util.Map">
         SELECT
             a.processed + b.processed as '已核查',
             d.untreated + e.untreated as '未核查'
@@ -640,12 +699,12 @@
         (
             (select count(conf_mode = 275 or null) as processed from t_warn_info
                 where warn_time between #{startTime} and #{endTime}) a,
-            (select count(conf_mode = 275 or null) as untreated from t_defect_info
-                where warn_time between #{startTime} and #{endTime}) b,
+            (select count(conf_mode = 275 or null) as processed from t_defect_info
+                where defect_time between #{startTime} and #{endTime}) b,
             (select count(conf_mode = 276 or null) as untreated from t_warn_info
                 where warn_time between #{startTime} and #{endTime}) d,
             (select count(conf_mode = 276 or null) as untreated from t_defect_info
-                where warn_time between #{startTime} and #{endTime}) e
+                where defect_time between #{startTime} and #{endTime}) e
         )
     </select>
     <!--查看告警处理情况-->

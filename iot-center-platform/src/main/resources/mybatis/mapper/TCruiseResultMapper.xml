@@ -106,7 +106,8 @@
             b.instance_id,
             b.task_result_id,
             d.task_id,
-            a.identify_result
+            a.identify_result,
+            a.person_check
         FROM
             t_cruise_data_result a,
             t_cruise_task_result_detail b,
@@ -115,6 +116,29 @@
         AND	a.cruise_result_id = b.cruise_result_id
         AND b.task_result_id = d.task_result_id
         <if test="cruiseDataId != null">and cruise_data_id = #{cruiseDataId,jdbcType = BIGINT}</if>
+    </select>
+    <select id="selectDeviceMeteInfo" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT
+            a.instance_id,
+            b.device_mete_id,
+            b.high_limit1,
+            b.high_limit2,
+            b.high_limit3,
+            b.high_limit4,
+            b.low_limit1,
+            b.low_limit2,
+            b.low_limit3,
+            b.low_limit4,
+            b.state_one,
+            b.state_zero,
+            b.alarm_note,
+            b.mete_kind,
+            b.alarm_state
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b on a.device_mete_id = b.device_mete_id
+        WHERE 1 = 1
+        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
     </select>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">
@@ -223,7 +247,7 @@
     </select>
 
     <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
-        SELECT
+        SELECT DISTINCT
         b.task_result_id,
         f.real_code,
         b.device_name,
@@ -263,15 +287,13 @@
         m.dict_note as mete_kind_name,
         e.cruise_id as preset_id,
         k.camera_id,
-        b.cruise_time,
         b.end_time,
         g.is_warn,
-        b.instance_id,
         n.device_type
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
-        LEFT JOIN t_std_device n on n.device_id = e.device_id and n.custom_id = e.custom_id
+        LEFT JOIN t_std_device n on n.device_id = b.device_id
         LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
         LEFT JOIN t_cruise_data_result g on g.cruise_result_id = b.cruise_result_id
         LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type
@@ -510,7 +532,8 @@
 
     <update id="updateWarnInfo">
         UPDATE t_warn_info a <set>
-         a.conf_mode = 275
+         a.conf_mode = 275,
+         a.deal_type = 286
         </set>
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
@@ -520,9 +543,8 @@
     <update id="updateWarnInfo2">
         UPDATE t_warn_info a <set>
         a.conf_mode = 275,
-        a.deal_type = 286,
-        a.deal_info = "程序异常,告警误报"
-    </set>
+        a.deal_type = 287
+        </set>
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}

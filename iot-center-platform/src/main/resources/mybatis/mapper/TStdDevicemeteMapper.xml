@@ -629,24 +629,17 @@
         SELECT DISTINCT
         b.device_mete_id,
         b.device_id,
-        b.mete_name,
         b.mete_type,
-        p.dict_note as mete_type_name,
         b.meter_type,
-        q.dict_note as meter_type_name
+        a.device_type
         FROM
         t_std_device a
         JOIN t_std_devicemete b ON a.device_id = b.device_id
-        LEFT JOIN t_dict_business e on e.dict_code = a.device_type and e.col_name = 'device_type'
-        LEFT JOIN t_dict_business f on f.dict_code = b.meter_type and f.col_name = 'meter_type'
-        LEFT JOIN t_dict_business g on g.dict_code = b.mete_type and g.col_name = 'mete_type'
         JOIN t_cruise_point_instance h on b.device_mete_id = h.device_mete_id
         JOIN  t_cruise_task_result_detail d on d.instance_id = h.instance_id
         LEFT JOIN t_cruise_data_result j on j.cruise_result_id = d.cruise_result_id
         LEFT JOIN t_cruise_result k on d.task_result_id = k.task_result_id and  k.c_state != 239 AND k.c_state != 241
         LEFT JOIN t_dict_business m on m.dict_code = k.c_state and m.col_name = 'task_state'
-        LEFT JOIN t_dict_business p on p.dict_code = b.mete_type and p.col_name = 'mete_type'
-        LEFT JOIN t_dict_business q on q.dict_code = b.meter_type and q.col_name = 'meter_type'
         WHERE 1 = 1
         <if test="deviceType != -1">and a.device_type = #{deviceType,jdbcType = INTEGER} </if>
         <if test="meterType != -1">and b.meter_type = #{meterType,jdbcType = INTEGER} </if>

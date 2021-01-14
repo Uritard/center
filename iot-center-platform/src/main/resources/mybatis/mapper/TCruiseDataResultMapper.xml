@@ -541,33 +541,35 @@
 
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
-        c.cruise_time,
-        d.result_num,
+        e.cruise_time as end_time,
+        f.result_num,
         b.cruise_type,
-        h.dict_note as cruiseTypeName,
-        i.c_type,
-        a.mete_name
+        h.dict_note as cruise_type_name,
+        g.c_type,
+        a.mete_name,
+        i.dict_note as c_type_name,
+        a.mete_type,
+        m.dict_note as mete_type_name,
+        a.meter_type,
+        n.dict_note as meter_type_name,
+        a.device_mete_id
         FROM
-        (
         t_std_devicemete a
-        LEFT JOIN (
-        t_cruise_point_instance b
-        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code
-        AND h.col_name = "cruise_type"
-        ) ON a.device_mete_id = b.device_mete_id
-        )
-        LEFT JOIN (
-        (
-        (t_cruise_task_result_detail c
-        LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id)
-        LEFT JOIN (t_cruise_result i LEFT JOIN t_dict_business j ON i.c_type=j.dict_code AND j.col_name="plan_type") ON c.task_result_id=i.task_result_id
-        )
-        ) ON b.instance_id = c.instance_id
-        WHERE
-        a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
-        <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime != ''">and c.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
+        LEFT JOIN t_cruise_point_instance b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
+        LEFT JOIN t_cruise_task_result_detail e ON b.instance_id = e.instance_id
+        LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
+        LEFT JOIN t_cruise_result g ON e.task_result_id = g.task_result_id
+        LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
+        LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
+        WHERE 1 = 1
+        <if test="deviceMeteId != null " > and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}</if>
+        <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime != ''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
         <if test="cruiseType != -1 " >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
-        <if test="cType != -1" >and i.c_type=#{cType,jdbcType=INTEGER}</if>
-        ORDER BY c.cruise_time ASC
+        <if test="cType != -1" >and g.c_type=#{cType,jdbcType=INTEGER}</if>
+        <if test="meterType != -1" >and a.meter_type=#{meterType,jdbcType=INTEGER}</if>
+        <if test="meteType != null and meteType != -1" >and a.mete_type=#{meteType,jdbcType=VARCHAR}</if>
+        ORDER BY e.cruise_time ASC
     </select>
 </mapper>

@@ -102,6 +102,7 @@ public class TCruiseDataResultService {
         }
 
         log.info("cruiseResultAnalMeteInfoList第一次==="+cruiseResultAnalMeteInfoList);
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         //获取同一设备下的有巡检结果的标准测点
         List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
@@ -139,7 +140,6 @@ public class TCruiseDataResultService {
         log.info("abnormalFilters==="+abnormalFilters);
         cruiseResultAnalMeteInfoList.removeAll(abnormalFilters);
         log.info("cruiseResultAnalMeteInfoList==="+cruiseResultAnalMeteInfoList);
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         resultMap.put("count",page.getTotal());
         resultMap.put("list", cruiseResultAnalMeteInfoList);
         return resultMap;
@@ -317,8 +317,10 @@ public class TCruiseDataResultService {
                                                  Integer cType,
                                                  Long deviceMeteId,
                                                  String startTime,
-                                                 String endTime) {
-        List<BrokenLineInfo> brokenLineInfos = tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime);
+                                                 String endTime,
+                                                 String meteType,
+                                                 Integer meterType) {
+        List<BrokenLineInfo> brokenLineInfos = tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
         return brokenLineInfos;
     }
 

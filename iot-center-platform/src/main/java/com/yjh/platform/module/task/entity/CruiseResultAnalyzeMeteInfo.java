@@ -19,11 +19,9 @@ public class CruiseResultAnalyzeMeteInfo extends CruiseResultAnalMeteInfo{
 
     @ApiModelProperty(value = "数据来源")
     private String meteType;
-    @ApiModelProperty(value = "数据来源--字典表")
-    private String meteTypeName;
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
-    @ApiModelProperty(value = "表计类型--字典表")
-    private String meterTypeName;
+    @ApiModelProperty(value = "设备类型")
+    private Integer deviceType;
 
 }

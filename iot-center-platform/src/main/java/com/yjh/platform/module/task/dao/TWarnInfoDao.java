@@ -56,12 +56,16 @@ public interface TWarnInfoDao {
     Map<String, Integer> countByAlarmSource();
     List<TJContentInfoDetail>  countByDeviceType(@Param(value = "startTime")String startTime,
                                                  @Param(value = "endTime")String endTime);
+    List<TJContentInfoDetail>  countAlarmByDeviceType(@Param(value = "startTime")String startTime,
+                                                 @Param(value = "endTime")String endTime);
     Map<String, Integer> countWarnConfMode(@Param(value = "startTime")String startTime,
                                            @Param(value = "endTime")String endTime);
-    Map<String, Integer> countWarnConfMode2(@Param(value = "startTime")String startTime,
+    Map<String, Integer> countWarnDefectConfMode(@Param(value = "startTime")String startTime,
                                            @Param(value = "endTime")String endTime);
     List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
     List<WarnStatistical> countWarnOnMonth();
+    List<WarnStatistical> countWarnAndDefectOnMonth();
+
     //查询未审核告警信息数量(查询所有未被核查的告警信息条数)
     Integer warnCountsNonIdentify();
 

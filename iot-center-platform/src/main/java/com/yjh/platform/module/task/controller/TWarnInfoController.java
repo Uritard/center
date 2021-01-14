@@ -200,8 +200,8 @@ public class TWarnInfoController {
     @RequestMapping(value = "/WarnConfirm", method = RequestMethod.GET)
     public Result WarnConfirm(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                               @RequestParam(value = "confMode", required = false) Integer confMode,
-                              @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
-                              @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
+                              @RequestParam(value = "startTime", required = false) String startTime,
+                              @RequestParam(value = "endTime", required = false)String endTime,
                               @RequestParam(value = "deviceName", required = false) String deviceName,
                               @RequestParam(value = "defectType", required = false) Integer defectType,
                               @RequestParam(value = "meteName", required = false) String meteName,
@@ -255,12 +255,25 @@ public class TWarnInfoController {
         }
         return result;
     }
-    @ApiOperation(value = "根据设备类型统计告警个数-柱图")
+    @ApiOperation(value = "根据设备类型统计告警个数-近一月")
     @RequestMapping(value = "/countByDeviceType", method = RequestMethod.GET)
     public Result countByDeviceType(){
         Result result = new Result();
         try {
             List<TJContentInfoDetail> list = tWarnInfoService.countByDeviceType();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据设备类型统计告警和缺陷个数-近一月")
+    @RequestMapping(value = "/countAlarmByDeviceType", method = RequestMethod.GET)
+    public Result countAlarmByDeviceType(){
+        Result result = new Result();
+        try {
+            List<TJContentInfoDetail> list = tWarnInfoService.countAlarmByDeviceType();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -281,7 +294,20 @@ public class TWarnInfoController {
         }
         return result;
     }
-    @ApiOperation(value = "根据告警处理状态统计告警个数-饼图")
+    @ApiOperation(value = "统计近一月的所有告警和缺陷个数-折线图")
+    @RequestMapping(value = "/countWarnAndDefectOnMonth", method = RequestMethod.GET)
+    public Result countWarnAndDefectOnMonth(){
+        Result result = new Result();
+        try {
+            List<WarnStatistical> list = tWarnInfoService.countWarnAndDefectOnMonth();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据告警处理状态统计告警个数-近一月")
     @RequestMapping(value = "/countWarnConfMode", method = RequestMethod.GET)
     public Result countWarnConfMode(){
         Result result = new Result();
@@ -294,12 +320,12 @@ public class TWarnInfoController {
         }
         return result;
     }
-    @ApiOperation(value = "根据告警处理状态统计告警个数-饼图2")
-    @RequestMapping(value = "/countWarnConfMode2", method = RequestMethod.GET)
-    public Result countWarnConfMode2(){
+    @ApiOperation(value = "根据告警和缺陷处理状态统计告警个数-近一月")
+    @RequestMapping(value = "/countWarnDefectConfMode", method = RequestMethod.GET)
+    public Result countWarnDefectConfMode(){
         Result result = new Result();
         try {
-            List<TJContentInfo> list = tWarnInfoService.countWarnConfMode2();
+            List<TJContentInfo> list = tWarnInfoService.countWarnDefectConfMode();
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -327,6 +353,22 @@ public class TWarnInfoController {
         String userId = request.getHeader("userId");
         try {
             result.setData(tWarnInfoService.alarmProcess(tWarnInfo,userId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("进行告警处理发生异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("进行告警处理发生错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "告警核查")
+    @RequestMapping(value = "/alarmAndDefectProcess", method = RequestMethod.PUT)
+    public Result alarmAndDefectProcess(@RequestBody AlarmAndDefectProcess alarmAndDefectProcess, HttpServletRequest request){
+        Result result = new Result();
+        String userId = request.getHeader("userId");
+        try {
+            result.setData(tWarnInfoService.alarmAndDefectProcess(alarmAndDefectProcess,userId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("进行告警处理发生异常:", e);

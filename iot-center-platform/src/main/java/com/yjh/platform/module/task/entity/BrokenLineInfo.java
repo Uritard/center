@@ -26,15 +26,29 @@ public class BrokenLineInfo implements Serializable {
     private String ResultNum;
     @ApiModelProperty(value = "巡视类型")
     private int cruiseType;
-
-    @ApiModelProperty(value = "查询条件-巡检方式")
-    private Integer cType;
-
     @ApiModelProperty(value = "巡视类型名称")
     private String cruiseTypeName;
 
+    @ApiModelProperty(value = "任务类型")
+    private Integer cType;
+
     @ApiModelProperty(value = "测点名称")
     private String meteName;
+
+    @ApiModelProperty(value = "任务类型--字典表")
+    private String cTypeName;
+
+    @ApiModelProperty(value = "识别类型")
+    private String meteType;
+    @ApiModelProperty(value = "任务类型--字典表")
+    private String meteTypeName;
+
+    @ApiModelProperty(value = "表计类型")
+    private Integer meterType;
+    @ApiModelProperty(value = "任务类型--字典表")
+    private String meterTypeName;
+
+
 
 
 }

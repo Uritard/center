@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
+import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
@@ -33,6 +34,8 @@ public class TWarnInfoService{
 
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    @Autowired
+    private TDefectInfoDao tDefectInfoDao;
     @Autowired
     private TCameraAlarmDao tCameraAlarmDao;
     @Autowired
@@ -102,7 +105,7 @@ public class TWarnInfoService{
     }
     @Logs(title = "告警确认", code = "tWarnInfo",content = "根据web传递的参数查询告警记录")
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfoDetail> WarnConfirm(Integer warnLevel, Integer confMode, Date startTime, Date endTime, String deviceName,Integer defectType,String meteName) {
+    public List<TWarnInfoDetail> WarnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("warnLevel", warnLevel);
         map.put("confMode", confMode);
@@ -142,6 +145,26 @@ public class TWarnInfoService{
         List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countByDeviceType(startTime,endTime);
         System.out.println("tjContentInfoList是："+tjContentInfoList);
         return tjContentInfoList;
+    }
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据设备类型统计告警和缺陷个数")
+    @Transactional(rollbackFor = Exception.class)
+    public List<TJContentInfoDetail> countAlarmByDeviceType(){
+        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        String firstTime1 = monthDates.get(0);
+        Date startingTime = dateTimeUtil.parse(firstTime1);
+        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        String startTime = monthDates.get(29);
+        log.info("startTime==="+startTime);
+        log.info("endTime==="+endTime);
+        List<TJContentInfoDetail> tjContentInfoList = tWarnInfoDao.countAlarmByDeviceType(startTime,endTime);
+        System.out.println("tjContentInfoList是："+tjContentInfoList);
+        return tjContentInfoList;
+    }
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "统计近一月的所有告警和缺陷个数")
+    @Transactional(rollbackFor = Exception.class)
+    public List<WarnStatistical> countWarnAndDefectOnMonth() {
+        List<WarnStatistical> list = tWarnInfoDao.countWarnAndDefectOnMonth();
+        return list;
     }
     @Logs(title = "统计告警个数", code = "tWarnInfo",content = "统计近一月的所有告警个数")
     @Transactional(rollbackFor = Exception.class)
@@ -218,9 +241,9 @@ public class TWarnInfoService{
         }
         return tjContentInfoList;
     }
-    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警处理状态统计告警个数-近一月")
+    @Logs(title = "统计告警个数", code = "tWarnInfo",content = "根据告警和缺陷处理状态统计告警个数-近一月")
     @Transactional(rollbackFor = Exception.class)
-    public List<TJContentInfo> countWarnConfMode2() {
+    public List<TJContentInfo> countWarnDefectConfMode() {
         List<String> monthDates = dateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
         Date startingTime = dateTimeUtil.parse(firstTime1);
@@ -228,7 +251,7 @@ public class TWarnInfoService{
         String startTime = monthDates.get(29);
         log.info("startTime==="+startTime);
         log.info("endTime==="+endTime);
-        Map<String, Integer> map = tWarnInfoDao.countWarnConfMode2(startTime,endTime);
+        Map<String, Integer> map = tWarnInfoDao.countWarnDefectConfMode(startTime,endTime);
         List<TJContentInfo> tjContentInfoList = new ArrayList<>();
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
@@ -269,6 +292,38 @@ public class TWarnInfoService{
             String json = JSON.toJSONString(jasonMap);
             System.out.println(("发送给前端的消息===" + json));
             WebSocketServer.sendMsg(json);
+        }
+        return jieGuo;
+    }
+    @Logs(title = "进行告警处理", code = "tWarnInfo",content = "根据web传递的参数进行告警处理")
+    @Transactional(rollbackFor = Exception.class)
+    public int alarmAndDefectProcess(AlarmAndDefectProcess alarmAndDefectProcess,String userId) {
+        Long warnId = alarmAndDefectProcess.getWarnId();
+        Integer dealType = alarmAndDefectProcess.getDealType();
+        String dealInfo = alarmAndDefectProcess.getDealInfo();
+        Integer defectModel = alarmAndDefectProcess.getDefectModel();
+        Date date = new Date();
+        int jieGuo = 0;
+        if (Objects.nonNull(defectModel)){
+            if (defectModel == 405){//告警产生的缺陷：其他
+                TWarnInfo tWarnInfo = new TWarnInfo()
+                        .setDealInfo(dealInfo)
+                        .setWarnId(warnId)
+                        .setDealType(dealType)
+                        .setDealTime(date)
+                        .setDealPersonId(userId)
+                        .setConfMode(275);
+                jieGuo = tWarnInfoDao.update(tWarnInfo);
+            }else {
+                TDefectInfo tDefectInfo = new TDefectInfo()
+                        .setDefectId(warnId)
+                        .setDealInfo(dealInfo)
+                        .setDealType(dealType)
+                        .setDealPersonId(userId)
+                        .setDealTime(date)
+                        .setConfMode(275);
+                jieGuo = tDefectInfoDao.update(tDefectInfo);
+            }
         }
         return jieGuo;
     }

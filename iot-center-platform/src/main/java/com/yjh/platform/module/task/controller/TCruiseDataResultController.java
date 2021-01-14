@@ -268,7 +268,6 @@ public class TCruiseDataResultController {
                                                @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                                                 @RequestParam(value = "meteType", required = false) String meteType,
                                                 @RequestParam(value = "meterType", required = false) Integer meterType,
-                                                @RequestParam(value = "instanceName", required = false) String instanceName,
                                                 @RequestParam(value = "endTime", required = false) String endTime,
                                                @RequestParam(value = "startTime", required = false) String startTime,
                                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -326,12 +325,13 @@ public class TCruiseDataResultController {
         }
         return result;
     }
-
     @ApiOperation(value = "获取折线图元素信息")
     @RequestMapping(value = "/selectBrokenLine", method = RequestMethod.GET)
     public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                    @RequestParam(value = "cType", required = false) Integer cType,
-                                   @RequestParam(value = "deviceMeteId") Long deviceMeteId,
+                                   @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
+                                   @RequestParam(value = "meteType", required = false) String meteType,
+                                   @RequestParam(value = "meterType", required = false) Integer meterType,
                                    @RequestParam(value = "endTime", required = false) String endTime,
                                    @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
@@ -342,7 +342,7 @@ public class TCruiseDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime));
+            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

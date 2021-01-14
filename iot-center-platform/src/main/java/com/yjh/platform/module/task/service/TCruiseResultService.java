@@ -1,10 +1,8 @@
 package com.yjh.platform.module.task.service;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -91,7 +89,10 @@ public class TCruiseResultService{
         Map<String, Object> resultMap = new HashMap<>();
 
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList);
+        List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
+        if (deviceIdList != null &&deviceIdList.size() > 0){
+            cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList);
+        }
 
         resultMap.put("count",page.getTotal());
         resultMap.put("list", cruiseResultDetailList);
@@ -110,34 +111,105 @@ public class TCruiseResultService{
         //审核
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
-        //判断该巡检点是否产生告警；若是，则将该条告警设置为已核查
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         log.info("judgeCondition是==="+judgeCondition);
-        if(judgeCondition.get("is_warn").toString() != null || judgeCondition.get("is_warn").toString().equals("")){
-            int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
-            String taskId = judgeCondition.get("task_id").toString();
-            Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
-            Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
-            log.info("人工审核的实际结果是==="+identifyResult);
-            log.info("查询的告警条件isWarn是==="+isWarn);
-            log.info("查询的告警条件taskId是==="+taskId);
-            log.info("查询的告警条件instanceId是==="+instanceId);
-            if ( isWarn == 1){
-                tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
-                if (identifyResult == 261){//结果正确
-                    tCruiseResultDao.updateWarnInfo2(taskId,instanceId);//更新告警表信息
-                    Long warnId = tCruiseResultDao.selectWarnId(taskId,instanceId);//根据任务和巡检点id查询告警id
-                    //给前端推webSocket
-                    Map<String,Object> jasonMap=new HashMap<>();
-                    jasonMap.put("type","finishedOneAlarm");
-                    jasonMap.put("alarmId",warnId);
-                    String json= JSON.toJSONString(jasonMap);
-                    System.out.println(("发送给前端的消息==="+json));
-                    WebSocketServer.sendMsg(json);
+        String personCheck = judgeCondition.get("person_check").toString();
+        log.info("人工审核的测点值信息是==="+personCheck);
+        int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
+        log.info("查询的告警条件isWarn是==="+isWarn);
+        String taskId = judgeCondition.get("task_id").toString();
+        log.info("查询的告警条件taskId是==="+taskId);
+        Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
+        log.info("查询的告警条件instanceId是==="+instanceId);
+        Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
+        log.info("人工审核的实际结果是==="+identifyResult);
+        //查询该巡检点对应测点配置的告警阈值相关信息
+        Map<String,Object> deviceMeteInfo = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
+
+        /*int isWarnRes = 0;
+        //判断该点是否已在告警表
+        if ("".equals(judgeCondition.get("is_warn").toString()) || judgeCondition.get("is_warn").toString() != null) {
+            if (isWarn == 1) {
+                //存在
+                //判断该点是否配置告警
+                Integer alarmState = Integer.valueOf(deviceMeteInfo.get("alarm_state").toString());
+                int isWarnSetting = warnSettings(alarmState,1,2,3,4,5,6,7,8);
+                if (isWarnSetting == 1){//满足
+                    // 判断该点修正后的值是否满足告警规则触发告警
+                    if ("".equals(deviceMeteInfo.get("mete_kind").toString()) || deviceMeteInfo.get("mete_kind").toString() != null ) {
+                        if (deviceMeteInfo.get("mete_kind").toString().equals("2")) {//遥测
+                            isWarnRes = warnJudgement(personCheck,1,2,3,4,5,6,7,8);
+                            if (isWarnRes > 0) {
+                                //修改，属实
+                                tCruiseResultDao.updateWarnInfo(taskId,instanceId);
+                            }else {
+                                //修改，不属实
+                                tCruiseResultDao.updateWarnInfo2(taskId,instanceId);
+                            }
+
+                        }else if (deviceMeteInfo.get("mete_kind").toString().equals("1")) {//遥信
+                            isWarnRes = warnJudgementTelesignaling(personCheck,1,2,3);
+                            if (isWarnRes == 1){
+                                //修改，属实
+                                tCruiseResultDao.updateWarnInfo(taskId,instanceId);
+                            }else {
+                                //修改，不属实
+                                tCruiseResultDao.updateWarnInfo2(taskId,instanceId);
+                            }
+                        }
+                    }
+                }
+            }else {
+                //不存在
+                //判断该点是否配置告警
+                Integer alarmState = Integer.valueOf(deviceMeteInfo.get("alarm_state").toString());
+                int isWarnSetting = warnSettings(alarmState,1,2,3,4,5,6,7,8);
+                if (isWarnSetting == 1){//满足
+                    // 判断该点修正后的值是否满足告警规则触发告警
+                    if ("".equals(deviceMeteInfo.get("mete_kind").toString()) || deviceMeteInfo.get("mete_kind").toString() != null ) {
+                        if (deviceMeteInfo.get("mete_kind").toString().equals("2")) {//遥测
+                            isWarnRes = warnJudgement(personCheck,1,2,3,4,5,6,7,8);
+                            if (isWarnRes > 0) {
+                                //触发告警---插库---属实
+                                switch (isWarnRes) {
+                                    case 1://预警
+                                        break;
+                                    case 2://一般
+                                        break;
+                                    case 3://严重
+                                        break;
+                                    case 4://危急
+                                        break;
+                                }
+                            }
+                        }else if (deviceMeteInfo.get("mete_kind").toString().equals("1")) {//遥信
+                            isWarnRes = warnJudgementTelesignaling(personCheck,1,2,3);
+                            if (isWarnRes == 1){
+                                //触发告警---插库---属实
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        */
+        /*if ( isWarn == 1){
+            tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
+            if (identifyResult == 261){//结果正确
+                tCruiseResultDao.updateWarnInfo2(taskId,instanceId);//更新告警表信息
+                Long warnId = tCruiseResultDao.selectWarnId(taskId,instanceId);//根据任务和巡检点id查询告警id
+                //给前端推webSocket
+                Map<String,Object> jasonMap=new HashMap<>();
+                jasonMap.put("type","finishedOneAlarm");
+                jasonMap.put("alarmId",warnId);
+                String json= JSON.toJSONString(jasonMap);
+                System.out.println(("发送给前端的消息==="+json));
+                WebSocketServer.sendMsg(json);
+            }
+        }*/
+
         //获取审核后的信息
         String taskResultId1  = cruiseManualReview.getTaskResultId();
         List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskResultId1);
