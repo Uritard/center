@@ -180,8 +180,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         //构造注册消息
         //todo sendcode 要从配置文件里读取
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("Client02)")
-                .setReceiveCode("Srerver02")
+                .setSendCode("Client02")
+                .setReceiveCode("Server02")
                 .setType("251")
                 .setCommand("1");
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
@@ -195,8 +195,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         try {
             // 心跳报文(客户端,服务端均可发起测试);
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode("Client02)")
-                    .setReceiveCode("Srerver02")
+                    .setSendCode("Client02")
+                    .setReceiveCode("Server02")
                     .setType("251")
                     .setCommand("2");
             String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
