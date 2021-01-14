@@ -159,7 +159,9 @@ public class TDeviceMaintenanceService{
                 item.setEffectiveState(406);
                 item.setEffectiveStateName("已生效");
             }
-            if(effectiveState != null && item.getEffectiveState() != effectiveState){
+            if(effectiveState != null && !(item.getEffectiveState().equals(effectiveState))){
+                System.out.println(item.getEffectiveState());
+                System.out.println(!(item.getEffectiveState().equals(effectiveState)));
                 continue;
             }
             List<IdAndNameDetail> list = this.tDeviceMaintenanceDao.selectIdAndName(item.getMaintenanceId());

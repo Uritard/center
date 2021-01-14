@@ -140,6 +140,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     }
                     tCruiseTaskAttrDao.batchInsert(attrList);
                 }
+                taskId = tCruiseTask.getTaskId();
                 Map<String,Object> jasonMap=new HashMap<>();
                 jasonMap.put("type","newTask");
                 jasonMap.put("taskId",tCruiseTask.getTaskId());
