@@ -32,6 +32,7 @@ public class SendToUpSystemServices {
             Constant.sendSessionId = sendSessionId;//刷新sendSessionId
         }else {
             Constant.sendSessionId = 0L;//刷新sendSessionId
+            return -1;
         }
         String type = "";
         if("abnormalWarn".equals(msgType)){//异常告警

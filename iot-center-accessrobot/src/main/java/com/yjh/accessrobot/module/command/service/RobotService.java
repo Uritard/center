@@ -663,5 +663,22 @@ public class RobotService {
         return map;
     }
 
+
+    @Logs(title ="站端控制机器人",code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public String upSystemCommand(XMLBaseModel xmlBaseModel){
+        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+
+        xmlBaseModel
+                .setSendCode("Server01")
+                .setReceiveCode(xmlBaseModel.getCode())
+                .setCode("省检018");
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+        log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
+        //根据不同的机器人对应不同的管道发送指令
+        RobotServerHandler.getRobotServerHandlerMap().get(xmlBaseModel.getCode()).SendHeartBeat( generateByteOrder(xmlString,xmlBaseModel.getCode()),xmlBaseModel.getCode());
+        return "success";
+    }
+
 }
 

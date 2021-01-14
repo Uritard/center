@@ -346,11 +346,11 @@ public class TStdMetemodelService {
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
         Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        //String path = (String) mapForCreatePath.get("content");
+        String path = (String) mapForCreatePath.get("content");
         Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String returnPath = (String) mapForReturnPath.get("content");
 
-        String path = "D:/code/qhTest";
+        //String path = "D:/code/qhTest";
         String fileName = "meteModel.xls";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
@@ -727,7 +727,6 @@ public class TStdMetemodelService {
                 tStdMete.setAlarmDelay(Integer.valueOf(item));
             }
 
-
             cell = row.getCell(15);
             if(cell != null){
 //设置单元格类型
@@ -738,9 +737,8 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setHighLimit1(Float.valueOf(item));
+                tStdMete.setStateZero(item);
             }
-
 
             cell = row.getCell(16);
             if(cell != null){
@@ -752,8 +750,10 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setLowLimit1(Float.valueOf(item));
+                tStdMete.setStateOne(item);
             }
+
+
 
 
             cell = row.getCell(17);
@@ -766,13 +766,13 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setHighLimit2(Float.valueOf(item));
+                tStdMete.setHighLimit1(Float.valueOf(item));
             }
 
 
             cell = row.getCell(18);
             if(cell != null){
-                //设置单元格类型
+//设置单元格类型
                 cell.setCellType(CellType.STRING);
                 item = cell.getStringCellValue();
                 if(checkString(item)){
@@ -780,7 +780,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setLowLimit2(Float.valueOf(item));
+                tStdMete.setLowLimit1(Float.valueOf(item));
             }
 
 
@@ -794,13 +794,13 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setHighLimit3(Float.valueOf(item));
+                tStdMete.setHighLimit2(Float.valueOf(item));
             }
 
 
             cell = row.getCell(20);
             if(cell != null){
-//设置单元格类型
+                //设置单元格类型
                 cell.setCellType(CellType.STRING);
                 item = cell.getStringCellValue();
                 if(checkString(item)){
@@ -808,7 +808,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setLowLimit3(Float.valueOf(item));
+                tStdMete.setLowLimit2(Float.valueOf(item));
             }
 
 
@@ -822,7 +822,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setHighLimit4(Float.valueOf(item));
+                tStdMete.setHighLimit3(Float.valueOf(item));
             }
 
 
@@ -836,7 +836,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setLowLimit4(Float.valueOf(item));
+                tStdMete.setLowLimit3(Float.valueOf(item));
             }
 
 
@@ -850,7 +850,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setAlarmCnt(Integer.valueOf(item));
+                tStdMete.setHighLimit4(Float.valueOf(item));
             }
 
 
@@ -864,7 +864,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
+                tStdMete.setLowLimit4(Float.valueOf(item));
             }
 
 
@@ -878,9 +878,8 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
+                tStdMete.setAlarmCnt(Integer.valueOf(item));
             }
-
 
 
             cell = row.getCell(26);
@@ -893,7 +892,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setModulus(Integer.valueOf(item));
+                tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
             }
 
 
@@ -904,6 +903,35 @@ public class TStdMetemodelService {
                 item = cell.getStringCellValue();
                 if(checkString(item)){
                     errMsg.append("第" + (i + 1) + "行," + "第" + (28) + "列含有特殊字符<br>");
+                    result.setMessage(errMsg.toString());
+                    return result;
+                }
+                tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
+            }
+
+
+
+            cell = row.getCell(28);
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                if(checkString(item)){
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (29) + "列含有特殊字符<br>");
+                    result.setMessage(errMsg.toString());
+                    return result;
+                }
+                tStdMete.setModulus(Integer.valueOf(item));
+            }
+
+
+            cell = row.getCell(29);
+            if(cell != null){
+//设置单元格类型
+                cell.setCellType(CellType.STRING);
+                item = cell.getStringCellValue();
+                if(checkString(item)){
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (30) + "列含有特殊字符<br>");
                     result.setMessage(errMsg.toString());
                     return result;
                 }

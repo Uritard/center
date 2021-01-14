@@ -163,7 +163,7 @@ public class TDeviceMaintenanceService{
                 continue;
             }
             List<IdAndNameDetail> list = this.tDeviceMaintenanceDao.selectIdAndName(item.getMaintenanceId());
-            item.setUpRegionList(this.tDeviceMaintenanceDao.selectUpRegionIdList(item.getMaintenanceId()));
+            //item.setUpRegionList(this.tDeviceMaintenanceDao.selectDeviceIds(item.getMaintenanceId()));
             item.setDeviceInfo(list);
             re.add(item);
             //&& endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0)
@@ -177,8 +177,8 @@ public class TDeviceMaintenanceService{
         Map<String,Object> re = new HashMap<>();
         List<IdAndNameDetail> list1 = this.tDeviceMaintenanceDao.selectIdAndName(maintenanceId);
         re.put("deviceInfo",list1);
-        List<Long> list2 = this.tDeviceMaintenanceDao.selectUpRegionIdList(maintenanceId);
-        re.put("upRegionIdList",list2);
+        List<Long> list2 = this.tDeviceMaintenanceDao.selectDeviceIds(maintenanceId);
+        re.put("deviceIds",list2);
         return re;
     }
 

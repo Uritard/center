@@ -79,7 +79,7 @@ public class TSysParamService{
         return this.insertIntoRedis();
     }
 
-    @Logs(title = "新增", code = "module", content = "新增系统参数缓存")
+    //@Logs(title = "新增", code = "module", content = "新增系统参数缓存")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoRedis(){
         List<TSysParam> list = this.tSysParamDao.selectAll();

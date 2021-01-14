@@ -9,6 +9,7 @@ import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
+import com.yjh.accesstcp.thread.WeatherThread;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;

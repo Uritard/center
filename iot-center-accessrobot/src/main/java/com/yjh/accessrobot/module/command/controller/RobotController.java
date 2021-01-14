@@ -5,6 +5,7 @@ import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
 import com.yjh.accessrobot.module.command.entity.TCruiseResult;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -118,6 +119,21 @@ public class RobotController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("机器人控制接口调用错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "站端命令下发")
+    @RequestMapping(value = "/upSystemCommand", method = RequestMethod.POST)
+    public Result upSystemCommand(@RequestBody XMLBaseModel xmlBaseModel){
+        Result result = new Result();
+        try {
+            result.setData(robotService.upSystemCommand(xmlBaseModel));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站端命令下发错误:", e);
         }
         return result;
     }

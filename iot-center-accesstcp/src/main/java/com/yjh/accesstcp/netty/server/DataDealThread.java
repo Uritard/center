@@ -3,6 +3,8 @@ package com.yjh.accesstcp.netty.server;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
+import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
@@ -108,7 +110,7 @@ public class DataDealThread implements Runnable {
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
         //解析的xml文件
-        if ("251".equals(xmlBaseModel.getType())) {
+        if ("251".equals(xmlBaseModel.getType())) {//系统消息
             if ("4".equals(xmlBaseModel.getCommand())) {//响应注册
                 log.info("---注册响应---");
                 if ("100".equals(xmlBaseModel.getCode())) {
@@ -135,7 +137,6 @@ public class DataDealThread implements Runnable {
                     //将数据放入redis 做个保存
                     redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
                     //todo 记得做 启动响应线程处理响应业务
-
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(tcpClientHandler, true);
                     //天气线程发天气
@@ -171,6 +172,24 @@ public class DataDealThread implements Runnable {
                 redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
             }
         }
+        if("1".equals(xmlBaseModel.getType()) || "2".equals(xmlBaseModel.getType()) || "3".equals(xmlBaseModel.getType())
+          || "4".equals(xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType())){//控制消息
+            log.info("--响应控制--");
+            Map<String,Object> robotMap = new HashMap<>();
+            robotMap.put("xmlBaseModel",xmlBaseModel);
+            robotTaskStates(robotMap);
+        }
 
+    }
+
+    private void robotTaskStates(Map<String,Object> robotMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_URL, robotMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

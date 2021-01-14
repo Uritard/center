@@ -21,13 +21,19 @@ public class HeartBeatThead implements Runnable{
     public void run() {
         while (isThreadStart) {
             try {
-                tCPClientHandler.ProcSend();
+
                 if (!tCPClientHandler.getIsThreadStart()) {
                     isThreadStart = false;
                     log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
                     log.info("Thread stop success!");
                 }
-                Thread.sleep(Long.valueOf(Constant.paramMap.get("heart_beat_interval"))*1000L);
+                tCPClientHandler.ProcSend();
+                log.info("--心跳信息已发送--");
+                String s = Constant.paramMap.get("heart_beat_interval");
+                if(s == null){
+                    s= "30";
+                }
+                Thread.sleep(Long.valueOf(s)*1000L);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
