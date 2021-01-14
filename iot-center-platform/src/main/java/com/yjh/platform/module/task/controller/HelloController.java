@@ -83,12 +83,14 @@ public class HelloController {
     @ApiOperation(value = "webSocketBroadcast测试")
     @RequestMapping(value = "/webSocketBroadcast", method = RequestMethod.POST)
     public Result webSocketBroadcast(@RequestParam(value = "type") String type,
-                                     @RequestParam(value = "message") String message) {
+                                     @RequestParam(value = "message") String message,
+                                     @RequestParam(value = "warnId") String warnId) {
         Result result = new Result();
         try {
             Map<String, Object> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", type);
             jasonMaps2.put("message", message);
+            jasonMaps2.put("warnId", warnId);
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();

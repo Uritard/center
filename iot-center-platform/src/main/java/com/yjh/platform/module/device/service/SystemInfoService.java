@@ -43,7 +43,7 @@ public class SystemInfoService {
     public Map<String,String> getMemory() throws Exception {
         return systemInfoUtil.getMemUsage();
     }
-    @Logs(title = "获取cpu信息", code = "module",content = "获取cpu信息")
+//    @Logs(title = "获取cpu信息", code = "module",content = "获取cpu信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getCPU() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getCpuUsage();
