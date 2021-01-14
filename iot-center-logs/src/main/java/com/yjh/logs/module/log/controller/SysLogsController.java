@@ -1,11 +1,14 @@
 package com.yjh.logs.module.log.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.logs.commons.utils.RandomUtil;
+import com.yjh.logs.commons.websocket.WebSocketServer;
 import com.yjh.logs.module.log.entity.SysLogsTime;
 import com.yjh.logs.module.log.service.SysLogsService;
 import com.yjh.logs.module.log.entity.SysLogs;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.swagger.annotations.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -60,13 +63,45 @@ public class SysLogsController {
             sysLogs.setUserId(userId);
             sysLogs.setUserName(userName);
             Random random = new Random();
-            new Thread(() -> {
-                String mathRandom = String.valueOf(random.nextInt(50))+"000";
-                long mathLong = Long.valueOf(mathRandom);
-                log.info("mathLong: "+mathLong);
-                try { Thread.sleep(mathLong); } catch (Exception e) {e.getMessage();}
-                result.setData(sysLogsService.insert(sysLogs));
-            }).start();
+            if (state == 1) {
+                new Thread(() -> {
+                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
+                    long mathLong = Long.valueOf(mathRandom);
+                    log.info("mathLong: " + mathLong);
+                    try {
+                        Thread.sleep(mathLong);
+                    } catch (Exception e) {
+                        e.getMessage();
+                    }
+                    result.setData(sysLogsService.insert(sysLogs));
+                }).start();
+            } else {
+                Map<String, Object> errMessage = new HashMap<>();
+                errMessage.put("type", "errorLog");
+                errMessage.put("content", content);
+                errMessage.put("state", state);
+                String json = JSON.toJSONString(errMessage);
+                new Thread(() -> {
+                    try {
+                        ConcurrentHashMap<String, WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
+                        for (String us : webSocketMap.keySet()) {
+                            webSocketMap.get(us).sendMessage(json);
+                        }
+                    } catch (Exception e) {
+                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                        log.error("发送失败：" + e);
+                    }
+                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
+                    long mathLong = Long.valueOf(mathRandom);
+                    log.info("mathLong: " + mathLong);
+                    try {
+                        Thread.sleep(mathLong);
+                    } catch (Exception e) {
+                        e.getMessage();
+                    }
+                    result.setData(sysLogsService.insert(sysLogs));
+                }).start();
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -82,7 +117,7 @@ public class SysLogsController {
         Result result = new Result();
         try {
             Map<String, String[]> map = request.getParameterMap();
-            System.out.println("map: "+ map);
+            System.out.println("map: " + map);
             result.setData(sysLogsService.insert(sysLogs));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -150,7 +185,7 @@ public class SysLogsController {
                          @RequestParam(value = "content", required = false) String content,
                          @RequestParam(value = "userId", required = false) Long userId,
                          @RequestParam(value = "userName", required = false) String userName,
-                         @RequestParam(value = "createTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date createTime) {
+                         @RequestParam(value = "createTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date createTime) {
         Result result = new Result();
         try {
             List<SysLogs> list = sysLogsService.select(logId, logType, ip, title, state, content, userId, userName, createTime);
@@ -170,7 +205,7 @@ public class SysLogsController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<SysLogs> list = sysLogsService.selectByPage(sysLogsTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
