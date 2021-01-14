@@ -43,7 +43,8 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@Validated @RequestBody TCameraGroup tCameraGroup) {
+    public Result add(@RequestBody TCameraGroup tCameraGroup) {
+
         Result result = new Result();
         try {
             result.setData(tCameraGroupService.add(tCameraGroup));

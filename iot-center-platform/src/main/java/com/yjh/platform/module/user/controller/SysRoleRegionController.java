@@ -41,7 +41,8 @@ public class SysRoleRegionController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert( @Validated @RequestBody  SysRoleRegion sysRoleRegion) {
+    public Result insert(@RequestBody  SysRoleRegion sysRoleRegion) {
+
         Result result = new Result();
         try {
             result.setData(sysRoleRegionService.insert(sysRoleRegion));

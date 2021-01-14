@@ -43,7 +43,8 @@ public class SysRoleCameraController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody SysRoleCamera sysRoleCamera) {
+    public Result insert(@RequestBody SysRoleCamera sysRoleCamera) {
+
         Result result = new Result();
         try {
             result.setData(sysRoleCameraService.insert(sysRoleCamera));

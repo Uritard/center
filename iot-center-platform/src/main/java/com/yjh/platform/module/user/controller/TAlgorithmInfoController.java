@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,8 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert( @Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
+    public Result insert(@RequestBody TAlgorithmInfo tAlgorithmInfo) {
+
         Result result = new Result();
         try {
             result.setData(tAlgorithmInfoService.insert(tAlgorithmInfo));

@@ -43,7 +43,8 @@ public class SysMenuController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody SysMenu sysMenu) {
+    public Result insert(@RequestBody SysMenu sysMenu) {
+
         Result result = new Result();
         try {
             result.setData(sysMenuService.insert(sysMenu));

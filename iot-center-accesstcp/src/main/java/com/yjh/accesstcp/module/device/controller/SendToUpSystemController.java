@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/sendToUpSystem/v1")
-@Api(value = "/sendToUpSystem", description = "审计日志表操作接口")
+@Api(value = "/sendToUpSystem", description = "上报服务")
 public class SendToUpSystemController {
 
     @Autowired
@@ -37,13 +37,26 @@ public class SendToUpSystemController {
     }
 
     @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "list", required = true) List<Map<String,Object>> list,
+    @RequestMapping(value = "/send", method = RequestMethod.GET)
+    public Result send(@RequestParam(value = "list", required = true) List<Map<String,Object>> list,
                                     @RequestParam(value = "msgType", required = true) String msgType) {
         Result result = new Result();
         try {
             sendToUpSystemService.send(list,msgType);
             result.setData(1);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "主键查询")
+    @RequestMapping(value = "/creatFile", method = RequestMethod.GET)
+    public Result creatFile() {
+        Result result = new Result();
+        try {
+            result.setData(sendToUpSystemService.creatFile("66"));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

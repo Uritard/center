@@ -1,10 +1,12 @@
 package com.yjh.accesstcp.netty.server;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.common.utils.Object2Map;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
@@ -174,22 +176,66 @@ public class DataDealThread implements Runnable {
         }
         if("1".equals(xmlBaseModel.getType()) || "2".equals(xmlBaseModel.getType()) || "3".equals(xmlBaseModel.getType())
           || "4".equals(xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType())){//控制消息
-            log.info("--响应控制--");
-            Map<String,Object> robotMap = new HashMap<>();
-            robotMap.put("xmlBaseModel",xmlBaseModel);
-            robotTaskStates(robotMap);
+            log.info("--响应控制 控制下发--");
+            Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            robotMap.put("list",list);
+            Result re = robotTaskStates(robotMap);
+            if(re == null){
+                sendToUpSystemServices.sendResponse("251","3","100",null);
+            }else if("success".equals(re.getData().toString())){
+                sendToUpSystemServices.sendResponse("251","3","200",null);
+            }else {
+                sendToUpSystemServices.sendResponse("251","3","500",null);
+            }
+            log.info("==控制响应==");
+        }
+        if ("41".equals(xmlBaseModel.getType())){
+            log.info("--响应任务控制--");
+            if("1".equals(xmlBaseModel.getCommand())){
+                //任务启动
+                String taskId = xmlBaseModel.getCode();
+                //todo 需要思考一下
+
+                Result re = new Result();
+                if(re == null){
+                    sendToUpSystemServices.sendResponse("251","3","100",null);
+                }else if("success".equals(re.getData().toString())){
+                    sendToUpSystemServices.sendResponse("251","3","200",null);
+                }else {
+                    sendToUpSystemServices.sendResponse("251","3","500",null);
+                }
+                log.info("==任务控制响应==");
+
+            }
+
+        }
+
+        if ("101".equals(xmlBaseModel.getType())){
+            log.info("--响应任务--");
+            if("1".equals(xmlBaseModel.getCommand())){
+                log.info("--响应任务 任务下发--");
+                List<Map<String,Object>> list = xmlBaseModel.getItems();
+                for (Map<String,Object> item:list){
+
+                }
+
+            }
         }
 
     }
 
-    private void robotTaskStates(Map<String,Object> robotMap) {
+    private Result robotTaskStates(Map<String,List<XMLBaseModel>> robotMap) {
+        Result re = new Result();
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_URL, robotMap, String.class);
+               re = serviceRestTemplate.postForObject(Constant.ROBOT_TASK_URL, robotMap, Result.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        return re;
     }
 }

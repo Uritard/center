@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.SendToUpSystemDao">
+
+
+
+    <select id="selectDeviceModel"  resultType="java.util.Map">
+        SELECT
+        a.instance_id as device_id,
+            (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
+             WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
+             WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
+             WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
+             WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
+             WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
+        END) AS device_name,
+				f.custom_id as component_id,
+				f.custom_name as component_name,
+				f.up_region_id as bay_id,
+				f.up_region_name as bay_name,
+				f.device_id as main_device_id,
+				f.device_name as main_device_name,
+				j.up_dict as device_type,
+				b.mete_type,
+				b.appearance_type,
+				"" as save_type_list,
+				k.dict_note as recognition_type_list,
+				"" as phase,
+				"" as device_info,
+				"" as data_type,
+				"" as lower_value,
+				"" as upper_value,
+				"" as video_pos
+		FROM t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+        left join t_std_device f on a.device_id = f.device_id and a.custom_id = f.custom_id
+				left join t_dict_business j on f.device_type = j.dict_code
+				left join t_dict_business k on a.cruise_type = k.dict_code
+    </select>
+	
+	<select id="selectRobotInfo" resultType="java.util.Map">
+		select
+		a.robot_name,
+		a.robot_code,
+		c.dict_note as manufacturer,
+		if(b.dict_code=399,0,1) as istransport,
+		b.up_dict as type ,
+		a.remarks as robot_info
+		from t_robot_info a
+		left join t_dict_business b on a.robot_type = b.dict_code
+		left join t_dict_business c on a.robot_factory = c.dict_code
+	</select>
+
+</mapper>

@@ -44,7 +44,8 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody  TCameraRecorder tCameraRecorder) {
+    public Result insert(@RequestBody TCameraRecorder tCameraRecorder) {
+
         Result result = new Result();
         try {
             result.setData(tCameraRecorderService.insert(tCameraRecorder));

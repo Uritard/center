@@ -42,7 +42,8 @@ public class TSysParamController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody TSysParam tSysParam) {
+    public Result insert(@RequestBody TSysParam tSysParam) {
+
         Result result = new Result();
         try {
             result.setData(tSysParamService.insert(tSysParam));

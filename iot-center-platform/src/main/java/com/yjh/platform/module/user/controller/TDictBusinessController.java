@@ -46,7 +46,8 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody  TDictBusiness tDictBusiness) {
+    public Result insert(@RequestBody TDictBusiness tDictBusiness) {
+
         Result result = new Result();
         try {
             result.setData(tDictBusinessService.insert(tDictBusiness));

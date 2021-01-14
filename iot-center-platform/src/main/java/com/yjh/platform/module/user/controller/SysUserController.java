@@ -62,7 +62,8 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody SysUser sysUser) {
+    public Result insert(@RequestBody SysUser sysUser) {
+
         Result result = new Result();
         try {
             result.setData(sysUserService.insert(sysUser));
@@ -283,7 +284,8 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insertUser(@Validated @RequestBody SysUser sysUser) {
+    public Result insertUser( @RequestBody SysUser sysUser) {
+
         Result result = new Result();
         try {
             Long creatorId = userManager.getCreatorId();

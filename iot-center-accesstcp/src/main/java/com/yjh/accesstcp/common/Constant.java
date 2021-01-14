@@ -71,5 +71,5 @@ public class Constant {
     public static Map<String,String> paramMap =new ConcurrentHashMap<>();
 
     //机器人任务路径
-    public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/upSystemCommand";
+    public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot2/robot/v1/upSystemCommand";
 }

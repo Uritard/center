@@ -43,7 +43,8 @@ public class SysRoleDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@Validated @RequestBody SysRoleDevice sysRoleDevice) {
+    public Result insert(@RequestBody   SysRoleDevice sysRoleDevice) {
+
         Result result = new Result();
         try {
             result.setData(sysRoleDeviceService.insert(sysRoleDevice));
