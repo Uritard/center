@@ -1,8 +1,10 @@
 package com.yjh.accessatmosphere;
 
+import com.yjh.accessatmosphere.common.Constant;
 import com.yjh.accessatmosphere.commons.utils.weatherUtils.ParamConfig;
 import com.yjh.accessatmosphere.thread.ListerThread;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,6 +27,8 @@ import java.util.Enumeration;
 @EnableFeignClients
 @Slf4j
 public class AccessAtmosphereApplication implements CommandLineRunner {
+    @Value("{spring.send.service.url}")
+    private String path;
 
     public static void main(String[] args) {
         SpringApplication.run(AccessAtmosphereApplication.class, args);
@@ -32,6 +36,7 @@ public class AccessAtmosphereApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        Constant.path = path;
         ParamConfig paramConfig = new ParamConfig("COM3", 19200, 0, 8, 1);
         Thread thread = new ListerThread(paramConfig);
         thread.start();
