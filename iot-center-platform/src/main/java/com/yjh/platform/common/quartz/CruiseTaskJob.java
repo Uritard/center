@@ -298,8 +298,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetail.setEndTime(new Date());
                             tCruiseTaskResultDetail.setCruiseTime(date);
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            continue;
                         }
-                        continue;
+
                     }
 
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);

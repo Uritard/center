@@ -361,8 +361,9 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetail.setEndTime(new Date());
                         tCruiseTaskResultDetail.setCruiseTime(date);
                         tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                        continue;
                     }
-                    continue;
+
                 }
 
                 //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
