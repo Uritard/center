@@ -117,28 +117,43 @@
         AND b.task_result_id = d.task_result_id
         <if test="cruiseDataId != null">and cruise_data_id = #{cruiseDataId,jdbcType = BIGINT}</if>
     </select>
-    <select id="selectDeviceMeteInfo" parameterType="java.lang.Long" resultType="java.util.Map">
-        SELECT
-            a.instance_id,
-            b.device_mete_id,
-            b.high_limit1,
-            b.high_limit2,
-            b.high_limit3,
-            b.high_limit4,
-            b.low_limit1,
-            b.low_limit2,
-            b.low_limit3,
-            b.low_limit4,
-            b.state_one,
-            b.state_zero,
-            b.alarm_note,
-            b.mete_kind,
-            b.alarm_state
-        FROM
-            t_cruise_point_instance a
-        LEFT JOIN t_std_devicemete b on a.device_mete_id = b.device_mete_id
-        WHERE 1 = 1
-        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+    <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TStdDevicemete">
+        select
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_type,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus,
+        a.remark
+        from t_cruise_point_instance b left join t_std_devicemete a
+        on b.device_mete_id=a.device_mete_id
+        where b.instance_id=#{instanceId,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.String">

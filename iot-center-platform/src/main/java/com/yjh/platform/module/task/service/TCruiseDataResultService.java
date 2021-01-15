@@ -91,8 +91,9 @@ public class TCruiseDataResultService {
     public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
 
         List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+        List<Long> deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
         log.info("regionIdList是==="+regionIdList);
-        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+
         log.info("deviceIdList是==="+deviceIdList);
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -132,10 +133,10 @@ public class TCruiseDataResultService {
                     deviceInfo.setFinalState(0);
                 }
             }
-            /*//cruiseRes:-1全部,1正常,0异常
+            //cruiseRes:-1全部,1正常,0异常
             if (cruiseRes != -1 && cruiseRes != deviceInfo.getFinalState()){
                 abnormalFilters.add(deviceInfo);
-            }*/
+            }
         }
         log.info("abnormalFilters==="+abnormalFilters);
         cruiseResultAnalMeteInfoList.removeAll(abnormalFilters);

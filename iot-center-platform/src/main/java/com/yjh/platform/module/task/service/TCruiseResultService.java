@@ -125,20 +125,19 @@ public class TCruiseResultService{
         Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
         log.info("人工审核的实际结果是==="+identifyResult);
         //查询该巡检点对应测点配置的告警阈值相关信息
-        Map<String,Object> deviceMeteInfo = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
-
-        /*int isWarnRes = 0;
+//        TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
+/*
+        int isWarnRes = 0;
         //判断该点是否已在告警表
         if ("".equals(judgeCondition.get("is_warn").toString()) || judgeCondition.get("is_warn").toString() != null) {
             if (isWarn == 1) {
                 //存在
                 //判断该点是否配置告警
-                Integer alarmState = Integer.valueOf(deviceMeteInfo.get("alarm_state").toString());
-                int isWarnSetting = warnSettings(alarmState,1,2,3,4,5,6,7,8);
+                int isWarnSetting = warnSettings(meteKind,stateZero,stateOne,1,2,3,4,5,6,7,8);
                 if (isWarnSetting == 1){//满足
                     // 判断该点修正后的值是否满足告警规则触发告警
-                    if ("".equals(deviceMeteInfo.get("mete_kind").toString()) || deviceMeteInfo.get("mete_kind").toString() != null ) {
-                        if (deviceMeteInfo.get("mete_kind").toString().equals("2")) {//遥测
+                    if ("".equals(tStdDevicemete.getMeteKind()) || tStdDevicemete.getMeteKind() != null ) {
+                        if (tStdDevicemete.getMeteKind().equals("2")) {//遥测
                             isWarnRes = warnJudgement(personCheck,1,2,3,4,5,6,7,8);
                             if (isWarnRes > 0) {
                                 //修改，属实
@@ -148,7 +147,7 @@ public class TCruiseResultService{
                                 tCruiseResultDao.updateWarnInfo2(taskId,instanceId);
                             }
 
-                        }else if (deviceMeteInfo.get("mete_kind").toString().equals("1")) {//遥信
+                        }else if (tStdDevicemete.getMeteKind().equals("1")) {//遥信
                             isWarnRes = warnJudgementTelesignaling(personCheck,1,2,3);
                             if (isWarnRes == 1){
                                 //修改，属实
@@ -163,38 +162,91 @@ public class TCruiseResultService{
             }else {
                 //不存在
                 //判断该点是否配置告警
-                Integer alarmState = Integer.valueOf(deviceMeteInfo.get("alarm_state").toString());
-                int isWarnSetting = warnSettings(alarmState,1,2,3,4,5,6,7,8);
+                Integer alarmState = tStdDevicemete.getAlarmState();
+                int isWarnSetting = warnSettings(meteKind,stateZero,stateOne,1,2,3,4,5,6,7,8);
                 if (isWarnSetting == 1){//满足
                     // 判断该点修正后的值是否满足告警规则触发告警
-                    if ("".equals(deviceMeteInfo.get("mete_kind").toString()) || deviceMeteInfo.get("mete_kind").toString() != null ) {
-                        if (deviceMeteInfo.get("mete_kind").toString().equals("2")) {//遥测
+                    if ("".equals(tStdDevicemete.getMeteKind()) || tStdDevicemete.getMeteKind() != null ) {
+                        if (tStdDevicemete.getMeteKind().equals("2")) {//遥测
                             isWarnRes = warnJudgement(personCheck,1,2,3,4,5,6,7,8);
                             if (isWarnRes > 0) {
                                 //触发告警---插库---属实
+                                TWarnInfo warnInfo = new TWarnInfo();
+                                warnInfo.setWarnTime(new Date());
+                                if (Objects.nonNull(tStdDevicemete.getAlarmType())){
+                                    warnInfo.setWarnType(Integer.parseInt(tStdDevicemete.getAlarmType()));
+                                }
+                                /*warnInfo.setWarnName(tStdDevicemete.getMeteName() + "状态异常");
+                                if (tStdDevicemete.getAlarmState() == 0) {
+                                    warnInfo.setWarnContent( "主设备告警:" + tStdDevicemete.getMeteName() + tStdDevicemete.getStateZero() + "状态触发告警");
+                                } else {
+                                    warnInfo.setWarnContent("主设备告警:" + tStdDevicemete.getMeteName() + tStdDevicemete.getStateOne() + "状态触发告警");
+                                }
+                                warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+                                warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+                                warnInfo.setInstanceId(instanceId);
+                                warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+                                warnInfo.setConfMode(275);//已核查
+                                warnInfo.setIsWarn(1);//是告警
+                                warnInfo.setDealType(286);//属实
+                                warnInfo.setDefectModel(405);//其他
+                                warnInfo.setDealPersonId(userId);
+                                warnInfo.setDealTime(new Date());
+                                warnInfo.setAlarmSource(282);//主辅设备
+                                warnInfo.setImagePath();
+                                warnInfo.setValue();
                                 switch (isWarnRes) {
                                     case 1://预警
+                                        warnInfo.setWarnLevel(130);
+                                        warnInfo.setWarnContent("主设备告警:" + tStdDevicemete.getMeteName() + "预警");
+                                        if (resultValueMeter >= tStdDevicemete.getHighLimit1()) {
+                                            warnInfo.setOutRange(String.valueOf(resultValueMeter - tStdDevicemete.getHighLimit1()));
+                                        } else {
+                                            warnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit1() - resultValueMeter));
+                                        }
                                         break;
                                     case 2://一般
+                                        warnInfo.setWarnLevel(131);
+                                        warnInfo.setWarnContent("主设备告警:" + tStdDevicemete.getMeteName() + "一般");
+                                        if (resultValueMeter >= tStdDevicemete.getHighLimit2()) {
+                                            warnInfo.setOutRange(String.valueOf(resultValueMeter - tStdDevicemete.getHighLimit2()));
+                                        } else {
+                                            warnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit2() - resultValueMeter));
+                                        }
                                         break;
                                     case 3://严重
+                                        warnInfo.setWarnLevel(132);
+                                        warnInfo.setWarnContent("主设备告警:" + tStdDevicemete.getMeteName() + "严重");
+                                        if (resultValueMeter >= tStdDevicemete.getHighLimit3()) {
+                                            warnInfo.setOutRange(String.valueOf(resultValueMeter - tStdDevicemete.getHighLimit3()));
+                                        } else {
+                                            warnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit3() - resultValueMeter));
+                                        }
                                         break;
                                     case 4://危急
+                                        warnInfo.setWarnLevel(133);
+                                        warnInfo.setWarnContent("主设备告警:" + tStdDevicemete.getMeteName() + "危急");
+                                        if (resultValueMeter >= tStdDevicemete.getHighLimit4()) {
+                                            warnInfo.setOutRange(String.valueOf(resultValueMeter - tStdDevicemete.getHighLimit4()));
+                                        } else {
+                                            warnInfo.setOutRange(String.valueOf(tStdDevicemete.getLowLimit4() - resultValueMeter));
+                                        }
                                         break;
                                 }
                             }
-                        }else if (deviceMeteInfo.get("mete_kind").toString().equals("1")) {//遥信
+                        }else if (tStdDevicemete.getMeteKind().equals("1")) {//遥信
                             isWarnRes = warnJudgementTelesignaling(personCheck,1,2,3);
                             if (isWarnRes == 1){
                                 //触发告警---插库---属实
+
                             }
                         }
                     }
                 }
             }
         }
+*/
 
-        */
         /*if ( isWarn == 1){
             tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
             if (identifyResult == 261){//结果正确

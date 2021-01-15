@@ -48,7 +48,7 @@ public interface TCruiseResultDao {
 
     int manualReview(CruiseManualReview cruiseManualReview);
     Map<String,Object> selectJudgeCondition(@Param(value = "cruiseDataId")Long cruiseDataId);
-    Map<String,Object> selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
+    TStdDevicemete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
 
     int updateWarnInfo(@Param(value = "taskId")String taskId,
                        @Param(value = "instanceId")Long instanceId);
