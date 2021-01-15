@@ -53,7 +53,7 @@ public class SystemInfoService {
         }else{
             menUsage.put("code","02");
         }
-        return systemInfoUtil.getMemUsage();
+        return menUsage;
     }
 //    @Logs(title = "获取cpu信息", code = "module",content = "获取cpu信息")
     @Transactional(rollbackFor = Exception.class)

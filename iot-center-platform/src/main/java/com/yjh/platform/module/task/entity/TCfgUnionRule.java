@@ -54,11 +54,10 @@ public class TCfgUnionRule implements Serializable {
     @ApiModelProperty(value = "延时发送时间")
     private Integer ruleDelay;
 
-    @Length(max = 256,message = "password长度必须小于等于256")
+    @Length(max = 500,message = "description长度必须小于等于500")
     @ApiModelProperty(value = "描述")
     private String description;
 
-    @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "入参数据,meteId,meteName")
     private String inputParam;
 
@@ -67,13 +66,16 @@ public class TCfgUnionRule implements Serializable {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "联动监控全景摄像机Id")
     private Long cameraId;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "联动监控全景摄像机对应预置位Id")
     private Long presetId;
 
