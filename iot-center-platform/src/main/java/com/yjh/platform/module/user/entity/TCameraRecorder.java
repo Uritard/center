@@ -25,7 +25,6 @@ public class TCameraRecorder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "recordId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "录像机ID")
     @TableId(value = "record_id", type = IdType.AUTO)

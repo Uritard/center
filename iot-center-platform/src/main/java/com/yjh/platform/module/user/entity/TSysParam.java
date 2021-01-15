@@ -25,7 +25,6 @@ public class TSysParam implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "paramId不为空")
     @Max(value=999999999)
     @ApiModelProperty(value = "参数ID")
     @TableId(value = "param_id", type = IdType.AUTO)

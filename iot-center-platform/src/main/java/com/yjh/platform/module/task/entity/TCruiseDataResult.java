@@ -8,7 +8,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,66 +28,86 @@ public class TCruiseDataResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "巡视点数据id")
     @TableId(value = "cruise_data_id", type = IdType.AUTO)
     private Long cruiseDataId;
 
+    @Length(max = 82,message = "cruiseResultId长度必须小于等于82")
     @ApiModelProperty(value = "巡视任务结果id")
     private String cruiseResultId;
 
+    @Max(value=999999999999999999l)
     private Long cruiseId;
 
+    @Length(max = 50,message = "cruiseName长度必须小于等于50")
     private String cruiseName;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹")
     private Integer cruiseType;
 
+    @Length(max = 512,message = "resultDesc长度必须小于等于512")
     @ApiModelProperty(value = "巡检结果文字描述")
     private String resultDesc;
 
+    @Length(max = 100,message = "cruiseResultId长度必须小于等于100")
     @ApiModelProperty(value = "巡检结果数值")
     private String resultNum;
 
+    @Length(max = 100,message = "modifyNum长度必须小于等于100")
     @ApiModelProperty(value = "修正值")
     private String modifyNum;
 
+    @Length(max = 256,message = "picpath长度必须小于等于256")
     @ApiModelProperty(value = "巡检分析图片")
     private String picpath;
 
+    @Length(max = 256,message = "personCheck长度必须小于等于256")
     @ApiModelProperty(value = "人工校核结果")
     private String personCheck;
 
+    @Length(max = 256,message = "origpic长度必须小于等于256")
     @ApiModelProperty(value = "算法原始图片/红外可见光")
     private String origpic;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "巡视结果")
     private Integer cruiseResult;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "巡视异常类型 -1数据异常 0未完成 1正常 2异常 3算法超时 4抓图失败 5未识别")
     private Integer cruiseAbnormal;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "评价状态 1误报 2漏报")
     private Integer evaluationState;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "识别状态 1识别正常 2识别异常")
     private Integer identifyState;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "实际结果 1正常 2异常")
     private Integer identifyResult;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createtime;
 
+    @Length(max = 256,message = "remark长度必须小于等于256")
     @ApiModelProperty(value = "备用字段3")
     private String remark;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "是否产生告警1.是0.否")
     private Integer isWarn;
 
+    @Length(max = 32,message = "checkUser长度必须小于等于32")
     @ApiModelProperty(value = "审核人")
     private String checkUser;
 
+    @Past
     @ApiModelProperty(value = "审核时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date checkDate;

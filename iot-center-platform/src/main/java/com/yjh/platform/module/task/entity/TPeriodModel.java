@@ -11,6 +11,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Past;
 
 /**
  * @author tt
@@ -24,21 +28,25 @@ public class TPeriodModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "周期ID")
     @TableId(value = "period_id", type = IdType.AUTO)
     private Long periodId;
 
+    @Length(max = 255,message = "cronExpression长度必须小于等于255")
     @ApiModelProperty(value = "表达式")
     private String cronExpression;
 
+    @Length(max = 512,message = "remark长度必须小于等于512")
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    @Past
     @ApiModelProperty(value = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    @Past
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

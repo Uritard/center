@@ -27,7 +27,6 @@ public class TCameraAlarm implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "cameraAlarmId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "可视设备本体告警告警ID")
     @TableId(value = "camera_alarm_id", type = IdType.AUTO)

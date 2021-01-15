@@ -26,7 +26,6 @@ public class TCameraPreset implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "presetId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "预置位id")
     private Long presetId;

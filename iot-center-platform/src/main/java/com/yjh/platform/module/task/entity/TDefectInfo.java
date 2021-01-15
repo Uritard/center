@@ -9,7 +9,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -25,81 +28,105 @@ public class TDefectInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "缺陷ID")
     @TableId(value = "defect_id", type = IdType.AUTO)
     private Long defectId;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "缺陷等级")
     private Integer defectLevel;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "缺陷时间")
     private Date defectTime;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "缺陷类型")
     private Integer defectType;
 
+    @Length(max = 125,message = "defectName长度必须小于等于125")
     @ApiModelProperty(value = "缺陷名称")
     private String defectName;
 
+    @Length(max = 512,message = "defectContent长度必须小于等于512")
     @ApiModelProperty(value = "缺陷内容")
     private String defectContent;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
 
+    @Length(max = 32,message = "cunstomId长度必须小于等于32")
     @ApiModelProperty(value = "部位ID")
     private String cunstomId;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "巡检点ID")
     private Long instanceId;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "标准测点ID")
     private Long stdMeteId;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "缺陷状态：1未处理 2已处理 3已确认 4已忽略")
     private Integer confMode;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "是否缺陷")
     private Integer isDefect;
 
+    @Max(value=9)
     @ApiModelProperty(value = "处理方式：0自动，1手动")
     private Integer dealType;
 
+    @Length(max = 2000,message = "dealInfo长度必须小于等于2000")
     @ApiModelProperty(value = "处理意见")
     private String dealInfo;
 
+    @Length(max = 32,message = "dealPersonId长度必须小于等于32")
     @ApiModelProperty(value = "确认人ID")
     private String dealPersonId;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "确认时间")
     private Date dealTime;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "是否缺陷抑制")
     private Integer ifDefectDisable;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "缺陷来源")
     private Integer alarmSource;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "缺陷子类型")
     private Integer defectSubtype;
 
+    @Length(max = 64,message = "deviceCode长度必须小于等于64")
     @ApiModelProperty(value = "设备编码")
     private String deviceCode;
 
+    @Length(max = 512,message = "imagePath长度必须小于等于512")
     @ApiModelProperty(value = "图片地址")
     private String imagePath;
 
+    @Length(max = 200,message = "videoPath长度必须小于等于200")
     @ApiModelProperty(value = "视频地址")
     private String videoPath;
 
+    @Length(max = 100,message = "value长度必须小于等于100")
     @TableField("VALUE")
     private String value;
 
+    @Length(max = 100,message = "outRange长度必须小于等于100")
     private String outRange;
 
+    @Length(max = 512,message = "linkMessage长度必须小于等于512")
     @ApiModelProperty(value = "联动信息")
     private String linkMessage;
 

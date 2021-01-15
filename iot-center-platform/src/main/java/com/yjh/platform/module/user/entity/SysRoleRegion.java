@@ -23,7 +23,6 @@ public class SysRoleRegion implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "roleId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "角色ID")
     private Long roleId;

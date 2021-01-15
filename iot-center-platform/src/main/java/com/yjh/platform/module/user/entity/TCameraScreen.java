@@ -27,7 +27,6 @@ public class TCameraScreen implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "userId不为空")
     @Max(value=999999999999999999l)
     private Long userId;
 
