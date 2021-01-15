@@ -97,12 +97,12 @@ public class TCruiseDataResultService {
         Map<String, Object> resultMap = new HashMap<>();
 
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         if (deviceIdList != null && deviceIdList.size() > 0){
             cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
         }
 
         log.info("cruiseResultAnalMeteInfoList第一次==="+cruiseResultAnalMeteInfoList);
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         //获取同一设备下的有巡检结果的标准测点
         List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
@@ -113,7 +113,7 @@ public class TCruiseDataResultService {
             deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
             deviceInfo.setCruiseResult(cruiseResultAnalMeteInfo.getCruiseResult());
             deviceInfo.setCruiseResultName(cruiseResultAnalMeteInfo.getCruiseResultName());
-            deviceInfo.setEndTime(cruiseResultAnalMeteInfo.getEndTime());
+            deviceInfo.setCruiseTime(cruiseResultAnalMeteInfo.getCruiseTime());
             deviceInfo.setPicPath(cruiseResultAnalMeteInfo.getPicPath());
             deviceInfo.setCruiseName(cruiseResultAnalMeteInfo.getCruiseName());
             deviceInfo.setIdentifyResult(cruiseResultAnalMeteInfo.getIdentifyResult());
