@@ -8,7 +8,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,32 +28,41 @@ public class TCfgUnionRule implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @NotNull(message = "ruleId不为空")
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "规则编号")
     @TableId(value = "rule_id", type = IdType.AUTO)
     private Long ruleId;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "预案id")
     private Long planId;
 
+    @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "规则名称")
     private String ruleName;
 
+    @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "是否生成联动监控弹窗0.不生成   1.生成")
     private String ruleType;
 
+    @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "具体治理规则")
     private String ruleContent;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "延时发送时间")
     private Integer ruleDelay;
 
+    @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "描述")
     private String description;
 
+    @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "入参数据,meteId,meteName")
     private String inputParam;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
