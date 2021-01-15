@@ -155,10 +155,7 @@ public class HelloController {
         Long beginTime=System.currentTimeMillis();
 
         Long endTime=System.currentTimeMillis();
-
-
-
-
+        List<Integer> results=new ArrayList<>();
 //        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
 //        log.info("djkhwqedkfe:"+maps.get("remark"));
 //        TCruiseTask tCruiseTask=new TCruiseTask();
@@ -314,6 +311,7 @@ public class HelloController {
         result.setData(map);
         return result;
     }
+
 
 
     @ApiOperation(value = "联动webSocket测试")

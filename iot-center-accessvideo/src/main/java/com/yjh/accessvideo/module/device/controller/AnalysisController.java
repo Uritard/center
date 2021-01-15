@@ -51,6 +51,9 @@ public class AnalysisController {
                 return result;
             }
             List<Analysis> analysisList = analysisMap.get("list");
+            log.info("---------发送算法信息中");
+            log.info("数据列表:"+analysisList);
+            log.info("端口号："+recognizePort);
             result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

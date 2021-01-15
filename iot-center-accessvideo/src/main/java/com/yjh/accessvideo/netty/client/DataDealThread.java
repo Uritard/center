@@ -112,6 +112,8 @@ public class DataDealThread implements Runnable {
                     log.info("读取到的redis：" + cruiseResult);
                     Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
 
+                    SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
                     log.info("端口号：" + remotePort);
 
@@ -139,7 +141,8 @@ public class DataDealThread implements Runnable {
                                         log.info("数据查询初始化");
                                         //满足告警数据结构-进行告警判断
                                         //表计测点未配置告警规则
-                                        if (analyseDataOperateService.warnSettings(tStdDevicemeteM.getAlarmState(),
+                                        if (analyseDataOperateService.warnSettings(tStdDevicemeteM.getMeteKind(),
+                                                tStdDevicemeteM.getStateZero(),
                                                 tStdDevicemeteM.getHighLimit1(),
                                                 tStdDevicemeteM.getLowLimit1(),
                                                 tStdDevicemeteM.getHighLimit2(),
@@ -165,7 +168,6 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("defectModel",analyseDataOperateService.selectDictCode("defect_model","其他"));
                                             log.info("开始告警判断");
                                             log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
-                                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                             switch (tStdDevicemeteM.getMeteKind()) {
                                                 case "1":
                                                     String resultValue = jsonObjectResult.get("resultValue").toString();
@@ -308,7 +310,7 @@ public class DataDealThread implements Runnable {
                                                     jasonMaps.put("alarmTime", warningMsg.get("warnTime"));
                                                     jasonMaps.put("alarmContent", warningMsg.get("warnContent"));
                                                     String jsons = JSON.toJSONString(jasonMaps);
-                                                    log.info("发送给前端的消息：" + jsons);
+                                                    log.info("告警生成-前端推送：" + jsons);
                                                     WebSocketServer.sendMsg(jsons);
 
                                                     //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
@@ -360,7 +362,7 @@ public class DataDealThread implements Runnable {
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形 
                                 if (resultValue != "null") {
                                    //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
-                                    cruiseResultMap.put("resultNum", "--");
+                                    cruiseResultMap.put("resultNum", resultValue);
                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "缺陷异常"));
                                     tAbnormal++;
@@ -383,9 +385,11 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
                                         defectMap.put("imagePath", cruiseResult.get("picpath").toString());
                                         defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
+                                        defectMap.put("defectTime",simpleDateFormat.format(new Date()));
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
+                                        String defectTime=simpleDateFormat.format(new Date());
                                         for (int i = 0; i < resultArr.length; i++) {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
@@ -401,6 +405,7 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
                                             defectMap.put("imagePath", cruiseResult.get("picpath").toString());
                                             defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
+                                            defectMap.put("defectTime",defectTime);
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
                                         }
 
@@ -408,7 +413,7 @@ public class DataDealThread implements Runnable {
 
                                 } else {  //未产生缺陷
                                     tNormal++;
-                                    cruiseResultMap.put("resultNum", resultValue);
+                                    cruiseResultMap.put("resultNum", "--");
                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                     cruiseResultMap.put("cruiseAbnormal", "--");
                                 }
@@ -465,6 +470,7 @@ public class DataDealThread implements Runnable {
             }
 
             if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1")) {  //满足插库条件
+                SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String finalCruiseKey = "instanceId";//最后修改任务表信息所需的redis KEY名
                 log.info("任务结束-开始数据存储");
                 //插库时从redis中取出正常、异常点数
@@ -493,7 +499,6 @@ public class DataDealThread implements Runnable {
                         tCruiseTaskResultDetail.setDeviceName(cruiseWorkedMap.get("deviceName").toString());
                         tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
                         tCruiseTaskResultDetail.setInstanceName(cruiseWorkedMap.get("instanceName").toString());
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
                         tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
                         tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
@@ -535,7 +540,7 @@ public class DataDealThread implements Runnable {
                         log.info("TDI开始");
                         TDefectInfo tDefectInfo = new TDefectInfo();
                         tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
-                        tDefectInfo.setDefectTime(new Date());
+                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
                         tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
                         tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
                         tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));

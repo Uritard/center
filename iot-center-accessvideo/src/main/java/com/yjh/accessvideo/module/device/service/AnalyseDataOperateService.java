@@ -220,7 +220,8 @@ public class AnalyseDataOperateService {
 
     @Logs(title = "告警配置判断")
     @Transactional(rollbackFor = Exception.class)
-    public int warnSettings(Integer alarmState,
+    public int warnSettings(String meteKind,
+                            String stateZero,
                             Float highLimit1,
                             Float lowLimit1,
                             Float highLimit2,
@@ -229,6 +230,7 @@ public class AnalyseDataOperateService {
                             Float lowLimit3,
                             Float highLimit4,
                             Float lowLimit4) {
+        int warnFlag=0;
         Set<Float> alarmMeter = new HashSet<>();
         alarmMeter.add(highLimit1);
         alarmMeter.add(lowLimit1);
@@ -240,11 +242,22 @@ public class AnalyseDataOperateService {
         alarmMeter.add(lowLimit4);
         alarmMeter.remove(null);
         log.info("alarmMeter:"+alarmMeter);
-        if (Objects.nonNull(alarmState) || alarmMeter.size() > 0) {
-            return 1;
-        } else {
-            return 0;
+        if(Objects.nonNull(meteKind)){
+            switch (meteKind){
+                case "1":
+                    if(Objects.nonNull(stateZero)){
+                        warnFlag=1;
+                    }
+                    break;
+                case "2":
+                    if(alarmMeter.size() > 0){
+                        warnFlag=1;
+                    }
+                    break;
+            }
         }
+
+        return warnFlag;
 
     }
 
