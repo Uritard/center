@@ -222,6 +222,7 @@ public class AnalyseDataOperateService {
     @Transactional(rollbackFor = Exception.class)
     public int warnSettings(String meteKind,
                             String stateZero,
+                            Integer alarmState,
                             Float highLimit1,
                             Float lowLimit1,
                             Float highLimit2,
@@ -245,7 +246,7 @@ public class AnalyseDataOperateService {
         if(Objects.nonNull(meteKind)){
             switch (meteKind){
                 case "1":
-                    if(Objects.nonNull(stateZero)){
+                    if(Objects.nonNull(stateZero) && Objects.nonNull(alarmState)){
                         warnFlag=1;
                     }
                     break;

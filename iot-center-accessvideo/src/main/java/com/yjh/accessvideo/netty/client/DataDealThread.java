@@ -143,6 +143,7 @@ public class DataDealThread implements Runnable {
                                         //表计测点未配置告警规则
                                         if (analyseDataOperateService.warnSettings(tStdDevicemeteM.getMeteKind(),
                                                 tStdDevicemeteM.getStateZero(),
+                                                tStdDevicemeteM.getAlarmState(),
                                                 tStdDevicemeteM.getHighLimit1(),
                                                 tStdDevicemeteM.getLowLimit1(),
                                                 tStdDevicemeteM.getHighLimit2(),
@@ -154,14 +155,12 @@ public class DataDealThread implements Runnable {
                                             //初始化告警信息redis表
                                             String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             Map<String, String> warnMap = new HashMap<>();
-                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
+                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmNote());
                                             warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
                                             warnMap.put("customId", tCruisePointInstance.getCustomId());
                                             warnMap.put("instanceId", jsonObjectResult.get("instanceId").toString());
                                             warnMap.put("stdMeteId", tCruisePointInstance.getDeviceMeteId().toString());
                                             warnMap.put("taskId", jsonObjectResult.get("taskId").toString());
-                                            warnMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
-                                            warnMap.put("ifWarnDisable", String.valueOf(0));
                                             warnMap.put("value", jsonObjectResult.get("resultValue").toString());
                                             warnMap.put("imagePath", cruiseResult.get("picpath").toString());
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
@@ -187,7 +186,7 @@ public class DataDealThread implements Runnable {
                                                         } else {
                                                             warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateOne() + "状态触发告警");
                                                         }
-                                                        warnMap.put("outRang", "-——-");
+                                                        warnMap.put("outRange", "--");
 
                                                         log.info("告警MAP：" + warnMap);
                                                         try {
@@ -283,24 +282,39 @@ public class DataDealThread implements Runnable {
                                             try {
                                                 // TODO: 2020/12/15 告警信息插库 并推送
                                                 Map<String, Object> warningMsg = redisTemplate.opsForHash().entries(warnName);
+                                                log.info("warnMsg:"+warningMsg);
                                                 if (warningMsg.size() != 0) {
                                                     TWarnInfo tWarnInfo = new TWarnInfo();
                                                     tWarnInfo.setWarnLevel(Integer.valueOf(warningMsg.get("warnLevel").toString()));
+                                                    log.info("1");
                                                     tWarnInfo.setWarnType(Integer.valueOf(warningMsg.get("warnType").toString()));
+                                                    log.info("2");
                                                     tWarnInfo.setDeviceId(Long.valueOf(warningMsg.get("deviceId").toString()));
+                                                    log.info("3");
                                                     tWarnInfo.setCunstomId(warningMsg.get("customId").toString());
+                                                    log.info("4");
                                                     tWarnInfo.setInstanceId(Long.valueOf(warningMsg.get("instanceId").toString()));
+                                                    log.info("5");
                                                     tWarnInfo.setStdMeteId(Long.valueOf(warningMsg.get("stdMeteId").toString()));
+                                                    log.info("6");
                                                     tWarnInfo.setTaskId(warningMsg.get("taskId").toString());
-                                                    tWarnInfo.setConfMode(Integer.valueOf(warningMsg.get("confMode").toString()));
+                                                    log.info("7");
                                                     tWarnInfo.setValue(warningMsg.get("value").toString());
+                                                    log.info("8");
                                                     tWarnInfo.setImagePath(warningMsg.get("imagePath").toString());
+                                                    log.info("9");
                                                     tWarnInfo.setAlarmSource(Integer.valueOf(warningMsg.get("alarmSource").toString()));
+                                                    log.info("10");
                                                     tWarnInfo.setWarnName(warningMsg.get("warnName").toString());
+                                                    log.info("11");
                                                     tWarnInfo.setOutRange(warningMsg.get("outRange").toString());
+                                                    log.info("12");
                                                     tWarnInfo.setWarnContent(warningMsg.get("warnContent").toString());
+                                                    log.info("13");
                                                     tWarnInfo.setDefectModel(Integer.valueOf(warningMsg.get("defectModel").toString()));
+                                                    log.info("14");
                                                     tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime").toString()));
+                                                    log.info("------------------------------------------------------------");
                                                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
                                                     // webSocket通知前端刷新告警统计数量
@@ -359,6 +373,7 @@ public class DataDealThread implements Runnable {
                             case 13669:
                                 String originResult = jsonObjectResult.get("resultValue").toString();
                                 String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
+                                log.info("解析的缺陷数据："+resultValue);
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形 
                                 if (resultValue != "null") {
                                    //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
