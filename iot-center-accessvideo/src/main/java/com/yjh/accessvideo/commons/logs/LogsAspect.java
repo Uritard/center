@@ -109,11 +109,11 @@ public class LogsAspect {
             return joinPoint.proceed();
         } catch (Throwable e) {
             serviceId = logsConfig.getName();
-            params.set("logType", serviceId+":"+annotation.code());
+            params.set("logType", serviceId);
             params.set("ip", ip);
             params.set("title", "内部接口错误");
-            params.set("state", 2);
-            params.set("content", content.toString() + "；异常信息：" + e.getMessage() + "\n" + getStackMsg(e));
+            params.set("state", 3);
+            params.set("content", "异常信息: " + e.getMessage() + "\n" + getStackMsg(e));
             params.set("userId", userId);
             params.set("userName", userName);
             post(params);
