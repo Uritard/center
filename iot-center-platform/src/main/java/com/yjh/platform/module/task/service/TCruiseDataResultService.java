@@ -89,12 +89,23 @@ public class TCruiseDataResultService {
     @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
-
-        List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-        List<Long> deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-        log.info("regionIdList是==="+regionIdList);
-
-        log.info("deviceIdList是==="+deviceIdList);
+        List<Long> regionIdList = new ArrayList<>();
+        List<Long> deviceIdList = new ArrayList<>();
+        if (regionId == null){
+            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            log.info("regionIdList是==="+regionIdList);
+            log.info("deviceIdList是==="+deviceIdList);
+        }else {
+            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            if (regionIdList != null && regionIdList.size() > 0){
+                deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                deviceIdList.add(regionId);
+            }
+            log.info("regionIdList是==="+regionIdList);
+            log.info("deviceIdList是==="+deviceIdList);
+        }
         Map<String, Object> resultMap = new HashMap<>();
 
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
