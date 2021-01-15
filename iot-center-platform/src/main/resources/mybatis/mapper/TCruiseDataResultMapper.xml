@@ -361,7 +361,7 @@
         b.instance_id,
         d.cruise_result,
         f.dict_note AS cruise_result_name,
-        b.end_time,
+        b.cruise_time,
         d.picpath,
         d.identify_result,
         k.dict_note AS identify_result_name,
@@ -382,7 +382,7 @@
         AND m.c_state != 239
         AND m.c_state != 241
         ORDER BY
-            b.end_time DESC
+            b.cruise_time DESC
         LIMIT 1
 
     </select>

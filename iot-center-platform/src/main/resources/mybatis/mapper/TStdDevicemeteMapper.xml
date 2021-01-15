@@ -631,7 +631,8 @@
         b.device_id,
         b.mete_type,
         b.meter_type,
-        a.device_type
+        a.device_type,
+        b.mete_name
         FROM
         t_std_device a
         JOIN t_std_devicemete b ON a.device_id = b.device_id
