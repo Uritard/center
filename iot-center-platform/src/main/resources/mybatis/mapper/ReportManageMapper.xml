@@ -143,6 +143,7 @@
             </foreach>
 
         <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
+        ORDER by cruise_time
     </select>
     <select id="selectStationName" resultType="java.lang.String">
         SELECT
