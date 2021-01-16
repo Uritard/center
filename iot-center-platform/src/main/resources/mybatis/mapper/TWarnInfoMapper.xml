@@ -629,7 +629,7 @@
     </select>
     <!--统计近一月的所有告警和缺陷个数-->
     <select id="countWarnAndDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-SELECT
+        SELECT
         a.timeNode,
         ifnull( b.count, 0 ) AS count
         FROM

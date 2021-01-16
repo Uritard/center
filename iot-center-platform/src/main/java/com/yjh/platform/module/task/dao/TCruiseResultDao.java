@@ -51,9 +51,17 @@ public interface TCruiseResultDao {
     TStdDevicemete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
 
     int updateWarnInfo(@Param(value = "taskId")String taskId,
-                       @Param(value = "instanceId")Long instanceId);
+                       @Param(value = "instanceId")Long instanceId,
+                       @Param(value = "warnName")String warnName,
+                       @Param(value = "warnLevel")Integer warnLevel,
+                       @Param(value = "warnContent")String warnContent,
+                       @Param(value = "outRange")String outRange,
+                       @Param(value = "dealPersonId")String dealPersonId,
+                       @Param(value = "dealTime")Date dealTime);
     int updateWarnInfo2(@Param(value = "taskId")String taskId,
-                       @Param(value = "instanceId")Long instanceId);
+                       @Param(value = "instanceId")Long instanceId,
+                        @Param(value = "dealPersonId")String dealPersonId,
+                        @Param(value = "dealTime")Date dealTime);
     Long selectWarnId(@Param(value = "taskId")String taskId,
                       @Param(value = "instanceId")Long instanceId);
     int batchInsert(List<TCruiseResult> list);
