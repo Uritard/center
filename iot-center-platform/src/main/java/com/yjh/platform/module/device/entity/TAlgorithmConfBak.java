@@ -7,6 +7,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Past;
 
 /**
  * @author lqh
@@ -20,33 +24,42 @@ public class TAlgorithmConfBak implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备标准测点ID")
     private Long deviceMeteId;
 
+    @Max(value=999999999999999999l)
     private Long algorithmId;
 
+    @Length(max = 68,message = "configName长度必须小于等于68")
     @ApiModelProperty(value = "算法配置名称")
     private String configName;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "状态")
     private Integer status;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "是否删除")
     private Integer ifDel;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "是否展示1展示，2不展示")
     private Integer ifShow;
 
+    @Length(max = 255,message = "picUrl长度必须小于等于255")
     @ApiModelProperty(value = "图标路径")
     private String picUrl;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "0不应用，1应用到日常巡视，2..待定")
     private Integer applyModule;
 
+    @Past
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @Past
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
 

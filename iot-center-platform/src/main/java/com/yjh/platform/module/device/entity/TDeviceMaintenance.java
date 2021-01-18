@@ -12,7 +12,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Past;
 
 /**
  * @author lqh
@@ -26,31 +30,39 @@ public class TDeviceMaintenance implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "检修ID")
     @TableId(value = "maintenance_id", type = IdType.AUTO)
     private Long maintenanceId;
 
+    @Length(max = 256,message = "maintenanceName长度必须小于等于256")
     @ApiModelProperty(value = "检修名称")
     private String maintenanceName;
 
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
 
+    @Max(value=99)
     @ApiModelProperty(value = "是否使用，0-不使用，1-使用")
     private Integer isValid;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "开始检修时间")
     private Date maintenanceStart;
 
+    @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "结束检修时间")
     private Date maintenanceStop;
 
+    @Max(value=999999999)
     private Integer effectiveState;
+
+    @Length(max = 256,message = "effectiveStateName长度必须小于等于256")
     private String effectiveStateName;
 
     private List<Long> deviceIdList;

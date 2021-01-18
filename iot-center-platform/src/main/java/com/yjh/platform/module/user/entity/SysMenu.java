@@ -26,7 +26,6 @@ public class SysMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "menuId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "主键")
     @TableId(value = "menu_id", type = IdType.AUTO)

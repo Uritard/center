@@ -28,7 +28,6 @@ public class TCfgUnionRule implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "ruleId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "规则编号")
     @TableId(value = "rule_id", type = IdType.AUTO)

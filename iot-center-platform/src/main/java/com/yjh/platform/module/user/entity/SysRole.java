@@ -29,7 +29,6 @@ public class SysRole implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "roleId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "主键")
     @TableId(value = "role_id", type = IdType.AUTO)

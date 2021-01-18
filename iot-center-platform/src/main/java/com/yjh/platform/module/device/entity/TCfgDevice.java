@@ -7,6 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Past;
 
 /**
  * @author lqh
@@ -20,32 +23,39 @@ public class TCfgDevice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Length(max = 20,message = "deviceId长度必须小于等于20")
     @ApiModelProperty(value = "设备编号")
     private String deviceId;
 
+    @Length(max = 128,message = "deviceName长度必须小于等于128")
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
 
+    @Length(max = 20,message = "deviceType长度必须小于等于20")
     @ApiModelProperty(value = "设备类型")
     private String deviceType;
 
+    @Length(max = 40,message = "deviceCode长度必须小于等于40")
     @ApiModelProperty(value = "设备编码+设备测点地址")
     private String deviceCode;
 
-
+    @Length(max = 20,message = "stationId长度必须小于等于20")
     @ApiModelProperty(value = "项目id")
     private String stationId;
 
+    @Length(max = 32,message = "relationCode长度必须小于等于32")
     @ApiModelProperty(value = "关联设备编码")
     private String relationCode;
 
+    @Past
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @Past
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @Length(max = 512,message = "remark长度必须小于等于512")
     @ApiModelProperty(value = "描述")
     private String remark;
 

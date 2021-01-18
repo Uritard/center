@@ -26,7 +26,6 @@ public class TCfgAlarmHistory implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "alarmNo不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "告警流水号current表获取")
     private Long alarmNo;

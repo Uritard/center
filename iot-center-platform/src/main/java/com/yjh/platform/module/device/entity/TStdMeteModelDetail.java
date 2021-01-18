@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
+
 /**
  * @author tt
  * @since 2020-08-07
@@ -20,7 +22,7 @@ public class TStdMeteModelDetail extends TStdDeviceMeteDetail implements Seriali
 
     private static final long serialVersionUID = 1L;
 
-
+    @Max(value=999999999999999999l)
     @ApiModelProperty(value = "监控量模板ID")
     private Long modelId;
 

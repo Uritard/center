@@ -25,7 +25,6 @@ public class TCameraInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "cameraId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "主键")
     private Long cameraId;

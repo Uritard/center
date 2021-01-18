@@ -25,7 +25,6 @@ public class TDictBusiness implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "dictId不为空")
     @Max(value=999999999)
     @ApiModelProperty(value = "字典ID")
     @TableId(value = "dict_id", type = IdType.AUTO)

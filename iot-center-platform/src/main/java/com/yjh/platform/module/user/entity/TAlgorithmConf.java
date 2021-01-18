@@ -27,7 +27,6 @@ public class TAlgorithmConf implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "presetId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "摄像头预置位ID或者机器人巡检点ID")
     private Long presetId;

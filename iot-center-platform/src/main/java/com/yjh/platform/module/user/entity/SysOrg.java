@@ -29,7 +29,6 @@ public class SysOrg implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "orgId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "组织ID")
     @TableId(value = "org_id", type = IdType.AUTO)

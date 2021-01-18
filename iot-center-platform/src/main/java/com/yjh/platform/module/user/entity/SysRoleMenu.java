@@ -25,7 +25,6 @@ public class SysRoleMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "rpId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "菜单ID")
     @TableId(value = "rp_id", type = IdType.AUTO)

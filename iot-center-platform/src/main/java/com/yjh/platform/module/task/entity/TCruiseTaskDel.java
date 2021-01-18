@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,14 +24,16 @@ public class TCruiseTaskDel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @Length(max = 50,message = "taskId长度必须小于等于50")
     @ApiModelProperty(value = "巡检任务UUID")
     private String taskId;
 
+    @Past
     @ApiModelProperty(value = "巡视时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date delTime;
 
+    @Past
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

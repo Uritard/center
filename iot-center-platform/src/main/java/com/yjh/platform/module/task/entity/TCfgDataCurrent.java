@@ -25,7 +25,6 @@ public class TCfgDataCurrent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "meteId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "监控量编号")
     private Long meteId;

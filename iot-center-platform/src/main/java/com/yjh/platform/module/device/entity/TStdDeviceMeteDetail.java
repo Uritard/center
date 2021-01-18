@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private Long upRegionId;
     private List<Long> ids;
 
+    @Max(value=999999999)
     private Integer analyseType;
     private String analyseTypeName;
 
