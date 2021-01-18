@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -13,6 +14,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import org.quartz.CronExpression;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -162,6 +164,40 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 TCDRList.add(tCruiseDataResult);
                 redisTemplate.opsForHash().putAll("t_cruise_task_result:"+taskId+":"+item, mapForCruise);
 
+                {
+                    //巡视点结果上报站端
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                    List<Map<String,Object>> xmlItems = new ArrayList<>();
+                    Map<String,Object> xmlItem = new HashMap<>();
+                    xmlBaseModel.setType("61");
+                    xmlItem.put("patroldevice_code",item);
+                    xmlItem.put("task_name",tCruiseTask.getTaskName());
+                    xmlItem.put("task_code",tCruiseTask.getTaskId());
+                    xmlItem.put("device_name",mapForCruise.get("cruiseName"));
+                    xmlItem.put("device_id",item);
+                    xmlItem.put("material_id",mapForCruise.get("realCode"));
+                    xmlItem.put("value","任务超期");
+                    xmlItem.put("value_unit","");
+                    xmlItem.put("unit","");
+                    xmlItem.put("time",simpleDateFormat.format(new Date()));
+                    //todo
+                    xmlItem.put("recognition_type","");
+                    xmlItem.put("file_type","2");
+                    xmlItem.put("file_path","");
+                    xmlItem.put("rectangle","");
+                    xmlItem.put("task_patrolled_id",taskId);
+                    xmlItem.put("data_type","0x01");
+                    xmlItem.put("valid","0");
+
+                    xmlItems.add(xmlItem);
+
+                    List<XMLBaseModel> list = new ArrayList<>();
+                    list.add(xmlBaseModel);
+                    Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                    cruiseResult.put("list",list);
+                    Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                }
+
             }
 
         }
@@ -229,6 +265,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
         tCruiseTaskResult.setCruiseResult(247);
         tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
+            sendTaskStateToUp(tCruiseTask,6);
+
         log.info("超期完毕");
         } catch (Exception e) {
             log.error("检查任务超期异常: "+e);
@@ -257,5 +295,53 @@ public class CheckTaskAreJob extends QuartzJobBean {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state){
+        //任务状态上报站端
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String,Object>> items= new ArrayList<>();
+        Map<String,Object> item = new HashMap<>();
+        xmlBaseModel.setType("41");
+        item.put("task_patrolled_id",tCruiseTask.getTaskId());
+        item.put("task_name",tCruiseTask.getTaskName());
+        item.put("task_code",tCruiseTask.getTaskId());
+        item.put("task_state",state);
+        item.put("plan_start_time",tCruiseTask.getStartTime());
+        if(tCruiseTask.getIfRun() == 172){
+            try{
+                CronExpression expression = new CronExpression(tCruiseTask.getDateType());
+                item.put("start_time",expression.getNextValidTimeAfter(new Date()));
+            }catch (Exception e){
+                log.info("上报出错"+e.getMessage());
+            }
+        }else {
+            item.put("start_time",tCruiseTask.getStartTime());
+        }
+        item.put("task_progress","0%");
+        Integer i =0;
+        Map<String,String> mapForGet = redisTemplate.opsForHash().entries("countForAbnormal:"+tCruiseTask.getTaskId());
+        Integer all = Integer.valueOf(mapForGet.get("all"));
+        Integer normal = Integer.valueOf(mapForGet.get("normal"));
+        Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
+        i = all -normal -abnormal;
+
+
+        item.put("task_estimated_time",i*60*5);
+        item.put("description","");
+        items.add(item);
+        xmlBaseModel.setItems(items);
+
+        List<XMLBaseModel> list = new ArrayList<>();
+        list.add(xmlBaseModel);
+        Map<String,List<XMLBaseModel>> map = new HashMap<>();
+        map.put("list",list);
+        Result re = null;
+        try{
+            re = Constant.otherServer(map,Constant.TCP_URL);
+        }catch (Exception e){
+            log.info("上报出错"+e.getMessage());
+        }
+        return re;
     }
 }

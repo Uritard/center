@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface AnalyseDataOperateDao {
@@ -38,6 +39,6 @@ public interface AnalyseDataOperateDao {
 
     int insertDefectInfo(TDefectInfo tDefectInfo);
     int batchInsertDefectInfo(List<TDefectInfo> list);
-
+    Map<String,Object> selectWarnInfo(@Param(value = "deviceMeteId")Long deviceMeteId);
 
 }

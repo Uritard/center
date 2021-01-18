@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.text.StyledEditorKit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class AnalyseDataOperateService {
@@ -435,5 +432,10 @@ public class AnalyseDataOperateService {
         return defectValue;
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectWarnInfo(Long deviceMeteId){
+        return analyseDataOperateDao.selectWarnInfo(deviceMeteId);
+    }
 }
 

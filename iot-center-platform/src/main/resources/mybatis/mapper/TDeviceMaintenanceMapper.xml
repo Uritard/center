@@ -178,4 +178,20 @@
         where 1 = 1
             and a.maintenance_id =#{maintenanceId, jdbcType=BIGINT}
     </select>
+
+    <select id="selectDeviceIdList" resultType="java.lang.Long">
+        select DISTINCT
+        a.device_id
+        from t_cruise_point_instance a
+        where a.instance_id in <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+        #{instanceId, jdbcType=BIGINT}
+    </foreach>
+    </select>
+
+    <delete id="deleteByDeviceIdList">
+         delete from t_device_maintenance
+         where device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
+        #{deviceId, jdbcType=BIGINT}
+    </foreach>
+    </delete>
 </mapper>

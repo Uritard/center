@@ -1,10 +1,14 @@
 package com.yjh.accesstcp.common;
 
+import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
+import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
+import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Constant {
@@ -70,6 +74,19 @@ public class Constant {
 
     public static Map<String,String> paramMap =new ConcurrentHashMap<>();
 
-    //机器人任务路径
+    //机器人任务路径 todo 记得改
     public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot2/robot/v1/upSystemCommand";
+
+    //检修区域路径 todo 记得改
+    public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/upSystemCommand";
+
+    public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
+        Result re = new Result();
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re = serviceRestTemplate.postForObject(url, map, Result.class);
+            }
+        return re;
+    }
+
 }

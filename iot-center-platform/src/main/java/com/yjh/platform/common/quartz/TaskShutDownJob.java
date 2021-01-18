@@ -191,6 +191,40 @@ public class TaskShutDownJob extends QuartzJobBean {
                         TCDRList.add(tCruiseDataResult);
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + item.getInstanceId(), mapForCruise);
 
+                        {
+                            //巡视点结果上报站端
+                            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                            List<Map<String,Object>> xmlItems = new ArrayList<>();
+                            Map<String,Object> xmlItem = new HashMap<>();
+                            xmlBaseModel.setType("61");
+                            xmlItem.put("patroldevice_code",item.getInstanceId());
+                            xmlItem.put("task_name",tCruiseTask.getTaskName());
+                            xmlItem.put("task_code",tCruiseTask.getTaskId());
+                            xmlItem.put("device_name",item.getCruiseName());
+                            xmlItem.put("device_id",item.getInstanceId());
+                            xmlItem.put("material_id",item.getRealCode());
+                            xmlItem.put("value","任务终止");
+                            xmlItem.put("value_unit","");
+                            xmlItem.put("unit","");
+                            xmlItem.put("time",simpleDateFormat.format(new Date()));
+                            //todo
+                            xmlItem.put("recognition_type","");
+                            xmlItem.put("file_type","2");
+                            xmlItem.put("file_path","");
+                            xmlItem.put("rectangle","");
+                            xmlItem.put("task_patrolled_id",taskId);
+                            xmlItem.put("data_type","0x01");
+                            xmlItem.put("valid","0");
+
+                            xmlItems.add(xmlItem);
+
+                            List<XMLBaseModel> list = new ArrayList<>();
+                            list.add(xmlBaseModel);
+                            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                            cruiseResult.put("list",list);
+                            Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                        }
+
                     } else {
                         //未放入缓存的点 未开始巡视的点。
                         taskWait = taskWait + 1;
@@ -225,6 +259,40 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseTaskResultDetailMap.put("taskName", tCruiseTask.getTaskName());
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         TCDRList.add(tCruiseDataResult);
+
+                        {
+                            //巡视点结果上报站端
+                            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                            List<Map<String,Object>> xmlItems = new ArrayList<>();
+                            Map<String,Object> xmlItem = new HashMap<>();
+                            xmlBaseModel.setType("61");
+                            xmlItem.put("patroldevice_code",item.getInstanceId());
+                            xmlItem.put("task_name",tCruiseTask.getTaskName());
+                            xmlItem.put("task_code",tCruiseTask.getTaskId());
+                            xmlItem.put("device_name",item.getCruiseName());
+                            xmlItem.put("device_id",item.getInstanceId());
+                            xmlItem.put("material_id",item.getRealCode());
+                            xmlItem.put("value","任务终止");
+                            xmlItem.put("value_unit","");
+                            xmlItem.put("unit","");
+                            xmlItem.put("time",simpleDateFormat.format(new Date()));
+                            //todo
+                            xmlItem.put("recognition_type","");
+                            xmlItem.put("file_type","2");
+                            xmlItem.put("file_path","");
+                            xmlItem.put("rectangle","");
+                            xmlItem.put("task_patrolled_id",taskId);
+                            xmlItem.put("data_type","0x01");
+                            xmlItem.put("valid","0");
+
+                            xmlItems.add(xmlItem);
+
+                            List<XMLBaseModel> list = new ArrayList<>();
+                            list.add(xmlBaseModel);
+                            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                            cruiseResult.put("list",list);
+                            Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                        }
                     }
                 }
                 //将正常 异常放回redis

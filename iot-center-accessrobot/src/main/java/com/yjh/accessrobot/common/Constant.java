@@ -1,5 +1,9 @@
 package com.yjh.accessrobot.common;
 
+import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import io.netty.channel.ChannelHandlerContext;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
@@ -28,4 +32,18 @@ public class Constant {
             .expiration(120000, TimeUnit.MILLISECONDS)
             .expirationPolicy(ExpirationPolicy.CREATED)
             .build();
+
+    public static String SEND_ROBOT_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+
+    public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
+        Result re = new Result();
+        ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        if (null != serviceRestTemplate) {
+            re = serviceRestTemplate.postForObject(url, map, Result.class);
+        }
+        return re;
+    }
+
+    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+
 }

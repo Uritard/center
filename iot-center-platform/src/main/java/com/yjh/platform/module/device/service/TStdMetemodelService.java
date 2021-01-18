@@ -394,10 +394,10 @@ public class TStdMetemodelService {
                 cell = row.createCell(i);
                 cell.setCellStyle(style);
                 if(i == 1){
-                    cell.setCellValue(list.get(i)+"*");
+                    cell.setCellValue("*"+list.get(i));
                 }
                 if(i == 2){
-                    cell.setCellValue(list.get(i)+"*");
+                    cell.setCellValue("*"+list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
@@ -419,7 +419,7 @@ public class TStdMetemodelService {
                     continue;
                 }
                 if(i == 4){
-                    cell.setCellValue(list.get(i)+"*");
+                    cell.setCellValue("*"+list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据

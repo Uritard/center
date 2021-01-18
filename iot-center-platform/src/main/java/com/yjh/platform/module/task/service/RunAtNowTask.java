@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
@@ -26,6 +27,7 @@ import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TSysParam;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -341,6 +343,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                 tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
                 tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
+                tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
 
                 Date now = new Date();
                 List<Long>  overhaul= tCruisePointInstanceDao.selectTimeIsIn(now);
@@ -440,6 +443,40 @@ public class RunAtNowTask implements Runnable{
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                         log.info("发送给前端的消息："+jsonMessage);
                         WebSocketServer.sendMsg(jsonMessage);
+
+                        {
+                            //巡视点结果上报站端
+                            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                            List<Map<String,Object>> xmlItems = new ArrayList<>();
+                            Map<String,Object> xmlItem = new HashMap<>();
+                            xmlBaseModel.setType("61");
+                            xmlItem.put("patroldevice_code",item);
+                            xmlItem.put("task_name",tCruiseTask.getTaskName());
+                            xmlItem.put("task_code",tCruiseTask.getTaskId());
+                            xmlItem.put("device_name",item.getCruiseName());
+                            xmlItem.put("device_id",item.getInstanceId());
+                            xmlItem.put("material_id",item.getRealCode());
+                            xmlItem.put("value","");
+                            xmlItem.put("value_unit","");
+                            xmlItem.put("unit","");
+                            xmlItem.put("time",cruiseTime);
+                            //todo
+                            xmlItem.put("recognition_type","");
+                            xmlItem.put("file_type","2");
+                            xmlItem.put("file_path",urlPath);
+                            xmlItem.put("rectangle","");
+                            xmlItem.put("task_patrolled_id",taskId);
+                            xmlItem.put("data_type","0x01");
+                            xmlItem.put("valid","0");
+
+                            xmlItems.add(xmlItem);
+
+                            List<XMLBaseModel> list = new ArrayList<>();
+                            list.add(xmlBaseModel);
+                            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                            cruiseResult.put("list",list);
+                            Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                        }
 
 
                     }else {
@@ -545,6 +582,40 @@ public class RunAtNowTask implements Runnable{
                             log.info("发送给前端的消息："+jsonMessage);
                             WebSocketServer.sendMsg(jsonMessage);
 
+                            {
+                                //巡视点结果上报站端
+                                XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                                List<Map<String,Object>> xmlItems = new ArrayList<>();
+                                Map<String,Object> xmlItem = new HashMap<>();
+                                xmlBaseModel.setType("61");
+                                xmlItem.put("patroldevice_code",item);
+                                xmlItem.put("task_name",tCruiseTask.getTaskName());
+                                xmlItem.put("task_code",tCruiseTask.getTaskId());
+                                xmlItem.put("device_name",item.getCruiseName());
+                                xmlItem.put("device_id",item.getInstanceId());
+                                xmlItem.put("material_id",item.getRealCode());
+                                xmlItem.put("value","");
+                                xmlItem.put("value_unit","");
+                                xmlItem.put("unit","");
+                                xmlItem.put("time",cruiseTime);
+                                //todo
+                                xmlItem.put("recognition_type","");
+                                xmlItem.put("file_type","2");
+                                xmlItem.put("file_path",urlPath);
+                                xmlItem.put("rectangle","");
+                                xmlItem.put("task_patrolled_id",taskId);
+                                xmlItem.put("data_type","0x01");
+                                xmlItem.put("valid","1");
+
+                                xmlItems.add(xmlItem);
+
+                                List<XMLBaseModel> list = new ArrayList<>();
+                                list.add(xmlBaseModel);
+                                Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                                cruiseResult.put("list",list);
+                                Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                            }
+
                         }
 
 
@@ -587,6 +658,8 @@ public class RunAtNowTask implements Runnable{
                         Thread.sleep(15000);
                         tCruiseResult.setCState(240);
                         tCruiseResultDao.update(tCruiseResult);
+
+                        sendTaskStateToUp(tCruiseTask,1);
                     }
                     mapForAbnormal.put("abnormal",abnormal.toString());
                     mapForAbnormal.put("normal",normal.toString());
@@ -644,6 +717,8 @@ public class RunAtNowTask implements Runnable{
                 tCruiseResult.setCState(240);
                 tCruiseResultDao.update(tCruiseResult);
 
+                sendTaskStateToUp(tCruiseTask,1);
+
             }else {
                 mapForAbnormal.put("abnormal",abnormal.toString());
                 mapForAbnormal.put("normal",normal.toString());
@@ -673,8 +748,56 @@ public class RunAtNowTask implements Runnable{
             //tCruiseTaskResultDao.update(tCruiseTaskResult);
             log.info("完成任务执行"+new Date());
         } catch (Exception e) {
-            log.error("立即任务异常" + e);
+            log.error("立即任务异常" + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private Result sendTaskStateToUp(TCruiseTask tCruiseTask,Integer state){
+        //任务状态上报站端
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String,Object>> items= new ArrayList<>();
+        Map<String,Object> item = new HashMap<>();
+        xmlBaseModel.setType("41");
+        item.put("task_patrolled_id",tCruiseTask.getTaskId());
+        item.put("task_name",tCruiseTask.getTaskName());
+        item.put("task_code",tCruiseTask.getTaskId());
+        item.put("task_state",state);
+        item.put("plan_start_time",tCruiseTask.getStartTime());
+        if(tCruiseTask.getIfRun() == 172){
+            try{
+                CronExpression expression = new CronExpression(tCruiseTask.getDateType());
+                item.put("start_time",expression.getNextValidTimeAfter(new Date()));
+            }catch (Exception e){
+                log.info("上报出错"+e.getMessage());
+            }
+        }else {
+            item.put("start_time",tCruiseTask.getStartTime());
+        }
+        item.put("task_progress","0%");
+        Integer i =0;
+        Map<String,String> mapForGet = redisTemplate.opsForHash().entries("countForAbnormal:"+tCruiseTask.getTaskId());
+        Integer all = Integer.valueOf(mapForGet.get("all"));
+        Integer normal = Integer.valueOf(mapForGet.get("normal"));
+        Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
+        i = all -normal -abnormal;
+
+
+        item.put("task_estimated_time",i*60*5);
+        item.put("description","");
+        items.add(item);
+        xmlBaseModel.setItems(items);
+
+        List<XMLBaseModel> list = new ArrayList<>();
+        list.add(xmlBaseModel);
+        Map<String,List<XMLBaseModel>> map = new HashMap<>();
+        map.put("list",list);
+        Result re = null;
+        try{
+            re = Constant.otherServer(map,Constant.TCP_URL);
+        }catch (Exception e){
+            log.info("上报出错"+e.getMessage());
+        }
+        return re;
     }
 }

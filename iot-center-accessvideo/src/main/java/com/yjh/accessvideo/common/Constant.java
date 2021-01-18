@@ -1,5 +1,9 @@
 package com.yjh.accessvideo.common;
 
+import com.yjh.accessvideo.commons.logs.SpringBeanUtils;
+import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessvideo.commons.result.Result;
+import com.yjh.accessvideo.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
 
 import java.util.*;
@@ -33,4 +37,14 @@ public class Constant {
 
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
+
+    public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
+        Result re = new Result();
+        ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        if (null != serviceRestTemplate) {
+            re = serviceRestTemplate.postForObject(url, map, Result.class);
+        }
+        return re;
+    }
+    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 }

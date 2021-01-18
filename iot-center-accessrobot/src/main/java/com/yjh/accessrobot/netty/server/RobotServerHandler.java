@@ -416,6 +416,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         robotStatusMap.put("valueUnit",res.get("value_unit").toString());
                         robotStatusMap.put("unit",res.get("unit").toString());
                         robotStatusList.add(robotStatusMap);
+
+                        robotService.upToCruise(xmlBaseModel);
                     });
                     log.info("机器人状态数据是："+robotStatusList);
                     //放缓存
@@ -443,6 +445,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         robotOperationMap.put("valueUnit",res.get("value_unit").toString());
                         robotOperationMap.put("unit",res.get("unit").toString());
                         robotOperationList.add(robotOperationMap);
+
+                        robotService.upToCruise(xmlBaseModel);
                     });
 //                    log.info("机器人运行数据是；"+robotOperationList);
                     //放缓存
@@ -694,6 +698,19 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, cruiseResultXmlString);
                     send(ctx, cruiseResultProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
+
+                {
+                    //巡视点结果上报站端
+                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:"+xmlBaseModel.getSendCode()+":"+xmlBaseModel.getCode());
+                    String instanceId = redisInfoMap.get("instanceId");
+                    Map<String,String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:"+xmlBaseModel.getCode() + ":" + instanceId);
+                    xmlBaseModel.getItems().get(0).put("material_id",mapForGet.get("realCode"));
+                    List<XMLBaseModel> list = new ArrayList<>();
+                    list.add(xmlBaseModel);
+                    Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                    cruiseResult.put("list",list);
+                    Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                }
 
                     break;
             }

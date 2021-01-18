@@ -73,6 +73,7 @@ public class TCameraScreenService{
                 Camera camera = new Camera();
                 TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.parseLong(item));
                 if(tCameraInfo == null){
+                    tCameraScreenDetail.setCameraIds(tCameraScreenDetail.getCameraIds().replace(","+item,"").replace(item,""));
                     continue;
                 }
                 camera.setCameraId(tCameraInfo.getCameraId().toString());

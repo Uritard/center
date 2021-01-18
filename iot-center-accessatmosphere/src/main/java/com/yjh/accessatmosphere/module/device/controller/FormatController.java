@@ -152,7 +152,7 @@ public class FormatController {
         Result result = new Result();
         try {
             Constant.path = path;
-            log.info("设置成功");
+            log.info("设置成功"+Constant.path);
             result.setData(1);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

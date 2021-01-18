@@ -3,6 +3,7 @@ package com.yjh.accesstcp.module.device.dao;
 
 
 import com.yjh.accesstcp.module.device.entity.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,5 +17,6 @@ import java.util.Map;
 public interface SendToUpSystemDao {
     List<Map<String,Object>> selectDeviceModel();
     List<Map<String,Object>> selectRobotInfo();
-
+    List<Map<String,Object>> selectTaskInfo();
+    List<Long> selectInstanceId(@Param(value = "taskId") String taskId);
 }

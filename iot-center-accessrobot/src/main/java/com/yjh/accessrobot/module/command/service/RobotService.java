@@ -7,6 +7,9 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.logs.Logs;
+import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
@@ -678,6 +681,30 @@ public class RobotService {
         //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(xmlBaseModel.getCode()).SendHeartBeat( generateByteOrder(xmlString,xmlBaseModel.getCode()),xmlBaseModel.getCode());
         return "success";
+    }
+
+    @Logs(title ="机器人数据上报巡视主机",code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public String upToCruise(XMLBaseModel xmlBaseModel){
+        Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
+        List<XMLBaseModel> list = new ArrayList<>();
+        list.add(xmlBaseModel);
+        robotMap.put("list",list);
+        robotTaskStates(robotMap);
+        return "success";
+    }
+
+    public Result robotTaskStates(Map<String,List<XMLBaseModel>> robotMap) {
+        Result re = new Result();
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re = serviceRestTemplate.postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return re;
     }
 
 }

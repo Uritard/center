@@ -60,7 +60,7 @@ public class DataDealThread implements Runnable {
         String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
         handlingMethod(data,finalBody);
         }catch (Exception e){
-            log.info("解析报文出错："+e);
+            log.info("解析报文出错："+e.getMessage());
         }
     }
     //拆包 解决毡包
@@ -118,7 +118,7 @@ public class DataDealThread implements Runnable {
                 if ("100".equals(xmlBaseModel.getCode())) {
                     //需要重发注册消息
                     tcpClientHandler.sendRegister();
-                } else if ("200".equals(xmlBaseModel.getCode())) {
+                }        else if ("200".equals(xmlBaseModel.getCode())) {
                     //服务端响应 我方开启心跳
 
                     List<Map<String, Object>> items = xmlBaseModel.getItems();
@@ -181,7 +181,7 @@ public class DataDealThread implements Runnable {
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             robotMap.put("list",list);
-            Result re = robotTaskStates(robotMap);
+            Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
             }else if("success".equals(re.getData().toString())){
@@ -218,24 +218,49 @@ public class DataDealThread implements Runnable {
                 log.info("--响应任务 任务下发--");
                 List<Map<String,Object>> list = xmlBaseModel.getItems();
                 for (Map<String,Object> item:list){
-
+                    //todo 下任务
                 }
 
             }
         }
 
+        if ("61".equals(xmlBaseModel.getType())){
+            log.info("--模型同步--");
+            if("1".equals(xmlBaseModel.getCommand())){
+                //log.info("----");
+            sendToUpSystemServices.creatFile();
+            List<Map<String,Object>> list =new ArrayList<>();
+            Map<String,String> mapForGetPath = redisTemplate.opsForHash().entries("t_sys_param:modelRelativePath");
+            String path = mapForGetPath.get("content");
+            Map<String,Object> mapForDevice = new HashMap<>();
+            mapForDevice.put("device_file_path",path+"/"+"device_file.xml");
+            list.add(mapForDevice);
+
+            Map<String,Object> mapForRobot = new HashMap<>();
+            mapForDevice.put("robot_file_path",path+"/"+"robot_file.xml");
+            list.add(mapForRobot);
+
+            Map<String,Object> mapForTask = new HashMap<>();
+            mapForDevice.put("task_file_path",path+"/"+"task_file.xml");
+            list.add(mapForTask);
+
+            sendToUpSystemServices.sendResponse("251","3","200",list);
+
+            }
+        }
+
+        if ("81".equals(xmlBaseModel.getType())){
+            log.info("--检修区域--");
+            Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            robotMap.put("list",list);
+            Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);
+            log.info("--响应检修--");
+            sendToUpSystemServices.sendResponse("251","4","200",null);
+        }
+
     }
 
-    private Result robotTaskStates(Map<String,List<XMLBaseModel>> robotMap) {
-        Result re = new Result();
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-               re = serviceRestTemplate.postForObject(Constant.ROBOT_TASK_URL, robotMap, Result.class);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return re;
-    }
+
 }

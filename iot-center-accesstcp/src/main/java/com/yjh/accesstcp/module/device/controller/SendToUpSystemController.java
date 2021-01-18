@@ -3,6 +3,7 @@ package com.yjh.accesstcp.module.device.controller;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
 import com.yjh.accesstcp.module.device.entity.SysLogs;
+import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.service.SysLogsService;
 import io.swagger.annotations.Api;
@@ -10,10 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,13 +34,15 @@ public class SendToUpSystemController {
         this.sendToUpSystemService = sendToUpSystemService;
     }
 
-    @ApiOperation(value = "主键查询")
+    @ApiOperation(value = "发送")
     @RequestMapping(value = "/send", method = RequestMethod.GET)
     public Result send(@RequestParam(value = "list", required = true) List<Map<String,Object>> list,
-                                    @RequestParam(value = "msgType", required = true) String msgType) {
+                       @RequestParam(value = "type", required = true) String type,
+                       @RequestParam(value = "command", required = false) String command,
+                       @RequestParam(value = "code", required = false) String code) {
         Result result = new Result();
         try {
-            sendToUpSystemService.send(list,msgType);
+            sendToUpSystemService.sendResponse(type,command,code,list);
             result.setData(1);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -51,12 +51,27 @@ public class SendToUpSystemController {
         return result;
     }
 
+
+    @ApiOperation(value = "发送")
+    @RequestMapping(value = "/sendXML", method = RequestMethod.POST)
+    public Result sendXML(@RequestBody Map<String,List<XMLBaseModel>> robotMap) {
+        Result result = new Result();
+        try {
+            XMLBaseModel xmlBaseModel = robotMap.get("list").get(0);
+            sendToUpSystemService.sendXML(xmlBaseModel);
+            result.setData(1);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("发送失败描述：", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/creatFile", method = RequestMethod.GET)
     public Result creatFile() {
         Result result = new Result();
         try {
-            result.setData(sendToUpSystemService.creatFile("66"));
+            result.setData(sendToUpSystemService.creatFile());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

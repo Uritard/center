@@ -27,7 +27,8 @@ import java.util.Enumeration;
 @EnableFeignClients
 @Slf4j
 public class AccessAtmosphereApplication implements CommandLineRunner {
-    @Value("{spring.send.service.url}")
+
+    @Value("${spring.send.service.url}")
     private String path;
 
     public static void main(String[] args) {
@@ -37,6 +38,7 @@ public class AccessAtmosphereApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         Constant.path = path;
+        System.out.println(Constant.path);
         ParamConfig paramConfig = new ParamConfig("COM3", 19200, 0, 8, 1);
         Thread thread = new ListerThread(paramConfig);
         thread.start();

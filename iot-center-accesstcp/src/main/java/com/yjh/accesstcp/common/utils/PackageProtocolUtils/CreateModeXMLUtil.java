@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.apache.catalina.startup.ExpandWar.deleteDir;
+
 /**
  * @author YC
  * @date 2020/11/13 - 16:02
@@ -37,9 +39,9 @@ public class CreateModeXMLUtil {
         }
         OutputFormat format = OutputFormat.createPrettyPrint();
         format.setEncoding("UTF-8");
-        File file = new File(failPath+File.separator+fileName);
+        File file = new File(failPath+"/"+fileName);
         if(file.exists()){
-           return  failPath+File.separator+fileName;
+            deleteDir(new File(failPath + "/"+fileName));
         }
         XMLWriter writer = new XMLWriter(new FileOutputStream(file), format);
         // 设置是否转义，默认使用转义字符
@@ -47,7 +49,7 @@ public class CreateModeXMLUtil {
         writer.write(document);
         writer.close();
 
-        return  failPath+File.separator+fileName;
+        return  failPath+"/"+fileName;
     }
 }
 

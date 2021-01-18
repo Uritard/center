@@ -7,6 +7,8 @@ import com.yjh.platform.module.device.entity.TDeviceMaintenance;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.task.entity.XMLBaseModel;
 import io.swagger.annotations.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -209,6 +211,24 @@ public class TDeviceMaintenanceController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "站端检修区域下发")
+    @RequestMapping(value = "/systemSend", method = RequestMethod.POST)
+    public Result systemSend(@RequestBody Map<String,List<XMLBaseModel>> map){
+        Result result = new Result();
+        try {
+            XMLBaseModel xmlBaseModel = map.get("list").get(0);
+            log.info("--站端检修区域数据--"+xmlBaseModel);
+            result.setData(tDeviceMaintenanceService.systemSend(xmlBaseModel));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站端命令下发错误:", e);
         }
         return result;
     }

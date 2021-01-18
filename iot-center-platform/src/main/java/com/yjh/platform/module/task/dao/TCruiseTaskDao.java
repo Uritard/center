@@ -58,4 +58,6 @@ public interface TCruiseTaskDao {
     List<WarnStatistical>selectOnYear();//本年
 
     List<TaskOnExecuteInfo> selectTaskOnExecute();
+
+    int countInstance(@Param(value = "taskId") String taskId);
 }

@@ -557,4 +557,13 @@ select *from (
             a.c_state = 239
             order by c.start_time desc limit 3
     </select>
+
+    <select id="countInstance" resultType="java.lang.Integer">
+        select
+           count(1) as count
+        FROM
+            t_cruise_task_attr
+        WHERE
+            task_id = #{taskId,jdbcType = VARCHAR}
+    </select>
 </mapper>

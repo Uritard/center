@@ -862,4 +862,16 @@
         </foreach>
     </insert>
 
+    <select id="selectWarnInfo" resultType="java.util.Map">
+        SELECT
+            a.unit,
+            b.up_dict as recognition_type,
+            c.up_dict as alarm_type
+        FROM
+            t_std_devicemete a
+            left join t_dict_business b on a.mete_type = b.dict_code and b.col_name = "mete_type"
+            left join t_dict_business c on a.alarm_type = c.dict_code and c.col_name = "alarm_type"
+            WHERE a.device_mete_id = #{deviceMeteId,jdbaType=BIGINT}
+    </select>
+
 </mapper>

@@ -90,7 +90,7 @@ public class WeatherThread implements Runnable{
                     map6.put("value_unit", mapForWeather.get("airPressure") + mapForWeather.get("airPressureUnit"));
                     list.add(map6);
 
-                    sendToUpSystemServices.send(list, "weather");
+                    sendToUpSystemServices.sendResponse("21","3","",list);
                     log.info("--天气信息已发送--");
                 }
 

@@ -5,9 +5,11 @@ import com.yjh.platform.module.device.entity.TDeviceMaintenance;
 import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
 
 import java.awt.image.ImageProducer;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
+import com.yjh.platform.module.task.entity.XMLBaseModel;
 import org.apache.bcel.generic.ANEWARRAY;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class TDeviceMaintenanceService{
     @Autowired
     private TDeviceMaintenanceDao tDeviceMaintenanceDao;
 
-    @Logs(title = "插入", code = "module")
+    @Logs(title = "插入", code = "module",content = "插入")
     @Transactional(rollbackFor = Exception.class)
     public int add(TDeviceMaintenance tDeviceMaintenance) {
 //        {
@@ -59,13 +61,13 @@ public class TDeviceMaintenanceService{
         return this.tDeviceMaintenanceDao.batchAdd(addList);
     }
 
-    @Logs(title = "删除", code = "module")
+    @Logs(title = "删除", code = "module",content = "删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long maintenanceId) {
         return this.tDeviceMaintenanceDao.deleteByPrimaryId(maintenanceId);
     }
 
-    @Logs(title = "更新", code = "module")
+    @Logs(title = "更新", code = "module",content = "更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
@@ -87,7 +89,7 @@ public class TDeviceMaintenanceService{
         return this.tDeviceMaintenanceDao.batchAdd(addList);
     }
 
-    @Logs(title = "主键查询", code = "module")
+    @Logs(title = "主键查询", code = "module",content = "主键查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TDeviceMaintenance> selectByPrimaryId(Long maintenanceId) {
         List<TDeviceMaintenance> tDeviceMaintenanceList = tDeviceMaintenanceDao.selectByPrimaryId(maintenanceId);
@@ -112,7 +114,7 @@ public class TDeviceMaintenanceService{
         return re;
     }
 
-    @Logs(title = "查询", code = "module")
+    @Logs(title = "查询", code = "module",content = "查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TDeviceMaintenance> select(Long maintenanceId, String maintenanceName, Long deviceId, Integer isValid, Date maintenanceStart, Date maintenanceStop,Integer effectiveState) {
         List<TDeviceMaintenance> tDeviceMaintenanceList = tDeviceMaintenanceDao.select(maintenanceId,maintenanceName,deviceId,isValid,maintenanceStart,maintenanceStop);
@@ -140,7 +142,7 @@ public class TDeviceMaintenanceService{
         return re;
     }
 
-    @Logs(title = "分页查询", code = "module")
+    @Logs(title = "分页查询", code = "module",content = "分页查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TDeviceMaintenanceDetail> selectByPage(String maintenanceName,Integer effectiveState) {
         List<TDeviceMaintenanceDetail> tDeviceMaintenanceList = tDeviceMaintenanceDao.selectByPage(maintenanceName);
@@ -173,7 +175,7 @@ public class TDeviceMaintenanceService{
         return re;
     }
 
-    @Logs(title = "查询区域下的设备", code = "module")
+    @Logs(title = "查询区域下的设备", code = "module",content = "查询区域下的设备")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectDeviceDetail(Long maintenanceId){
         Map<String,Object> re = new HashMap<>();
@@ -184,13 +186,13 @@ public class TDeviceMaintenanceService{
         return re;
     }
 
-    @Logs(title = "批量插入", code = "module")
+    @Logs(title = "批量插入", code = "module",content = "批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TDeviceMaintenance> list) {
         return this.tDeviceMaintenanceDao.batchAdd(list);
     }
 
-    @Logs(title = "批量删除", code = "module")
+    @Logs(title = "批量删除", code = "module",content = "批量删除")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String maintenanceId) {
     List<String> list1= Arrays.asList(maintenanceId.split(","));
@@ -198,7 +200,7 @@ public class TDeviceMaintenanceService{
     }
 
 
-    @Logs(title = "查询区域下的设备", code = "module")
+    @Logs(title = "查询区域下的设备", code = "module",content = "查询区域下的设备")
     @Transactional(rollbackFor = Exception.class)
     public List<IdAndNameDetail> selectDevice(String deviceIds) {
         String[] list = deviceIds.split(",");
@@ -212,10 +214,46 @@ public class TDeviceMaintenanceService{
         return null;
     }
 
-    @Logs(title = "查询设备下的巡视点", code = "module")
+    @Logs(title = "查询设备下的巡视点", code = "module",content = "查询设备下的巡视点")
     @Transactional(rollbackFor = Exception.class)
     public List<IdAndNameDetail> selectInstance(Long deviceId) {
         return this.tDeviceMaintenanceDao.selectInstance(deviceId);
+    }
+
+
+    @Logs(title = "站端检修区域下发", code = "module",content = "站端检修区域下发")
+    @Transactional(rollbackFor = Exception.class)
+    public int systemSend(XMLBaseModel xmlBaseModel) throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<Map<String,Object>> list = xmlBaseModel.getItems();
+        for (Map<String,Object> item:list) {
+             String enable = item.get("enable").toString();
+             String start_time = item.get("start_time").toString();
+             String end_time = item.get("end_time").toString();
+             String device_level = item.get("device_level").toString();
+             String device_list = item.get("device_list").toString();
+             String[] dd = device_list.split(",");
+             List<Long> instanceIdList = new ArrayList<>();
+             for (String str:dd) {
+                 instanceIdList.add(Long.valueOf(str));
+             }
+             List<Long> deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdList(instanceIdList);
+             if("1".equals(enable)){
+                 //设置检修区域
+                TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
+                tDeviceMaintenance.setMaintenanceName("检修区域"+start_time);
+                tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
+                tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
+                tDeviceMaintenance.setDeviceIdList(deviceIdLst);
+                tDeviceMaintenanceDao.add(tDeviceMaintenance);
+             }
+             if("0".equals(enable)){
+                //删除检修区域
+                 tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst);
+             }
+
+        }
+        return 1;
     }
 
 }

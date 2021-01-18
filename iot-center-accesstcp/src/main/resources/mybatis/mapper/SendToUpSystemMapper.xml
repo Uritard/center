@@ -53,4 +53,33 @@
 		left join t_dict_business c on a.robot_factory = c.dict_code
 	</select>
 
+	<select id="selectTaskInfo" resultType="java.util.Map">
+		SELECT
+		b.up_dict as type,
+		a.task_id as task_code,
+		a.task_name,
+		a.task_level as priority,
+		"3" as device_level,
+		if(a.if_run=174,a.start_time,"") as fixed_start_time,
+		IFNULL(a.date_type,"") as time,
+		"" as cycle_month,
+		"" as  cycle_week,
+		"" as cycle_execute_time,
+		"" as cycle_start_time,
+		"" as cycle_end_time,
+		"" as interval_number,
+		"" as interval_type,
+		if(c.c_state=240,1,0) isenable,
+		"" as creator,
+		"" as create_time
+		from t_cruise_task a
+		left join t_dict_business b on a.type = b.dict_code and b.col_name="plan_type"
+		left join t_cruise_result c on a.task_id = c.task_id
+	</select>
+	<select id="selectInstanceId" resultType="java.lang.Long">
+		SELECT
+		a.instance_id
+		from t_cruise_task_attr a where a.task_id =#{taskId,jdbcType=VARCHAR}
+	</select>
+
 </mapper>

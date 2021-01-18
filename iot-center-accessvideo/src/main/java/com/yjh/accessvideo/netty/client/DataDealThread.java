@@ -4,6 +4,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.websocket.WebSocketServer;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
@@ -99,6 +100,8 @@ public class DataDealThread implements Runnable {
                     Integer tNormal = 0;
                     taskConstant.put("taskId", TASKID);
                     log.info("keyName" + name);
+
+                    String alarm_level = "";
 
 
                     log.info("数据初始化");
@@ -226,6 +229,7 @@ public class DataDealThread implements Runnable {
                                                             case 1:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
                                                                 warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "预警");
+                                                                alarm_level = "1";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit1()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
                                                                 } else {
@@ -235,6 +239,7 @@ public class DataDealThread implements Runnable {
                                                             case 2:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                                                 warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "一般");
+                                                                alarm_level = "2";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit2()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
                                                                 } else {
@@ -244,6 +249,7 @@ public class DataDealThread implements Runnable {
                                                             case 3:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
                                                                 warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "严重");
+                                                                alarm_level = "3";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit3()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit3()));
                                                                 } else {
@@ -254,6 +260,7 @@ public class DataDealThread implements Runnable {
                                                             case 4:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
                                                                 warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "危急");
+                                                                alarm_level = "4";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit4()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit4()));
                                                                 } else {
@@ -302,6 +309,39 @@ public class DataDealThread implements Runnable {
                                                     tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime").toString()));
                                                     log.info("------------------------------------------------------------");
                                                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
+
+                                                    {
+                                                        //告警上报站端
+                                                        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                                                        List<Map<String,Object>> xmlItems = new ArrayList<>();
+                                                        Map<String,Object> xmlItem = new HashMap<>();
+                                                        xmlBaseModel.setType("62");
+                                                        xmlItem.put("patroldevice_code",cruiseResultMap.get("instanceId"));
+                                                        xmlItem.put("task_name",cruiseResultMap.get("taskName"));
+                                                        xmlItem.put("task_code",cruiseResultMap.get("taskId"));
+                                                        xmlItem.put("device_name",cruiseResultMap.get("instanceName"));
+                                                        xmlItem.put("device_id",cruiseResultMap.get("instanceId"));
+                                                        xmlItem.put("alarm_level",alarm_level);
+                                                        String deviceMeteId = cruiseResultMap.get("deviceMeteId");
+                                                        Map<String,Object> info = analyseDataOperateService.selectWarnInfo(Long.valueOf(deviceMeteId));
+                                                        xmlItem.put("alarm_type",info.get("alarm_type"));
+                                                        xmlItem.put("recognition_type",info.get("recognition_type"));
+                                                        xmlItem.put("value",tWarnInfo.getValue());
+                                                        xmlItem.put("value_unit",tWarnInfo.getValue()+info.get("unit"));
+                                                        xmlItem.put("unit",info.get("unit"));
+                                                        xmlItem.put("time",simpleDateFormat.format(new Date()));
+                                                        xmlItem.put("task_patrolled_id",cruiseResultMap.get("taskId"));
+                                                        xmlItem.put("content",tWarnInfo.getWarnContent());
+
+
+                                                        xmlItems.add(xmlItem);
+
+                                                        List<XMLBaseModel> list = new ArrayList<>();
+                                                        list.add(xmlBaseModel);
+                                                        Map<String,List<XMLBaseModel>> map = new HashMap<>();
+                                                        cruiseResult.put("list",list);
+                                                        Constant.otherServer(map,Constant.TCP_URL);
+                                                    }
 
                                                     // webSocket通知前端刷新告警统计数量
                                                     Map<String, Object> jasonMaps = new HashMap<>();
@@ -434,6 +474,41 @@ public class DataDealThread implements Runnable {
                     // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
 
                     redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
+
+                    {
+                        //巡视点结果上报站端
+                        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                        List<Map<String,Object>> xmlItems = new ArrayList<>();
+                        Map<String,Object> xmlItem = new HashMap<>();
+                        xmlBaseModel.setType("61");
+                        xmlItem.put("patroldevice_code",cruiseResultMap.get("instanceId"));
+                        xmlItem.put("task_name",cruiseResultMap.get("taskName"));
+                        xmlItem.put("task_code",cruiseResultMap.get("taskId"));
+                        xmlItem.put("device_name",cruiseResultMap.get("instanceName"));
+                        xmlItem.put("device_id",cruiseResultMap.get("instanceId"));
+                        xmlItem.put("material_id",cruiseResultMap.get("realCode"));
+                        xmlItem.put("value","");
+                        xmlItem.put("value_unit",cruiseResultMap.get("resultNum"));
+                        xmlItem.put("unit","");
+                        xmlItem.put("time",simpleDateFormat.format(new Date()));
+                        //todo
+                        xmlItem.put("recognition_type","");
+                        xmlItem.put("file_type","2");
+                        xmlItem.put("file_path",cruiseResultMap.get("picpath"));
+                        xmlItem.put("rectangle","");
+                        xmlItem.put("task_patrolled_id",cruiseResultMap.get("taskId"));
+                        xmlItem.put("data_type","0x01");
+                        xmlItem.put("valid","1");
+
+                        xmlItems.add(xmlItem);
+
+                        List<XMLBaseModel> list = new ArrayList<>();
+                        list.add(xmlBaseModel);
+                        Map<String,List<XMLBaseModel>> map = new HashMap<>();
+                        cruiseResult.put("list",list);
+                        Constant.otherServer(map,Constant.TCP_URL);
+                    }
+
                     //若本任务上一次有巡视数据，则正常或异常点数要进行加和
                     if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
                         tNormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal").toString()) + tNormal;
