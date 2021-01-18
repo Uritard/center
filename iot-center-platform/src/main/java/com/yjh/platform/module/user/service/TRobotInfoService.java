@@ -1,20 +1,14 @@
 package com.yjh.platform.module.user.service;
 
-import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.entity.TRobotInspectionTree;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
-
-import com.yjh.platform.module.user.entity.TRobotInspectionTree;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -57,10 +51,12 @@ public class TRobotInfoService{
                                     String upRegionName, String lightIp, String lightPort, String lightUsername, String lightPassword,
                                    String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
                                    String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
-                                   Date commissionDateString, Long upRegionId, String robotPosition, String remarks) {
+                                   Date commissionDateString, Long upRegionId, String robotPosition, String remarks,String robotSource,
+                                   String address,String buildingUser,String appearanceNumber) {
         List<TRobotInfo> tRobotInfoList = tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
                 upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
-                photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition, remarks);
+                photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition,
+                robotSource,address,buildingUser,appearanceNumber,remarks);
         return tRobotInfoList;
     }
 

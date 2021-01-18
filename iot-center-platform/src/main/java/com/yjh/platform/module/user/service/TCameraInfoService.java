@@ -1,20 +1,17 @@
 package com.yjh.platform.module.user.service;
 
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.Object2Map;
-
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
-import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-
-import org.springframework.data.redis.core.RedisTemplate;
-
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -81,14 +78,14 @@ public class TCameraInfoService {
 
     @Logs(title = "查询", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, String aliasName, String recordId,
+    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String aliasName, String recordId,
                                           Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,
                                           Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
                                           String url, Integer port, Integer cameraType, Integer isControl, String latitude,
-                                          String longitude, String address) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, aliasName,
+                                          String longitude, String address,String unit) {
+        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, cameraModel,aliasName,
                 recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType, cameraIp, url,
-                port, cameraType, latitude, longitude, address, isControl);
+                port, cameraType, latitude, longitude, address, isControl,unit);
         return tCameraInfoByDictList;
     }
 

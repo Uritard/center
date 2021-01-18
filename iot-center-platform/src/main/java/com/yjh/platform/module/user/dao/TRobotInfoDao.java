@@ -1,14 +1,14 @@
 package com.yjh.platform.module.user.dao;
 
-import java.util.List;
-import java.util.Date;
-
 import com.yjh.platform.module.task.entity.RobotInfoForHomePage;
 import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -53,6 +53,10 @@ public interface TRobotInfoDao {
                                 @Param(value = "commissionDate") Date commissionDate,
                                 @Param(value = "upRegionId") Long upRegionId,
                                 @Param(value = "robotPosition") String robotPosition,
+                                @Param(value = "robotSource") String robotSource,
+                                @Param(value = "address") String address,
+                                @Param(value = "buildingUser") String buildingUser,
+                                @Param(value = "appearanceNumber") String appearanceNumber,
                                 @Param(value = "remarks") String remarks);
     List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
 

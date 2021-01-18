@@ -83,4 +83,9 @@ public class TCameraInfoByDict implements Serializable {
     @ApiModelProperty(value = "经度")
     private String longitude;
 
+    @ApiModelProperty(value = "摄像机型号")
+    private Integer cameraModel;
+    @ApiModelProperty(value = "单位")
+    private String unit;
+
 }

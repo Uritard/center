@@ -24,18 +24,19 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        record_id, record_name, recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
+        record_id, record_name, recorder_model,recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
     </sql>
     <sql id="TongYong">
-        a.record_id,a.record_name,a.recorder_type,b.dict_note as recorder_type_Name ,a.alias_name,a.record_ip,
+        a.record_id,a.record_name,a.recorder_model,a.recorder_type,b.dict_note as recorder_type_Name ,a.alias_name,a.record_ip,
 		a.protocol,d.dict_note as protocol_type,a.http_port,a.trans_port,a.rtsp_port,a.user_name,
-        a.pwd,a.protocol_url,a.max_channel,a.hdd_size,a.buffer_day,a.time_long
+        a.pwd,a.protocol_url,a.max_channel,a.hdd_size,a.buffer_day,a.time_long,unit
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="recordId" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
         insert into t_camera_recorder(
             record_id,
             record_name,
+            recorder_model,
             recorder_type,
             alias_name,
             record_ip,
@@ -49,10 +50,12 @@
             max_channel,
             hdd_size,
             buffer_day,
-            time_long
+            time_long,
+            unit
         )values(
                 #{recordId, jdbcType=BIGINT},
                 #{recordName, jdbcType=VARCHAR},
+                #{recorderModel, jdbcType=INTEGER},
                 #{recorderType, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
                 #{recordIp, jdbcType=VARCHAR},
@@ -66,7 +69,8 @@
                 #{maxChannel, jdbcType=INTEGER},
                 #{hddSize, jdbcType=INTEGER},
                 #{bufferDay, jdbcType=INTEGER},
-                #{timeLong, jdbcType=INTEGER}
+                #{timeLong, jdbcType=INTEGER},
+                #{unit, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -105,6 +109,7 @@
         update t_camera_recorder a <set>
         <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=BIGINT},</if>
         <if test="recordName != null and recordName != ''">a.record_name = #{recordName, jdbcType=VARCHAR},</if>
+        <if test="recorderModel != null ">a.recorder_model = #{recorderModel, jdbcType=INTEGER},</if>
         <if test="recorderType != null and recorderType != ''">a.recorder_type = #{recorderType, jdbcType=VARCHAR},</if>
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="recordIp != null and recordIp != ''">a.record_ip = #{recordIp, jdbcType=VARCHAR},</if>
@@ -119,17 +124,34 @@
         <if test="hddSize != null ">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>
         <if test="bufferDay != null ">a.buffer_day = #{bufferDay, jdbcType=INTEGER},</if>
         <if test="timeLong != null ">a.time_long = #{timeLong, jdbcType=INTEGER},</if>
+        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
     </set>
             where a.record_id = #{recordId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
-        select<include refid="TongYong"></include>
-        from t_camera_recorder a,t_dict_business b,t_dict_business d
+        select
+            record_id,
+            record_name,
+            recorder_model,
+            recorder_type,
+            alias_name,
+            record_ip,
+            protocol,
+            http_port,
+            trans_port,
+            rtsp_port,
+            user_name,
+            pwd,
+            protocol_url,
+            max_channel,
+            hdd_size,
+            buffer_day,
+            time_long,
+            unit
+        from t_camera_recorder a
         where 1 = 1
             and a.record_id = #{recordId, jdbcType=BIGINT}
-            and b.dict_code = a.recorder_type
-            and d.dict_code = a.protocol
         limit 1
     </select>
 
@@ -139,6 +161,7 @@
         where 1 = 1
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
+        <if test="recorderModel != null "> and a.recorder_model = #{recorderModel, jdbcType=INTEGER}</if>
         <if test="recorderType != null and recorderType != ''"> and a.recorder_type = #{recorderType, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordIp != null and recordIp != ''"> and a.record_ip = #{recordIp, jdbcType=VARCHAR}</if>
@@ -153,6 +176,7 @@
         <if test="hddSize != null "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
         <if test="bufferDay != null "> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
         <if test="timeLong != null "> and a.time_long = #{timeLong, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         and b.dict_code = a.recorder_type
         and d.dict_code = a.protocol
     </select>
@@ -163,6 +187,7 @@
         where 1 = 1
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
+        <if test="recorderModel != null "> and a.recorder_model = #{recorderModel, jdbcType=INTEGER}</if>
         <if test="recorderType != null and recorderType != ''"> and a.recorder_type = #{recorderType, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordIp != null and recordIp != ''"> and a.record_ip = #{recordIp, jdbcType=VARCHAR}</if>
@@ -177,6 +202,7 @@
         <if test="hddSize != null  "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
         <if test="bufferDay != null "> and a.buffer_day = #{bufferDay, jdbcType=INTEGER}</if>
         <if test="timeLong != null "> and a.time_long = #{timeLong, jdbcType=INTEGER}</if>
+        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
         and b.dict_code = a.recorder_type
         and d.dict_code = a.protocol
     </select>
@@ -185,6 +211,7 @@
         insert into t_camera_recorder(
             record_id,
             record_name,
+            recorder_model,
             recorder_type,
             alias_name,
             record_ip,
@@ -198,12 +225,14 @@
             max_channel,
             hdd_size,
             buffer_day,
-            time_long
+            time_long,
+            unit
         )values
         <foreach collection="list" item="TCameraRecorder" separator=",">
             (
                 #{TCameraRecorder.recordId, jdbcType=BIGINT},
                 #{TCameraRecorder.recordName, jdbcType=VARCHAR},
+            #{TCameraRecorder.recorderModel, jdbcType=INTEGER},
                 #{TCameraRecorder.recorderType, jdbcType=VARCHAR},
                 #{TCameraRecorder.aliasName, jdbcType=VARCHAR},
                 #{TCameraRecorder.recordIp, jdbcType=VARCHAR},
@@ -217,7 +246,8 @@
                 #{TCameraRecorder.maxChannel, jdbcType=INTEGER},
                 #{TCameraRecorder.hddSize, jdbcType=INTEGER},
                 #{TCameraRecorder.bufferDay, jdbcType=INTEGER},
-                #{TCameraRecorder.timeLong, jdbcType=INTEGER}
+                #{TCameraRecorder.timeLong, jdbcType=INTEGER},
+                #{TCameraRecorder.unit, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

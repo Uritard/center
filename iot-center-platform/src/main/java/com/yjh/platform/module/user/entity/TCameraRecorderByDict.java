@@ -74,5 +74,9 @@ public class TCameraRecorderByDict {
     @ApiModelProperty(value = "录制文件时长 单位秒")
     private Integer timeLong;
 
+    @ApiModelProperty(value = "录像机型号")
+    private String recorderModel;
+    @ApiModelProperty(value = "单位")
+    private Integer unit;
 
 }

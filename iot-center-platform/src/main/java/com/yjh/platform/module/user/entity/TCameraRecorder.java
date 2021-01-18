@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -90,5 +89,9 @@ public class TCameraRecorder implements Serializable {
     @ApiModelProperty(value = "录制文件时长 单位秒")
     private Integer timeLong;
 
+    @ApiModelProperty(value = "录像机型号")
+    private Integer recorderModel;
+    @ApiModelProperty(value = "单位")
+    private String unit;
 
 }

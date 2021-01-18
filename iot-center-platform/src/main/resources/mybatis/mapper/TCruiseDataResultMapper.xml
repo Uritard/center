@@ -397,6 +397,7 @@
             e.instance_name,
             g.c_type,
             i.dict_note AS c_type_name,
+            f.person_check,
             f.result_num,
             f.identify_result,
             j.dict_note AS identify_result_name,

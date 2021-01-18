@@ -71,6 +71,10 @@
             commission_date,
             up_region_id,
             robot_position,
+            robot_source,
+            address,
+            building_user,
+            appearance_number,
             remarks
         )values(
                 #{robotCode, jdbcType=VARCHAR},
@@ -97,6 +101,10 @@
                 #{commissionDate, jdbcType=TIMESTAMP},
                 #{upRegionId, jdbcType=BIGINT},
                 #{robotPosition, jdbcType=VARCHAR},
+                #{robotSource, jdbcType=VARCHAR},
+                #{address, jdbcType=VARCHAR},
+                #{buildingUser, jdbcType=VARCHAR},
+                #{appearanceNumber, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR}
         )
     </insert>
@@ -143,6 +151,10 @@
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
+        <if test="robotSource != null and robotSource !=''">a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
+        <if test="address != null and address !=''">a.address = #{address, jdbcType=VARCHAR},</if>
+        <if test="buildingUser != null and buildingUser !=''">a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
+        <if test="appearanceNumber != null and appearanceNumber !=''">a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
@@ -175,6 +187,10 @@
         a.commission_date,
         a.up_region_id,
         a.robot_position,
+        a.robot_source,
+        a.address,
+        a.building_user,
+        a.appearance_number,
         a.remarks
         from t_robot_info a
         where 1 = 1
@@ -209,6 +225,10 @@
         a.commission_date,
         a.up_region_id,
         a.robot_position,
+        a.robot_source,
+        a.address,
+        a.building_user,
+        a.appearance_number,
         a.remarks
         from t_robot_info a
         where 1 = 1
@@ -237,6 +257,10 @@
         <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
+        <if test="robotSource != null and robotSource !=''">a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
+        <if test="address != null and address !=''">a.address = #{address, jdbcType=VARCHAR},</if>
+        <if test="buildingUser != null and buildingUser !=''">a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
+        <if test="appearanceNumber != null and appearanceNumber !=''">a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
@@ -272,6 +296,10 @@
         a.up_region_id,
         e.dict_note as robot_position_name,
         a.robot_position ,
+        a.robot_source,
+        a.address,
+        a.building_user,
+        a.appearance_number,
         a.remarks
         from t_robot_info a
         LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code
@@ -316,6 +344,10 @@
             commission_date,
             up_region_id,
             robot_position,
+            robot_source,
+            address,
+            building_user,
+            appearance_number,
             remarks
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
@@ -344,6 +376,10 @@
                 #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.upRegionId, jdbcType=BIGINT},
                 #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
+                #{TRobotInfo.robotSource, jdbcType=VARCHAR},
+                #{TRobotInfo.address, jdbcType=VARCHAR},
+                #{TRobotInfo.buildingUser, jdbcType=VARCHAR},
+                #{TRobotInfo.appearanceNumber, jdbcType=VARCHAR},
                 #{TRobotInfo.remarks, jdbcType=VARCHAR}
             )
         </foreach>
