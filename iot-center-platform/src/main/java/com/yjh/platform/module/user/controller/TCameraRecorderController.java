@@ -16,7 +16,6 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -126,7 +125,8 @@ public class TCameraRecorderController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "recordId", required = false) Long recordId,
                             @RequestParam(value = "recordName", required = false) String recordName,
-                            @RequestParam(value = "recorderType", required = false) String recorderType,
+                         @RequestParam(value = "recorderModel", required = false) Integer recorderModel,
+                         @RequestParam(value = "recorderType", required = false) String recorderType,
                             @RequestParam(value = "aliasName", required = false) String aliasName,
                             @RequestParam(value = "recordIp", required = false) String recordIp,
                             @RequestParam(value = "protocol", required = false) String protocol,
@@ -139,10 +139,11 @@ public class TCameraRecorderController {
                             @RequestParam(value = "maxChannel", required = false) Integer maxChannel,
                             @RequestParam(value = "hddSize", required = false) Integer hddSize,
                             @RequestParam(value = "bufferDay", required = false) Integer bufferDay,
-                            @RequestParam(value = "timeLong", required = false) Integer timeLong) {
+                            @RequestParam(value = "timeLong", required = false) Integer timeLong,
+                            @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

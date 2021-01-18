@@ -8,6 +8,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
+import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
 import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import io.swagger.annotations.Api;
@@ -271,20 +272,21 @@ public class TCruiseDataResultController {
                                                 @RequestParam(value = "endTime", required = false) String endTime,
                                                @RequestParam(value = "startTime", required = false) String startTime,
                                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                               @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize) {
+                                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-//            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             if (Objects.isNull(startTime) || "".equals(startTime)){
                 startTime = null;
             }
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            resultMap = (tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize));
-//            resultMap.put("count", page.getTotal());
-//            resultMap.put("list", list);
+            List<CruiseResultAnalyzeInfo>  list = tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
+//            resultMap = tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

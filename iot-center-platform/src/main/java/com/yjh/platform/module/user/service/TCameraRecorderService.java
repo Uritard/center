@@ -55,8 +55,8 @@ public class TCameraRecorderService {
 
     @Logs(title = "查询", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraRecorderByDict> select(Long recordId, String recordName, String recorderType, String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong) {
-        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong);
+    public List<TCameraRecorderByDict> select(Long recordId, String recordName,Integer recorderModel, String recorderType, String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong,String unit) {
+        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName,recorderModel, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
         return tCameraRecorderByDictList;
     }
 

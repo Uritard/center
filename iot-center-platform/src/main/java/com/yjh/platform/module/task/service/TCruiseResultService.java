@@ -125,17 +125,17 @@ public class TCruiseResultService{
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         log.info("judgeCondition是==="+judgeCondition);
         String personCheck = judgeCondition.get("person_check").toString();
-        log.info("人工审核的测点值信息是==="+personCheck);
+//        log.info("人工审核的测点值信息是==="+personCheck);
         int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
-        log.info("查询的告警条件isWarn是==="+isWarn);
+//        log.info("查询的告警条件isWarn是==="+isWarn);
         String taskId = judgeCondition.get("task_id").toString();
-        log.info("查询的告警条件taskId是==="+taskId);
+//        log.info("查询的告警条件taskId是==="+taskId);
         String picPath = judgeCondition.get("picpath").toString();
-        log.info("查询的图片路径是==="+picPath);
+//        log.info("查询的图片路径是==="+picPath);
         Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
-        log.info("查询的告警条件instanceId是==="+instanceId);
+//        log.info("查询的告警条件instanceId是==="+instanceId);
         Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
-        log.info("人工审核的实际结果是==="+identifyResult);
+//        log.info("人工审核的实际结果是==="+identifyResult);
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
         log.info("tStdDevicemete==="+tStdDevicemete);

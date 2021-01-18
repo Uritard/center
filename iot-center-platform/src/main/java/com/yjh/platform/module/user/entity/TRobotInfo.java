@@ -1,12 +1,6 @@
 package com.yjh.platform.module.user.entity;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableField;
-
-import java.io.Serializable;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,8 +10,10 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -156,4 +152,13 @@ public class TRobotInfo implements Serializable {
     @Length(max = 255, message = "remarks长度必须小于等于255")
     private String remarks;
 
+
+    @ApiModelProperty(value = "设备来源")
+    private String robotSource;
+    @ApiModelProperty(value = "安装位置")
+    private String address;
+    @ApiModelProperty(value = "使用单位")
+    private String buildingUser;
+    @ApiModelProperty(value = "出场编号")
+    private String appearanceNumber;
 }

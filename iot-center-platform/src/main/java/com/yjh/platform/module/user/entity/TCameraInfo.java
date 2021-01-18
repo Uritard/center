@@ -1,8 +1,5 @@
 package com.yjh.platform.module.user.entity;
 
-import java.io.Serializable;
-import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,7 +8,8 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author tt
@@ -102,4 +100,10 @@ public class TCameraInfo implements Serializable {
     private String longitude;
 
     private List<Long> upRegionIds;
+
+    @ApiModelProperty(value = "摄像机型号")
+    private Integer cameraModel;
+    @ApiModelProperty(value = "单位")
+    private String unit;
+
 }

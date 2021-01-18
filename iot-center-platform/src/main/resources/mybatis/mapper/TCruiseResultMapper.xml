@@ -43,7 +43,7 @@
         a.check_user,
         a.check_date,
         a.modify_state,
-        a.task_wait,a.weather,a.area_id,a.create_time,a.task_code,
+        a.task_wait,a.create_time,
         a.remark
     </sql>
 
@@ -282,6 +282,7 @@
         g.check_date,
         g.picpath as pic_path,
         g.identify_result,
+        w.dict_note as identify_result_name,
         g.identify_state,
         g.person_check,
         b.device_id,
@@ -312,13 +313,14 @@
         LEFT JOIN t_std_device n on n.device_id = b.device_id
         LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
         LEFT JOIN t_cruise_data_result g on g.cruise_result_id = b.cruise_result_id
-        LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type
-        LEFT JOIN t_dict_business i on i.dict_code = g.evaluation_state
-        LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result
-        LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal
+        LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type and h.col_name = 'cruise_type'
+        LEFT JOIN t_dict_business i on i.dict_code = g.evaluation_state and i.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result and j.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal and p.col_name = 'abnormal_type'
         LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
         LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
         LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
+        LEFT JOIN t_dict_business w on w.dict_code = g.identify_result and w.col_name ='identify_result'
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 

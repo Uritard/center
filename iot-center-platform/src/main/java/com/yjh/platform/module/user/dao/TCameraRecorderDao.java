@@ -22,6 +22,7 @@ public interface TCameraRecorderDao {
     TCameraRecorderByDict selectByPrimaryId(@Param(value = "recordId") Long recordId);
     List<TCameraRecorderByDict> select(@Param(value = "recordId") Long recordId,
                                        @Param(value = "recordName") String recordName,
+                                       @Param(value = "recorderModel") Integer recorderModel,
                                        @Param(value = "recorderType") String recorderType,
                                        @Param(value = "aliasName") String aliasName,
                                        @Param(value = "recordIp") String recordIp,
@@ -35,7 +36,8 @@ public interface TCameraRecorderDao {
                                        @Param(value = "maxChannel") Integer maxChannel,
                                        @Param(value = "hddSize") Integer hddSize,
                                        @Param(value = "bufferDay") Integer bufferDay,
-                                       @Param(value = "timeLong") Integer timeLong);
+                                       @Param(value = "timeLong") Integer timeLong,
+                                       @Param(value = "unit") String unit);
     List<TCameraRecorderByDict> selectByPage(TCameraRecorder tCameraRecorder);
 
     int batchInsert(List<TCameraRecorder> list);

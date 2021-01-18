@@ -1,9 +1,5 @@
 package com.yjh.platform.module.user.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
@@ -11,7 +7,8 @@ import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @author tt
@@ -30,6 +27,7 @@ public interface TCameraInfoDao {
     List<TCameraInfoByDict> selectByCameraName(@Param(value = "cameraName") String cameraName);
     List<TCameraInfoByDict> select(@Param(value = "cameraId") Long cameraId,
                              @Param(value = "cameraName") String cameraName,
+                             @Param(value = "cameraModel") Integer cameraModel,
                              @Param(value = "aliasName") String aliasName,
                              @Param(value = "recordId") String recordId,
                              @Param(value = "upRegionId") Long upRegionId,
@@ -43,10 +41,11 @@ public interface TCameraInfoDao {
                              @Param(value = "url") String url,
                              @Param(value = "port") Integer port,
                              @Param(value = "cameraType") Integer cameraType,
-                             @RequestParam(value = "latitude", required = false) String latitude,
-                             @RequestParam(value = "longitude", required = false) String longitude,
-                             @RequestParam(value = "address", required = false) String address,
-                             @Param(value = "isControl") Integer isControl);
+                             @Param(value = "latitude") String latitude,
+                             @Param(value = "longitude") String longitude,
+                             @Param(value = "address") String address,
+                             @Param(value = "isControl") Integer isControl,
+                             @Param(value = "unit") String unit);
     List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
 
     List<AreaInfo> selectCameraTreeDevice();

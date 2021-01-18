@@ -90,6 +90,8 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     @ApiModelProperty(value = "实际结果")
     private Integer identifyResult;
+    @ApiModelProperty(value = "实际结果--字典表")
+    private String identifyResultName;
 
     @ApiModelProperty(value = "人工校核结果")
     private String personCheck;

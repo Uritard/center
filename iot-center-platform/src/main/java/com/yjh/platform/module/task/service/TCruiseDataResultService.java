@@ -307,21 +307,24 @@ public class TCruiseDataResultService {
     }
     @Logs(title = "获取当前测点下的巡检结果", code = "TCruiseDataResult", content = "获取测点巡检结果")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime,int pageNum,int pageSize){
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime,int pageNum,int pageSize){
 
-        Map<String, Object> resultMap = new HashMap<>();
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+//        Map<String, Object> resultMap = new HashMap<>();
+//        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
 
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId,meteType ,meterType,endTime, startTime);
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
             if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult()) || cruiseResultAnalInfo.getIdentifyResult() == 0) {
                 cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
             }
+            if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())){
+                cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
+            }
         }
-        resultMap.put("count", page.getTotal());
-        resultMap.put("list", cruiseResultAnalyzeInfoList);
+//        resultMap.put("count", page.getTotal());
+//        resultMap.put("list", cruiseResultAnalyzeInfoList);
 
-        return resultMap;
+        return cruiseResultAnalyzeInfoList;
     }
     @Logs(title = "获取折线图元素信息", code = "TCruiseDataResult", content = "获取折线图信息")
     @Transactional(rollbackFor = Exception.class)

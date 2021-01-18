@@ -1,28 +1,24 @@
 package com.yjh.platform.module.user.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.service.TCameraInfoService;
-import com.yjh.platform.module.user.entity.TCameraInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-
-import io.swagger.annotations.*;
-
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
 import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -169,6 +165,7 @@ public class TCameraInfoController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "cameraId", required = false) Long cameraId,
                          @RequestParam(value = "cameraName", required = false) String cameraName,
+                         @RequestParam(value = "cameraModel", required = false) Integer cameraModel,
                          @RequestParam(value = "aliasName", required = false) String aliasName,
                          @RequestParam(value = "recordId", required = false) String recordId,
                          @RequestParam(value = "upRegionId", required = false) Long upRegionId,
@@ -185,12 +182,13 @@ public class TCameraInfoController {
                          @RequestParam(value = "latitude", required = false) String latitude,
                          @RequestParam(value = "longitude", required = false) String longitude,
                          @RequestParam(value = "address", required = false) String address,
-                         @RequestParam(value = "isControl", required = false) Integer isControl) {
+                         @RequestParam(value = "isControl", required = false) Integer isControl,
+                         @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, aliasName,
+            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, cameraModel,aliasName,
                     recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,
-                    cameraIp,url, port, cameraType, isControl,latitude,longitude,address);
+                    cameraIp,url, port, cameraType, isControl,latitude,longitude,address,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

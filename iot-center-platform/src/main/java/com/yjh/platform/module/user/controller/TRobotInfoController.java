@@ -1,25 +1,25 @@
 package com.yjh.platform.module.user.controller;
 
-import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.user.service.TRobotInfoService;
-import com.yjh.platform.module.user.entity.TRobotInfo;
-
-import java.util.*;
-
-import io.swagger.annotations.*;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.service.TRobotInfoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -151,10 +151,18 @@ public class TRobotInfoController {
                          @RequestParam(value = "commissionDate", required = false) Date commissionDate,
                          @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                          @RequestParam(value = "robotPosition", required = false) String robotPosition,
+                         @RequestParam(value = "robotSource", required = false) String robotSource,
+                         @RequestParam(value = "address", required = false) String address,
+                         @RequestParam(value = "buildingUser", required = false) String buildingUser,
+                         @RequestParam(value = "appearanceNumber", required = false) String appearanceNumber,
                          @RequestParam(value = "remarks", required = false) String remarks) {
         Result result = new Result();
         try {
-            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort, upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword, photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDate, upRegionId, robotPosition, remarks);
+            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType,
+                    robotIp, robotPort, upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp,
+                    inferadPort, inferadUsername, inferadPassword, photePath, createBy, createDate, updateBy,
+                    updateDate, robotFactory, isUse, commissionDate, upRegionId, robotPosition,robotSource,
+                    address,buildingUser,appearanceNumber,remarks);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
