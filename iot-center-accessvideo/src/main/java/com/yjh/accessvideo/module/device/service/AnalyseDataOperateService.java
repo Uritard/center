@@ -275,6 +275,16 @@ public class AnalyseDataOperateService {
                              Float highLimit4,
                              Float lowLimit4) {
 
+        log.info("input----------------------------------:"+value+"--"+
+                highLimit1+"*"+
+                lowLimit1+"*"+
+                highLimit2+"*"+
+                 lowLimit2+"*"+
+                 highLimit3+"*"+
+                 lowLimit3+"*"+
+                highLimit4+"*"+
+               lowLimit4);
+
         Boolean emergency1 = false;
         Boolean emergency2 = false;
         Boolean worse1 = false;
