@@ -339,7 +339,7 @@ public class DataDealThread implements Runnable {
                                                         List<XMLBaseModel> list = new ArrayList<>();
                                                         list.add(xmlBaseModel);
                                                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
-                                                        cruiseResult.put("list",list);
+                                                        map.put("list",list);
                                                         log.info("信息上报：-"+map);
                                                         Constant.otherServer(map,Constant.TCP_URL);
                                                     }
@@ -506,7 +506,7 @@ public class DataDealThread implements Runnable {
                         List<XMLBaseModel> list = new ArrayList<>();
                         list.add(xmlBaseModel);
                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
-                        cruiseResult.put("list",list);
+                        map.put("list",list);
                         log.info("信息上报：-"+map);
                         Constant.otherServer(map,Constant.TCP_URL);
                     }
