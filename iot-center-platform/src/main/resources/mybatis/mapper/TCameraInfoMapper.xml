@@ -33,11 +33,30 @@
     </sql>
 
     <sql id="tongTong">
-        a.camera_id,a.camera_model,a.camera_name,a.alias_name,a.record_id,c.region_name as upRegionName,
-        a.vendor_id ,b.dict_note as vendorName ,
+        a.address,
+        a.camera_id,
+        a.camera_model,
+        e.dict_note as camera_model_name,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.vendor_id ,
+        b.dict_note as vendorName ,
         a.camera_type,
-        a.channel_num,a.sms_id,a.rms_id,a.stream_type,a.protocol_type,
-        a.camera_ip,a.url, a.port,a.is_control,a.address,a.latitude,a.longitude,a.unit
+        d.dict_note as camera_type_name,
+        a.channel_num,
+        a.sms_id,
+        a.rms_id,
+        a.stream_type,
+        a.protocol_type,
+        a.camera_ip,
+        a.url,
+        a.port,
+        a.is_control,
+        a.latitude,
+        a.longitude,
+        a.unit,
+        f.region_name as up_region_name
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
@@ -182,38 +201,23 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select<include refid="tongTong"></include>
         from t_camera_info a
-        left JOIN t_dict_business b on a.vendor_id = b.dict_code
-        LEFT JOIN t_std_region c on a.up_region_id = c.region_id
-        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code and d.col_name = 'camera_type'
+        LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
+        LEFT JOIN t_std_region f on a.up_region_id = f.region_id
         where 1 = 1
-        <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
-        <if test="cameraModel != null "> and a.camera_model = #{cameraModel, jdbcType=INTEGER}</if>
+        <if test="cameraModel != -1 "> and a.camera_model = #{cameraModel, jdbcType=INTEGER}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
-        <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
-        <if test="upRegionId != null and upRegionId != ''">
+        <if test="regionIdList != null and regionIdList.size() > 0 ">
          and a.up_region_id in
-            <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
+            <foreach collection="regionIdList" item="upRegionIds"  separator="," open="(" close=")"  >
                 #{upRegionIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        <if test="channelNum != null "> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
-        <if test="smsId != null "> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
-        <if test="rmsId != null "> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
-        <if test="vendorId != null and vendorId != ''"> and a.vendor_id = #{vendorId, jdbcType=VARCHAR}</if>
-        <if test="streamType != null "> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
-        <if test="protocolType != null "> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
-        <if test="streamType != null "> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
-        <if test="protocolType != null "> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
-        <if test="cameraIp != null and cameraIp != ''"> and a.camera_ip like concat('%',#{cameraIp, jdbcType=VARCHAR},'%')</if>
-        <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
-        <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
-        <if test="cameraType != null "> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
-        <if test="isControl != null "> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
-        <if test="address != null">and a.address = #{address, jdbcType=VARCHAR},</if>
-        <if test="latitude != null">and a.latitude = #{latitude, jdbcType=VARCHAR},</if>
-        <if test="longitude != null">and a.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        <if test="unit != null and unit != ''">and a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="cameraVendor != -1 "> and a.vendor_id = #{cameraVendor, jdbcType=VARCHAR}</if>
+        <if test="address != null and address != '' ">and a.address = #{address, jdbcType=VARCHAR}</if>
+        <if test="unit != null and unit != ''">and a.unit = #{unit, jdbcType=VARCHAR}</if>
         order by a.camera_id
     </select>
 

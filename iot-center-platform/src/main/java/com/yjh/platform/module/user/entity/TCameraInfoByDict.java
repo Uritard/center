@@ -85,6 +85,8 @@ public class TCameraInfoByDict implements Serializable {
 
     @ApiModelProperty(value = "摄像机型号")
     private Integer cameraModel;
+    @ApiModelProperty(value = "摄像机型号-字典表")
+    private String cameraModelName;
     @ApiModelProperty(value = "单位")
     private String unit;
 

@@ -55,15 +55,15 @@ public class TCameraRecorderService {
 
     @Logs(title = "查询", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraRecorderByDict> select(Long recordId, String recordName,Integer recorderModel, String recorderType, String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong,String unit) {
-        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName,recorderModel, recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
+    public List<TCameraRecorderByDict> select(Long recordId, String recordName,Integer recorderModel, String recorderType,Integer vendorId,String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong,String unit) {
+        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName,recorderModel, recorderType,vendorId, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
         return tCameraRecorderByDictList;
     }
 
     @Logs(title = "分页查询", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraRecorderByDict> selectByPage(TCameraRecorder tCameraRecorder) {
-        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(tCameraRecorder);
+    public List<TCameraRecorderByDict> selectByPage(String aliasName,String unit,Integer vendorId, Integer recorderModel,String recordName) {
+        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(aliasName,unit,vendorId,recorderModel,recordName);
         return tCameraRecorderByDictList;
     }
     @Logs(title = "查询部分信息", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")

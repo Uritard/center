@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
@@ -32,6 +33,8 @@ public class TCameraInfoController {
 
     @Autowired
     private final TCameraInfoService tCameraInfoService;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
@@ -198,16 +201,23 @@ public class TCameraInfoController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCameraInfo tCameraInfo,
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
+                                @RequestParam(value = "unit", required = false) String unit,
+                               @RequestParam(value = "address", required = false) String address,
+                               @RequestParam(value = "cameraVendor", required = false) String cameraVendor,
+                               @RequestParam(value = "cameraModel", required = false) Integer cameraModel,
+                               @RequestParam(value = "cameraName", required = false) String cameraName,
+                               @RequestParam(value = "regionId", required = false) Long regionId,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tCameraInfo.getUpRegionId());
+//            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tCameraInfo.getUpRegionId());
+            List<Long> regionIdList =  tStdRegionDao.selectDownId(regionId);
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(tCameraInfo, upRegionIds);
+            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

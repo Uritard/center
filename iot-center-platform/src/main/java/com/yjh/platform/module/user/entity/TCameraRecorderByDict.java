@@ -75,8 +75,14 @@ public class TCameraRecorderByDict {
     private Integer timeLong;
 
     @ApiModelProperty(value = "录像机型号")
-    private String recorderModel;
+    private Integer recorderModel;
+    @ApiModelProperty(value = "录像机型号--字典表")
+    private String recorderModelName;
     @ApiModelProperty(value = "单位")
-    private Integer unit;
+    private String unit;
+    @ApiModelProperty(value = "生产厂家")
+    private Integer vendorId;
+    @ApiModelProperty(value = "生产厂家---字典表")
+    private String vendorName;
 
 }

@@ -127,7 +127,8 @@ public class TCameraRecorderController {
                             @RequestParam(value = "recordName", required = false) String recordName,
                          @RequestParam(value = "recorderModel", required = false) Integer recorderModel,
                          @RequestParam(value = "recorderType", required = false) String recorderType,
-                            @RequestParam(value = "aliasName", required = false) String aliasName,
+                         @RequestParam(value = "vendorId", required = false) Integer vendorId,
+                         @RequestParam(value = "aliasName", required = false) String aliasName,
                             @RequestParam(value = "recordIp", required = false) String recordIp,
                             @RequestParam(value = "protocol", required = false) String protocol,
                             @RequestParam(value = "httpPort", required = false) Integer httpPort,
@@ -143,7 +144,7 @@ public class TCameraRecorderController {
                             @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, vendorId,aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -153,15 +154,19 @@ public class TCameraRecorderController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TCameraRecorder tCameraRecorder,
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
+                               @RequestParam(value = "unit", required = false) String unit,
+                               @RequestParam(value = "vendorId", required = false) Integer vendorId,
+                               @RequestParam(value = "recorderModel", required = false) Integer recorderModel,
+                               @RequestParam(value = "recordName", required = false) String recordName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCameraRecorderByDict> list = tCameraRecorderService.selectByPage(tCameraRecorder);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.selectByPage(aliasName,unit,vendorId,recorderModel,recordName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

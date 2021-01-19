@@ -91,14 +91,9 @@ public class TCameraInfoService {
 
     @Logs(title = "分页查询", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo, List<Long> upRegionIds) {
-        if (upRegionIds.size() != 0) {
-            tCameraInfo.setUpRegionIds(upRegionIds);
-        } else {
-            upRegionIds.add(tCameraInfo.getUpRegionId());
-            tCameraInfo.setUpRegionIds(upRegionIds);
-        }
-        List<TCameraInfoByDict> tCameraInfoByDict = tCameraInfoDao.selectByPage(tCameraInfo);
+    public List<TCameraInfoByDict> selectByPage(String aliasName,String unit,String address,String cameraVendor,
+                                                Integer cameraModel,String cameraName,List<Long> regionIdList) {
+        List<TCameraInfoByDict> tCameraInfoByDict = tCameraInfoDao.selectByPage(aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
         return tCameraInfoByDict;
     }
 

@@ -536,7 +536,7 @@
         FROM
         t_defect_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
-        LEFT JOIN t_dict_business c ON a.defect_level = c.dict_code and c.col_name = 'defect_level'
+        LEFT JOIN t_dict_business c ON a.defect_level = c.dict_code and c.col_name = 'alarm_level'
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code and d.col_name = 'alarm_source'
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code and e.col_name = 'conf_mode'
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
@@ -549,8 +549,7 @@
         WHERE
         1 = 1)
         ) big_table
-        WHERE
-        1 = 1
+        WHERE 1 = 1
         <if test="warnLevel != -1"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != -1"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>

@@ -93,5 +93,6 @@ public class TCameraRecorder implements Serializable {
     private Integer recorderModel;
     @ApiModelProperty(value = "单位")
     private String unit;
-
+    @ApiModelProperty(value = "生产厂家")
+    private Integer vendorId;
 }

@@ -62,14 +62,9 @@ public class TRobotInfoService{
 
     @Logs(title = "分页模糊查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo, List<Long> upRegionIds) {
-        if(upRegionIds.size() != 0){
-            tRobotInfo.setUpRegionIds(upRegionIds);
-        }else {
-            upRegionIds.add(tRobotInfo.getUpRegionId());
-            tRobotInfo.setUpRegionIds(upRegionIds);
-        }
-        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(tRobotInfo);
+    public List<TRobotInfo> selectByPage(String robotName,String buildingUser,Integer robotFactory,Integer robotType,String robotSource,Integer isUse,
+                                          String address, List<Long> regionIdList) {
+        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
         return tRobotInfoList;
     }
 

@@ -106,8 +106,8 @@ public class TCruiseDataResultService {
             log.info("regionIdList是==="+regionIdList);
             log.info("deviceIdList是==="+deviceIdList);
         }
-        Map<String, Object> resultMap = new HashMap<>();
 
+        Map<String, Object> resultMap = new HashMap<>();
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         if (deviceIdList != null && deviceIdList.size() > 0){
@@ -289,10 +289,23 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseDataReport( Integer cType, String meteType, Integer meterType, String endTime, String startTime,Long regionId,String instanceName,int pageNum,int pageSize) {
 
-        List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-        log.info("regionIdList是===" + regionIdList);
-        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-        log.info("deviceIdList是===" + deviceIdList);
+        List<Long> regionIdList = new ArrayList<>();
+        List<Long> deviceIdList = new ArrayList<>();
+        if (regionId == null){
+            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            log.info("regionIdList是==="+regionIdList);
+            log.info("deviceIdList是==="+deviceIdList);
+        }else {
+            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            if (regionIdList != null && regionIdList.size() > 0){
+                deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                deviceIdList.add(regionId);
+            }
+            log.info("regionIdList是==="+regionIdList);
+            log.info("deviceIdList是==="+deviceIdList);
+        }
 
         Map<String, Object> resultMap = new HashMap<>();
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
@@ -309,9 +322,6 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime,int pageNum,int pageSize){
 
-//        Map<String, Object> resultMap = new HashMap<>();
-//        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId,meteType ,meterType,endTime, startTime);
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
             if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult()) || cruiseResultAnalInfo.getIdentifyResult() == 0) {
@@ -321,8 +331,6 @@ public class TCruiseDataResultService {
                 cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
             }
         }
-//        resultMap.put("count", page.getTotal());
-//        resultMap.put("list", cruiseResultAnalyzeInfoList);
 
         return cruiseResultAnalyzeInfoList;
     }

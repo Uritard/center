@@ -58,7 +58,14 @@ public interface TRobotInfoDao {
                                 @Param(value = "buildingUser") String buildingUser,
                                 @Param(value = "appearanceNumber") String appearanceNumber,
                                 @Param(value = "remarks") String remarks);
-    List<TRobotInfo> selectByPage(TRobotInfo tRobotInfo);
+    List<TRobotInfo> selectByPage(@Param(value = "robotName") String robotName,
+                                @Param(value = "buildingUser") String buildingUser,
+                                  @Param(value = "robotFactory") Integer robotFactory,
+                                  @Param(value = "robotType") Integer robotType,
+                                  @Param(value = "robotSource") String robotSource,
+                                  @Param(value = "isUse") Integer isUse,
+                                  @Param(value = "address") String address,
+                                  @Param(value = "regionIdList") List<Long> regionIdList);
 
     int batchInsert(@Param("list") List<TRobotInfo> list);
     List<TRobotInspectionTree> selectInspectionTree();

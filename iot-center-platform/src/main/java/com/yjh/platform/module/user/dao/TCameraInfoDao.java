@@ -46,7 +46,13 @@ public interface TCameraInfoDao {
                              @Param(value = "address") String address,
                              @Param(value = "isControl") Integer isControl,
                              @Param(value = "unit") String unit);
-    List<TCameraInfoByDict> selectByPage(TCameraInfo tCameraInfo);
+    List<TCameraInfoByDict> selectByPage(@Param(value = "aliasName") String aliasName,
+                                         @Param(value = "unit") String unit,
+                                         @Param(value = "address") String address,
+                                         @Param(value = "cameraVendor") String cameraVendor,
+                                         @Param(value = "cameraModel") Integer cameraModel,
+                                         @Param(value = "cameraName") String cameraName,
+                                         @Param(value = "regionIdList") List<Long> regionIdList);
 
     List<AreaInfo> selectCameraTreeDevice();
     List<AreaInfo> selectCameraPresetTree();

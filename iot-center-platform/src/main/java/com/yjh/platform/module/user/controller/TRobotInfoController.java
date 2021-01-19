@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TRobotInfoService;
@@ -33,6 +34,8 @@ public class TRobotInfoController {
 
     @Autowired
     private final TRobotInfoService tRobotInfoService;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
@@ -172,16 +175,24 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "分页模糊查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TRobotInfo tRobotInfo,
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    public Result selectByPage(@RequestParam(value = "robotName", required = false) String robotName,
+                                @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                               @RequestParam(value = "buildingUser", required = false) String buildingUser,
+                               @RequestParam(value = "robotFactory", required = false) Integer robotFactory,
+                               @RequestParam(value = "robotType", required = false) Integer robotType,
+                               @RequestParam(value = "robotSource", required = false) String robotSource,
+                               @RequestParam(value = "isUse", required = false) Integer isUse,
+                               @RequestParam(value = "address", required = false) String address,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
+//            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
+            List<Long> regionIdList =  tStdRegionDao.selectDownId(upRegionId);
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<TRobotInfo> list = tRobotInfoService.selectByPage(tRobotInfo, upRegionIds);
+            List<TRobotInfo> list = tRobotInfoService.selectByPage(robotName,buildingUser, robotFactory,robotType,robotSource,isUse,address,regionIdList);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
