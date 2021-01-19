@@ -56,7 +56,7 @@ public class AccessTcpApplication implements CommandLineRunner {
         loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(serverUrl, port);
         log.info("accesstcp is running, url is : " + url);
-        //nettyClient.start(address,redisTemplate, sendToUpSystemServices);
+        nettyClient.start(address,redisTemplate, sendToUpSystemServices);
     }
     public void loadDeviceInfo()throws IOException{
 

@@ -918,6 +918,7 @@ public class TCruiseTaskService {
         map.put("list",list);
         Result re = null;
         try{
+            log.info("信息上报：-"+map);
             re = Constant.otherServer(map,Constant.TCP_URL);
         }catch (Exception e){
             log.info("上报出错"+e.getMessage());

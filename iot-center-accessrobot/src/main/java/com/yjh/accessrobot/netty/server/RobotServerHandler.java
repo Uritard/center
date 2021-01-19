@@ -709,6 +709,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     list.add(xmlBaseModel);
                     Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                     cruiseResult.put("list",list);
+                    log.info("信息上报：-"+cruiseResult);
                     Constant.otherServer(cruiseResult,Constant.TCP_URL);
                 }
 

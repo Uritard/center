@@ -475,6 +475,7 @@ public class RunAtNowTask implements Runnable{
                             list.add(xmlBaseModel);
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
+                            log.info("信息上报：-"+cruiseResult);
                             Constant.otherServer(cruiseResult,Constant.TCP_URL);
                         }
 
@@ -613,6 +614,8 @@ public class RunAtNowTask implements Runnable{
                                 list.add(xmlBaseModel);
                                 Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                                 cruiseResult.put("list",list);
+                                log.info("信息上报：-"+cruiseResult);
+                                log.info("信息上报：-"+cruiseResult);
                                 Constant.otherServer(cruiseResult,Constant.TCP_URL);
                             }
 
@@ -794,6 +797,7 @@ public class RunAtNowTask implements Runnable{
         map.put("list",list);
         Result re = null;
         try{
+            log.info("信息上报：-"+map);
             re = Constant.otherServer(map,Constant.TCP_URL);
         }catch (Exception e){
             log.info("上报出错"+e.getMessage());
