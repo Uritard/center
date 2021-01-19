@@ -470,7 +470,7 @@ public class RunAtNowTask implements Runnable{
                             xmlItem.put("valid","0");
 
                             xmlItems.add(xmlItem);
-
+                            xmlBaseModel.setItems(xmlItems);
                             List<XMLBaseModel> list = new ArrayList<>();
                             list.add(xmlBaseModel);
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
@@ -609,7 +609,7 @@ public class RunAtNowTask implements Runnable{
                                 xmlItem.put("valid","1");
 
                                 xmlItems.add(xmlItem);
-
+                                xmlBaseModel.setItems(xmlItems);
                                 List<XMLBaseModel> list = new ArrayList<>();
                                 list.add(xmlBaseModel);
                                 Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();

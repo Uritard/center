@@ -562,6 +562,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, alarmProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
+
+                    xmlBaseModel.setType("62");
+                    robotService.upToCruise(xmlBaseModel);
+
                     break;
                 //微气象数据(接收并发送响应)
                 case "21":

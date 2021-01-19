@@ -190,7 +190,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     xmlItem.put("valid","0");
 
                     xmlItems.add(xmlItem);
-
+                    xmlBaseModel.setItems(xmlItems);
                     List<XMLBaseModel> list = new ArrayList<>();
                     list.add(xmlBaseModel);
                     Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();

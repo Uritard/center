@@ -335,7 +335,7 @@ public class DataDealThread implements Runnable {
 
 
                                                         xmlItems.add(xmlItem);
-
+                                                        xmlBaseModel.setItems(xmlItems);
                                                         List<XMLBaseModel> list = new ArrayList<>();
                                                         list.add(xmlBaseModel);
                                                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
@@ -502,7 +502,7 @@ public class DataDealThread implements Runnable {
                         xmlItem.put("valid","1");
 
                         xmlItems.add(xmlItem);
-
+                        xmlBaseModel.setItems(xmlItems);
                         List<XMLBaseModel> list = new ArrayList<>();
                         list.add(xmlBaseModel);
                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
