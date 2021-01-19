@@ -1,4 +1,4 @@
-package com.yjh.gate.common.http;
+package com.yjh.gateway.common.http;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
