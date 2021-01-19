@@ -871,7 +871,7 @@
             t_std_devicemete a
             left join t_dict_business b on a.mete_type = b.dict_code and b.col_name = "mete_type"
             left join t_dict_business c on a.alarm_type = c.dict_code and c.col_name = "alarm_type"
-            WHERE a.device_mete_id = #{deviceMeteId,jdbaType=BIGINT}
+            WHERE a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
 
 </mapper>

@@ -530,7 +530,7 @@ public class TStdDeviceService{
     public int batchDelete(String list){
         List<String> list1= Arrays.asList(list.split(","));
         for (String item:list1) {
-            this.deleteByPrimaryId(Long.valueOf(item));
+            this.deleteByPrimaryIdALL(Long.valueOf(item));
         }
         return 1;
     }

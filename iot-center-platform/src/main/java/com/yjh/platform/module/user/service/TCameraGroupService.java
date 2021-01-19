@@ -51,11 +51,14 @@ public class TCameraGroupService{
     public TCameraGroupDetail selectByPrimaryId(Long groupId) {
         TCameraGroup tCameraGroup = this.tCameraGroupDao.selectByPrimaryId(groupId);
         List<Camera> list = new ArrayList<>();
+        boolean flag = false;
         if(tCameraGroup.getCameraIds() != null && !"".equals(tCameraGroup.getCameraIds())) {
             String[] cameraList = tCameraGroup.getCameraIds().split(",");
             for (String item : cameraList) {
                 TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(item));
                 if(tCameraInfo == null){
+                    tCameraGroup.setCameraIds(tCameraGroup.getCameraIds().replace(","+item,"").replace(item,""));
+                    flag = true;
                     continue;
                 }
                 Camera camera = new Camera();
@@ -70,6 +73,9 @@ public class TCameraGroupService{
         tCameraGroupDetail.setCameraIds(tCameraGroup.getCameraIds());
         tCameraGroupDetail.setRemarks(tCameraGroup.getRemarks());
         tCameraGroupDetail.setCameraList(list);
+        if(flag){
+            tCameraGroupDao.update(tCameraGroup);
+        }
         return tCameraGroupDetail;
     }
 

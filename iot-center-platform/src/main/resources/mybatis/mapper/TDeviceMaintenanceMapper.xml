@@ -169,7 +169,7 @@
 
     <delete id="deleteByDeviceId" >
          delete from t_device_maintenance
-                where device_id = #{deviceDd, jdbcType=BIGINT}
+                where device_id = #{deviceId, jdbcType=BIGINT}
     </delete>
     <select id="selectDeviceIds" resultType="java.lang.Long">
         select DISTINCT
