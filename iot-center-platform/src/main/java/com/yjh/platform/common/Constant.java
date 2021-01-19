@@ -51,5 +51,7 @@ public class Constant {
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
+    public static Map<String,String> userInfo= new HashMap<>();
+
 
 }
