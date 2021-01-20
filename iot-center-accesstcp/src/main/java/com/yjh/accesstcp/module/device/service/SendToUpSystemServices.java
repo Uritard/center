@@ -72,15 +72,15 @@ public class SendToUpSystemServices {
             //String path = mapForPath.get("content");
             String path = "D:/code/qhTest/66666";
             List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
-            map.put("device_file_path",CreateModeXMLUtil.createXmlFile(list,path,"device_file.xml"));
+            map.put("device_file_path",CreateModeXMLUtil.createXmlFile(list,path,"device_file.xml","Device_Model"));
             list = sendToUpSystemDao.selectRobotInfo();
-            map.put("robot_file_path",CreateModeXMLUtil.createXmlFile(list,path,"robot_file.xml"));
+            map.put("robot_file_path",CreateModeXMLUtil.createXmlFile(list,path,"robot_file.xml","Robot_Model"));
             list = sendToUpSystemDao.selectTaskInfo();
             //CronExpression expression;
             for (Map<String,Object> item:list) {
                 String taskId = item.get("task_code").toString();
                 List<Long> instanceIdList = sendToUpSystemDao.selectInstanceId(taskId);
-                item.put("device_list",instanceIdList);
+                item.put("device_list",instanceIdList.toString().replaceFirst("\\[","").replace("]","").replace(" ",""));
                 if(!"".equals(item.get("time"))){
                     //计算 todo 内容不完整
                     String time = item.get("time").toString();
@@ -106,7 +106,7 @@ public class SendToUpSystemServices {
 
                 }
             }
-            map.put("task_file_path",CreateModeXMLUtil.createXmlFile(list,path,"task_file.xml"));
+            map.put("task_file_path",CreateModeXMLUtil.createXmlFile(list,path,"task_file.xml","Task_Model"));
             return map;
         }catch (Exception e) {
         e.printStackTrace();

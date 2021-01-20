@@ -42,12 +42,12 @@
 	
 	<select id="selectRobotInfo" resultType="java.util.Map">
 		select
-		a.robot_name,
-		a.robot_code,
-		c.dict_note as manufacturer,
-		if(b.dict_code=399,0,1) as istransport,
-		b.up_dict as type ,
-		a.remarks as robot_info
+		IFNULL(a.robot_name,""),
+		IFNULL(a.robot_code,""),
+		IFNULL(c.dict_note,"") as manufacturer,
+		IFNULL(b.up_dict,"") as type,
+		IFNULL(a.remarks,"") as robot_info,
+		if(b.dict_code=399,0,1) as istransport
 		from t_robot_info a
 		left join t_dict_business b on a.robot_type = b.dict_code
 		left join t_dict_business c on a.robot_factory = c.dict_code
