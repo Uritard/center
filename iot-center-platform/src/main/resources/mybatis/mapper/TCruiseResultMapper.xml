@@ -337,7 +337,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY cruise_time
+        ORDER BY b.device_id,n.custom_id,b.instance_id
     </select>
 
     <insert id="batchInsert">

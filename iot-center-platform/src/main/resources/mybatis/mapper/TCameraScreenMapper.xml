@@ -128,5 +128,11 @@
         FROM
             t_camera_info a
     </select>
+    <select id="selectRecordId2" resultType="java.lang.Long">
+        SELECT
+            a.record_id
+        FROM
+            t_camera_recorder a
+    </select>
 
 </mapper>

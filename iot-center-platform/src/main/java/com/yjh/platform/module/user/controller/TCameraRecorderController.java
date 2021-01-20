@@ -176,7 +176,18 @@ public class TCameraRecorderController {
         }
         return result;
     }
-
+    @ApiOperation(value = "从PMS系统同步录像机信息")
+    @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
+    public Result synchronizeFromPMS(@RequestParam(value = "recorderCode") String recorderCode) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraRecorderService.synchronizeFromPMS(recorderCode));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("从PMS系统同步录像机信息失败描述：" + e);
+        }
+        return result;
+    }
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     public Result batchInsert(@RequestBody List<TCameraRecorder> list) {

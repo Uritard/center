@@ -213,7 +213,6 @@
         left join t_dict_business d on d.dict_code = a.protocol and d.col_name = 'protocol_type'
         left join t_dict_business e on e.dict_code = a.vendor_id and e.col_name = 'camera_vendor'
         left join t_dict_business f on f.dict_code = a.recorder_model and f.col_name = 'recorder_model'
-
         where 1 = 1
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
         <if test="recorderModel != -1 "> and a.recorder_model = #{recorderModel, jdbcType=INTEGER}</if>

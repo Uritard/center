@@ -442,4 +442,17 @@
         where a.is_use = 166
         <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
     </select>
+    <select id="selectDictCode" resultType="java.lang.String">
+        select
+            a.dict_code
+        FROM t_dict_business a
+        where 1 = 1
+        <if test="colName != null and colName !=''">and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+        <if test="dictNote != null and dictNote !=''">and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectRobotIdByCode" parameterType="java.lang.String" resultType="java.lang.Long">
+        select robot_id from t_robot_info
+        where 1 = 1
+        <if test="robotCode != null and robotCode != ''"> and robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+    </select>
 </mapper>

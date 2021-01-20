@@ -84,5 +84,7 @@ public class TCameraRecorderByDict {
     private Integer vendorId;
     @ApiModelProperty(value = "生产厂家---字典表")
     private String vendorName;
+    @ApiModelProperty(value = "录像机状态")
+    private String recorderStatus;
 
 }

@@ -1,13 +1,13 @@
 package com.yjh.platform.module.user.dao;
 
-import java.util.List;
-import java.util.Date;
-
 import com.yjh.platform.module.user.entity.AreaInfoDetail;
 import com.yjh.platform.module.user.entity.TCameraScreen;
 import com.yjh.platform.module.user.entity.TCameraScreenDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -30,4 +30,5 @@ public interface TCameraScreenDao {
     int batchDelete(List<String> list);
     List<AreaInfoDetail> selectCameraTreeDevice(@Param(value = "cameraName") String cameraName);
     List<Long> selectRecordId();
+    List<Long> selectRecordId2();
 }

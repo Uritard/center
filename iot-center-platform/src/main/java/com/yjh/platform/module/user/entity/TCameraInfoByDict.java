@@ -89,5 +89,7 @@ public class TCameraInfoByDict implements Serializable {
     private String cameraModelName;
     @ApiModelProperty(value = "单位")
     private String unit;
+    @ApiModelProperty(value = "摄像机状态")
+    private String cameraStatus;
 
 }

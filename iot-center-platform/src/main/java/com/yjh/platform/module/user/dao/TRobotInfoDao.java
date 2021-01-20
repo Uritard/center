@@ -74,4 +74,9 @@ public interface TRobotInfoDao {
     List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")String taskId);
 
     List<RobotInfoForHomePage>selectRobotInfo(@Param(value = "robotPosition")String robotPosition);
+
+    String selectDictCode(@Param(value = "colName")String colName,
+                          @Param(value = "dictNote")String dictNote);
+    Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
+
 }

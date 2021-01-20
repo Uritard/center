@@ -1,11 +1,18 @@
 package com.yjh.platform.module.user.service;
 
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -29,7 +36,10 @@ public class TCameraInfoService {
     private RedisTemplate redisTemplate;
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
+    @Autowired
+    private TCameraScreenDao tCameraScreenDao;
 
+    private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
     @Logs(title = "插入", code = "tCameraInfo",content = "根据web传递的参数插入摄像头信息")
     @Transactional(rollbackFor = Exception.class)
@@ -94,9 +104,47 @@ public class TCameraInfoService {
     public List<TCameraInfoByDict> selectByPage(String aliasName,String unit,String address,String cameraVendor,
                                                 Integer cameraModel,String cameraName,List<Long> regionIdList) {
         List<TCameraInfoByDict> tCameraInfoByDict = tCameraInfoDao.selectByPage(aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
+
+        Map<String,String> map = new HashMap<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        log.info("recordIdList==="+recordIdList);
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            map.putAll((Map<String,String>)re.getData());
+        }
+        log.info("map==="+map);
+        for (TCameraInfoByDict xi : tCameraInfoByDict){
+            if (map.containsKey(xi.getCameraId().toString())){
+                if ("0".equals(map.get(xi.getCameraId().toString()))){
+                    xi.setCameraStatus("离线");
+                }else{
+                    xi.setCameraStatus("在线");
+                }
+            }else{
+                xi.setCameraStatus("离线");
+            }
+        }
         return tCameraInfoByDict;
     }
+    private static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+            }
+        } catch (Exception e) {
 
+        }
+        return re;
+    }
+    @Logs(title = "从PMS系统同步摄像机信息", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public boolean synchronizeFromPMS(String cameraCode) {
+        return true;
+    }
     @Logs(title = "查询当前任务下的摄像头信息", code = "tCameraInfo",content = "查询当前任务下的摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<CameraInfo> selectCameraByTaskId(Long taskId) {

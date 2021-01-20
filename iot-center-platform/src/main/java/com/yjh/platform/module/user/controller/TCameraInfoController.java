@@ -227,9 +227,18 @@ public class TCameraInfoController {
         }
         return result;
     }
-
-
-
+    @ApiOperation(value = "从PMS系统同步摄像机信息")
+    @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
+    public Result synchronizeFromPMS(@RequestParam(value = "cameraCode") String cameraCode) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraInfoService.synchronizeFromPMS(cameraCode));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("从PMS系统同步摄像机信息失败描述：" + e);
+        }
+        return result;
+    }
     @ApiOperation(value = "B-查询一个任务下的摄像头信息")
     @RequestMapping(value = "/selectCameraByTaskId",method =RequestMethod.GET)
     public Result selectCameraByTaskId(@RequestParam(value = "taskId")Long taskId){

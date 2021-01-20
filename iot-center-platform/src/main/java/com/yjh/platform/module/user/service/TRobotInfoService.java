@@ -4,10 +4,18 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -20,6 +28,10 @@ public class TRobotInfoService{
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
+    private Logger log = LoggerFactory.getLogger(TRobotInfoService.class);
+    private SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -72,6 +84,66 @@ public class TRobotInfoService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TRobotInfo> list) {
         return this.tRobotInfoDao.batchInsert(list);
+    }
+    @Logs(title = "从PMS系统同步机器人信息", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public boolean synchronizeFromPMS(String robotCode) throws Exception {
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+
+        String filePathAndName = "D:/testform/PMS/机器人PMS系统.xml";
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new File(filePathAndName));
+        //解析xml
+        Element rootElement = document.getRootElement();
+
+        Iterator iterator = rootElement.elementIterator();
+        Map<String,Object> map = new HashMap<>();
+        while (iterator.hasNext()){
+            Element stu = (Element) iterator.next();
+            List<Attribute> attributes = stu.attributes();
+
+            for (Attribute attribute : attributes) {
+                if (robotCode.equals(attribute.getValue())){
+                    Iterator iterator1 = stu.elementIterator();
+                    while (iterator1.hasNext()){
+                        Element stuChild = (Element) iterator1.next();
+                        map.put(stuChild.getName(),stuChild.getStringValue());
+                    }
+                    log.info("map的结果是==="+map);
+
+                    String robotFactory = tRobotInfoDao.selectDictCode("robot_factory",map.get("robotFactory").toString());
+                    String isUse = tRobotInfoDao.selectDictCode("robot_use",map.get("isUse").toString());
+                    String robotPosition = tRobotInfoDao.selectDictCode("robot_position",map.get("robotPosition").toString());
+                    Integer robotType = Integer.valueOf(tRobotInfoDao.selectDictCode("robot_type",map.get("robotType").toString()));
+
+                    TRobotInfo tRobotInfo = new TRobotInfo()
+                            .setRobotId(robotId)
+                            .setRobotType(robotType)
+                            .setRobotIp(map.get("robotIp").toString())
+                            .setRobotPort(Integer.valueOf(map.get("robotPort").toString()))
+                            .setLightIp(map.get("lightIp").toString())
+                            .setLightPort(map.get("lightPort").toString())
+                            .setLightUsername(map.get("lightUsername").toString())
+                            .setLightPassword(map.get("lightPassword").toString())
+                            .setLnferadIp(map.get("lnferadIP").toString())
+                            .setInferadPort(Integer.valueOf(map.get("InferadPort").toString()))
+                            .setInferadUsername(map.get("InferadUsername").toString())
+                            .setInferadPassword(map.get("InferadPassword").toString())
+                            .setCommissionDate(sf.parse(map.get("commissionDate").toString()))
+                            .setRobotSource(map.get("robotStatus").toString())
+                            .setAddress(map.get("address").toString())
+                            .setBuildingUser(map.get("buildingUser").toString())
+                            .setRobotFactory(robotFactory)
+                            .setIsUse(isUse)
+                            .setRobotPosition(robotPosition)
+                            .setAppearanceNumber(map.get("appearanceNumber").toString());
+                    log.info("tRobotInfo信息是==="+tRobotInfo);
+                    tRobotInfoDao.update(tRobotInfo);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
