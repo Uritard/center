@@ -26,6 +26,9 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "巡检任务UUID")
     private String taskId;
 
+    @ApiModelProperty(value = "任务编码")
+    private String taskCode;
+
     @ApiModelProperty(value = "任务名称")
     private String taskName;
 

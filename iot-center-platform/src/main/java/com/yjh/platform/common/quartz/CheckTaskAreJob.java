@@ -172,7 +172,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     xmlBaseModel.setType("61");
                     xmlItem.put("patroldevice_code",item);
                     xmlItem.put("task_name",tCruiseTask.getTaskName());
-                    xmlItem.put("task_code",tCruiseTask.getTaskId());
+                    xmlItem.put("task_code",tCruiseTask.getTaskCode());
                     xmlItem.put("device_name",mapForCruise.get("cruiseName"));
                     xmlItem.put("device_id",item);
                     xmlItem.put("material_id",mapForCruise.get("realCode"));
@@ -306,7 +306,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         xmlBaseModel.setType("41");
         item.put("task_patrolled_id",tCruiseTask.getTaskId());
         item.put("task_name",tCruiseTask.getTaskName());
-        item.put("task_code",tCruiseTask.getTaskId());
+        item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
         item.put("plan_start_time",tCruiseTask.getStartTime());
         if(tCruiseTask.getIfRun() == 172){

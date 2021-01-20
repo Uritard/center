@@ -5,6 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTask">
         <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="task_code" jdbcType="VARCHAR" property="taskCode" />
         <result column="task_name" jdbcType="VARCHAR" property="taskName" />
         <result column="plan_id" jdbcType="BIGINT" property="planId" />
         <result column="area_id" jdbcType="VARCHAR" property="areaId" />
@@ -20,13 +21,14 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        task_id, task_name, plan_id, area_id, type, if_run, robot_id, date_type, task_type, start_time, create_time, task_level
+        task_id,task_code, task_name, plan_id, area_id, type, if_run, robot_id, date_type, task_type, start_time, create_time, task_level
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="taskId" parameterType="com.yjh.platform.module.task.entity.TCruiseTask">
         insert into t_cruise_task(
             task_id,
+            task_code,
             task_name,
             plan_id,
             area_id,
@@ -40,6 +42,7 @@
             create_time
         )values(
                 #{taskId, jdbcType=VARCHAR},
+                #{taskCode, jdbcType=VARCHAR},
                 #{taskName, jdbcType=VARCHAR},
                 #{planId, jdbcType=BIGINT},
                 #{areaId, jdbcType=VARCHAR},
@@ -80,6 +83,7 @@
     <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
         select
         a.task_id,
+        a.task_code,
         a.task_name,
         a.plan_id,
         a.area_id,
@@ -100,6 +104,7 @@
     <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseTask" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
         select
         a.task_id,
+        a.task_code,
         a.task_name,
         a.plan_id,
         a.area_id,
@@ -130,6 +135,7 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseTask" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
         select
         a.task_id,
+        a.task_code,
         a.task_name,
         a.plan_id,
         a.area_id,
@@ -160,6 +166,7 @@
     <insert id="batchInsert">
         insert into t_cruise_task(
             task_id,
+        task_code,
             task_name,
             plan_id,
             area_id,
@@ -175,6 +182,7 @@
         <foreach collection="list" item="TCruiseTask" separator=",">
             (
                 #{TCruiseTask.taskId, jdbcType=VARCHAR},
+            #{TCruiseTask.taskCode, jdbcType=VARCHAR},
                 #{TCruiseTask.taskName, jdbcType=VARCHAR},
                 #{TCruiseTask.planId, jdbcType=BIGINT},
                 #{TCruiseTask.areaId, jdbcType=VARCHAR},

@@ -199,7 +199,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                             xmlBaseModel.setType("61");
                             xmlItem.put("patroldevice_code",item.getInstanceId());
                             xmlItem.put("task_name",tCruiseTask.getTaskName());
-                            xmlItem.put("task_code",tCruiseTask.getTaskId());
+                            xmlItem.put("task_code",tCruiseTask.getTaskCode());
                             xmlItem.put("device_name",item.getCruiseName());
                             xmlItem.put("device_id",item.getInstanceId());
                             xmlItem.put("material_id",item.getRealCode());
@@ -269,7 +269,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                             xmlBaseModel.setType("61");
                             xmlItem.put("patroldevice_code",item.getInstanceId());
                             xmlItem.put("task_name",tCruiseTask.getTaskName());
-                            xmlItem.put("task_code",tCruiseTask.getTaskId());
+                            xmlItem.put("task_code",tCruiseTask.getTaskCode());
                             xmlItem.put("device_name",item.getCruiseName());
                             xmlItem.put("device_id",item.getInstanceId());
                             xmlItem.put("material_id",item.getRealCode());
