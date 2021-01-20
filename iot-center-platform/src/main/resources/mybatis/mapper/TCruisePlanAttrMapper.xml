@@ -126,7 +126,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         LEFT JOIN t_dict_business j ON a.sub_type = j.dict_code AND j.col_name = "sub_plan_type"
         where 1 = 1
-            and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id
+            and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id,a.instance_id
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttr">

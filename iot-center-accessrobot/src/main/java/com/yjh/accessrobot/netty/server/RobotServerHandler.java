@@ -709,6 +709,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String instanceId = redisInfoMap.get("instanceId");
                     Map<String,String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:"+xmlBaseModel.getCode() + ":" + instanceId);
                     xmlBaseModel.getItems().get(0).put("material_id",mapForGet.get("realCode"));
+                    xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
                     List<XMLBaseModel> list = new ArrayList<>();
                     list.add(xmlBaseModel);
                     Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();

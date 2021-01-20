@@ -316,21 +316,21 @@ public class DataDealThread implements Runnable {
                                                         List<Map<String,Object>> xmlItems = new ArrayList<>();
                                                         Map<String,Object> xmlItem = new HashMap<>();
                                                         xmlBaseModel.setType("62");
-                                                        xmlItem.put("patroldevice_code",cruiseResultMap.get("instanceId"));
-                                                        xmlItem.put("task_name",cruiseResultMap.get("taskName"));
-                                                        xmlItem.put("task_code",cruiseResultMap.get("taskId"));
-                                                        xmlItem.put("device_name",cruiseResultMap.get("instanceName"));
-                                                        xmlItem.put("device_id",cruiseResultMap.get("instanceId"));
+                                                        xmlItem.put("patroldevice_code",cruiseResult.get("instanceId"));
+                                                        xmlItem.put("task_name",cruiseResult.get("taskName"));
+                                                        xmlItem.put("task_code",cruiseResult.get("taskId"));
+                                                        xmlItem.put("device_name",cruiseResult.get("instanceName"));
+                                                        xmlItem.put("device_id",cruiseResult.get("instanceId"));
                                                         xmlItem.put("alarm_level",alarm_level);
-                                                        String deviceMeteId = cruiseResultMap.get("deviceMeteId");
+                                                        String deviceMeteId = cruiseResult.get("device_mete_id").toString();
                                                         Map<String,Object> info = analyseDataOperateService.selectWarnInfo(Long.valueOf(deviceMeteId));
-                                                        xmlItem.put("alarm_type",info.get("alarm_type"));
-                                                        xmlItem.put("recognition_type",info.get("recognition_type"));
+                                                        xmlItem.put("alarm_type",(null== info.get("alarm_type") ? "": info.get("alarm_type")));
+                                                        xmlItem.put("recognition_type",(null== info.get("recognition_type") ? "": info.get("recognition_type")));
                                                         xmlItem.put("value",tWarnInfo.getValue());
-                                                        xmlItem.put("value_unit",tWarnInfo.getValue()+info.get("unit"));
-                                                        xmlItem.put("unit",info.get("unit"));
+                                                        xmlItem.put("unit",(null== info.get("unit") ? "": info.get("unit")));
+                                                        xmlItem.put("value_unit",tWarnInfo.getValue()+xmlItem.get("unit"));
                                                         xmlItem.put("time",simpleDateFormat.format(new Date()));
-                                                        xmlItem.put("task_patrolled_id",cruiseResultMap.get("taskId"));
+                                                        xmlItem.put("task_patrolled_id",cruiseResult.get("taskId"));
                                                         xmlItem.put("content",tWarnInfo.getWarnContent());
 
 
@@ -340,7 +340,7 @@ public class DataDealThread implements Runnable {
                                                         list.add(xmlBaseModel);
                                                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
                                                         map.put("list",list);
-                                                        log.info("信息上报：-"+map);
+                                                        log.info("告警上报：-"+map);
                                                         Constant.otherServer(map,Constant.TCP_URL);
                                                     }
 
@@ -482,12 +482,12 @@ public class DataDealThread implements Runnable {
                         List<Map<String,Object>> xmlItems = new ArrayList<>();
                         Map<String,Object> xmlItem = new HashMap<>();
                         xmlBaseModel.setType("61");
-                        xmlItem.put("patroldevice_code",cruiseResultMap.get("instanceId"));
-                        xmlItem.put("task_name",cruiseResultMap.get("taskName"));
-                        xmlItem.put("task_code",cruiseResultMap.get("taskId"));
-                        xmlItem.put("device_name",cruiseResultMap.get("instanceName"));
-                        xmlItem.put("device_id",cruiseResultMap.get("instanceId"));
-                        xmlItem.put("material_id",cruiseResultMap.get("realCode"));
+                        xmlItem.put("patroldevice_code",cruiseResult.get("instanceId"));
+                        xmlItem.put("task_name",cruiseResult.get("taskName"));
+                        xmlItem.put("task_code",cruiseResult.get("taskId"));
+                        xmlItem.put("device_name",cruiseResult.get("instanceName"));
+                        xmlItem.put("device_id",cruiseResult.get("instanceId"));
+                        xmlItem.put("material_id",cruiseResult.get("realCode"));
                         xmlItem.put("value","");
                         xmlItem.put("value_unit",cruiseResultMap.get("resultNum"));
                         xmlItem.put("unit","");
@@ -495,11 +495,17 @@ public class DataDealThread implements Runnable {
                         //todo
                         xmlItem.put("recognition_type","");
                         xmlItem.put("file_type","2");
-                        xmlItem.put("file_path",cruiseResultMap.get("picpath"));
+                        xmlItem.put("file_path",cruiseResult.get("picpath"));
                         xmlItem.put("rectangle","");
-                        xmlItem.put("task_patrolled_id",cruiseResultMap.get("taskId"));
+                        xmlItem.put("task_patrolled_id",cruiseResult.get("taskId"));
                         xmlItem.put("data_type","0x01");
-                        xmlItem.put("valid","1");
+                        String valid = "";
+                        if("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))){
+                            valid = "0";
+                        }else {
+                            valid = "1";
+                        }
+                        xmlItem.put("valid",valid);
 
                         xmlItems.add(xmlItem);
                         xmlBaseModel.setItems(xmlItems);
@@ -507,7 +513,7 @@ public class DataDealThread implements Runnable {
                         list.add(xmlBaseModel);
                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
                         map.put("list",list);
-                        log.info("信息上报：-"+map);
+                        log.info("结果信息上报：-"+map);
                         Constant.otherServer(map,Constant.TCP_URL);
                     }
 

@@ -7,6 +7,7 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
@@ -193,34 +194,143 @@ public class DataDealThread implements Runnable {
         }
         if ("41".equals(xmlBaseModel.getType())){
             log.info("--响应任务控制--");
-            if("1".equals(xmlBaseModel.getCommand())){
-                //任务启动
-                String taskId = xmlBaseModel.getCode();
-                //todo 需要思考一下
-
-                Result re = new Result();
-                if(re == null){
-                    sendToUpSystemServices.sendResponse("251","3","100",null);
-                }else if("success".equals(re.getData().toString())){
-                    sendToUpSystemServices.sendResponse("251","3","200",null);
-                }else {
-                    sendToUpSystemServices.sendResponse("251","3","500",null);
-                }
-                log.info("==任务控制响应==");
-
+            Result re = new Result();
+            Map<String,List<XMLBaseModel>> map = new HashMap<>();
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            map.put("list",list);
+            re = Constant.otherServer(map,Constant.TASK_STATE_URL);
+            List<Map<String,Object>> items = new ArrayList<>();
+            Map<String,Object> item = new HashMap<>();
+            item.put("task_patrolled_id",xmlBaseModel.getCode());
+            items.add(item);
+            if(re == null){
+                sendToUpSystemServices.sendResponse("251","4","100",items);
+            }else if("1".equals(re.getData().toString())){
+                sendToUpSystemServices.sendResponse("251","4","200",items);
+            }else {
+                sendToUpSystemServices.sendResponse("251","4","500",items);
             }
+            log.info("==任务控制响应==");
+
 
         }
 
         if ("101".equals(xmlBaseModel.getType())){
             log.info("--响应任务--");
             if("1".equals(xmlBaseModel.getCommand())){
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 log.info("--响应任务 任务下发--");
                 List<Map<String,Object>> list = xmlBaseModel.getItems();
                 for (Map<String,Object> item:list){
                     //todo 下任务
+                    TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+                    String type = item.get("type").toString();
+                    String device_list = item.get("device_list").toString();
+                    tCruiseTaskAdd.setDeviceList(device_list);
+                    if(type != null && "1".equals(type)){
+                        type = "214";
+                    }
+                    if(type != null && "2".equals(type)){
+                        type = "216";
+                    }
+                    if(type != null && "3".equals(type)){
+                        type = "217";
+                    }
+                    if(type != null && "4".equals(type)){
+                        type = "218";
+                    }
+                    tCruiseTaskAdd.setType(Integer.valueOf(type));
+                    tCruiseTaskAdd.setTaskId(item.get("task_code").toString());
+                    tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
+                    tCruiseTaskAdd.setTaskLevel(Integer.valueOf(item.get("priority").toString()));
+                    if(item.get("fixed_start_time") != null || "".equals(item.get("fixed_start_time"))){
+                        tCruiseTaskAdd.setIfRun(172);
+                        StringBuilder stringBuilder = new StringBuilder("0 0");
+                        String interval_type = item.get("interval_type").toString();
+                        if("1".equals(interval_type)){
+                            String interval_number = item.get("interval_number").toString();
+                            stringBuilder.append(" 0/"+interval_number+" ?");
+                        }
+                        if("2".equals(interval_type)){
+                            String interval_number = item.get("interval_number").toString();
+                            stringBuilder.append(" 0 0/"+interval_number+" ?");
+                        }
+                        String cycle_month = item.get("cycle_month").toString();
+                        if("".equals(cycle_month) || null == cycle_month){
+                            stringBuilder.append(" ?");
+                        }else {
+                            stringBuilder.append(" "+cycle_month);
+                        }
+                        String cycle_week = item.get("cycle_week").toString();
+                        if("".equals(cycle_week) || null == cycle_week){
+                            stringBuilder.append(" ?");
+                        }else {
+                            stringBuilder.append(" "+cycle_week);
+                        }
+                        tCruiseTaskAdd.setDateType(stringBuilder.toString());
+                    }else {
+                        tCruiseTaskAdd.setIfRun(174);
+                    }
+                    tCruiseTaskAdd.setStartTime(simpleDateFormat.parse(item.get("fixed_start_time").toString()));
+
+                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
+                    List<TCruiseTaskAdd> taskList = new ArrayList<>();
+                    taskList.add(tCruiseTaskAdd);
+                    map.put("list",taskList);
+                    Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
+                    if(re == null){
+                    sendToUpSystemServices.sendResponse("251","3","500",null);
+                    }else if("ok".equals(re.getData())){
+                        sendToUpSystemServices.sendResponse("251","3","200",null);
+                    }else {
+                        sendToUpSystemServices.sendResponse("251","3","100",null);
+                    }
+                    log.info("--响应任务下发--");
                 }
 
+            }
+        }
+
+        if ("102".equals(xmlBaseModel.getType())) {
+            log.info("--响应联动任务--");
+            if("1".equals(xmlBaseModel.getCommand())){
+                //联动任务
+                List<Map<String,Object>> list = xmlBaseModel.getItems();
+                for (Map<String,Object> item:list){
+                    TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+                    String taskId = item.get("task_code").toString();
+                    tCruiseTaskAdd.setTaskId(taskId);
+                    String taskName = item.get("task_name").toString();
+                    tCruiseTaskAdd.setTaskName(taskName);
+                    String taskLevel = item.get("priority").toString();
+                    tCruiseTaskAdd.setTaskLevel(Integer.valueOf(taskLevel));
+                    String deviceList = item.get("device_list").toString();
+                    tCruiseTaskAdd.setDeviceList(deviceList);
+
+                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
+                    List<TCruiseTaskAdd> listTask = new ArrayList<>();
+                    listTask.add(tCruiseTaskAdd);
+                    map.put("list",listTask);
+                    Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
+                    List<Map<String,Object>> xmlItems = new ArrayList<>();
+                    Map<String,Object> xmlItem = new HashMap<>();
+                    xmlItem.put("task_patrolled_id",taskId);
+                    if(re == null){
+                        xmlItem.put("error_code","3");
+                        xmlItems.add(xmlItem);
+                        sendToUpSystemServices.sendResponse("251","4","100",xmlItems);
+                    }else if("ok".equals(re.getData())){
+                        xmlItem.put("error_code","0");
+                        xmlItems.add(xmlItem);
+                        sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
+                    }else {
+                        xmlItem.put("error_code","1");
+                        xmlItems.add(xmlItem);
+                        sendToUpSystemServices.sendResponse("251","4","500",xmlItems);
+                    }
+
+                }
             }
         }
 

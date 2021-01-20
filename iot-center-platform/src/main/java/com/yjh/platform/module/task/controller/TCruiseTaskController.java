@@ -363,4 +363,38 @@ public class TCruiseTaskController {
         }
         return result;
     }
+
+    @ApiOperation(value = "站端任务控制")
+    @RequestMapping(value = "/upSystemCtrl", method = RequestMethod.POST)
+    public Result upSystemCtrl(@RequestBody Map<String,List<XMLBaseModel>> map) {
+        Result result = new Result();
+        try {
+            XMLBaseModel xmlBaseModel = map.get("list").get(0);
+            result.setData(tCruiseTaskService.upSystemCtrl(xmlBaseModel));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("站端任务控制异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("站端任务控制错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "站端任务下发")
+    @RequestMapping(value = "/upSystemIssuedTask", method = RequestMethod.POST)
+    public Result upSystemIssuedTask(@RequestBody Map<String,List<TCruiseTaskAdd>> map) {
+        Result result = new Result();
+        try {
+            TCruiseTaskAdd TCruiseTaskAdd = map.get("list").get(0);
+            result.setData(tCruiseTaskService.upSystemIssuedTask(TCruiseTaskAdd));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("站端任务控制异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("站端任务控制错误:", e);
+        }
+        return result;
+    }
 }

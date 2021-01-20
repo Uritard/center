@@ -926,7 +926,136 @@ public class TCruiseTaskService {
         return re;
     }
 
+    //@Logs(title = "任务确认下发", code = "TCruiseTask",content = "任务确认下发")
+    @Transactional(rollbackFor = Exception.class)
+    public int upSystemCtrl(XMLBaseModel xmlBaseModel){
+        String com = xmlBaseModel.getCommand();
+        String taskId = xmlBaseModel.getCode();
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        if(tCruiseTask == null){
+            return -1;
+        }
+        if("1".equals(com)){
+            //任务启动
+            //立即执行
+            try {
+                //模板图片路径
+                Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+                picModelPath = (String) mapForPicModelPath.get("content");
+                //等待相机转到预置位时间
+                Map<String,Object> mapForWaitTime  = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
+                waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+                //任务超期时间
+                Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+                tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
+                RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
+                        tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
+                        tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
+                        tRobotInspectionDao, tAlgorithmConfBakDao);
+                Thread thread = new Thread(runAtNowTask);
+                thread.setDaemon(true);
+                thread.start();
+            } catch (Exception e) { e.getMessage(); }
 
+        }
+        if("2".equals(com)){
+            //任务暂停
+           return this.taskPause(taskId);
+        }
+        if("3".equals(com)){
+            //任务继续
+            return this.taskGoOn(taskId);
+        }
+        if("4".equals(com)){
+            //任务终止
+            return this.taskShutDown(taskId);
+        }
+        return -1;
+    }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String upSystemIssuedTask(TCruiseTaskAdd tCruiseTaskAdd){
+        TCruiseTask tCruiseTask= new TCruiseTask();
+
+        tCruiseTask.setDateType(tCruiseTaskAdd.getDateType());
+        tCruiseTask.setAreaId(tCruiseTaskAdd.getAreaId());
+        tCruiseTask.setIfRun(tCruiseTaskAdd.getIfRun());
+        tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
+        tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
+        tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
+        tCruiseTask.setTaskLevel(tCruiseTaskAdd.getTaskLevel());
+        //TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+        tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
+        tCruiseTask.setType(tCruiseTaskAdd.getType());
+
+        String[] l = tCruiseTaskAdd.getDeviceList().split(",");
+        List<Long> instanceList = new ArrayList<>();
+        for (String item:l) {
+            instanceList.add(Long.valueOf(item));
+        }
+
+        List<TCruisePointInstance> tCruisePointInstanceList = this.tCruiseTaskAttrDao.batchSelect(instanceList);
+        List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
+        for (TCruisePointInstance tCruisePointInstance:tCruisePointInstanceList) {
+            TCruiseTaskAttr tCruiseTaskAttr = new TCruiseTaskAttr();
+            tCruiseTaskAttr.setTaskId(tCruiseTask.getTaskId());
+            tCruiseTaskAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+            tCruiseTaskAttr.setDeviceMeteId(tCruisePointInstance.getDeviceMeteId());
+            tCruiseTaskAttr.setDeviceId(tCruisePointInstance.getDeviceId());
+            tCruiseTaskAttr.setCustomId(tCruisePointInstance.getCustomId());
+            tCruiseTaskAttr.setPointTaskId(String.valueOf(tCruisePointInstance.getCruiseId()));
+            tCruiseTaskAttrList.add(tCruiseTaskAttr);
+        }
+        this.tCruiseTaskDao.insert(tCruiseTask);
+        this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
+        //开启定时任务
+        QuartzTask quartzTask = new QuartzTask();
+        quartzTask.setJobName(tCruiseTask.getTaskName());
+        quartzTask.setJobGroup(jobName);
+        if(tCruiseTask.getDateType()== null){
+            if(tCruiseTask.getIfRun() == 173){
+                //立即执行
+                try {
+                    //模板图片路径
+                    Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+                    picModelPath = (String) mapForPicModelPath.get("content");
+                    //等待相机转到预置位时间
+                    Map<String,Object> mapForWaitTime  = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
+                    waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+                    //任务超期时间
+                    Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+                    tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
+                    RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask,waitTime,picModelPath,redisTemplate,
+                            tCruisePointInstanceDao ,tCameraPresetDao,tCruiseResultDao,tAlgorithmConfDao,tAlgorithmInfoDao,tCruisePlanAttrDao,
+                            tCruiseDataResultDao,tCruiseTaskResultDetailDao,tCruiseTaskResultDao,false,tasksAreTime,
+                            tRobotInspectionDao, tAlgorithmConfBakDao);
+                    Thread thread = new Thread(runAtNowTask);
+                    thread.setDaemon(true);
+                    thread.start();
+                } catch (Exception e) { e.getMessage(); }
+            }else {
+                //定时
+                quartzTask.setStartTime(tCruiseTask.getStartTime());
+                //quartzTask.setStartTime(new Date());
+                JobManager jobManager = new JobManager();
+                try {
+                    jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
+                } catch (Exception e) { e.getMessage(); }
+            }
+        }else{
+            //周期 0 */10 * * * ?
+            quartzTask.setCronExpression(tCruiseTask.getDateType());
+            //quartzTask.setCronExpression("0 */1 * * * ?");
+            log.info("quartzTask: "+quartzTask.getCronExpression());
+            JobManager jobManager = new JobManager();
+            try {
+                jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
+            } catch (Exception e) { e.getMessage(); }
+        }
+
+        //任务状态上报站端
+        sendTaskStateToUp(tCruiseTask,5);
+        return  "ok";
+    }
 }
 

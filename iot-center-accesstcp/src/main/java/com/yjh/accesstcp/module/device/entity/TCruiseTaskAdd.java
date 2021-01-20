@@ -1,4 +1,4 @@
-package com.yjh.platform.module.task.entity;
+package com.yjh.accesstcp.module.device.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -83,7 +83,7 @@ public class TCruiseTaskAdd implements Serializable {
     private Long periodId;
 
     private String password;
-
     private String deviceList;
+
 
 }

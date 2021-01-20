@@ -5,6 +5,7 @@ import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
+import org.apache.poi.ss.formula.functions.T;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -75,12 +76,12 @@ public class Constant {
     public static Map<String,String> paramMap =new ConcurrentHashMap<>();
 
     //机器人任务路径 todo 记得改
-    public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/upSystemCommand";
+    public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot2/robot/v1/upSystemCommand";
 
     //检修区域路径 todo 记得改
     public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/upSystemCommand";
 
-    public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
+    public static <T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
@@ -88,5 +89,11 @@ public class Constant {
             }
         return re;
     }
+
+    //任务状态控制
+    public static final String TASK_STATE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemCtrl";
+
+    //任务下发
+    public static final String TASK_ISSUE_URL = "http://iot-center-platform2/tCruiseTask/v1/upSystemIssuedTask";
 
 }
