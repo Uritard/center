@@ -690,7 +690,8 @@ public class RobotService {
         List<XMLBaseModel> list = new ArrayList<>();
         list.add(xmlBaseModel);
         robotMap.put("list",list);
-        robotTaskStates(robotMap);
+        //todo 记得改
+        //robotTaskStates(robotMap);
         return "success";
     }
 
