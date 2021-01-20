@@ -282,7 +282,7 @@ public class DataDealThread implements Runnable {
                     Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
                     if(re == null){
                     sendToUpSystemServices.sendResponse("251","3","500",null);
-                    }else if("ok".equals(re.getData())){
+                    }else if("200".equals(re.getCode())){
                         sendToUpSystemServices.sendResponse("251","3","200",null);
                     }else {
                         sendToUpSystemServices.sendResponse("251","3","100",null);
@@ -300,7 +300,7 @@ public class DataDealThread implements Runnable {
                 List<Map<String,Object>> list = xmlBaseModel.getItems();
                 for (Map<String,Object> item:list){
                     TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
-                    String taskId = item.get("task_code").toString()+simpleDateFormat.format(new Date());
+                    String taskId = item.get("task_code").toString();
                     tCruiseTaskAdd.setTaskId(taskId);
                     String taskName = item.get("task_name").toString();
                     tCruiseTaskAdd.setTaskName(taskName);
@@ -316,17 +316,19 @@ public class DataDealThread implements Runnable {
                     Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
                     List<Map<String,Object>> xmlItems = new ArrayList<>();
                     Map<String,Object> xmlItem = new HashMap<>();
-                    xmlItem.put("task_patrolled_id",taskId);
                     if(re == null){
                         xmlItem.put("error_code","3");
+                        xmlItem.put("task_patrolled_id",taskId);
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","100",xmlItems);
-                    }else if("ok".equals(re.getData())){
+                    }else if("200".equals(re.getCode())){
+                        xmlItem.put("task_patrolled_id",re.getData());
                         xmlItem.put("error_code","0");
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
                     }else {
                         xmlItem.put("error_code","1");
+                        xmlItem.put("task_patrolled_id",taskId);
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","500",xmlItems);
                     }
