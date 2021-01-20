@@ -1,25 +1,28 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.module.task.entity.TCameraAlarm;
 import com.yjh.platform.module.task.service.TCameraAlarmService;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
+
 import io.swagger.annotations.*;
-import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
-import com.yjh.platform.common.result.Result;
+
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mysql.jdbc.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -42,9 +45,15 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCameraAlarm tCameraAlarm) {
+    public Result insert(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                if (tCameraAlarm.getAlarmState() != null) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tCameraAlarmService.insert(tCameraAlarm));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -73,9 +82,16 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TCameraAlarm tCameraAlarm) {
+    public Result update(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                TCameraAlarm list = tCameraAlarmService.selectByPrimaryId(tCameraAlarm.getCameraAlarmId());
+                if (list.getAlarmState() != tCameraAlarm.getAlarmState()) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tCameraAlarmService.update(tCameraAlarm));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -104,21 +120,21 @@ public class TCameraAlarmController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "cameraAlarmId", required = false) Long cameraAlarmId,
-                            @RequestParam(value = "alarmName", required = false) String alarmName,
-                            @RequestParam(value = "cameraId", required = false) Long cameraId,
-                            @RequestParam(value = "stationId", required = false) String stationId,
-                            @RequestParam(value = "alarmType", required = false) Integer alarmType,
-                            @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
-                            @RequestParam(value = "alarmInfo", required = false) String alarmInfo,
-                            @RequestParam(value = "alarmTime", required = false) Date alarmTime,
-                            @RequestParam(value = "isAlarm", required = false) Integer isAlarm,
-                            @RequestParam(value = "dealType", required = false) Integer dealType,
-                            @RequestParam(value = "dealInfo", required = false) String dealInfo,
-                            @RequestParam(value = "dealPersonId", required = false) String dealPersonId,
-                            @RequestParam(value = "dealTime", required = false) Date dealTime,
-                            @RequestParam(value = "alarmState", required = false) Integer alarmState,
-                            @RequestParam(value = "createTime", required = false) Date createTime,
-                            @RequestParam(value = "endTime", required = false) Date endTime) {
+                         @RequestParam(value = "alarmName", required = false) String alarmName,
+                         @RequestParam(value = "cameraId", required = false) Long cameraId,
+                         @RequestParam(value = "stationId", required = false) String stationId,
+                         @RequestParam(value = "alarmType", required = false) Integer alarmType,
+                         @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
+                         @RequestParam(value = "alarmInfo", required = false) String alarmInfo,
+                         @RequestParam(value = "alarmTime", required = false) Date alarmTime,
+                         @RequestParam(value = "isAlarm", required = false) Integer isAlarm,
+                         @RequestParam(value = "dealType", required = false) Integer dealType,
+                         @RequestParam(value = "dealInfo", required = false) String dealInfo,
+                         @RequestParam(value = "dealPersonId", required = false) String dealPersonId,
+                         @RequestParam(value = "dealTime", required = false) Date dealTime,
+                         @RequestParam(value = "alarmState", required = false) Integer alarmState,
+                         @RequestParam(value = "createTime", required = false) Date createTime,
+                         @RequestParam(value = "endTime", required = false) Date endTime) {
         Result result = new Result();
         try {
             List<TCameraAlarm> list = tCameraAlarmService.select(cameraAlarmId, alarmName, cameraId, stationId, alarmType, alarmLevel, alarmInfo, alarmTime, isAlarm, dealType, dealInfo, dealPersonId, dealTime, alarmState, createTime, endTime);
@@ -133,12 +149,12 @@ public class TCameraAlarmController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TCameraAlarm tCameraAlarm,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TCameraAlarm> list = tCameraAlarmService.selectByPage(tCameraAlarm);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -152,13 +168,21 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCameraAlarm> list) {
+    public Result batchInsert(@RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
-        result.setData(tCameraAlarmService.batchInsert(list));
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                for (TCameraAlarm e : list) {
+                    if (e.getAlarmState() != null) {
+                        throw new JurisdictionException();
+                    }
+                }
+            }
+            result.setData(tCameraAlarmService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }

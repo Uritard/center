@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.module.device.service.TStdMetemodelDetailService;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 
@@ -13,12 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -41,9 +45,17 @@ public class TStdMetemodelDetailController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TStdMeteModelDetail tStdMeteModelDetail) {
+    public Result add(@RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                if (tStdMeteModelDetail.getLowLimit1() != null || tStdMeteModelDetail.getLowLimit2() != null || tStdMeteModelDetail.getLowLimit3() != null || tStdMeteModelDetail.getLowLimit4() != null
+                        || tStdMeteModelDetail.getHighLimit1() != null || tStdMeteModelDetail.getHighLimit2() != null || tStdMeteModelDetail.getHighLimit3() != null || tStdMeteModelDetail.getHighLimit4() != null
+                        || tStdMeteModelDetail.getAlarmState() != null) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tStdMetemodelDetailService.add(tStdMeteModelDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -57,10 +69,10 @@ public class TStdMetemodelDetailController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public Result delete(@RequestParam(value = "modelId", required = true) Long modelId,
-                         @RequestParam(value = "meteId",required = true) Long meteId) {
+                         @RequestParam(value = "meteId", required = true) Long meteId) {
         Result result = new Result();
         try {
-            result.setData(tStdMetemodelDetailService.deleteByPrimaryId(modelId,meteId));
+            result.setData(tStdMetemodelDetailService.deleteByPrimaryId(modelId, meteId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -73,9 +85,19 @@ public class TStdMetemodelDetailController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TStdMeteModelDetail tStdMeteModelDetail) {
+    public Result update(@RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                List<TStdMeteModelDetail> tStdMete = tStdMetemodelDetailService.selectByPrimaryId(tStdMeteModelDetail.getModelId());
+                TStdMeteModelDetail list = tStdMete.get(0);
+                if (tStdMeteModelDetail.getLowLimit1() != list.getLowLimit1() || tStdMeteModelDetail.getLowLimit2() != list.getLowLimit2() || tStdMeteModelDetail.getLowLimit3() != list.getLowLimit3() || tStdMeteModelDetail.getLowLimit4() != list.getLowLimit4()
+                        || tStdMeteModelDetail.getHighLimit1() != list.getHighLimit1() || tStdMeteModelDetail.getHighLimit2() != list.getHighLimit2() || tStdMeteModelDetail.getHighLimit3() != list.getHighLimit3() || tStdMeteModelDetail.getHighLimit4() != list.getHighLimit4()
+                        || tStdMeteModelDetail.getAlarmState() != list.getAlarmState()) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tStdMetemodelDetailService.update(tStdMeteModelDetail));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -104,36 +126,36 @@ public class TStdMetemodelDetailController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "modelId", required = false) Long modelId,
-                            @RequestParam(value = "meteId", required = false) Long meteId,
-                            @RequestParam(value = "customType", required = false) String customType,
-                            @RequestParam(value = "customTypeName",required = false)String customTypeName,
-                            @RequestParam(value = "meteName", required = false) String meteName,
-                            @RequestParam(value = "meteType", required = false) String meteType,
-                            @RequestParam(value = "meteKind", required = false) Integer meteKind,
+                         @RequestParam(value = "meteId", required = false) Long meteId,
+                         @RequestParam(value = "customType", required = false) String customType,
+                         @RequestParam(value = "customTypeName", required = false) String customTypeName,
+                         @RequestParam(value = "meteName", required = false) String meteName,
+                         @RequestParam(value = "meteType", required = false) String meteType,
+                         @RequestParam(value = "meteKind", required = false) Integer meteKind,
                          @RequestParam(value = "analyseType", required = false) Integer analyseType,
-                            @RequestParam(value = "unit", required = false) String unit,
-                            @RequestParam(value = "alarmNote", required = false) String alarmNote,
-                            @RequestParam(value = "alarmExplain", required = false) String alarmExplain,
-                            @RequestParam(value = "alarmType", required = false) String alarmType,
-                            @RequestParam(value = "upEffect", required = false) Float upEffect,
-                            @RequestParam(value = "downEffect", required = false) Float downEffect,
-                            @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
-                            @RequestParam(value = "highLimit1", required = false) Float highLimit1,
-                            @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
-                            @RequestParam(value = "highLimit2", required = false) Float highLimit2,
-                            @RequestParam(value = "lowLimit2", required = false) Float lowLimit2,
-                           @RequestParam(value = "highLimit2", required = false) Float highLimit3,
-                           @RequestParam(value = "lowLimit2", required = false) Float lowLimit3,
-                           @RequestParam(value = "highLimit2", required = false) Float highLimit4,
-                           @RequestParam(value = "lowLimit2", required = false) Float lowLimit4,
-                            @RequestParam(value = "alarmDelay", required = false) Integer alarmDelay,
-                            @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
-                            @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
-                            @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
-                            @RequestParam(value = "modulus", required = false) Integer modulus) {
+                         @RequestParam(value = "unit", required = false) String unit,
+                         @RequestParam(value = "alarmNote", required = false) String alarmNote,
+                         @RequestParam(value = "alarmExplain", required = false) String alarmExplain,
+                         @RequestParam(value = "alarmType", required = false) String alarmType,
+                         @RequestParam(value = "upEffect", required = false) Float upEffect,
+                         @RequestParam(value = "downEffect", required = false) Float downEffect,
+                         @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
+                         @RequestParam(value = "highLimit1", required = false) Float highLimit1,
+                         @RequestParam(value = "lowLimit1", required = false) Float lowLimit1,
+                         @RequestParam(value = "highLimit2", required = false) Float highLimit2,
+                         @RequestParam(value = "lowLimit2", required = false) Float lowLimit2,
+                         @RequestParam(value = "highLimit2", required = false) Float highLimit3,
+                         @RequestParam(value = "lowLimit2", required = false) Float lowLimit3,
+                         @RequestParam(value = "highLimit2", required = false) Float highLimit4,
+                         @RequestParam(value = "lowLimit2", required = false) Float lowLimit4,
+                         @RequestParam(value = "alarmDelay", required = false) Integer alarmDelay,
+                         @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
+                         @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
+                         @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
+                         @RequestParam(value = "modulus", required = false) Integer modulus) {
         Result result = new Result();
         try {
-            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType,customTypeName,  meteName, meteType,meteKind,analyseType, unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2,highLimit3, lowLimit3,highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
+            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType, customTypeName, meteName, meteType, meteKind, analyseType, unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -145,12 +167,12 @@ public class TStdMetemodelDetailController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody TStdMeteModelDetail tStdMeteModelDetail,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TStdMeteModelDetail> list = tStdMetemodelDetailService.selectByPage(tStdMeteModelDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -164,13 +186,23 @@ public class TStdMetemodelDetailController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchadd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TStdMeteModelDetail> list) {
+    public Result batchAdd(@RequestBody List<TStdMeteModelDetail> list, HttpServletRequest request) {
         Result result = new Result();
         try {
-        result.setData(tStdMetemodelDetailService.batchAdd(list));
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                for (TStdMeteModelDetail e : list) {
+                    if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
+                            || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
+                            || e.getAlarmState() != null) {
+                        throw new JurisdictionException();
+                    }
+                }
+            }
+            result.setData(tStdMetemodelDetailService.batchAdd(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }
