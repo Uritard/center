@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
@@ -10,19 +11,21 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
-import com.yjh.platform.module.device.service.TStdMeteService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -51,9 +54,17 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+    public Result add(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request)  {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                if (tStdDeviceMeteDetail.getLowLimit1() != null || tStdDeviceMeteDetail.getLowLimit2() != null || tStdDeviceMeteDetail.getLowLimit3() != null || tStdDeviceMeteDetail.getLowLimit4() != null
+                        || tStdDeviceMeteDetail.getHighLimit1() != null || tStdDeviceMeteDetail.getHighLimit2() != null || tStdDeviceMeteDetail.getHighLimit3() != null || tStdDeviceMeteDetail.getHighLimit4() != null
+                        || tStdDeviceMeteDetail.getAlarmState() != null) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tStdDevicemeteService.add(tStdDeviceMeteDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -82,9 +93,18 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+    public Result update(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                TStdDeviceMete tStdDeviceMete = tStdDevicemeteService.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+                if (tStdDeviceMeteDetail.getLowLimit1() != tStdDeviceMete.getLowLimit1() || tStdDeviceMeteDetail.getLowLimit2() != tStdDeviceMete.getLowLimit2() || tStdDeviceMeteDetail.getLowLimit3() != tStdDeviceMete.getLowLimit3() || tStdDeviceMeteDetail.getLowLimit4() != tStdDeviceMete.getLowLimit4()
+                        || tStdDeviceMeteDetail.getHighLimit1() != tStdDeviceMete.getHighLimit1() || tStdDeviceMeteDetail.getHighLimit2() != tStdDeviceMete.getHighLimit2()  || tStdDeviceMeteDetail.getHighLimit3() != tStdDeviceMete.getHighLimit3()  || tStdDeviceMeteDetail.getHighLimit4() != tStdDeviceMete.getHighLimit4()
+                        || tStdDeviceMeteDetail.getAlarmState() != tStdDeviceMete.getAlarmState()) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tStdDevicemeteService.update(tStdDeviceMeteDetail));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -145,7 +165,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "appearanceType", required = false) Integer appearanceType) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId,customId, meteId, meteKind,meteType, meteName, deviceType,  positionType,analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark,stateZero,stateOne,alarmState,meterType,appearanceType);
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind, meteType, meteName, deviceType, positionType, analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark, stateZero, stateOne, alarmState, meterType, appearanceType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -163,10 +183,10 @@ public class TStdDevicemeteController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceMeteDetail.getUpRegionId());
-            if (upRegionIds.size() == 0){
+            if (upRegionIds.size() == 0) {
                 upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
             }
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -180,9 +200,19 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TStdDeviceMete> list) {
+    public Result batchAdd(@RequestBody List<TStdDeviceMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                for (TStdDeviceMete e : list) {
+                    if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
+                            || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
+                            || e.getAlarmState() != null) {
+                        throw new JurisdictionException();
+                    }
+                }
+            }
             result.setData(tStdDevicemeteService.batchAdd(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -207,9 +237,19 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "新增/修改设备测点")
     @RequestMapping(value = "/batchUpdateDevMete", method = RequestMethod.POST)
-    public Result batchUpdateDevMete(@RequestBody List<TStdDeviceMete> list) {
+    public Result batchUpdateDevMete(@RequestBody List<TStdDeviceMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                for (TStdDeviceMete e : list) {
+                    if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
+                            || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
+                            || e.getAlarmState() != null) {
+                        throw new JurisdictionException();
+                    }
+                }
+            }
             result.setData(tStdDevicemeteService.batchUpdateDevMete(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -280,7 +320,7 @@ public class TStdDevicemeteController {
     public Result batchDelete(@RequestParam(value = "deviceMeteIds") String deviceMeteIds) {
         Result result = new Result();
         try {
-               result.setData(tStdDevicemeteService.batchDelete(deviceMeteIds));
+            result.setData(tStdDevicemeteService.batchDelete(deviceMeteIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("根据设备Id删除设备测点异常:", e);

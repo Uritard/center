@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.module.task.entity.TRobotAlarm;
 import java.util.HashMap;
 import java.util.List;
@@ -7,20 +8,19 @@ import java.util.Date;
 
 import com.yjh.platform.module.task.service.TRobotAlarmService;
 import io.swagger.annotations.*;
-import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
 import java.util.Map;
-import com.yjh.platform.common.result.Result;
+
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mysql.jdbc.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -43,9 +43,15 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TRobotAlarm tRobotAlarm) {
+    public Result insert(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                if (tRobotAlarm.getAlarmState()!=null) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tRobotAlarmService.insert(tRobotAlarm));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -74,9 +80,16 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TRobotAlarm tRobotAlarm) {
+    public Result update(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                TRobotAlarm list = tRobotAlarmService.selectByPrimaryId(tRobotAlarm.getRobotAlarmId());
+                if (list.getAlarmState()!=tRobotAlarm.getAlarmState()) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tRobotAlarmService.update(tRobotAlarm));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -154,9 +167,17 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TRobotAlarm> list) {
+    public Result batchInsert(@RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                for (TRobotAlarm e : list) {
+                    if (e.getAlarmState()!=null) {
+                        throw new JurisdictionException();
+                    }
+                }
+            }
         result.setData(tRobotAlarmService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMeteDetail;
 import com.yjh.platform.module.device.service.TStdMeteService;
@@ -23,6 +24,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author tt
@@ -44,9 +47,17 @@ public class TStdMeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TStdMete tStdMete) {
+    public Result add(@RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                if (tStdMete.getLowLimit1() != null || tStdMete.getLowLimit2() != null || tStdMete.getLowLimit3() != null || tStdMete.getLowLimit4() != null
+                        || tStdMete.getHighLimit1() != null || tStdMete.getHighLimit2() != null || tStdMete.getHighLimit3() != null || tStdMete.getHighLimit4() != null
+                       ) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tStdMeteService.add(tStdMete));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -75,9 +86,18 @@ public class TStdMeteController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TStdMete tStdMete) {
+    public Result update(@RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                TStdMete list = tStdMeteService.selectByPrimaryId(tStdMete.getStdMeteId());
+                if (tStdMete.getLowLimit1() != list.getLowLimit1() || tStdMete.getLowLimit2() != list.getLowLimit2() || tStdMete.getLowLimit3() != list.getLowLimit3() || tStdMete.getLowLimit4() != list.getLowLimit4()
+                        || tStdMete.getHighLimit1() != list.getHighLimit1() || tStdMete.getHighLimit2() != list.getHighLimit2()  || tStdMete.getHighLimit3() != list.getHighLimit3()  || tStdMete.getHighLimit4() != list.getHighLimit4()
+                        ) {
+                    throw new JurisdictionException();
+                }
+            }
             result.setData(tStdMeteService.update(tStdMete));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -172,9 +192,19 @@ public class TStdMeteController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TStdMete> list) {
+    public Result batchAdd(@RequestBody List<TStdMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            Integer userId = Integer.valueOf(request.getHeader("userId"));
+            if (userId.intValue() != 10001) {
+                for (TStdMete e : list) {
+                    if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
+                            || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
+                           ) {
+                        throw new JurisdictionException();
+                    }
+                }
+            }
             result.setData(tStdMeteService.batchAdd(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
