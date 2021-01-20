@@ -495,6 +495,7 @@ public class CameraConService {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get camera status fail, error code: "+iErr);
                 channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
+                channleStatusMap.put("errorCode: " ,"401");
                 return channleStatusMap;
             }
             m_strIpparaCfg.read();
@@ -513,9 +514,11 @@ public class CameraConService {
 
             }
             log.info("channelStatusMap: "+channleStatusMap);
+            channleStatusMap.put("errorCode: " ,"200");
             return channleStatusMap;
         }
-        channleStatusMap.put("errorMessage: " ,"userID is null");
+        channleStatusMap.put("errorMessage: " ,"recordId is null");
+        channleStatusMap.put("errorCode: " ,"403");
         return channleStatusMap;
     }
 
@@ -617,7 +620,7 @@ public class CameraConService {
             channleStatusMap.put("freeTotal", String.valueOf(hardFreeTotal));
             return channleStatusMap;
         }
-        channleStatusMap.put("errorMessage: " ,"userID is null");
+        channleStatusMap.put("errorMessage: " ,"recordId is null");
         return channleStatusMap;
     }
 
