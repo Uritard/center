@@ -387,6 +387,7 @@ public class TCruiseTaskController {
         Result result = new Result();
         try {
             TCruiseTaskAdd TCruiseTaskAdd = map.get("list").get(0);
+            log.info("--站端任务下发--"+TCruiseTaskAdd);
             result.setData(tCruiseTaskService.upSystemIssuedTask(TCruiseTaskAdd));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

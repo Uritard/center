@@ -29,6 +29,10 @@ public class TCruiseTask implements Serializable {
     @ApiModelProperty(value = "巡检任务UUID")
     private String taskId;
 
+    @Length(max = 50,message = "taskId长度必须小于等于50")
+    @ApiModelProperty(value = "巡检任务UUID")
+    private String taskCode;
+
     @Length(max = 32,message = "taskName长度必须小于等于32")
     @ApiModelProperty(value = "任务名称")
     private String taskName;
@@ -74,6 +78,8 @@ public class TCruiseTask implements Serializable {
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
+
+
 
 
 }

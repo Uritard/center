@@ -109,6 +109,7 @@ public class TCruiseTaskService {
             }
         } catch (Exception e) { e.getMessage(); }
         if (Objects.isNull(tCruiseTask.getTaskId())) tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
         List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(),null,null,null,null,null,null,null,null,null,null,null,null,null);
         List<Long> instanceList = new ArrayList<>();
         for (TCruisePlanAttr tCruisePlanAttr:tCruisePlanAttrList) {
@@ -882,7 +883,7 @@ public class TCruiseTaskService {
         xmlBaseModel.setType("41");
         item.put("task_patrolled_id",tCruiseTask.getTaskId());
         item.put("task_name",tCruiseTask.getTaskName());
-        item.put("task_code",tCruiseTask.getTaskId());
+        item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
         item.put("plan_start_time",tCruiseTask.getStartTime());
         if(tCruiseTask.getIfRun() == 172){
@@ -975,8 +976,11 @@ public class TCruiseTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public String upSystemIssuedTask(TCruiseTaskAdd tCruiseTaskAdd){
+        //SimpleDateFormat simpleDateFormat =new SimpleDateFormat("HH:mm:ss");
         TCruiseTask tCruiseTask= new TCruiseTask();
-
+        String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");
+        tCruiseTask.setTaskId(uuid);
+        tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
         tCruiseTask.setDateType(tCruiseTaskAdd.getDateType());
         tCruiseTask.setAreaId(tCruiseTaskAdd.getAreaId());
         tCruiseTask.setIfRun(tCruiseTaskAdd.getIfRun());
@@ -1055,7 +1059,7 @@ public class TCruiseTaskService {
 
         //任务状态上报站端
         sendTaskStateToUp(tCruiseTask,5);
-        return  "ok";
+        return  uuid;
     }
 }
 

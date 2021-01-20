@@ -318,7 +318,7 @@ public class DataDealThread implements Runnable {
                                                         xmlBaseModel.setType("62");
                                                         xmlItem.put("patroldevice_code",cruiseResult.get("instanceId"));
                                                         xmlItem.put("task_name",cruiseResult.get("taskName"));
-                                                        xmlItem.put("task_code",cruiseResult.get("taskId"));
+                                                        xmlItem.put("task_code",cruiseResult.get("taskCode"));
                                                         xmlItem.put("device_name",cruiseResult.get("instanceName"));
                                                         xmlItem.put("device_id",cruiseResult.get("instanceId"));
                                                         xmlItem.put("alarm_level",alarm_level);
@@ -484,7 +484,7 @@ public class DataDealThread implements Runnable {
                         xmlBaseModel.setType("61");
                         xmlItem.put("patroldevice_code",cruiseResult.get("instanceId"));
                         xmlItem.put("task_name",cruiseResult.get("taskName"));
-                        xmlItem.put("task_code",cruiseResult.get("taskId"));
+                        xmlItem.put("task_code",cruiseResult.get("taskCode"));
                         xmlItem.put("device_name",cruiseResult.get("instanceName"));
                         xmlItem.put("device_id",cruiseResult.get("instanceId"));
                         xmlItem.put("material_id",cruiseResult.get("realCode"));

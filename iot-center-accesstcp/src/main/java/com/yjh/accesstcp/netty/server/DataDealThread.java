@@ -112,6 +112,8 @@ public class DataDealThread implements Runnable {
 
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //解析的xml文件
         if ("251".equals(xmlBaseModel.getType())) {//系统消息
             if ("4".equals(xmlBaseModel.getCommand())) {//响应注册
@@ -219,7 +221,6 @@ public class DataDealThread implements Runnable {
         if ("101".equals(xmlBaseModel.getType())){
             log.info("--响应任务--");
             if("1".equals(xmlBaseModel.getCommand())){
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 log.info("--响应任务 任务下发--");
                 List<Map<String,Object>> list = xmlBaseModel.getItems();
                 for (Map<String,Object> item:list){
@@ -299,7 +300,7 @@ public class DataDealThread implements Runnable {
                 List<Map<String,Object>> list = xmlBaseModel.getItems();
                 for (Map<String,Object> item:list){
                     TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
-                    String taskId = item.get("task_code").toString();
+                    String taskId = item.get("task_code").toString()+simpleDateFormat.format(new Date());
                     tCruiseTaskAdd.setTaskId(taskId);
                     String taskName = item.get("task_name").toString();
                     tCruiseTaskAdd.setTaskName(taskName);

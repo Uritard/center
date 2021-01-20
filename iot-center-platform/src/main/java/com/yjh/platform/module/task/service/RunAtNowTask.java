@@ -344,6 +344,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
                 tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
                 tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
+                tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
 
                 Date now = new Date();
                 List<Long>  overhaul= tCruisePointInstanceDao.selectTimeIsIn(now);
@@ -452,7 +453,7 @@ public class RunAtNowTask implements Runnable{
                             xmlBaseModel.setType("61");
                             xmlItem.put("patroldevice_code",item);
                             xmlItem.put("task_name",tCruiseTask.getTaskName());
-                            xmlItem.put("task_code",tCruiseTask.getTaskId());
+                            xmlItem.put("task_code",tCruiseTask.getTaskCode());
                             xmlItem.put("device_name",item.getCruiseName());
                             xmlItem.put("device_id",item.getInstanceId());
                             xmlItem.put("material_id",item.getRealCode());
@@ -591,7 +592,7 @@ public class RunAtNowTask implements Runnable{
                                 xmlBaseModel.setType("61");
                                 xmlItem.put("patroldevice_code",item);
                                 xmlItem.put("task_name",tCruiseTask.getTaskName());
-                                xmlItem.put("task_code",tCruiseTask.getTaskId());
+                                xmlItem.put("task_code",tCruiseTask.getTaskCode());
                                 xmlItem.put("device_name",item.getCruiseName());
                                 xmlItem.put("device_id",item.getInstanceId());
                                 xmlItem.put("material_id",item.getRealCode());
@@ -763,7 +764,7 @@ public class RunAtNowTask implements Runnable{
         xmlBaseModel.setType("41");
         item.put("task_patrolled_id",tCruiseTask.getTaskId());
         item.put("task_name",tCruiseTask.getTaskName());
-        item.put("task_code",tCruiseTask.getTaskId());
+        item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
         item.put("plan_start_time",tCruiseTask.getStartTime());
         if(tCruiseTask.getIfRun() == 172){

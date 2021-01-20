@@ -136,6 +136,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTask.setDateType(null);
                     tCruiseTask.setStartTime(new Date());
                     tCruiseTask.setCreateTime(new Date());
+                    tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
                     tCruiseTaskDao.insert(tCruiseTask);
                     for (TCruiseTaskAttr item:attrList) {
                         item.setTaskId(newTaskId);
@@ -282,6 +283,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
 
                     tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
+                    tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
 
                     Date now = new Date();
                     List<Long>  overhaul= tCruisePointInstanceDao.selectTimeIsIn(now);
@@ -388,7 +390,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 xmlBaseModel.setType("61");
                                 xmlItem.put("patroldevice_code",item);
                                 xmlItem.put("task_name",tCruiseTask.getTaskName());
-                                xmlItem.put("task_code",tCruiseTask.getTaskId());
+                                xmlItem.put("task_code",tCruiseTask.getTaskCode());
                                 xmlItem.put("device_name",item.getCruiseName());
                                 xmlItem.put("device_id",item.getInstanceId());
                                 xmlItem.put("material_id",item.getRealCode());
@@ -529,7 +531,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     xmlBaseModel.setType("61");
                                     xmlItem.put("patroldevice_code",item);
                                     xmlItem.put("task_name",tCruiseTask.getTaskName());
-                                    xmlItem.put("task_code",tCruiseTask.getTaskId());
+                                    xmlItem.put("task_code",tCruiseTask.getTaskCode());
                                     xmlItem.put("device_name",item.getCruiseName());
                                     xmlItem.put("device_id",item.getInstanceId());
                                     xmlItem.put("material_id",item.getRealCode());
@@ -764,7 +766,7 @@ public class CruiseTaskJob extends QuartzJobBean {
         xmlBaseModel.setType("41");
         item.put("task_patrolled_id",tCruiseTask.getTaskId());
         item.put("task_name",tCruiseTask.getTaskName());
-        item.put("task_code",tCruiseTask.getTaskId());
+        item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
         item.put("plan_start_time",tCruiseTask.getStartTime());
         if(tCruiseTask.getIfRun() == 172){
