@@ -889,7 +889,7 @@ public class TCruiseTaskService {
         if(tCruiseTask.getIfRun() == 172){
             try{
                 CronExpression expression = new CronExpression(tCruiseTask.getDateType());
-                item.put("start_time",expression.getNextValidTimeAfter(new Date()));
+                item.put("start_time",tCruiseTask.getStartTime());
             }catch (Exception e){
                 log.info("上报出错"+e.getMessage());
             }
@@ -938,6 +938,13 @@ public class TCruiseTaskService {
         }
         if("1".equals(com)){
             //任务启动
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");
+            tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
+            tCruiseTask.setTaskId(uuid);
+            tCruiseTask.setTaskName(tCruiseTask.getTaskName()+"-站端-"+simpleDateFormat.format(new Date()));
+            tCruiseTaskDao.insert(tCruiseTask);
+            log.info("--站端启动--"+tCruiseTask);
             //立即执行
             try {
                 //模板图片路径
@@ -976,17 +983,18 @@ public class TCruiseTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public String upSystemIssuedTask(TCruiseTaskAdd tCruiseTaskAdd){
-        //SimpleDateFormat simpleDateFormat =new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat simpleDateFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         TCruiseTask tCruiseTask= new TCruiseTask();
         String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");
         tCruiseTask.setTaskId(uuid);
-        tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
+        tCruiseTask.setTaskCode(tCruiseTaskAdd.getTaskId());
+        tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
         tCruiseTask.setDateType(tCruiseTaskAdd.getDateType());
         tCruiseTask.setAreaId(tCruiseTaskAdd.getAreaId());
         tCruiseTask.setIfRun(tCruiseTaskAdd.getIfRun());
         tCruiseTask.setPlanId(tCruiseTaskAdd.getPlanId());
         tCruiseTask.setRobotId(tCruiseTaskAdd.getRobotId());
-        tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
+        tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName()+simpleDateFormat.format(new Date()));
         tCruiseTask.setTaskLevel(tCruiseTaskAdd.getTaskLevel());
         //TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
         tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());

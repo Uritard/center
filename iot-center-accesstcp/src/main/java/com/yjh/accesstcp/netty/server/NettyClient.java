@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @lombok.extern.slf4j.Slf4j
 public class NettyClient {
 
-    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices) {
+    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -29,11 +29,11 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices) {
+                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices,server, cruise) {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
-                            p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices));
+                            p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices, server, cruise));
                         }
                     });
 

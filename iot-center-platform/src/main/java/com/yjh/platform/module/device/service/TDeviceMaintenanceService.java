@@ -245,11 +245,11 @@ public class TDeviceMaintenanceService{
                 tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
                 tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
                 tDeviceMaintenance.setDeviceIdList(deviceIdLst);
-                tDeviceMaintenanceDao.add(tDeviceMaintenance);
+                this.add(tDeviceMaintenance);
              }
              if("0".equals(enable)){
                 //删除检修区域
-                 tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst);
+                 tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst,"检修区域"+start_time);
              }
 
         }

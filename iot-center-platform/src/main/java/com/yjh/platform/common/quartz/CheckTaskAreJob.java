@@ -256,15 +256,29 @@ public class CheckTaskAreJob extends QuartzJobBean {
 
         //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
         //任务状态
-        TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-        tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
-        tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
-        tCruiseTaskResult.setTaskAbnormal(abnormal);
-        tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
-        tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
-        tCruiseTaskResult.setTaskStatus(244);
-        tCruiseTaskResult.setCruiseResult(247);
-        tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
+        TCruiseTaskResult tCruiseTaskResult ;
+        tCruiseTaskResult = tCruiseTaskResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
+        if(tCruiseResult == null){
+            tCruiseTaskResult = new TCruiseTaskResult();
+            tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
+            tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+            tCruiseTaskResult.setTaskAbnormal(abnormal);
+            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
+            tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+            tCruiseTaskResult.setTaskStatus(244);
+            tCruiseTaskResult.setCruiseResult(247);
+            tCruiseTaskResultDao.insert(tCruiseTaskResult);
+        }else {
+            tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
+            tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+            tCruiseTaskResult.setTaskAbnormal(abnormal);
+            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
+            tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+            tCruiseTaskResult.setTaskStatus(244);
+            tCruiseTaskResult.setCruiseResult(247);
+            tCruiseTaskResultDao.update(tCruiseTaskResult);
+        }
 
             sendTaskStateToUp(tCruiseTask,6);
 

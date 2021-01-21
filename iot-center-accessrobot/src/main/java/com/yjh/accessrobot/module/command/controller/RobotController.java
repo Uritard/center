@@ -125,9 +125,10 @@ public class RobotController {
 
     @ApiOperation(value = "站端命令下发")
     @RequestMapping(value = "/upSystemCommand", method = RequestMethod.POST)
-    public Result upSystemCommand(@RequestBody XMLBaseModel xmlBaseModel){
+    public Result upSystemCommand(@RequestBody Map<String,List<XMLBaseModel>> map){
         Result result = new Result();
         try {
+            XMLBaseModel xmlBaseModel = map.get("list").get(0);
             log.info("--站端控制数据--"+xmlBaseModel);
             result.setData(robotService.upSystemCommand(xmlBaseModel));
         } catch (BusinessException b) {

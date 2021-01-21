@@ -37,6 +37,10 @@ public class AccessTcpApplication implements CommandLineRunner {
     private int port;
     @Value("${netty.server.url}")
     private String serverUrl;
+    @Value("${spring.union.upSystem}")
+    private String server;
+    @Value("${spring.union.cruiseHost}")
+    private String cruise;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -56,7 +60,7 @@ public class AccessTcpApplication implements CommandLineRunner {
         loadDeviceInfo();
         InetSocketAddress address = new InetSocketAddress(serverUrl, port);
         log.info("accesstcp is running, url is : " + url);
-        nettyClient.start(address,redisTemplate, sendToUpSystemServices);
+        nettyClient.start(address,redisTemplate, sendToUpSystemServices, server, cruise);
     }
     public void loadDeviceInfo()throws IOException{
 

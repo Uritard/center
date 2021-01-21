@@ -88,7 +88,7 @@ public class DataDealThread implements Runnable {
         } else {
             log.info("不完整啊，小老弟");
             Packet = parameter;
-//                log.info("不足一个完整的包：" + Packet);
+            log.info("不足一个完整的包：" + Packet);
         }
 
     }
@@ -141,7 +141,6 @@ public class DataDealThread implements Runnable {
                     }
                     //将数据放入redis 做个保存
                     redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
-                    //todo 记得做 启动响应线程处理响应业务
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(tcpClientHandler, true);
                     //天气线程发天气
@@ -224,7 +223,6 @@ public class DataDealThread implements Runnable {
                 log.info("--响应任务 任务下发--");
                 List<Map<String,Object>> list = xmlBaseModel.getItems();
                 for (Map<String,Object> item:list){
-                    //todo 下任务
                     TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
                     String type = item.get("type").toString();
                     String device_list = item.get("device_list").toString();
@@ -251,11 +249,11 @@ public class DataDealThread implements Runnable {
                         String interval_type = item.get("interval_type").toString();
                         if("1".equals(interval_type)){
                             String interval_number = item.get("interval_number").toString();
-                            stringBuilder.append(" 0/"+interval_number+" ?");
+                            stringBuilder.append(" 0/"+interval_number);
                         }
                         if("2".equals(interval_type)){
                             String interval_number = item.get("interval_number").toString();
-                            stringBuilder.append(" 0 0/"+interval_number+" ?");
+                            stringBuilder.append(" 0 0/"+interval_number);
                         }
                         String cycle_month = item.get("cycle_month").toString();
                         if("".equals(cycle_month) || null == cycle_month){
@@ -308,6 +306,8 @@ public class DataDealThread implements Runnable {
                     tCruiseTaskAdd.setTaskLevel(Integer.valueOf(taskLevel));
                     String deviceList = item.get("device_list").toString();
                     tCruiseTaskAdd.setDeviceList(deviceList);
+                    tCruiseTaskAdd.setIfRun(173);
+                    tCruiseTaskAdd.setStartTime(new Date());
 
                     Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
                     List<TCruiseTaskAdd> listTask = new ArrayList<>();

@@ -17,10 +17,13 @@ public class TCPClientChannelInitializer extends ChannelInitializer<SocketChanne
 
     private RedisTemplate redisTemplate;
     private SendToUpSystemServices sendToUpSystemServices;
-
-    public TCPClientChannelInitializer(RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices) {
+    private String server;
+    private String cruise;
+    public TCPClientChannelInitializer(RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
         this.redisTemplate =redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
+        this.server =server;
+        this.cruise = cruise;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class TCPClientChannelInitializer extends ChannelInitializer<SocketChanne
         ChannelPipeline p = socketChannel.pipeline();
         //p.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
         //p.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices));
+        p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices, server, cruise));
     }
 
     @Override

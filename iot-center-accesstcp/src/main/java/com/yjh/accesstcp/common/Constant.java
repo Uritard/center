@@ -76,10 +76,10 @@ public class Constant {
     public static Map<String,String> paramMap =new ConcurrentHashMap<>();
 
     //机器人任务路径 todo 记得改
-    public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot2/robot/v1/upSystemCommand";
+    public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/upSystemCommand";
 
     //检修区域路径 todo 记得改
-    public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/upSystemCommand";
+    public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/systemSend";
 
     public static <T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
@@ -94,6 +94,6 @@ public class Constant {
     public static final String TASK_STATE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemCtrl";
 
     //任务下发
-    public static final String TASK_ISSUE_URL = "http://iot-center-platform2/tCruiseTask/v1/upSystemIssuedTask";
+    public static final String TASK_ISSUE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemIssuedTask";
 
 }

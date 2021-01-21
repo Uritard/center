@@ -98,9 +98,7 @@ public class WeatherThread implements Runnable{
                 if(s == null){
                     s= "30";
                 }
-                //todo 记得改
-                break;
-                //Thread.sleep(Long.valueOf(s)*1000L);
+                Thread.sleep(Long.valueOf(s)*1000L);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

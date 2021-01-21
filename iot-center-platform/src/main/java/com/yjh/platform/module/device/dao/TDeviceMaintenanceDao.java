@@ -36,5 +36,6 @@ public interface TDeviceMaintenanceDao {
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
     List<Long> selectDeviceIds(@Param(value = "maintenanceId") Long maintenanceId);
     List<Long> selectDeviceIdList(@Param(value = "list") List<Long> list);
-    int deleteByDeviceIdList(@Param(value = "list") List<Long> list);
+    int deleteByDeviceIdList(@Param(value = "list") List<Long> list,
+                             @Param(value = "name") String name);
 }

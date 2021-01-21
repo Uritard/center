@@ -190,7 +190,8 @@
 
     <delete id="deleteByDeviceIdList">
          delete from t_device_maintenance
-         where device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
+         where maintenance_name = #{name,jdbcType=VARCHAR}
+         and device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
         #{deviceId, jdbcType=BIGINT}
     </foreach>
     </delete>

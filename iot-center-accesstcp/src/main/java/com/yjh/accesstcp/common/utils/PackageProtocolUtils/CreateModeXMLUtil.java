@@ -25,7 +25,6 @@ public class CreateModeXMLUtil {
     //生成xml
     public static String createXmlFile(List<Map<String,Object>> list,String failPath,String fileName,String model) throws Exception{
         Document document = DocumentHelper.createDocument();
-        //todo 记得改
         Element rss = document.addElement(model);//根节点
 
         if(list!=null && list.size()>0) {
