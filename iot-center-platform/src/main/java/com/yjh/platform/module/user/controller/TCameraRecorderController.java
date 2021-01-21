@@ -128,6 +128,7 @@ public class TCameraRecorderController {
                          @RequestParam(value = "recorderModel", required = false) Integer recorderModel,
                          @RequestParam(value = "recorderType", required = false) String recorderType,
                          @RequestParam(value = "vendorId", required = false) Integer vendorId,
+                         @RequestParam(value = "pmsId", required = false) String pmsId,
                          @RequestParam(value = "aliasName", required = false) String aliasName,
                             @RequestParam(value = "recordIp", required = false) String recordIp,
                             @RequestParam(value = "protocol", required = false) String protocol,
@@ -144,7 +145,7 @@ public class TCameraRecorderController {
                             @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, vendorId,aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, vendorId,pmsId,aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -178,10 +179,10 @@ public class TCameraRecorderController {
     }
     @ApiOperation(value = "从PMS系统同步录像机信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
-    public Result synchronizeFromPMS(@RequestParam(value = "recorderCode") String recorderCode) {
+    public Result synchronizeFromPMS(@RequestParam(value = "pmsId") String pmsId) {
         Result result = new Result();
         try {
-            result.setData(tCameraRecorderService.synchronizeFromPMS(recorderCode));
+            result.setData(tCameraRecorderService.synchronizeFromPMS(pmsId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("从PMS系统同步录像机信息失败描述：" + e);

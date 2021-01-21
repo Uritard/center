@@ -95,4 +95,6 @@ public class TCameraRecorder implements Serializable {
     private String unit;
     @ApiModelProperty(value = "生产厂家")
     private Integer vendorId;
+    @ApiModelProperty(value = "PMS ID")
+    private String pmsId;
 }

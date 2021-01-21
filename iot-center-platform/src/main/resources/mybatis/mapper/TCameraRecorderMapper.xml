@@ -33,6 +33,7 @@
         f.dict_note as recorder_model_name,
         a.recorder_type,
         a.vendor_id,
+        a.pms_id,
         e.dict_note as vendor_name,
         b.dict_note as recorder_type_Name ,
         a.alias_name,
@@ -59,6 +60,7 @@
             recorder_model,
             recorder_type,
             vendor_id,
+            pms_id,
             alias_name,
             record_ip,
             protocol,
@@ -79,6 +81,7 @@
                 #{recorderModel, jdbcType=INTEGER},
                 #{recorderType, jdbcType=VARCHAR},
                 #{vendorId, jdbcType=INTEGER},
+                #{pmsId, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
                 #{recordIp, jdbcType=VARCHAR},
                 #{protocol, jdbcType=VARCHAR},
@@ -134,6 +137,7 @@
         <if test="recorderModel != null ">a.recorder_model = #{recorderModel, jdbcType=INTEGER},</if>
         <if test="recorderType != null and recorderType != ''">a.recorder_type = #{recorderType, jdbcType=VARCHAR},</if>
         <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
+        <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="recordIp != null and recordIp != ''">a.record_ip = #{recordIp, jdbcType=VARCHAR},</if>
         <if test="protocol != null and protocol != ''">a.protocol = #{protocol, jdbcType=VARCHAR},</if>
@@ -158,6 +162,8 @@
             record_name,
             recorder_model,
             recorder_type,
+            vendor_id,
+            pms_id,
             alias_name,
             record_ip,
             protocol,
@@ -179,17 +185,35 @@
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
-        select<include refid="TongYong"></include>
+        select
+        a.record_id,
+        a.record_name,
+        a.recorder_model,
+        a.recorder_type,
+        a.vendor_id,
+        a.pms_id,
+        a.alias_name,
+        a.record_ip,
+        a.protocol,
+        a.http_port,
+        a.trans_port,
+        a.rtsp_port,
+        a.user_name,
+        a.pwd,
+        a.protocol_url,
+        a.max_channel,
+        a.hdd_size,
+        a.buffer_day,
+        a.time_long,
+        a.unit
         from t_camera_recorder a
-        left join t_dict_business b on b.dict_code = a.recorder_type and b.col_name = 'recorder_type'
-        left join t_dict_business d on d.dict_code = a.protocol and d.col_name = 'protocol_type'
-        left join t_dict_business e on e.dict_code = a.vendor_id and e.col_name = 'camera_vendor'
         where 1 = 1
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
         <if test="recorderModel != null "> and a.recorder_model = #{recorderModel, jdbcType=INTEGER}</if>
         <if test="recorderType != null and recorderType != ''"> and a.recorder_type = #{recorderType, jdbcType=VARCHAR}</if>
         <if test="vendorId != null"> and a.vendor_id = #{vendorId, jdbcType=INTEGER}</if>
+        <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="recordIp != null and recordIp != ''"> and a.record_ip = #{recordIp, jdbcType=VARCHAR}</if>
         <if test="protocol != null and protocol != ''"> and a.protocol = #{protocol, jdbcType=VARCHAR}</if>
@@ -228,6 +252,7 @@
             recorder_model,
             recorder_type,
             vendor_id,
+            pms_id,
             alias_name,
             record_ip,
             protocol,
@@ -250,6 +275,7 @@
             #{TCameraRecorder.recorderModel, jdbcType=INTEGER},
                 #{TCameraRecorder.recorderType, jdbcType=VARCHAR},
             #{TCameraRecorder.vendorId, jdbcType=INTEGER},
+            #{TCameraRecorder.pmsId, jdbcType=VARCHAR},
             #{TCameraRecorder.aliasName, jdbcType=VARCHAR},
                 #{TCameraRecorder.recordIp, jdbcType=VARCHAR},
                 #{TCameraRecorder.protocol, jdbcType=VARCHAR},
@@ -273,6 +299,13 @@
         a.record_id,
         a.record_name
         from t_camera_recorder a
+    </select>
+    <select id="selectRecorderIdByPmsId" resultType="java.lang.Long">
+        select
+        a.record_id
+        from t_camera_recorder a
+        where 1 = 1
+        <if test="pmsId != null and pmsId != ''">and a.pms_id = #{pmsId,jdbcType = VARCHAR}</if>
     </select>
 
 

@@ -21,13 +21,13 @@ public interface TCameraInfoDao {
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
     int update(TCameraInfo tCameraInfo);
     int deleteSelectedCamera(@Param(value = "list") List<String> list);
-    List<TCameraInfoByDict> select(@Param(value = "cameraId") Long cameraId);
     TCameraInfoByDict selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
     List<TCameraInfoByDict> selectByRegionId(@Param(value = "regionId") Long regionId);
     List<TCameraInfoByDict> selectByCameraName(@Param(value = "cameraName") String cameraName);
     List<TCameraInfoByDict> select(@Param(value = "cameraId") Long cameraId,
                              @Param(value = "cameraName") String cameraName,
                              @Param(value = "cameraModel") Integer cameraModel,
+                             @Param(value = "pmsId") String pmsId,
                              @Param(value = "aliasName") String aliasName,
                              @Param(value = "recordId") String recordId,
                              @Param(value = "upRegionId") Long upRegionId,
@@ -62,4 +62,5 @@ public interface TCameraInfoDao {
     List<TCamreaPresetTree> batchSelectPreset();
 
     TCameraInfo selectCamera(@Param(value = "cameraId") Long cameraId);
+    Long selectCameraIdByPmsId(@Param(value = "pmsId")String pmsId);
 }

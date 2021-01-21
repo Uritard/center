@@ -25,6 +25,7 @@ public interface TCameraRecorderDao {
                                        @Param(value = "recorderModel") Integer recorderModel,
                                        @Param(value = "recorderType") String recorderType,
                                        @Param(value = "vendorId")Integer vendorId,
+                                       @Param(value = "pmsId") String pmsId,
                                        @Param(value = "aliasName") String aliasName,
                                        @Param(value = "recordIp") String recordIp,
                                        @Param(value = "protocol") String protocol,
@@ -46,4 +47,5 @@ public interface TCameraRecorderDao {
                                              @Param(value = "recordName")String recordName);
     int batchInsert(List<TCameraRecorder> list);
     List<TCameraRecorderDetail> selectIdAndName();
+    Long selectRecorderIdByPmsId(@Param(value = "pmsId")String pmsId);
 }

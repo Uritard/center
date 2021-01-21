@@ -37,7 +37,7 @@ public class ReportDataRepo {
 //    };
     //明细
     private static final String[] TASK_PORT_INFO = {
-            "序号", "设备名称", "检测内容", "结果", "图片", "巡检结果", "巡检时间"
+            "序号", "设备名称", "检测内容", "巡视值", "图片", "识别状态", "巡检时间"
     };
 
     public static  ContentData getData(ReportData param) {
@@ -111,13 +111,13 @@ public class ReportDataRepo {
 
             elements.add(new TableCellElement(rowIndex, rowIndex, 2, 2, new String[]{cbsInspectionResultVo.getInstanceName()},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{cbsInspectionResultVo.getCruiseResult()},//结果
+            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{cbsInspectionResultVo.getResultNum()},//巡视值
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
-            String file = StringUtils.isEmpty(cbsInspectionResultVo.getPicpath()) ?null
-                    : cbsInspectionResultVo.getPicpath();
+            String file = StringUtils.isEmpty(cbsInspectionResultVo.getPicPath()) ?null
+                    : cbsInspectionResultVo.getPicPath();
             elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{file},
                     TableCellElement.TYPE_PICTURE));
-            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{cbsInspectionResultVo.getIdentifyResult()},//巡检结果
+            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{cbsInspectionResultVo.getCruiseResultName()},//识别状态
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{dataFormat(cbsInspectionResultVo.getCruiseTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
