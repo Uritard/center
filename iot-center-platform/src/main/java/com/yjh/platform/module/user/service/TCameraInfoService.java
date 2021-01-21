@@ -154,8 +154,8 @@ public class TCameraInfoService {
         Long cameraId = tCameraInfoDao.selectCameraIdByPmsId(pmsId);
 
         Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-//        String filePathAndName = resMap.get("content") +  "/PMS/CameraPMS.xml";
-        String filePathAndName = "D:/testform/PMS/摄像机PMS系统.xml";
+        String filePathAndName = resMap.get("content") +  "/PMS/CameraPMS.xml";
+//        String filePathAndName = "D:/testform/PMS/摄像机PMS系统.xml";
         log.info("路径是==="+filePathAndName);
 
         SAXReader reader = new SAXReader();
