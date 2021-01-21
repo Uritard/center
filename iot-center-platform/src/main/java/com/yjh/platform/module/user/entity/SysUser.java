@@ -1,7 +1,10 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 
@@ -84,6 +87,7 @@ public class SysUser implements Serializable {
 
     @Length(max = 32,message = "userTitle长度必须小于等于32")
     @ApiModelProperty(value = "用户职称")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String userTitle;
 
     @Max(value=999999999999999999l)
