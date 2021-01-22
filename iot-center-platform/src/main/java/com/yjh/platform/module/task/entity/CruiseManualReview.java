@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,6 +26,7 @@ public class CruiseManualReview {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "巡视点数据id")
+
     private Long cruiseDataId;
     @ApiModelProperty(value = "巡检任务id")
     private String taskResultId;
@@ -32,6 +35,7 @@ public class CruiseManualReview {
     @ApiModelProperty(value = "巡检点实例id")
     private Long instanceId;
     @ApiModelProperty(value = "人工校核结果")
+    @TableField(value = "person_check",updateStrategy = FieldStrategy.IGNORED)
     private String personCheck;
     @ApiModelProperty(value = "评价状态")
     private Integer evaluationState;
@@ -46,6 +50,7 @@ public class CruiseManualReview {
     @ApiModelProperty(value = "识别状态-字典表")
     private String identifyStateName;
     @ApiModelProperty(value = "审核人")
+    @TableField(value = "check_user",updateStrategy = FieldStrategy.IGNORED)
     private String checkUser;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")

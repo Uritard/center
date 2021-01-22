@@ -44,12 +44,12 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
         update t_algorithm_info a <set>
-        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
-        <if test="algorithmName != null and algorithmName != ''">a.algorithm_name = #{algorithmName, jdbcType=VARCHAR},</if>
-        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
-        <if test="describel != null and describel != ''">a.describel = #{describel, jdbcType=VARCHAR},</if>
+        <if test="algorithmId != null ">a.algorithm_id = #{algorithmId},</if>
+        <if test="algorithmName != null ">a.algorithm_name = #{algorithmName},</if>
+        <if test="aliasName != null ">a.alias_name = #{aliasName},</if>
+        <if test="describel != null ">a.describel = #{describel},</if>
         <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR},</if>
-        <if test="analyseType != null and analyseType != ''">a.analyse_type = #{analyseType, jdbcType=VARCHAR},</if>
+        <if test="analyseType != null">a.analyse_type = #{analyseType},</if>
         <if test="isAi != null ">a.is_ai = #{isAi, jdbcType=INTEGER},</if>
     </set>
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}

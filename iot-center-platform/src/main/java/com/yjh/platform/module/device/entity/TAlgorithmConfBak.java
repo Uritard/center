@@ -2,6 +2,9 @@ package com.yjh.platform.module.device.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,13 +29,16 @@ public class TAlgorithmConfBak implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备标准测点ID")
+    @TableField(value = "device_mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceMeteId;
 
     @Max(value=999999999999999999l)
+     @TableField(value = "algorithm_id",updateStrategy = FieldStrategy.IGNORED)
     private Long algorithmId;
 
     @Length(max = 68,message = "configName长度必须小于等于68")
     @ApiModelProperty(value = "算法配置名称")
+     @TableField(value = "config_name",updateStrategy = FieldStrategy.IGNORED)
     private String configName;
 
     @Max(value=999999999)
@@ -49,6 +55,7 @@ public class TAlgorithmConfBak implements Serializable {
 
     @Length(max = 255,message = "picUrl长度必须小于等于255")
     @ApiModelProperty(value = "图标路径")
+     @TableField(value = "pic_url",updateStrategy = FieldStrategy.IGNORED)
     private String picUrl;
 
     @Max(value=999999999)

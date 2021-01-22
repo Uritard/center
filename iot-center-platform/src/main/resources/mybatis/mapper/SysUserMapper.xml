@@ -106,24 +106,24 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysUser">
         update sys_user a <set>
-        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
-        <if test="password != null and password != ''">a.PASSWORD = #{password, jdbcType=VARCHAR},</if>
-        <if test="trueName != null and trueName != ''">a.true_name = #{trueName, jdbcType=VARCHAR},</if>
+        <if test="userName != null ">a.user_name = #{userName},</if>
+        <if test="password != null">a.PASSWORD = #{password},</if>
+        <if test="trueName != null ">a.true_name = #{trueName},</if>
         <if test="userType != null">a.user_type = #{userType, jdbcType=INTEGER},</if>
         <if test="sex != null">a.sex = #{sex, jdbcType=INTEGER},</if>
-        <if test="eMail != null and eMail != ''">a.e_mail = #{eMail, jdbcType=VARCHAR},</if>
-        <if test="mobilePhone != null and mobilePhone != ''">a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR},</if>
-        <if test="workNo != null and workNo != ''">a.work_no = #{workNo, jdbcType=VARCHAR},</if>
-        <if test="faceId != null and faceId != ''">a.face_id = #{faceId, jdbcType=VARCHAR},</if>
-        <if test="fingerId != null and fingerId != ''">a.finger_id = #{fingerId, jdbcType=VARCHAR},</if>
-        <if test="voiceId != null and voiceId != ''">a.voice_id = #{voiceId, jdbcType=VARCHAR},</if>
+        <if test="eMail != null">a.e_mail = #{eMail},</if>
+        <if test="mobilePhone != null">a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR},</if>
+        <if test="workNo != null">a.work_no = #{workNo},</if>
+        <if test="faceId != null">a.face_id = #{faceId},</if>
+        <if test="fingerId != null ">a.finger_id = #{fingerId},</if>
+        <if test="voiceId != null ">a.voice_id = #{voiceId},</if>
         <if test="state != null">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="userTitle != null">a.user_title = #{userTitle, jdbcType=VARCHAR},</if>
-        <if test="creatorId != null and creatorId != ''">a.creator_id = #{creatorId, jdbcType=BIGINT},</if>
-        <if test="appkey != null and appkey != ''">a.appkey = #{appkey, jdbcType=VARCHAR},</if>
-        <if test="imageUrl != null and imageUrl != ''">a.image_url = #{imageUrl, jdbcType=VARCHAR},</if>
-        <if test="roleId != null and roleId != ''">a.role_id = #{roleId, jdbcType=BIGINT},</if>
-        <if test="orgId != null and orgId != ''">a.org_id = #{orgId, jdbcType=BIGINT},</if>
+        <if test="creatorId != null ">a.creator_id = #{creatorId},</if>
+        <if test="appkey != null">a.appkey = #{appkey},</if>
+        <if test="imageUrl != null ">a.image_url = #{imageUrl},</if>
+        <if test="roleId != null ">a.role_id = #{roleId},</if>
+        <if test="orgId != null">a.org_id = #{orgId},</if>
         <if test="userStatus != null">a.user_status = #{userStatus, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>

@@ -31,8 +31,8 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleRobot">
         update sys_role_robot a <set>
-        <if test="roleId != null and roleId != ''">a.role_id = #{roleId, jdbcType=BIGINT},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="roleId != null">a.role_id = #{roleId},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
     </set>
             where a.role_id = #{roleId, jdbcType=BIGINT}
     </update>

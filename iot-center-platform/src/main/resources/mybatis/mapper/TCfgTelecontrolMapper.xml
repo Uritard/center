@@ -67,20 +67,20 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgTelecontrol">
         update t_cfg_telecontrol a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="meteId != null ">a.mete_id = #{meteId},</if>
+        <if test="meteName != null ">a.mete_name = #{meteName},</if>
         <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
         <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
         <if test="controlStatus != null ">a.control_status = #{controlStatus, jdbcType=INTEGER},</if>
-        <if test="enableString != null and enableString != ''">a.enable_string = #{enableString, jdbcType=VARCHAR},</if>
-        <if test="succeedString != null and succeedString != ''">a.succeed_string = #{succeedString, jdbcType=VARCHAR},</if>
-        <if test="triggerString != null and triggerString != ''">a.trigger_string = #{triggerString, jdbcType=VARCHAR},</if>
+        <if test="enableString != null ">a.enable_string = #{enableString},</if>
+        <if test="succeedString != null ">a.succeed_string = #{succeedString},</if>
+        <if test="triggerString != null">a.trigger_string = #{triggerString},</if>
         <if test="controlValue != null ">a.control_value = #{controlValue, jdbcType=INTEGER},</if>
-        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
-        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+        <if test="meteCode != null">a.mete_code = #{meteCode},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType},</if>
+        <if test="description != null ">a.description = #{description},</if>
+        <if test="describer != null ">a.describer = #{describer},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
@@ -248,19 +248,19 @@
 
     <update id="updateForAll" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
         update t_cfg_telecontrol a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="meteId != null ">a.mete_id = #{meteId},</if>
+        <if test="meteName != null">a.mete_name = #{meteName},</if>
         <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
         <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
         <if test="controlStatus != null ">a.control_status = #{controlStatus, jdbcType=INTEGER},</if>
-        <if test="enableString != null and enableString != ''">a.enable_string = #{enableString, jdbcType=VARCHAR},</if>
-        <if test="succeedString != null and succeedString != ''">a.succeed_string = #{succeedString, jdbcType=VARCHAR},</if>
-        <if test="triggerString != null and triggerString != ''">a.trigger_string = #{triggerString, jdbcType=VARCHAR},</if>
+        <if test="enableString != null">a.enable_string = #{enableString},</if>
+        <if test="succeedString != null  ">a.succeed_string = #{succeedString},</if>
+        <if test="triggerString != null ">a.trigger_string = #{triggerString},</if>
         <if test="controlValue != null ">a.control_value = #{controlValue, jdbcType=INTEGER},</if>
-        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="meteCode != null  ">a.mete_code = #{meteCode},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType},</if>
+        <if test="description != null">a.description = #{description},</if>
         <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
     </set>
         where a.device_id = #{deviceId, jdbcType=VARCHAR}

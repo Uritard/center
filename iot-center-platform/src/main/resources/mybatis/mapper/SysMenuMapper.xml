@@ -70,20 +70,20 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysMenu">
         update sys_menu a <set>
-        <if test="menuId != null and menuId != ''">a.menu_id = #{menuId, jdbcType=BIGINT},</if>
-        <if test="menuName != null and menuName != ''">a.menu_name = #{menuName, jdbcType=VARCHAR},</if>
-        <if test="menuCode != null and menuCode != ''">a.menu_code = #{menuCode, jdbcType=VARCHAR},</if>
-        <if test="upId != null and upId != ''">a.up_id = #{upId, jdbcType=BIGINT},</if>
-        <if test="iconCode != null and iconCode != ''">a.icon_code = #{iconCode, jdbcType=VARCHAR},</if>
-        <if test="iconUrl != null and iconUrl != ''">a.icon_url = #{iconUrl, jdbcType=VARCHAR},</if>
+        <if test="menuId != null ">a.menu_id = #{menuId},</if>
+        <if test="menuName != null">a.menu_name = #{menuName},</if>
+        <if test="menuCode != null ">a.menu_code = #{menuCode},</if>
+        <if test="upId != null ">a.up_id = #{upId},</if>
+        <if test="iconCode != null ">a.icon_code = #{iconCode},</if>
+        <if test="iconUrl != null ">a.icon_url = #{iconUrl},</if>
         <if test="menuType != null ">a.menu_type = #{menuType, jdbcType=INTEGER},</if>
         <if test="menuLevel != null ">a.menu_level = #{menuLevel, jdbcType=INTEGER},</if>
-        <if test="elementCode != null and elementCode != ''">a.element_code = #{elementCode, jdbcType=VARCHAR},</if>
+        <if test="elementCode != null ">a.element_code = #{elementCode},</if>
         <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="linkType != null ">a.link_type = #{linkType, jdbcType=INTEGER},</if>
-        <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
-        <if test="creatorId != null and creatorId != ''">a.creator_id = #{creatorId, jdbcType=BIGINT},</if>
+        <if test="url != null and">a.url = #{url},</if>
+        <if test="creatorId != null">a.creator_id = #{creatorId},</if>
         <if test="sysState != null ">a.sys_state = #{sysState, jdbcType=INTEGER},</if>
     </set>
             where a.menu_id = #{menuId, jdbcType=BIGINT}

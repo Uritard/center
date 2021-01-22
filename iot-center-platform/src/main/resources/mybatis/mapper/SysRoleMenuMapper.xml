@@ -45,11 +45,11 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleMenu">
         update sys_role_menu a <set>
-        <if test="rpId != null and rpId != ''">a.rp_id = #{rpId, jdbcType=BIGINT},</if>
-        <if test="menuCode != null and menuCode != ''">a.menu_code = #{menuCode, jdbcType=VARCHAR},</if>
-        <if test="sort != null">a.sort = #{sort, jdbcType=INTEGER},</if>
-        <if test="elementCode != null and elementCode != ''">a.element_code = #{elementCode, jdbcType=VARCHAR},</if>
-        <if test="roleId != null and roleId != ''">a.role_id = #{roleId, jdbcType=BIGINT},</if>
+        <if test="rpId != null">a.rp_id = #{rpId},</if>
+        <if test="menuCode != null">a.menu_code = #{menuCode},</if>
+        <if test="sort != null">a.sort = #{sort},</if>
+        <if test="elementCode != null">a.element_code = #{elementCode},</if>
+        <if test="roleId != null ">a.role_id = #{roleId},</if>
     </set>
             where a.rp_id = #{rpId, jdbcType=BIGINT}
     </update>
