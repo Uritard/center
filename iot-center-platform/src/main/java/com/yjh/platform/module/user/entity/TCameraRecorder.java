@@ -109,4 +109,5 @@ public class TCameraRecorder implements Serializable {
     @ApiModelProperty(value = "PMS ID")
      @TableField(value = "pms_id",updateStrategy = FieldStrategy.IGNORED)
     private String pmsId;
+
 }

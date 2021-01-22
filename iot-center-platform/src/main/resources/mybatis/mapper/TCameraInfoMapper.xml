@@ -27,7 +27,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-         camera_name, camera_model,pms_id,alias_name, record_id, up_region_id, channel_num, sms_id,
+         camera_name, camera_model,alias_name, record_id, up_region_id, channel_num, sms_id,
          rms_id, vendor_id, stream_type, protocol_type, camera_ip,url, port, camera_type,
          is_control,latitude,longitude,address,unit
     </sql>
@@ -36,7 +36,6 @@
         a.address,
         a.camera_id,
         a.camera_model,
-        a.pms_id,
         e.dict_note as camera_model_name,
         a.camera_name,
         a.alias_name,
@@ -67,7 +66,6 @@
         )values(
                 #{cameraName, jdbcType=VARCHAR},
                 #{cameraModel, jdbcType=INTEGER},
-                #{pmsId, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
                 #{recordId, jdbcType=VARCHAR},
                 #{upRegionId, jdbcType=BIGINT},
@@ -121,7 +119,6 @@
         update t_camera_info a <set>
         <if test="cameraName != null and cameraName != ''">a.camera_name = #{cameraName, jdbcType=VARCHAR},</if>
         <if test="cameraModel != null ">a.camera_model = #{cameraModel, jdbcType=INTEGER},</if>
-        <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
         <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
         <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=BIGINT},</if>
         <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
@@ -169,35 +166,12 @@
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
-        select
-        a.camera_id,
-        a.camera_name,
-        a.camera_model,
-        a.pms_id,
-        a.alias_name,
-        a.record_id,
-        a.up_region_id,
-        a.channel_num,
-        a.sms_id,
-        a.rms_id,
-        a.vendor_id,
-        a.stream_type,
-        a.protocol_type,
-        a.camera_ip,
-        a.url,
-        a.port,
-        a.camera_type,
-        a.is_control,
-        a.latitude,
-        a.longitude,
-        a.address,
-        a.unit
-        from t_camera_info a
+        select<include refid="tongTong"></include>
+        from t_camera_info a,t_dict_business b,t_std_region c,t_dict_business d
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
         <if test="cameraModel != null "> and a.camera_model = #{cameraModel, jdbcType=INTEGER}</if>
-        <if test="pmsId != null and pmsId != ''"> and a.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
@@ -218,6 +192,10 @@
         <if test="latitude != null">and a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null">and a.longitude = #{longitude, jdbcType=VARCHAR},</if>
         <if test="unit != null and unit != ''">and a.unit = #{unit, jdbcType=VARCHAR},</if>
+        and b.dict_code = a.vendor_id
+        and d.dict_code = a.camera_type
+        and c.region_id = a.up_region_id
+
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
@@ -305,13 +283,6 @@
         select *
         from t_camera_info a
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
-    </select>
-    <select id="selectCameraIdByPmsId" resultType="java.lang.Long">
-        SELECT
-            a.camera_id
-        FROM t_camera_info a
-        WHERE 1 = 1
-        <if test="pmsId != null and pmsId != ''">and a.pms_id = #{pmsId,jdbcType = VARCHAR}</if>
     </select>
 
 

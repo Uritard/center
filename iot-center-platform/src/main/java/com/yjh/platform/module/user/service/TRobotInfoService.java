@@ -11,7 +11,6 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +28,6 @@ public class TRobotInfoService{
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TRobotInfoService.class);
     private SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -38,11 +35,7 @@ public class TRobotInfoService{
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TRobotInfo tRobotInfo,Long userId) {
-        String userName = tRobotInfoDao.selectUserName(userId);
-        tRobotInfo.setCreateBy(userName);
-        tRobotInfo.setCreateDate(new Date());
-        tRobotInfo.setRobotStatus("离线");
+    public int insert(TRobotInfo tRobotInfo) {
         return this.tRobotInfoDao.insert(tRobotInfo);
     }
 
@@ -54,10 +47,7 @@ public class TRobotInfoService{
 
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int update(TRobotInfo tRobotInfo,Long userId) {
-        String userName = tRobotInfoDao.selectUserName(userId);
-        tRobotInfo.setUpdateBy(userName);
-        tRobotInfo.setUpdateDate(new Date());
+    public int update(TRobotInfo tRobotInfo) {
         return this.tRobotInfoDao.update(tRobotInfo);
     }
 
@@ -97,15 +87,10 @@ public class TRobotInfoService{
     }
     @Logs(title = "从PMS系统同步机器人信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public boolean synchronizeFromPMS(String robotCode,Long userId) throws Exception {
+    public boolean synchronizeFromPMS(String robotCode) throws Exception {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-        String userName = tRobotInfoDao.selectUserName(userId);
 
-        Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String filePathAndName = resMap.get("content") +  "/PMS/RobotPMS.xml";
-//        String filePathAndName = "D:/testform/PMS/机器人PMS系统.xml";
-        log.info("路径是==="+filePathAndName);
-
+        String filePathAndName = "D:/testform/PMS/机器人PMS系统.xml";
         SAXReader reader = new SAXReader();
         Document document = reader.read(new File(filePathAndName));
         //解析xml
@@ -144,17 +129,14 @@ public class TRobotInfoService{
                             .setInferadPort(Integer.valueOf(map.get("InferadPort").toString()))
                             .setInferadUsername(map.get("InferadUsername").toString())
                             .setInferadPassword(map.get("InferadPassword").toString())
-                            .setUpdateBy(userName)
-                            .setUpdateDate(new Date())
-                            .setRobotFactory(robotFactory)
-                            .setIsUse(isUse)
                             .setCommissionDate(sf.parse(map.get("commissionDate").toString()))
-                            .setRobotSource(map.get("robotSource").toString())
+                            .setRobotSource(map.get("robotStatus").toString())
                             .setAddress(map.get("address").toString())
                             .setBuildingUser(map.get("buildingUser").toString())
+                            .setRobotFactory(robotFactory)
+                            .setIsUse(isUse)
                             .setRobotPosition(robotPosition)
-                            .setAppearanceNumber(map.get("appearanceNumber").toString())
-                            .setRemarks(map.get("remarks").toString());
+                            .setAppearanceNumber(map.get("appearanceNumber").toString());
                     log.info("tRobotInfo信息是==="+tRobotInfo);
                     tRobotInfoDao.update(tRobotInfo);
                     return true;

@@ -652,6 +652,10 @@
         </if>
         AND k.c_state != 239
         AND k.c_state != 241
+        ORDER BY
+        d.cruise_time,
+        d.device_id,
+        b.device_mete_id DESC
     </select>
 
     <select id="getdeviceMeteByPointinstance" parameterType="java.lang.Long" resultType="java.lang.Long">

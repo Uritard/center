@@ -88,14 +88,14 @@ public class TCruiseDataResultService {
 
     @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,
-                                String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) throws Exception {
+    public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
         List<Long> regionIdList = new ArrayList<>();
         List<Long> deviceIdList = new ArrayList<>();
         if (regionId == null){
             regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
             deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
             log.info("regionIdList是==="+regionIdList);
+            log.info("deviceIdList是==="+deviceIdList);
         }else {
             regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
             if (regionIdList != null && regionIdList.size() > 0){
@@ -104,9 +104,8 @@ public class TCruiseDataResultService {
                 deviceIdList.add(regionId);
             }
             log.info("regionIdList是==="+regionIdList);
+            log.info("deviceIdList是==="+deviceIdList);
         }
-        log.info("deviceIdList是==="+deviceIdList);
-
 
         Map<String, Object> resultMap = new HashMap<>();
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
@@ -115,6 +114,7 @@ public class TCruiseDataResultService {
             cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
         }
 
+        log.info("cruiseResultAnalMeteInfoList第一次==="+cruiseResultAnalMeteInfoList);
         //获取同一设备下的有巡检结果的标准测点
         List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
@@ -151,17 +151,7 @@ public class TCruiseDataResultService {
         }
         log.info("abnormalFilters==="+abnormalFilters);
         cruiseResultAnalMeteInfoList.removeAll(abnormalFilters);
-        //按巡检时间逆序排列
-       Collections.sort(cruiseResultAnalMeteInfoList, new Comparator<CruiseResultAnalyzeMeteInfo>() {
-            @Override
-            public int compare(CruiseResultAnalyzeMeteInfo o1, CruiseResultAnalyzeMeteInfo o2) {
-                Date date1 = o1.getCruiseTime();
-                Date date2 = o2.getCruiseTime();
-                int flag = date1.compareTo(date2);
-                flag = -flag;
-                return flag;
-            }
-        });
+        log.info("cruiseResultAnalMeteInfoList==="+cruiseResultAnalMeteInfoList);
         resultMap.put("count",page.getTotal());
         resultMap.put("list", cruiseResultAnalMeteInfoList);
         return resultMap;
@@ -322,14 +312,6 @@ public class TCruiseDataResultService {
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
         if (deviceIdList != null && deviceIdList.size() > 0) {
             cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
-            for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
-                if (Objects.isNull(cRAI.getIdentifyResult())) {
-                    cRAI.setIdentifyResultName(cRAI.getCruiseResultName());
-                }
-                if (Objects.isNull(cRAI.getPersonCheck())){
-                    cRAI.setPersonCheck(cRAI.getResultNum());
-                }
-            }
         }
         resultMap.put("count", page.getTotal());
         resultMap.put("list", cruiseResultAnalyzeInfoList);
@@ -342,7 +324,7 @@ public class TCruiseDataResultService {
 
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId,meteType ,meterType,endTime, startTime);
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
-            if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())) {
+            if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult()) || cruiseResultAnalInfo.getIdentifyResult() == 0) {
                 cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
             }
             if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())){

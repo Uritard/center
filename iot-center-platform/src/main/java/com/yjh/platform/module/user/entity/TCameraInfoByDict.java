@@ -91,7 +91,5 @@ public class TCameraInfoByDict implements Serializable {
     private String unit;
     @ApiModelProperty(value = "摄像机状态")
     private String cameraStatus;
-    @ApiModelProperty(value = "PMS ID")
-    private String pmsId;
 
 }

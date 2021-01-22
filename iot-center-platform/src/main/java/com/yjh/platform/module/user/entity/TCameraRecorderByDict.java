@@ -86,7 +86,5 @@ public class TCameraRecorderByDict {
     private String vendorName;
     @ApiModelProperty(value = "录像机状态")
     private String recorderStatus;
-    @ApiModelProperty(value = "PMS ID")
-    private String pmsId;
 
 }

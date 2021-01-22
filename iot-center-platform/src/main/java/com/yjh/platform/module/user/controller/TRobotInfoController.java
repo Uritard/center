@@ -53,7 +53,8 @@ public class TRobotInfoController {
 
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userId = request.getHeader("userId");
+            tRobotInfo.setCreateBy(userId);
 
             if (tRobotInfo.getRobotIp() != null && !"".equals(tRobotInfo.getRobotIp())) {
                 String robotIp = tRobotInfo.getRobotIp();
@@ -67,7 +68,7 @@ public class TRobotInfoController {
                     result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
                 }
             }
-            result.setData(tRobotInfoService.insert(tRobotInfo,userId));
+            result.setData(tRobotInfoService.insert(tRobotInfo));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -98,8 +99,9 @@ public class TRobotInfoController {
     public Result update(HttpServletRequest request, @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(tRobotInfoService.update(tRobotInfo,userId));
+            String userId = request.getHeader("userId");
+            tRobotInfo.setUpdateBy(userId);
+            result.setData(tRobotInfoService.update(tRobotInfo));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新机器人异常:", e);
@@ -202,11 +204,10 @@ public class TRobotInfoController {
     }
     @ApiOperation(value = "从PMS系统同步机器人信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
-    public Result synchronizeFromPMS(@RequestParam(value = "robotCode") String robotCode,HttpServletRequest request) {
+    public Result synchronizeFromPMS(@RequestParam(value = "robotName") String robotCode) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(tRobotInfoService.synchronizeFromPMS(robotCode,userId));
+            result.setData(tRobotInfoService.synchronizeFromPMS(robotCode));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("从PMS系统同步机器人信息失败描述：" + e);

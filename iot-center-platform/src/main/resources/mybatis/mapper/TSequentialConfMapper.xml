@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TSequentialConfDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TSequentialConf">
+        <id column="cfg_device_id" jdbcType="VARCHAR" property="cfgDeviceId" />
+        <result column="cfg_mete_id" jdbcType="VARCHAR" property="cfgMeteId" />
+        <result column="preset_id" jdbcType="BIGINT" property="presetId" />
+        <result column="identify_result" jdbcType="VARCHAR" property="identifyResult" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cfg_device_id, cfg_mete_id, preset_id, identify_result
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="cfgDeviceId" parameterType="com.yjh.platform.module.user.entity.TSequentialConf">
+        insert into t_sequential_conf(
+            cfg_device_id,
+            cfg_mete_id,
+            preset_id,
+            identify_result
+        )values(
+                #{cfgDeviceId, jdbcType=VARCHAR},
+                #{cfgMeteId, jdbcType=VARCHAR},
+                #{presetId, jdbcType=BIGINT},
+                #{identifyResult, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_sequential_conf
+                where cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TSequentialConf">
+        update t_sequential_conf a <set>
+        <if test="cfgDeviceId != null and cfgDeviceId != ''">a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR},</if>
+        <if test="cfgMeteId != null and cfgMeteId != ''">a.cfg_mete_id = #{cfgMeteId, jdbcType=VARCHAR},</if>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=VARCHAR},</if>
+    </set>
+            where a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.TSequentialConf">
+        select
+        a.cfg_device_id,
+        c.device_name as cgfDeviceName,
+        a.cfg_mete_id,
+        d.mete_name as cfgMeteName,
+        a.preset_id,
+        b.preset_name,
+        a.identify_result
+        from t_sequential_conf a
+        left join t_camera_preset b on a.preset_id = b.preset_id
+        left join t_cfg_device c on a.cfg_device_id = c.device_id
+        left join t_cfg_mete d on a.cfg_device_id = d.mete_id
+        where 1 = 1
+            and a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TSequentialConf" resultType="com.yjh.platform.module.user.entity.TSequentialConf">
+        select
+        a.cfg_device_id,
+        c.device_name,
+        a.cfg_mete_id,
+        d.mete_name,
+        a.preset_id,
+        b.preset_name,
+        a.identify_result
+        from t_sequential_conf a
+        left join t_camera_preset b on a.preset_id = b.preset_id
+        left join t_cfg_device c on a.cfg_device_id = c.device_id
+        left join t_cfg_mete d on a.cfg_device_id = d.mete_id
+        where 1 = 1
+        <if test="cfgDeviceName != null and cfgDeviceName != ''"> and c.device_name like concat('%',#{cfgDeviceName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TSequentialConf" resultType="com.yjh.platform.module.user.entity.TSequentialConf">
+        select
+        a.cfg_device_id,
+        c.device_name as cfgDeviceName,
+        a.cfg_mete_id,
+        d.mete_name as cfgMeteName,
+        a.preset_id,
+        b.preset_name,
+        a.identify_result
+        from t_sequential_conf a
+        left join t_camera_preset b on a.preset_id = b.preset_id
+        left join t_cfg_device c on a.cfg_device_id = c.device_id
+        left join t_cfg_mete d on a.cfg_device_id = d.mete_id
+        where 1 = 1
+        <if test="cfgDeviceName != null and cfgDeviceName != ''"> and c.device_name like concat('%',#{cfgDeviceName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_sequential_conf(
+            cfg_device_id,
+            cfg_mete_id,
+            preset_id,
+            identify_result
+        )values
+        <foreach collection="list" item="TSequentialConf" separator=",">
+            (
+                #{TSequentialConf.cfgDeviceId, jdbcType=VARCHAR},
+                #{TSequentialConf.cfgMeteId, jdbcType=VARCHAR},
+                #{TSequentialConf.presetId, jdbcType=BIGINT},
+                #{TSequentialConf.identifyResult, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_sequential_conf
+        where cfg_device_id in (
+            <foreach collection="list" item="cfgDeviceId" separator=",">
+                #{cfgDeviceId, jdbcType=VARCHAR}
+            </foreach>
+            )
+    </delete>
+
+    <select id="selectForTCfgMete"  resultType="com.yjh.platform.module.device.entity.AreaInfo">
+            select
+            a.mete_kind as upId,
+            b.dict_note as upName,
+            a.mete_id as Id,
+            c.device_name as label,
+            "device" as infoType
+            from t_cfg_mete a
+            left join t_dict_business b on a.mete_kind = b.dict_code and b.col_name="mete_kind"
+            left join t_cfg_device c on a.mete_id = c.device_id
+            where a.mete_kind = #{meteKind, jdbcType=INTEGER}
+        <if test="cfgDeviceName != null and cfgDeviceName != ''"> and c.device_name like concat('%',#{cfgDeviceName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+</mapper>
