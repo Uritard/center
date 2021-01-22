@@ -1,7 +1,10 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 
@@ -32,10 +35,12 @@ public class SysRole implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "主键")
     @TableId(value = "role_id", type = IdType.AUTO)
+    @TableField(value = "role_id",updateStrategy = FieldStrategy.IGNORED)
     private Long roleId;
 
     @Length(max = 20,message = "roleName长度必须小于等于20")
     @ApiModelProperty(value = "角色名称")
+    @TableField(value = "role_name",updateStrategy = FieldStrategy.IGNORED)
     private String roleName;
 
     @Past
@@ -45,6 +50,7 @@ public class SysRole implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "创建人")
+     @TableField(value = "creator_id",updateStrategy = FieldStrategy.IGNORED)
     private Long creatorId;
 
     @Max(value=9)

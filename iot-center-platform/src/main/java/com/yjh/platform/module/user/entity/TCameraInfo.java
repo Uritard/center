@@ -1,5 +1,10 @@
 package com.yjh.platform.module.user.entity;
 
+import java.io.Serializable;
+import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,18 +34,22 @@ public class TCameraInfo implements Serializable {
 
     @Length(max = 128,message = "cameraName长度必须小于等于128")
     @ApiModelProperty(value = "摄像机名称")
+    @TableField(value = "camera_name",updateStrategy = FieldStrategy.IGNORED)
     private String cameraName;
 
     @Length(max = 128,message = "aliasName长度必须小于等于128")
     @ApiModelProperty(value = "摄像机别名")
+     @TableField(value = "alias_name",updateStrategy = FieldStrategy.IGNORED)
     private String aliasName;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "录像机ID")
+     @TableField(value = "record_id",updateStrategy = FieldStrategy.IGNORED)
     private Long recordId;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "上级区域ID")
+     @TableField(value = "up_region_id",updateStrategy = FieldStrategy.IGNORED)
     private Long upRegionId;
 
     @Max(value=999999999)
@@ -69,6 +78,7 @@ public class TCameraInfo implements Serializable {
 
     @Length(max = 128,message = "url长度必须小于等于128")
     @ApiModelProperty(value = "码流地址")
+    @TableField(value = "url",updateStrategy = FieldStrategy.IGNORED)
     private String url;
 
     @Max(value=999999999)
@@ -85,10 +95,12 @@ public class TCameraInfo implements Serializable {
 
     @Length(max = 38,message = "cameraIp长度必须小于等于128")
     @ApiModelProperty(value = "摄像机ip")
+    @TableField(value = "camera_ip",updateStrategy = FieldStrategy.IGNORED)
     private String cameraIp;
 
     @Length(max = 32,message = "address长度必须小于等于128")
     @ApiModelProperty(value = "安装地址")
+     @TableField(value = "address",updateStrategy = FieldStrategy.IGNORED)
     private String address;
 
     @Length(max = 32,message = "latitude长度必须小于等于128")

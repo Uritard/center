@@ -1,7 +1,10 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 
@@ -32,18 +35,22 @@ public class SysOrg implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "组织ID")
     @TableId(value = "org_id", type = IdType.AUTO)
+    @TableField(value = "org_id",updateStrategy = FieldStrategy.IGNORED)
     private Long orgId;
 
     @Length(max = 50,message = "orgName长度必须小于等于50")
     @ApiModelProperty(value = "组织名称")
+     @TableField(value = "org_name",updateStrategy = FieldStrategy.IGNORED)
     private String orgName;
 
     @Length(max = 50,message = "orgCode长度必须小于等于50")
     @ApiModelProperty(value = "组织编码")
+    @TableField(value = "org_code",updateStrategy = FieldStrategy.IGNORED)
     private String orgCode;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "上级组织ID")
+     @TableField(value = "up_id",updateStrategy = FieldStrategy.IGNORED)
     private Long upId;
 
     @Max(value=999999999)
@@ -56,17 +63,19 @@ public class SysOrg implements Serializable {
     private Date createTime;
 
     @Max(value=999999999999999999l)
+     @TableField(value = "creator_id",updateStrategy = FieldStrategy.IGNORED)
     private Long creatorId;
 
     @Max(value=999999999)
     @ApiModelProperty(value = "层级")
-    private Integer orgLevel;
-
     @Length(max = 255,message = "orgPath长度必须小于等于255")
+    private Integer orgLevel;
+    @TableField(value = "org_path",updateStrategy = FieldStrategy.IGNORED)
     private String orgPath;
 
     @Length(max = 64,message = "deptName长度必须小于等于64")
     @ApiModelProperty(value = "部门名称")
+    @TableField(value = "dept_name",updateStrategy = FieldStrategy.IGNORED)
     private String deptName;
 
 

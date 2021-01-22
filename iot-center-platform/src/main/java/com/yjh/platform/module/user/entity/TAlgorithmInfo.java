@@ -1,6 +1,9 @@
 package com.yjh.platform.module.user.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,17 +26,21 @@ public class TAlgorithmInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
-    private Long algorithmId;
 
+    @Max(value=999999999999999999l)
     @Length(max = 64,message = "algorithmName长度必须小于等于64")
+    @TableField(value = "algorithm_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long algorithmId;
+     @TableField(value = "algorithm_name",updateStrategy = FieldStrategy.IGNORED)
     private String algorithmName;
 
     @Length(max = 64,message = "aliasName长度必须小于等于64")
     @ApiModelProperty(value = "算法类型")
+    @TableField(value = "alias_name",updateStrategy = FieldStrategy.IGNORED)
     private String aliasName;
 
     @Length(max = 255,message = "describel长度必须小于等于255")
+    @TableField(value = "describel",updateStrategy = FieldStrategy.IGNORED)
     private String describel;
 
     @Length(max = 20,message = "algorithmCode长度必须小于等于20")
@@ -41,6 +48,7 @@ public class TAlgorithmInfo implements Serializable {
     private String algorithmCode;
 
     @Length(max = 11,message = "analyseType长度必须小于等于11")
+    @TableField(value = "analyse_type",updateStrategy = FieldStrategy.IGNORED)
     private String analyseType;
 
     @Max(value=9)

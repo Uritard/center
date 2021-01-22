@@ -1,5 +1,7 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,10 +30,12 @@ public class TCameraPreset implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "预置位id")
+    @TableField(value = "preset_id",updateStrategy = FieldStrategy.IGNORED)
     private Long presetId;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "摄像头id")
+    @TableField(value = "camera_id",updateStrategy = FieldStrategy.IGNORED)
     private Long cameraId ;
 
     @Max(value=999999999)
@@ -40,10 +44,12 @@ public class TCameraPreset implements Serializable {
 
     @Length(max = 128,message = "presetName长度必须小于等于128")
     @ApiModelProperty(value = "预置位名称")
+    @TableField(value = "preset_name",updateStrategy = FieldStrategy.IGNORED)
     private String presetName ;
 
     @Length(max = 64,message = "creatorUser长度必须小于等于64")
     @ApiModelProperty(value = "啥也不是")
+    @TableField(value = "creator_user",updateStrategy = FieldStrategy.IGNORED)
     private String creatorUser ;
 
     @Past
@@ -57,6 +63,7 @@ public class TCameraPreset implements Serializable {
 
     @Length(max = 255,message = "presetImg长度必须小于等于255")
     @ApiModelProperty(value = "啥也不是啊")
+     @TableField(value = "preset_img",updateStrategy = FieldStrategy.IGNORED)
     private String presetImg ;
 
     @Max(value=999999999)

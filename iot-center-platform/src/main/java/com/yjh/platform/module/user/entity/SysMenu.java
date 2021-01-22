@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -29,26 +31,32 @@ public class SysMenu implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "主键")
     @TableId(value = "menu_id", type = IdType.AUTO)
+    @TableField(value = "menu_id",updateStrategy = FieldStrategy.IGNORED)
     private Long menuId;
 
     @Length(max = 20,message = "menuName长度必须小于等于20")
     @ApiModelProperty(value = "菜单名称")
+     @TableField(value = "menu_name",updateStrategy = FieldStrategy.IGNORED)
     private String menuName;
 
     @Length(max = 20,message = "menuCode长度必须小于等于20")
     @ApiModelProperty(value = "菜单编码")
+    @TableField(value = "menu_code",updateStrategy = FieldStrategy.IGNORED)
     private String menuCode;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "父级ID")
+    @TableField(value = "up_id",updateStrategy = FieldStrategy.IGNORED)
     private Long upId;
 
     @Length(max = 20,message = "iconCode长度必须小于等于20")
     @ApiModelProperty(value = "字体图标编码")
+    @TableField(value = "icon_code",updateStrategy = FieldStrategy.IGNORED)
     private String iconCode;
 
     @Length(max = 255,message = "iconUrl长度必须小于等于255")
     @ApiModelProperty(value = "图标地址")
+     @TableField(value = "icon_url",updateStrategy = FieldStrategy.IGNORED)
     private String iconUrl;
 
     @Max(value=9)
@@ -61,6 +69,7 @@ public class SysMenu implements Serializable {
 
     @Length(max = 255,message = "elementCode长度必须小于等于255")
     @ApiModelProperty(value = "页面元素 add|edit")
+    @TableField(value = "element_code",updateStrategy = FieldStrategy.IGNORED)
     private String elementCode;
 
     @Max(value=9)
@@ -77,10 +86,12 @@ public class SysMenu implements Serializable {
 
     @Length(max = 255,message = "url长度必须小于等于255")
     @ApiModelProperty(value = "连接地址")
+    @TableField(value = "url",updateStrategy = FieldStrategy.IGNORED)
     private String url;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "创建人")
+     @TableField(value = "creator_id",updateStrategy = FieldStrategy.IGNORED)
     private Long creatorId;
 
     @Max(value=9)

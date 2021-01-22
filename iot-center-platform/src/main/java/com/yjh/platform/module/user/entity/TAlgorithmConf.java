@@ -3,6 +3,8 @@ package com.yjh.platform.module.user.entity;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,13 +31,16 @@ public class TAlgorithmConf implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "摄像头预置位ID或者机器人巡检点ID")
+    @TableField(value = "preset_id",updateStrategy = FieldStrategy.IGNORED)
     private Long presetId;
 
     @Max(value=999999999999999999l)
+    @TableField(value = "algorithm_id",updateStrategy = FieldStrategy.IGNORED)
     private Long algorithmId;
 
     @Length(max = 68,message = "configName长度必须小于等于68")
     @ApiModelProperty(value = "算法配置名称")
+    @TableField(value = "config_name",updateStrategy = FieldStrategy.IGNORED)
     private String configName;
 
     @Max(value=99999999999l)
@@ -52,10 +57,12 @@ public class TAlgorithmConf implements Serializable {
 
     @Length(max = 255,message = "picUrl长度必须小于等于255")
     @ApiModelProperty(value = "图标路径")
+     @TableField(value = "pic_url",updateStrategy = FieldStrategy.IGNORED)
     private String picUrl;
 
     @Max(value=99999999999l)
     @ApiModelProperty(value = "0不应用，1应用到日常巡视，2..待定")
+    @TableField(value = "apply_module",updateStrategy = FieldStrategy.IGNORED)
     private Integer applyModule;
 
     @Past

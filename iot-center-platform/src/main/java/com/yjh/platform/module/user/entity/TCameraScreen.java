@@ -3,6 +3,8 @@ package com.yjh.platform.module.user.entity;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,13 +29,15 @@ public class TCameraScreen implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
-    private Long userId;
 
-    @Length(max = 50,message = "screenNum长度必须小于等于50")
-    private String screenNum;
 
     @Length(max = 200,message = "cameraIds长度必须小于等于200")
+    @TableField(value = "user_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long userId;
+    @Length(max = 50,message = "screenNum长度必须小于等于50")
+    @TableField(value = "screen_num",updateStrategy = FieldStrategy.IGNORED)
+    private String screenNum;
+    @TableField(value = "camera_ids",updateStrategy = FieldStrategy.IGNORED)
     private String cameraIds;
 
     @Past

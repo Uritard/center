@@ -1,5 +1,7 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,11 +26,13 @@ public class SysRoleRobot implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "角色ID")
+    @TableField(value = "role_id",updateStrategy = FieldStrategy.IGNORED)
     private Long roleId;
 
     @NotNull(message = "roleId不为空")
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人ID")
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
 

@@ -1,6 +1,9 @@
 package com.yjh.platform.module.user.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,10 +28,12 @@ public class TCameraGroup implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "分组ID")
+    @TableField(value = "group_id",updateStrategy = FieldStrategy.IGNORED)
     private Long groupId;
 
     @Length(max = 128,message = "groupName长度必须小于等于128")
     @ApiModelProperty(value = "分组名称")
+     @TableField(value = "group_name",updateStrategy = FieldStrategy.IGNORED)
     private String groupName;
 
     @Length(max = 255,message = "cameraIds长度必须小于等于255")
@@ -37,6 +42,7 @@ public class TCameraGroup implements Serializable {
 
     @Length(max = 64,message = "remarks长度必须小于等于64")
     @ApiModelProperty(value = "备注")
+    @TableField(value = "remarks",updateStrategy = FieldStrategy.IGNORED)
     private String remarks;
 
 
