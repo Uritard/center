@@ -31,7 +31,7 @@ public class zuulFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String s = String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString());
-        log.info(s);
+        log.info(""+s);
         return null;
     }
 }
