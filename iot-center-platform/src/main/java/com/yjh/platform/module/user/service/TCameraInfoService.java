@@ -10,7 +10,12 @@ import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 
 
@@ -38,6 +44,8 @@ public class TCameraInfoService {
     private TCameraPresetDao tCameraPresetDao;
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
@@ -88,14 +96,14 @@ public class TCameraInfoService {
 
     @Logs(title = "查询", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String aliasName, String recordId,
-                                          Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,
+    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String pmsId,String aliasName, String recordId,
+                                          Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,String monitorId,
                                           Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
                                           String url, Integer port, Integer cameraType, Integer isControl, String latitude,
                                           String longitude, String address,String unit) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, cameraModel,aliasName,
-                recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType, cameraIp, url,
-                port, cameraType, latitude, longitude, address, isControl,unit);
+        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
+                recordId, upRegionId, channelNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType, cameraIp, url,
+                port, cameraType,isControl,latitude, longitude, address, unit);
         return tCameraInfoByDictList;
     }
 
@@ -142,8 +150,57 @@ public class TCameraInfoService {
     }
     @Logs(title = "从PMS系统同步摄像机信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public boolean synchronizeFromPMS(String cameraCode) {
-        return true;
+    public boolean synchronizeFromPMS(String pmsId) throws Exception{
+        Long cameraId = tCameraInfoDao.selectCameraIdByPmsId(pmsId);
+
+        Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+//        String filePathAndName = resMap.get("content") +  "/PMS/CameraPMS.xml";
+        String filePathAndName = "D:/testform/PMS/摄像机PMS系统.xml";
+        log.info("路径是==="+filePathAndName);
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new File(filePathAndName));
+        //解析xml
+        Element rootElement = document.getRootElement();
+
+        Iterator iterator = rootElement.elementIterator();
+        Map<String,Object> map = new HashMap<>();
+        while (iterator.hasNext()) {
+            Element stu = (Element) iterator.next();
+            List<Attribute> attributes = stu.attributes();
+
+            for (Attribute attribute : attributes) {
+                if (pmsId.equals(attribute.getValue())) {
+                    Iterator iterator1 = stu.elementIterator();
+                    while (iterator1.hasNext()) {
+                        Element stuChild = (Element) iterator1.next();
+                        map.put(stuChild.getName(), stuChild.getStringValue());
+                    }
+                    log.info("map的结果是===" + map);
+
+                    Integer cameraModel = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_model",map.get("cameraModel").toString()));
+                    Integer vendorId = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_vendor",map.get("vendorId").toString()));
+                    Integer cameraType = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_type",map.get("cameraType").toString()));
+
+                    TCameraInfo tCameraInfo = new TCameraInfo()
+                            .setCameraId(cameraId)
+                            .setCameraModel(cameraModel)
+                            .setAliasName(map.get("aliasName").toString())
+                            .setChannelNum(Integer.valueOf(map.get("channelNum").toString()))
+                            .setVendorId(vendorId)
+                            .setCameraIp(map.get("cameraIp").toString())
+                            .setPort(Integer.valueOf(map.get("port").toString()))
+                            .setCameraType(cameraType)
+                            .setIsControl(Integer.valueOf(map.get("isControl").toString()))
+                            .setAddress(map.get("address").toString())
+                            .setUnit(map.get("unit").toString());
+                    log.info("tCameraInfo==="+tCameraInfo);
+                    tCameraInfoDao.update(tCameraInfo);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     @Logs(title = "查询当前任务下的摄像头信息", code = "tCameraInfo",content = "查询当前任务下的摄像头信息")
     @Transactional(rollbackFor = Exception.class)

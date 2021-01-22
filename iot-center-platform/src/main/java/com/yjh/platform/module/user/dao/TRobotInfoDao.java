@@ -57,6 +57,9 @@ public interface TRobotInfoDao {
                                 @Param(value = "address") String address,
                                 @Param(value = "buildingUser") String buildingUser,
                                 @Param(value = "appearanceNumber") String appearanceNumber,
+                                @Param(value = "defectRecord") String defectRecord,
+                                @Param(value = "repairRecord") String repairRecord,
+                                @Param(value = "exitPutIntoRecord") String exitPutIntoRecord,
                                 @Param(value = "remarks") String remarks);
     List<TRobotInfo> selectByPage(@Param(value = "robotName") String robotName,
                                 @Param(value = "buildingUser") String buildingUser,
@@ -78,5 +81,6 @@ public interface TRobotInfoDao {
     String selectDictCode(@Param(value = "colName")String colName,
                           @Param(value = "dictNote")String dictNote);
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
+    String selectUserName(@Param(value = "userID")Long  userID);
 
 }

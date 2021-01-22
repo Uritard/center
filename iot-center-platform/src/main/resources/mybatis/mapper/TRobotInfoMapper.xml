@@ -30,7 +30,6 @@
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
         <result column="robotPosition" jdbcType="VARCHAR" property="robotPosition" />
         <result column="remarks" jdbcType="VARCHAR" property="remarks" />
-        <result column="robot_type_name" jdbcType="VARCHAR" property="dictNote" />
         <result column="robot_factory_name" jdbcType="VARCHAR" property="robotFactoryName" />
         <result column="is_use_name" jdbcType="VARCHAR" property="isUseName" />
         <result column="robot_position_name" jdbcType="VARCHAR" property="robotPositionName" />
@@ -75,6 +74,9 @@
             address,
             building_user,
             appearance_number,
+            defect_record,
+            repair_record,
+            exit_putInto_record,
             remarks
         )values(
                 #{robotCode, jdbcType=VARCHAR},
@@ -93,7 +95,7 @@
                 #{inferadPassword, jdbcType=VARCHAR},
                 #{photePath, jdbcType=VARCHAR},
                 #{createBy, jdbcType=VARCHAR},
-                NOW(),
+                #{createDate, jdbcType=TIMESTAMP},
                 #{updateBy, jdbcType=VARCHAR},
                 #{updateDate, jdbcType=TIMESTAMP},
                 #{robotFactory, jdbcType=VARCHAR},
@@ -105,6 +107,9 @@
                 #{address, jdbcType=VARCHAR},
                 #{buildingUser, jdbcType=VARCHAR},
                 #{appearanceNumber, jdbcType=VARCHAR},
+                #{defectRecord, jdbcType=VARCHAR},
+                #{repairRecord, jdbcType=VARCHAR},
+                #{exitPutIntoRecord, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR}
         )
     </insert>
@@ -145,7 +150,7 @@
         <if test="createBy != null and createBy != ''">a.create_by = #{createBy, jdbcType=VARCHAR},</if>
         <if test="createDate != null">a.create_date = #{createDate, jdbcType=TIMESTAMP},</if>
         <if test="updateBy != null and updateBy != ''">a.update_by = #{updateBy, jdbcType=VARCHAR},</if>
-        a.update_date = NOW(),
+        <if test="updateDate != null">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
         <if test="robotFactory != null and robotFactory !=''">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
         <if test="isUse != null and isUse !=''">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
@@ -155,6 +160,9 @@
         <if test="address != null and address !=''">a.address = #{address, jdbcType=VARCHAR},</if>
         <if test="buildingUser != null and buildingUser !=''">a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
         <if test="appearanceNumber != null and appearanceNumber !=''">a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
+        <if test="defectRecord != null and defectRecord !=''">a.defect_record = #{defectRecord, jdbcType=VARCHAR},</if>
+        <if test="repairRecord != null and repairRecord !=''">a.repair_record = #{repairRecord, jdbcType=VARCHAR},</if>
+        <if test="exitPutIntoRecord != null and exitPutIntoRecord !=''">a.exit_putInto_record = #{exitPutIntoRecord, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
@@ -191,6 +199,9 @@
         a.address,
         a.building_user,
         a.appearance_number,
+        a.defect_record,
+        a.repair_record,
+        a.exit_putInto_record,
         a.remarks
         from t_robot_info a
         where 1 = 1
@@ -229,6 +240,9 @@
         a.address,
         a.building_user,
         a.appearance_number,
+        a.defect_record,
+        a.repair_record,
+        a.exit_putInto_record,
         a.remarks
         from t_robot_info a
         where 1 = 1
@@ -257,10 +271,13 @@
         <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
-        <if test="robotSource != null and robotSource !=''">a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
-        <if test="address != null and address !=''">a.address = #{address, jdbcType=VARCHAR},</if>
-        <if test="buildingUser != null and buildingUser !=''">a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
-        <if test="appearanceNumber != null and appearanceNumber !=''">a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
+        <if test="robotSource != null and robotSource !=''">and a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
+        <if test="address != null and address !=''">and a.address = #{address, jdbcType=VARCHAR},</if>
+        <if test="buildingUser != null and buildingUser !=''">and a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
+        <if test="appearanceNumber != null and appearanceNumber !=''">and a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
+        <if test="defectRecord != null and defectRecord !=''">and a.defect_record = #{defectRecord, jdbcType=VARCHAR},</if>
+        <if test="repairRecord != null and repairRecord !=''">and a.repair_record = #{repairRecord, jdbcType=VARCHAR},</if>
+        <if test="exitPutIntoRecord != null and exitPutIntoRecord !=''">and a.exit_putInto_record = #{exitPutIntoRecord, jdbcType=VARCHAR},</if>
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
@@ -300,6 +317,9 @@
         a.address,
         a.building_user,
         a.appearance_number,
+        a.defect_record,
+        a.repair_record,
+        a.exit_putInto_record,
         a.remarks
         from t_robot_info a
         LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
@@ -353,6 +373,9 @@
             address,
             building_user,
             appearance_number,
+            defect_record,
+            repair_record,
+            exit_putInto_record,
             remarks
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
@@ -373,7 +396,7 @@
                 #{TRobotInfo.inferadPassword, jdbcType=VARCHAR},
                 #{TRobotInfo.photePath, jdbcType=VARCHAR},
                 #{TRobotInfo.createBy, jdbcType=VARCHAR},
-                NOW(),
+                #{TRobotInfo.createDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.updateBy, jdbcType=VARCHAR},
                 #{TRobotInfo.updateDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
@@ -385,6 +408,9 @@
                 #{TRobotInfo.address, jdbcType=VARCHAR},
                 #{TRobotInfo.buildingUser, jdbcType=VARCHAR},
                 #{TRobotInfo.appearanceNumber, jdbcType=VARCHAR},
+                #{TRobotInfo.defectRecord, jdbcType=VARCHAR},
+                #{TRobotInfo.repairRecord, jdbcType=VARCHAR},
+                #{TRobotInfo.exitPutIntoRecord, jdbcType=VARCHAR},
                 #{TRobotInfo.remarks, jdbcType=VARCHAR}
             )
         </foreach>
@@ -454,5 +480,8 @@
         select robot_id from t_robot_info
         where 1 = 1
         <if test="robotCode != null and robotCode != ''"> and robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectUserName" resultType="java.lang.String">
+        select user_name from sys_user where user_id = #{userID}
     </select>
 </mapper>

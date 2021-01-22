@@ -21,19 +21,20 @@ public interface TCameraInfoDao {
     int deleteByPrimaryId(@Param(value = "cameraId") Long cameraId);
     int update(TCameraInfo tCameraInfo);
     int deleteSelectedCamera(@Param(value = "list") List<String> list);
-    List<TCameraInfoByDict> select(@Param(value = "cameraId") Long cameraId);
     TCameraInfoByDict selectByPrimaryId(@Param(value = "cameraId") Long cameraId);
     List<TCameraInfoByDict> selectByRegionId(@Param(value = "regionId") Long regionId);
     List<TCameraInfoByDict> selectByCameraName(@Param(value = "cameraName") String cameraName);
     List<TCameraInfoByDict> select(@Param(value = "cameraId") Long cameraId,
                              @Param(value = "cameraName") String cameraName,
                              @Param(value = "cameraModel") Integer cameraModel,
+                            @Param(value = "pmsId") String pmsId,
                              @Param(value = "aliasName") String aliasName,
                              @Param(value = "recordId") String recordId,
                              @Param(value = "upRegionId") Long upRegionId,
                              @Param(value = "channelNum") Integer channelNum,
                              @Param(value = "smsId") Integer smsId,
                              @Param(value = "rmsId") Integer rmsId,
+                             @Param(value = "monitorId")String monitorId,
                              @Param(value = "vendorId") Integer vendorId,
                              @Param(value = "streamType") Integer streamType,
                              @Param(value = "protocolType") Integer protocolType,
@@ -41,10 +42,10 @@ public interface TCameraInfoDao {
                              @Param(value = "url") String url,
                              @Param(value = "port") Integer port,
                              @Param(value = "cameraType") Integer cameraType,
+                            @Param(value = "isControl") Integer isControl,
                              @Param(value = "latitude") String latitude,
                              @Param(value = "longitude") String longitude,
                              @Param(value = "address") String address,
-                             @Param(value = "isControl") Integer isControl,
                              @Param(value = "unit") String unit);
     List<TCameraInfoByDict> selectByPage(@Param(value = "aliasName") String aliasName,
                                          @Param(value = "unit") String unit,
@@ -62,4 +63,5 @@ public interface TCameraInfoDao {
     List<TCamreaPresetTree> batchSelectPreset();
 
     TCameraInfo selectCamera(@Param(value = "cameraId") Long cameraId);
+    Long selectCameraIdByPmsId(@Param(value = "pmsId")String pmsId);
 }

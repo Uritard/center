@@ -237,9 +237,7 @@ public class ReportManageService {
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
-        //站所名称
-        String stationName = reportManageDao.selectStationName();
-        taskVO.setStationName(stationName);
+
         //测点数
         Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
         taskVO.setMeteNum(meteNum);
@@ -248,10 +246,11 @@ public class ReportManageService {
         taskVO.setAbnormalNum(abnormalNum);
         //关联测点数
         taskVO.setMeteRelationNum(0);
-        //任务名称、巡检时间
-        TaskVO taskNameAndTime = reportManageDao.selectTaskNameAndTime(taskId);
-        taskVO.setTaskName(taskNameAndTime.getTaskName());
-        taskVO.setCruiseDate(taskNameAndTime.getCruiseDate());
+        //站所名称、任务名称、巡检时间
+        TaskVO someThing = reportManageDao.selectTaskNameAndTime(taskId);
+        taskVO.setStationName(someThing.getStationName());
+        taskVO.setTaskName(someThing.getTaskName());
+        taskVO.setCruiseDate(someThing.getCruiseDate());
         recordData.setTaskVO(taskVO);
         //2.分项预览
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);

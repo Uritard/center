@@ -161,4 +161,10 @@ public class TRobotInfo implements Serializable {
     private String buildingUser;
     @ApiModelProperty(value = "出场编号")
     private String appearanceNumber;
+    @ApiModelProperty(value = "缺陷记录")
+    private String defectRecord;
+    @ApiModelProperty(value = "大修记录")
+    private String repairRecord;
+    @ApiModelProperty(value = "退出再重放记录")
+    private String exitPutIntoRecord;
 }

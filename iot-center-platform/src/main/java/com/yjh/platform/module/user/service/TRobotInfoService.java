@@ -11,6 +11,7 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ public class TRobotInfoService{
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TRobotInfoService.class);
     private SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -35,7 +38,11 @@ public class TRobotInfoService{
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TRobotInfo tRobotInfo) {
+    public int insert(TRobotInfo tRobotInfo,Long userId) {
+        String userName = tRobotInfoDao.selectUserName(userId);
+        tRobotInfo.setCreateBy(userName);
+        tRobotInfo.setCreateDate(new Date());
+        tRobotInfo.setRobotStatus("离线");
         return this.tRobotInfoDao.insert(tRobotInfo);
     }
 
@@ -47,7 +54,11 @@ public class TRobotInfoService{
 
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public int update(TRobotInfo tRobotInfo) {
+    public int update(TRobotInfo tRobotInfo,Long userId) {
+        String userName = tRobotInfoDao.selectUserName(userId);
+        tRobotInfo.setUpdateBy(userName);
+        tRobotInfo.setUpdateDate(new Date());
+
         return this.tRobotInfoDao.update(tRobotInfo);
     }
 
@@ -63,12 +74,13 @@ public class TRobotInfoService{
                                     String upRegionName, String lightIp, String lightPort, String lightUsername, String lightPassword,
                                    String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
                                    String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
-                                   Date commissionDateString, Long upRegionId, String robotPosition, String remarks,String robotSource,
-                                   String address,String buildingUser,String appearanceNumber) {
+                                   Date commissionDateString, Long upRegionId, String robotPosition, String robotSource,
+                                   String address,String buildingUser,String appearanceNumber,String defectRecord,String repairRecord,
+                                   String exitPutIntoRecord,String remarks) {
         List<TRobotInfo> tRobotInfoList = tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
                 upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
                 photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition,
-                robotSource,address,buildingUser,appearanceNumber,remarks);
+                robotSource,address,buildingUser,appearanceNumber,defectRecord,repairRecord,exitPutIntoRecord,remarks);
         return tRobotInfoList;
     }
 
@@ -87,10 +99,15 @@ public class TRobotInfoService{
     }
     @Logs(title = "从PMS系统同步机器人信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public boolean synchronizeFromPMS(String robotCode) throws Exception {
+    public boolean synchronizeFromPMS(String robotCode,Long userId) throws Exception {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+        String userName = tRobotInfoDao.selectUserName(userId);
 
+        Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+//        String filePathAndName = resMap.get("content") +  "/PMS/RobotPMS.xml";
         String filePathAndName = "D:/testform/PMS/机器人PMS系统.xml";
+        log.info("路径是==="+filePathAndName);
+
         SAXReader reader = new SAXReader();
         Document document = reader.read(new File(filePathAndName));
         //解析xml
@@ -129,14 +146,17 @@ public class TRobotInfoService{
                             .setInferadPort(Integer.valueOf(map.get("InferadPort").toString()))
                             .setInferadUsername(map.get("InferadUsername").toString())
                             .setInferadPassword(map.get("InferadPassword").toString())
-                            .setCommissionDate(sf.parse(map.get("commissionDate").toString()))
-                            .setRobotSource(map.get("robotStatus").toString())
-                            .setAddress(map.get("address").toString())
-                            .setBuildingUser(map.get("buildingUser").toString())
+                            .setUpdateBy(userName)
+                            .setUpdateDate(new Date())
                             .setRobotFactory(robotFactory)
                             .setIsUse(isUse)
+                            .setCommissionDate(sf.parse(map.get("commissionDate").toString()))
+                            .setRobotSource(map.get("robotSource").toString())
+                            .setAddress(map.get("address").toString())
+                            .setBuildingUser(map.get("buildingUser").toString())
                             .setRobotPosition(robotPosition)
-                            .setAppearanceNumber(map.get("appearanceNumber").toString());
+                            .setAppearanceNumber(map.get("appearanceNumber").toString())
+                            .setRemarks(map.get("remarks").toString());
                     log.info("tRobotInfo信息是==="+tRobotInfo);
                     tRobotInfoDao.update(tRobotInfo);
                     return true;

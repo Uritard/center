@@ -25,12 +25,12 @@ public class TCruiseDataResultDetail implements Serializable {
     private String deviceName;
     @ApiModelProperty(value = "检测内容")
     private String instanceName;
-    @ApiModelProperty(value = "结果")
-    private String identifyResult;
+    @ApiModelProperty(value = "巡视值")
+    private String resultNum;
     @ApiModelProperty(value = "图片")
-    private String picpath;
-    @ApiModelProperty(value = "巡检结果")
-    private String cruiseResult;
+    private String picPath;
+    @ApiModelProperty(value = "识别状态")
+    private String cruiseResultName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "巡检时间")
     private Date cruiseTime;

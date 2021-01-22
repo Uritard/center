@@ -64,17 +64,18 @@
 		e.cruise_result_id,
 		f.cruise_data_id,
 		a.device_id,
+		e.device_name,
 		b.device_mete_id,
 		d.instance_id,
+		e.instance_name,
 		b.mete_type,
 		w.dict_note as mete_type_name,
 		f.evaluation_state,
 		x.dict_note as evaluation_state_name,
-		e.device_name ,
-        e.instance_name,
-		h.dict_note as identify_result,
+		f.result_num,
 		f.origpic as picpath,
-		g.dict_note as cruise_result,
+		F.cruise_result,
+		g.dict_note as cruise_result_name,
 		e.cruise_time
 		FROM t_std_device a
 		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
@@ -83,7 +84,6 @@
 		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
 		LEFT JOIN t_cruise_result q on q.task_result_id = e.task_result_id
 		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
-		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
 		LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
 		LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
     </sql>
@@ -254,10 +254,9 @@
     <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
         SELECT
             a.task_name,
-            b.execute_time as cruise_date
+            a.execute_time as cruise_date
         from
             t_cruise_task a
-        LEFT JOIN t_cruise_result b on b.task_id = a.task_id
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>

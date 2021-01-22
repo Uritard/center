@@ -169,12 +169,14 @@ public class TCameraInfoController {
     public Result select(@RequestParam(value = "cameraId", required = false) Long cameraId,
                          @RequestParam(value = "cameraName", required = false) String cameraName,
                          @RequestParam(value = "cameraModel", required = false) Integer cameraModel,
+                         @RequestParam(value = "pmsId", required = false) String pmsId,
                          @RequestParam(value = "aliasName", required = false) String aliasName,
                          @RequestParam(value = "recordId", required = false) String recordId,
                          @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                          @RequestParam(value = "channelNum", required = false) Integer channelNum,
                          @RequestParam(value = "smsId", required = false) Integer smsId,
                          @RequestParam(value = "rmsId", required = false) Integer rmsId,
+                         @RequestParam(value = "monitorId", required = false) String monitorId,
                          @RequestParam(value = "vendorId", required = false) Integer vendorId,
                          @RequestParam(value = "streamType", required = false) Integer streamType,
                          @RequestParam(value = "protocolType", required = false) Integer protocolType,
@@ -189,8 +191,8 @@ public class TCameraInfoController {
                          @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, cameraModel,aliasName,
-                    recordId, upRegionId, channelNum, smsId, rmsId, vendorId, streamType, protocolType,
+            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
+                    recordId, upRegionId, channelNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType,
                     cameraIp,url, port, cameraType, isControl,latitude,longitude,address,unit);
             result.setData(list);
         } catch (Exception e) {
@@ -229,10 +231,10 @@ public class TCameraInfoController {
     }
     @ApiOperation(value = "从PMS系统同步摄像机信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
-    public Result synchronizeFromPMS(@RequestParam(value = "cameraCode") String cameraCode) {
+    public Result synchronizeFromPMS(@RequestParam(value = "pmsId") String pmsId) {
         Result result = new Result();
         try {
-            result.setData(tCameraInfoService.synchronizeFromPMS(cameraCode));
+            result.setData(tCameraInfoService.synchronizeFromPMS(pmsId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("从PMS系统同步摄像机信息失败描述：" + e);

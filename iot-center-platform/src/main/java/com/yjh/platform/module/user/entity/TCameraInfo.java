@@ -117,5 +117,9 @@ public class TCameraInfo implements Serializable {
     private Integer cameraModel;
     @ApiModelProperty(value = "单位")
     private String unit;
+    @ApiModelProperty(value = "PMS ID")
+    private String pmsId;
+    @ApiModelProperty(value = "检测点ID")
+    private String monitorId;
 
 }
