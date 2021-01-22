@@ -61,18 +61,18 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
         update t_robot_inspection a <set>
-        <if test="inspectionId != null and inspectionId != ''">a.inspection_id = #{inspectionId, jdbcType=BIGINT},</if>
-        <if test="inspectionCode != null and inspectionCode != ''">a.inspection_code = #{inspectionCode, jdbcType=VARCHAR},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
-        <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
+        <if test="inspectionId != null ">a.inspection_id = #{inspectionId},</if>
+        <if test="inspectionCode != null">a.inspection_code = #{inspectionCode},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
+        <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>
         <if test="inspectionType != null ">a.inspection_type = #{inspectionType, jdbcType=INTEGER},</if>
-        <if test="alarmTop != null and alarmTop != ''">a.alarm_top = #{alarmTop, jdbcType=VARCHAR},</if>
-        <if test="alarmBottom != null and alarmBottom != ''">a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR},</if>
-        <if test="defaultValue != null and defaultValue != ''">a.default_value = #{defaultValue, jdbcType=VARCHAR},</if>
+        <if test="alarmTop != null ">a.alarm_top = #{alarmTop},</if>
+        <if test="alarmBottom != null ">a.alarm_bottom = #{alarmBottom},</if>
+        <if test="defaultValue != null ">a.default_value = #{defaultValue},</if>
         <if test="inspectionPosition != null ">a.inspection_position = #{inspectionPosition, jdbcType=INTEGER},</if>
         <if test="collectStatus != null ">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
         <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
-        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="unit != null ">a.unit = #{unit},</if>
     </set>
             where a.inspection_id = #{inspectionId, jdbcType=BIGINT}
     </update>

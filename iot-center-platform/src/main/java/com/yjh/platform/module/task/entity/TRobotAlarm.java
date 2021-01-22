@@ -1,7 +1,10 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -29,17 +32,21 @@ public class TRobotAlarm implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人告警ID")
     @TableId(value = "robot_alarm_id", type = IdType.AUTO)
+    @TableField(value = "robot_alarm_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotAlarmId;
 
     @Length(max = 125,message = "alarmName长度必须小于等于125")
     @ApiModelProperty(value = "机器人本体告警名称")
+    @TableField(value = "alarm_name",updateStrategy = FieldStrategy.IGNORED)
     private String alarmName;
 
     @Max(value=999999999999999999l)
+     @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
     @Length(max = 32,message = "stationId长度必须小于等于32")
     @ApiModelProperty(value = "站所id")
+     @TableField(value = "station_id",updateStrategy = FieldStrategy.IGNORED)
     private String stationId;
 
     @Max(value=99)
@@ -52,10 +59,12 @@ public class TRobotAlarm implements Serializable {
 
     @Length(max = 256,message = "alarmInfo长度必须小于等于256")
     @ApiModelProperty(value = "告警具体信息")
+    @TableField(value = "alarm_info",updateStrategy = FieldStrategy.IGNORED)
     private String alarmInfo;
 
     @Past
     @ApiModelProperty(value = "告警时间")
+    @TableField(value = "alarm_time",updateStrategy = FieldStrategy.IGNORED)
     private Date alarmTime;
 
     @Max(value=9)
@@ -64,10 +73,12 @@ public class TRobotAlarm implements Serializable {
 
     @Length(max = 256,message = "dealInfo长度必须小于等于256")
     @ApiModelProperty(value = "处理信息")
+    @TableField(value = "deal_info",updateStrategy = FieldStrategy.IGNORED)
     private String dealInfo;
 
     @Length(max = 32,message = "dealPersonId长度必须小于等于32")
     @ApiModelProperty(value = "处理人ID")
+    @TableField(value = "deal_person_id",updateStrategy = FieldStrategy.IGNORED)
     private String dealPersonId;
 
     @Past
@@ -76,10 +87,12 @@ public class TRobotAlarm implements Serializable {
 
     @Length(max = 100,message = "positionStationNum长度必须小于等于100")
     @ApiModelProperty(value = "机器人告警时坐标X")
+    @TableField(value = "position_station_num",updateStrategy = FieldStrategy.IGNORED)
     private String positionStationNum;
 
     @Length(max = 100,message = "positionOffset长度必须小于等于100")
     @ApiModelProperty(value = "机器人告警时坐标Y")
+     @TableField(value = "position_offset",updateStrategy = FieldStrategy.IGNORED)
     private String positionOffset;
 
     @Max(value=9)
@@ -87,9 +100,11 @@ public class TRobotAlarm implements Serializable {
     private Integer alarmState;
 
     @Past
+    @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private Date createTime;
 
     @Past
+    @TableField(value = "end_time",updateStrategy = FieldStrategy.IGNORED)
     private Date endTime;
 
 

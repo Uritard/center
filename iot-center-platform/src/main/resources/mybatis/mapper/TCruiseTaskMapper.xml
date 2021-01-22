@@ -64,18 +64,18 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTask">
         update t_cruise_task a <set>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
-        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
-        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null">a.task_id = #{taskId},</if>
+        <if test="taskName != null">a.task_name = #{taskName},</if>
+        <if test="planId != null">a.plan_id = #{planId},</if>
+        <if test="areaId != null ">a.area_id = #{areaId},</if>
         <if test="type != null">a.type = #{type, jdbcType=INTEGER},</if>
         <if test="ifRun != null">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
-        <if test="dateType != null and dateType != ''">a.date_type = #{dateType, jdbcType=VARCHAR},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
+        <if test="dateType != null ">a.date_type = #{dateType},</if>
         <if test="taskType != null">a.task_type = #{taskType, jdbcType=INTEGER},</if>
         <if test="taskLevel != null">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
-        <if test="startTime != null and startTime != ''">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="startTime != null ">a.start_time = #{startTime},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
     </set>
             where a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>

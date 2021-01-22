@@ -46,13 +46,13 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.THisTelemeterData">
         update t_his_telemeter_data a <set>
-        <if test="id !=null and id != ''">a.id=#{id,jdbcType=BIGINT},</if>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="id !=null  ">a.id=#{id},</if>
+        <if test="meteId != null ">a.mete_id = #{meteId},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
         a.record_time = #{recordTime, jdbcType=TIMESTAMP},
         <if test="meteKind != null ">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
-        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
-        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+        <if test="meteValue != null ">a.mete_value = #{meteValue},</if>
+        <if test="lastMeteValue != null ">a.last_mete_value = #{lastMeteValue},</if>
     </set>
        where a.id=#{id,jdbcType=BIGINT}
     </update>

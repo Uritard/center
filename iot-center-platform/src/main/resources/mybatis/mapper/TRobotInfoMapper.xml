@@ -124,7 +124,7 @@
                 where robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
 
-    <update id="update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
+    "update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
         update t_robot_info a <set>
         <if test="robotId != null and robotId != ''"> a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="robotCode != null and robotCode != ''"> a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
