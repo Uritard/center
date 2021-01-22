@@ -3,6 +3,8 @@ package com.yjh.platform.module.task.entity;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,18 +31,22 @@ public class TCruiseResult implements Serializable {
 
     @Length(max = 50,message = "taskResultId长度必须小于等于50")
     @ApiModelProperty(value = "任务结果UUID")
+    @TableField(value = "task_result_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskResultId;
 
     @Length(max = 50,message = "taskId长度必须小于等于50")
     @ApiModelProperty(value = "巡检任务ID")
+    @TableField(value = "task_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskId;
 
     @Length(max = 50,message = "taskName长度必须小于等于50")
     @ApiModelProperty(value = "巡检任务ID")
+     @TableField(value = "task_name",updateStrategy = FieldStrategy.IGNORED)
     private String taskName;
 
     @Length(max = 32,message = "planName长度必须小于等于32")
     @ApiModelProperty(value = "区域id")
+    @TableField(value = "area_id",updateStrategy = FieldStrategy.IGNORED)
     private String areaId;
 
     @Max(value=999999999)
@@ -65,6 +71,7 @@ public class TCruiseResult implements Serializable {
 
     @Length(max = 128,message = "checkUser长度必须小于等于128")
     @ApiModelProperty(value = "审核人")
+    @TableField(value = "check_user",updateStrategy = FieldStrategy.IGNORED)
     private String checkUser;
 
     @Past
@@ -75,6 +82,7 @@ public class TCruiseResult implements Serializable {
 
     @Length(max = 255,message = "weather长度必须小于等于255")
     @ApiModelProperty(value = "微气象")
+    @TableField(value = "weatherTableField",updateStrategy = FieldStrategy.IGNORED)
     private String weather;
 
     @Past
@@ -91,10 +99,12 @@ public class TCruiseResult implements Serializable {
 
     @Length(max = 32,message = "taskCode长度必须小于等于32")
     @ApiModelProperty(value = "任务编码")
+    @TableField(value = "task_code",updateStrategy = FieldStrategy.IGNORED)
     private String taskCode;
 
     @Length(max = 256,message = "remark长度必须小于等于256")
     @ApiModelProperty(value = "备用字段3")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
 

@@ -37,10 +37,10 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraGroup">
         update t_camera_group a <set>
-        <if test="groupId != null and groupId != ''">a.group_id = #{groupId, jdbcType=BIGINT},</if>
-        <if test="groupName != null and groupName != ''">a.group_name = #{groupName, jdbcType=VARCHAR},</if>
+        <if test="groupId != null ">a.group_id = #{groupId},</if>
+        <if test="groupName != null">a.group_name = #{groupName},</if>
         <if test="cameraIds != null">a.camera_ids = #{cameraIds, jdbcType=VARCHAR},</if>
-        <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
+        <if test="remarks != null ">a.remarks = #{remarks},</if>
     </set>
             where a.group_id = #{groupId, jdbcType=BIGINT}
     </update>

@@ -1,6 +1,8 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -31,22 +33,27 @@ public class TCfgUnionRule implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "规则编号")
     @TableId(value = "rule_id", type = IdType.AUTO)
+    @TableField(value = "rule_id",updateStrategy = FieldStrategy.IGNORED)
     private Long ruleId;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "预案id")
+    @TableField(value = "plan_id",updateStrategy = FieldStrategy.IGNORED)
     private Long planId;
 
     @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "规则名称")
+    @TableField(value = "rule_name",updateStrategy = FieldStrategy.IGNORED)
     private String ruleName;
 
     @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "是否生成联动监控弹窗0.不生成   1.生成")
+    @TableField(value = "rule_type",updateStrategy = FieldStrategy.IGNORED)
     private String ruleType;
 
     @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "具体治理规则")
+    @TableField(value = "rule_content",updateStrategy = FieldStrategy.IGNORED)
     private String ruleContent;
 
     @Max(value=999999999)
@@ -55,9 +62,11 @@ public class TCfgUnionRule implements Serializable {
 
     @Length(max = 500,message = "description长度必须小于等于500")
     @ApiModelProperty(value = "描述")
+      @TableField(value = "description",updateStrategy = FieldStrategy.IGNORED)
     private String description;
 
     @ApiModelProperty(value = "入参数据,meteId,meteName")
+     @TableField(value = "input_param",updateStrategy = FieldStrategy.IGNORED)
     private String inputParam;
 
     @Past

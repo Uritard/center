@@ -1,7 +1,10 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -30,18 +33,22 @@ public class TCfgAlarmCurrent implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "告警流水号")
     @TableId(value = "alarm_no", type = IdType.AUTO)
+    @TableField(value = "alarm_no",updateStrategy = FieldStrategy.IGNORED)
     private Long alarmNo;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备编号")
+    @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
     @Length(max = 32,message = "cunstomId长度必须小于等于32")
     @ApiModelProperty(value = "部位ID")
+     @TableField(value = "cunstom_id",updateStrategy = FieldStrategy.IGNORED)
     private String cunstomId;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "监控量编号")
+    @TableField(value = "mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long meteId;
 
     @Past
@@ -54,18 +61,22 @@ public class TCfgAlarmCurrent implements Serializable {
 
     @Length(max = 100,message = "alarmValue长度必须小于等于100")
     @ApiModelProperty(value = "告警值")
+    @TableField(value = "alarm_value",updateStrategy = FieldStrategy.IGNORED)
     private String alarmValue;
 
     @Length(max = 128,message = "alarmDesc长度必须小于等于128")
     @ApiModelProperty(value = "告警描述")
+    @TableField(value = "alarm_desc",updateStrategy = FieldStrategy.IGNORED)
     private String alarmDesc;
 
     @Max(value=999999999)
     @ApiModelProperty(value = "确认状态")
+
     private Integer confirmState;
 
     @Length(max = 50,message = "confirmPeople长度必须小于等于50")
     @ApiModelProperty(value = "确认人")
+    @TableField(value = "confirm_people",updateStrategy = FieldStrategy.IGNORED)
     private String confirmPeople;
 
     @Past
@@ -74,6 +85,7 @@ public class TCfgAlarmCurrent implements Serializable {
 
     @Length(max = 128,message = "confirmRemark长度必须小于等于128")
     @ApiModelProperty(value = "确认说明")
+     @TableField(value = "confirm_remark",updateStrategy = FieldStrategy.IGNORED)
     private String confirmRemark;
 
     @Max(value=999999999)
@@ -86,14 +98,17 @@ public class TCfgAlarmCurrent implements Serializable {
 
     @Length(max = 20,message = "meteCode长度必须小于等于20")
     @ApiModelProperty(value = "信号标准化编码")
+     @TableField(value = "mete_code",updateStrategy = FieldStrategy.IGNORED)
     private String meteCode;
 
     @Length(max = 11,message = "isClear长度必须小于等于11")
     @ApiModelProperty(value = "告警状态")
+    @TableField(value = "is_clear",updateStrategy = FieldStrategy.IGNORED)
     private String isClear;
 
     @Length(max = 20,message = "showType长度必须小于等于20")
     @ApiModelProperty(value = "显示类型")
+     @TableField(value = "show_type",updateStrategy = FieldStrategy.IGNORED)
     private String showType;
 
     @Past
