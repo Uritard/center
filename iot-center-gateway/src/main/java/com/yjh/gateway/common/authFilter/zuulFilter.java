@@ -49,13 +49,13 @@ public class zuulFilter extends ZuulFilter {
                     jsonModel.put(param.getKey(), ((String[]) param.getValue())[0]);
                 }
             }
-            StringBuilder sb = new StringBuilder();
-            if (null != jsonModel.toJSONString()) {
-                for (char c : jsonModel.toJSONString().toCharArray()) {
-                    sb.append(Integer.toUnsignedString(c, 10));
-                }
-            }
-            String token = Demo.summary(sb.toString());
+//            StringBuilder sb = new StringBuilder();
+//            if (null != jsonModel.toJSONString()) {
+//                for (char c : jsonModel.toJSONString().toCharArray()) {
+//                    sb.append(Integer.toUnsignedString(c, 10));
+//                }
+//            }
+            String token = Demo.summary(jsonModel.toJSONString());
             if (!token.equals(tokenStr)) {
                 log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的token: " + token);
                 //throw new RuntimeException("参数篡改");
@@ -86,11 +86,11 @@ public class zuulFilter extends ZuulFilter {
             String token = request.getHeader("webcode") != null ? request.getHeader("webcode") : "";
             log.info("进入参数校验--------------原始token : " + token);
             String buliderString = stringBuilder.toString();
-            StringBuilder sb = new StringBuilder();
-            for (char c : buliderString.toCharArray()) {
-                sb.append(Integer.toUnsignedString(c, 10));
-            }
-            String tokens = Demo.summary(sb.toString());
+//            StringBuilder sb = new StringBuilder();
+//            for (char c : buliderString.toCharArray()) {
+//                sb.append(Integer.toUnsignedString(c, 10));
+//            }
+            String tokens = Demo.summary(buliderString);
             log.info("进入参数校验--------------后端解析token : " + tokens);
             if (!tokens.equals(token)) {
                 ctx.setSendZuulResponse(false);

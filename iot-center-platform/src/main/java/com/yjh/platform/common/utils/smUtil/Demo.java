@@ -11,67 +11,56 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 /**
- * @ClassName: DemoMain
  * @Description: TODO(国密SM2签名验签 / SM3报文摘要)
- * @date 2019年5月10日
  */
 public class Demo {
-    //	// 国密规范测试用户ID
-//	private static final String userId = "rzx";
-//	// 国密规范测试私钥
-//	private static final String prik = "211E7686A0BCAFF554F0FD366F428E40A2C4FC1AB6E7E7F74E8696494B723AA2";
-//	//国密规范测试公钥
-//	private static final String pubk = "0402B1B28FB8C84696417DD172FBA233DEB751D871772BDE2A48E7964CDFE468DC02197EB57F20FDF341860B9A2006E76377AC2507D454BC217D3F22D611284D15";
-//
-// 国密规范测试用户ID
+
+    // 国密规范测试用户ID
     private static final String userId = "rzx";
     // 国密规范测试私钥
     private static final String prik = "055C74CFB227BD9CDFF242D233096BC6FDBAFB59D001D5EE7F857ADFC6BF1501";
-    //"211E7686A0BCAFF554F0FD366F428E40A2C4FC1AB6E7E7F74E8696494B723AA2";
     //国密规范测试公钥
     private static final String pubk = "04673FC4F3D41C9470E32AABCB5A958E2CE528959F373D0F7AB2B82E65BF4DE8FB67716A269993585451888C8450E92A75A6C34EDFF748097BEAD8E41C2976E8AA";
-    //"0402B1B28FB8C84696417DD172FBA233DEB751D871772BDE2A48E7964CDFE468DC02197EB57F20FDF341860B9A2006E76377AC2507D454BC217D3F22D611284D15";
 
-    public static void main(String[] arg) {
-//		Result msg =new Result();
-        //createKey();
-        String msg = "123456789";//原始数据
-        System.out.println("原始数据：" + msg);
-        String summaryString = summary(String.valueOf(msg));
-        System.out.println("摘要：" + summaryString);
-        String signString = sign(summaryString);
-        System.out.println("摘要签名：" + signString);
-        boolean status = verify(summaryString, signString);
-        System.out.println("验签结果：" + status);
 
-        System.out.println("加密: ");
-        byte[] cipherText = null;
-        try {
-            cipherText = SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), String.valueOf(msg).getBytes());
-        } catch (IllegalArgumentException e1) {
-            // TODO 自动生成的 catch 块
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            // TODO 自动生成的 catch 块
-            e1.printStackTrace();
-        }
-        System.out.println(new String(Base64.encode(cipherText)));
-        System.out.println("");
-
-        System.out.println("解密: ");
-        String res = null;
-        try {
-            res = new String(SM2Utils.decrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(prik))).getBytes()), cipherText));
-        } catch (IllegalArgumentException e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        System.out.println(res);
-
-    }
+//    public static void main(String[] arg) {
+//        String msg = "123456789";//原始数据
+//        System.out.println("原始数据：" + msg);
+//        String summaryString = summary(String.valueOf(msg));
+//        System.out.println("摘要：" + summaryString);
+//        String signString = sign(summaryString);
+//        System.out.println("摘要签名：" + signString);
+//        boolean status = verify(summaryString, signString);
+//        System.out.println("验签结果：" + status);
+//
+//        System.out.println("加密: ");
+//        byte[] cipherText = null;
+//        try {
+//            cipherText = SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), String.valueOf(msg).getBytes());
+//        } catch (IllegalArgumentException e1) {
+//            // TODO 自动生成的 catch 块
+//            e1.printStackTrace();
+//        } catch (IOException e1) {
+//            // TODO 自动生成的 catch 块
+//            e1.printStackTrace();
+//        }
+//        System.out.println(new String(Base64.encode(cipherText)));
+//        System.out.println("");
+//
+//        System.out.println("解密: ");
+//        String res = null;
+//        try {
+//            res = new String(SM2Utils.decrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(prik))).getBytes()), cipherText));
+//        } catch (IllegalArgumentException e) {
+//            // TODO 自动生成的 catch 块
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            // TODO 自动生成的 catch 块
+//            e.printStackTrace();
+//        }
+//        System.out.println(res);
+//
+//    }
 
     /**
      * 摘要
