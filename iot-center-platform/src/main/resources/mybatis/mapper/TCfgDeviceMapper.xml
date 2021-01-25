@@ -395,7 +395,7 @@
         )
     </insert>
 
-    "updateForAll" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
+    <update id="updateForAll" parameterType="com.yjh.platform.module.device.entity.SYAllInfo">
         update t_cfg_device a <set>
         <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
         <if test="deviceName != null and deviceName != ''">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>

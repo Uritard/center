@@ -257,4 +257,34 @@ public class TRobotInfoController {
         }
         return result;
     }
+    @ApiOperation(value = "从PMS系统同步机器人台账信息2")
+    @RequestMapping(value = "/synchronizeFromPMS2", method = RequestMethod.GET)
+    public Result synchronizeFromPMS2() {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInfoService.synchronizeFromPMS2());
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("发生异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("发生错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "读取从PMS系统获取的文件再生成xml")
+    @RequestMapping(value = "/generateXMLByFile", method = RequestMethod.GET)
+    public Result generateXMLByFile() {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInfoService.generateXMLByFile());
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("发生异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("发生错误:", e);
+        }
+        return result;
+    }
 }
