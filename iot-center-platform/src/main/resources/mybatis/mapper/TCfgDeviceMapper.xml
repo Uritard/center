@@ -52,15 +52,15 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCfgDevice">
         update t_cfg_device a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
-        <if test="deviceName != null and deviceName != ''">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
-        <if test="stationId != null and stationId != ''">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
-        <if test="relationCode != null and relationCode != ''">a.relation_code = #{relationCode, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="deviceName != null ">a.device_name = #{deviceName},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType},</if>
+        <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
+        <if test="stationId != null ">a.station_id = #{stationId},</if>
+        <if test="relationCode != null ">a.relation_code = #{relationCode},</if>
+        <if test="createTime != null">a.create_time = #{createTime},</if>
+        <if test="updateTime != null ">a.update_time = #{updateTime},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>

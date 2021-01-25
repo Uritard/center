@@ -40,11 +40,11 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruisePointAttr">
         update t_cruise_point_attr a <set>
-        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="instanceName != null and instanceName != ''">a.instance_name = #{instanceName, jdbcType=VARCHAR},</if>
-        <if test="attrName != null and attrName != ''">a.attr_name = #{attrName, jdbcType=VARCHAR},</if>
-        <if test="attrValue != null and attrValue != ''">a.attr_value = #{attrValue, jdbcType=VARCHAR},</if>
-        <if test="remark1 != null and remark1 != ''">a.remark1 = #{remark1, jdbcType=VARCHAR},</if>
+        <if test="instanceId != null ">a.instance_id = #{instanceId},</if>
+        <if test="instanceName != null ">a.instance_name = #{instanceName},</if>
+        <if test="attrName != null ">a.attr_name = #{attrName},</if>
+        <if test="attrValue != null ">a.attr_value = #{attrValue},</if>
+        <if test="remark1 != null ">a.remark1 = #{remark1},</if>
     </set>
             where a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>

@@ -67,19 +67,19 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruisePlanAttr">
         update t_cruise_plan_attr a <set>
-        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
-        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="planId != null ">a.plan_id = #{planId},</if>
+        <if test="instanceId != null ">a.instance_id = #{instanceId},</if>
         <if test="pointType != null">a.point_type = #{pointType, jdbcType=INTEGER},</if>
-        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="cruiseRegionIds != null and cruiseRegionIds != ''">a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR},</if>
+        <if test="areaId != null ">a.area_id = #{areaId},</if>
+        <if test="cruiseRegionIds != null ">a.cruise_region_ids = #{cruiseRegionIds},</if>
         <if test="exceptionType != null">a.exception_type = #{exceptionType, jdbcType=INTEGER},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
-        <if test="position != null and position != ''">a.position = #{position, jdbcType=VARCHAR},</if>
-        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
-        <if test="inferadAnalyze != null and inferadAnalyze != ''">a.inferad_analyze = #{inferadAnalyze, jdbcType=VARCHAR},</if>
-        <if test="irTempBox != null and irTempBox != ''">a.ir_temp_box = #{irTempBox, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
+        <if test="position != null ">a.position = #{position},</if>
+        <if test="algorithmId != null ">a.algorithm_id = #{algorithmId},</if>
+        <if test="inferadAnalyze != null ">a.inferad_analyze = #{inferadAnalyze},</if>
+        <if test="irTempBox != null ">a.ir_temp_box = #{irTempBox},</if>
+        <if test="createTime != null">a.create_time = #{createTime},</if>
+        <if test="updateTime != null ">a.update_time = #{updateTimeP},</if>
         <if test="subType != null">a.sub_type = #{subType, jdbcType=INTEGER},</if>
     </set>
             where a.plan_id = #{planId, jdbcType=BIGINT}

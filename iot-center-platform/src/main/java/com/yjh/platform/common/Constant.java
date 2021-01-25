@@ -53,5 +53,7 @@ public class Constant {
 
     public static Map<String,String> userInfo= new HashMap<>();
 
+    public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
+    public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
 
 }

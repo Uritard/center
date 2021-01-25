@@ -6,8 +6,11 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -156,6 +159,9 @@ public class TRobotInfoService{
                             .setBuildingUser(map.get("buildingUser").toString())
                             .setRobotPosition(robotPosition)
                             .setAppearanceNumber(map.get("appearanceNumber").toString())
+                            .setDefectRecord(map.get("defectRecord").toString())
+                            .setRepairRecord(map.get("repairRecord").toString())
+                            .setExitPutIntoRecord(map.get("exitPutIntoRecord").toString())
                             .setRemarks(map.get("remarks").toString());
                     log.info("tRobotInfo信息是==="+tRobotInfo);
                     tRobotInfoDao.update(tRobotInfo);
@@ -165,7 +171,11 @@ public class TRobotInfoService{
         }
         return false;
     }
-
+    @Logs(title = "批量插入", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int lookRobotRecord(List<TRobotInfo> list) {
+        return this.tRobotInfoDao.batchInsert(list);
+    }
     @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectInspectionTree() {
@@ -216,5 +226,123 @@ public class TRobotInfoService{
         }
         return i;
     }
+    @Logs(title = "从PMS系统同步机器人信息2", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int synchronizeFromPMS2() throws IOException{
+        BufferedReader br = null;
+        InputStreamReader in = null;
+        String filePath = "D:/testform/PMS/PMS.txt";
+        try  {
+            in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
+            br = new BufferedReader(in);
+            String line;
+            String[] strArray = null;
+            List<TRobotInfo> list = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                if(line.contains("#")){
+                    strArray = line.split("\\s+");
+                    if("".equals(strArray[0])){
+                        strArray= Arrays.copyOfRange(strArray,1,strArray.length);
+                    }
+                    //取数据
+                    String robotFactory = tRobotInfoDao.selectDictCode("robot_factory",strArray[3]);
+                    String isUse = tRobotInfoDao.selectDictCode("robot_use",strArray[4]);
+                    Integer robotType = Integer.valueOf(tRobotInfoDao.selectDictCode("robot_type",strArray[2]));
 
+                    TRobotInfo tRobotInfo = new TRobotInfo();
+                    tRobotInfo.setRobotCode(strArray[1]);
+                    tRobotInfo.setRobotType(robotType);
+                    tRobotInfo.setRobotFactory(robotFactory);
+                    tRobotInfo.setIsUse(isUse);
+                    list.add(tRobotInfo);
+                }
+            }
+            log.info("准备插库的结果是==="+list);
+            br.close();
+            in.close();
+        }catch (IOException e) {
+            log.info("读取文件错误: "+e);
+        } finally {
+            if(br != null ){
+                br.close();
+            }
+            if(in != null ){
+                in.close();
+            }
+
+        }
+        return 1;
+    }
+
+    @Logs(title = "读取从PMS系统获取的文件再生成xml", code = "module")
+    @Transactional(rollbackFor = Exception.class)
+    public int generateXMLByFile() throws IOException {
+        BufferedReader br = null;
+        InputStreamReader in = null;
+        String filePath = "D:/testform/PMS/PMS.txt";
+        try {
+            //读取文件
+            in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
+            br = new BufferedReader(in);
+            String line;
+            String[] strArray = null;
+            Document document = DocumentHelper.createDocument();
+            Element rss = document.addElement("Robot");
+            while ((line = br.readLine()) != null) {
+                if (line.contains("#")) {
+                    strArray = line.split("\\s+");
+                    if ("".equals(strArray[0])) {
+                        strArray = Arrays.copyOfRange(strArray, 1, strArray.length);
+                    }
+                    Element items = rss.addElement("items");
+                    items.addAttribute("robotCode", strArray[1]);
+                    Element robotType = items.addElement("robotType");
+                    robotType.setText(strArray[2]);
+                    Element robotFactory = items.addElement("robotFactory");
+                    robotFactory.setText(strArray[3]);
+                    Element isUse = items.addElement("isUse");
+                    isUse.setText(strArray[4]);
+                    Element commissionDate = items.addElement("commissionDate");
+                    commissionDate.setText(strArray[5]);
+                    Element robotSource = items.addElement("robotSource");
+                    robotSource.setText(strArray[6]);
+                    Element address = items.addElement("address");
+                    address.setText(strArray[7]);
+                    Element buildingUser = items.addElement("buildingUser");
+                    buildingUser.setText(strArray[8]);
+                    Element appearanceNumber = items.addElement("appearanceNumber");
+                    appearanceNumber.setText(strArray[9]);
+                    Element defectRecord = items.addElement("defectRecord");
+                    defectRecord.setText(strArray[10]);
+                    Element repairRecord = items.addElement("repairRecord");
+                    repairRecord.setText(strArray[11]);
+                    Element exitPutIntoRecord = items.addElement("exitPutIntoRecord");
+                    exitPutIntoRecord.setText(strArray[12]);
+                }
+            }
+            br.close();
+            in.close();
+
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            format.setEncoding("UTF-8");
+            //生成xml文件
+            File file = new File("D:/testform/Robot_PMS_System.xml");
+            XMLWriter writer = new XMLWriter(new FileOutputStream(file), format);
+            writer.setEscapeText(false);
+            writer.write(document);
+            writer.close();
+            System.out.println("生成Robot_PMS_System.xml成功");
+
+        } catch (IOException e) {
+            log.info("读取文件错误: "+e);
+        } finally {
+            if(br != null ){
+                br.close();
+            }
+            if(in != null ){
+                in.close();
+            }
+        }
+        return 1;
+    }
 }

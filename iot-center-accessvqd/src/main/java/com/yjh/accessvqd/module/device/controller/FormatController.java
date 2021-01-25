@@ -5,8 +5,12 @@ import com.yjh.accessvqd.commons.result.BusinessException;
 import com.yjh.accessvqd.commons.result.Result;
 import com.yjh.accessvqd.commons.result.ResultCodeEnum;
 import com.yjh.accessvqd.commons.utils.weatherUtils.ParamConfig;
+import com.yjh.accessvqd.commons.utils.xmlAnalyse.PlatformXMLUtil;
+import com.yjh.accessvqd.module.device.entity.XMLBaseModel;
 import com.yjh.accessvqd.module.device.service.FormatService;
 import com.yjh.accessvqd.module.device.entity.Format;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -182,4 +186,25 @@ public class FormatController {
         return result;
     }
 
+
+    @ApiOperation(value = "视频诊断测试")
+    @RequestMapping(value = "/vqdTest",method = RequestMethod.GET)
+    public Result vqdTest(){
+        Result result=new Result();
+        XMLBaseModel xmlBaseModel=new XMLBaseModel();
+        List<String> items=new ArrayList<>();
+        items.add("900");
+        items.add("1000");
+        xmlBaseModel.setCode("1");
+        xmlBaseModel.setCommand("dajksdh");
+        xmlBaseModel.setReceiveCode("10011");
+        xmlBaseModel.setReceiveCode("99");
+        xmlBaseModel.setType("996");
+        xmlBaseModel.setTime("2021-01-01");
+        xmlBaseModel.setSendCode("233333");
+        xmlBaseModel.setItems(items);
+        result.setData(PlatformXMLUtil.generateXml(xmlBaseModel));
+
+        return  result;
+    }
 }

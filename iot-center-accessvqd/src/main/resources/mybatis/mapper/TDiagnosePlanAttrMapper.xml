@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessvqd.module.diagnose.dao.TDiagnosePlanAttrDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
+        <id column="diagnose_plan_id" jdbcType="VARCHAR" property="diagnosePlanId" />
+        <result column="channel_id" jdbcType="VARCHAR" property="channelId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        diagnose_plan_id, channel_id
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="diagnosePlanId" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
+        insert into t_diagnose_plan_attr(
+            diagnose_plan_id,
+            channel_id
+        )values(
+                #{diagnosePlanId, jdbcType=VARCHAR},
+                #{channelId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_diagnose_plan_attr
+                where diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
+        update t_diagnose_plan_attr a <set>
+        <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR},</if>
+        <if test="channelId != null and channelId != ''">a.channel_id = #{channelId, jdbcType=VARCHAR},</if>
+    </set>
+            where a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
+        select
+        a.diagnose_plan_id,
+        a.channel_id
+        from t_diagnose_plan_attr a
+        where 1 = 1
+            and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
+        select
+        a.diagnose_plan_id,
+        a.channel_id
+        from t_diagnose_plan_attr a
+        where 1 = 1
+        <if test="diagnosePlanId != null and diagnosePlanId != ''"> and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+        <if test="channelId != null and channelId != ''"> and a.channel_id = #{channelId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
+        select
+        a.diagnose_plan_id,
+        a.channel_id
+        from t_diagnose_plan_attr a
+        where 1 = 1
+        <if test="diagnosePlanId != null and diagnosePlanId != ''"> and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+        <if test="channelId != null and channelId != ''"> and a.channel_id = #{channelId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_diagnose_plan_attr(
+            diagnose_plan_id,
+            channel_id
+        )values
+        <foreach collection="list" item="TDiagnosePlanAttr" separator=",">
+            (
+                #{TDiagnosePlanAttr.diagnosePlanId, jdbcType=VARCHAR},
+                #{TDiagnosePlanAttr.channelId, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

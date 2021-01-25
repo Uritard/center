@@ -119,14 +119,14 @@
         </foreach>
     </delete>
 
-    <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
+       <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
         update t_camera_info a <set>
-        <if test="cameraName != null and cameraName != ''">a.camera_name = #{cameraName, jdbcType=VARCHAR},</if>
+        <if test="cameraName != null ">a.camera_name = #{cameraName},</if>
         <if test="cameraModel != null ">a.camera_model = #{cameraModel, jdbcType=INTEGER},</if>
-        <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
-        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
-        <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=BIGINT},</if>
-        <if test="upRegionId != null and upRegionId != ''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+        <if test="pmsId != null ">a.pms_id = #{pmsId},</if>
+        <if test="aliasName != null">a.alias_name = #{aliasName},</if>
+        <if test="recordId != null ">a.record_id = #{recordId},</if>
+        <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
         <if test="channelNum != null">a.channel_num = #{channelNum, jdbcType=INTEGER},</if>
         <if test="smsId != null">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
         <if test="rmsId != null">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
@@ -134,15 +134,15 @@
         <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=VARCHAR},</if>
         <if test="streamType != null">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
-        <if test="cameraIp != null and cameraIp != ''">a.camera_ip = #{cameraIp, jdbcType=VARCHAR},</if>
+        <if test="cameraIp != null ">a.camera_ip = #{cameraIp},</if>
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
         <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
         <if test="isControl != null">a.is_control = #{isControl, jdbcType=INTEGER},</if>
-        <if test="address != null and address != ''">a.address = #{address, jdbcType=VARCHAR},</if>
+        <if test="address != null ">a.address = #{address},</if>
         <if test="latitude != null">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null ">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
-        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="unit != null and">a.unit = #{unit},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>
@@ -316,6 +316,28 @@
         FROM t_camera_info a
         WHERE 1 = 1
         <if test="pmsId != null and pmsId != ''">and a.pms_id = #{pmsId,jdbcType = VARCHAR}</if>
+    </select>
+
+    <select id="selectNVRNode" resultType="com.yjh.platform.module.device.entity.NVRChannelTree">
+        SELECT
+        record_name as 'label',
+        record_id as 'id'
+    FROM
+        t_camera_recorder
+    </select>
+
+    <select id="selectChannelNode" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.NVRChannelTree">
+        SELECT
+            a.camera_name as 'label',
+            a.monitor_id as 'id',
+            a.record_id as 'upId',
+            2 as 'level'
+        FROM
+            t_camera_info a
+        WHERE
+            a.record_id = #{recordId,jdbcType=BIGINT}
+            and a.monitor_id IS NOT NULL;
+
     </select>
 
 

@@ -5,6 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
+
+import com.alibaba.druid.util.StringUtils;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Sets;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -21,8 +26,14 @@ import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 
@@ -48,6 +59,8 @@ public class TCruiseResultService{
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+
+    private RedisTemplate redisTemplate;
 
 
     @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
@@ -375,8 +388,46 @@ public class TCruiseResultService{
     @Logs(title = "查询正在执行中的任务",code = "cruiseResult",content = "查询正在执行中的任务")
     @Transactional(rollbackFor = Exception.class)
     public List<TaskSimpleInfo> selectTaskIsRunning(){
-        return this.tCruiseResultDao.selectTaskIsRunning();
+        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
+        for(TaskSimpleInfo temTask:novelTaskList){
+            List<Long> counts=tCruiseResultDao.cruiseInspectCount(temTask.getTaskId());
+            temTask.setDeviceMeteCount(counts.get(0));
+            temTask.setCameraCount(counts.get(1));
+            temTask.setRobotPointsCount(counts.get(2));
+
+        }
+
+        return novelTaskList ;
     }
-    
+
+
+
+
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
+    }
+
+
 }
 

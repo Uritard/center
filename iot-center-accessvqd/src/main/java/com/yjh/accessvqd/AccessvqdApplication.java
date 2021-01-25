@@ -1,14 +1,20 @@
 package com.yjh.accessvqd;
 
-import com.yjh.accessvqd.commons.utils.weatherUtils.ParamConfig;
-import com.yjh.accessvqd.thread.ListerThread;
+import com.yjh.accessvqd.module.diagnose.dao.TDiagnosePlanDao;
+import com.yjh.accessvqd.module.diagnose.service.ChanResultService;
+import com.yjh.accessvqd.module.diagnose.service.PlansService;
+import com.yjh.accessvqd.socket.SocketServerListenHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.session.data.redis.config.ConfigureRedisAction;
 
 /**
  * @Description
@@ -21,15 +27,31 @@ import org.springframework.context.annotation.ComponentScan;
 @Slf4j
 public class AccessvqdApplication implements CommandLineRunner {
 
+    @Autowired
+    private ChanResultService chanResultService;
+
+    @Autowired
+    private TDiagnosePlanDao tDiagnosePlanDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     public static void main(String[] args) {
         SpringApplication.run(AccessvqdApplication.class, args);
     }
 
     @Override
     public void run(String... strings) throws Exception {
-        ParamConfig paramConfig = new ParamConfig("COM3", 19200, 0, 8, 1);
-        Thread thread = new ListerThread(paramConfig);
-        thread.start();
+        SocketServerListenHandler socketServerListenHandler=new SocketServerListenHandler(18725,chanResultService,tDiagnosePlanDao,redisTemplate);
+        socketServerListenHandler.listenClientConnect();
+        log.info("socket服务开启------------------------");
     }
+
+
+//    @Bean
+//    public static ConfigureRedisAction configureRedisAction() {
+//        return ConfigureRedisAction.NO_OP;
+//    }
+
 
 }

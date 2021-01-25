@@ -134,18 +134,18 @@
         update t_std_devicemete a <set>
         <if test="deviceMeteId != null">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="customType != null and customType != ''">a.custom_id = #{customType, jdbcType=VARCHAR},</if>
+        <if test="customType != null">a.custom_id = #{customType},</if>
         <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="meteKind != null and meteKind != ''">a.mete_kind = #{meteKind, jdbcType=VARCHAR},</if>
+        <if test="meteKind != null ">a.mete_kind = #{meteKind},</if>
         <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="meteName != null">a.mete_name = #{meteName},</if>
         <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
         <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
-        <if test="positionType != null and positionType != ''">a.position_type = #{positionType, jdbcType=VARCHAR},</if>
+        <if test="positionType != null ">a.position_type = #{positionType},</if>
         <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
-        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
-        <if test="alarmNote != null and alarmNote != ''">a.alarm_note = #{alarmNote, jdbcType=VARCHAR},</if>
-        <if test="alarmType != null and alarmType != ''">a.alarm_type = #{alarmType, jdbcType=VARCHAR},</if>
+        <if test="unit != null ">a.unit = #{unit},</if>
+        <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
+        <if test="alarmType != null '">a.alarm_type = #{alarmType},</if>
         <if test="upEffect != null">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=REAL},</if>
         <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
@@ -161,11 +161,11 @@
         <if test="alarmCnt != null ">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
         <if test="thresholdAbs != null ">a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},</if>
         <if test="thresholdPer != null ">a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},</if>
-        <if test="meteType != null and meteType != ''">a.mete_type = #{meteType, jdbcType=VARCHAR},</if>
+        <if test="meteType != null ">a.mete_type = #{meteType},</if>
         <if test="modulus != null">a.modulus = #{modulus, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
-        <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR},</if>
-        <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
+        <if test="stateZero != null ">a.state_zero = #{stateZero},</if>
+        <if test="stateOne != null ">a.state_one = #{stateOne},</if>
         <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
 
     </set>

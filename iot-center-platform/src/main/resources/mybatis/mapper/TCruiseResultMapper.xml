@@ -91,10 +91,10 @@
     </select>
     <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update t_cruise_data_result set
-        <if test="personCheck != null and personCheck != ''">person_check = #{personCheck,jdbcType=VARCHAR},</if>
+        <if test="personCheck != null ">person_check = #{personCheck},</if>
         <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
         evaluation_state = 256,
-        <if test="checkUser != null and checkUser != ''">check_user = #{checkUser,jdbcType=VARCHAR},</if>
+        <if test="checkUser != null ">check_user = #{checkUser},</if>
         <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
         <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
         where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
@@ -164,22 +164,22 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseResult">
         update t_cruise_result a <set>
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
-        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="taskResultId != null ">a.task_result_id = #{taskResultId},</if>
+        <if test="taskId != null">a.task_id = #{taskId},</if>
+        <if test="taskName != null">a.task_name = #{taskName},</if>
+        <if test="areaId != null">a.area_id = #{areaId},</if>
         <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
         <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
         <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
         <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
         <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
-        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkUser != null ">a.check_user = #{checkUser},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP},
-        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
+        <if test="weather != null">a.weather = #{weather},</if>
         a.create_time = #{createTime, jdbcType=TIMESTAMP},
         a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
-        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="taskCode != null ">a.task_code = #{taskCode},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
     </update>
@@ -542,7 +542,7 @@
 
     <update id="updateCheck">
         update t_cruise_result a <set>
-        <if test="checkUserName != null and checkUserName != ''">a.check_user = #{checkUserName, jdbcType=VARCHAR},</if>
+        <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP}
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
@@ -550,13 +550,13 @@
 
     <update id="updateWarnInfo">
         UPDATE t_warn_info a <set>
-        <if test="warnName != null and warnName != ''">a.warn_name = #{warnName, jdbcType=VARCHAR},</if>
+        <if test="warnName != null">a.warn_name = #{warnName},</if>
         <if test="warnLevel != null">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
-        <if test="warnContent != null and warnContent != ''">a.warn_content = #{warnContent, jdbcType=VARCHAR},</if>
+        <if test="warnContent != null ">a.warn_content = #{warnContent},</if>
          a.conf_mode = 275,
          a.deal_type = 286,
-        <if test="outRange != null and outRange != ''">a.out_range = #{outRange, jdbcType=VARCHAR},</if>
-        <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        <if test="outRange != null ">a.out_range = #{outRange},</if>
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
     </set>
         WHERE
@@ -569,7 +569,7 @@
         a.conf_mode = 275,
         a.deal_type = 287,
         a.deal_info = "程序异常，告警误报",
-        <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
         a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
         </set>
         WHERE
@@ -610,6 +610,57 @@
         SELECT b.analyse_type FROM t_algorithm_conf a
 	        LEFT JOIN t_algorithm_info b ON a.algorithm_id = b.algorithm_id
 	        WHERE a.preset_id = #{presetId, jdbcType = BIGINT}
+    </select>
+
+    <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+            count(*)
+        FROM
+            t_std_devicemete
+        WHERE
+            device_mete_id IN (
+                SELECT DISTINCT
+                    b.device_mete_id
+                FROM
+                    t_cruise_task a
+                LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+                WHERE
+                    a.task_id = #{taskId,jdbcType=VARCHAR}
+            )
+        UNION ALL
+            SELECT
+                count(*)
+            FROM
+                t_camera_info
+            WHERE
+                camera_id IN (
+                    SELECT DISTINCT
+                        c.camera_id
+                    FROM
+                        t_cruise_task a
+                    LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+                    LEFT JOIN t_camera_preset c ON b.point_task_id = c.preset_id
+                    WHERE
+                        a.task_id = #{taskId,jdbcType=VARCHAR}
+                )
+            UNION ALL
+                SELECT
+                    count(*)
+                FROM
+                    t_cruise_task a
+                LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+                LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+                WHERE
+                    a.task_id = #{taskId,jdbcType=VARCHAR}
+                AND c.cruise_type = 228
+            UNION ALL
+			SELECT
+				count(*)
+			FROM
+				t_cruise_task a
+			LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+			WHERE
+				a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 
 </mapper>

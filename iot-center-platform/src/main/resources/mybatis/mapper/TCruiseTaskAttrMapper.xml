@@ -55,12 +55,12 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskAttr">
         update t_cruise_task_attr a <set>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
-        <if test="pointTaskId != null and pointTaskId != ''">a.point_task_id = #{pointTaskId, jdbcType=VARCHAR},</if>
+        <if test="taskId != null">a.task_id = #{taskId},</if>
+        <if test="instanceId != null ">a.instance_id = #{instanceId},</if>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        <if test="deviceId != null">a.device_id = #{deviceId},</if>
+        <if test="customId != null ">a.custom_id = #{customId},</if>
+        <if test="pointTaskId != null ">a.point_task_id = #{pointTaskId},</if>
         <if test="ifRobot != null">a.if_robot = #{ifRobot, jdbcType=INTEGER},</if>
         <if test="ifVideo != null">a.if_video = #{ifVideo, jdbcType=INTEGER},</if>
         <if test="ifInferad != null">a.if_inferad = #{ifInferad, jdbcType=INTEGER},</if>

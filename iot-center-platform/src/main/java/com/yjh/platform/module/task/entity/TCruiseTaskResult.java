@@ -2,6 +2,9 @@ package com.yjh.platform.module.task.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,14 +29,17 @@ public class TCruiseTaskResult implements Serializable {
 
     @Length(max = 50,message = "taskResultId长度必须小于等于50")
     @ApiModelProperty(value = "任务结果UUID")
+    @TableField(value = "task_result_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskResultId;
 
     @Length(max = 50,message = "taskId长度必须小于等于50")
     @ApiModelProperty(value = "巡检任务ID")
+    @TableField(value = "task_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskId;
 
     @Length(max = 50,message = "taskName长度必须小于等于50")
     @ApiModelProperty(value = "巡检任务名称")
+     @TableField(value = "task_name",updateStrategy = FieldStrategy.IGNORED)
     private String taskName;
 
     @Max(value=999999999)
@@ -45,6 +51,7 @@ public class TCruiseTaskResult implements Serializable {
 
     @Length(max = 30,message = "runExecute长度必须小于等于30")
     @ApiModelProperty(value = "执行类型")
+     @TableField(value = "run_execute",updateStrategy = FieldStrategy.IGNORED)
     private String runExecute;
 
     @Past
@@ -61,6 +68,7 @@ public class TCruiseTaskResult implements Serializable {
 
     @Length(max = 255,message = "remark长度必须小于等于255")
     @ApiModelProperty(value = "备注")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
 

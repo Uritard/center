@@ -100,31 +100,31 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TDefectInfo">
         update t_defect_info a <set>
-        <if test="defectId != null and defectId != ''">a.defect_id = #{defectId, jdbcType=BIGINT},</if>
+        <if test="defectId != null ">a.defect_id = #{defectId},</if>
         <if test="defectLevel != null ">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
         <if test="defectTime != null ">a.defect_time = #{defectTime, jdbcType=TIMESTAMP},</if>
         <if test="defectType != null ">a.defect_type = #{defectType, jdbcType=INTEGER},</if>
-        <if test="defectName != null and defectName != ''">a.defect_name = #{defectName, jdbcType=VARCHAR},</if>
-        <if test="defectContent != null and defectContent != ''">a.defect_content = #{defectContent, jdbcType=VARCHAR},</if>
+        <if test="defectName != null ">a.defect_name = #{defectName},</if>
+        <if test="defectContent != null">a.defect_content = #{defectContent},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
         <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
         <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
         <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
         <if test="isDefect != null ">a.is_defect = #{isDefect, jdbcType=INTEGER},</if>
         <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
-        <if test="dealInfo != null and dealInfo != ''">a.deal_info = #{dealInfo, jdbcType=VARCHAR},</if>
-        <if test="dealPersonId != null and dealPersonId != ''">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
         <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
         <if test="ifDefectDisable != null ">a.if_defect_disable = #{ifDefectDisable, jdbcType=INTEGER},</if>
         <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
         <if test="defectSubtype != null ">a.defect_subtype = #{defectSubtype, jdbcType=INTEGER},</if>
-        <if test="deviceCode != null and deviceCode != ''">a.device_code = #{deviceCode, jdbcType=VARCHAR},</if>
-        <if test="imagePath != null and imagePath != ''">a.image_path = #{imagePath, jdbcType=VARCHAR},</if>
-        <if test="videoPath != null and videoPath != ''">a.video_path = #{videoPath, jdbcType=VARCHAR},</if>
-        <if test="value != null and value != ''">a.VALUE = #{value, jdbcType=VARCHAR},</if>
-        <if test="outRange != null and outRange != ''">a.out_range = #{outRange, jdbcType=VARCHAR},</if>
-        <if test="linkMessage != null and linkMessage != ''">a.link_message = #{linkMessage, jdbcType=VARCHAR},</if>
+        <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
+        <if test="imagePath != null ">a.image_path = #{imagePath},</if>
+        <if test="videoPath != null ">a.video_path = #{videoPath},</if>
+        <if test="value != null ">a.VALUE = #{value},</if>
+        <if test="outRange != null ">a.out_range = #{outRange},</if>
+        <if test="linkMessage != null">a.link_message = #{linkMessage},</if>
     </set>
         where a.defect_id = #{defectId, jdbcType=BIGINT}
     </update>

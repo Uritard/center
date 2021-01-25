@@ -1,6 +1,8 @@
 package com.yjh.platform.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -44,6 +46,7 @@ public class TStdDeviceMete implements Serializable {
 
     @Max(value = 999999999)
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
+    @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
     private Integer meteKind;
 
     @Length(max = 50, message = "meteKindName长度必须小于等于50")
@@ -55,6 +58,7 @@ public class TStdDeviceMete implements Serializable {
 
     @Length(max = 50, message = "meteName长度必须小于等于50")
     @ApiModelProperty(value = "设备名称")
+    @TableField(value = "mete_name",updateStrategy = FieldStrategy.IGNORED)
     private String meteName;
 
     @Max(value = 99)
@@ -67,18 +71,22 @@ public class TStdDeviceMete implements Serializable {
 
     @Length(max = 20, message = "positionType长度必须小于等于20")
     @ApiModelProperty(value = "点号位置，inside-内部设备，outside-外部设备")
+    @TableField(value = "position_type",updateStrategy = FieldStrategy.IGNORED)
     private String positionType;
 
     @Length(max = 50, message = "unit长度必须小于等于50")
     @ApiModelProperty(value = "单位")
+    @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
     private String unit;
 
     @Length(max = 50, message = "alarmNote长度必须小于等于50")
     @ApiModelProperty(value = "是否生成告警提示 0-生成 1-不生成")
+    @TableField(value = "alarm_note",updateStrategy = FieldStrategy.IGNORED)
     private String alarmNote;
 
     @Length(max = 50, message = "alarmType长度必须小于等于50")
     @ApiModelProperty(value = "告警分类")
+    @TableField(value = "alarm_type",updateStrategy = FieldStrategy.IGNORED)
     private String alarmType;
 
     @Max(value = 999999999)
@@ -142,6 +150,7 @@ public class TStdDeviceMete implements Serializable {
     private BigDecimal thresholdPer;
 
     @Length(max = 50, message = "meteType长度必须小于等于50")
+    @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
     private String meteType;
 
     @Max(value = 999999999)
@@ -150,14 +159,17 @@ public class TStdDeviceMete implements Serializable {
 
     @Length(max = 128, message = "remark长度必须小于等于128")
     @ApiModelProperty(value = "信号说明")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
     @Length(max = 20, message = "stateZero长度必须小于等于20")
     @ApiModelProperty(value = "状态一描述")
+    @TableField(value = "state_zero",updateStrategy = FieldStrategy.IGNORED)
     private String stateZero;
 
     @Length(max = 20, message = "stateOne长度必须小于等于20")
     @ApiModelProperty(value = "状态二描述")
+    @TableField(value = "state_one",updateStrategy = FieldStrategy.IGNORED)
     private String stateOne;
 
     @Max(value = 99999999)

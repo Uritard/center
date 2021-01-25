@@ -1,13 +1,20 @@
 package com.yjh.accessvqd.module.diagnose.controller;
 
+import com.google.gson.internal.$Gson$Preconditions;
 import com.yjh.accessvqd.commons.result.Result;
 import com.yjh.accessvqd.commons.result.ResultCodeEnum;
+import com.yjh.accessvqd.commons.utils.xmlAnalyse.DataServerXML;
+import com.yjh.accessvqd.commons.utils.xmlAnalyse.PlatformXMLUtil;
+import com.yjh.accessvqd.module.diagnose.entity.Channel;
+import com.yjh.accessvqd.module.diagnose.entity.DataServer;
 import com.yjh.accessvqd.module.diagnose.service.ChannelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.*;
 import com.yjh.accessvqd.module.diagnose.entity.TestList;
 
@@ -25,10 +32,11 @@ public class ChannelController {
 
     private Logger log = LoggerFactory.getLogger(ChannelController.class);
 
+    @Autowired
     private ChannelService channelService;
 
     @ApiOperation(value = "密码加密")
-    @RequestMapping(value = "userPwdEncrypt",method = RequestMethod.GET)
+    @RequestMapping(value = "/userPwdEncrypt",method = RequestMethod.GET)
     public Result userPwdEncrypt(@RequestParam String pass){
         Result result=new Result();
         try {
@@ -42,6 +50,112 @@ public class ChannelController {
         }
         return result;
     }
+
+    @ApiOperation(value = "数据服务器配置操作-查询")
+    @RequestMapping(value = "/dataServers",method = RequestMethod.GET)
+    public  Result dataServers(){
+        Result result=new Result();
+        try{
+            result.setData(channelService.dataServerConfig());
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("操作失败"+e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value ="新增数据服务器")
+    @RequestMapping(value = "/addDataServers",method = RequestMethod.POST)
+    public Result addDataServers(@RequestBody DataServer dataServer){
+        Result result=new Result();
+        try {
+            result.setData(channelService.addDataServer(dataServer));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("新增失败"+e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "修改数据服务器")
+    @RequestMapping(value = "/updateDataServers",method = RequestMethod.PUT)
+    public Result update(@RequestBody DataServer dataServer){
+        Result result=new Result();
+        try {
+            result.setData(channelService.updateDataServer(dataServer));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("修改失败"+e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除数据服务器")
+    @RequestMapping(value = "deleteDataServers",method = RequestMethod.DELETE)
+    public Result deleteDataServers(@RequestParam String serverId){
+        Result result=new Result();
+        try {
+            result.setData(channelService.deleteDateServer(serverId));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除失败"+e);
+        }
+        return  result;
+    }
+
+    @ApiOperation(value = "查询监测点列表")
+    @RequestMapping(value = "channelListInfo",method = RequestMethod.GET)
+    public Result channelListInfo(){
+        Result result=new Result();
+        try {
+            result.setData(channelService.channelInfo());
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询失败"+e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询单个监测点信息")
+    @RequestMapping(value = "getChannel",method = RequestMethod.GET)
+    public Result getChannel(@RequestParam String channelId){
+        Result result=new Result();
+        try {
+            result.setData(channelService.getChannel(channelId));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询失败"+e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "新增&修改单个监测点")
+    @RequestMapping(value = "updateChannel",method = RequestMethod.PUT)
+    public Result updateChannel(@RequestBody Channel channel){
+        Result result=new Result();
+        try {
+            result.setData(channelService.addChannel(channel));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("修改失败"+e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除单个监测点")
+    @RequestMapping(value = "/deleteChannel",method = RequestMethod.DELETE)
+    public Result deleteChannel(@RequestParam String channelId){
+        Result result=new Result();
+        try{
+            result.setData(channelService.deleteChannel(channelId));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除失败"+e);
+        }
+        return  result;
+    }
+
+
 
 
 }

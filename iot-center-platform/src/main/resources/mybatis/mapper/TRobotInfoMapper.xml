@@ -425,32 +425,14 @@
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
     </select>
 
-    <select id="selectRobotScreen" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.CameraOfRobotInfo">
-            SELECT
-             f.robot_id,
-	         f.light_ip,
-             f.light_port,
-             f.light_username,
-             f.light_password,
-             f.lnferad_IP,
-             f.Inferad_Port,
-             f.Inferad_username,
-             f.Inferad_password
-           FROM
-	          (
-		        (
-			       t_cruise_task a
-			       LEFT JOIN (
-				   t_cruise_plan b
-				   LEFT JOIN t_cruise_plan_attr c ON b.plan_id = c.plan_id
-			     ) ON a.plan_id = b.plan_id
-		       )
-		      LEFT JOIN t_cruise_point_instance d ON c.instance_id = d.instance_id
-	          )
-             JOIN
-           (t_robot_inspection e LEFT JOIN t_robot_info f ON e.robot_id=f.robot_id)
-           ON d.cruise_id=e.inspection_id
-           WHERE a.task_id=#{taskId,jdbcType=VARCHAR}
+    <select id="selectRobotScreen" parameterType="java.lang.Long" resultType="java.lang.Long">
+           SELECT
+            b.robot_id
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
+        WHERE
+            a.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
 
     <select id="selectRobotInfo" resultType="com.yjh.platform.module.task.entity.RobotInfoForHomePage">

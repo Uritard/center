@@ -39,12 +39,12 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruisePlan">
         update t_cruise_plan a <set>
-        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
-        <if test="planName != null and planName != ''">a.plan_name = #{planName, jdbcType=VARCHAR},</if>
+        <if test="planId != null">a.plan_id = #{planId},</if>
+        <if test="planName != null ">a.plan_name = #{planName},</if>
         <if test="type != null">a.type = #{type, jdbcType=INTEGER},</if>
-        <if test="planPointTypes != null and planPointTypes != ''">a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        <if test="planPointTypes != null">a.plan_point_types = #{planPointTypes},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
+        <if test="updateTime != null ">a.update_time = #{updateTime},</if>
     </set>
             where a.plan_id = #{planId, jdbcType=BIGINT}
     </update>

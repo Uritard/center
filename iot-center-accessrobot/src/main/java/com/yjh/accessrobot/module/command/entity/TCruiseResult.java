@@ -1,5 +1,7 @@
 package com.yjh.accessrobot.module.command.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,18 +31,22 @@ public class TCruiseResult implements Serializable {
     @NotEmpty(message = "cruiseDataId")
     @Length(min=1,max = 50,message = "taskResultId长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "任务结果UUID")
+    @TableField(value = "task_result_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskResultId;
 
     @Length(min=1,max = 50,message = "taskId长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "巡检任务ID")
+     @TableField(value = "task_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskId;
 
     @Length(min=1,max = 50,message = "taskName长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "巡检任务名称")
+    @TableField(value = "task_name",updateStrategy = FieldStrategy.IGNORED)
     private String taskName;
 
     @Length(min=1,max = 32,message = "areaId长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "区域id")
+    @TableField(value = "area_id",updateStrategy = FieldStrategy.IGNORED)
     private String areaId;
 
     @Range(min=0,max = 11,message = "cType长度必须在{min}-{max}之间")
@@ -65,6 +71,7 @@ public class TCruiseResult implements Serializable {
 
     @Length(min=1,max = 128,message = "checkUser长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "审核人")
+    @TableField(value = "check_user",updateStrategy = FieldStrategy.IGNORED)
     private String checkUser;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -74,6 +81,7 @@ public class TCruiseResult implements Serializable {
 
     @Length(min=1,max = 255,message = "taskResultId长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "微气象")
+    @TableField(value = "weather",updateStrategy = FieldStrategy.IGNORED)
     private String weather;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -88,10 +96,12 @@ public class TCruiseResult implements Serializable {
 
     @Length(min=1,max = 32,message = "taskCode长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "任务编码")
+     @TableField(value = "task_code",updateStrategy = FieldStrategy.IGNORED)
     private String taskCode;
 
     @Length(max = 256,message = "remark长度必须在{max}之间")
     @ApiModelProperty(value = "备用字段3")
+     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
 

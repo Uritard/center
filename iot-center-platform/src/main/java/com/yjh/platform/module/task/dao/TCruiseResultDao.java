@@ -79,7 +79,10 @@ public interface TCruiseResultDao {
     List<StatisticalTools> cruiseStatisticalByStatus();
     List<CruiseStatistical> cruiseStatisticalByAbnormal();
 
+    //查询正在执行的任务
     List<TaskSimpleInfo> selectTaskIsRunning();
+    //查询巡视监控统计点(listIndex:0-任务下测点 1-任务下摄像头个数 2-任务下机器人点位 3-任务下巡视点个数)
+    List<Long> cruiseInspectCount(@Param(value = "taskId")String taskId);
 
     String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);

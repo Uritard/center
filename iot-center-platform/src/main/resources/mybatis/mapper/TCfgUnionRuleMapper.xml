@@ -61,14 +61,14 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule">
         update t_cfg_union_rule a <set>
-        <if test="ruleId != null and ruleId != ''">a.rule_id = #{ruleId, jdbcType=BIGINT},</if>
-        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
-        <if test="ruleName != null and ruleName != ''">a.rule_name = #{ruleName, jdbcType=VARCHAR},</if>
-        <if test="ruleType != null and ruleType != ''">a.rule_type = #{ruleType, jdbcType=VARCHAR},</if>
-        <if test="ruleContent != null and ruleContent != ''">a.rule_content = #{ruleContent, jdbcType=VARCHAR},</if>
+        <if test="ruleId != null">a.rule_id = #{ruleId},</if>
+        <if test="planId != null ">a.plan_id = #{planId},</if>
+        <if test="ruleName != null ">a.rule_name = #{ruleName},</if>
+        <if test="ruleType != null ">a.rule_type = #{ruleType},</if>
+        <if test="ruleContent != null ">a.rule_content = #{ruleConten},</if>
         <if test="ruleDelay != null">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
-        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
-        <if test="inputParam != null and inputParam != ''">a.input_param = #{inputParam, jdbcType=VARCHAR},</if>
+        <if test="description != null ">a.description = #{description},</if>
+        <if test="inputParam != null ">a.input_param = #{inputParam},</if>
         a.update_time =CURRENT_TIMESTAMP(),
         <if test="cameraId != null ">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
         <if test="presetId != null ">a.preset_id = #{presetId, jdbcType=BIGINT},</if>

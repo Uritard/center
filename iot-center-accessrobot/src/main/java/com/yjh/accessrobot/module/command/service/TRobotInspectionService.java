@@ -3,6 +3,8 @@ package com.yjh.accessrobot.module.command.service;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.entity.TRobotInspection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ public class TRobotInspectionService {
 
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    private Logger log = LoggerFactory.getLogger(TRobotInspectionService.class);
+
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -62,6 +66,5 @@ public class TRobotInspectionService {
     public int batchInsert(List<TRobotInspection> list) {
         return this.tRobotInspectionDao.batchInsertTRobotInspection(list);
     }
-
 }
 

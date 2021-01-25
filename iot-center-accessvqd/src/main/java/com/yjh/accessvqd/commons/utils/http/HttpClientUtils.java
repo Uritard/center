@@ -6,10 +6,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -17,6 +16,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.yjh.accessvqd.commons.utils.http.HttpDeleteWithBody;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -145,10 +145,11 @@ public class HttpClientUtils {
     public String getUrl(String url, String json) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
-        httpGet.addHeader("Content-type", "application/json;charset=utf-8");
-        httpGet.setHeader("Accept", "application/json");
+        httpGet.addHeader("Content-type", "text/xml;charset=utf-8");
+        httpGet.setHeader("Accept", "text/xml");
         CloseableHttpResponse response = client.execute(httpGet);
         HttpEntity entity = response.getEntity();
+        System.out.print(entity);
         String result = EntityUtils.toString(entity, "UTF-8");
         return result;
     }
@@ -156,12 +157,47 @@ public class HttpClientUtils {
     public String postUrl(String url, String json) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
+        httpPost.addHeader("Content-type", "text/xml;charset=utf-8");
+        httpPost.setHeader("Accept", "text/xml");
         httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
         CloseableHttpResponse response = client.execute(httpPost);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, "UTF-8");
+    }
+
+    public String putUrl(String url,String json) throws IOException{
+        CloseableHttpClient client=HttpClients.createDefault();
+        HttpPut httpPut=new HttpPut(url);
+        httpPut.addHeader("Content-type","text/xml;charset=utf-8");
+        httpPut.setHeader("Accept","application/xml");
+        httpPut.setEntity(new StringEntity(json,Charset.forName("UTF-8")));
+        CloseableHttpResponse response=client.execute(httpPut);
+        HttpEntity entity=response.getEntity();
+        return EntityUtils.toString(entity,"UTF-8");
+    }
+
+
+//    public String deleteUrl(String url,String json)throws IOException{
+//        CloseableHttpClient client=HttpClients.createDefault();
+//        HttpDeleteWithBody httpDeleteWithBody=new HttpDeleteWithBody(url);
+//        httpDeleteWithBody.addHeader("Content-type","text/xml;charset=utf-8");
+//        httpDeleteWithBody.setHeader("Accept","application/xml");
+////        httpDeleteWithBody.setEntity(new StringEntity(json,Charset.forName("UTF-8")));
+//        CloseableHttpResponse response=client.execute(httpDeleteWithBody);
+//        HttpEntity entity=response.getEntity();
+//        return EntityUtils.toString(entity,"UTF-8");
+//    }
+    public String deleteUrl(String url,String json)throws IOException{
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpDelete httpDelete=new HttpDelete(url);
+        System.out.print("***********:"+url);
+        httpDelete.addHeader("Content-type", "text/xml;charset=utf-8");
+        httpDelete.setHeader("Accept", "text/xml");
+        CloseableHttpResponse response = client.execute(httpDelete);
+        HttpEntity entity = response.getEntity();
+        System.out.print(entity);
+        String result = EntityUtils.toString(entity, "UTF-8");
+        return result;
     }
 
     public CloseableHttpClient getHttpClient() {
@@ -187,4 +223,6 @@ public class HttpClientUtils {
     }
 
 }
+
+
 

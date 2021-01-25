@@ -52,14 +52,14 @@
 
     <update id="update" parameterType="com.yjh.logs.module.log.entity.SysLogs">
         update sys_logs a <set>
-        <if test="logId != null and logId != ''">a.log_id = #{logId, jdbcType=VARCHAR},</if>
-        <if test="logType != null and logType != ''">a.log_type = #{logType, jdbcType=VARCHAR},</if>
-        <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
-        <if test="title != null and title != ''">a.title = #{title, jdbcType=VARCHAR},</if>
+        <if test="logId != null ">a.log_id = #{logId},</if>
+        <if test="logType != null">a.log_type = #{logType},</if>
+        <if test="ip != null">a.ip = #{ip},</if>
+        <if test="title != null">a.title = #{title},</if>
         <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
-        <if test="content != null and content != ''">a.content = #{content, jdbcType=VARCHAR},</if>
-        <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
-        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
+        <if test="content != null">a.content = #{content},</if>
+        <if test="userId != null  ">a.user_id = #{userId},</if>
+        <if test="userName != null">a.user_name = #{userName},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
     </set>
         where a.log_id = #{logId, jdbcType=VARCHAR}

@@ -1,6 +1,8 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -31,16 +33,20 @@ public class TCruiseDataResult implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "巡视点数据id")
     @TableId(value = "cruise_data_id", type = IdType.AUTO)
+    @TableField(value = "cruise_data_id",updateStrategy = FieldStrategy.IGNORED)
     private Long cruiseDataId;
 
     @Length(max = 82,message = "cruiseResultId长度必须小于等于82")
     @ApiModelProperty(value = "巡视任务结果id")
+    @TableField(value = "cruise_result_id",updateStrategy = FieldStrategy.IGNORED)
     private String cruiseResultId;
 
     @Max(value=999999999999999999l)
+     @TableField(value = "cruise_id",updateStrategy = FieldStrategy.IGNORED)
     private Long cruiseId;
 
     @Length(max = 50,message = "cruiseName长度必须小于等于50")
+    @TableField(value = "cruise_Name",updateStrategy = FieldStrategy.IGNORED)
     private String cruiseName;
 
     @Max(value=999999999)
@@ -49,26 +55,32 @@ public class TCruiseDataResult implements Serializable {
 
     @Length(max = 512,message = "resultDesc长度必须小于等于512")
     @ApiModelProperty(value = "巡检结果文字描述")
+    @TableField(value = "result_desc",updateStrategy = FieldStrategy.IGNORED)
     private String resultDesc;
 
     @Length(max = 100,message = "cruiseResultId长度必须小于等于100")
     @ApiModelProperty(value = "巡检结果数值")
+     @TableField(value = "result_num",updateStrategy = FieldStrategy.IGNORED)
     private String resultNum;
 
     @Length(max = 100,message = "modifyNum长度必须小于等于100")
     @ApiModelProperty(value = "修正值")
+     @TableField(value = "modify_num",updateStrategy = FieldStrategy.IGNORED)
     private String modifyNum;
 
     @Length(max = 256,message = "picpath长度必须小于等于256")
     @ApiModelProperty(value = "巡检分析图片")
+    @TableField(value = "picpath",updateStrategy = FieldStrategy.IGNORED)
     private String picpath;
 
     @Length(max = 256,message = "personCheck长度必须小于等于256")
     @ApiModelProperty(value = "人工校核结果")
+    @TableField(value = "person_check",updateStrategy = FieldStrategy.IGNORED)
     private String personCheck;
 
     @Length(max = 256,message = "origpic长度必须小于等于256")
     @ApiModelProperty(value = "算法原始图片/红外可见光")
+     @TableField(value = "origpic",updateStrategy = FieldStrategy.IGNORED)
     private String origpic;
 
     @Max(value=999999999)
@@ -97,6 +109,7 @@ public class TCruiseDataResult implements Serializable {
 
     @Length(max = 256,message = "remark长度必须小于等于256")
     @ApiModelProperty(value = "备用字段3")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
     @Max(value=999999999)
@@ -105,6 +118,7 @@ public class TCruiseDataResult implements Serializable {
 
     @Length(max = 32,message = "checkUser长度必须小于等于32")
     @ApiModelProperty(value = "审核人")
+    @TableField(value = "check_user",updateStrategy = FieldStrategy.IGNORED)
     private String checkUser;
 
     @Past

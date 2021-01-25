@@ -132,26 +132,26 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
         update t_camera_recorder a <set>
-        <if test="recordId != null and recordId != ''">a.record_id = #{recordId, jdbcType=BIGINT},</if>
-        <if test="recordName != null and recordName != ''">a.record_name = #{recordName, jdbcType=VARCHAR},</if>
+        <if test="recordId != null">a.record_id = #{recordId},</if>
+        <if test="recordName != null ">a.record_name = #{recordName},</if>
         <if test="recorderModel != null ">a.recorder_model = #{recorderModel, jdbcType=INTEGER},</if>
-        <if test="recorderType != null and recorderType != ''">a.recorder_type = #{recorderType, jdbcType=VARCHAR},</if>
+        <if test="recorderType != null ">a.recorder_type = #{recorderType},</if>
         <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
-        <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
-        <if test="aliasName != null and aliasName != ''">a.alias_name = #{aliasName, jdbcType=VARCHAR},</if>
-        <if test="recordIp != null and recordIp != ''">a.record_ip = #{recordIp, jdbcType=VARCHAR},</if>
-        <if test="protocol != null and protocol != ''">a.protocol = #{protocol, jdbcType=VARCHAR},</if>
+        <if test="pmsId != null  ">a.pms_id = #{pmsId},</if>
+        <if test="aliasName != null">a.alias_name = #{aliasName},</if>
+        <if test="recordIp != null">a.record_ip = #{recordIp},</if>
+        <if test="protocol != null ">a.protocol = #{protocol},</if>
         <if test="httpPort != null ">a.http_port = #{httpPort, jdbcType=INTEGER},</if>
         <if test="transPort != null ">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
-        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
-        <if test="pwd != null and pwd != ''">a.pwd = #{pwd, jdbcType=VARCHAR},</if>
-        <if test="protocolUrl != null and protocolUrl != ''">a.protocol_url = #{protocolUrl, jdbcType=VARCHAR},</if>
+        <if test="userName != null ">a.user_name = #{userName},</if>
+        <if test="pwd != null and ">a.pwd = #{pwd},</if>
+        <if test="protocolUrl != null ">a.protocol_url = #{protocolUr},</if>
         <if test="maxChannel != null ">a.max_channel = #{maxChannel, jdbcType=INTEGER},</if>
         <if test="hddSize != null ">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>
         <if test="bufferDay != null ">a.buffer_day = #{bufferDay, jdbcType=INTEGER},</if>
         <if test="timeLong != null ">a.time_long = #{timeLong, jdbcType=INTEGER},</if>
-        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="unit != null ">a.unit = #{unit},</if>
     </set>
             where a.record_id = #{recordId, jdbcType=BIGINT}
     </update>

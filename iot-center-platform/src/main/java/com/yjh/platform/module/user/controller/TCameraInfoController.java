@@ -280,4 +280,18 @@ public class TCameraInfoController {
         return result;
     }
 
+    @ApiOperation(value = "查询NVR-channel树")
+    @RequestMapping(value = "/selectNVRChannelTree",method = RequestMethod.GET)
+    public Result selectNVRChannelTree(){
+        Result result=new Result();
+        try {
+            result.setData(tCameraInfoService.selectNVRChannelTree());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("树查询失败：", e);
+        }
+        return result;
+    }
+
+
 }
