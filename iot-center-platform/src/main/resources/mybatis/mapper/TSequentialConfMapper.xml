@@ -136,5 +136,23 @@
             where a.mete_kind = #{meteKind, jdbcType=INTEGER}
         <if test="cfgDeviceName != null and cfgDeviceName != ''"> and c.device_name like concat('%',#{cfgDeviceName, jdbcType=VARCHAR},'%')</if>
     </select>
+    
+    
+    <select id="selectForSequenceInfo" resultType="java.util.Map">
+        SELECT
+            d.record_time as recordTime,
+            b.device_name as deviceName,
+            f.camera_id as cameraId,
+            f.camera_name as cameraName,
+            e.preset_name as presetName
+        FROM
+        t_sequential_conf a
+        left join t_cfg_data_current d on a.cfg_device_id = d.mete_id
+        left join t_cfg_device b on a.cfg_device_id = b.device_id
+        left join t_cfg_mete c on a.cfg_device_id = c.mete_id
+        left join t_camera_preset e on a.preset_id = e.preset_id
+        left join t_camera_info f on e.camera_id = f.camera_id
+        where a.cfg_device_id = #{cfgDeviceId,jdbcType=VARCHAR}
+    </select>
 
 </mapper>

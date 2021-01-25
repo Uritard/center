@@ -1,12 +1,15 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
+import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.user.entity.TSequentialConf;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +25,18 @@ public class TSequentialConfService{
 
     @Autowired
     private TSequentialConfDao tSequentialConfDao;
+    @Autowired
+    private TCfgDataCurrentDao tCfgDataCurrentDao;
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int add(TSequentialConf tSequentialConf) {
         tSequentialConf.setCfgMeteId(tSequentialConf.getCfgDeviceId());
-        return this.tSequentialConfDao.add(tSequentialConf);
+        if(tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId()) != null){
+           return tSequentialConfDao.update(tSequentialConf);
+        }else {
+            return this.tSequentialConfDao.add(tSequentialConf);
+        }
     }
 
     @Logs(title = "删除", code = "module")
@@ -93,7 +102,7 @@ public class TSequentialConfService{
         List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2,cfgDeviceName);
         AreaInfo areaInfoItem2 = new AreaInfo();
         areaInfoItem2.setId(2L);
-        areaInfoItem2.setUpId(-1L);
+        areaInfoItem2.setUpId(-2L);
         areaInfoItem2.setLabel("遥测");
         areaInfoItem2.setChildren(listItem2);
         areaInfoItem2.setInfoType("meteKind");
@@ -104,20 +113,39 @@ public class TSequentialConfService{
         areaInfoItem2.setId(3L);
         areaInfoItem2.setUpId(-3L);
         areaInfoItem2.setLabel("遥控");
-        areaInfoItem2.setChildren(listItem2);
+        areaInfoItem2.setChildren(listItem3);
         areaInfoItem2.setInfoType("meteKind");
-        list.add(areaInfoItem2);
+        list.add(areaInfoItem3);
         //遥测
         List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4,cfgDeviceName);
         AreaInfo areaInfoItem4 = new AreaInfo();
         areaInfoItem2.setId(4L);
         areaInfoItem2.setUpId(-4L);
         areaInfoItem2.setLabel("遥调");
-        areaInfoItem2.setChildren(listItem2);
+        areaInfoItem2.setChildren(listItem4);
         areaInfoItem2.setInfoType("meteKind");
-        list.add(areaInfoItem2);
+        list.add(areaInfoItem4);
 
         return list;
+    }
+
+    @Logs(title = "顺控联动", code = "TCfgUnionRule",content = "查询四遥信息")
+    @Transactional(rollbackFor = Exception.class)
+    public String sequential(String meteId){
+        {
+            //todo 生成一个巡视任务
+
+            //todo 发给算法进行分析
+
+            //todo 生成顺控文件
+        }
+       return "ok";
+    }
+
+    @Logs(title = "顺控联动", code = "TCfgUnionRule",content = "查询四遥信息")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,String> sequentialInfo(String cfgDeviceId){
+         return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }
 
 

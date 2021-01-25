@@ -31,6 +31,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by tt on 2019/7/31.
@@ -41,10 +43,12 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
     private RedisTemplate redisTemplate;
     private TCfgMeteService tCfgMeteService;
     private String UNION_URL;
-    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService,String UNION_URL) {
+    private String SEQUENCE_URL;
+    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService,String UNION_URL,String SEQUENCE_URL) {
         this.redisTemplate = redisTemplate;
         this.tCfgMeteService = tCfgMeteService;
         this.UNION_URL=UNION_URL;
+        this.SEQUENCE_URL =SEQUENCE_URL;
     }
     private boolean isThreadStart = true;
     public boolean getIsThreadStart() { return isThreadStart; }
@@ -204,41 +208,84 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //            union(map);
             //将实时表里的数据更新到历史表里
             tCfgMeteService.insertIntoHis(tCfgDataCurrent);
-            getUrl(UNION_URL,meteId.toString());
+
+            {//遥控信号
+                if(meteKind == 3){
+                    getUrl(SEQUENCE_URL,meteId.toString());
+                }else {
+                    getUrl(UNION_URL,meteId.toString());
+                }
+
+            }
 
         }else if ("43".equals(udp[4])){
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
             log.info("有无后续：  "+doesHas);
-            Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
-            log.info("帧序号：  "+xuHao);
-            //其实传输位置 9-12
-            Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
-            String value = arrayToString(udp,14,valueLength,true);
-            log.info("文件内容:  " + value);
-            value = value.replace("\\t"," ");
-            log.info("文件内容(删除\\t):  " + value);
-            String[] valueArray = value.split("\\s+");
-            if("".equals(valueArray[0])){
-                valueArray= Arrays.copyOfRange(valueArray,1,valueArray.length);
+            if(doesHas == 1){
+                Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
+                log.info("帧序号：  "+xuHao);
+                //其实传输位置 9-12
+                Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
+                List<String> listByte = new ArrayList<>();
+                for(int i =0;i<valueLength;i++){
+                    listByte.add(udp[14+i]);
+                }
+                Constant.data.put(xuHao,listByte);
             }
-            log.info("文件内容(转字符数组):  " + Arrays.toString(valueArray));
+            if(doesHas == 0){
+                Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
+                log.info("帧序号：  "+xuHao);
+                //其实传输位置 9-12
+                Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
+                List<String> listByte = new ArrayList<>();
+                for(int i =14;i<valueLength;i++){
+                    listByte.add(udp[i]);
+                }
+                Constant.data.put(xuHao,listByte);
 
-            SYAllInfo syAllInfo = new SYAllInfo();
-            syAllInfo.setStationId(valueArray[1]);
-            String[] mete = valueArray[3].split("/");
-            String meteName = mete[mete.length-1]+"-"+valueArray[4];
-            syAllInfo.setMeteId(valueArray[2]);
-            syAllInfo.setMeteName(meteName);
-            syAllInfo.setDeviceId(valueArray[2]);
-            syAllInfo.setDeviceName(valueArray[3]);
-            Integer meteKind = valueArray[4].contains("遥信")?1:(valueArray[4].contains("遥测")?2:(valueArray[4].contains("遥控")?3:4));
-            syAllInfo.setMeteKind(meteKind);
-            tCfgMeteService.updateForAll(syAllInfo);
+                List<String> listForSortByte =new ArrayList<>();
+                for(int i=0;i<Constant.data.size();i++ ){
+                    Constant.data.get(i);
+                    for (String item:Constant.data.get(i)) {
+                        listForSortByte.add(item);
+                    }
+
+                }
+                String data = arrayToString(listForSortByte);
+                String regex ="\\#.*?(是|不是)";
+                Matcher matcher = Pattern.compile(regex).matcher(data);
+                List<SYAllInfo> list = new LinkedList<>();
+                while (matcher.find()){
+                    String str = matcher.group();
+                    str = str.replaceAll("\\t"," ");
+
+                    String[]strArray = str.split("\\s+");
+                    if("".equals(strArray[0])){
+                        strArray= Arrays.copyOfRange(strArray,1,strArray.length);
+                    }
+                    //取数据
+                    SYAllInfo syAllInfo = new SYAllInfo();
+                    syAllInfo.setStationId(strArray[1]);
+                    String[] mete = strArray[3].split("/");
+                    String meteName = mete[mete.length-1]+"-"+strArray[4];
+                    syAllInfo.setMeteId(strArray[2]);
+                    syAllInfo.setMeteName(meteName);
+                    syAllInfo.setDeviceId(strArray[2]);
+                    syAllInfo.setDeviceName(strArray[3]);
+                    Integer meteKind = strArray[4].contains("遥信")?1:(strArray[4].contains("遥测")?2:(strArray[4].contains("遥控")?3:(strArray[4].contains("遥调")?4:5)));
+                    syAllInfo.setMeteKind(meteKind);
+                    list.add(syAllInfo);
+                    //list.add(str);
+                }
+                tCfgMeteService.deleteAll();
+                tCfgMeteService.insertForAll(list);
+                Constant.dataByDevice = data;
+                Constant.listAllByte = new ArrayList<>();
+                Constant.data = new HashMap<>();
+            }
 
         }
-//        String msgString = datagramPacket.content().toString(CharsetUtil.UTF_8);
-//        log.info(" 发来的消息：" + msgString);
-//        handleDate(msgString);
+
     }
 
     public String getUrl(String url, String json) throws IOException {
@@ -267,6 +314,17 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         }
     }
 
+    public String arrayToString(List<String> udp)throws UnsupportedEncodingException{
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < udp.size();i++){
+            stringBuilder.append(udp.get(i));
+        }
+        String str =  stringBuilder.toString();
+//        if(flag){
+//            return hexStr2Str(str);
+//        }
+        return hexStr2Str(str);
+    }
     public String arrayToString(String[] udp,int start,int length,boolean flag)throws UnsupportedEncodingException{
         StringBuilder stringBuilder = new StringBuilder();
         for(int i = 0; i < length;i++){

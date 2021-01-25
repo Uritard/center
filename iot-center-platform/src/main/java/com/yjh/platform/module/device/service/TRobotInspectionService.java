@@ -1,8 +1,10 @@
 package com.yjh.platform.module.device.service;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
@@ -94,6 +96,12 @@ public class TRobotInspectionService{
         String robotState =(String) mapForRobotState.get("value");
         if( !"2".equals(robotState)){
             //机器人未在做任务
+            Map<String,Object> jasonMap=new HashMap<>();
+            jasonMap.put("type","noTask");
+            //jasonMap.put("taskId",tCruiseTask.getTaskId());
+            String json= JSON.toJSONString(jasonMap);
+            WebSocketServer.sendMsg(json);
+            //log.info("发送给前端的消息：   "+json);
             return  null;
         }
         String instanceList = (String)mapForRobotInstance.get("instanceIdList");
@@ -198,7 +206,7 @@ public class TRobotInspectionService{
 
     @Logs(title = "查询机器人任务进度", code = "device",content = "查询机器人任务进度")
     @Transactional(rollbackFor = Exception.class)
-    public Object selectRobotTaskProgress(Long robotId){
+    public Integer selectRobotTaskProgress(Long robotId){
 
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);

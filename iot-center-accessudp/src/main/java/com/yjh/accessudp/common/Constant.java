@@ -2,6 +2,11 @@ package com.yjh.accessudp.common;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Constant {
 
     public static final String USER_COUNT = "statistics:userCount";
@@ -55,4 +60,10 @@ public class Constant {
     public static final String TYPE_104 = "104";
 
     public static String TIME= "";
+
+    public static String dataByDevice;
+
+    public static Map<Integer,List<String>>  data = new HashMap<>();
+
+    public static List<String> listAllByte = new ArrayList<>();
 }

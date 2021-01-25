@@ -34,6 +34,8 @@ public class SendToUpSystemServices {
     private int port;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Value("${spring.union.stationCode}")
+    private String stationCode;
 
     @Autowired
     private SendToUpSystemDao sendToUpSystemDao;
@@ -69,12 +71,12 @@ public class SendToUpSystemServices {
         try{
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
-            //String path = mapForPath.get("content");
-            String path = "D:/code/qhTest/66666";
+            String path = mapForPath.get("content")+"/"+stationCode+"/Model";
+            //String path = "D:/code/qhTest/66666";
             List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
-            map.put("device_file_path",CreateModeXMLUtil.createXmlFile(list,path,"device_file.xml","Device_Model"));
+            map.put("device_file_path",CreateModeXMLUtil.createXmlFile(list,path,"device_model.xml","Device_Model"));
             list = sendToUpSystemDao.selectRobotInfo();
-            map.put("robot_file_path",CreateModeXMLUtil.createXmlFile(list,path,"robot_file.xml","Robot_Model"));
+            map.put("robot_file_path",CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","Robot_Model"));
             list = sendToUpSystemDao.selectTaskInfo();
             //CronExpression expression;
             for (Map<String,Object> item:list) {
@@ -106,7 +108,7 @@ public class SendToUpSystemServices {
 
                 }
             }
-            map.put("task_file_path",CreateModeXMLUtil.createXmlFile(list,path,"task_file.xml","Task_Model"));
+            map.put("task_file_path",CreateModeXMLUtil.createXmlFile(list,path,"task_model.xml","Task_Model"));
             return map;
         }catch (Exception e) {
         e.printStackTrace();

@@ -28,7 +28,7 @@ public class Swagger2 {
                 //添加head参数
 //                .globalOperationParameters(pars)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.yjh.device"))//扫描路径
+                .apis(RequestHandlerSelectors.basePackage("com.yjh.accessudp"))//扫描路径
                 .paths(PathSelectors.any())
                 .build();
     }

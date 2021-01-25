@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,26 +23,46 @@ public class TCfgMeteService {
 
     @Transactional(rollbackFor = Exception.class)
     public int insertForAll(List<SYAllInfo> syAllInfoList) {
+        List<SYAllInfo> list1 = new ArrayList<>();
+        List<SYAllInfo> list2 = new ArrayList<>();
+        List<SYAllInfo> list3 = new ArrayList<>();
+        List<SYAllInfo> list4 = new ArrayList<>();
+        this.tCfgMeteDao.insertForMete(syAllInfoList);//mete
+        this.tCfgMeteDao.insertForDevice(syAllInfoList);//device
         for (SYAllInfo syAllInfo:syAllInfoList) {
-            this.tCfgMeteDao.insertForMete(syAllInfo);//mete
-            this.tCfgMeteDao.insertForDevice(syAllInfo);//device
             if(syAllInfo.getMeteKind() == 1){//遥信
-                tCfgMeteDao.insertForTelesignal(syAllInfo);
+                list1.add(syAllInfo);
+                //tCfgMeteDao.insertForTelesignal(syAllInfo);
                 continue;
             }
             if(syAllInfo.getMeteKind() == 2){//遥测
-                tCfgMeteDao.insertForTelemeter(syAllInfo);
+                list2.add(syAllInfo);
+                //tCfgMeteDao.insertForTelemeter(syAllInfo);
                 continue;
             }
             if(syAllInfo.getMeteKind() == 3){//遥控
-                tCfgMeteDao.insertForTelecontrol(syAllInfo);
+                list3.add(syAllInfo);
+                //tCfgMeteDao.insertForTelecontrol(syAllInfo);
                 continue;
             }
             if(syAllInfo.getMeteKind() == 4){//遥调
-                tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
+                list4.add(syAllInfo);
+                //tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
                 continue;
             }
             //tCfgMeteDao.insertForTeleadjust(syAllInfo);//遥调
+        }
+        if(list1.size()>0){
+            tCfgMeteDao.insertForTelesignal(list1);
+        }
+        if(list2.size()>0){
+            tCfgMeteDao.insertForTelemeter(list2);
+        }
+        if(list3.size()>0){
+            tCfgMeteDao.insertForTelecontrol(list3);
+        }
+        if(list4.size()>0){
+            tCfgMeteDao.insertForTeleadjust(list4);//遥调
         }
         return 1;
     }
