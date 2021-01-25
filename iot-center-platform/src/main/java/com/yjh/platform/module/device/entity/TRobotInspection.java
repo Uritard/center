@@ -1,6 +1,8 @@
 package com.yjh.platform.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -27,18 +29,22 @@ public class TRobotInspection implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备检测点编码")
     @TableId(value = "inspection_id", type = IdType.AUTO)
+     @TableField(value = "inspection_id",updateStrategy = FieldStrategy.IGNORED)
     private Long inspectionId;
 
     @Length(max = 68,message = "inspectionCode长度必须小于等于68")
     @ApiModelProperty(value = "机器人检测点编码")
+     @TableField(value = "inspection_code",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionCode;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人ID")
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
     @Length(max = 60,message = "inspectionName长度必须小于等于60")
     @ApiModelProperty(value = "巡检点名称")
+      @TableField(value = "inspection_name",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionName;
 
     @Max(value=999999999)
@@ -47,14 +53,17 @@ public class TRobotInspection implements Serializable {
 
     @Length(max = 20,message = "alarmTop长度必须小于等于20")
     @ApiModelProperty(value = "检测点告警上限")
+     @TableField(value = "alarm_top",updateStrategy = FieldStrategy.IGNORED)
     private String alarmTop;
 
     @Length(max = 20,message = "alarmBottom长度必须小于等于20")
     @ApiModelProperty(value = "检测点告警下线")
+     @TableField(value = "alarm_bottom",updateStrategy = FieldStrategy.IGNORED)
     private String alarmBottom;
 
     @Length(max = 60,message = "defaultValue长度必须小于等于60")
     @ApiModelProperty(value = "检测点默认值")
+     @TableField(value = "default_value",updateStrategy = FieldStrategy.IGNORED)
     private String defaultValue;
 
     @Max(value=999999999)
@@ -71,6 +80,7 @@ public class TRobotInspection implements Serializable {
 
     @Length(max = 20,message = "unit长度必须小于等于20")
     @ApiModelProperty(value = "巡检结果单位")
+    @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
     private String unit;
 
 

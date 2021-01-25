@@ -55,16 +55,16 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskResult">
         update t_cruise_task_result a <set>
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
+        <if test="taskResultId != null ">a.task_result_id = #{taskResultId},</if>
+        <if test="taskId != null">a.task_id = #{taskId},</if>
+        <if test="taskName != null ">a.task_name = #{taskName},</if>
         <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
         <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
-        <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
+        <if test="runExecute != null">a.run_execute = #{runExecute},</if>
         a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},
         <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
         <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="remark != null">a.remark = #{remark},</if>
     </set>
             where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
     </update>

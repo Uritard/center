@@ -41,7 +41,7 @@
                 where maintenance_id = #{maintenanceId, jdbcType=BIGINT}
     </delete>
 
-    <update id="update" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
+    "update" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
         update t_device_maintenance a <set>
         <if test="maintenanceId != null and maintenanceId != ''">a.maintenance_id = #{maintenanceId, jdbcType=BIGINT},</if>
         <if test="maintenanceName != null and maintenanceName != ''">a.maintenance_name = #{maintenanceName, jdbcType=VARCHAR},</if>

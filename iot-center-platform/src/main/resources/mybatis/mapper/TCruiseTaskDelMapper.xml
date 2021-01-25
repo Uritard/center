@@ -34,9 +34,9 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskDel">
         update t_cruise_task_del a <set>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="delTime != null and delTime != ''">a.del_time = #{delTime, jdbcType=TIMESTAMP},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="taskId != null ">a.task_id = #{taskId},</if>
+        <if test="delTime != null ">a.del_time = #{delTime},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
     </set>
             where a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>

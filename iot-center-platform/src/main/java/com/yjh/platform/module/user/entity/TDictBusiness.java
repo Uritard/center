@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -32,14 +34,17 @@ public class TDictBusiness implements Serializable {
 
     @Length(max = 20,message = "dictCode长度必须小于等于20")
     @ApiModelProperty(value = "字典编码")
+    @TableField(value = "dict_code",updateStrategy = FieldStrategy.IGNORED)
     private String dictCode;
 
     @Length(max = 50,message = "colName长度必须小于等于50")
     @ApiModelProperty(value = "字典列名")
+    @TableField(value = "col_name",updateStrategy = FieldStrategy.IGNORED)
     private String colName;
 
     @Length(max = 128,message = "dictNote长度必须小于等于128")
     @ApiModelProperty(value = "字典描述")
+     @TableField(value = "dict_note",updateStrategy = FieldStrategy.IGNORED)
     private String dictNote;
 
     @Max(value=999999999)
@@ -48,10 +53,12 @@ public class TDictBusiness implements Serializable {
 
     @Length(max = 128,message = "remark长度必须小于等于128")
     @ApiModelProperty(value = "描述")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
     @Max(value=99999999)
     @ApiModelProperty(value = "排序")
+    @TableField(value = "sort",updateStrategy = FieldStrategy.IGNORED)
     private Long sort;
 
 

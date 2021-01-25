@@ -1,6 +1,9 @@
 package com.yjh.platform.module.task.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,9 +31,11 @@ public class TCruiseType implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "实例ID")
+    @TableField(value = "instance_id",updateStrategy = FieldStrategy.IGNORED)
     private Long instanceId;
 
     @Length(max = 12,message = "remark长度必须小于等于12")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
 

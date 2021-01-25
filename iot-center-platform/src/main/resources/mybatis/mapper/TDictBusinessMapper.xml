@@ -47,12 +47,12 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TDictBusiness">
         update t_dict_business a <set>
         <if test="dictId != null ">a.dict_id = #{dictId, jdbcType=INTEGER},</if>
-        <if test="dictCode != null and dictCode != ''">a.dict_code = #{dictCode, jdbcType=VARCHAR},</if>
-        <if test="colName != null and colName != ''">a.col_name = #{colName, jdbcType=VARCHAR},</if>
-        <if test="dictNote != null and dictNote != ''">a.dict_note = #{dictNote, jdbcType=VARCHAR},</if>
+        <if test="dictCode != null ">a.dict_code = #{dictCode},</if>
+        <if test="colName != null ">a.col_name = #{colName},</if>
+        <if test="dictNote != null ">a.dict_note = #{dictNote},</if>
         <if test="upDict != null ">a.up_dict = #{upDict, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
-        <if test="sort != null and sort != ''">a.sort = #{sort, jdbcType=BIGINT},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
+        <if test="sort != null ">a.sort = #{sort},</if>
     </set>
             where a.dict_id = #{dictId, jdbcType=INTEGER}
     </update>

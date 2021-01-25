@@ -40,11 +40,11 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TPeriodModel">
         update t_period_model a <set>
-        <if test="periodId != null and periodId != ''">a.period_id = #{periodId, jdbcType=BIGINT},</if>
-        <if test="cronExpression != null and cronExpression != ''">a.cron_expression = #{cronExpression, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
-        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="periodId != null ">a.period_id = #{periodId},</if>
+        <if test="cronExpression != null ">a.cron_expression = #{cronExpression},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
+        <if test="updateTime != null ">a.update_time = #{updateTime},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
     </set>
             where a.period_id = #{periodId, jdbcType=BIGINT}
     </update>

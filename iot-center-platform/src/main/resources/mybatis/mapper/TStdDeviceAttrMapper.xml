@@ -88,27 +88,27 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         update t_std_device_attr a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
         <if test="deviceModel != null ">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
-        <if test="pmsType != null and pmsType != ''">a.pms_type = #{pmsType, jdbcType=VARCHAR},</if>
-        <if test="pmsId != null and pmsId != ''">a.pms_id = #{pmsId, jdbcType=VARCHAR},</if>
-        <if test="deviceVendor != null and deviceVendor != ''">a.device_vendor = #{deviceVendor, jdbcType=VARCHAR},</if>
+        <if test="pmsType != null ">a.pms_type = #{pmsType},</if>
+        <if test="pmsId != null ">a.pms_id = #{pmsId},</if>
+        <if test="deviceVendor != null ">a.device_vendor = #{deviceVendor},</if>
         <if test="productionDate != null ">a.production_date = #{productionDate, jdbcType=TIMESTAMP},</if>
         <if test="usedTime != null ">a.used_time = #{usedTime, jdbcType=TIMESTAMP},</if>
         <if test="disableDate != null ">a.disable_date = #{disableDate, jdbcType=TIMESTAMP},</if>
         <if test="lastMaintenance != null ">a.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP},</if>
-        <if test="maintenanceCount != null and maintenanceCount != ''">a.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR},</if>
-        <if test="organization != null and organization != ''">a.organization = #{organization, jdbcType=VARCHAR},</if>
-        <if test="department != null and department != ''">a.department = #{department, jdbcType=VARCHAR},</if>
-        <if test="responsiblePerson != null and responsiblePerson != ''">a.responsible_person = #{responsiblePerson, jdbcType=VARCHAR},</if>
-        <if test="latitude != null and latitude != ''">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
-        <if test="longitude != null and longitude != ''">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
+        <if test="maintenanceCount != null ">a.maintenance_count = #{maintenanceCount},</if>
+        <if test="organization != null ">a.organization = #{organization},</if>
+        <if test="department != null ">a.department = #{department},</if>
+        <if test="responsiblePerson != null ">a.responsible_person = #{responsiblePerson},</if>
+        <if test="latitude != null ">a.latitude = #{latitude},</if>
+        <if test="longitude != null">a.longitude = #{longitude},</if>
         <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
         <if test="port != null ">a.port = #{port, jdbcType=INTEGER},</if>
-        <if test="voltageLevel != null and voltageLevel != ''">a.voltage_level = #{voltageLevel, jdbcType=VARCHAR},</if>
-        <if test="sequencePoint != null and sequencePoint != ''">a.sequence_point = #{sequencePoint, jdbcType=VARCHAR},</if>
-        <if test="realCode != null and realCode != ''">a.real_code = #{realCode, jdbcType=VARCHAR},</if>
-        <if test="address != null and address != ''">a.address = #{address, jdbcType=VARCHAR},</if>
+        <if test="voltageLevel != null">a.voltage_level = #{voltageLevel},</if>
+        <if test="sequencePoint != null ">a.sequence_point = #{sequencePoint},</if>
+        <if test="realCode != null ">a.real_code = #{realCode},</if>
+        <if test="address != null">a.address = #{address},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=BIGINT}
     </update>
