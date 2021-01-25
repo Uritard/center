@@ -66,9 +66,9 @@
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TSequentialConf" resultType="com.yjh.platform.module.user.entity.TSequentialConf">
         select
         a.cfg_device_id,
-        c.device_name,
+        c.device_name as cfgDeviceName,
         a.cfg_mete_id,
-        d.mete_name,
+        d.mete_name as cfgMeteName,
         a.preset_id,
         b.preset_name,
         a.identify_result
