@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "数据服务器对象", description = "视频诊断-数据服务器")
-public class DateServer implements Serializable {
+public class DataServer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

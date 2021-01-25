@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -28,4 +29,12 @@ public class TaskSimpleInfo implements Serializable {
     private String TypeName;
     @ApiModelProperty(value = "任务状态名称")
     private String taskStateName;
+    @ApiModelProperty(value = "测点数量")
+    private Long deviceMeteCount;
+    @ApiModelProperty(value = "视频设备个数")
+    private Long cameraCount;
+    @ApiModelProperty(value = "机器人点位")
+    private Long robotPointsCount;
+
+
 }

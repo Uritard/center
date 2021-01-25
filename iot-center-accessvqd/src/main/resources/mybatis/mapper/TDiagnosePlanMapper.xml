@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessvqd.module.diagnose.dao.TDiagnosePlanDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        <id column="diagnose_plan_id" jdbcType="VARCHAR" property="diagnosePlanId"/>
+        <result column="plan_name" jdbcType="VARCHAR" property="planName"/>
+        <result column="plan_type" jdbcType="VARCHAR" property="planType"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        diagnose_plan_id, plan_name, plan_type, user_id,start_time,end_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="diagnosePlanId"
+            parameterType="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        insert into t_diagnose_plan(
+            diagnose_plan_id,
+            plan_name,
+            plan_type,
+            user_id,
+            start_time,
+            end_time
+        )values(
+                #{diagnosePlanId, jdbcType=VARCHAR},
+                #{planName, jdbcType=VARCHAR},
+                #{planType, jdbcType=VARCHAR},
+                #{userId, jdbcType=BIGINT},
+                #{startTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP}
+
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_diagnose_plan
+                where diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        update t_diagnose_plan a
+        <set>
+            <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id =
+                #{diagnosePlanId, jdbcType=VARCHAR},
+            </if>
+            <if test="planName != null and planName != ''">a.plan_name = #{planName, jdbcType=VARCHAR},</if>
+            <if test="planType != null and planType != ''">a.plan_type = #{planType, jdbcType=VARCHAR},</if>
+            <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
+            <if test="startTime != null">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
+            <if test="endTime != null">a.start_time = #{endTime, jdbcType=TIMESTAMP},</if>
+        </set>
+        where a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </update>
+
+
+    <update id="updateEndTime">
+        update t_diagnose_plan a
+        <set>
+            <if test="endTime != null">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
+        </set>
+        where a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String"
+            resultType="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        select
+        a.diagnose_plan_id,
+        a.plan_name,
+        a.plan_type,
+        a.user_id,
+        start_time,
+        end_time
+        from t_diagnose_plan a
+        where 1 = 1
+            and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessvqd.module.diagnose.entity.Plans"
+            resultType="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        select
+        a.diagnose_plan_id,
+        a.plan_name,
+        a.plan_type,
+        a.user_id,
+        a.start_time
+        from t_diagnose_plan a
+        where 1 = 1
+        <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id =
+            #{diagnosePlanId, jdbcType=VARCHAR}
+        </if>
+        <if test="planName != null and planName != ''">and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
+        <if test="planType != null and planType != ''">and a.plan_type = #{planType, jdbcType=VARCHAR}</if>
+        <if test="userId != null and userId != ''">and a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="startTime != null ">and start_time = #{startTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="java.lang.String"
+            resultType="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        select
+        a.diagnose_plan_id,
+        a.plan_name,
+        a.plan_type,
+        a.user_id,
+        a.start_time,
+        end_time
+        from t_diagnose_plan a
+        where 1 = 1
+        <if test="planName != null and planName != ''">and a.plan_name like concat ('%',#{planName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_diagnose_plan(
+        diagnose_plan_id,
+        plan_name,
+        plan_type,
+        user_id,
+        start_time,
+        end_time
+        )values
+        <foreach collection="list" item="TDiagnosePlan" separator=",">
+            (
+            #{TDiagnosePlan.diagnosePlanId, jdbcType=VARCHAR},
+            #{TDiagnosePlan.planName, jdbcType=VARCHAR},
+            #{TDiagnosePlan.planType, jdbcType=VARCHAR},
+            #{TDiagnosePlan.userId, jdbcType=BIGINT},
+            #{TDiagnosePlan.startTime, jdbcType=TIMESTAMP}
+            #{TDiagnosePlan.endTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+</mapper>

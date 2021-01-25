@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.google.common.collect.Sets;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
@@ -157,9 +158,12 @@ public class HelloController {
         Long endTime=System.currentTimeMillis();
         List<Integer> results=new ArrayList<>();
 
+          HashMap<String,Long> map1=new HashMap<>();
+          map1.put("cameraId",Long.valueOf("40050"));
+         Result result1=sendPostRequest(Constant.START_CAMERA_URL,map1);
+         result.setData(result1.getData());
+         log.info("---------："+result1.getData());
 
-
-        result.setData( resolveDefectResult("wcaqm13103151399418wcgz12733701470807"));
 //        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
 //        log.info("djkhwqedkfe:"+maps.get("remark"));
 //        TCruiseTask tCruiseTask=new TCruiseTask();
@@ -167,8 +171,8 @@ public class HelloController {
 //        log.info("class.....:"+testString.getClass());
 //        log.info("content-length:"+testString.length());
 //
-//        log.info("Content表计:"+testString.matches("\\{\"msgData.*?\"2\"}"));
-//        log.info("Content缺陷:"+testString.matches("\\{\"msgType.*?}}}}"));
+        log.info("Content表计:"+testString.matches("\\{\"msgData.*?\"2\"}"));
+        log.info("Content缺陷:"+testString.matches("\\{\"msgType.*?}}}}"));
 
 //        log.info("Content前半:"+testString.matches());
 //        log.info("Content后半:"+testString.matches());
@@ -302,86 +306,7 @@ public class HelloController {
 
         return result;
     }
-
-
-
-    public String resolveDefectResult(String resultValue) {
-        log.info("----缺陷识别结果解析---resultValue:" + resultValue);
-        String defectValue = "";
-        String value = resultValue;
-        String finalValue = value.replaceAll("[0-9]", "");
-        String[] str2 = finalValue.split("\\s+");
-        for (int i = 0; i < str2.length; i++) {
-            switch (str2[i]) {
-                case "wcaqm":
-                    defectValue = defectValue + "未穿安全帽" + " ";
-                    break;
-                case "wcgz":
-                    defectValue = defectValue + "未穿工装" + " ";
-                    break;
-                case "rydd":
-                    defectValue = defectValue + "人员倒地" + " ";
-                    break;
-                case "xy":
-                    defectValue = defectValue + "吸烟" + " ";
-                    break;
-                case "sly_dmyw":
-                    defectValue = defectValue + "地面油污" + " ";
-                    break;
-                case "yw_nc":
-                    defectValue = defectValue + "鸟窝" + " ";
-                    break;
-                case "yw_gkxfw":
-                    defectValue = defectValue + "飘挂物" + " ";
-                    break;
-                case "jyz_bmwh":
-                    defectValue = defectValue + "绝缘子-表面污秽" + " ";
-                    break;
-                case "jyz_pl":
-                    defectValue = defectValue + "绝缘子-破裂" + " ";
-                    break;
-                case "jyz_lw":
-                    defectValue = defectValue + "绝缘子-裂纹" + " ";
-                    break;
-                case "hxq_gjbs":
-                    defectValue = defectValue + "呼吸器-硅胶变色" + " ";
-                    break;
-                case "hxq_gjtps":
-                    defectValue = defectValue + "呼吸器-硅胶筒破损" + " ";
-                    break;
-                case "ywzt_yfyc":
-                    defectValue = defectValue + "油位状态-油位异常" + " ";
-                    break;
-                case "bj_bpmh":
-                    defectValue = defectValue + "表计-表盘模糊" + " ";
-                    break;
-                case "bj_bpps":
-                    defectValue = defectValue + "表计-表盘破损" + " ";
-                    break;
-                case "bj_wkps":
-                    defectValue = defectValue + "表计-外壳破损" + " ";
-                    break;
-                case "mcqdmsh":
-                    defectValue = defectValue + "门窗墙地面损坏" + " ";
-                    break;
-                case "gbps":
-                    defectValue = defectValue + "盖板破损" + " ";
-                    break;
-                case "gjptwss":
-                    defectValue = defectValue + "构架爬梯未上锁" + " ";
-                    break;
-                case "xmbhyc":
-                    defectValue = defectValue + "箱门闭合异常" + " ";
-                    break;
-                case "jsxs":
-                    defectValue = defectValue + "金属锈蚀" + " ";
-                    break;
-                default:
-                    return "null";
-            }
-        }
-        return defectValue;
-    }
+    
 
     @ApiOperation("发任务")
     @PostMapping("/task")
@@ -442,6 +367,19 @@ public class HelloController {
     }
 
 
+
+    public Result sendPostRequest(String url,HashMap<String,Long> params) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.getForObject(url, Result.class,params);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
+    }
     //读批量redis
     public Set<String> redisScan(String key) {
         return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {

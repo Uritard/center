@@ -370,7 +370,8 @@ select *from (
             c.device_id as'deviceId',
             c.instance_id as 'instanceId',
             c.cruise_type as 'cruiseType',
-            d.dict_note as 'cruiseTypeName'
+            d.dict_note as 'cruiseTypeName',
+            c.unit
         FROM
             t_cruise_task a
         LEFT JOIN t_cruise_plan_attr b ON a.plan_id = b.plan_id

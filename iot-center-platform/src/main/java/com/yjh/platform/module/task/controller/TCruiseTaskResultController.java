@@ -11,6 +11,7 @@ import io.swagger.annotations.*;
 
 
 import org.jboss.netty.util.internal.ReusableIterator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -173,9 +174,22 @@ public class TCruiseTaskResultController {
 
     }
 
+    @ApiOperation(value = "A-获取当前执行任务的实时告警信息")
+    @RequestMapping(value = "/selectRealTimeWarnInfo",method = RequestMethod.GET)
+    public Result selectRealTimeWarnInfo(@RequestParam String taskId){
+        Result result=new Result();
+        try {
+            result.setData(tCruiseTaskResultService.realTimeWarnInfo(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询失败：", e);
+        }
+       return result;
+    }
+
 
     @ApiOperation(value = "A-获取巡检任务进度")
-    @RequestMapping(value = "selectCruiseAdvance",method = RequestMethod.GET)
+    @RequestMapping(value = "/selectCruiseAdvance",method = RequestMethod.GET)
     public Result selectCruiseAdvance(@RequestParam String taskId){
         Result result=new Result();
        try{
@@ -187,6 +201,18 @@ public class TCruiseTaskResultController {
 
         return  result;
     }
+
+//    @ApiOperation(value = "B-展示任务采集图片阵列")
+//    @RequestMapping(value = "/selectImagePosition",method = RequestMethod.GET)
+//    public Result selectImagePosition(@RequestParam String taskId){
+//        Result result=new Result();
+//        try {
+//            result.setData(tCruiseTaskResultService.selectImagePosition(taskId));
+//        }catch (Exception e){
+//
+//        }
+//        return result;
+//    }
 
     @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间")
     @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
@@ -233,19 +259,7 @@ public class TCruiseTaskResultController {
         }
         return  result;
     }
-    @ApiOperation(value = "B-机器人巡视画面")
-    @RequestMapping(value = "/selectRobotScreen",method = RequestMethod.GET)
-    public Result selectRobotScreen(@RequestParam String taskId){
-        Result result=new Result();
-        try{
-            result.setData(tCruiseTaskResultService.selectRobotScreen(taskId));
-        }catch (Exception e){
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述",e);
-        }
-        return  result;
 
-    }
 
     @ApiOperation(value = "读取缓存中的任务下巡视点绑定的摄像头信息")
     @RequestMapping(value = "/cameraInfoByRedis",method = RequestMethod.GET)

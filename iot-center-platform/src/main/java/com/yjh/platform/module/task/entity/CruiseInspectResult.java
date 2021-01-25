@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,6 +10,9 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -34,6 +38,19 @@ public class CruiseInspectResult implements Serializable {
     @ApiModelProperty(value = "数据来源")
     private Integer cruiseType;
     private  String cruiseTypeName;
+    @ApiModelProperty(value = "巡检状态")
+    private String cruiseStatus;
+    @ApiModelProperty(value = "是否告警")
+    private String isWarn;
+    @ApiModelProperty(value = "单位")
+    private String unit;
+    @ApiModelProperty(value = "图片路径")
+    private String imagePath;
+    @ApiModelProperty(value = "摄像头ID")
+    private Long cameraId;
+    @ApiModelProperty(value = "视频与流地址信息列表")
+    private Object videoInfo;
+
 
 }
 

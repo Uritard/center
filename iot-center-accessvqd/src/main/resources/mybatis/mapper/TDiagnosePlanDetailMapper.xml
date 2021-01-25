@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessvqd.module.diagnose.dao.TDiagnosePlanDetailDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
+        <id column="diagnose_plan_id" jdbcType="VARCHAR" property="diagnosePlanId" />
+        <result column="signal_opt" jdbcType="VARCHAR" property="signalOpt" />
+        <result column="blur_opt" jdbcType="VARCHAR" property="blurOpt" />
+        <result column="contrast_opt" jdbcType="VARCHAR" property="contrastOpt" />
+        <result column="bright_opt" jdbcType="VARCHAR" property="brightOpt" />
+        <result column="dark_opt" jdbcType="VARCHAR" property="darkOpt" />
+        <result column="chroma_opt" jdbcType="VARCHAR" property="chromaOpt" />
+        <result column="mono_opt" jdbcType="VARCHAR" property="monoOpt" />
+        <result column="noise_opt" jdbcType="VARCHAR" property="noiseOpt" />
+        <result column="streak_opt" jdbcType="VARCHAR" property="streakOpt" />
+        <result column="freeze_opt" jdbcType="VARCHAR" property="freezeOpt" />
+        <result column="shake_opt" jdbcType="VARCHAR" property="shakeOpt" />
+        <result column="flash_opt" jdbcType="VARCHAR" property="flashOpt" />
+        <result column="scene_opt" jdbcType="VARCHAR" property="sceneOpt" />
+        <result column="cover_opt" jdbcType="VARCHAR" property="coverOpt" />
+        <result column="ptz_opt" jdbcType="VARCHAR" property="ptzOpt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        diagnose_plan_id, signal_opt, blur_opt, contrast_opt, bright_opt, dark_opt, chroma_opt, mono_opt, noise_opt, streak_opt, freeze_opt, shake_opt, flash_opt, scene_opt, cover_opt, ptz_opt
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="diagnosePlanId" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
+        insert into t_diagnose_plan_detail(
+            diagnose_plan_id,
+            signal_opt,
+            blur_opt,
+            contrast_opt,
+            bright_opt,
+            dark_opt,
+            chroma_opt,
+            mono_opt,
+            noise_opt,
+            streak_opt,
+            freeze_opt,
+            shake_opt,
+            flash_opt,
+            scene_opt,
+            cover_opt,
+            ptz_opt
+        )values(
+                #{diagnosePlanId, jdbcType=VARCHAR},
+                #{signalOpt, jdbcType=VARCHAR},
+                #{blurOpt, jdbcType=VARCHAR},
+                #{contrastOpt, jdbcType=VARCHAR},
+                #{brightOpt, jdbcType=VARCHAR},
+                #{darkOpt, jdbcType=VARCHAR},
+                #{chromaOpt, jdbcType=VARCHAR},
+                #{monoOpt, jdbcType=VARCHAR},
+                #{noiseOpt, jdbcType=VARCHAR},
+                #{streakOpt, jdbcType=VARCHAR},
+                #{freezeOpt, jdbcType=VARCHAR},
+                #{shakeOpt, jdbcType=VARCHAR},
+                #{flashOpt, jdbcType=VARCHAR},
+                #{sceneOpt, jdbcType=VARCHAR},
+                #{coverOpt, jdbcType=VARCHAR},
+                #{ptzOpt, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_diagnose_plan_detail
+                where diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
+        update t_diagnose_plan_detail a <set>
+        <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR},</if>
+        <if test="signalOpt != null and signalOpt != ''">a.signal_opt = #{signalOpt, jdbcType=VARCHAR},</if>
+        <if test="blurOpt != null and blurOpt != ''">a.blur_opt = #{blurOpt, jdbcType=VARCHAR},</if>
+        <if test="contrastOpt != null and contrastOpt != ''">a.contrast_opt = #{contrastOpt, jdbcType=VARCHAR},</if>
+        <if test="brightOpt != null and brightOpt != ''">a.bright_opt = #{brightOpt, jdbcType=VARCHAR},</if>
+        <if test="darkOpt != null and darkOpt != ''">a.dark_opt = #{darkOpt, jdbcType=VARCHAR},</if>
+        <if test="chromaOpt != null and chromaOpt != ''">a.chroma_opt = #{chromaOpt, jdbcType=VARCHAR},</if>
+        <if test="monoOpt != null and monoOpt != ''">a.mono_opt = #{monoOpt, jdbcType=VARCHAR},</if>
+        <if test="noiseOpt != null and noiseOpt != ''">a.noise_opt = #{noiseOpt, jdbcType=VARCHAR},</if>
+        <if test="streakOpt != null and streakOpt != ''">a.streak_opt = #{streakOpt, jdbcType=VARCHAR},</if>
+        <if test="freezeOpt != null and freezeOpt != ''">a.freeze_opt = #{freezeOpt, jdbcType=VARCHAR},</if>
+        <if test="shakeOpt != null and shakeOpt != ''">a.shake_opt = #{shakeOpt, jdbcType=VARCHAR},</if>
+        <if test="flashOpt != null and flashOpt != ''">a.flash_opt = #{flashOpt, jdbcType=VARCHAR},</if>
+        <if test="sceneOpt != null and sceneOpt != ''">a.scene_opt = #{sceneOpt, jdbcType=VARCHAR},</if>
+        <if test="coverOpt != null and coverOpt != ''">a.cover_opt = #{coverOpt, jdbcType=VARCHAR},</if>
+        <if test="ptzOpt != null and ptzOpt != ''">a.ptz_opt = #{ptzOpt, jdbcType=VARCHAR},</if>
+    </set>
+            where a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
+        select
+        a.diagnose_plan_id,
+        a.signal_opt,
+        a.blur_opt,
+        a.contrast_opt,
+        a.bright_opt,
+        a.dark_opt,
+        a.chroma_opt,
+        a.mono_opt,
+        a.noise_opt,
+        a.streak_opt,
+        a.freeze_opt,
+        a.shake_opt,
+        a.flash_opt,
+        a.scene_opt,
+        a.cover_opt,
+        a.ptz_opt
+        from t_diagnose_plan_detail a
+        where 1 = 1
+            and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
+        select
+        a.diagnose_plan_id,
+        a.signal_opt,
+        a.blur_opt,
+        a.contrast_opt,
+        a.bright_opt,
+        a.dark_opt,
+        a.chroma_opt,
+        a.mono_opt,
+        a.noise_opt,
+        a.streak_opt,
+        a.freeze_opt,
+        a.shake_opt,
+        a.flash_opt,
+        a.scene_opt,
+        a.cover_opt,
+        a.ptz_opt
+        from t_diagnose_plan_detail a
+        where 1 = 1
+        <if test="diagnosePlanId != null and diagnosePlanId != ''"> and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+        <if test="signalOpt != null and signalOpt != ''"> and a.signal_opt = #{signalOpt, jdbcType=VARCHAR}</if>
+        <if test="blurOpt != null and blurOpt != ''"> and a.blur_opt = #{blurOpt, jdbcType=VARCHAR}</if>
+        <if test="contrastOpt != null and contrastOpt != ''"> and a.contrast_opt = #{contrastOpt, jdbcType=VARCHAR}</if>
+        <if test="brightOpt != null and brightOpt != ''"> and a.bright_opt = #{brightOpt, jdbcType=VARCHAR}</if>
+        <if test="darkOpt != null and darkOpt != ''"> and a.dark_opt = #{darkOpt, jdbcType=VARCHAR}</if>
+        <if test="chromaOpt != null and chromaOpt != ''"> and a.chroma_opt = #{chromaOpt, jdbcType=VARCHAR}</if>
+        <if test="monoOpt != null and monoOpt != ''"> and a.mono_opt = #{monoOpt, jdbcType=VARCHAR}</if>
+        <if test="noiseOpt != null and noiseOpt != ''"> and a.noise_opt = #{noiseOpt, jdbcType=VARCHAR}</if>
+        <if test="streakOpt != null and streakOpt != ''"> and a.streak_opt = #{streakOpt, jdbcType=VARCHAR}</if>
+        <if test="freezeOpt != null and freezeOpt != ''"> and a.freeze_opt = #{freezeOpt, jdbcType=VARCHAR}</if>
+        <if test="shakeOpt != null and shakeOpt != ''"> and a.shake_opt = #{shakeOpt, jdbcType=VARCHAR}</if>
+        <if test="flashOpt != null and flashOpt != ''"> and a.flash_opt = #{flashOpt, jdbcType=VARCHAR}</if>
+        <if test="sceneOpt != null and sceneOpt != ''"> and a.scene_opt = #{sceneOpt, jdbcType=VARCHAR}</if>
+        <if test="coverOpt != null and coverOpt != ''"> and a.cover_opt = #{coverOpt, jdbcType=VARCHAR}</if>
+        <if test="ptzOpt != null and ptzOpt != ''"> and a.ptz_opt = #{ptzOpt, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
+        select
+        a.diagnose_plan_id,
+        a.signal_opt,
+        a.blur_opt,
+        a.contrast_opt,
+        a.bright_opt,
+        a.dark_opt,
+        a.chroma_opt,
+        a.mono_opt,
+        a.noise_opt,
+        a.streak_opt,
+        a.freeze_opt,
+        a.shake_opt,
+        a.flash_opt,
+        a.scene_opt,
+        a.cover_opt,
+        a.ptz_opt
+        from t_diagnose_plan_detail a
+        where 1 = 1
+        <if test="diagnosePlanId != null and diagnosePlanId != ''"> and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+        <if test="signalOpt != null and signalOpt != ''"> and a.signal_opt = #{signalOpt, jdbcType=VARCHAR}</if>
+        <if test="blurOpt != null and blurOpt != ''"> and a.blur_opt = #{blurOpt, jdbcType=VARCHAR}</if>
+        <if test="contrastOpt != null and contrastOpt != ''"> and a.contrast_opt = #{contrastOpt, jdbcType=VARCHAR}</if>
+        <if test="brightOpt != null and brightOpt != ''"> and a.bright_opt = #{brightOpt, jdbcType=VARCHAR}</if>
+        <if test="darkOpt != null and darkOpt != ''"> and a.dark_opt = #{darkOpt, jdbcType=VARCHAR}</if>
+        <if test="chromaOpt != null and chromaOpt != ''"> and a.chroma_opt = #{chromaOpt, jdbcType=VARCHAR}</if>
+        <if test="monoOpt != null and monoOpt != ''"> and a.mono_opt = #{monoOpt, jdbcType=VARCHAR}</if>
+        <if test="noiseOpt != null and noiseOpt != ''"> and a.noise_opt = #{noiseOpt, jdbcType=VARCHAR}</if>
+        <if test="streakOpt != null and streakOpt != ''"> and a.streak_opt = #{streakOpt, jdbcType=VARCHAR}</if>
+        <if test="freezeOpt != null and freezeOpt != ''"> and a.freeze_opt = #{freezeOpt, jdbcType=VARCHAR}</if>
+        <if test="shakeOpt != null and shakeOpt != ''"> and a.shake_opt = #{shakeOpt, jdbcType=VARCHAR}</if>
+        <if test="flashOpt != null and flashOpt != ''"> and a.flash_opt = #{flashOpt, jdbcType=VARCHAR}</if>
+        <if test="sceneOpt != null and sceneOpt != ''"> and a.scene_opt = #{sceneOpt, jdbcType=VARCHAR}</if>
+        <if test="coverOpt != null and coverOpt != ''"> and a.cover_opt = #{coverOpt, jdbcType=VARCHAR}</if>
+        <if test="ptzOpt != null and ptzOpt != ''"> and a.ptz_opt = #{ptzOpt, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_diagnose_plan_detail(
+            diagnose_plan_id,
+            signal_opt,
+            blur_opt,
+            contrast_opt,
+            bright_opt,
+            dark_opt,
+            chroma_opt,
+            mono_opt,
+            noise_opt,
+            streak_opt,
+            freeze_opt,
+            shake_opt,
+            flash_opt,
+            scene_opt,
+            cover_opt,
+            ptz_opt
+        )values
+        <foreach collection="list" item="TDiagnosePlanDetail" separator=",">
+            (
+                #{TDiagnosePlanDetail.diagnosePlanId, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.signalOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.blurOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.contrastOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.brightOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.darkOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.chromaOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.monoOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.noiseOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.streakOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.freezeOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.shakeOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.flashOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.sceneOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.coverOpt, jdbcType=VARCHAR},
+                #{TDiagnosePlanDetail.ptzOpt, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

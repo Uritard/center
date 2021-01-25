@@ -1,7 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.task.entity.RobotInfoForHomePage;
-import com.yjh.platform.module.user.entity.CameraOfRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.apache.ibatis.annotations.Param;
@@ -74,7 +73,8 @@ public interface TRobotInfoDao {
     List<TRobotInspectionTree> selectInspectionTree();
     List<TRobotInspectionTree> batchSelectInspection();
 
-    List<CameraOfRobotInfo>selectRobotScreen(@Param(value = "taskId")String taskId);
+    //通过巡视点ID查询绑定的机器人
+    Long selectRobotScreen(@Param(value = "instanceId")Long instanceId);
 
     List<RobotInfoForHomePage>selectRobotInfo(@Param(value = "robotPosition")String robotPosition);
 

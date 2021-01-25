@@ -612,4 +612,55 @@
 	        WHERE a.preset_id = #{presetId, jdbcType = BIGINT}
     </select>
 
+    <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+            count(*)
+        FROM
+            t_std_devicemete
+        WHERE
+            device_mete_id IN (
+                SELECT DISTINCT
+                    b.device_mete_id
+                FROM
+                    t_cruise_task a
+                LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+                WHERE
+                    a.task_id = #{taskId,jdbcType=VARCHAR}
+            )
+        UNION ALL
+            SELECT
+                count(*)
+            FROM
+                t_camera_info
+            WHERE
+                camera_id IN (
+                    SELECT DISTINCT
+                        c.camera_id
+                    FROM
+                        t_cruise_task a
+                    LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+                    LEFT JOIN t_camera_preset c ON b.point_task_id = c.preset_id
+                    WHERE
+                        a.task_id = #{taskId,jdbcType=VARCHAR}
+                )
+            UNION ALL
+                SELECT
+                    count(*)
+                FROM
+                    t_cruise_task a
+                LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+                LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+                WHERE
+                    a.task_id = #{taskId,jdbcType=VARCHAR}
+                AND c.cruise_type = 228
+            UNION ALL
+			SELECT
+				count(*)
+			FROM
+				t_cruise_task a
+			LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+			WHERE
+				a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
