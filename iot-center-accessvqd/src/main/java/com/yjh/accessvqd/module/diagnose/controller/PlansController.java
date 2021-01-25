@@ -93,9 +93,7 @@ public class PlansController {
     public Result test(@RequestParam String time) {
         Result result = new Result();
         try {
-
-            String str="diagnosePlan:12345";
-           result.setData( str.replaceAll("diagnosePlan:",""));
+            result.setData("---");
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("任务下发失败" + e);
