@@ -1,7 +1,10 @@
 package com.yjh.platform.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.List;
@@ -33,14 +36,17 @@ public class TDeviceMaintenance implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "检修ID")
     @TableId(value = "maintenance_id", type = IdType.AUTO)
+    @TableField(value = "maintenance_id",updateStrategy = FieldStrategy.IGNORED)
     private Long maintenanceId;
 
     @Length(max = 256,message = "maintenanceName长度必须小于等于256")
     @ApiModelProperty(value = "检修名称")
+    @TableField(value = "maintenance_name",updateStrategy = FieldStrategy.IGNORED)
     private String maintenanceName;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备ID")
+     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
     @Max(value=99)
