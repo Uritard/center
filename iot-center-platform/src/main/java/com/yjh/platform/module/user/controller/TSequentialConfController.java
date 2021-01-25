@@ -167,12 +167,53 @@ public class TSequentialConfController {
 
 
     @ApiOperation(value = "查询顺控设备树")
+    @RequestMapping(value = "/sequenceControlResponse", method = RequestMethod.GET)
+    public Result sequenceControlResponse(@RequestParam(value = "map", required = false) Map<String,List<Long>> map) {
+        Result result = new Result();
+        try {
+
+            //List<AreaInfo> list = tSequentialConfService.selectForCfgDeviceTree(cfgDeviceName);
+            result.setData(1);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "一键顺控响应")
     @RequestMapping(value = "/selectForCfgDeviceTree", method = RequestMethod.GET)
     public Result selectForCfgDeviceTree(@RequestParam(value = "cfgDeviceName", required = false) String cfgDeviceName) {
         Result result = new Result();
         try {
             List<AreaInfo> list = tSequentialConfService.selectForCfgDeviceTree(cfgDeviceName);
             result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "触发顺控")
+    @RequestMapping(value = "/sequential",method = RequestMethod.GET)
+    public Result sequential(@RequestParam Map<String,String> meteId){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.sequential(meteId.get("meteId")));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "顺控信息")
+    @RequestMapping(value = "/sequentialInfo",method = RequestMethod.GET)
+    public Result sequentialInfo(@RequestParam(value = "cfgDeviceId") String cfgDeviceId){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.sequentialInfo(cfgDeviceId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

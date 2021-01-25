@@ -16,22 +16,22 @@ import java.util.List;
 @Repository
 public interface TCfgMeteDao {
 
-    int insertForMete(SYAllInfo syAllInfo);
+    int insertForMete(List<SYAllInfo> list);
     int updateForMete(SYAllInfo syAllInfo);
 
-    int insertForDevice(SYAllInfo syAllInfo);
+    int insertForDevice(List<SYAllInfo> list);
     int updateForDevice(SYAllInfo syAllInfo);
 
-    int insertForTeleadjust(SYAllInfo syAllInfo);
+    int insertForTeleadjust(List<SYAllInfo> list);
     int updateForTeleadjust(SYAllInfo syAllInfo);
 
-    int insertForTelecontrol(SYAllInfo syAllInfo);
+    int insertForTelecontrol(List<SYAllInfo> list);
     int updateForTelecontrol(SYAllInfo syAllInfo);
 
-    int insertForTelemeter(SYAllInfo syAllInfo);
+    int insertForTelemeter(List<SYAllInfo> list);
     int updateForTelemeter(SYAllInfo syAllInfo);
 
-    int insertForTelesignal(SYAllInfo syAllInfo);
+    int insertForTelesignal(List<SYAllInfo> list);
     int updateForTelesignal(SYAllInfo syAllInfo);
 
     String selectByMeteId(String meteId);

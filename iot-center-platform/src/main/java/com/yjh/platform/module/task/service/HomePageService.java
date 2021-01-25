@@ -129,23 +129,29 @@ public class HomePageService {
         List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo(robotPosition);
         for (RobotInfoForHomePage item: robotList) {
             //计算机器人投运时间
-            Date startTime = simpleDateFormat.parse(item.getCommissionDate());
-            Date endTime = new Date();
-            long diff = endTime.getTime()-startTime.getTime();
-            long days = diff / (1000 * 60 * 60 * 24);
-            long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
-            long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
-            String usedTime= "";
-            if(days != 0){
-                usedTime =usedTime+days+"天";
+            if(item.getCommissionDate() == null){
+                item.setCommissionDate("");
+            }else {
+                Date startTime = simpleDateFormat.parse(item.getCommissionDate());
+                Date endTime = new Date();
+                long diff = endTime.getTime()-startTime.getTime();
+                long days = diff / (1000 * 60 * 60 * 24);
+                long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
+                long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
+                String usedTime= "";
+                if(days != 0){
+                    usedTime =usedTime+days+"天";
+                }
+                if(hours != 0){
+                    usedTime =usedTime+hours+"小时";
+                }
+                if(minutes != 0){
+                    usedTime =usedTime+minutes+"分";
+                }
+                item.setCommissionDate(usedTime);
             }
-            if(hours != 0){
-                usedTime =usedTime+hours+"小时";
-            }
-            if(minutes != 0){
-                usedTime =usedTime+minutes+"分";
-            }
-            item.setCommissionDate(usedTime);
+
+
             Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+item.getRobotCode()+":3");
             if(mapForCell.size() != 0){
                Double value = Double.valueOf(mapForCell.get("value").toString());//电池电量

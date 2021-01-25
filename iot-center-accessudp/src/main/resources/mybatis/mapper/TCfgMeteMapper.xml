@@ -2,66 +2,69 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.accessudp.module.device.dao.TCfgMeteDao">
 
-    <insert id="insertForMete" useGeneratedKeys="true" keyProperty="meteId" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
+    <insert id="insertForMete" >
         insert into t_cfg_mete(
-            mete_id,
-            mete_type,
-            mete_kind,
-            mete_name,
-            mete_code,
-            unit,
-            mete_explain_type,
-            create_time,
-            update_time,
-            modulus,
-            station_name,
-            station_id,
-            up_effect,
-            down_effect,
-            alarmlevel,
-            alarmthresbhold,
-            describer,
-            mete_precision,
-            change_limit,
-            hilimit1,
-            lolimit1,
-            hilimit2,
-            lolimit2,
-            hilimit3,
-            lolimit3,
-            hilimit4,
-            stander,
-            controlenable
-        )values(
-                #{meteId, jdbcType=VARCHAR},
-                #{meteType, jdbcType=VARCHAR},
-                #{meteKind, jdbcType=INTEGER},
-                #{meteName, jdbcType=VARCHAR},
-                #{meteCode, jdbcType=VARCHAR},
-                #{unit, jdbcType=VARCHAR},
-                #{meteExplainType, jdbcType=VARCHAR},
-                CURRENT_TIME (),
-                CURRENT_TIME (),
-                #{modulus, jdbcType=INTEGER},
-                #{stationName, jdbcType=VARCHAR},
-                #{stationId, jdbcType=VARCHAR},
-                #{upEffect, jdbcType=INTEGER},
-                #{downEffect, jdbcType=INTEGER},
-                #{alarmlevel, jdbcType=INTEGER},
-                #{alarmthresbhold, jdbcType=INTEGER},
-                #{describer, jdbcType=VARCHAR},
-                #{metePrecision, jdbcType=INTEGER},
-                #{changeLimit, jdbcType=REAL},
-                #{hilimit1, jdbcType=REAL},
-                #{lolimit1, jdbcType=REAL},
-                #{hilimit2, jdbcType=REAL},
-                #{lolimit2, jdbcType=REAL},
-                #{hilimit3, jdbcType=REAL},
-                #{lolimit3, jdbcType=REAL},
-                #{hilimit4, jdbcType=REAL},
-                #{stander, jdbcType=REAL},
-                #{controlenable, jdbcType=INTEGER}
-        )
+        mete_id,
+        mete_type,
+        mete_kind,
+        mete_name,
+        mete_code,
+        unit,
+        mete_explain_type,
+        create_time,
+        update_time,
+        modulus,
+        station_name,
+        station_id,
+        up_effect,
+        down_effect,
+        alarmlevel,
+        alarmthresbhold,
+        describer,
+        mete_precision,
+        change_limit,
+        hilimit1,
+        lolimit1,
+        hilimit2,
+        lolimit2,
+        hilimit3,
+        lolimit3,
+        hilimit4,
+        stander,
+        controlenable
+        )values
+        <foreach collection="list" item="SYAllInfo" separator=",">
+            (
+            #{SYAllInfo.meteId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteType, jdbcType=VARCHAR},
+            #{SYAllInfo.meteKind, jdbcType=INTEGER},
+            #{SYAllInfo.meteName, jdbcType=VARCHAR},
+            #{SYAllInfo.meteCode, jdbcType=VARCHAR},
+            #{SYAllInfo.unit, jdbcType=VARCHAR},
+            #{SYAllInfo.meteExplainType, jdbcType=VARCHAR},
+            CURRENT_TIME (),
+            CURRENT_TIME (),
+            #{SYAllInfo.modulus, jdbcType=INTEGER},
+            #{SYAllInfo.stationName, jdbcType=VARCHAR},
+            #{SYAllInfo.stationId, jdbcType=VARCHAR},
+            #{SYAllInfo.upEffect, jdbcType=INTEGER},
+            #{SYAllInfo.downEffect, jdbcType=INTEGER},
+            #{SYAllInfo.alarmlevel, jdbcType=INTEGER},
+            #{SYAllInfo.alarmthresbhold, jdbcType=INTEGER},
+            #{SYAllInfo.describer, jdbcType=VARCHAR},
+            #{SYAllInfo.metePrecision, jdbcType=INTEGER},
+            #{SYAllInfo.changeLimit, jdbcType=REAL},
+            #{SYAllInfo.hilimit1, jdbcType=REAL},
+            #{SYAllInfo.lolimit1, jdbcType=REAL},
+            #{SYAllInfo.hilimit2, jdbcType=REAL},
+            #{SYAllInfo.lolimit2, jdbcType=REAL},
+            #{SYAllInfo.hilimit3, jdbcType=REAL},
+            #{SYAllInfo.lolimit3, jdbcType=REAL},
+            #{SYAllInfo.hilimit4, jdbcType=REAL},
+            #{SYAllInfo.stander, jdbcType=REAL},
+            #{SYAllInfo.controlenable, jdbcType=INTEGER}
+            )
+        </foreach>
     </insert>
 
     <update id="updateForMete" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
@@ -97,28 +100,31 @@
         where a.mete_id = #{meteId, jdbcType=VARCHAR}
     </update>
 
-    <insert id="insertForDevice" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
+    <insert id="insertForDevice">
         insert into t_cfg_device(
-            device_id,
-            device_name,
-            device_type,
-            device_code,
-            station_id,
-            relation_code,
-            create_time,
-            update_time,
-            remark
-        )values(
-                #{deviceId, jdbcType=VARCHAR},
-                #{deviceName, jdbcType=VARCHAR},
-                #{deviceType, jdbcType=VARCHAR},
-                #{deviceCode, jdbcType=VARCHAR},
-                #{stationId, jdbcType=VARCHAR},
-                #{relationCode, jdbcType=VARCHAR},
-                CURRENT_TIME (),
-                CURRENT_TIME (),
-                #{remark, jdbcType=VARCHAR}
-        )
+        device_id,
+        device_name,
+        device_type,
+        device_code,
+        station_id,
+        relation_code,
+        create_time,
+        update_time,
+        remark
+        )values
+        <foreach collection="list" item="SYAllInfo" separator=",">
+            (
+            #{SYAllInfo.deviceId, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceName, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceType, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceCode, jdbcType=VARCHAR},
+            #{SYAllInfo.stationId, jdbcType=VARCHAR},
+            #{SYAllInfo.relationCode, jdbcType=VARCHAR},
+            CURRENT_TIME (),
+            CURRENT_TIME (),
+            #{SYAllInfo.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
     </insert>
 
     <update id="updateForDevice" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
@@ -135,44 +141,47 @@
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
 
-    <insert id="insertForTeleadjust" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
+    <insert id="insertForTeleadjust">
         insert into t_cfg_teleadjust(
-            device_id,
-            mete_id,
-            mete_name,
-            up_effect,
-            down_effect,
-            mete_precision,
-            unit,
-            mete_index,
-            mete_cid,
-            adjust_kind,
-            last_value,
-            last_time,
-            mete_code,
-            device_type,
-            description,
-            stander,
-            controlenable
-        )values(
-                #{deviceId, jdbcType=VARCHAR},
-                #{meteId, jdbcType=VARCHAR},
-                #{meteName, jdbcType=VARCHAR},
-                #{upEffect, jdbcType=REAL},
-                #{downEffect, jdbcType=REAL},
-                #{metePrecision, jdbcType=INTEGER},
-                #{unit, jdbcType=VARCHAR},
-                #{meteIndex, jdbcType=INTEGER},
-                #{meteCid, jdbcType=INTEGER},
-                #{adjustKind, jdbcType=INTEGER},
-                #{lastValue, jdbcType=REAL},
-                #{lastTime, jdbcType=TIMESTAMP},
-                #{meteCode, jdbcType=VARCHAR},
-                #{deviceType, jdbcType=VARCHAR},
-                #{description, jdbcType=VARCHAR},
-                #{stander, jdbcType=REAL},
-                #{controlenable, jdbcType=INTEGER}
-        )
+        device_id,
+        mete_id,
+        mete_name,
+        up_effect,
+        down_effect,
+        mete_precision,
+        unit,
+        mete_index,
+        mete_cid,
+        adjust_kind,
+        last_value,
+        last_time,
+        mete_code,
+        device_type,
+        description,
+        stander,
+        controlenable
+        )values
+        <foreach collection="list" item="SYAllInfo" separator=",">
+            (
+            #{SYAllInfo.deviceId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteName, jdbcType=VARCHAR},
+            #{SYAllInfo.upEffect, jdbcType=REAL},
+            #{SYAllInfo.downEffect, jdbcType=REAL},
+            #{SYAllInfo.metePrecision, jdbcType=INTEGER},
+            #{SYAllInfo.unit, jdbcType=VARCHAR},
+            #{SYAllInfo.meteIndex, jdbcType=INTEGER},
+            #{SYAllInfo.meteCid, jdbcType=INTEGER},
+            #{SYAllInfo.adjustKind, jdbcType=INTEGER},
+            #{SYAllInfo.lastValue, jdbcType=REAL},
+            CURRENT_TIME (),
+            #{SYAllInfo.meteCode, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceType, jdbcType=VARCHAR},
+            #{SYAllInfo.description, jdbcType=VARCHAR},
+            #{SYAllInfo.stander, jdbcType=REAL},
+            #{SYAllInfo.controlenable, jdbcType=INTEGER}
+            )
+        </foreach>
     </insert>
 
     <update id="updateForTeleadjust" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
@@ -198,38 +207,41 @@
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
 
-    <insert id="insertForTelecontrol" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
+    <insert id="insertForTelecontrol">
         insert into t_cfg_telecontrol(
-            device_id,
-            mete_id,
-            mete_name,
-            mete_index,
-            mete_cid,
-            control_status,
-            enable_string,
-            succeed_string,
-            trigger_string,
-            control_value,
-            mete_code,
-            device_type,
-            description,
-            describer
-        )values(
-                #{deviceId, jdbcType=VARCHAR},
-                #{meteId, jdbcType=VARCHAR},
-                #{meteName, jdbcType=VARCHAR},
-                #{meteIndex, jdbcType=INTEGER},
-                #{meteCid, jdbcType=INTEGER},
-                #{controlStatus, jdbcType=INTEGER},
-                #{enableString, jdbcType=VARCHAR},
-                #{succeedString, jdbcType=VARCHAR},
-                #{triggerString, jdbcType=VARCHAR},
-                #{controlValue, jdbcType=INTEGER},
-                #{meteCode, jdbcType=VARCHAR},
-                #{deviceType, jdbcType=VARCHAR},
-                #{description, jdbcType=VARCHAR},
-                #{describer, jdbcType=VARCHAR}
-        )
+        device_id,
+        mete_id,
+        mete_name,
+        mete_index,
+        mete_cid,
+        control_status,
+        enable_string,
+        succeed_string,
+        trigger_string,
+        control_value,
+        mete_code,
+        device_type,
+        description,
+        describer
+        )values
+        <foreach collection="list" item="SYAllInfo" separator=",">
+            (
+            #{SYAllInfo.deviceId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteName, jdbcType=VARCHAR},
+            #{SYAllInfo.meteIndex, jdbcType=INTEGER},
+            #{SYAllInfo.meteCid, jdbcType=INTEGER},
+            #{SYAllInfo.controlStatus, jdbcType=INTEGER},
+            #{SYAllInfo.enableString, jdbcType=VARCHAR},
+            #{SYAllInfo.succeedString, jdbcType=VARCHAR},
+            #{SYAllInfo.triggerString, jdbcType=VARCHAR},
+            #{SYAllInfo.controlValue, jdbcType=INTEGER},
+            #{SYAllInfo.meteCode, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceType, jdbcType=VARCHAR},
+            #{SYAllInfo.description, jdbcType=VARCHAR},
+            #{SYAllInfo.describer, jdbcType=VARCHAR}
+            )
+        </foreach>
     </insert>
 
     <update id="updateForTelecontrol" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
@@ -252,72 +264,75 @@
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
 
-    <insert id="insertForTelemeter" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
+    <insert id="insertForTelemeter">
         insert into t_cfg_telemeter(
-            device_id,
-            mete_id,
-            mete_name,
-            up_effect,
-            down_effect,
-            mete_precision,
-            unit,
-            mete_index,
-            mete_cid,
-            limit_band,
-            change_limit,
-            valid_mid,
-            valid_string,
-            invalid_value,
-            last_value,
-            last_time,
-            mete_code,
-            device_type,
-            description,
-            hilimit1,
-            lolimit1,
-            hilimit2,
-            lolimit2,
-            hilimit3,
-            lolimit3,
-            hilimit4,
-            lolimit4,
-            stander,
-            isshield,
-            storageperiod,
-            link_mete_id
-        )values(
-                #{deviceId, jdbcType=VARCHAR},
-                #{meteId, jdbcType=VARCHAR},
-                #{meteName, jdbcType=VARCHAR},
-                #{upEffect, jdbcType=REAL},
-                #{downEffect, jdbcType=REAL},
-                #{metePrecision, jdbcType=INTEGER},
-                #{unit, jdbcType=VARCHAR},
-                #{meteIndex, jdbcType=INTEGER},
-                #{meteCid, jdbcType=INTEGER},
-                #{limitBand, jdbcType=REAL},
-                #{changeLimit, jdbcType=REAL},
-                #{validMid, jdbcType=VARCHAR},
-                #{validString, jdbcType=VARCHAR},
-                #{invalidValue, jdbcType=REAL},
-                #{lastValue, jdbcType=REAL},
-                #{lastTime, jdbcType=TIMESTAMP},
-                #{meteCode, jdbcType=VARCHAR},
-                #{deviceType, jdbcType=VARCHAR},
-                #{description, jdbcType=VARCHAR},
-                #{hilimit1, jdbcType=REAL},
-                #{lolimit1, jdbcType=REAL},
-                #{hilimit2, jdbcType=REAL},
-                #{lolimit2, jdbcType=REAL},
-                #{hilimit3, jdbcType=REAL},
-                #{lolimit3, jdbcType=REAL},
-                #{hilimit4, jdbcType=REAL},
-                #{lolimit4, jdbcType=REAL},
-                #{stander, jdbcType=REAL},
-                #{isshield, jdbcType=INTEGER},
-                #{storageperiod, jdbcType=BIGINT},
-                #{linkMeteId, jdbcType=VARCHAR}
-        )
+        device_id,
+        mete_id,
+        mete_name,
+        up_effect,
+        down_effect,
+        mete_precision,
+        unit,
+        mete_index,
+        mete_cid,
+        limit_band,
+        change_limit,
+        valid_mid,
+        valid_string,
+        invalid_value,
+        last_value,
+        last_time,
+        mete_code,
+        device_type,
+        description,
+        hilimit1,
+        lolimit1,
+        hilimit2,
+        lolimit2,
+        hilimit3,
+        lolimit3,
+        hilimit4,
+        lolimit4,
+        stander,
+        isshield,
+        storageperiod,
+        link_mete_id
+        )values
+        <foreach collection="list" item="SYAllInfo" separator=",">
+            (
+            #{SYAllInfo.deviceId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteName, jdbcType=VARCHAR},
+            #{SYAllInfo.upEffect, jdbcType=REAL},
+            #{SYAllInfo.downEffect, jdbcType=REAL},
+            #{SYAllInfo.metePrecision, jdbcType=INTEGER},
+            #{SYAllInfo.unit, jdbcType=VARCHAR},
+            #{SYAllInfo.meteIndex, jdbcType=INTEGER},
+            #{SYAllInfo.meteCid, jdbcType=INTEGER},
+            #{SYAllInfo.limitBand, jdbcType=REAL},
+            #{SYAllInfo.changeLimit, jdbcType=REAL},
+            #{SYAllInfo.validMid, jdbcType=VARCHAR},
+            #{SYAllInfo.validString, jdbcType=VARCHAR},
+            #{SYAllInfo.invalidValue, jdbcType=REAL},
+            #{SYAllInfo.lastValue, jdbcType=REAL},
+            CURRENT_TIME (),
+            #{SYAllInfo.meteCode, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceType, jdbcType=VARCHAR},
+            #{SYAllInfo.description, jdbcType=VARCHAR},
+            #{SYAllInfo.hilimit1, jdbcType=REAL},
+            #{SYAllInfo.lolimit1, jdbcType=REAL},
+            #{SYAllInfo.hilimit2, jdbcType=REAL},
+            #{SYAllInfo.lolimit2, jdbcType=REAL},
+            #{SYAllInfo.hilimit3, jdbcType=REAL},
+            #{SYAllInfo.lolimit3, jdbcType=REAL},
+            #{SYAllInfo.hilimit4, jdbcType=REAL},
+            #{SYAllInfo.lolimit4, jdbcType=REAL},
+            #{SYAllInfo.stander, jdbcType=REAL},
+            #{SYAllInfo.isshield, jdbcType=INTEGER},
+            #{SYAllInfo.storageperiod, jdbcType=BIGINT},
+            #{SYAllInfo.linkMeteId, jdbcType=VARCHAR}
+            )
+        </foreach>
     </insert>
 
     <update id="updateForTelemeter" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
@@ -357,64 +372,67 @@
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
 
-    <insert id="insertForTelesignal" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
+    <insert id="insertForTelesignal">
         insert into t_cfg_telesignal(
-            device_id,
-            mete_id,
-            mete_name,
-            up_effect,
-            down_effect,
-            mete_index,
-            mete_cid,
-            signal_kind,
-            last_value,
-            last_time,
-            explain_type,
-            report_type,
-            report_level,
-            mask_type,
-            mask_mid,
-            mask_string,
-            mask_value,
-            delay_time,
-            mete_code,
-            device_type,
-            description,
-            isshield,
-            storageperiod,
-            describer,
-            alarmthresbhold,
-            alarmlevel,
-            link_mete_id
-        )values(
-                #{deviceId, jdbcType=VARCHAR},
-                #{meteId, jdbcType=VARCHAR},
-                #{meteName, jdbcType=VARCHAR},
-                #{upEffect, jdbcType=INTEGER},
-                #{downEffect, jdbcType=INTEGER},
-                #{meteIndex, jdbcType=INTEGER},
-                #{meteCid, jdbcType=INTEGER},
-                #{signalKind, jdbcType=INTEGER},
-                #{lastValue, jdbcType=INTEGER},
-                #{lastTime, jdbcType=TIMESTAMP},
-                #{explainType, jdbcType=INTEGER},
-                #{reportType, jdbcType=INTEGER},
-                #{reportLevel, jdbcType=INTEGER},
-                #{maskType, jdbcType=INTEGER},
-                #{maskMid, jdbcType=VARCHAR},
-                #{maskString, jdbcType=VARCHAR},
-                #{maskValue, jdbcType=INTEGER},
-                #{delayTime, jdbcType=INTEGER},
-                #{meteCode, jdbcType=VARCHAR},
-                #{deviceType, jdbcType=VARCHAR},
-                #{description, jdbcType=VARCHAR},
-                #{isshield, jdbcType=INTEGER},
-                #{storageperiod, jdbcType=BIGINT},
-                #{describer, jdbcType=VARCHAR},
-                #{alarmthresbhold, jdbcType=INTEGER},
-                #{alarmlevel, jdbcType=INTEGER},
-                #{linkMeteId, jdbcType=VARCHAR}
-        )
+        device_id,
+        mete_id,
+        mete_name,
+        up_effect,
+        down_effect,
+        mete_index,
+        mete_cid,
+        signal_kind,
+        last_value,
+        last_time,
+        explain_type,
+        report_type,
+        report_level,
+        mask_type,
+        mask_mid,
+        mask_string,
+        mask_value,
+        delay_time,
+        mete_code,
+        device_type,
+        description,
+        isshield,
+        storageperiod,
+        describer,
+        alarmthresbhold,
+        alarmlevel,
+        link_mete_id
+        )values
+        <foreach collection="list" item="SYAllInfo" separator=",">
+            (
+            #{SYAllInfo.deviceId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteId, jdbcType=VARCHAR},
+            #{SYAllInfo.meteName, jdbcType=VARCHAR},
+            #{SYAllInfo.upEffect, jdbcType=INTEGER},
+            #{SYAllInfo.downEffect, jdbcType=INTEGER},
+            #{SYAllInfo.meteIndex, jdbcType=INTEGER},
+            #{SYAllInfo.meteCid, jdbcType=INTEGER},
+            #{SYAllInfo.signalKind, jdbcType=INTEGER},
+            #{SYAllInfo.lastValue, jdbcType=INTEGER},
+            CURRENT_TIME (),
+            #{SYAllInfo.explainType, jdbcType=INTEGER},
+            #{SYAllInfo.reportType, jdbcType=INTEGER},
+            #{SYAllInfo.reportLevel, jdbcType=INTEGER},
+            #{SYAllInfo.maskType, jdbcType=INTEGER},
+            #{SYAllInfo.maskMid, jdbcType=VARCHAR},
+            #{SYAllInfo.maskString, jdbcType=VARCHAR},
+            #{SYAllInfo.maskValue, jdbcType=INTEGER},
+            #{SYAllInfo.delayTime, jdbcType=INTEGER},
+            #{SYAllInfo.meteCode, jdbcType=VARCHAR},
+            #{SYAllInfo.deviceType, jdbcType=VARCHAR},
+            #{SYAllInfo.description, jdbcType=VARCHAR},
+            #{SYAllInfo.isshield, jdbcType=INTEGER},
+            #{SYAllInfo.storageperiod, jdbcType=BIGINT},
+            #{SYAllInfo.describer, jdbcType=VARCHAR},
+            #{SYAllInfo.alarmthresbhold, jdbcType=INTEGER},
+            #{SYAllInfo.alarmlevel, jdbcType=INTEGER},
+            #{SYAllInfo.linkMeteId, jdbcType=VARCHAR}
+            )
+        </foreach>
     </insert>
 
     <update id="updateForTelesignal" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">

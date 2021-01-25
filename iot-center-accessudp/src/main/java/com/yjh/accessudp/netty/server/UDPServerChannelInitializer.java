@@ -17,17 +17,19 @@ public class UDPServerChannelInitializer extends ChannelInitializer<NioDatagramC
     private TCfgMeteService tCfgMeteService;
     private NioDatagramChannel nioDatagramChannel;
     private String UNION_URL;
+    private String SEQUENCE_URL;
 
-    public UDPServerChannelInitializer(RedisTemplate redisTemplate, TCfgMeteService tCfgMeteService,String UNION_URL) {
+    public UDPServerChannelInitializer(RedisTemplate redisTemplate, TCfgMeteService tCfgMeteService,String UNION_URL,String SEQUENCE_URL) {
         this.redisTemplate = redisTemplate;
         this.tCfgMeteService =  tCfgMeteService;
         this.UNION_URL = UNION_URL;
+        this.SEQUENCE_URL = SEQUENCE_URL;
     }
 
     @Override
     protected void initChannel(NioDatagramChannel nioDatagramChannel) throws Exception {
         log.info("IEC104ServerChannelInitializer channelInit....");
-        nioDatagramChannel.pipeline().addLast(new UDPServerHandler(redisTemplate, tCfgMeteService,UNION_URL));
+        nioDatagramChannel.pipeline().addLast(new UDPServerHandler(redisTemplate, tCfgMeteService,UNION_URL, SEQUENCE_URL));
     }
 
     @Override

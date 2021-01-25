@@ -1,5 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.service.TRobotInspectionService;
 import com.yjh.platform.module.device.entity.TRobotInspection;
@@ -166,7 +168,14 @@ public class TRobotInspectionController {
             List<RobotTaskMessage> list =tRobotInspectionService.selectRobotTaskMessage(robotId);
             resultMap.put("taskInfo",list);
             if(list != null){
-                Object taskProgress = tRobotInspectionService.selectRobotTaskProgress(robotId);
+                Integer taskProgress = tRobotInspectionService.selectRobotTaskProgress(robotId);
+                if(taskProgress == 100 ){
+                    Map<String,Object> jasonMap=new HashMap<>();
+                    jasonMap.put("type","noTask");
+                    //jasonMap.put("taskId",tCruiseTask.getTaskId());
+                    String json= JSON.toJSONString(jasonMap);
+                    WebSocketServer.sendMsg(json);
+                }
                 resultMap.put("taskProgress",taskProgress);
             }else {
                 resultMap.put("taskProgress",0);

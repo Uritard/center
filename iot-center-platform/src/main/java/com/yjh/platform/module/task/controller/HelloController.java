@@ -81,9 +81,11 @@ public class HelloController {
     @RequestMapping(value = "/testAnything", method = RequestMethod.GET)
     public Result QrDecode() {
         Result result = new Result();
-//        //List<Long> list = tCruiseTaskDao.selectTimeIsIn(new Date());
-//        tCruisePointInstanceDao.selectForTask(list);
-//        result.setData(list);
+        Map<String,Object> jasonMap=new HashMap<>();
+        jasonMap.put("type","noTask");
+        //jasonMap.put("taskId",tCruiseTask.getTaskId());
+        String json= JSON.toJSONString(jasonMap);
+        WebSocketServer.sendMsg(json);
         return result;
     }
 

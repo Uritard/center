@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.TSequentialConf;
@@ -28,4 +29,5 @@ public interface TSequentialConfDao {
     int batchDelete(List<String> list);
     List<AreaInfo> selectForTCfgMete(@Param(value = "meteKind") Integer meteKind,
                                      @Param(value = "cfgDeviceName") String cfgDeviceName);
+    Map<String,String> selectForSequenceInfo(@Param(value = "cfgDeviceId") String cfgDeviceId);
 }
