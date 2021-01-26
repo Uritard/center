@@ -53,7 +53,11 @@ public class Constant {
 
     public static Map<String,String> userInfo= new HashMap<>();
 
+<<<<<<< Updated upstream
     public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
     public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
+=======
+    public static final String Maintenance_Issued = "http://iot-center-accessrobot2/robot/v1/deviceMaintenanceIssued";
+>>>>>>> Stashed changes
 
 }

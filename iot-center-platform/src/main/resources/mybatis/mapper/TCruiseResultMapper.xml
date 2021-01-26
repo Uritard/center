@@ -306,6 +306,9 @@
         k.camera_id,
         b.end_time,
         g.is_warn,
+        q.alarm_state,
+        q.alarm_level,
+        s.dict_note as alarm_level_name,
         n.device_type
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
@@ -321,6 +324,7 @@
         LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
         LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
         LEFT JOIN t_dict_business w on w.dict_code = g.identify_result and w.col_name ='identify_result'
+        LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 

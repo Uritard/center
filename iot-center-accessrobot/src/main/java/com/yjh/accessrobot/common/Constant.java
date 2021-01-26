@@ -21,6 +21,7 @@ public class Constant {
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
     public static int heartNum = 0;
     public static int flag = 0;
+    public static int flag2 = 0;
     public static String Packet = "";
 
     public static long sendSessionId = 0L;//发送会话序列号
@@ -45,5 +46,7 @@ public class Constant {
     }
 
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+
+    public static Map<String,String> robotResultMap =  new HashMap<>();
 
 }

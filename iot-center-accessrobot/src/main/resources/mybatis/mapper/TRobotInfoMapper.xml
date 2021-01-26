@@ -353,6 +353,20 @@
     <select id="selectLastRobotId" resultType="java.lang.Long">
         select robot_id from t_robot_info order by robot_id DESC limit 1
     </select>
+    <select id="selectContent" resultType="java.lang.String">
+    SELECT
+        a.content
+    FROM
+        t_sys_param a
+    WHERE 1 = 1
+    <if test="paramCode != null and paramCode != ''">and a.param_code = #{paramCode,jdbcType = VARCHAR}</if>
+    </select>
+    <select id="selectOnline" resultType="java.lang.String">
+        SELECT
+            a.robot_code
+        FROM t_robot_info a
+        WHERE a.robot_status = '在线'
+    </select>
     <!--根据机器人id查询机器人code-->
     <select id="selectRobotIdByCode" parameterType="java.lang.String" resultType="java.lang.Long">
         select robot_id from t_robot_info

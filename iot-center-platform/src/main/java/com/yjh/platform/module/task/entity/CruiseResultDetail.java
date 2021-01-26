@@ -108,5 +108,9 @@ public class CruiseResultDetail extends TStdDeviceMete {
     @ApiModelProperty(value = "是否产生告警")
     private Integer isWarn;
 
+    @ApiModelProperty(value = "告警级别--字典表")
+    private String alarmLevelName;
+
+
 }
 

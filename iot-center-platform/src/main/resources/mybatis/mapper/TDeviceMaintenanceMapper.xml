@@ -178,6 +178,15 @@
         where 1 = 1
             and a.maintenance_id =#{maintenanceId, jdbcType=BIGINT}
     </select>
+    <select id="selectDeviceIds2" resultType="java.lang.Long">
+        select DISTINCT
+        a.device_id
+        from t_device_maintenance a
+        where 1 = 1
+            and a.maintenance_id in <foreach collection="list" item="maintenanceId" open="(" separator="," close=")">
+        #{maintenanceId, jdbcType=BIGINT}
+    </foreach>
+    </select>
 
     <select id="selectDeviceIdList" resultType="java.lang.Long">
         select DISTINCT
@@ -195,4 +204,16 @@
         #{deviceId, jdbcType=BIGINT}
     </foreach>
     </delete>
+    <select id="selectCruiseIdAndDeviceId" resultType="java.lang.String">
+       SELECT
+        b.inspection_code
+		FROM t_cruise_point_instance a,t_robot_inspection b
+		WHERE 1 = 1
+		and a.cruise_id = b.inspection_id
+        <if test="list != null and list.size() > 0">and a.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
 </mapper>

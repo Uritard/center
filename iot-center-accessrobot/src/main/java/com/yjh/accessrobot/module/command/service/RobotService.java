@@ -50,7 +50,7 @@ public class RobotService {
 
     @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) {
+    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) throws Exception{
         Map scmap = new HashMap();
         if (command.equals("1") && type.equals("1")) {
             Map<String, Object> zcz = this.booleanZcz(key, userId, password);
@@ -94,8 +94,9 @@ public class RobotService {
         }
         Item.add(map);
 
+        String sendCode = tRobotInfoDao.selectContent("PlatformServer");
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("Server01")
+                .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
                 .setCode("省检018")
                 .setTime(sdf.format(new Date()))
@@ -106,6 +107,13 @@ public class RobotService {
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+        Thread.sleep(500);
+        String code = Constant.robotResultMap.get("Code");
+        if ("200".equals(code)){
+            log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
+        }else{
+            log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
+        }
         scmap.put("code", 3);
         scmap.put("result", "success");
         return scmap;
@@ -116,9 +124,11 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public boolean feignRobotTransfer(String robotCode) throws Exception {
         boolean res = false;
+        String sendCode = tRobotInfoDao.selectContent("PlatformServer");
+
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode("Server01")
+                .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
                 .setCode("省检018")
                 .setTime(sdf.format(new Date()))
@@ -269,7 +279,55 @@ public class RobotService {
 
         return 1;
     }
+    @Logs(title = "机器人收到下发任务指令/控制指令后，巡视主机接收响应处理", code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,String> receivingResponse(XMLBaseModel xmlBaseModel) {
+        Constant.robotResultMap.put("Type",xmlBaseModel.getType());
+        Constant.robotResultMap.put("Code",xmlBaseModel.getCode());
+        log.info("组成的robotResultMap是==="+Constant.robotResultMap);
+        return Constant.robotResultMap;
+    }
 
+    @Logs(title = "巡视主机向机器人下发检修区域指令接口", code = "Robot")
+    @Transactional(rollbackFor = Exception.class)
+    public String deviceMaintenanceIssued(Map<String,Object> resMap) {
+        String sendCode = tRobotInfoDao.selectContent("PlatformServer");
+//        log.info("传来的map是==="+resMap);
+        List<Map<String, Object>> ItemList = new ArrayList<>();
+        Map<String,Object> itemMap = new HashMap<>();
+        itemMap.put("enable",Integer.valueOf(resMap.get("enable").toString()));
+        itemMap.put("start_time",resMap.get("startTime").toString());
+        itemMap.put("end_time",resMap.get("endTime").toString());
+        itemMap.put("device_level",3);
+        String deviceList = resMap.get("deviceList").toString();
+        String deviceIdList = deviceList.substring(1,deviceList.length()-1);
+        itemMap.put("device_list",deviceIdList);
+        ItemList.add(itemMap);
+
+        List<String> robotCodeList = tRobotInfoDao.selectOnline();
+
+        for (String robotCode : robotCodeList){
+            XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                    .setSendCode(sendCode)
+                    .setReceiveCode(robotCode)
+                    .setCode("变电站编码")
+                    .setType("81")
+                    .setCommand("4")
+                    .setItems(ItemList);
+            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+            log.info("生成的机器人下发检修区域指令xml是<start>" + xmlString + "<end>");
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+        }
+
+        String code = Constant.robotResultMap.get("Code");
+        if ("200".equals(code)){
+//            log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
+            return "true";
+        }else{
+//            log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
+            return "false";
+        }
+    }
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
@@ -318,13 +376,13 @@ public class RobotService {
                     String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
                     str.add(inspectionCode);
 
-                    Map<String, String> redisInfoMap = new HashMap<>();//缓存信息map
-                    redisInfoMap.put("robotCode", rTII.getRobotCode());//缓存中放robotCode
-                    redisInfoMap.put("instanceId", instanceId + "");//缓存中放instanceId
-                    redisInfoMap.put("inspectionCode", inspectionCode);//缓存中放inspectionCode
-                    redisInfoMap.put("cruiseTime", sdf.format(new Date()));//缓存中放cruiseTime
-                    redisInfoMap.put("taskId", rTII.getTaskId());//缓存中放taskId
-                    redisInfoList.add(redisInfoMap);//缓存信息List添加数据
+                    Map<String, String> redisInfoMap = new HashMap<>();
+                    redisInfoMap.put("robotCode", rTII.getRobotCode());
+                    redisInfoMap.put("instanceId", instanceId + "");
+                    redisInfoMap.put("inspectionCode", inspectionCode);
+                    redisInfoMap.put("cruiseTime", sdf.format(new Date()));
+                    redisInfoMap.put("taskId", rTII.getTaskId());
+                    redisInfoList.add(redisInfoMap);
                 }
 
                 log.info("redisInfoList是===" + redisInfoList);
@@ -363,10 +421,11 @@ public class RobotService {
 //                map.put("create_time", "编制时间");
                 mapList.add(map);
                 log.info("任务下发的item是：" + mapList);
+                String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("101")
-                        .setSendCode("Server01")
+                        .setSendCode(sendCode)
                         .setReceiveCode(rTII.getRobotCode())
                         .setCode("省检018")
                         .setTime(sdf.format(new Date()))
@@ -409,12 +468,12 @@ public class RobotService {
             List<String> robotCodeList = JSON.parseArray(json, String.class);
             log.info("robotCodeList===" + robotCodeList);
 
-            List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
+            String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
             for (String robotCode : robotCodeList) {
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("41")
-                        .setSendCode("Server01")
+                        .setSendCode(sendCode)
                         .setReceiveCode(robotCode)
                         .setCode(taskId)
                         .setCommand(commandValue)

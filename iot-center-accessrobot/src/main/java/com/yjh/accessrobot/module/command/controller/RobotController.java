@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
@@ -136,6 +134,20 @@ public class RobotController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("站端命令下发错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视主机向机器人下发检修区域指令接口")
+    @RequestMapping(value = "/deviceMaintenanceIssued", method = RequestMethod.POST)
+    public Result deviceMaintenanceIssued(@RequestBody Map<String,Object> resMap){
+        Result result = new Result();
+        try {
+            result.setData(robotService.deviceMaintenanceIssued(resMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("巡视主机向机器人下发检修区域指令接口发生错误:", e);
         }
         return result;
     }

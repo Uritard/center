@@ -252,6 +252,7 @@ public class TWarnInfoService{
         log.info("startTime==="+startTime);
         log.info("endTime==="+endTime);
         Map<String, Integer> map = tWarnInfoDao.countWarnDefectConfMode(startTime,endTime);
+        log.info("统计的map==="+map);
         List<TJContentInfo> tjContentInfoList = new ArrayList<>();
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {

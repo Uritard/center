@@ -316,6 +316,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception  {
         log.info("robotServerHandlerMap==="+robotServerHandlerMap);
+        Map<String, String> platformServerMap = redisTemplate.opsForHash().entries("t_sys_param:PlatformServer");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
@@ -338,7 +339,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     Items.put("weather_interval", weatherDataIntervalMap.get("content"));//微气象数据间隔
                     ItemsList.add(Items);
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
-                            .setSendCode("Server01")
+                            .setSendCode(platformServerMap.get("content"))
                             .setReceiveCode(xmlBaseModel.getSendCode())//Client01
                             .setType("251")
                             .setCode("200")
@@ -366,7 +367,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //若心跳能够正常收发，将机器人置为在线状态
                     Constant.heartNum = 0;
                     Constant.flag = 1;
-                    int res = robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
+                    if (Constant.flag2 == 0){
+                        robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
+                        Constant.flag2 = 1;
+                    }
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -388,14 +392,18 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         List<Map<String,Object>> robotMap = robotModel.getItems();
                         log.info("robotMap是："+robotMap);
                         robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
+                    }else if (xmlBaseModel.getItems().get(0).size() == 2){//检修区域下发
+                        log.info("机器人收到检修区域指令了,这是机器人的响应");
+                        //处理检修区域下发成功的响应
+                        robotService.receivingResponse(xmlBaseModel);
                     }
                     break;
                 //任务下发指令and控制指令(接收响应)
                 case "2513":
                     log.info("机器人收到下发任务指令/控制指令了,这是机器人的响应");
                     //处理任务下发/控制的响应
-                    log.info("巡视主机收到的响应是："+xmlBaseModel.toString());
-                    log.info("巡视主机收到响应的type是："+xmlBaseModel.getType());
+                    log.info("巡视主机收到的响应是==="+xmlBaseModel.toString());
+                    robotService.receivingResponse(xmlBaseModel);
                     break;
             }
         }else {
@@ -604,8 +612,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
                         //1.已执行2.正在执行3.暂停4.终止5.未执行6.超期
                         taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());//任务状态
-                        taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time").toString());//计划开始时间
-                        taskStatusMap.put("startTime", xmlBaseModel.getItems().get(0).get("start_time").toString());//开始时间
+                        taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));//计划开始时间
+                        taskStatusMap.put("startTime", xmlBaseModel.getItems().get(0).get("start_time"));//开始时间
                         taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());//任务进度
                         taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());//任务预计剩余时间
                         taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());//描述

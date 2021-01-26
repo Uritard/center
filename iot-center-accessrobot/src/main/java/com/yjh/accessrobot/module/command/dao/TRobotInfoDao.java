@@ -49,6 +49,8 @@ public interface TRobotInfoDao {
 
     List<String> selectAllRobotCode();
     Long selectLastRobotId();
+    String selectContent(@Param(value = "paramCode")String paramCode);
+    List<String> selectOnline();
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
     TCruiseResult selectTaskResultId(@Param(value = "taskId") String taskId);

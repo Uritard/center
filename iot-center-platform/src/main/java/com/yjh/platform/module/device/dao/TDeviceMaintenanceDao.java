@@ -1,13 +1,13 @@
 package com.yjh.platform.module.device.dao;
 
-import java.util.List;
-import java.util.Date;
-
 import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenance;
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -35,7 +35,10 @@ public interface TDeviceMaintenanceDao {
     List<IdAndNameDetail> selectIdAndName(@Param(value = "maintenanceId") Long maintenanceId);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
     List<Long> selectDeviceIds(@Param(value = "maintenanceId") Long maintenanceId);
+    List<Long> selectDeviceIds2(@Param(value = "list") List<String> list);
+
     List<Long> selectDeviceIdList(@Param(value = "list") List<Long> list);
     int deleteByDeviceIdList(@Param(value = "list") List<Long> list,
                              @Param(value = "name") String name);
+    List<String> selectCruiseIdAndDeviceId(@Param(value = "list") List<Long> list);
 }

@@ -1,20 +1,23 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
 import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenance;
-import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
-
-import java.awt.image.ImageProducer;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
-import org.apache.bcel.generic.ANEWARRAY;
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
 * @author lqh
@@ -25,6 +28,8 @@ public class TDeviceMaintenanceService{
 
     @Autowired
     private TDeviceMaintenanceDao tDeviceMaintenanceDao;
+    private Logger log = LoggerFactory.getLogger(TDeviceMaintenanceService.class);
+
 
     @Logs(title = "插入", code = "module",content = "插入")
     @Transactional(rollbackFor = Exception.class)
@@ -47,6 +52,19 @@ public class TDeviceMaintenanceService{
         this.tDeviceMaintenanceDao.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
 
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
+
+        //给机器人下发检修区域指令
+        {
+            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            HashMap<String,Object> params = new HashMap<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            params.put("enable",1);
+            params.put("deviceList",inspectionCodeList);
+            params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
+            params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
+            params.put("deviceLevel",3);
+            sendPostRequest(Constant.Maintenance_Issued,params);
+        }
         List<TDeviceMaintenance> addList = new ArrayList<>();
         for(Long item:list){
             TDeviceMaintenance deviceMaintenanceItem = new TDeviceMaintenance();
@@ -61,9 +79,35 @@ public class TDeviceMaintenanceService{
         return this.tDeviceMaintenanceDao.batchAdd(addList);
     }
 
+    public Result sendPostRequest(String url, HashMap<String,Object> params) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.postForObject(url, params,Result.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
+    }
+
     @Logs(title = "删除", code = "module",content = "删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long maintenanceId) {
+        //给机器人下发检修区域指令
+        {
+            List<Long> list = tDeviceMaintenanceDao.selectDeviceIds(maintenanceId);
+            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            HashMap<String,Object> params = new HashMap<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            params.put("enable",0);
+            params.put("deviceList",inspectionCodeList);
+            params.put("startTime",sdf.format(new Date()));
+            params.put("endTime",sdf.format(new Date()));
+            params.put("deviceLevel",3);
+            sendPostRequest(Constant.Maintenance_Issued,params);
+        }
         return this.tDeviceMaintenanceDao.deleteByPrimaryId(maintenanceId);
     }
 
@@ -85,6 +129,18 @@ public class TDeviceMaintenanceService{
                     .setMaintenanceId(tDeviceMaintenance.getMaintenanceId())
                     .setMaintenanceStop(tDeviceMaintenance.getMaintenanceStop());
             addList.add(deviceMaintenanceItem);
+        }
+        //给机器人下发检修区域指令
+        {
+            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            HashMap<String,Object> params = new HashMap<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            params.put("enable",1);
+            params.put("deviceList",inspectionCodeList);
+            params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
+            params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
+            params.put("deviceLevel",3);
+            sendPostRequest(Constant.Maintenance_Issued,params);
         }
         return this.tDeviceMaintenanceDao.batchAdd(addList);
     }
@@ -196,6 +252,19 @@ public class TDeviceMaintenanceService{
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String maintenanceId) {
     List<String> list1= Arrays.asList(maintenanceId.split(","));
+        //给机器人下发检修区域指令
+        {
+            List<Long> list = tDeviceMaintenanceDao.selectDeviceIds2(list1);
+            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            HashMap<String,Object> params = new HashMap<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            params.put("enable",0);
+            params.put("deviceList",inspectionCodeList);
+            params.put("startTime",sdf.format(new Date()));
+            params.put("endTime",sdf.format(new Date()));
+            params.put("deviceLevel",3);
+            sendPostRequest(Constant.Maintenance_Issued,params);
+        }
     return this.tDeviceMaintenanceDao.batchDelete(list1);
     }
 
