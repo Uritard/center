@@ -14,6 +14,7 @@ import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -42,7 +43,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruiseResult tCruiseResult) {
+    public Result insert(@Validated  @RequestBody TCruiseResult tCruiseResult) {
         Result result = new Result();
         try {
             result.setData(tCruiseResultService.insert(tCruiseResult));
@@ -276,7 +277,7 @@ public class TCruiseResultController {
     }*/
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCruiseResult> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCruiseResult> list) {
         Result result = new Result();
         try {
             result.setData(tCruiseResultService.batchInsert(list));

@@ -41,7 +41,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "新增组织机构")
     @RequestMapping(value = "/addOrg", method = RequestMethod.POST)
-    public Result insert(@RequestBody   SysOrg sysOrg) {
+    public Result insert(@Validated @RequestBody   SysOrg sysOrg) {
 
         Result result = new Result();
         try {

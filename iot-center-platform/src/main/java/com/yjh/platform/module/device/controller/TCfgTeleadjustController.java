@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -39,7 +40,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TCfgTeleadjust tCfgTeleadjust) {
+    public Result add(@Validated  @RequestBody TCfgTeleadjust tCfgTeleadjust) {
         Result result = new Result();
         try {
             result.setData(tCfgTeleadjustService.insert(tCfgTeleadjust));
@@ -150,7 +151,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TCfgTeleadjust> list) {
+    public Result batchAdd(@Validated @RequestBody List<TCfgTeleadjust> list) {
         Result result = new Result();
         try {
         result.setData(tCfgTeleadjustService.batchInsert(list));

@@ -42,7 +42,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TSysParam tSysParam) {
+    public Result insert(@Validated @RequestBody TSysParam tSysParam) {
 
         Result result = new Result();
         try {
@@ -149,7 +149,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TSysParam> list) {
+    public Result batchInsert(@Validated @RequestBody List<TSysParam> list) {
         Result result = new Result();
         try {
             result.setData(tSysParamService.batchInsert(list));

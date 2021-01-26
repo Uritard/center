@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -46,7 +47,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "新增区域")
     @RequestMapping(value = "/addRegion", method = RequestMethod.POST)
-    public Result insert(@RequestBody TStdRegion tStdRegion) {
+    public Result insert(@Validated  @RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
             result.setData(tStdRegionService.insert(tStdRegion));

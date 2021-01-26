@@ -10,6 +10,7 @@ import java.util.*;
 import io.swagger.annotations.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -42,7 +43,7 @@ public class TCfgDataCurrentController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCfgDataCurrent tCfgDataCurrent) {
+    public Result insert(@Validated  @RequestBody TCfgDataCurrent tCfgDataCurrent) {
         Result result = new Result();
         try {
             result.setData(tCfgDataCurrentService.insert(tCfgDataCurrent));
@@ -149,7 +150,7 @@ public class TCfgDataCurrentController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCfgDataCurrent> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCfgDataCurrent> list) {
         Result result = new Result();
         try {
         result.setData(tCfgDataCurrentService.batchInsert(list));

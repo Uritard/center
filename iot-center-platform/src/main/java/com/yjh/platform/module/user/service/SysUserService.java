@@ -4,6 +4,9 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.common.utils.smUtil.SM2Utils;
+import com.yjh.platform.common.utils.smUtil.Util;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
@@ -12,6 +15,7 @@ import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.dao.SysUserDao;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -20,6 +24,7 @@ import java.util.*;
 
 import com.yjh.platform.module.user.entity.SysUserBackUp;
 import com.yjh.platform.module.user.entity.SysUserLogin;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,7 +45,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Service
 public class SysUserService {
-
+    //国密规范测试公钥
+    private static final String prik = "055C74CFB227BD9CDFF242D233096BC6FDBAFB59D001D5EE7F857ADFC6BF1501";
+    //国密规范测试公钥
+    private static final String pubk = "04673FC4F3D41C9470E32AABCB5A958E2CE528959F373D0F7AB2B82E65BF4DE8FB67716A269993585451888C8450E92A75A6C34EDFF748097BEAD8E41C2976E8AA";
     @Autowired
     private SysUserDao sysUserDao;
     @Resource
@@ -59,12 +67,16 @@ public class SysUserService {
     @Logs(title = "新增", code = "sysUser", content = "新增用户")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysUser sysUser) {
+        Map map = new LinkedHashMap<>();
         Date date = new Date();
         sysUser.setCreateTime(date);
         sysUser.setUpdateTime(date);
         int total = sysUserDao.insert(sysUser);
+        map.put("userName", sysUser.getUserName());
+        map.put("password", sysUser.getPassword());
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
+        sysUserBackUp.setVerfiCode(Demo.summary(map.toString()));
         SysUserBackUpDao.insert(sysUserBackUp);
         return total;
     }
@@ -85,53 +97,94 @@ public class SysUserService {
 
     @Logs(title = "登陆", code = "module", content = "用户登陆")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException {
+    public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
         Map<String, Object> mapResult = new HashMap<>();
         if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
-            String userName = userMap.get("userName");
-            String password = userMap.get("password");
+            String userName =//userMap.get("userName");
+                    Demo.decrypt(userMap.get("userName"));
+                   //new String(SM2Utils.decrypt(org.bouncycastle.util.encoders.Base64.decode(new String(org.bouncycastle.util.encoders.Base64.encode(Util.hexToByte(prik))).getBytes()), Base64.decode(userMap.get("userName").getBytes())));
+            String password =//userMap.get("password");
+                    Demo.decrypt(userMap.get("password"));
+                  // new String(SM2Utils.decrypt(org.bouncycastle.util.encoders.Base64.decode(new String(org.bouncycastle.util.encoders.Base64.encode(Util.hexToByte(prik))).getBytes()), Base64.decode(userMap.get("password").getBytes())));
+            String verfiCode = userMap.get("verfiCode");
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
+            sysUserLogin.setUserName(Demo.encryption(sysUserLogin.getUserName()));
+            sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
+            SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(userName, password, verfiCode);
             if (!Objects.equals(null, sysUserLogin)) {
-                String userAvoid=Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
-                if (!replayAvoid.equals(userAvoid)) {
-                    Constant.userInfo.put(String.valueOf(sysUserLogin.getUserId()),replayAvoid);
-                    String appKey = getRandomNickname(10);
-                    sysUserLogin.setAppkey(appKey);
-                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                    params.set("logType", "iot-center-platform:module");
-                    params.set("ip", request.getRequestURI());
-                    params.set("title", "登录");
-                    params.set("state", 1);
-                    params.set("userId", sysUserLogin.getUserId());
-                    params.set("userName", userName);
-                    params.set("content", "用户登录");
-                    LogsAspect logsAspect = new LogsAspect();
-                    logsAspect.post(params);
-                    String userIds = String.valueOf(sysUserLogin.getUserId());
-                    String keys = Constant.account_lock_time.replace("userAccountID", userIds);
-                    //系统当前时间
-                    String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = sdf.parse(timeStr1);
-                    int yxTime = DateTimeUtil.daysBetween(sysUserLogin.getInvalidTime(), date);
-                    if (redisTemplate.hasKey(keys)) {//如果key存在
-                        redisTemplate.delete(keys);
-                    }
-                    if (sysUserLogin.getState() == 2) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(date);
-                        //锁定时间
-                        Calendar calendarOne = Calendar.getInstance();
-                        calendarOne.setTime(sysUserLogin.getUpdateTime());
-                        Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
-                        if (lockTime < redisAndYxsjUtil.getLoginTime()) { //如果锁定时间小于1200S
-                            mapResult.put("errorCount", "账户已被锁定！");
-                            mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                            mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                if (!Objects.equals(null, sysUserBackUp)) {
+                    String userAvoid = Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
+                    if (!replayAvoid.equals(userAvoid)) {
+                        Constant.userInfo.put(String.valueOf(sysUserLogin.getUserId()), replayAvoid);
+                        String appKey = getRandomNickname(10);
+                        sysUserLogin.setAppkey(appKey);
+                        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                        params.set("logType", "iot-center-platform:module");
+                        params.set("ip", request.getRequestURI());
+                        params.set("title", "登录");
+                        params.set("state", 1);
+                        params.set("userId", sysUserLogin.getUserId());
+                        params.set("userName", userName);
+                        params.set("content", "用户登录");
+                        LogsAspect logsAspect = new LogsAspect();
+                        logsAspect.post(params);
+                        String userIds = String.valueOf(sysUserLogin.getUserId());
+                        String keys = Constant.account_lock_time.replace("userAccountID", userIds);
+                        //系统当前时间
+                        String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Date date = sdf.parse(timeStr1);
+                        int yxTime = DateTimeUtil.daysBetween(sysUserLogin.getInvalidTime(), date);
+                        if (redisTemplate.hasKey(keys)) {//如果key存在
+                            redisTemplate.delete(keys);
+                        }
+                        if (sysUserLogin.getState() == 2) {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(date);
+                            //锁定时间
+                            Calendar calendarOne = Calendar.getInstance();
+                            calendarOne.setTime(sysUserLogin.getUpdateTime());
+                            Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
+                            if (lockTime < redisAndYxsjUtil.getLoginTime()) { //如果锁定时间小于1200S
+                                mapResult.put("errorCount", "账户已被锁定！");
+                                mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                                mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                                return mapResult;
+                            } else {
+                                if (yxTime > redisAndYxsjUtil.getYxsjTime()) {
+                                    mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
+                                }
+                                List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+                                mapResult.put("roleMenuList", sysRoleMenuList);
+                                mapResult.put("sysUserLogin", sysUserLogin);
+                                String userId = String.valueOf(sysUserLogin.getUserId());
+                                Map<String, Object> mapAccount = new HashMap<>();
+                                Map<String, Object> mapAppKey = new HashMap<>();
+                                mapAccount.put("userId", userId);
+                                mapAccount.put("userName", userName);
+                                mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+                                mapAccount.put("appKey", appKey);
+                                mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                                mapAccount.put("errorInputTimes", "0");
+                                String key = Constant.account_lock_times.replace("userAccountID", userId);
+                                redisTemplate.opsForHash().putAll(key, mapAccount);
+                                mapAppKey.put("userId", userId);
+                                mapAppKey.put("userName", userName);
+                                mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+                                mapAppKey.put("appKey", appKey);
+                                mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                                redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
+                            }
+
+                        }
+                        if (sysUserLogin.getState() == 0) {
+                            mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                            mapResult.put("info", ResultCodeEnum.CODE10101.getName());
                             return mapResult;
-                        } else {
-                            if (yxTime > redisAndYxsjUtil.getYxsjTime()) {
+                        }
+                        if (sysUserLogin.getState() == 1) {
+                            if (yxTime > redisAndYxsjUtil.getLoginTime()) {
                                 mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -155,41 +208,14 @@ public class SysUserService {
                             mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
                             redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
                         }
-
-                    }
-                    if (sysUserLogin.getState() == 0) {
-                        mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-                        mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                    } else {
+                        mapResult.put("code", ResultCodeEnum.CODE10107.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10107.getName());
                         return mapResult;
                     }
-                    if (sysUserLogin.getState() == 1) {
-                        if (yxTime > redisAndYxsjUtil.getLoginTime()) {
-                            mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
-                        }
-                        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
-                        mapResult.put("roleMenuList", sysRoleMenuList);
-                        mapResult.put("sysUserLogin", sysUserLogin);
-                        String userId = String.valueOf(sysUserLogin.getUserId());
-                        Map<String, Object> mapAccount = new HashMap<>();
-                        Map<String, Object> mapAppKey = new HashMap<>();
-                        mapAccount.put("userId", userId);
-                        mapAccount.put("userName", userName);
-                        mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                        mapAccount.put("appKey", appKey);
-                        mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        mapAccount.put("errorInputTimes", "0");
-                        String key = Constant.account_lock_times.replace("userAccountID", userId);
-                        redisTemplate.opsForHash().putAll(key, mapAccount);
-                        mapAppKey.put("userId", userId);
-                        mapAppKey.put("userName", userName);
-                        mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                        mapAppKey.put("appKey", appKey);
-                        mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
-                    }
                 } else {
-                    mapResult.put("code", ResultCodeEnum.CODE10107.getCode());
-                    mapResult.put("info", ResultCodeEnum.CODE10107.getName());
+                    mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10108.getName());
                     return mapResult;
                 }
             } else {
@@ -353,14 +379,21 @@ public class SysUserService {
 
     @Logs(title = "更新密码", code = "changePassword", content = "更新密码")
     @Transactional(rollbackFor = Exception.class)
-    public int changePassword(Long userId, Map<String, String> map) {
+    public int changePassword(Long userId, Map<String, String> map, String userName) throws IOException {
+        Map linkedHashMap = new LinkedHashMap<>();
+        linkedHashMap.put("userName", userName);
+        linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userId);
-        sysUser.setPassword(map.get("newPassword"));
+        sysUser.setPassword(
+               // map.get("newPassword")
+                Demo.decrypt(map.get("newPassword"))
+        );
         Date date = new Date();
         sysUser.setUpdateTime(date);
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
+        sysUserBackUp.setVerfiCode(Demo.summary(map.toString()));
         SysUserBackUpDao.update(sysUserBackUp);
         return this.sysUserDao.update(sysUser);
     }

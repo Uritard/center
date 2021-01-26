@@ -41,7 +41,7 @@ public class SysRoleRobotController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysRoleRobot sysRoleRobot) {
+    public Result insert(@Validated @RequestBody SysRoleRobot sysRoleRobot) {
 
         Result result = new Result();
         try {
@@ -138,7 +138,7 @@ public class SysRoleRobotController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<SysRoleRobot> list) {
+    public Result batchInsert(@Validated @RequestBody List<SysRoleRobot> list) {
         Result result = new Result();
         try {
             result.setData(sysRoleRobotService.batchInsert(list));

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -42,7 +43,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
+    public Result insert(@Validated  @RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
         Result result = new Result();
         try {
             result.setData(tCfgAlarmHistoryService.insert(tCfgAlarmHistory));
@@ -181,7 +182,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCfgAlarmHistory> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCfgAlarmHistory> list) {
         Result result = new Result();
         try {
         result.setData(tCfgAlarmHistoryService.batchInsert(list));

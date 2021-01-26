@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -39,7 +40,7 @@ public class RobotAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody RobotAlarm robotAlarm) {
+    public Result add(@Validated  @RequestBody RobotAlarm robotAlarm) {
         Result result = new Result();
         try {
             result.setData(robotAlarmService.insert(robotAlarm));
@@ -148,7 +149,7 @@ public class RobotAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<RobotAlarm> list) {
+    public Result batchInsert(@Validated @RequestBody List<RobotAlarm> list) {
         Result result = new Result();
         try {
         result.setData(robotAlarmService.batchInsert(list));

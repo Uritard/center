@@ -21,4 +21,6 @@ public interface SysUserBackUpDao {
 
         int update(SysUserBackUp sysUserBackUp);
 
+        SysUserBackUp selectByVerfiCode(@Param(value = "userName") String userName, @Param(value = "password") String password,@Param(value = "verfiCode") String verfiCode);
+
 }

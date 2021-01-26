@@ -28,6 +28,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
         <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
+        <result column="verfi_code" jdbcType="VARCHAR" property="verfiCode" />
     </resultMap>
 
 
@@ -59,7 +60,8 @@
             create_time,
             update_time,
             invalid_time,
-            last_login
+            last_login,
+            verfi_code
         )values(
                 #{userId, jdbcType=BIGINT},
                 #{userName, jdbcType=VARCHAR},
@@ -84,7 +86,8 @@
                 #{createTime, jdbcType=TIMESTAMP},
                 #{updateTime, jdbcType=TIMESTAMP},
                 #{invalidTime, jdbcType=TIMESTAMP},
-                #{lastLogin, jdbcType=TIMESTAMP}
+                #{lastLogin, jdbcType=TIMESTAMP},
+                #{verfiCode, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -118,9 +121,20 @@
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
         <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP},</if>
         <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
+        <if test="verfiCode != null and verfiCode != ''">a.verfi_code = #{verfiCode, jdbcType=VARCHAR},</if>
     </set>
         where a.user_id = #{userId, jdbcType=BIGINT}
     </update>
 
 
+
+    <select id="selectByVerfiCode" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUserBackUp">
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,a.verfi_code,
+          a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,a.org_id,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login
+        from sys_user_backup a
+        where 1 = 1
+        and a.user_name = #{userName, jdbcType=VARCHAR}
+        and a.PASSWORD = #{password, jdbcType=VARCHAR}
+         and a.verfi_code = #{verfiCode, jdbcType=VARCHAR}
+    </select>
 </mapper>

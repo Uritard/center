@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +46,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruiseDataResult tCruiseDataResult) {
+    public Result insert(@Validated  @RequestBody TCruiseDataResult tCruiseDataResult) {
         Result result = new Result();
         try {
             result.setData(tCruiseDataResultService.insert(tCruiseDataResult));
@@ -163,7 +164,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCruiseDataResult> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCruiseDataResult> list) {
         Result result = new Result();
         try {
             result.setData(tCruiseDataResultService.batchInsert(list));

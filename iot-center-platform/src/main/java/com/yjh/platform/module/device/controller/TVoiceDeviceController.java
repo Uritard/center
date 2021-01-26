@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -40,7 +41,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TVoiceDevice tVoiceDevice) {
+    public Result add(@Validated  @RequestBody TVoiceDevice tVoiceDevice) {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.add(tVoiceDevice));
@@ -139,7 +140,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TVoiceDevice> list) {
+    public Result batchAdd(@Validated @RequestBody List<TVoiceDevice> list) {
         Result result = new Result();
         try {
         result.setData(tVoiceDeviceService.batchAdd(list));

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -39,7 +40,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TUnionTaskAttr tUnionTaskAttr) {
+    public Result insert(@Validated  @RequestBody TUnionTaskAttr tUnionTaskAttr) {
         Result result = new Result();
         try {
             result.setData(tUnionTaskAttrService.insert(tUnionTaskAttr));
@@ -142,7 +143,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TUnionTaskAttr> list) {
+    public Result batchInsert(@Validated @RequestBody List<TUnionTaskAttr> list) {
         Result result = new Result();
         try {
         result.setData(tUnionTaskAttrService.batchInsert(list));

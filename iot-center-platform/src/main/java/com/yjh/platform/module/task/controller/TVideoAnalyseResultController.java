@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -39,7 +40,7 @@ public class TVideoAnalyseResultController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TVideoAnalyseResult tVideoAnalyseResult) {
+    public Result insert(@Validated  @RequestBody TVideoAnalyseResult tVideoAnalyseResult) {
         Result result = new Result();
         try {
             result.setData(tVideoAnalyseResultService.insert(tVideoAnalyseResult));
@@ -142,7 +143,7 @@ public class TVideoAnalyseResultController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TVideoAnalyseResult> list) {
+    public Result batchInsert(@Validated @RequestBody List<TVideoAnalyseResult> list) {
         Result result = new Result();
         try {
         result.setData(tVideoAnalyseResultService.batchInsert(list));

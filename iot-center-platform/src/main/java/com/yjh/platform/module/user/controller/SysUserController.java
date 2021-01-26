@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
@@ -62,7 +63,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysUser sysUser) {
+    public Result insert(@Validated @RequestBody SysUser sysUser) {
 
         Result result = new Result();
         try {
@@ -284,13 +285,14 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    public Result insertUser( @RequestBody SysUser sysUser) {
+    public Result insertUser(@Validated @RequestBody SysUser sysUser) {
 
         Result result = new Result();
         try {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
             sysUser.setPassword("Yjh@123!");
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
             sysUserService.insert(sysUser);
             result.setData(sysUser);
         } catch (Exception e) {
@@ -348,10 +350,14 @@ public class SysUserController {
         try {
             Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
-            String oldPassword = map.get("oldPassword");
+            String oldPassword =Demo.decrypt(map.get("oldPassword"));
+                    //map.get("oldPassword");
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (sysUserCurrent.getPassword().equals(oldPassword)) {
-                if (sysUserCurrent.getPassword().equals(map.get("newPassword"))) {
+                if (sysUserCurrent.getPassword().equals(
+                        //map.get("newPassword")
+                        Demo.decrypt(map.get("newPassword"))
+                )) {
                     result.setMessage("新密码不能和旧密码重复");
                     return result;
                 } else if (map.get("newPassword").contains(sysUserCurrent.getUserName())) {
@@ -361,7 +367,7 @@ public class SysUserController {
                     result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
                     return result;
                 } else {
-                    result.setData(sysUserService.changePassword(userId, map));
+                    result.setData(sysUserService.changePassword(userId, map,sysUserCurrent.getUserName()));
                 }
             } else {
                 Map<String, Object> mapResult = new HashMap<>();

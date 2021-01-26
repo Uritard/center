@@ -42,7 +42,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TAlgorithmInfo tAlgorithmInfo) {
+    public Result insert(@Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
 
         Result result = new Result();
         try {
@@ -150,7 +150,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TAlgorithmInfo> list) {
+    public Result batchInsert( @Validated @RequestBody List<TAlgorithmInfo> list) {
         Result result = new Result();
         try {
         result.setData(tAlgorithmInfoService.batchInsert(list));

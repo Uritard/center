@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -40,7 +41,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCruiseTaskDel tCruiseTaskDel) {
+    public Result insert(@Validated  @RequestBody TCruiseTaskDel tCruiseTaskDel) {
         Result result = new Result();
         try {
             result.setData(tCruiseTaskDelService.insert(tCruiseTaskDel));
@@ -137,7 +138,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCruiseTaskDel> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCruiseTaskDel> list) {
         Result result = new Result();
         try {
         result.setData(tCruiseTaskDelService.batchInsert(list));

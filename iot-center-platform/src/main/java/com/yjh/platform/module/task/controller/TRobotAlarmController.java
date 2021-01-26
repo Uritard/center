@@ -8,6 +8,7 @@ import java.util.Date;
 
 import com.yjh.platform.module.task.service.TRobotAlarmService;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -43,7 +44,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
+    public Result insert(@Validated  @RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
@@ -167,7 +168,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
+    public Result batchInsert(@Validated @RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

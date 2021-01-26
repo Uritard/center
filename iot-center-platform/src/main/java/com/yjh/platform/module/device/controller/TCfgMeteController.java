@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -40,7 +41,7 @@ public class TCfgMeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TCfgMete tCfgMete) {
+    public Result add(@Validated  @RequestBody TCfgMete tCfgMete) {
         Result result = new Result();
         try {
             result.setData(tCfgMeteService.insert(tCfgMete));
@@ -162,7 +163,7 @@ public class TCfgMeteController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TCfgMete> list) {
+    public Result batchAdd(@Validated @RequestBody List<TCfgMete> list) {
         Result result = new Result();
         try {
         result.setData(tCfgMeteService.batchInsert(list));

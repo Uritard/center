@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -41,7 +42,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TDefectInfo tDefectInfo) {
+    public Result insert(@Validated  @RequestBody TDefectInfo tDefectInfo) {
         Result result = new Result();
         try {
             result.setData(tDefectInfoService.insert(tDefectInfo));
@@ -160,7 +161,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TDefectInfo> list) {
+    public Result batchInsert(@Validated @RequestBody List<TDefectInfo> list) {
         Result result = new Result();
         try {
         result.setData(tDefectInfoService.batchInsert(list));

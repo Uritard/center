@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils.smUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
@@ -137,5 +138,21 @@ public class Demo {
         System.out.println("公钥: " + Util.byteToHex(publicKey.getEncoded()));
         System.out.println("私钥: " + Util.byteToHex(privateKey.toByteArray()));
     }
+    /**
+     * 加密
+     */
+    public static  String encryption(String msg) throws IOException {
+      return   new String(Base64.encode(SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), msg.getBytes())));
+    }
 
+    /**
+     * 解密
+     */
+    public  static  String decrypt(String msg) throws IOException {
+        if (StringUtils.isNotBlank(msg)) {
+            return new String(SM2Utils.decrypt(org.bouncycastle.util.encoders.Base64.decode(new String(org.bouncycastle.util.encoders.Base64.encode(Util.hexToByte(prik))).getBytes()), Base64.decode(msg.getBytes())));
+        }else {
+            return  msg;
+        }
+    }
 }

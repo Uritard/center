@@ -43,7 +43,7 @@ public class SysRoleCameraController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody SysRoleCamera sysRoleCamera) {
+    public Result insert(@Validated @RequestBody SysRoleCamera sysRoleCamera) {
 
         Result result = new Result();
         try {
@@ -140,7 +140,7 @@ public class SysRoleCameraController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<SysRoleCamera> list) {
+    public Result batchInsert(@Validated @RequestBody List<SysRoleCamera> list) {
         Result result = new Result();
         try {
             result.setData(sysRoleCameraService.batchInsert(list));

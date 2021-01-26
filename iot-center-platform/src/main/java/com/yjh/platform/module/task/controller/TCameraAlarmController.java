@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Date;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -45,7 +46,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
+    public Result insert(@Validated  @RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
@@ -168,7 +169,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
+    public Result batchInsert(@Validated @RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

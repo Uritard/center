@@ -43,7 +43,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TCameraScreen tCameraScreen) {
+    public Result add(@Validated @RequestBody TCameraScreen tCameraScreen) {
 
         Result result = new Result();
         try {
@@ -143,7 +143,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TCameraScreen> list) {
+    public Result batchAdd(@Validated @RequestBody List<TCameraScreen> list) {
         Result result = new Result();
         try {
         result.setData(tCameraScreenService.batchAdd(list));

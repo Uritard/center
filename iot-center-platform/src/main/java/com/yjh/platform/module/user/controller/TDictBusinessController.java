@@ -46,7 +46,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TDictBusiness tDictBusiness) {
+    public Result insert(@Validated @RequestBody TDictBusiness tDictBusiness) {
 
         Result result = new Result();
         try {
@@ -156,7 +156,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TDictBusiness> list) {
+    public Result batchInsert(@Validated @RequestBody List<TDictBusiness> list) {
         Result result = new Result();
         try {
         result.setData(tDictBusinessService.batchInsert(list));

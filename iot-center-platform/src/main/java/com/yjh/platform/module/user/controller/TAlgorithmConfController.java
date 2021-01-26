@@ -41,7 +41,7 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TAlgorithmConf tAlgorithmConf) {
+    public Result add(@Validated @RequestBody TAlgorithmConf tAlgorithmConf) {
 
         Result result = new Result();
         try {
@@ -146,7 +146,7 @@ public class TAlgorithmConfController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    public Result batchAdd(@RequestBody List<TAlgorithmConf> list) {
+    public Result batchAdd(@Validated @RequestBody List<TAlgorithmConf> list) {
         Result result = new Result();
         try {
         result.setData(tAlgorithmConfService.batchAdd(list));

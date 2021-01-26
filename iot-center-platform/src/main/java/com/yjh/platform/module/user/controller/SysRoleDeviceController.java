@@ -43,7 +43,7 @@ public class SysRoleDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody   SysRoleDevice sysRoleDevice) {
+    public Result insert(@Validated @RequestBody   SysRoleDevice sysRoleDevice) {
 
         Result result = new Result();
         try {
@@ -140,7 +140,7 @@ public class SysRoleDeviceController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<SysRoleDevice> list) {
+    public Result batchInsert(@Validated @RequestBody List<SysRoleDevice> list) {
         Result result = new Result();
         try {
             result.setData(sysRoleDeviceService.batchInsert(list));

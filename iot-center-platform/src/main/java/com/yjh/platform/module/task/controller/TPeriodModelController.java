@@ -8,6 +8,7 @@ import com.yjh.platform.module.task.entity.TPeriodModel;
 import java.util.*;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -40,7 +41,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TPeriodModelAdd tPeriodModelAdd) {
+    public Result insert(@Validated  @RequestBody TPeriodModelAdd tPeriodModelAdd) {
         Result result = new Result();
         try {
             // 秒  分  时  天  月  星期  年
@@ -169,7 +170,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TPeriodModel> list) {
+    public Result batchInsert(@Validated @RequestBody List<TPeriodModel> list) {
         Result result = new Result();
         try {
         result.setData(tPeriodModelService.batchInsert(list));
