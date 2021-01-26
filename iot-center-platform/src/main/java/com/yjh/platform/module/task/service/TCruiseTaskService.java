@@ -229,7 +229,8 @@ public class TCruiseTaskService {
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             }else {
                 //删除整个周期任务
-                for (ConcurrentHashMap<String,Object> mapItem: Constant.taskMap) {
+                for(Iterator<ConcurrentHashMap<String,Object>> it = Constant.taskMap.iterator();it.hasNext();){
+                    ConcurrentHashMap<String,Object> mapItem = it.next();
                     //找到任务Id
                     if(mapItem.get("taskId").equals(taskId)){
                         JobManager.removeJob(mapItem.get("jobName").toString(),mapItem.get("jobGroupName").toString(),mapItem.get("triggerName").toString(),mapItem.get("triggerGroupName").toString());
