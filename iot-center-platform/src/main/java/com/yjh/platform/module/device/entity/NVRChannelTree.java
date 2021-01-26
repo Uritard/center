@@ -18,7 +18,7 @@ public class NVRChannelTree {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "节点ID")
-    private Long id;
+    private String id;
     @ApiModelProperty(value = "节点标签")
     private String label;
     @ApiModelProperty(value = "上级ID")

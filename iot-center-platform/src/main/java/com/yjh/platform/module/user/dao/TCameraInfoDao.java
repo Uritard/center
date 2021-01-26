@@ -69,6 +69,6 @@ public interface TCameraInfoDao {
 
     //查询NVR-ChannelTree
     List<NVRChannelTree> selectNVRNode();
-    List<NVRChannelTree> selectChannelNode(@Param(value = "recordId")Long recordId);
+    List<NVRChannelTree> selectChannelNode(@Param(value = "recordId")String recordId);
 
 }

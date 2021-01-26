@@ -326,7 +326,7 @@
         t_camera_recorder
     </select>
 
-    <select id="selectChannelNode" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.NVRChannelTree">
+    <select id="selectChannelNode" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.NVRChannelTree">
         SELECT
             a.camera_name as 'label',
             a.monitor_id as 'id',
@@ -335,7 +335,7 @@
         FROM
             t_camera_info a
         WHERE
-            a.record_id = #{recordId,jdbcType=BIGINT}
+            a.record_id = #{recordId,jdbcType=VARCHAR}
             and a.monitor_id IS NOT NULL;
 
     </select>
