@@ -2,6 +2,7 @@ package com.yjh.device.common.sm;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.util.encoders.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -187,30 +188,27 @@ public class SM2Utils {
 
 //        String privateKey = "4F9ACC3A24CB9557754ABA7ED0D6F1CC849AEFBEE7C9197F5E569A2D4AC792D5";
 //        String publicKey = "04D012B3DA830A808D0733D1BE231EC8F48FDB13FCC09B7678769F0BF68262EE79922140C786C5E02283AC78D3198F2BFB2A07E4B1949A627BEB0950142FD191B3";
-
-
 //        //测试验签
 //        String plainText = "{\"startIndex\":1,\"pageSize\":17,\"markName\":\"\",\"detailLog\":\"查询条件：所有标记\"}";
 //        String userId = "1234567812345678";
-//
 //        byte[] signBytes = SM2Utils.sign(userId.getBytes(), Util.hexToByte(privateKey), plainText.getBytes());
 //        System.out.println("sign: " + Util.getHexString(signBytes));
 //        boolean vs = SM2Utils.verifySign(userId.getBytes(), Util.hexToByte(publicKey), plainText.getBytes(), signBytes);
+//          自转方法
+//        boolean vs = SM2Utils.verifySign(userId.getBytes(), ByteUtil.toByteArray(publicKey), plainText.getBytes(), siginData.getBytes());
 //        System.out.println("签名验证结果 - " + vs);
 
-        String privateKey = "4F9ACC3A24CB9557754ABA7ED0D6F1CC849AEFBEE7C9197F5E569A2D4AC792D5";
-        String publicKey = "AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAriNiNnSXlGHNwySTproKgAlJdOZlaeaLFl3SR5LtK2cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGEFxY6bu0CeQKHOSu01WbgSR1L7vpzDhlVeDFspJpLp";
-
-        //测试验签
-        String plainText = "12345678123456781234567812345678";
-        String userId = "1234567812345678";
-        String siginData = "MEQCIHGsEST03Txp49gzKvjDQ/NuNSv6xFuNf+AKdOB8R22aAiBhOBWqMnIhzqoJ571dcEaU9jkpfJzBdiH3hLgwYDlJgg==";
-
-        byte[] signBytes = SM2Utils.sign(userId.getBytes(), Util.hexToByte(privateKey), plainText.getBytes());
-        System.out.println("sign: " + Util.getHexString(signBytes));
-        boolean vs = SM2Utils.verifySign(userId.getBytes(), ByteUtil.toByteArray(publicKey), plainText.getBytes(), siginData.getBytes());
-//        boolean vs = SM2Utils.verifySign(userId.getBytes(), Util.hexToByte(publicKey), plainText.getBytes(), siginData.getBytes());
-        System.out.println("签名验证结果 - " + vs);
+        //测试验签1
+        System.out.println("验签: ");
+        String signStr = "MEUCIHLlmxj2h4cDBLP+XZNeMugFK/Umlw/abes/HvW1sBg/AiEAgkDfFAwxVjtEndPnbjAw16mt0Com3OhTDnvC2Z8FpE8=";
+        String pubs = "KN1sf5a9aTugawGErt+sOniSdozhQBc75Terb0ggv8OtgFfyDd7ZVRVIXpxz3LNxJ6Z6S06ZPlwb85814+Ya3g==";
+        String pub_key = "04" + Util.getHexString(Base64.decode(pubs.getBytes()));
+        byte [] c = Base64.decode(signStr);
+        System.out.println("c: " + Util.byteToHex(c));
+        boolean vs = SM2Utils.verifySign("1234567812345678".getBytes(), Util.hexToByte(pub_key), "123".getBytes(), c);
+        System.out.println("vs - " + vs);
+        String str = "12345678123456781234567812345678";
+        System.out.println(Util.getHexString(Base64.decode(str.getBytes())));
 
     }
 }

@@ -145,14 +145,4 @@
         limit 1
     </select>
 
-    <select id="selectUnableCameraIds" resultType="java.lang.Long">
-        SELECT d.camera_id FROM t_cruise_task_result a
-            LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
-            LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
-            LEFT JOIN t_camera_preset d ON d.preset_id = c.cruise_id
-            WHERE a.task_status = '239';
-    </select>
-
-
-
 </mapper>

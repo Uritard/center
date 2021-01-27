@@ -17,9 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,6 +41,8 @@ public class CameraConService {
 
     @Autowired
     private CameraConDao cameraConDao;
+    @Resource
+    private RedisTemplate redisTemplate;
     @Value("${nvr.rtmp.video}")
     private String UrlTem;
 
@@ -688,18 +692,14 @@ public class CameraConService {
         }
     }
 
-//    judge is camera controlled. by tt.
+//    judge is camera controlled. by tt. 1-不可控
     @Logs(title = "获取相机当前控制状态", code = "isCameraControlled", content = "获取相机当前控制状态")
     @Transactional(rollbackFor = Exception.class)
     public Result isCameraControlled (Long cameraId) {
         Result result = new Result();
-        List<Long> unableCameraList = cameraConDao.selectUnableCameraIds();
-        if (Objects.nonNull(unableCameraList)) {
-            for (Long unableCameraId:unableCameraList) {
-                if (Objects.equals(unableCameraId, cameraId)) {
-                    throw new BusinessException("this camera is unable to control.");
-                }
-            }
+        Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:"+cameraId);
+        if (Objects.nonNull(camreaStatusMap.get("state")) && Objects.equals(camreaStatusMap.get("state"),1)) {
+            throw new BusinessException("this camera is unable to control.");
         }
         return result;
     }
