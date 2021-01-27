@@ -693,12 +693,15 @@ public class CameraConService {
     }
 
 //    judge is camera controlled. by tt. 1-不可控
-    @Logs(title = "获取相机当前控制状态", code = "isCameraControlled", content = "获取相机当前控制状态")
+//    @Logs(title = "获取相机当前控制状态", code = "isCameraControlled", content = "获取相机当前控制状态")
     @Transactional(rollbackFor = Exception.class)
     public Result isCameraControlled (Long cameraId) {
         Result result = new Result();
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:"+cameraId);
+        log.info("camreaStatusMap: "+camreaStatusMap);
+        log.info("camreaStatusMapState: "+camreaStatusMap.get("state"));
         if (Objects.nonNull(camreaStatusMap.get("state")) && Objects.equals(camreaStatusMap.get("state"),1)) {
+            log.info("unable");
             throw new BusinessException("this camera is unable to control.");
         }
         return result;
