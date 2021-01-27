@@ -611,9 +611,8 @@
     </select>
 
     <select id="selectAlgorithmType" parameterType="java.lang.Long" resultType="java.lang.String">
-        SELECT b.analyse_type FROM t_algorithm_conf a
-	        LEFT JOIN t_algorithm_info b ON a.algorithm_id = b.algorithm_id
-	        WHERE a.preset_id = #{presetId, jdbcType = BIGINT}
+        SELECT a.analyse_type FROM t_std_devicemete a
+	        WHERE a.device_mete_id = #{deviceMeteId, jdbcType = BIGINT}
     </select>
 
     <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">

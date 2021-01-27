@@ -96,5 +96,5 @@ public interface TCruiseResultDao {
 
     TCruiseResult selectForTaskId(@Param(value = "taskId") String taskId);
 
-    String selectAlgorithmType(@Param(value = "presetId") Long presetId);
+    String selectAlgorithmType(@Param(value = "deviceMeteId") Long deviceMeteId);
 }
