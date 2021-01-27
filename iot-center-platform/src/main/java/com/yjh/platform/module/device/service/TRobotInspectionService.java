@@ -1,28 +1,26 @@
 package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import com.yjh.platform.module.user.entity.TRobotInfo;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author tt
@@ -65,8 +63,13 @@ public class TRobotInspectionService{
 
     @Logs(title = "查询", code = "device",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName, Integer inspectionType, String alarmTop, String alarmBottom, String defaultValue, Integer inspectionPosition, Integer collectStatus, Integer calibrationStatus, String unit) {
-        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
+    public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName,
+                                         String componentId,String componentName,String bayId,String bayName,String mainDeviceId,
+                                         String mainDeviceName,String deviceType,String meterType,String appearanceType,String saveTypeList,
+                                         String recognitionTypeList,String phase,String deviceInfo) {
+        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName,
+                componentId,componentName,bayId,bayName,mainDeviceId,mainDeviceName,deviceType,meterType,appearanceType,saveTypeList,
+                recognitionTypeList,phase,deviceInfo);
         return tRobotInspectionList;
     }
 

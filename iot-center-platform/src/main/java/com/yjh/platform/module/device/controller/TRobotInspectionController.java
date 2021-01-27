@@ -1,25 +1,25 @@
 package com.yjh.platform.module.device.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
-import com.yjh.platform.module.device.service.TRobotInspectionService;
 import com.yjh.platform.module.device.entity.TRobotInspection;
-import java.util.HashMap;
-import java.util.List;
-
-import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.device.service.TRobotInspectionService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -105,19 +105,26 @@ public class TRobotInspectionController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "inspectionId", required = false) Long inspectionId,
                          @RequestParam(value = "inspectionCode", required = false)String inspectionCode,
-                            @RequestParam(value = "robotId", required = false) Long robotId,
-                            @RequestParam(value = "inspectionName", required = false) String inspectionName,
-                            @RequestParam(value = "inspectionType", required = false) Integer inspectionType,
-                            @RequestParam(value = "alarmTop", required = false) String alarmTop,
-                            @RequestParam(value = "alarmBottom", required = false) String alarmBottom,
-                            @RequestParam(value = "defaultValue", required = false) String defaultValue,
-                            @RequestParam(value = "inspectionPosition", required = false) Integer inspectionPosition,
-                            @RequestParam(value = "collectStatus", required = false) Integer collectStatus,
-                            @RequestParam(value = "calibrationStatus", required = false) Integer calibrationStatus,
-                            @RequestParam(value = "unit", required = false) String unit) {
+                         @RequestParam(value = "robotId", required = false) Long robotId,
+                         @RequestParam(value = "inspectionName", required = false) String inspectionName,
+                         @RequestParam(value = "componentId", required = false) String componentId,
+                         @RequestParam(value = "componentName", required = false) String componentName,
+                         @RequestParam(value = "bayId", required = false) String bayId,
+                         @RequestParam(value = "bayName", required = false) String bayName,
+                         @RequestParam(value = "mainDeviceId", required = false) String mainDeviceId,
+                         @RequestParam(value = "mainDeviceName", required = false) String mainDeviceName,
+                         @RequestParam(value = "deviceType", required = false) String deviceType,
+                         @RequestParam(value = "meterType", required = false) String meterType,
+                         @RequestParam(value = "appearanceType", required = false) String appearanceType,
+                         @RequestParam(value = "saveTypeList", required = false) String saveTypeList,
+                         @RequestParam(value = "recognitionTypeList", required = false) String recognitionTypeList,
+                         @RequestParam(value = "phase", required = false) String phase,
+                         @RequestParam(value = "deviceInfo", required = false) String deviceInfo) {
         Result result = new Result();
         try {
-            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
+            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName,
+                    componentId,componentName,bayId,bayName,mainDeviceId,mainDeviceName,deviceType,meterType,appearanceType,saveTypeList,
+                    recognitionTypeList,phase,deviceInfo);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

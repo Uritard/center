@@ -174,13 +174,13 @@ public class RobotService {
     @Logs(title = "机器人在线状态更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int updateRobotInfo(String robotCode, String robotStatus) {
-        log.info("机器人code是:" + robotCode);
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-        log.info("机器人的id是：" + robotId);
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setRobotStatus(robotStatus);
         int res = tRobotInfoDao.update(tRobotInfo);
+        log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus());
+        //机器人状态改变给前端推送webSocket
         return res;
     }
 

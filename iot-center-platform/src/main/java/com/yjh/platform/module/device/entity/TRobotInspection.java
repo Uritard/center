@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +12,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
+import java.io.Serializable;
 
 /**
  * @author tt
@@ -43,45 +43,36 @@ public class TRobotInspection implements Serializable {
     private Long robotId;
 
     @Length(max = 60,message = "inspectionName长度必须小于等于60")
-    @ApiModelProperty(value = "巡检点名称")
+    @ApiModelProperty(value = "测点名称")
       @TableField(value = "inspection_name",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionName;
 
-    @Max(value=999999999)
-    @ApiModelProperty(value = "检测点类型")
-    private Integer inspectionType;
-
-    @Length(max = 20,message = "alarmTop长度必须小于等于20")
-    @ApiModelProperty(value = "检测点告警上限")
-     @TableField(value = "alarm_top",updateStrategy = FieldStrategy.IGNORED)
-    private String alarmTop;
-
-    @Length(max = 20,message = "alarmBottom长度必须小于等于20")
-    @ApiModelProperty(value = "检测点告警下线")
-     @TableField(value = "alarm_bottom",updateStrategy = FieldStrategy.IGNORED)
-    private String alarmBottom;
-
-    @Length(max = 60,message = "defaultValue长度必须小于等于60")
-    @ApiModelProperty(value = "检测点默认值")
-     @TableField(value = "default_value",updateStrategy = FieldStrategy.IGNORED)
-    private String defaultValue;
-
-    @Max(value=999999999)
-    @ApiModelProperty(value = "检测点位置，0-室外 1-室内")
-    private Integer inspectionPosition;
-
-    @Max(value=999999999)
-    @ApiModelProperty(value = "采集状态，0-未采集 1-已采集")
-    private Integer collectStatus;
-
-    @Max(value=999999999)
-    @ApiModelProperty(value = "标定状态，0-未标定 1-已标定")
-    private Integer calibrationStatus;
-
-    @Length(max = 20,message = "unit长度必须小于等于20")
-    @ApiModelProperty(value = "巡检结果单位")
-    @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
-    private String unit;
+    @ApiModelProperty(value = "部件ID")
+    private String componentId;
+    @ApiModelProperty(value = "部件名称")
+    private String componentName;
+    @ApiModelProperty(value = "间隔id")
+    private String bayId;
+    @ApiModelProperty(value = "间隔名称")
+    private String bayName;
+    @ApiModelProperty(value = "主设备id")
+    private String mainDeviceId;
+    @ApiModelProperty(value = "主设备名称")
+    private String mainDeviceName;
+    @ApiModelProperty(value = "主设备类型")
+    private String deviceType;
+    @ApiModelProperty(value = "表计类型")
+    private String meterType;
+    @ApiModelProperty(value = "外观类型")
+    private String appearanceType;
+    @ApiModelProperty(value = "采集/保存文件类型列表")
+    private String saveTypeList;
+    @ApiModelProperty(value = "识别类型列表")
+    private String recognitionTypeList;
+    @ApiModelProperty(value = "相位，A相B相C相")
+    private String phase;
+    @ApiModelProperty(value = "备注信息")
+    private String deviceInfo;
 
 
 }
