@@ -2,9 +2,11 @@ package com.yjh.accessvqd.module.diagnose.dao;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.accessvqd.module.diagnose.entity.ChanResult;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yjh.accessvqd.module.diagnose.entity.DiagnoseResultDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -45,4 +47,18 @@ public interface ChanResultDao {
     List<ChanResult> selectByPage(ChanResult chanResult);
 
     int batchInsert(List<ChanResult> list);
+
+    //分页条件查询诊断结果
+    List<DiagnoseResultDetail> selectDiagnoseResultByPage(@Param(value = "planName")String planName,
+                                                          @Param(value = "channelName")String channelName,
+                                                          @Param(value = "startTime")Date startTime,
+                                                          @Param(value = "endTime")Date endTime,
+                                                          @Param(value = "diagnosePlanId")String diagnosePlanId);
+    //不同故障类型点数量统计
+    Map<String,Long>faultTypeSta(@Param(value = "diagnosePlanId")String diagnosePlanId);
+    //不同监测点状态点数量统计
+    Map<String,Long>statusTypeChannel(@Param(value = "diagnosePlanId")String diagnosePlanId);
+
+    List<Map<String,Object>> staticalAnalysis(@Param(value = "startTime")Date startTime,
+                                              @Param(value = "endTime")Date endTime);
 }
