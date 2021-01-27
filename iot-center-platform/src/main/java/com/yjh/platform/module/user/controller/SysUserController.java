@@ -67,6 +67,8 @@ public class SysUserController {
 
         Result result = new Result();
         try {
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+            sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             result.setData(sysUserService.insert(sysUser));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -99,6 +101,8 @@ public class SysUserController {
     public Result update(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+            sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             result.setData(sysUserService.update(sysUser));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -116,6 +120,8 @@ public class SysUserController {
         Result result = new Result();
         try {
             SysUser sysUser = sysUserService.selectByPrimaryId(userId);
+            sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
+            sysUser.setUserName(Demo.encryption(sysUser.getUserName()));
             result.setData(sysUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -129,8 +135,14 @@ public class SysUserController {
     public Result selectByUserState(@RequestParam(value = "state", required = true) Integer state) {
         Result result = new Result();
         try {
+            List<SysUser> enUser=new ArrayList<>();
             List<SysUser> sysUser = sysUserService.selectByUserState(state);
-            result.setData(sysUser);
+            for(SysUser list:sysUser){
+                  list.setUserName(Demo.encryption(list.getUserName()));
+                  list.setPassword(Demo.encryption(list.getPassword()));
+                  enUser.add(list);
+            }
+            result.setData(enUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -143,8 +155,14 @@ public class SysUserController {
     public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
         Result result = new Result();
         try {
+            List<SysUser> enUser=new ArrayList<>();
             List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
-            result.setData(sysUsers);
+            for(SysUser list:sysUsers){
+                list.setUserName(Demo.encryption(list.getUserName()));
+                list.setPassword(Demo.encryption(list.getPassword()));
+                enUser.add(list);
+            }
+            result.setData(enUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -181,8 +199,14 @@ public class SysUserController {
                          @RequestParam(value = "lastLogin", required = false) Date lastLogin) {
         Result result = new Result();
         try {
+            List<SysUser> enUser=new ArrayList<>();
             List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
-            result.setData(list);
+            for(SysUser lists:list){
+                lists.setUserName(Demo.encryption(lists.getUserName()));
+                lists.setPassword(Demo.encryption(lists.getPassword()));
+                enUser.add(lists);
+            }
+            result.setData(enUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -202,9 +226,18 @@ public class SysUserController {
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
+            List<Map<String, String>> enUser=new ArrayList<>();
             List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
+            for(Map<String,String> map:list){
+                for (Map.Entry<String, String> m : map.entrySet()) {
+                    if(m.getKey().equals("userName")||m.getKey().equals("password")){
+                        m.setValue(Demo.encryption(m.getValue()));
+                    }
+                }
+                enUser.add(map);
+            }
             resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
+            resultMap.put("list", enUser);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

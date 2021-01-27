@@ -132,9 +132,6 @@
         select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,a.verfi_code,
           a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,a.org_id,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login
         from sys_user_backup a
-        where 1 = 1
-        and a.user_name = #{userName, jdbcType=VARCHAR}
-        and a.PASSWORD = #{password, jdbcType=VARCHAR}
-         and a.verfi_code = #{verfiCode, jdbcType=VARCHAR}
+         WHERE user_id = #{userId, jdbcType=BIGINT}
     </select>
 </mapper>
