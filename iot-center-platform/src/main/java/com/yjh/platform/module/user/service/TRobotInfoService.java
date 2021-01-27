@@ -39,7 +39,6 @@ public class TRobotInfoService{
     private SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
-    @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TRobotInfo tRobotInfo,Long userId) {
         String userName = tRobotInfoDao.selectUserName(userId);
@@ -49,13 +48,11 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.insert(tRobotInfo);
     }
 
-    @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long robotId) {
         return this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
     }
 
-    @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TRobotInfo tRobotInfo,Long userId) {
         String userName = tRobotInfoDao.selectUserName(userId);
@@ -65,13 +62,11 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.update(tRobotInfo);
     }
 
-    @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public TRobotInfo selectByPrimaryId(Long robotId) {
         return this.tRobotInfoDao.selectByPrimaryId(robotId);
     }
 
-    @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> select(Long robotId, String robotCode, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
                                     String upRegionName, String lightIp, String lightPort, String lightUsername, String lightPassword,
@@ -87,7 +82,6 @@ public class TRobotInfoService{
         return tRobotInfoList;
     }
 
-    @Logs(title = "分页模糊查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> selectByPage(String robotName,String buildingUser,Integer robotFactory,Integer robotType,String robotSource,Integer isUse,
                                           String address, List<Long> regionIdList) {
@@ -95,12 +89,10 @@ public class TRobotInfoService{
         return tRobotInfoList;
     }
 
-    @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TRobotInfo> list) {
         return this.tRobotInfoDao.batchInsert(list);
     }
-    @Logs(title = "从PMS系统同步机器人信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public boolean synchronizeFromPMS(String robotCode,Long userId) throws Exception {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
@@ -171,12 +163,10 @@ public class TRobotInfoService{
         }
         return false;
     }
-    @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int lookRobotRecord(List<TRobotInfo> list) {
         return this.tRobotInfoDao.batchInsert(list);
     }
-    @Logs(title = "查询所有机器人巡检点信息树", code = "robotInspectionTree")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectInspectionTree() {
         List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree();
@@ -216,7 +206,6 @@ public class TRobotInfoService{
         return robotInspectionList;
     }
 
-    @Logs(title = "批量删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String robotIds) {
         int i = 0;
@@ -226,7 +215,6 @@ public class TRobotInfoService{
         }
         return i;
     }
-    @Logs(title = "从PMS系统同步机器人信息2", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int synchronizeFromPMS2() throws IOException{
         BufferedReader br = null;
@@ -274,7 +262,6 @@ public class TRobotInfoService{
         return 1;
     }
 
-    @Logs(title = "读取从PMS系统获取的文件再生成xml", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int generateXMLByFile() throws IOException {
         BufferedReader br = null;

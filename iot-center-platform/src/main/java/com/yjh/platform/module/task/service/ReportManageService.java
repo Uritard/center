@@ -40,7 +40,6 @@ public class ReportManageService {
     private TCruiseDataResultDao tCruiseDataResultDao;
 
     private DateTimeUtil dateTimeUtil;
-    @Logs(title = "生成报表", code = "reportManage",content = "根据web传递的参数生成不同的报表")
     @Transactional(rollbackFor = Exception.class)
     public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType) {
         List<String> list = Arrays.asList(deviceIdList.split(","));
@@ -134,7 +133,6 @@ public class ReportManageService {
         int res = reportManageDao.insertReport(reportInfo);
         return res;
     }
-    @Logs(title = "下载报表", code = "reportManage",content = "通过web传递的参数下载报表")
     @Transactional(rollbackFor = Exception.class)
     public String reportDownload(String reportId) {
 //        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
@@ -150,7 +148,6 @@ public class ReportManageService {
         log.info("filePath:"+filePath);
         return filePath;
     }
-    @Logs(title = "查询报表生成记录", code = "reportManage",content = "通过web传递的参数查询报表记录")
     @Transactional(rollbackFor = Exception.class)
     public List<TReportInfo> reportSelect(String reportName,String startTime,String endTime){
         HashMap<String, Object> map = new HashMap<>();
@@ -159,7 +156,6 @@ public class ReportManageService {
         map.put("endTime", endTime);
         return reportManageDao.reportSelect(map);
     }
-    @Logs(title = "删除报表", code = "reportManage",content = "通过web传递的参数删除报表记录")
     @Transactional(rollbackFor = Exception.class)
     public int reportDelete(String reportId) {
         //从缓存中获取系统参数
@@ -210,7 +206,6 @@ public class ReportManageService {
         }
         return res;
     }
-//    @Logs(title = "批量删除报表", code = "reportManage",content = "通过web传递的参数批量删除报表记录")
 //    @Transactional(rollbackFor = Exception.class)
 //    public boolean reportBatchDelete(String reportPath,List<TReportInfo> fileNameList) {
 //        for (TReportInfo res:fileNameList) {
@@ -231,7 +226,6 @@ public class ReportManageService {
 //        }
 //        return  true;
 //    }
-    @Logs(title = "审核完成后根据任务生成巡检记录报告", code = "reportManage",content = "根据巡检任务生成报告")
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
         ReportData recordData = new ReportData();
@@ -304,7 +298,6 @@ public class ReportManageService {
         return fileRelativePath;
     }
 
-    @Logs(title = "下载巡视报告", code = "test",content = "啥也不是")
     @Transactional(rollbackFor = Exception.class)
     public String downLoadCruiseReport(String taskId){
         String reportName = taskId + ".xlsx";//报表名称
@@ -314,20 +307,17 @@ public class ReportManageService {
         log.info("该文件相对路径是==="+fileRelativePath);
         return fileRelativePath;
     }
-    @Logs(title = "根据过滤条件生成巡视报告并下载", code = "cruiseResult",content = "根据过滤条件生成巡视报告并下载")
     @Transactional(rollbackFor = Exception.class)
     public String reportByCondition(String taskId,Integer deviceType,Integer cruiseType,String startTime,String endTime) {
 //        List<Long> regionIdList = tStdRegionDao.selectDownId();
         return "";
     }
-    @Logs(title = "啥也不是", code = "test",content = "啥也不是")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> test(String taskId){
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         return tCDRDList;
     }
 
-    @Logs(title = "巡视结果分析报表生成下载",code = "reportManage",content = "分析报表下载")
     @Transactional(rollbackFor = Exception.class)
     public String cruiseResultAnalyseReporter(Long deviceMeteId){
 

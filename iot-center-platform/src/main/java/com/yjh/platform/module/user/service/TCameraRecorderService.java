@@ -45,45 +45,38 @@ public class TCameraRecorderService {
 
     private Logger log = LoggerFactory.getLogger(TCameraRecorderService.class);
 
-    @Logs(title = "插入", code = "tCameraRecorder",content = "根据web传递的参数插入录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraRecorder tCameraRecorder) {
         return this.tCameraRecorderDao.insert(tCameraRecorder);
     }
 
-    @Logs(title = "删除", code = "tCameraRecorder",content = "根据web传递的参数删除录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long recordId) {
         return this.tCameraRecorderDao.deleteByPrimaryId(recordId);
     }
 
-    @Logs(title = "批量删除", code = "tCameraRecorder",content = "根据web传递的参数批量删除录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedRecord(String recordIds) {
         List<String> list= Arrays.asList(recordIds.split(","));
         return this.tCameraRecorderDao.deleteSelectedRecord(list);
     }
 
-    @Logs(title = "更新", code = "tCameraRecorder",content = "根据web传递的参数更新录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraRecorder tCameraRecorder) {
         return this.tCameraRecorderDao.update(tCameraRecorder);
     }
 
-    @Logs(title = "主键查询", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public TCameraRecorderByDict selectByPrimaryId(Long recordId) {
         return this.tCameraRecorderDao.selectByPrimaryId(recordId);
     }
 
-    @Logs(title = "查询", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraRecorderByDict> select(Long recordId, String recordName,Integer recorderModel, String recorderType,Integer vendorId,String pmsId,String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong,String unit) {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName,recorderModel, recorderType,vendorId,pmsId, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
         return tCameraRecorderByDictList;
     }
 
-    @Logs(title = "分页查询", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraRecorderByDict> selectByPage(String aliasName,String unit,Integer vendorId, Integer recorderModel,String recordName) {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(aliasName,unit,vendorId,recorderModel,recordName);
@@ -118,7 +111,6 @@ public class TCameraRecorderService {
         }
         return re;
     }
-    @Logs(title = "从PMS系统同步录像机信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public boolean synchronizeFromPMS(String pmsId) throws Exception{
         Long recorderId = tCameraRecorderDao.selectRecorderIdByPmsId(pmsId);
@@ -180,13 +172,11 @@ public class TCameraRecorderService {
         }
         return false;
     }
-    @Logs(title = "查询部分信息", code = "tCameraRecorder",content = "根据web传递的参数查询录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraRecorderDetail> selectIdAndName(){
         return tCameraRecorderDao.selectIdAndName();
     }
 
-    @Logs(title = "批量插入", code = "tCameraRecorder",content = "根据web传递的参数批量插入录像服务器信息")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCameraRecorder> list) {
         return this.tCameraRecorderDao.batchInsert(list);

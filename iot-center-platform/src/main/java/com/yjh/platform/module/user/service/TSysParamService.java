@@ -26,7 +26,6 @@ public class TSysParamService{
     private RedisTemplate redisTemplate;
 
 
-    @Logs(title = "插入", code = "module", content = "新增系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TSysParam tSysParam) {
          this.tSysParamDao.insert(tSysParam);
@@ -34,14 +33,12 @@ public class TSysParamService{
     }
 
 
-    @Logs(title = "删除", code = "module", content = "删除系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Integer paramId) {
         this.tSysParamDao.deleteByPrimaryId(paramId);
         return this.insertIntoRedis();
     }
 
-    @Logs(title = "更新", code = "module", content = "更新系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TSysParam tSysParam) {
         this.tSysParamDao.update(tSysParam);
@@ -49,14 +46,12 @@ public class TSysParamService{
     }
 
 
-    @Logs(title = "查询", code = "module", content = "根据参数ID查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public TSysParam selectByPrimaryId(Integer paramId) {
         return this.tSysParamDao.selectByPrimaryId(paramId);
     }
 
 
-    @Logs(title = "查询", code = "module", content = "查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TSysParam> select(Integer paramId,String paramCode, String paramType, String paramName, String content, String remark) {
         List<TSysParam> tSysParamList = tSysParamDao.select(paramId,paramCode,paramType, paramName, content, remark);
@@ -64,7 +59,6 @@ public class TSysParamService{
     }
 
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TSysParam> selectByPage(Integer paramId,String paramCode, String paramType, String paramName, String content, String remark) {
         List<TSysParam> tSysParamList = tSysParamDao.selectByPage(paramId,paramCode, paramType, paramName, content, remark);
@@ -72,14 +66,12 @@ public class TSysParamService{
     }
 
 
-    @Logs(title = "新增", code = "module", content = "批量新增系统参数信息")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TSysParam> list) {
         this.tSysParamDao.batchInsert(list);
         return this.insertIntoRedis();
     }
 
-    //@Logs(title = "新增", code = "module", content = "新增系统参数缓存")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoRedis(){
         List<TSysParam> list = this.tSysParamDao.selectAll();

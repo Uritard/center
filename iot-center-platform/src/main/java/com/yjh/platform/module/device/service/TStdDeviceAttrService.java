@@ -21,45 +21,42 @@ public class TStdDeviceAttrService{
     @Autowired
     private TStdDeviceAttrDao tStdDeviceAttrDao;
 
-    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
+
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdDeviceAttr tStdDeviceAttr) {
         return this.tStdDeviceAttrDao.add(tStdDeviceAttr);
     }
 
-    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
+
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceId) {
         return this.tStdDeviceAttrDao.deleteByPrimaryId(deviceId);
     }
 
-    @Logs(title = "更新", code = "module",content = "根据页面传入的参数更新数据")
+
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDeviceAttr tStdDeviceAttr) {
         return this.tStdDeviceAttrDao.update(tStdDeviceAttr);
     }
 
-    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
+
     @Transactional(rollbackFor = Exception.class)
     public TStdDeviceAttr selectByPrimaryId(Long deviceId) {
         return this.tStdDeviceAttrDao.selectByPrimaryId(deviceId);
     }
 
-    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceAttr> select(Long deviceId, Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {
         List<TStdDeviceAttr> tStdDeviceAttrList = tStdDeviceAttrDao.select(deviceId, deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
         return tStdDeviceAttrList;
     }
 
-    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceAttr> selectByPage(TStdDeviceAttr tStdDeviceAttr) {
         List<TStdDeviceAttr> tStdDeviceAttrList = tStdDeviceAttrDao.selectByPage(tStdDeviceAttr);
         return tStdDeviceAttrList;
     }
 
-    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TStdDeviceAttr> list) {
         return this.tStdDeviceAttrDao.batchInsert(list);

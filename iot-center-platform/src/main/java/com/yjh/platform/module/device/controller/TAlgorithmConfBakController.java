@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.service.TAlgorithmConfBakService;
 import com.yjh.platform.module.device.entity.TAlgorithmConfBak;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "插入",content = "根据用户传递的参数新增",logType = 2)
     public Result add(@RequestBody TAlgorithmConfBak tAlgorithmConfBak) {
         Result result = new Result();
         try {
@@ -54,6 +56,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除",logType = 4)
     public Result delete(@RequestParam(value = "deviceMeteId", required = true) Long deviceMeteId) {
         Result result = new Result();
         try {
@@ -70,6 +73,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "更新",content = "根据用户传递的参数更新数据",logType = 3)
     public Result update(@RequestBody TAlgorithmConfBak tAlgorithmConfBak) {
         Result result = new Result();
         try {
@@ -86,6 +90,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "deviceMeteId", required = true) Long deviceMeteId) {
         Result result = new Result();
         try {
@@ -100,6 +105,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result select(@RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                             @RequestParam(value = "algorithmId", required = false) Long algorithmId,
                             @RequestParam(value = "configName", required = false) String configName,
@@ -123,6 +129,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result selectByPage(@RequestBody TAlgorithmConfBak tAlgorithmConfBak,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -143,6 +150,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入",logType = 1)
     public Result batchAdd(@RequestBody List<TAlgorithmConfBak> list) {
         Result result = new Result();
         try {
@@ -156,6 +164,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @Logs(title = "批量删除",content = "根据用户传递的参数批量",logType = 1)
     public Result batchDelete(@RequestParam(value = "deviceMeteIds") String deviceMeteIds) {
     Result result = new Result();
     try {
@@ -173,6 +182,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "获取已有的算法分析类型")
     @RequestMapping(value = "/selectAnalyseType", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询已有的算法分析类型",logType = 1)
     public Result selectAnalyseType() {
         Result result = new Result();
         try {

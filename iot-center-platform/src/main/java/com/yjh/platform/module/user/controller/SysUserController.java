@@ -1,7 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;

@@ -59,7 +59,6 @@ public class HomePageService {
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
 
-    @Logs(title = "巡视任务概览数据", code = "TaskForHomeService",content = "根据页面参数查询任务数据概览")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date) {
         if(1 == date){
@@ -84,13 +83,11 @@ public class HomePageService {
     }
 
 
-    @Logs(title = "统计缺陷", code = "TaskForHomeService",content = "统计缺陷")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Integer>> countByDefectLevel(){
         return tDefectInfoDao.countByDefectLevel();
     }
 
-    @Logs(title = "巡视任务数据", code = "TaskForHomeService",content = "巡视任务数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TaskOnExecuteInfo> taskOnExecute()throws ParseException {
         //查出正在执行的任务
@@ -109,19 +106,16 @@ public class HomePageService {
         return listTask;
     }
 
-    @Logs(title = "告警级别数据", code = "TaskForHomeService",content = "告警级别数据")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> countByAlarmLevel(){
         return tDefectInfoDao.countByAlarmLevel();
     }
 
-    @Logs(title = "告警内容数据", code = "TaskForHomeService",content = "告警内容数据")
     @Transactional(rollbackFor = Exception.class)
     public List<WarnInfoForHomePage> selectThereWarn(Integer alarmLevel){
         return tDefectInfoDao.selectThereWarn(alarmLevel);
     }
 
-    @Logs(title = "机器人信息", code = "TaskForHomeService",content = "机器人信息")
     @Transactional(rollbackFor = Exception.class)
     public List<RobotInfoForHomePage> robotInfoForHomePage(String robotPosition) throws Exception{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -221,7 +215,6 @@ public class HomePageService {
         return robotList;
     }
 
-    @Logs(title = "变电站概况信息", code = "TaskForHomeService",content = "机器人信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> stationInfo() throws Exception{
         DecimalFormat df = new DecimalFormat("#0.0");
@@ -273,13 +266,11 @@ public class HomePageService {
         return mapForRe;
     }
 
-    @Logs(title = "获取摄像机分组信息", code = "TaskForHomeService",content = "获取摄像机分组信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> getCameraGroupInfo(){
         return tCameraGroupDao.selectGroupName();
     }
 
-    @Logs(title = "获取摄像机id信息", code = "TaskForHomeService",content = "获取摄像机id信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Long> getCameraIdInfo(){
         Map<String,String> map = new HashMap<>();
@@ -305,7 +296,6 @@ public class HomePageService {
         return re;
     }
 
-    @Logs(title = "获取分组下摄像机id信息", code = "TaskForHomeService",content = "获取分组下摄像机id信息")
     @Transactional(rollbackFor = Exception.class)
     public List<String> getCameraIdInfoForGroup(Long groupId){
         Map<String,String> map = new HashMap<>();
@@ -331,7 +321,6 @@ public class HomePageService {
         return re;
     }
 
-    @Logs(title = "获取分组下摄像机id信息", code = "TaskForHomeService",content = "获取分组下摄像机id信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> getWeatherInfo() throws Exception{
         //String url = "http://192.168.10.100:18713/format/v1/getWeatherInfo";

@@ -34,7 +34,6 @@ public class TCfgUnionRuleService{
     @Autowired
     private TCruisePlanDao tCruisePlanDao;
 
-    @Logs(title = "插入", code = "TCfgUnionRule",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int add(TCfgUnionRule tCfgUnionRule) {
             String regex = "id:([\\w]*?)\\W";
@@ -49,13 +48,11 @@ public class TCfgUnionRuleService{
     }
 
 
-    @Logs(title = "删除", code = "TCfgUnionRule",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long ruleId) {
         return this.tCfgUnionRuleDao.deleteByPrimaryId(ruleId);
     }
 
-    @Logs(title = "更新", code = "TCfgUnionRule",content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgUnionRule tCfgUnionRule) {
             String regex = "id:([\\w]*?)\\W";
@@ -69,20 +66,17 @@ public class TCfgUnionRuleService{
             return this.tCfgUnionRuleDao.update(tCfgUnionRule);
     }
 
-    @Logs(title = "主键查询", code = "TCfgUnionRule",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCfgUnionRule selectByPrimaryId(Long ruleId) {
         return this.tCfgUnionRuleDao.selectByPrimaryId(ruleId);
     }
 
-    @Logs(title = "查询", code = "TCfgUnionRule",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgUnionRule> select(Long ruleId, Long planId, String ruleName, String ruleType, String ruleContent, Integer ruleDelay, String description, String inputParam, Date createTime, Date updateTime,Long cameraId,Long presetId) {
         List<TCfgUnionRule> tCfgUnionRuleList = tCfgUnionRuleDao.select(ruleId, planId, ruleName, ruleType, ruleContent, ruleDelay, description, inputParam, createTime, updateTime,cameraId,presetId);
         return tCfgUnionRuleList;
     }
 
-    @Logs(title = "分页查询", code = "TCfgUnionRule",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgUnionRuleDetail> selectByPage(String ruleName) {
         TCfgUnionRule tCfgUnionRule = new TCfgUnionRule();
@@ -103,7 +97,6 @@ public class TCfgUnionRuleService{
         return tCfgUnionRuleList;
     }
 
-    @Logs(title = "批量插入", code = "TCfgUnionRule",content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TCfgUnionRule> list) {
         int i = 0;
@@ -113,14 +106,12 @@ public class TCfgUnionRuleService{
         return i;
     }
 
-    @Logs(title = "批量删除", code = "TCfgUnionRule",content = "根据web传入的参数批量删除")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String ruleIds) {
     List<String> list1= Arrays.asList(ruleIds.split(","));
     return this.tCfgUnionRuleDao.batchDelete(list1);
     }
 
-    @Logs(title = "查询四遥树信息", code = "TCfgUnionRule",content = "查询四遥信息")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectForTCfgMete(){
         List<AreaInfo> list = new LinkedList<>();

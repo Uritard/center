@@ -20,45 +20,38 @@ public class TCfgTelecontrolService{
     @Autowired
     private TCfgTelecontrolDao tCfgTelecontrolDao;
 
-    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增一条数据")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgTelecontrol tCfgTelecontrol) {
         return this.tCfgTelecontrolDao.insert(tCfgTelecontrol);
     }
 
-    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除一条数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String deviceId) {
         return this.tCfgTelecontrolDao.deleteByPrimaryId(deviceId);
     }
 
-    @Logs(title = "更新", code = "module",content = "根据页面传入的参数修改一条数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgTelecontrol tCfgTelecontrol) {
         return this.tCfgTelecontrolDao.update(tCfgTelecontrol);
     }
 
-    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TCfgTelecontrol selectByPrimaryId(String deviceId) {
         return this.tCfgTelecontrolDao.selectByPrimaryId(deviceId);
     }
 
-    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgTelecontrol> select(String deviceId, String meteId, String meteName, Integer meteIndex, Integer meteCid, Integer controlStatus, String enableString, String succeedString, String triggerString, Integer controlValue, String meteCode, String deviceType, String description, String describer) {
         List<TCfgTelecontrol> tCfgTelecontrolList = tCfgTelecontrolDao.select(deviceId, meteId, meteName, meteIndex, meteCid, controlStatus, enableString, succeedString, triggerString, controlValue, meteCode, deviceType, description, describer);
         return tCfgTelecontrolList;
     }
 
-    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgTelecontrol> selectByPage(TCfgTelecontrol tCfgTelecontrol) {
         List<TCfgTelecontrol> tCfgTelecontrolList = tCfgTelecontrolDao.selectByPage(tCfgTelecontrol);
         return tCfgTelecontrolList;
     }
 
-    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgTelecontrol> list) {
         return this.tCfgTelecontrolDao.batchInsert(list);

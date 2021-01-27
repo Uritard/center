@@ -32,7 +32,6 @@ public class TSequentialConfService{
 
     private Logger log = LoggerFactory.getLogger(TSequentialConfService.class);
 
-    @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int add(TSequentialConf tSequentialConf) {
         List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
@@ -47,13 +46,11 @@ public class TSequentialConfService{
         }
     }
 
-    @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String cfgDeviceId) {
         return this.tSequentialConfDao.deleteByPrimaryId(cfgDeviceId);
     }
 
-    @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TSequentialConf tSequentialConf) {
         TSequentialConf old = tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId());
@@ -67,40 +64,34 @@ public class TSequentialConfService{
         return this.tSequentialConfDao.update(tSequentialConf);
     }
 
-    @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public TSequentialConf selectByPrimaryId(String cfgDeviceId) {
         return this.tSequentialConfDao.selectByPrimaryId(cfgDeviceId);
     }
 
-    @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TSequentialConf> select(String cfgDeviceId, String cfgMeteId, Long presetId, String identifyResult) {
         List<TSequentialConf> tSequentialConfList = tSequentialConfDao.select(cfgDeviceId, cfgMeteId, presetId, identifyResult);
         return tSequentialConfList;
     }
 
-    @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TSequentialConf> selectByPage(String cfgDeviceName) {
         List<TSequentialConf> tSequentialConfList = tSequentialConfDao.selectByPage(cfgDeviceName);
         return tSequentialConfList;
     }
 
-    @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TSequentialConf> list) {
         return this.tSequentialConfDao.batchAdd(list);
     }
 
-    @Logs(title = "批量删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String cfgDeviceId) {
     List<String> list1= Arrays.asList(cfgDeviceId.split(","));
     return this.tSequentialConfDao.batchDelete(list1);
     }
 
-    @Logs(title = "查询四遥树信息", code = "TCfgUnionRule",content = "查询四遥信息")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectForCfgDeviceTree(String cfgDeviceName){
         List<AreaInfo> list = new LinkedList<>();
@@ -144,7 +135,6 @@ public class TSequentialConfService{
         return list;
     }
 
-    @Logs(title = "顺控联动", code = "TCfgUnionRule",content = "查询四遥信息")
     @Transactional(rollbackFor = Exception.class)
     public String sequential(String meteId){
         {
@@ -180,7 +170,6 @@ public class TSequentialConfService{
        return "ok";
     }
 
-    @Logs(title = "顺控联动", code = "TCfgUnionRule",content = "查询四遥信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> sequentialInfo(String cfgDeviceId){
         //todo 写入识别结果

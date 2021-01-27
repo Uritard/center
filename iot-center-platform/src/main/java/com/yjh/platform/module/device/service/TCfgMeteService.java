@@ -33,51 +33,43 @@ public class TCfgMeteService{
     private TCfgTelesignalDao tCfgTelesignalDao;
 
 
-    @Logs(title = "插入", code = "module",content = "新增一条测点信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgMete tCfgMete) {
         return this.tCfgMeteDao.insert(tCfgMete);
     }
 
-    @Logs(title = "删除", code = "module",content = "删除一条测点信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String meteId) {
         return this.tCfgMeteDao.deleteByPrimaryId(meteId);
     }
 
-    @Logs(title = "更新", code = "module",content = "更新一条测点信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgMete tCfgMete) {
         return this.tCfgMeteDao.update(tCfgMete);
     }
 
-    @Logs(title = "主键查询", code = "module",content = "查询信息")
     @Transactional(rollbackFor = Exception.class)
     public TCfgMete selectByPrimaryId(String meteId) {
         return this.tCfgMeteDao.selectByPrimaryId(meteId);
     }
 
-    @Logs(title = "查询", code = "module",content = "查询信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgMete> select(String meteId, String meteType, Integer meteKind, String meteName, String meteCode, String unit, String meteExplainType, Date createTime, Date updateTime, Integer modulus, String stationName, String stationId, Integer upEffect, Integer downEffect, Integer alarmlevel, Integer alarmthresbhold, String describer, Integer metePrecision, Float changeLimit, Float hilimit1, Float lolimit1, Float hilimit2, Float lolimit2, Float hilimit3, Float lolimit3, Float hilimit4, Float stander, Integer controlenable) {
         List<TCfgMete> tCfgMeteList = tCfgMeteDao.select(meteId, meteType, meteKind, meteName, meteCode, unit, meteExplainType, createTime, updateTime, modulus, stationName, stationId, upEffect, downEffect, alarmlevel, alarmthresbhold, describer, metePrecision, changeLimit, hilimit1, lolimit1, hilimit2, lolimit2, hilimit3, lolimit3, hilimit4, stander, controlenable);
         return tCfgMeteList;
     }
 
-    @Logs(title = "分页查询", code = "module",content = "查询信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgMete> selectByPage(TCfgMete tCfgMete) {
         List<TCfgMete> tCfgMeteList = tCfgMeteDao.selectByPage(tCfgMete);
         return tCfgMeteList;
     }
 
-    @Logs(title = "批量插入", code = "module",content = "批量插入测点信息")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgMete> list) {
         return this.tCfgMeteDao.batchInsert(list);
     }
 
-    @Logs(title = "插入四遥信息", code = "module",content = "插入四遥信息")
     @Transactional(rollbackFor = Exception.class)
     public int insertForAll(Map<String, List<SYAllInfo>> syAllInfoMap) {
         List<SYAllInfo> syAllInfoList = syAllInfoMap.get("list");
@@ -98,7 +90,6 @@ public class TCfgMeteService{
         return 1;
     }
 
-    @Logs(title = "更新四遥信息", code = "module",content = "更新四遥信息")
     @Transactional(rollbackFor = Exception.class)
     public int updateForAll(Map<String, List<SYAllInfo>> syAllInfoMap) {
         List<SYAllInfo> syAllInfoList = syAllInfoMap.get("list");

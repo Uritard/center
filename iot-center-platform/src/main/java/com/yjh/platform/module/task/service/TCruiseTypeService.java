@@ -24,7 +24,6 @@ public class TCruiseTypeService{
     @Autowired
     private TCruiseTypeDao tCruiseTypeDao;
 
-    @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int add(Integer cruiseType,String instanceList,String remark) {
         if("".equals(instanceList)){
@@ -43,52 +42,44 @@ public class TCruiseTypeService{
         return this.tCruiseTypeDao.batchAdd(list);
     }
 
-    @Logs(title = "删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Integer subType) {
         return this.tCruiseTypeDao.deleteByPrimaryId(subType);
     }
 
-    @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseType tCruiseType) {
         return this.tCruiseTypeDao.update(tCruiseType);
     }
 
-    @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseType selectByPrimaryId(Integer subType) {
         return this.tCruiseTypeDao.selectByPrimaryId(subType);
     }
 
-    @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTypeDetail> select(Integer subType) {
         List<TCruiseTypeDetail> tCruiseTypeList = tCruiseTypeDao.select(subType);
         return tCruiseTypeList;
     }
 
-    @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTypeDetail> selectByPage(TCruiseType tCruiseType) {
         List<TCruiseTypeDetail> tCruiseTypeList = tCruiseTypeDao.selectByPage(tCruiseType);
         return tCruiseTypeList;
     }
 
-    @Logs(title = "批量插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TCruiseType> list) {
         return this.tCruiseTypeDao.batchAdd(list);
     }
 
-    @Logs(title = "批量删除", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String subType) {
     List<String> list1= Arrays.asList(subType.split(","));
     return this.tCruiseTypeDao.batchDelete(list1);
     }
 
-    @Logs(title = "查询类型下的所有id", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public List<Long> selectIdList(Integer subType) {
         return this.tCruiseTypeDao.selectIdList(subType);

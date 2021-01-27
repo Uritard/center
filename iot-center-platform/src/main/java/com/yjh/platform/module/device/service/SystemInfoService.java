@@ -42,7 +42,6 @@ public class SystemInfoService {
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
-//    @Logs(title = "获取内存信息", code = "module",content = "获取内存信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> getMemory() throws Exception {
         Map<String,String> menUsage=systemInfoUtil.getMemUsage();
@@ -55,7 +54,6 @@ public class SystemInfoService {
         }
         return menUsage;
     }
-//    @Logs(title = "获取cpu信息", code = "module",content = "获取cpu信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getCPU() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getCpuUsage();
@@ -70,7 +68,6 @@ public class SystemInfoService {
         }
         return result2;
     }
-//    @Logs(title = "获取磁盘信息", code = "module",content = "获取磁盘信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getSwap() throws Exception {
         List<Map<String,String>> result = systemInfoUtil.getDeskUsage();
@@ -83,7 +80,6 @@ public class SystemInfoService {
         return result2;
     }
 
-//    @Logs(title = "获取cpu利用率", code = "module",content = "获取cpu利用率")
     @Transactional(rollbackFor = Exception.class)
     public  Map<String,Object> getCpuOnUse() throws Exception {
         Map<String,Object> cpuOnUsemap=new HashMap<>();
@@ -99,7 +95,6 @@ public class SystemInfoService {
         return cpuOnUsemap;
     }
 
-//    @Logs(title = "获取硬盘利用率", code = "module",content = "获取硬盘利用率")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> getDeskOnUse() throws Exception {
         Map<String,Object> deskOnUse=systemInfoUtil.getDeskOnUse();
@@ -114,7 +109,6 @@ public class SystemInfoService {
     }
 
 
-//    @Logs(title = "获取关键服务", code = "module",content = "获取关键服务")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> getServices() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

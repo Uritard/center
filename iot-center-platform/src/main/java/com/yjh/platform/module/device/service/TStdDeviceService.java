@@ -45,13 +45,11 @@ public class TStdDeviceService{
     private TDeviceMaintenanceDao tDeviceMaintenanceDao;
 
 
-    @Logs(title = "联合主键查询",code = "module",content = "设备ID和部位ID联合查询设备信息")
     @Transactional(rollbackFor = Exception.class)
     public TStdDevice selectByUnionKeys(Long deviceId,String customId){
         return tStdDeviceDao.selectByUnionKeys(deviceId, customId);
     }
 
-    @Logs(title = "新增", code = "module", content = "新增设备")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDevice tStdDevice) {
         if(tStdDevice.getCustomId() == null){
@@ -63,7 +61,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "新增", code = "module", content = "新增设备及属性")
     @Transactional(rollbackFor = Exception.class)
     public int addALL(TStdDeviceDetail tStdDeviceDetail) {
 
@@ -149,13 +146,11 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "删除", code = "module", content = "根据设备ID删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long deviceId) {
         return this.tStdDeviceDao.deleteByPrimaryId(deviceId);
     }
 
-    @Logs(title = "删除", code = "module", content = "删除设备及属性")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryIdALL(Long deviceId) {
                 tStdDeviceAttrDao.deleteByPrimaryId(deviceId);//删除属性
@@ -168,14 +163,12 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "更新", code = "module", content = "更新设备")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDevice tStdDevice) {
         return this.tStdDeviceDao.update(tStdDevice);
     }
 
 
-    @Logs(title = "更新", code = "module", content = "更新设备及属性")
     @Transactional(rollbackFor = Exception.class)
     public int updateAll(TStdDeviceDetail tStdDeviceDetail) {
 //        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tStdDeviceDetail.getDeviceId());
@@ -272,21 +265,18 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "查询", code = "module", content = "根据设备ID查询设备信息")
     @Transactional(rollbackFor = Exception.class)
     public TStdDevice selectByPrimaryId(Long deviceId) {
         return this.tStdDeviceDao.selectByPrimaryId(deviceId);
     }
 
 
-    @Logs(title = "查询", code = "module", content = "根据设备ID查询设备信息")
     @Transactional(rollbackFor = Exception.class)
     public TStdDeviceDetail selectByPrimaryIdAll(Long deviceId) {
         return this.tStdDeviceDao.selectByPrimaryIdAll(deviceId);
     }
 
 
-    @Logs(title = "查询", code = "module", content = "查询设备")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDevice> select(Long deviceId, String customId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, String customName, Integer customType, Integer status, Date updateTime, Date createTime) {
         List<TStdDevice> tStdDeviceList = tStdDeviceDao.select(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime);
@@ -294,7 +284,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "查询", code = "module", content = "查询设备及属性")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceDetail> selectAll(Long deviceId, String customId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, String customName, Integer customType, Integer status, Date updateTime, Date createTime,Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {
         return this.tStdDeviceDao.selectAll(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime,
@@ -302,7 +291,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询设备")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDevice> selectByPage(TStdDevice tStdDevice) {
         List<TStdDevice> tStdDeviceList = tStdDeviceDao.selectByPage(tStdDevice);
@@ -310,7 +298,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询设备及属性")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail, List<Long> upRegionIds) {
         if(upRegionIds.size() != 0){
@@ -322,14 +309,12 @@ public class TStdDeviceService{
         return this.tStdDeviceDao.selectByPageAll(tStdDeviceDetail);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据设备ID查询上级区域信息")
     @Transactional(rollbackFor = Exception.class)
     public TStdRegion selectRegionById(Long deviceId) {
         return this.tStdDeviceDao.selectRegionById(deviceId);
     }
 
 
-    @Logs(title = "查询", code = "module", content = "设备树查询")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectDevTree(String level, String deviceShow) {
         List<AreaInfo> listTree = new ArrayList<>();
@@ -375,7 +360,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "查询", code = "module", content = "查询区域设备树")
     @Transactional(rollbackFor = Exception.class)
     public List<Long> selectRegionIdTree(Long UpRegionId) {
         List<Long> upRegionIds = new ArrayList<>();
@@ -416,7 +400,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "查询", code = "module", content = "区域树模糊查询")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectRegionTreeByName(String regionName) {
         List<AreaInfo> listTree = new ArrayList<>();
@@ -511,7 +494,6 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "查询", code = "module", content = "根据ModelId查询")
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectByModelId(Long modelId) {
         List<String> tStdDeviceList = tStdDeviceDao.selectByModelId(modelId);
@@ -519,13 +501,11 @@ public class TStdDeviceService{
     }
 
 
-    @Logs(title = "修改", content = "根据设备ID和部位ID修改设备的模板ID")
     @Transactional(rollbackFor = Exception.class)
     public int updateModelIdByDevCus(Long deviceId,Long customId,Long modelId){
         return this.tStdDeviceDao.updateModelIdByDevCus(deviceId, customId, modelId);
     }
 
-    @Logs(title = "批量删除",code = "module", content = "批量删除设备")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String list){
         List<String> list1= Arrays.asList(list.split(","));
@@ -535,7 +515,6 @@ public class TStdDeviceService{
         return 1;
     }
 
-    @Logs(title = "根据区域Id批量查询设备Id")
     public List<Long> selectDeviceIdsByRegion(List<Long> regionIds){
         return tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
     }

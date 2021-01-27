@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.service.TCruisePointInstanceService;
 
@@ -40,6 +41,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "插入",content = "根据用户传递的参数新增数据",logType = 2)
     public Result add(@RequestBody TCruisePointInstance tCruisePointInstance) {
         Result result = new Result();
         try {
@@ -55,6 +57,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "根据主键删除删除")
     @RequestMapping(value = "/deleteByPrimaryId", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除",logType = 4)
     public Result deleteByPrimaryId(@RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
         try {
@@ -72,6 +75,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "更新",content = "根据用户传递的参数修改数据",logType = 3)
     public Result update(@RequestBody TCruisePointInstance tCruisePointInstance) {
         Result result = new Result();
         try {
@@ -88,6 +92,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
         try {
@@ -102,6 +107,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result select(@RequestParam(value = "instanceId", required = false) Long instanceId,
                          @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                          @RequestParam(value = "stationId", required = false) String stationId,
@@ -136,6 +142,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -156,6 +163,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "巡检点关联分页查询")
     @RequestMapping(value = "/selectCruisePointByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result selectCruisePointByPage(@RequestBody TStdDeviceMete tStdDeviceMete,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -164,6 +172,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "告警联动分页查询")
     @RequestMapping(value = "/selectSYCruisePointByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
     public Result selectSYCruisePointByPage(@RequestBody TCfgMeteForPointDetail tCfgMeteForPointDetail,
                                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                           @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -171,6 +180,7 @@ public class TCruisePointInstanceController {
     }
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入",logType = 2)
     public Result batchAdd(@RequestBody List<TCruisePointInstance> list) {
         Result result = new Result();
         try {
@@ -184,6 +194,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "标准测点关联机器人巡检点")
     @RequestMapping(value = "/StdMeteUnionInspectionId", method = RequestMethod.GET)
+    @Logs(title = "操作",content = "标准测点关联机器人巡检点",logType = 5)
     public Result StdMeteUnionInspectionId(@RequestParam(value = "deviceId", required = false) Long deviceId) {
         Result result = new Result();
         try {
@@ -198,6 +209,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "巡检点关联配置")
     @RequestMapping(value = "/instanceUpdate", method = RequestMethod.PUT)
+    @Logs(title = "插入",content = "巡检点关联配置",logType = 2)
     public Result instanceUnionUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();
         try{
@@ -213,6 +225,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "告警配置")
     @RequestMapping(value = "/warnInspectUpdate", method = RequestMethod.PUT)
+    @Logs(title = "插入",content = "告警配置",logType = 2)
     public Result warnInspectUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();
         try{
@@ -229,6 +242,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-统计当前任务下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCount",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "统计当前任务下的巡检点数量",logType = 1)
     public  Result selectCruiseCount(@RequestParam  String taskId){
         Result result=new Result();
         try {
@@ -242,6 +256,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-查询各种巡检类型下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCountByType",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询巡检类型下的巡检点数量",logType = 1)
     public Result selectCruiseCountByType(@RequestParam String taskId){
         Result result=new Result();
         try {

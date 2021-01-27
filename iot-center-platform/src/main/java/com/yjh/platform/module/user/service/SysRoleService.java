@@ -30,65 +30,54 @@ public class SysRoleService{
     @Autowired
     private SysRoleDeviceDao sysRoleDeviceDao;
 
-    @Logs(title = "插入", code = "module", content = "新增角色")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysRole sysRole) {
         return this.sysRoleDao.insert(sysRole);
     }
 
-    @Logs(title = "删除", code = "module", content = "删除角色")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long roleId) {
         return this.sysRoleDao.deleteByPrimaryId(roleId);
     }
 
-    @Logs(title = "更新", code = "module", content = "更新角色")
     @Transactional(rollbackFor = Exception.class)
     public int update(SysRole sysRole) {
         return this.sysRoleDao.update(sysRole);
     }
 
-    @Logs(title = "主键查询", code = "module", content = "根据角色ID查询角色")
     @Transactional(rollbackFor = Exception.class)
     public SysRole selectByPrimaryId(Long roleId) {
         return this.sysRoleDao.selectByPrimaryId(roleId);
     }
 
-    @Logs(title = "查询", code = "module", content = "查询角色信息")
     @Transactional(rollbackFor = Exception.class)
     public List<SysRole> select(Long roleId, String roleName, Date createTime, Long creatorId, Integer sysState) {
         return this.sysRoleDao.select(roleId, roleName, createTime, creatorId, sysState);
     }
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询角色")
     @Transactional(rollbackFor = Exception.class)
     public List<SysRole> selectByPage(SysRole sysRole) {
         return this.sysRoleDao.selectByPage(sysRole);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据角色ID查询关联的菜单信息")
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectRelationMenu(Long roleId) { return this.sysRoleDao.selectRelationMenu(roleId); }
 
-    @Logs(title = "查询", code = "module", content = "根据角色ID查询关联的区域信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectRelationRegion(Long roleId) {
         return this.sysRoleDao.selectRelationRegion(roleId);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据角色ID查询关联的相机信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectRelationCamera(Long roleId) {
         return this.sysRoleDao.selectRelationCamera(roleId);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据角色ID查询关联的设备信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectRelationDevice(Long roleId) {
         return this.sysRoleDao.selectRelationDevice(roleId);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据角色ID查询关联的权限信息")
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectRelationAuthor(Long roleId) {
         List<String> list = new ArrayList<>();
@@ -112,7 +101,6 @@ public class SysRoleService{
         return list.stream().distinct().collect(Collectors.toList());
     }
 
-    @Logs(title = "查询", code = "module", content = "根据角色ID查询关联的权限树信息")
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectRelationAuthorTree(Long roleId) {
         List<String> list = new ArrayList<>();
@@ -182,7 +170,6 @@ public class SysRoleService{
         }
     }
 
-    @Logs(title = "修改", code = "module", content = "修改角色区域设备权限")
     @Transactional(rollbackFor = Exception.class)
     public int updateRoleDeviceRight(Map<String, Object> req) {
         Long roleId = Long.valueOf(String.valueOf(req.get("roleId")));
@@ -266,7 +253,6 @@ public class SysRoleService{
         return 0;
     }
 
-    @Logs(title = "修改", code = "module", content = "修改角色菜单权限")
     @Transactional(rollbackFor = Exception.class)
     public int updateRoleMenuRight(Map<String, Object> req) {
         Long roleId = Long.valueOf(String.valueOf(req.get("roleId")));
@@ -297,7 +283,6 @@ public class SysRoleService{
         return 0;
     }
 
-//    @Logs(title = "根据角色ID查询关联的菜单信息", code = "module")
 //    @Transactional(rollbackFor = Exception.class)
 //    public List<String> selectRelationMenu(Long roleId) {
 //        List<String> list = new ArrayList<>();

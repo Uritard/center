@@ -76,7 +76,6 @@ public class CameraConService {
     //设备信息
     private HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
 
-    @Logs(title = "相机播放", code = "cameraPlay")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startRealPlay(Long cameraId) {
         Map<String, Object> returnMap = new HashMap<>();

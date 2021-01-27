@@ -23,38 +23,32 @@ public class TCfgDeviceService{
     @Autowired
     private TCfgDeviceDao tCfgDeviceDao;
 
-    @Logs(title = "插入", code = "module",content = "新增一条设备信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgDevice tCfgDevice) {
         return this.tCfgDeviceDao.insert(tCfgDevice);
     }
 
-    @Logs(title = "删除", code = "module",content = "删除一条设备信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String deviceId) {
         return this.tCfgDeviceDao.deleteByPrimaryId(deviceId);
     }
 
-    @Logs(title = "更新", code = "module",content = "更新一条设备信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgDevice tCfgDevice) {
         return this.tCfgDeviceDao.update(tCfgDevice);
     }
 
-    @Logs(title = "主键查询", code = "module",content = "查询信息")
     @Transactional(rollbackFor = Exception.class)
     public TCfgDevice selectByPrimaryId(String deviceId) {
         return this.tCfgDeviceDao.selectByPrimaryId(deviceId);
     }
 
-    @Logs(title = "查询", code = "module",content = "查询信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgDevice> select(String deviceId, String deviceName, String deviceType, String deviceCode, String stationId, String relationCode, Date createTime, Date updateTime, String remark) {
         List<TCfgDevice> tCfgDeviceList = tCfgDeviceDao.select(deviceId, deviceName, deviceType, deviceCode, stationId, relationCode, createTime, updateTime, remark);
         return tCfgDeviceList;
     }
 
-    @Logs(title = "分页查询", code = "module",content = "查询信息")
     @Transactional(rollbackFor = Exception.class)
     public List<HashMap<String,Object>> selectByPage(TCfgDeviceDetail tCfgDeviceDetail) {
         if ("-1".equals(tCfgDeviceDetail.getMeteKind())){
@@ -65,7 +59,6 @@ public class TCfgDeviceService{
     }
 
 
-    @Logs(title = "批量插入", code = "module",content = "批量插入设备信息")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgDevice> list) {
         return this.tCfgDeviceDao.batchInsert(list);
@@ -95,7 +88,6 @@ public class TCfgDeviceService{
 
 
 
-    @Logs(title = "遥调", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTeleadjust(Map<String,String> mapAll){
         TCfgTeleadjust tCfgTeleadjust = new TCfgTeleadjust();
@@ -114,7 +106,6 @@ public class TCfgDeviceService{
         return tCfgDeviceDao.insertIntoTeleadjust(tCfgTeleadjust);
     }
 
-    @Logs(title = "遥信", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTelesignal(Map<String,String> mapAll){
 
@@ -133,7 +124,6 @@ public class TCfgDeviceService{
         return tCfgDeviceDao.insertIntoTelesignal(tCfgTelesignal);
     }
 
-    @Logs(title = "遥测", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTelemeter(Map<String,String> mapAll){
 
@@ -160,7 +150,6 @@ public class TCfgDeviceService{
         return tCfgDeviceDao.insertIntoTelemeter(tCfgTelemeter);
     }
 
-    @Logs(title = "遥控", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoTelecontrol(Map<String,String> mapAll){
 

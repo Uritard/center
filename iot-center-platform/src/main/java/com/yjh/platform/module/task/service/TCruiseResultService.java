@@ -63,44 +63,37 @@ public class TCruiseResultService{
     private RedisTemplate redisTemplate;
 
 
-    @Logs(title = "插入", code = "cruiseResult",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseResult tCruiseResult) {
         return this.tCruiseResultDao.insert(tCruiseResult);
     }
 
-    @Logs(title = "删除", code = "cruiseResult",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskResultId) {
         return this.tCruiseResultDao.deleteByPrimaryId(taskResultId);
     }
 
-    @Logs(title = "更新", code = "cruiseResult",content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseResult tCruiseResult) {
         return this.tCruiseResultDao.update(tCruiseResult);
     }
 
-    @Logs(title = "主键查询", code = "cruiseResult",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectByPrimaryId(String taskResultId) {
         return this.tCruiseResultDao.selectByPrimaryId(taskResultId);
     }
 
-    @Logs(title = "查询", code = "cruiseResult",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseResult> select(String taskResultId, String taskId, String taskName, String areaId, Integer cType, Integer cState, Integer modifyState, Integer taskCount, Integer taskWait, String checkUser, Date checkDate, String weather, Date createTime, Date executeTime, String taskCode, String remark) {
         List<TCruiseResult> tCruiseResultList = tCruiseResultDao.select(taskResultId, taskId,taskName, areaId, cType, cState, modifyState, taskCount, taskWait, checkUser, checkDate, weather, createTime, executeTime, taskCode, remark);
         return tCruiseResultList;
     }
 
-    @Logs(title = "分页查询--巡视结果确认", code = "cruiseResult",content = "根据web传递的参数查询任务结果")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cType, Integer cState) {
         List<TCruiseResultExpand> tCruiseResultExpandList = tCruiseResultDao.selectTaskByPage(taskName,cState,cType);
         return tCruiseResultExpandList;
     }
-    @Logs(title = "分页查询--任务结果详细", code = "cruiseResult",content = "根据web传递的参数查询巡检点结果")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId,int pageNum,int pageSize) {
 
@@ -121,7 +114,6 @@ public class TCruiseResultService{
         resultMap.put("list", cruiseResultDetailList);
         return resultMap;
     }
-    @Logs(title = "人工修正", code = "cruiseResult",content = "根据web传递的参数进行人工修正")
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview,String userId) throws Exception{
         //获取审核人
@@ -330,7 +322,6 @@ public class TCruiseResultService{
         }
         return cruiseManualReview.getCheckDate();
     }
-    @Logs(title = "巡视任务结果统计", code = "cruiseResult",content = "根据巡视类型统计本周和上周的任务结果")
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalResult> taskStatistical() throws Exception{
 
@@ -359,7 +350,6 @@ public class TCruiseResultService{
 
         return taskStatisticalList;
     }
-    @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据巡视数据状态统计巡检点结果")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseStatistical> cruiseStatistical() {
         List<CruiseStatistical> list = tCruiseResultDao.cruiseStatistical();//异常
@@ -367,25 +357,21 @@ public class TCruiseResultService{
         list.add(cruiseStatistical);
         return list;
     }
-    @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据正常异常状态统计")
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalTools> cruiseStatisticalByStatus() {
         List<StatisticalTools> statisticalToolsList = tCruiseResultDao.cruiseStatisticalByStatus();
         return statisticalToolsList;
     }
-    @Logs(title = "巡视点结果统计", code = "cruiseResult",content = "根据异常分类统计")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseStatistical> cruiseStatisticalByAbnormal() {
         List<CruiseStatistical> tsList = tCruiseResultDao.cruiseStatisticalByAbnormal();
         return tsList;
     }
-    @Logs(title = "批量插入", code = "cruiseResult")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseResult> list) {
         return this.tCruiseResultDao.batchInsert(list);
     }
 
-    @Logs(title = "查询正在执行中的任务",code = "cruiseResult",content = "查询正在执行中的任务")
     @Transactional(rollbackFor = Exception.class)
     public List<TaskSimpleInfo> selectTaskIsRunning(){
         List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();

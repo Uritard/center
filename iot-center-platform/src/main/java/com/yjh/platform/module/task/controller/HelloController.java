@@ -351,7 +351,6 @@ public class HelloController {
     @ApiOperation("发任务")
     @PostMapping("/task")
     @ResponseBody
-    @Logs(title = "用户信息",logType = 1, content = "查询用户信息")
     public Result task() throws Exception {
         Result result = new Result();
         Map<String,Object> map = new HashMap<>();

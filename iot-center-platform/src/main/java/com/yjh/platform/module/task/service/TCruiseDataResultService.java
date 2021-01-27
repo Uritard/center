@@ -42,51 +42,43 @@ public class TCruiseDataResultService {
 
     private Logger log = LoggerFactory.getLogger(TCruiseDataResultService.class);
 
-    @Logs(title = "插入", code = "TCruiseDataResult", content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseDataResult tCruiseDataResult) {
         return this.tCruiseDataResultDao.insert(tCruiseDataResult);
     }
 
-    @Logs(title = "删除", code = "TCruiseDataResult", content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long cruiseDataId) {
         return this.tCruiseDataResultDao.deleteByPrimaryId(cruiseDataId);
     }
 
-    @Logs(title = "更新", code = "TCruiseDataResult", content = "根据web传入的参数更新")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseDataResult tCruiseDataResult) {
         return this.tCruiseDataResultDao.update(tCruiseDataResult);
     }
 
-    @Logs(title = "主键查询", code = "TCruiseDataResult", content = "根据主键查询")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseDataResult selectByPrimaryId(Long cruiseDataId) {
         return this.tCruiseDataResultDao.selectByPrimaryId(cruiseDataId);
     }
 
-    @Logs(title = "查询", code = "TCruiseDataResult", content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResult> select(Long cruiseDataId, String cruiseResultId, Long cruiseId,String cruiseName, Integer cruiseType, Integer cruiseAbnormal,String resultDesc, String resultNum, String modifyNum, String picpath, String personcheck, String origpic, String evaluationState, Integer identifyState, Integer identifyResult, Date createtime, String remark,String checkUser,Date checkDate,Integer isWarn ,Integer cruiseResult ) {
         List<TCruiseDataResult> tCruiseDataResultList = tCruiseDataResultDao.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,  cruiseAbnormal,resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,checkUser,checkDate,isWarn,cruiseResult);
         return tCruiseDataResultList;
     }
 
-    @Logs(title = "分页查询", code = "TCruiseDataResult", content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResult> selectByPage(TCruiseDataResult tCruiseDataResult) {
         List<TCruiseDataResult> tCruiseDataResultList = tCruiseDataResultDao.selectByPage(tCruiseDataResult);
         return tCruiseDataResultList;
     }
 
-    @Logs(title = "批量插入", code = "TCruiseDataResult", content = "根据web传入的参数批量插入")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseDataResult> list) {
         return this.tCruiseDataResultDao.batchInsert(list);
     }
 
-    @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
         List<Long> regionIdList = new ArrayList<>();
@@ -166,7 +158,6 @@ public class TCruiseDataResultService {
         return resultMap;
     }
 
-    @Logs(title = "巡视结果查询-测点查询", code = "TCruiseDataResult", content = "巡视结果测点查询")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(List<Long>deviceIds,String resultSwitch) {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=new ArrayList<>();
@@ -277,7 +268,6 @@ public class TCruiseDataResultService {
     }
 
 
-    @Logs(title = "获取当前测点下的巡检结果", code = "TCruiseDataResult", content = "获取测点巡检结果")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalInfo> selectCruiseDataResultByList(Integer cruiseType,
                                                                    Integer cType,
@@ -294,7 +284,6 @@ public class TCruiseDataResultService {
         return cruiseResultAnalInfos;
     }
 
-    @Logs(title = "获取当前测点下的巡检结果", code = "TCruiseDataResult", content = "获取测点巡检结果")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseDataReport( Integer cType, String meteType, Integer meterType, String endTime, String startTime,Long regionId,String instanceName,int pageNum,int pageSize) {
 
@@ -335,7 +324,6 @@ public class TCruiseDataResultService {
 
         return resultMap;
     }
-    @Logs(title = "获取当前测点下的巡检结果", code = "TCruiseDataResult", content = "获取测点巡检结果")
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime,int pageNum,int pageSize){
 
@@ -351,7 +339,6 @@ public class TCruiseDataResultService {
 
         return cruiseResultAnalyzeInfoList;
     }
-    @Logs(title = "获取折线图元素信息", code = "TCruiseDataResult", content = "获取折线图信息")
     @Transactional(rollbackFor = Exception.class)
     public List<BrokenLineInfo> selectBrokenLine(Integer cruiseType,
                                                  Integer cType,

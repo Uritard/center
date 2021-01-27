@@ -1,7 +1,6 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
@@ -56,7 +55,6 @@ public class SysUserService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
 
-    @Logs(title = "新增", code = "sysUser", content = "新增用户")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysUser sysUser) {
         Date date = new Date();
@@ -69,13 +67,11 @@ public class SysUserService {
         return total;
     }
 
-    @Logs(title = "删除", code = "module", content = "删除用户")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long userId) {
         return this.sysUserDao.deleteByPrimaryId(userId);
     }
 
-    @Logs(title = "更新", code = "module", content = "更新用户")
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) {
         Date date = new Date();
@@ -83,7 +79,6 @@ public class SysUserService {
         return this.sysUserDao.update(sysUser);
     }
 
-    @Logs(title = "登陆", code = "module", content = "用户登陆")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException {
         Map<String, Object> mapResult = new HashMap<>();
@@ -106,8 +101,8 @@ public class SysUserService {
                     params.set("userId", sysUserLogin.getUserId());
                     params.set("userName", userName);
                     params.set("content", "用户登录");
-                    LogsAspect logsAspect = new LogsAspect();
-                    logsAspect.post(params);
+                    //LogsAspect logsAspect = new LogsAspect();
+                    //logsAspect.post(params);
                     String userIds = String.valueOf(sysUserLogin.getUserId());
                     String keys = Constant.account_lock_time.replace("userAccountID", userIds);
                     //系统当前时间
@@ -207,8 +202,8 @@ public class SysUserService {
                 }
                 params.set("userName", userName);
                 params.set("content", "用户名或密码错误登录失败");
-                LogsAspect logsAspect = new LogsAspect();
-                logsAspect.post(params);
+//                LogsAspect logsAspect = new LogsAspect();
+//                logsAspect.post(params);
                 if (sysUserList.size() == 0) {
                     mapResult.put("info", ResultCodeEnum.CODE10101.getName());
                     mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
@@ -251,13 +246,11 @@ public class SysUserService {
     }
 
 
-    @Logs(title = "查询", code = "module", content = "根据用户ID查询用户")
     @Transactional(rollbackFor = Exception.class)
     public SysUser selectByPrimaryId(Long userId) {
         return this.sysUserDao.selectByPrimaryId(userId);
     }
 
-    @Logs(title = "查询", code = "module", content = "用户状态查询")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> selectByUserState(Integer state) {
         if (state.equals(-1)) {
@@ -266,25 +259,21 @@ public class SysUserService {
         return this.sysUserDao.selectByUserState(state);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据用户名查询用户信息")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> selectByUserName(String userName) {
         return this.sysUserDao.selectByUserName(userName);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据用户名完全匹配查询用户信息")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> selectByUserNameTotal(String userName) {
         return this.sysUserDao.selectByUserNameTotal(userName);
     }
 
-    @Logs(title = "查询", code = "module", content = "用户名查询")
     @Transactional(rollbackFor = Exception.class)
     public List<SysUser> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Date invalidTime, Date lastLogin) {
         return sysUserDao.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
     }
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询用户信息")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, String>> selectByPage(SysUser sysUser) {
         if (sysUser.getUserStatus() != null && sysUser.getUserStatus() == -1) {
@@ -293,19 +282,16 @@ public class SysUserService {
         return sysUserDao.selectByPage(sysUser);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据用户ID查询关联的组织结构信息")
     @Transactional(rollbackFor = Exception.class)
     public SysOrg selectRelationOrg(Long userId) {
         return this.sysUserDao.selectRelationOrg(userId);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据用户ID查询关联菜单权限")
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectRelationMenu(Long userId) {
         return this.sysUserDao.selectRelationMenu(userId);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据用户ID查询关联区域设备权限")
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectRelationAuthor(Long userId) {
         List<AreaInfo> areaInfoCountryList = new ArrayList<>();
@@ -330,7 +316,6 @@ public class SysUserService {
         return this.sysUserDao.selectByUserNameL(userName, password);
     }
 
-    @Logs(title = "用户登出", code = "module", content = "用户登出")
     @Transactional(rollbackFor = Exception.class)
     public int userLogout(String userId) {
         SysUser sysUserParams = new SysUser();
@@ -340,7 +325,6 @@ public class SysUserService {
         return this.sysUserDao.update(sysUserParams);
     }
 
-    @Logs(title = "用户帐号解锁", code = "unlockUserAccount", content = "用户帐号解锁")
     @Transactional(rollbackFor = Exception.class)
     public int unlockUserAccount(Map<String, String> map) {
         SysUser sysUserLocked = new SysUser();
@@ -351,7 +335,6 @@ public class SysUserService {
         return this.sysUserDao.update(sysUserLocked);
     }
 
-    @Logs(title = "更新密码", code = "changePassword", content = "更新密码")
     @Transactional(rollbackFor = Exception.class)
     public int changePassword(Long userId, Map<String, String> map) {
         SysUser sysUser = new SysUser();

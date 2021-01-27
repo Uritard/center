@@ -23,51 +23,43 @@ public class TDictBusinessService{
     @Autowired
     private TDictBusinessDao tDictBusinessDao;
 
-    @Logs(title = "插入", code = "module", content = "新增字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TDictBusiness tDictBusiness) {
         return this.tDictBusinessDao.insert(tDictBusiness);
     }
 
-    @Logs(title = "删除", code = "module", content = "删除字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Integer dictId) {
         return this.tDictBusinessDao.deleteByPrimaryId(dictId);
     }
 
-    @Logs(title = "更新", code = "module", content = "更新字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TDictBusiness tDictBusiness) {
         return this.tDictBusinessDao.update(tDictBusiness);
     }
 
-    @Logs(title = "查询", code = "module", content = "根据字典ID查询字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public TDictBusiness selectByPrimaryId(Integer dictId) {
         return this.tDictBusinessDao.selectByPrimaryId(dictId);
     }
 
-    @Logs(title = "查询", code = "module", content = "查询字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TDictBusiness> select(Integer dictId, String dictCode, String colName, String dictNote, Integer upDict, String remark, Long sort) {
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(dictId, dictCode, colName, dictNote, upDict, remark, sort);
         return tDictBusinessList;
     }
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TDictBusiness> selectByPage(TDictBusiness tDictBusiness) {
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.selectByPage(tDictBusiness);
         return tDictBusinessList;
     }
 
-    @Logs(title = "批量插入", code = "module", content = "批量新增字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TDictBusiness> list) {
         return this.tDictBusinessDao.batchInsert(list);
     }
 
-    @Logs(title = "多类型查询", code = "module", content = "多类型查询字典表信息")
     @Transactional(rollbackFor = Exception.class)
     public  List<TDictBusiness> selectQuery(List<String> colNames) {
         return tDictBusinessDao.selectQuery(colNames);

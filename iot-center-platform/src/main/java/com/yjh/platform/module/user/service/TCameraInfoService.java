@@ -50,21 +50,18 @@ public class TCameraInfoService {
 
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
-    @Logs(title = "插入", code = "tCameraInfo",content = "根据web传递的参数插入摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraInfo tCameraInfo) {
         this.tCameraInfoDao.insert(tCameraInfo);
         return this.intoRedis();
     }
 
-    @Logs(title = "删除", code = "tCameraInfo",content = "根据web传递的参数删除摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long cameraId) {
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
         return this.intoRedis();
     }
 
-    @Logs(title = "批量删除", code = "tCameraInfo",content = "根据web传递的参数批量删除摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedCamera(String cameraIds) {
         List<String> list = Arrays.asList(cameraIds.split(","));
@@ -73,33 +70,28 @@ public class TCameraInfoService {
         return i;
     }
 
-    @Logs(title = "更新", code = "tCameraInfo",content = "根据web传递的参数更新摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraInfo tCameraInfo) {
         return this.tCameraInfoDao.update(tCameraInfo);
     }
 
-    @Logs(title = "主键查询", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public TCameraInfoByDict selectByPrimaryId(Long cameraId) {
         return this.tCameraInfoDao.selectByPrimaryId(cameraId);
     }
 
-    @Logs(title = "根据间隔id查询所有摄像机信息", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> selectByRegionId(Long regionId) {
         List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.selectByRegionId(regionId);
         return tCameraInfoByDictList;
     }
 
-    @Logs(title = "根据摄像机名称查询信息", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> selectByCameraName(String cameraName) {
         List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.selectByCameraName(cameraName);
         return tCameraInfoByDictList;
     }
 
-    @Logs(title = "查询", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String pmsId,String aliasName, String recordId,
                                           Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,String monitorId,
@@ -112,7 +104,6 @@ public class TCameraInfoService {
         return tCameraInfoByDictList;
     }
 
-    @Logs(title = "分页查询", code = "tCameraInfo",content = "根据web传递的参数查询摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> selectByPage(String aliasName,String unit,String address,String cameraVendor,
                                                 Integer cameraModel,String cameraName,List<Long> regionIdList) {
@@ -153,7 +144,6 @@ public class TCameraInfoService {
         }
         return re;
     }
-    @Logs(title = "从PMS系统同步摄像机信息", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public boolean synchronizeFromPMS(String pmsId) throws Exception{
         Long cameraId = tCameraInfoDao.selectCameraIdByPmsId(pmsId);
@@ -207,13 +197,11 @@ public class TCameraInfoService {
         }
         return false;
     }
-    @Logs(title = "查询当前任务下的摄像头信息", code = "tCameraInfo",content = "查询当前任务下的摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public List<CameraInfo> selectCameraByTaskId(Long taskId) {
         return this.tCameraInfoDao.selectCameraByTaskId(taskId);
     }
 
-    @Logs(title = "查询所有摄像头预置位信息树", code = "tCameraInfo",content = "查询所有摄像头预置位信息树")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectPresetTree() {
         List<TCamreaPresetTree> cameraList = tCameraInfoDao.selectCameraId();
@@ -256,7 +244,6 @@ public class TCameraInfoService {
     }
 
 
-    @Logs(title = "将cameraInfo数据放入redis", code = "tCameraInfo",content = "将cameraInfo数据放入redis")
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
         List<Long> list =tCameraInfoDao.selectCameraAll();
@@ -272,7 +259,6 @@ public class TCameraInfoService {
 
 
 
-    @Logs(title = "查询NVR-监测点树",code ="tCameraInfo",content = "NVR-ChannelPoint树")
     @Transactional(rollbackFor = Exception.class)
     public List<NVRChannelTree> selectNVRChannelTree(){
         List<NVRChannelTree> roots=tCameraInfoDao.selectNVRNode();

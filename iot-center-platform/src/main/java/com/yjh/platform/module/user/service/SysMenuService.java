@@ -21,42 +21,36 @@ public class SysMenuService{
     private SysMenuDao sysMenuDao;
 
 
-    @Logs(title = "插入", code = "module", content = "新增系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysMenu sysMenu) {
         return this.sysMenuDao.insert(sysMenu);
     }
 
 
-    @Logs(title = "删除", code = "module", content = "删除系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long menuId) {
         return this.sysMenuDao.deleteByPrimaryId(menuId);
     }
 
 
-    @Logs(title = "更新", code = "module", content = "更新系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public int update(SysMenu sysMenu) {
         return this.sysMenuDao.update(sysMenu);
     }
 
 
-    @Logs(title = "主键查询", code = "module", content = "根据菜单ID查询系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public SysMenu selectByPrimaryId(Long menuId) {
         return this.sysMenuDao.selectByPrimaryId(menuId);
     }
 
 
-    @Logs(title = "查询", code = "module", content = "根据入参查询系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public List<SysMenu> select(Long menuId, String menuName, String menuCode, Long upId, String iconCode, String iconUrl, Integer menuType, Integer menuLevel, String elementCode, Integer state, Integer sort, Integer linkType, String url, Long creatorId, Integer sysState) {
         List<SysMenu> sysMenuList = sysMenuDao.select(menuId, menuName, menuCode, upId, iconCode, iconUrl, menuType, menuLevel, elementCode, state, sort, linkType, url, creatorId, sysState);
         return sysMenuList;
     }
 
-    @Logs(title = "分页查询", code = "module", content = "分页查询系统菜单")
     @Transactional(rollbackFor = Exception.class)
     public List<SysMenu> selectByPage(SysMenu sysMenu) {
         List<SysMenu> sysMenuList = sysMenuDao.selectByPage(sysMenu);

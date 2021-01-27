@@ -57,55 +57,46 @@ public class TStdMetemodelService {
     @Autowired
     RedisTemplate redisTemplate;
 
-    @Logs(title = "插入", code = "module",content = "根据页面传入的参数新增数据")
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdMeteModel tStdMeteModel) {
         return this.tStdMetemodelDao.add(tStdMeteModel);
     }
 
-    @Logs(title = "删除", code = "module",content = "根据页面传入的参数删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long modelId) {
         return this.tStdMetemodelDao.deleteByPrimaryId(modelId);
     }
 
-    @Logs(title = "更新", code = "module",content = "根据页面传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdMeteModel tStdMeteModel) {
         return this.tStdMetemodelDao.update(tStdMeteModel);
     }
 
-    @Logs(title = "主键查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public TStdMeteModel selectByPrimaryId(Long modelId) {
         return this.tStdMetemodelDao.selectByPrimaryId(modelId);
     }
 
-    @Logs(title = "查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdMeteModel> select(Long modelId, String modelName, Integer deviceType, String remark) {
         return tStdMetemodelDao.select(modelId, modelName, deviceType, remark);
     }
 
-    @Logs(title = "分页查询", code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdMeteModel> selectByPage(TStdMeteModel tStdMeteModel) {
         return tStdMetemodelDao.selectByPage(tStdMeteModel);
     }
 
-    @Logs(title = "批量插入", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TStdMeteModel> list) {
         return this.tStdMetemodelDao.batchAdd(list);
     }
 
-    @Logs(title = "根据模版的设备类型查询对应的初始测点信息", code = "module",content = "根据页面传入的参数根据模版的设备类型查询对应的初始测点信息")
     @Transactional(rollbackFor = Exception.class)
     public List<TStdMeteModelDetail> selectMeteByDeviceType(Integer deviceType) {
         return tStdMetemodelDao.selectMeteByDeviceType(deviceType);
     }
 
-    @Logs(title = "批量插入模版测点", code = "module",content = "根据页面传入的参数批量插入数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchAddModelMete(List<TStdMeteModelDetail> list) {
         Long modelId = list.get(0).getModelId();
@@ -119,14 +110,12 @@ public class TStdMetemodelService {
         }
     }
 
-    @Logs(title = "批量删除", code = "module",content = "根据页面传入的参数批量删除数据")
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(List<String> list) {
         return this.tStdMetemodelDao.batchDelete(list);
     }
 
 
-    @Logs(title = "查询设备类型-模板树", code = "module",content = "根据页面传入的参数查询设备类型-模板树")
     @Transactional(rollbackFor = Exception.class)
     public List<DeviceTypeTree> selectDeviceTypeModelTree(String deviceType) {
         List<MeteModel> list1=new ArrayList<>();
@@ -151,7 +140,6 @@ public class TStdMetemodelService {
         return list2;
     }
 
-  @Logs(title = "新建模板联合新增",code = "module",content = "根据页面传入的参数新增数据")
   @Transactional(rollbackFor = Exception.class)
   public Long addModel(ModelCreator modelCreator){
         TStdMeteModel m=new TStdMeteModel();
@@ -198,7 +186,6 @@ public class TStdMetemodelService {
         return m.getModelId();
   }
 
-    @Logs(title = "查询当前模板信息",code = "module",content = "根据页面传入的参数查询数据")
     @Transactional(rollbackFor = Exception.class)
     public ModelInfo selectModel(Long modelId){
         ModelInfo mInfo=new ModelInfo();
@@ -215,7 +202,6 @@ public class TStdMetemodelService {
 
     }
 
-    @Logs(title = "修改当前模板信息",code = "module",content = "根据页面传入的参数修改数据")
     @Transactional(rollbackFor = Exception.class)
     public int updateModel(ModelCreator modelCreator){
 
@@ -342,7 +328,6 @@ public class TStdMetemodelService {
          return 1;
     }
 
-    @Logs(title = "创建模板信息",code = "module",content = "创建模板信息")
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
         Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
@@ -500,7 +485,6 @@ public class TStdMetemodelService {
         }
         return path +"/"+ fileName;
     }
-    @Logs(title = "测点模板信息导入",code = "module",content = "测点模板信息导入")
     @Transactional(rollbackFor = Exception.class)
     public Result insertModel(MultipartFile file) throws Exception  {
         Result result = new Result();

@@ -148,31 +148,26 @@ public class TCfgDataCurrentService {
         return null;
     }
 
-    @Logs(title = "插入", code = "TCfgDataCurrent",content = "根据web传入的参数新增")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgDataCurrent tCfgDataCurrent) {
         return this.tCfgDataCurrentDao.insert(tCfgDataCurrent);
     }
 
-    @Logs(title = "删除", code = "TCfgDataCurrent",content = "根据web传入的参数删除")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long meteId) {
         return this.tCfgDataCurrentDao.deleteByPrimaryId(meteId);
     }
 
-    @Logs(title = "更新", code = "TCfgDataCurrent",content = "根据web传入的参数更新数据")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCfgDataCurrent tCfgDataCurrent) {
         return this.tCfgDataCurrentDao.update(tCfgDataCurrent);
     }
 
-    @Logs(title = "主键查询", code = "TCfgDataCurrent",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public TCfgDataCurrent selectByPrimaryId(Long meteId) {
         return this.tCfgDataCurrentDao.selectByPrimaryId(meteId);
     }
 
-    @Logs(title = "查询", code = "TCfgDataCurrent",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgDataCurrent> select(Long meteId, Long deviceId, String cunstomId, Date recordTime, Integer meteKind, String regionId, String meteValue, String lastMeteValue) throws ScriptException {
         List<TCfgDataCurrent> tCfgDataCurrentList = tCfgDataCurrentDao.select(meteId, deviceId, cunstomId, recordTime, meteKind, regionId, meteValue, lastMeteValue);
@@ -183,14 +178,12 @@ public class TCfgDataCurrentService {
         return tCfgDataCurrentList;
     }
 
-    @Logs(title = "分页查询", code = "TCfgDataCurrent",content = "根据web传入的参数查询")
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgDataCurrent> selectByPage(TCfgDataCurrent tCfgDataCurrent) {
         List<TCfgDataCurrent> tCfgDataCurrentList = tCfgDataCurrentDao.selectByPage(tCfgDataCurrent);
         return tCfgDataCurrentList;
     }
 
-    @Logs(title = "批量插入", code = "TCfgDataCurrent",content = "根据web传入的参数批量删除")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCfgDataCurrent> list) {
         return this.tCfgDataCurrentDao.batchInsert(list);
@@ -200,7 +193,6 @@ public class TCfgDataCurrentService {
 
 
     //TODO: 测试方法 用完删除
-    @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "TCfgDataCurrent",content = "联动规则匹配")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws ScriptException {
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -337,7 +329,6 @@ public class TCfgDataCurrentService {
 
 
 
-//    @Logs(title = "联动规则一次、二次匹配与规则计算、条件判断", code = "TCfgDataCurrent",content = "联动规则匹配")
 //    @Transactional(rollbackFor = Exception.class)
 //    public List<TCruiseTask> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
 //        Set<Long> plans = new HashSet<>();//满足触发条件的预案
@@ -429,7 +420,6 @@ public class TCfgDataCurrentService {
 //    }
 
 
-    @Logs(title = "联动记录&&告警信息-滚动刷新", code = "TCfgDataCurrent",content = "联动信息滚动刷新")
     @Transactional(rollbackFor = Exception.class)
     public Map unionRecordRoll(String unionId) {
         // TODO: 2020/9/25 功能待完善--联动记录Id-单个/多个（demo仅使用单个）;记录结果集可用新类型来装（demo临时使用Map）
