@@ -43,7 +43,14 @@ public class TSequentialConfController {
     public Result add(@RequestBody TSequentialConf tSequentialConf) {
         Result result = new Result();
         try {
-            result.setData(tSequentialConfService.add(tSequentialConf));
+            int i = tSequentialConfService.add(tSequentialConf);
+            if(i == -1){
+                result.setCode(209,"此摄像机已绑定其他监控量");
+
+            }else {
+                result.setData(i);
+            }
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -74,7 +81,13 @@ public class TSequentialConfController {
     public Result update(@RequestBody TSequentialConf tSequentialConf) {
         Result result = new Result();
         try {
-            result.setData(tSequentialConfService.update(tSequentialConf));
+            int i = tSequentialConfService.update(tSequentialConf);
+            if(i ==-1){
+                result.setCode(209,"此摄像机已绑定其他监控量");
+            }else {
+                result.setData(i);
+            }
+
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
@@ -210,7 +223,7 @@ public class TSequentialConfController {
 
     @ApiOperation(value = "顺控信息")
     @RequestMapping(value = "/sequentialInfo",method = RequestMethod.GET)
-    public Result sequentialInfo(@RequestParam(value = "cfgDeviceId") String cfgDeviceId){
+    public Result sequentialInfo(@RequestParam(value = "cfgDeviceId",required = false) String cfgDeviceId){
         Result result=new Result();
         try {
             result.setData(tSequentialConfService.sequentialInfo(cfgDeviceId));

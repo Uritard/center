@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.entity;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,10 +35,16 @@ public class TSequentialConf implements Serializable {
     @ApiModelProperty(value = "预置位id")
     private Long presetId;
 
+    @ApiModelProperty(value = "预置位id")
+    private Long cameraId;
+
     private String presetName;
 
     @ApiModelProperty(value = "识别结果")
     private String identifyResult;
 
+    private Integer sort;
+
+    private Date recordTime;
 
 }

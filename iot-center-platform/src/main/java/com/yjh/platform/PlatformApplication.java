@@ -1,6 +1,8 @@
 package com.yjh.platform;
 
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired
     private TSysParamService tSysParamService;
+    @Autowired
+    private TCameraInfoService tCameraInfoService;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -43,6 +47,7 @@ public class PlatformApplication  implements CommandLineRunner {
 //        jobManager.addJob(quartzTask);
 //        sss
         tSysParamService.insertIntoRedis();
+        tCameraInfoService.intoRedis();
     }
 
     @Bean

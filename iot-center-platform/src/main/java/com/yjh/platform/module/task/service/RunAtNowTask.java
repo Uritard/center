@@ -390,6 +390,17 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetailMap.put("cameraId",tCameraPreset.getCameraId().toString());
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         log.info(map.toString());
+                        Map<String,String> mapForCameraState = redisTemplate.opsForHash().entries("camera_info:"+tCameraPreset.getCameraId());
+                        Integer cameraState = Integer.valueOf(mapForCameraState.get("state"));
+                        if(cameraState == 1){//摄像头在任务中
+                            while (cameraState == 1){
+                                Thread.sleep(waitTime+10000);
+                                log.info("任务："+tCruiseTask.getTaskName()+"在"+simpleDateFormat.format(new Date())+"时已经等待了"+(waitTime+1000)/1000+"秒");
+                                cameraState = Integer.valueOf(mapForCameraState.get("state"));
+                            }
+                        }
+                        mapForCameraState.put("state","1");
+                        redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
                         move(map);
                         Thread.sleep(waitTime);//等待摄像头转到预置位
                         //2.抓图
@@ -405,7 +416,8 @@ public class RunAtNowTask implements Runnable{
                             absPath = (String) jsonForRe.get("absPath");
                             isOk = re.getMessage();
                         }
-
+                        mapForCameraState.put("state","0");
+                        redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
                     }
                     if( !"success".equals(isOk)){
                         //抓图失败 任务失败

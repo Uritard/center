@@ -6,13 +6,15 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TSequentialConf">
         <id column="cfg_device_id" jdbcType="VARCHAR" property="cfgDeviceId" />
         <result column="cfg_mete_id" jdbcType="VARCHAR" property="cfgMeteId" />
+        <result column="camera_id" jdbcType="BIGINT" property="cameraId" />
         <result column="preset_id" jdbcType="BIGINT" property="presetId" />
         <result column="identify_result" jdbcType="VARCHAR" property="identifyResult" />
+        <result column="record_time" jdbcType="VARCHAR" property="recordTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        cfg_device_id, cfg_mete_id, preset_id, identify_result
+        cfg_device_id, cfg_mete_id, camera_id,preset_id, identify_result,record_time
     </sql>
 
 
@@ -20,13 +22,17 @@
         insert into t_sequential_conf(
             cfg_device_id,
             cfg_mete_id,
+            camera_id,
             preset_id,
-            identify_result
+            identify_result,
+            record_time
         )values(
                 #{cfgDeviceId, jdbcType=VARCHAR},
                 #{cfgMeteId, jdbcType=VARCHAR},
+                #{cameraId, jdbcType=BIGINT},
                 #{presetId, jdbcType=BIGINT},
-                #{identifyResult, jdbcType=VARCHAR}
+                #{identifyResult, jdbcType=VARCHAR},
+                CURRENT_TIMESTAMP()
         )
     </insert>
 
@@ -39,8 +45,10 @@
         update t_sequential_conf a <set>
         <if test="cfgDeviceId != null and cfgDeviceId != ''">a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR},</if>
         <if test="cfgMeteId != null and cfgMeteId != ''">a.cfg_mete_id = #{cfgMeteId, jdbcType=VARCHAR},</if>
+        <if test="cameraId != null and cameraId != ''">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
         <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
         <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=VARCHAR},</if>
+        CURRENT_TIMESTAMP(),
     </set>
             where a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR}
     </update>
@@ -102,14 +110,16 @@
             cfg_device_id,
             cfg_mete_id,
             preset_id,
-            identify_result
+            identify_result,
+        record_time
         )values
         <foreach collection="list" item="TSequentialConf" separator=",">
             (
                 #{TSequentialConf.cfgDeviceId, jdbcType=VARCHAR},
                 #{TSequentialConf.cfgMeteId, jdbcType=VARCHAR},
                 #{TSequentialConf.presetId, jdbcType=BIGINT},
-                #{TSequentialConf.identifyResult, jdbcType=VARCHAR}
+                #{TSequentialConf.identifyResult, jdbcType=VARCHAR},
+            CURRENT_TIMESTAMP()
             )
         </foreach>
     </insert>
@@ -140,19 +150,37 @@
     
     <select id="selectForSequenceInfo" resultType="java.util.Map">
         SELECT
-            d.record_time as recordTime,
-            b.device_name as deviceName,
-            f.camera_id as cameraId,
-            f.camera_name as cameraName,
-            e.preset_name as presetName
-        FROM
-        t_sequential_conf a
-        left join t_cfg_data_current d on a.cfg_device_id = d.mete_id
-        left join t_cfg_device b on a.cfg_device_id = b.device_id
-        left join t_cfg_mete c on a.cfg_device_id = c.mete_id
+        c.sort,
+        a.cfg_device_id as cfgDeviceId,
+        g.device_name as deviceName,
+        IFNULL(b.record_time,"") as recordTime,
+        IFNULL(b.mete_value,"") as state,
+        f.camera_id as cameraId,
+        f.camera_name as cameraName,
+        e.preset_id as presetId,
+        e.preset_name as presetName
+        FROM t_sequential_conf a
+        left join t_cfg_data_current b on a.cfg_device_id = b.mete_id
+        left join (SELECT (@i:=@i+1) as sort,x.cfg_device_id FROM t_sequential_conf x,(Select @i:=0) z) c on a.cfg_device_id = c.cfg_device_id
         left join t_camera_preset e on a.preset_id = e.preset_id
         left join t_camera_info f on e.camera_id = f.camera_id
-        where a.cfg_device_id = #{cfgDeviceId,jdbcType=VARCHAR}
+        left join t_cfg_device g on a.cfg_device_id = g.device_id
+        where 1=1
+        <if test="cfgDeviceId != null and cfgDeviceId != ''"> and c.cfg_device_id =#{cfgDeviceId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectSort" resultType="com.yjh.platform.module.user.entity.TSequentialConf">
+        select
+        d.sort,
+        a.*
+        from t_sequential_conf a
+        left join (SELECT (@i:=@i+1) as sort,c.cfg_device_id FROM t_sequential_conf c,(Select @i:=0) b) d on a.cfg_device_id = d.cfg_device_id
+        WHERE a.cfg_device_id = #{cfgDeviceId,jdbcType=VARCHAR}
+    </select>
+    <select id="selectCameraId" resultType="java.lang.Long">
+        select
+        camera_id
+        from t_sequential_conf
     </select>
 
 </mapper>

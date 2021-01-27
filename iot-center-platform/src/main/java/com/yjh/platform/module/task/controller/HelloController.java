@@ -114,6 +114,43 @@ public class HelloController {
         return result;
     }
 
+
+    @ApiOperation(value = "webSocket测试")
+    @RequestMapping(value = "/webSocketTestAnything", method = RequestMethod.POST)
+    public Result webSocketTestAnything(@RequestBody Map<String,String> map) {
+        Result result = new Result();
+        try {
+//            Map<String, Object> jasonMaps2 = new HashMap<>();
+//            jasonMaps2.put("type", type);
+//            jasonMaps2.put("message", message);
+//            jasonMaps2.put("warnId", warnId);
+
+            //结果
+//            {"type": "newSequentialResult",
+//                    "cfgDeviceId": "1001",
+//                    "sort": "1",
+//                    "state": "控合",
+//                    "identifyResult": "合"
+//            }
+            //顺控
+//            {"type": "newSequential",
+//                    "cfgDeviceId": "1001",
+//                    "sort": "1",
+//                    "state": "控合"
+//            }
+
+            String json = JSON.toJSONString(map);
+            log.info("发送给前端的消息：" + json);
+            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
+            for (String userId :webSocketMap.keySet()) {
+                webSocketMap.get(userId).sendMessage(json);
+            }
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("webSocketBroadcast测试失败：" + e);
+        }
+        return result;
+    }
     @ApiOperation(value = "webSocketgetUserId测试")
     @RequestMapping(value = "/webSocketgetUserId", method = RequestMethod.POST)
     public Result webSocketgetUserId() {

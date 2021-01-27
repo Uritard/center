@@ -71,4 +71,5 @@ public interface TCameraInfoDao {
     List<NVRChannelTree> selectNVRNode();
     List<NVRChannelTree> selectChannelNode(@Param(value = "recordId")String recordId);
 
+    List<Long> selectCameraAll();
 }

@@ -341,4 +341,8 @@
     </select>
 
 
+    <select id="selectCameraAll" resultType="java.lang.Long">
+        select camera_id
+        from t_camera_info
+    </select>
 </mapper>

@@ -1,16 +1,17 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
+import com.yjh.platform.module.user.controller.TSequentialConfController;
 import com.yjh.platform.module.user.entity.TSequentialConf;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -28,9 +29,16 @@ public class TSequentialConfService{
     @Autowired
     private TCfgDataCurrentDao tCfgDataCurrentDao;
 
+
+    private Logger log = LoggerFactory.getLogger(TSequentialConfService.class);
+
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int add(TSequentialConf tSequentialConf) {
+        List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
+        if(cameraIdList != null && cameraIdList.size() >0 && cameraIdList.contains(tSequentialConf.getCameraId())){
+            return -1;
+        }
         tSequentialConf.setCfgMeteId(tSequentialConf.getCfgDeviceId());
         if(tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId()) != null){
            return tSequentialConfDao.update(tSequentialConf);
@@ -48,6 +56,13 @@ public class TSequentialConfService{
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TSequentialConf tSequentialConf) {
+        TSequentialConf old = tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId());
+        if(old.getCameraId() != tSequentialConf.getCameraId()){
+            List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
+            if(cameraIdList != null && cameraIdList.size() >0 && cameraIdList.contains(tSequentialConf.getCameraId())){
+                return -1;
+            }
+        }
         tSequentialConf.setCfgMeteId(tSequentialConf.getCfgDeviceId());
         return this.tSequentialConfDao.update(tSequentialConf);
     }
@@ -133,6 +148,29 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public String sequential(String meteId){
         {
+            Map<String,String> map = this.sequentialInfo(meteId).get(0);
+            Map<String, Object> jasonMaps2 = new HashMap<>();
+            jasonMaps2.put("type", "newSequential");
+            jasonMaps2.put("cfgDeviceId", meteId);
+            jasonMaps2.put("sort", map.get("sort"));
+            jasonMaps2.put("state", map.get("state"));
+            String json = JSON.toJSONString(jasonMaps2);
+            log.info("发送给前端的消息：" + json);
+            //结果
+//            {"type": "newSequentialResult",
+//                    "cfgDeviceId": "1001",
+//                    "sort": "1",
+//                    "state": "控合",
+//                    "identifyResult": "合"
+//            }
+//            顺控
+//            {"type": "newSequential",
+//                    "cfgDeviceId": "1001",
+//                    "sort": "1",
+//                    "state": "控合"
+//            }
+
+
             //todo 生成一个巡视任务
 
             //todo 发给算法进行分析
@@ -144,7 +182,8 @@ public class TSequentialConfService{
 
     @Logs(title = "顺控联动", code = "TCfgUnionRule",content = "查询四遥信息")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,String> sequentialInfo(String cfgDeviceId){
+    public List<Map<String,String>> sequentialInfo(String cfgDeviceId){
+        //todo 写入识别结果
          return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }
 

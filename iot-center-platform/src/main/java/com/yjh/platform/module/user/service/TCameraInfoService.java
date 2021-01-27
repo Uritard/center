@@ -53,20 +53,24 @@ public class TCameraInfoService {
     @Logs(title = "插入", code = "tCameraInfo",content = "根据web传递的参数插入摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraInfo tCameraInfo) {
-        return this.tCameraInfoDao.insert(tCameraInfo);
+        this.tCameraInfoDao.insert(tCameraInfo);
+        return this.intoRedis();
     }
 
     @Logs(title = "删除", code = "tCameraInfo",content = "根据web传递的参数删除摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long cameraId) {
-        return this.tCameraInfoDao.deleteByPrimaryId(cameraId);
+        this.tCameraInfoDao.deleteByPrimaryId(cameraId);
+        return this.intoRedis();
     }
 
     @Logs(title = "批量删除", code = "tCameraInfo",content = "根据web传递的参数批量删除摄像头信息")
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedCamera(String cameraIds) {
         List<String> list = Arrays.asList(cameraIds.split(","));
-        return this.tCameraInfoDao.deleteSelectedCamera(list);
+        int i = this.tCameraInfoDao.deleteSelectedCamera(list);
+        this.intoRedis();
+        return i;
     }
 
     @Logs(title = "更新", code = "tCameraInfo",content = "根据web传递的参数更新摄像头信息")
@@ -255,16 +259,12 @@ public class TCameraInfoService {
     @Logs(title = "将cameraInfo数据放入redis", code = "tCameraInfo",content = "将cameraInfo数据放入redis")
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
-        List<TCameraPreset> list =tCameraPresetDao.selectAll();
-        for (TCameraPreset item:list) {
-            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(item.getCameraId());
-            Map map = Object2Map.toStringMap(Object2Map.objectToMap(item,true));
-            if(tCameraInfo != null){
-                Map map2 = Object2Map.toStringMap(Object2Map.objectToMap(tCameraInfo,true));
-                map.putAll(map2);
-            }
-
-            String str = "camera_info:"+item.getPresetId();
+        List<Long> list =tCameraInfoDao.selectCameraAll();
+        for (Long item:list) {
+            Map<String,String> map = new HashMap<>();
+            map.put("cameraId",item.toString());
+            map.put("state","0");
+            String str = "camera_info:"+item;
             redisTemplate.opsForHash().putAll(str, map);
         }
        return 1;
