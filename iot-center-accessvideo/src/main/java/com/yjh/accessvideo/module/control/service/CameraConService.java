@@ -5,7 +5,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
-import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
@@ -119,7 +118,7 @@ public class CameraConService {
         return returnMap;
     }
 
-    @Logs(title = "相机停止播放", code = "cameraStopPlay")
+    //@Logs(title = "相机停止播放", code = "cameraStopPlay")
     @Transactional(rollbackFor = Exception.class)
     public String stopRealPlay(Long cameraId, String rtmpUrl) {
         String urlStop = null;
@@ -152,7 +151,7 @@ public class CameraConService {
         return "stop " + cameraId + " preview success!";
     }
 
-    @Logs(title = "相机批量播放", code = "cameraPlay", content = "相机批量播放")
+    //@Logs(title = "相机批量播放", code = "cameraPlay", content = "相机批量播放")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
         log.info("cameraIds: "+cameraIds);
@@ -203,7 +202,7 @@ public class CameraConService {
         return returnMapList;
     }
 
-    @Logs(title = "机器人相机播放", code = "robotPlay", content = "机器人相机播放")
+    //@Logs(title = "机器人相机播放", code = "robotPlay", content = "机器人相机播放")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> robotStartRealPlay(Long robotId) {
         List<Map<String, Object>> returnMapList = new ArrayList<>();
@@ -263,7 +262,7 @@ public class CameraConService {
         return returnMapList;
     }
 
-    @Logs(title = "机器人停止播放", code = "robotStopPlay", content = "机器人相机停止播放")
+    //@Logs(title = "机器人停止播放", code = "robotStopPlay", content = "机器人相机停止播放")
     @Transactional(rollbackFor = Exception.class)
     public String robotStopRealPlay(Long robotId) {
         String urlStop = null;
@@ -311,7 +310,7 @@ public class CameraConService {
         return "stop " + robotId + " preview success!";
     }
 
-    @Logs(title = "视频回放", code = "cameraPlayBack")
+    //@Logs(title = "视频回放", code = "cameraPlayBack")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startPlayBack(Long cameraId, String startTime, String stopTime) {
         Map<String, Object> returnMap = new HashMap<>();
@@ -356,7 +355,7 @@ public class CameraConService {
         return returnMap;
     }
 
-    @Logs(title = "云台控制", code = "cameraControl")
+    //@Logs(title = "云台控制", code = "cameraControl")
     @Transactional(rollbackFor = Exception.class)
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
@@ -380,7 +379,7 @@ public class CameraConService {
 
     }
 
-    @Logs(title = "相机抓图", code = "capturePicture")
+    //@Logs(title = "相机抓图", code = "capturePicture")
     @Transactional(rollbackFor = Exception.class)
     public String capturePicture(String filePath, Long cameraId) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
@@ -456,7 +455,7 @@ public class CameraConService {
         } else { return "userID is null"; }
     }
 
-    @Logs(title = "预置点调用", code = "presetAction")
+    //@Logs(title = "预置点调用", code = "presetAction")
     @Transactional(rollbackFor = Exception.class)
     public boolean PresetAction(Long presetId, Long cameraId, int presetCmd) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,presetId);
@@ -481,7 +480,7 @@ public class CameraConService {
         return true;
     }
 
-    @Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
+    //@Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> getCameraStatus(Long recordId) {
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
@@ -525,7 +524,7 @@ public class CameraConService {
         return channleStatusMap;
     }
 
-    @Logs(title = "获取相机树状态", code = "getCameraStatusTree", content = "获取NVR下挂相机树状态")
+    //@Logs(title = "获取相机树状态", code = "getCameraStatusTree", content = "获取NVR下挂相机树状态")
     @Transactional(rollbackFor = Exception.class)
     public List<CameraAreaInfo> getCameraStatusTree(String cameraName,Integer flag) {
         //if (Objects.nonNull(cameraName)) {}
@@ -627,7 +626,7 @@ public class CameraConService {
         return channleStatusMap;
     }
 
-    @Logs(title = "NVR注册", code = "NVRRegister")
+    //@Logs(title = "NVR注册", code = "NVRRegister")
     @Transactional(rollbackFor = Exception.class)
     public String registerNVR(Long recordId) {
 

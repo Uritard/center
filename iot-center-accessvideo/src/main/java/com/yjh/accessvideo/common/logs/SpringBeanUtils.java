@@ -1,4 +1,4 @@
-package com.yjh.accessvideo.commons.logs;
+package com.yjh.accessvideo.common.logs;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;

@@ -3,7 +3,6 @@ package com.yjh.accessvideo.module.device.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.netty.client.AnalysisClientHandler;
 import org.slf4j.Logger;
@@ -26,7 +25,7 @@ public class AnalysisService {
     private static long algorithmMsgId = 100000001;
     private static long defectMsgId = 200000001;
 
-    @Logs(title = "算法调用", code = "Analysis")
+    //@Logs(title = "算法调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public String feignAlgorithm(List<Analysis> analysisList, int recognizePort) throws InterruptedException {
         log.info("analysisList____-----____:"+analysisList);
@@ -65,7 +64,7 @@ public class AnalysisService {
         return "success";
     }
 
-    @Logs(title = "缺陷调用", code = "Analysis")
+    //@Logs(title = "缺陷调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public String feignDefect(List<Analysis> analysisList, int aiPort) throws InterruptedException {
         JSONObject analysisObject = new JSONObject();
