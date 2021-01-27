@@ -1,6 +1,5 @@
 package com.yjh.accessvideo.module.device.service;
 
-import com.yjh.accessvideo.commons.logs.Logs;
 import com.yjh.accessvideo.module.device.dao.FormatDao;
 import com.yjh.accessvideo.module.device.entity.Format;
 import org.springframework.beans.factory.annotation.Autowired;
