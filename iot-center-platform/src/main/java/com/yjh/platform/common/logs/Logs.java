@@ -15,4 +15,7 @@ public @interface Logs {
     //业务操作内容
     String content() default "用户操作";
 
+    //日志类型
+    int logType() default 1;
+
 }

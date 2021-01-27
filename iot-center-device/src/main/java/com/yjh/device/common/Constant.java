@@ -48,7 +48,7 @@ public class Constant {
     public static final String DEVICE_STATE_OFFLINE = "OFFLINE";
 
 
-    public static final String TYPE_OC = "OC";
+    public static final String PRI_KEY = "OC";
 
-    public static final String TYPE_104 = "104";
+    public static final String PUB_KEY = "104";
 }

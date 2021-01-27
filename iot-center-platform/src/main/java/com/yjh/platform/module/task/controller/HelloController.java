@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
@@ -313,6 +314,7 @@ public class HelloController {
     @ApiOperation("发任务")
     @PostMapping("/task")
     @ResponseBody
+    @Logs(title = "用户信息",logType = 1, content = "查询用户信息")
     public Result task() throws Exception {
         Result result = new Result();
         Map<String,Object> map = new HashMap<>();

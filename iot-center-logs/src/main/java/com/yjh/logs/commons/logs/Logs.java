@@ -6,9 +6,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface Logs {
-    //标题
-    String title() default "";
+    //业务码
+    String title();
 
-    //业务编码
-    String code() default "";
+    //日志类型
+    int logType() default 1;
+
+    //操作类型
+    String code() default "module";
+
+    //业务操作内容
+    String content() default "";
 }
