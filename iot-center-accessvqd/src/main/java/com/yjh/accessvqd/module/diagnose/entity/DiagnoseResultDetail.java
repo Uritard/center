@@ -26,8 +26,6 @@ public class DiagnoseResultDetail extends ChanResult {
     private String ip;
     @ApiModelProperty(value = "Port")
     private String port;
-    @ApiModelProperty(value = "通道号-channelNum")
-    private String chanIndex;
     @ApiModelProperty(value = "设备类型-isControl")
     private String devType;
     @ApiModelProperty(value = "厂商-vendor")

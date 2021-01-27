@@ -12,6 +12,7 @@ import java.util.Objects;
 
 public class PlansXML {
 
+    //解析PlanList
     public static List<Plans> unPackingXML(String response) throws DocumentException {
         List<Plans> plansList = new ArrayList<>();
         Document doc = DocumentHelper.parseText(response);
@@ -48,9 +49,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime2(start.getText());
+                                plans.setStartTime1(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime2(end.getText());
+                                plans.setEndTime1(end.getText());
                             }
 
                         }
@@ -59,9 +60,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime3(start.getText());
+                                plans.setStartTime1(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime3(end.getText());
+                                plans.setEndTime1(end.getText());
                             }
 
                         }
@@ -70,9 +71,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime4(start.getText());
+                                plans.setStartTime1(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime4(end.getText());
+                                plans.setEndTime1(end.getText());
                             }
 
                         }
@@ -81,9 +82,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime5(start.getText());
+                                plans.setStartTime1(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime5(end.getText());
+                                plans.setEndTime1(end.getText());
                             }
 
                         }
@@ -92,9 +93,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime6(start.getText());
+                                plans.setStartTime1(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime6(end.getText());
+                                plans.setEndTime1(end.getText());
                             }
 
                         }
@@ -103,9 +104,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime7(start.getText());
+                                plans.setStartTime1(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime7(end.getText());
+                                plans.setEndTime1(end.getText());
                             }
 
                         }
@@ -165,6 +166,166 @@ public class PlansXML {
     }
 
 
+    //解析PlanInfo
+    public static Plans unpackingXMLByPlanId(String response) throws DocumentException {
+        Plans plans=new Plans();
+        Document doc=DocumentHelper.parseText(response);
+        Element root=doc.getRootElement();
+        List<Element> childNodes=root.elements();
+        for (Element child : childNodes) {
+            if (child.getName().equals("id"))
+                plans.setDiagnosePlanId(child.getText());
+            if (child.getName().equals("checkFlag"))
+                plans.setCheckFlag(child.getText());
+            if (child.getName().equals("period"))
+                plans.setPeriod(child.getText());
+            if (child.getName().equals("repeat"))
+                plans.setRepeat(child.getText());
+            if(child.getName().equals("week")){
+                List<Element> weeks=child.elements();
+                for(Element week:weeks){
+                    if(week.getName().equals("mon")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)){
+                            Element start=time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end=time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                    if(week.getName().equals("tues")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)) {
+                            Element start = time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end = time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                    if(week.getName().equals("wed")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)) {
+                            Element start = time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end = time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                    if(week.getName().equals("thur")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)) {
+                            Element start = time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end = time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                    if(week.getName().equals("fri")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)) {
+                            Element start = time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end = time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                    if(week.getName().equals("sat")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)) {
+                            Element start = time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end = time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                    if(week.getName().equals("sun")){
+                        Element diagnoseTime=week.element("DiagnoseTime");
+                        Element time=diagnoseTime.element("Time");
+                        if(Objects.nonNull(time)) {
+                            Element start = time.element("StartTime");
+                            plans.setStartTime1(start.getText());
+                            Element end = time.element("EndTime");
+                            plans.setEndTime1(end.getText());
+                        }
+
+                    }
+                }
+            }
+            if (child.getName().equals("CheckItems")) {
+                List<Element> lowers = child.elements();
+                for (Element low : lowers) {
+                    if (low.getName().equals("signal"))
+                        plans.setSignal(low.getText());
+                    if (low.getName().equals("blur"))
+                        plans.setBlur(low.getText());
+                    if (low.getName().equals("contrast"))
+                        plans.setContrast(low.getText());
+                    if (low.getName().equals("bright"))
+                        plans.setBright(low.getText());
+                    if (low.getName().equals("dark"))
+                        plans.setDark(low.getText());
+                    if (low.getName().equals("chroma"))
+                        plans.setChroma(low.getText());
+                    if (low.getName().equals("mono"))
+                        plans.setMono(low.getText());
+                    if (low.getName().equals("noise"))
+                        plans.setNoise(low.getText());
+                    if (low.getName().equals("streak"))
+                        plans.setStreak(low.getText());
+                    if (low.getName().equals("freeze"))
+                        plans.setFreeze(low.getText());
+                    if (low.getName().equals("shake"))
+                        plans.setShake(low.getText());
+                    if (low.getName().equals("flash"))
+                        plans.setFlash(low.getText());
+                    if (low.getName().equals("scene"))
+                        plans.setScene(low.getText());
+                    if (low.getName().equals("cover"))
+                        plans.setCover(low.getText());
+                    if (low.getName().equals("ptz"))
+                        plans.setPtz(low.getText());
+                }
+            }
+            if (child.getName().equals("TaskList")) {
+                List<Element> lowers = child.elements();
+                List<String> taskIds = new ArrayList<>();
+                for (Element low : lowers) {
+                    if (low.getName().equals("taskID"))
+                        taskIds.add(low.getText());
+                }
+                plans.setTaskList(taskIds);
+            }
+
+        }
+
+
+        return plans;
+    }
+
+
+    public static List<String> unpackingXmlTaskList(String response) throws DocumentException {
+        List<String>taskList=new ArrayList<>();
+        Document doc=DocumentHelper.parseText(response);
+        Element root=doc.getRootElement();
+        List<Element> childrenNode=root.elements();
+        for(Element child:childrenNode){
+            if(child.getName().equals("taskID"))
+                taskList.add(child.getText());
+        }
+        return taskList;
+    }
     public static String generatePlansXMl(Plans plans) {
         Document document = DocumentHelper.createDocument();
         Element root = document.addElement("PlanInfo");

@@ -10,21 +10,21 @@
         <result column="chan_index" jdbcType="VARCHAR" property="chanIndex"/>
         <result column="check_time" jdbcType="TIMESTAMP" property="checkTime"/>
         <result column="channel_result" jdbcType="INTEGER" property="channelResult"/>
-        <result column="signal_result" jdbcType="INTEGER" property="signalResult"/>
-        <result column="blur_result" jdbcType="INTEGER" property="blurResult"/>
-        <result column="contrast_result" jdbcType="INTEGER" property="contrastResult"/>
-        <result column="bright_result" jdbcType="INTEGER" property="brightResult"/>
-        <result column="dark_result" jdbcType="INTEGER" property="darkResult"/>
-        <result column="chroma_result" jdbcType="INTEGER" property="chromaResult"/>
-        <result column="mono_result" jdbcType="INTEGER" property="monoResult"/>
-        <result column="noise_result" jdbcType="INTEGER" property="noiseResult"/>
-        <result column="streak_result" jdbcType="INTEGER" property="streakResult"/>
-        <result column="freeze_result" jdbcType="INTEGER" property="freezeResult"/>
-        <result column="shake_result" jdbcType="INTEGER" property="shakeResult"/>
-        <result column="flash_result" jdbcType="INTEGER" property="flashResult"/>
-        <result column="scene_result" jdbcType="INTEGER" property="sceneResult"/>
-        <result column="cover_result" jdbcType="INTEGER" property="coverResult"/>
-        <result column="ptz_result" jdbcType="INTEGER" property="ptzResult"/>
+        <result column="signal_result" jdbcType="VARCHAR" property="signalResult"/>
+        <result column="blur_result" jdbcType="VARCHAR" property="blurResult"/>
+        <result column="contrast_result" jdbcType="VARCHAR" property="contrastResult"/>
+        <result column="bright_result" jdbcType="VARCHAR" property="brightResult"/>
+        <result column="dark_result" jdbcType="VARCHAR" property="darkResult"/>
+        <result column="chroma_result" jdbcType="VARCHAR" property="chromaResult"/>
+        <result column="mono_result" jdbcType="VARCHAR" property="monoResult"/>
+        <result column="noise_result" jdbcType="VARCHAR" property="noiseResult"/>
+        <result column="streak_result" jdbcType="VARCHAR" property="streakResult"/>
+        <result column="freeze_result" jdbcType="VARCHAR" property="freezeResult"/>
+        <result column="shake_result" jdbcType="VARCHAR" property="shakeResult"/>
+        <result column="flash_result" jdbcType="VARCHAR" property="flashResult"/>
+        <result column="scene_result" jdbcType="VARCHAR" property="sceneResult"/>
+        <result column="cover_result" jdbcType="VARCHAR" property="coverResult"/>
+        <result column="ptz_result" jdbcType="VARCHAR" property="ptzResult"/>
         <result column="snapshot_url" jdbcType="VARCHAR" property="snapshotUrl"/>
         <result column="result_content" jdbcType="VARCHAR" property="resultContent"/>
         <result column="width" jdbcType="VARCHAR" property="width"/>
@@ -74,21 +74,21 @@
                 #{chanIndex, jdbcType=VARCHAR},
                 #{checkTime, jdbcType=TIMESTAMP},
                 #{channelResult, jdbcType=INTEGER},
-                #{signalResult, jdbcType=INTEGER},
-                #{blurResult, jdbcType=INTEGER},
-                #{contrastResult, jdbcType=INTEGER},
-                #{brightResult, jdbcType=INTEGER},
-                #{darkResult, jdbcType=INTEGER},
-                #{chromaResult, jdbcType=INTEGER},
-                #{monoResult, jdbcType=INTEGER},
-                #{noiseResult, jdbcType=INTEGER},
-                #{streakResult, jdbcType=INTEGER},
-                #{freezeResult, jdbcType=INTEGER},
-                #{shakeResult, jdbcType=INTEGER},
-                #{flashResult, jdbcType=INTEGER},
-                #{sceneResult, jdbcType=INTEGER},
-                #{coverResult, jdbcType=INTEGER},
-                #{ptzResult, jdbcType=INTEGER},
+                #{signalResult, jdbcType=VARCHAR},
+                #{blurResult, jdbcType=VARCHAR},
+                #{contrastResult, jdbcType=VARCHAR},
+                #{brightResult, jdbcType=VARCHAR},
+                #{darkResult, jdbcType=VARCHAR},
+                #{chromaResult, jdbcType=VARCHAR},
+                #{monoResult, jdbcType=VARCHAR},
+                #{noiseResult, jdbcType=VARCHAR},
+                #{streakResult, jdbcType=VARCHAR},
+                #{freezeResult, jdbcType=VARCHAR},
+                #{shakeResult, jdbcType=VARCHAR},
+                #{flashResult, jdbcType=VARCHAR},
+                #{sceneResult, jdbcType=VARCHAR},
+                #{coverResult, jdbcType=VARCHAR},
+                #{ptzResult, jdbcType=VARCHAR},
                 #{snapshotUrl, jdbcType=VARCHAR},
                 #{resultContent, jdbcType=VARCHAR},
                 #{width, jdbcType=VARCHAR},
@@ -116,18 +116,18 @@
                 #{channelResult, jdbcType=INTEGER},
             </if>
             <if test="signalResult != null and signalResult != ''">a.signal_result =
-                #{signalResult, jdbcType=INTEGER},
+                #{signalResult, jdbcType=VARCHAR},
             </if>
-            <if test="blurResult != null and blurResult != ''">a.blur_result = #{blurResult, jdbcType=INTEGER},</if>
+            <if test="blurResult != null and blurResult != ''">a.blur_result = #{blurResult, jdbcType=VARCHAR},</if>
             <if test="contrastResult != null and contrastResult != ''">a.contrast_result =
-                #{contrastResult, jdbcType=INTEGER},
+                #{contrastResult, jdbcType=VARCHAR},
             </if>
             <if test="brightResult != null and brightResult != ''">a.bright_result =
-                #{brightResult, jdbcType=INTEGER},
+                #{brightResult, jdbcType=VARCHAR},
             </if>
-            <if test="darkResult != null and darkResult != ''">a.dark_result = #{darkResult, jdbcType=INTEGER},</if>
+            <if test="darkResult != null and darkResult != ''">a.dark_result = #{darkResult, jdbcType=VARCHAR},</if>
             <if test="chromaResult != null and chromaResult != ''">a.chroma_result =
-                #{chromaResult, jdbcType=INTEGER},
+                #{chromaResult, jdbcType=VARCHAR},
             </if>
             <if test="monoResult != null and monoResult != ''">a.mono_result = #{monoResult, jdbcType=INTEGER},</if>
             <if test="noiseResult != null and noiseResult != ''">a.noise_result = #{noiseResult, jdbcType=INTEGER},</if>
@@ -148,7 +148,9 @@
             </if>
             <if test="width != null and width != ''">a.width = #{width, jdbcType=VARCHAR},</if>
             <if test="height != null and height != ''">a.height = #{height, jdbcType=VARCHAR},</if>
-            <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+            <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id =
+                #{diagnosePlanId, jdbcType=VARCHAR}
+            </if>
         </set>
         where a.diagnose_result_id = #{diagnoseResultId, jdbcType=BIGINT}
     </update>
@@ -229,35 +231,37 @@
         <if test="channelResult != null and channelResult != ''">and a.channel_result =
             #{channelResult, jdbcType=INTEGER}
         </if>
-        <if test="signalResult != null and signalResult != ''">and a.signal_result = #{signalResult, jdbcType=INTEGER}
+        <if test="signalResult != null and signalResult != ''">and a.signal_result = #{signalResult, jdbcType=VARCHAR}
         </if>
-        <if test="blurResult != null and blurResult != ''">and a.blur_result = #{blurResult, jdbcType=INTEGER}</if>
+        <if test="blurResult != null and blurResult != ''">and a.blur_result = #{blurResult, jdbcType=VARCHAR}</if>
         <if test="contrastResult != null and contrastResult != ''">and a.contrast_result =
-            #{contrastResult, jdbcType=INTEGER}
+            #{contrastResult, jdbcType=VARCHAR}
         </if>
-        <if test="brightResult != null and brightResult != ''">and a.bright_result = #{brightResult, jdbcType=INTEGER}
+        <if test="brightResult != null and brightResult != ''">and a.bright_result = #{brightResult, jdbcType=VARCHAR}
         </if>
-        <if test="darkResult != null and darkResult != ''">and a.dark_result = #{darkResult, jdbcType=INTEGER}</if>
-        <if test="chromaResult != null and chromaResult != ''">and a.chroma_result = #{chromaResult, jdbcType=INTEGER}
+        <if test="darkResult != null and darkResult != ''">and a.dark_result = #{darkResult, jdbcType=VARCHAR}</if>
+        <if test="chromaResult != null and chromaResult != ''">and a.chroma_result = #{chromaResult, jdbcType=VARCHAR}
         </if>
-        <if test="monoResult != null and monoResult != ''">and a.mono_result = #{monoResult, jdbcType=INTEGER}</if>
-        <if test="noiseResult != null and noiseResult != ''">and a.noise_result = #{noiseResult, jdbcType=INTEGER}</if>
-        <if test="streakResult != null and streakResult != ''">and a.streak_result = #{streakResult, jdbcType=INTEGER}
+        <if test="monoResult != null and monoResult != ''">and a.mono_result = #{monoResult, jdbcType=VARCHAR}</if>
+        <if test="noiseResult != null and noiseResult != ''">and a.noise_result = #{noiseResult, jdbcType=VARCHAR}</if>
+        <if test="streakResult != null and streakResult != ''">and a.streak_result = #{streakResult, jdbcType=VARCHAR}
         </if>
-        <if test="freezeResult != null and freezeResult != ''">and a.freeze_result = #{freezeResult, jdbcType=INTEGER}
+        <if test="freezeResult != null and freezeResult != ''">and a.freeze_result = #{freezeResult, jdbcType=VARCHAR}
         </if>
-        <if test="shakeResult != null and shakeResult != ''">and a.shake_result = #{shakeResult, jdbcType=INTEGER}</if>
-        <if test="flashResult != null and flashResult != ''">and a.flash_result = #{flashResult, jdbcType=INTEGER}</if>
-        <if test="sceneResult != null and sceneResult != ''">and a.scene_result = #{sceneResult, jdbcType=INTEGER}</if>
-        <if test="coverResult != null and coverResult != ''">and a.cover_result = #{coverResult, jdbcType=INTEGER}</if>
-        <if test="ptzResult != null and ptzResult != ''">and a.ptz_result = #{ptzResult, jdbcType=INTEGER}</if>
+        <if test="shakeResult != null and shakeResult != ''">and a.shake_result = #{shakeResult, jdbcType=VARCHAR}</if>
+        <if test="flashResult != null and flashResult != ''">and a.flash_result = #{flashResult, jdbcType=VARCHAR}</if>
+        <if test="sceneResult != null and sceneResult != ''">and a.scene_result = #{sceneResult, jdbcType=VARCHAR}</if>
+        <if test="coverResult != null and coverResult != ''">and a.cover_result = #{coverResult, jdbcType=VARCHAR}</if>
+        <if test="ptzResult != null and ptzResult != ''">and a.ptz_result = #{ptzResult, jdbcType=VARCHAR}</if>
         <if test="snapshotUrl != null and snapshotUrl != ''">and a.snapshot_url = #{snapshotUrl, jdbcType=VARCHAR}</if>
         <if test="resultContent != null and resultContent != ''">and a.result_content =
             #{resultContent, jdbcType=VARCHAR}
         </if>
         <if test="width != null and width != ''">and a.width = #{width, jdbcType=VARCHAR}</if>
         <if test="height != null and height != ''">and a.height = #{height, jdbcType=VARCHAR}</if>
-        <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+        <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id =
+            #{diagnosePlanId, jdbcType=VARCHAR}
+        </if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessvqd.module.diagnose.entity.ChanResult"
@@ -301,35 +305,37 @@
         <if test="channelResult != null and channelResult != ''">and a.channel_result =
             #{channelResult, jdbcType=INTEGER}
         </if>
-        <if test="signalResult != null and signalResult != ''">and a.signal_result = #{signalResult, jdbcType=INTEGER}
+        <if test="signalResult != null and signalResult != ''">and a.signal_result = #{signalResult, jdbcType=VARCHAR}
         </if>
-        <if test="blurResult != null and blurResult != ''">and a.blur_result = #{blurResult, jdbcType=INTEGER}</if>
+        <if test="blurResult != null and blurResult != ''">and a.blur_result = #{blurResult, jdbcType=VARCHAR}</if>
         <if test="contrastResult != null and contrastResult != ''">and a.contrast_result =
-            #{contrastResult, jdbcType=INTEGER}
+            #{contrastResult, jdbcType=VARCHAR}
         </if>
-        <if test="brightResult != null and brightResult != ''">and a.bright_result = #{brightResult, jdbcType=INTEGER}
+        <if test="brightResult != null and brightResult != ''">and a.bright_result = #{brightResult, jdbcType=VARCHAR}
         </if>
-        <if test="darkResult != null and darkResult != ''">and a.dark_result = #{darkResult, jdbcType=INTEGER}</if>
-        <if test="chromaResult != null and chromaResult != ''">and a.chroma_result = #{chromaResult, jdbcType=INTEGER}
+        <if test="darkResult != null and darkResult != ''">and a.dark_result = #{darkResult, jdbcType=VARCHAR}</if>
+        <if test="chromaResult != null and chromaResult != ''">and a.chroma_result = #{chromaResult, jdbcType=VARCHAR}
         </if>
-        <if test="monoResult != null and monoResult != ''">and a.mono_result = #{monoResult, jdbcType=INTEGER}</if>
-        <if test="noiseResult != null and noiseResult != ''">and a.noise_result = #{noiseResult, jdbcType=INTEGER}</if>
-        <if test="streakResult != null and streakResult != ''">and a.streak_result = #{streakResult, jdbcType=INTEGER}
+        <if test="monoResult != null and monoResult != ''">and a.mono_result = #{monoResult, jdbcType=VARCHAR}</if>
+        <if test="noiseResult != null and noiseResult != ''">and a.noise_result = #{noiseResult, jdbcType=VARCHAR}</if>
+        <if test="streakResult != null and streakResult != ''">and a.streak_result = #{streakResult, jdbcType=VARCHAR}
         </if>
-        <if test="freezeResult != null and freezeResult != ''">and a.freeze_result = #{freezeResult, jdbcType=INTEGER}
+        <if test="freezeResult != null and freezeResult != ''">and a.freeze_result = #{freezeResult, jdbcType=VARCHAR}
         </if>
-        <if test="shakeResult != null and shakeResult != ''">and a.shake_result = #{shakeResult, jdbcType=INTEGER}</if>
-        <if test="flashResult != null and flashResult != ''">and a.flash_result = #{flashResult, jdbcType=INTEGER}</if>
-        <if test="sceneResult != null and sceneResult != ''">and a.scene_result = #{sceneResult, jdbcType=INTEGER}</if>
-        <if test="coverResult != null and coverResult != ''">and a.cover_result = #{coverResult, jdbcType=INTEGER}</if>
-        <if test="ptzResult != null and ptzResult != ''">and a.ptz_result = #{ptzResult, jdbcType=INTEGER}</if>
+        <if test="shakeResult != null and shakeResult != ''">and a.shake_result = #{shakeResult, jdbcType=VARCHAR}</if>
+        <if test="flashResult != null and flashResult != ''">and a.flash_result = #{flashResult, jdbcType=VARCHAR}</if>
+        <if test="sceneResult != null and sceneResult != ''">and a.scene_result = #{sceneResult, jdbcType=VARCHAR}</if>
+        <if test="coverResult != null and coverResult != ''">and a.cover_result = #{coverResult, jdbcType=VARCHAR}</if>
+        <if test="ptzResult != null and ptzResult != ''">and a.ptz_result = #{ptzResult, jdbcType=VARCHAR}</if>
         <if test="snapshotUrl != null and snapshotUrl != ''">and a.snapshot_url = #{snapshotUrl, jdbcType=VARCHAR}</if>
         <if test="resultContent != null and resultContent != ''">and a.result_content =
             #{resultContent, jdbcType=VARCHAR}
         </if>
         <if test="width != null and width != ''">and a.width = #{width, jdbcType=VARCHAR}</if>
         <if test="height != null and height != ''">and a.height = #{height, jdbcType=VARCHAR}</if>
-        <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
+        <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id =
+            #{diagnosePlanId, jdbcType=VARCHAR}
+        </if>
     </select>
 
     <insert id="batchInsert">
@@ -369,21 +375,21 @@
             #{TDiagnoseResult.chanIndex, jdbcType=VARCHAR},
             #{TDiagnoseResult.checkTime, jdbcType=TIMESTAMP},
             #{TDiagnoseResult.channelResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.signalResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.blurResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.contrastResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.brightResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.darkResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.chromaResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.monoResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.noiseResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.streakResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.freezeResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.shakeResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.flashResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.sceneResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.coverResult, jdbcType=INTEGER},
-            #{TDiagnoseResult.ptzResult, jdbcType=INTEGER},
+            #{TDiagnoseResult.signalResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.blurResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.contrastResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.brightResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.darkResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.chromaResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.monoResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.noiseResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.streakResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.freezeResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.shakeResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.flashResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.sceneResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.coverResult, jdbcType=VARCHAR},
+            #{TDiagnoseResult.ptzResult, jdbcType=VARCHAR},
             #{TDiagnoseResult.snapshotUrl, jdbcType=VARCHAR},
             #{TDiagnoseResult.resultContent, jdbcType=VARCHAR}
             #{TDiagnoseResult.width, jdbcType=VARCHAR}
@@ -394,8 +400,316 @@
     </insert>
 
     <select id="selectDiagnoseResultByPage" resultType="com.yjh.accessvqd.module.diagnose.entity.DiagnoseResultDetail">
-
+        SELECT
+        c.camera_name as 'channelName',
+        d.record_ip as 'ip',
+        d.http_port as 'port',
+        c.channel_num as 'chanIndex',
+        c.is_control as 'devType',
+        f.dict_note as 'devBrand',
+        e.region_name as 'regionName',
+        a.channel_result,
+        a.check_time,
+        a.result_content,
+        a.signal_result,
+        a.blur_result,
+        a.contrast_result,
+        a.bright_result,
+        a.dark_result,
+        a.chroma_result,
+        a.mono_result,
+        a.noise_result,
+        a.streak_result,
+        a.freeze_result,
+        a.shake_result,
+        a.flash_result,
+        a.scene_result,
+        a.cover_result,
+        a.ptz_result,
+        a.snapshot_url
+        FROM
+        t_diagnose_result a JOIN t_diagnose_plan b ON a.diagnose_plan_id=b.diagnose_plan_id
+        LEFT JOIN t_camera_info c ON a.channel_id=c.monitor_id
+        LEFT JOIN t_camera_recorder d ON c.record_id=d.record_id
+        LEFT JOIN t_std_region e ON c.up_region_id=e.region_id
+        LEFT JOIN t_dict_business f ON c.vendor_id=f.dict_code
+        WHERE 1=1
+        <if test="planName != null and planName != ''">AND b.plan_name like
+            concat('%',#{planName, jdbcType=VARCHAR},'%')
+        </if>
+        <if test="channelName != null and channelName != ''">AND c.camera_name like
+            concat('%',#{channelName, jdbcType=VARCHAR},'%')
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        <if test="diagnosePlanId !=null and diagnosePlanId !=''">and a.diagnose_plan_id
+            =#{diagnosePlanId,jdbcType=VARCHAR}
+        </if>
     </select>
 
+    <select id="faultTypeSta" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        count(case WHEN a.signal_result='2' then 1 else null end) as 'signal',
+        count(case WHEN a.blur_result='2' then 1 else null end) as 'blur',
+        count(case WHEN a.contrast_result='2' THEN 1 ELSE null end) as 'contrast',
+        count(case WHEN a.bright_result='2' THEN 1 ELSE null end) as 'bright',
+        count(case WHEN a.dark_result='2' THEN 1 ELSE null end) as 'dark',
+        count(case WHEN a.chroma_result='2' THEN 1 ELSE null end) as 'chroma',
+        count(case WHEN a.mono_result='2' THEN 1 ELSE null end) as 'mono',
+        count(case WHEN a.noise_result='2' THEN 1 ELSE null end) as 'noise',
+        count(case WHEN a.streak_result='2' THEN 1 ELSE null end) as 'streak',
+        count(case WHEN a.freeze_result='2' THEN 1 ELSE null end) as 'freeze',
+        count(case WHEN a.shake_result='2' THEN 1 ELSE null end) as 'shake',
+        count(case WHEN a.flash_result='2' THEN 1 ELSE null end) as 'flash',
+        count(case WHEN a.scene_result='2' THEN 1 ELSE null end) as 'scene',
+        count(case WHEN a.cover_result='2' THEN 1 ELSE null end) as 'cover',
+        count(case WHEN a.ptz_result='2' THEN 1 ELSE null end) as 'ptz'
+
+        FROM t_diagnose_result a
+        where 1=1
+        <if test="diagnosePlanId !=null and diagnosePlanId !=''">and a.diagnose_plan_id=
+            #{diagnosePlanId,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="statusTypeChannel" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        count(case when a.channel_result=1 then 1 else null end) as 'normal',
+        count(case when a.channel_result=2 then 1 else null end) as 'abnormal',
+        count(case when a.channel_result=3 then 1 else null end) as 'loginFailed',
+        count(case when a.channel_result=4 then 1 else null end) as 'flowFault'
+        FROM
+        t_diagnose_result a
+        where 1=1
+        <if test="diagnosePlanId !=null and diagnosePlanId !=''">and a.diagnose_plan_id=
+            #{diagnosePlanId,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+    <select id="staticalAnalysis" resultType="java.util.Map">
+                SELECT
+        '信号丢失' as 'faultType',
+        count(case WHEN a.signal_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '图像模糊' as 'faultType',
+        count(case WHEN a.blur_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+      UNION ALL
+
+        SELECT
+        '对比度' as 'faultType',
+        count(case WHEN a.contrast_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '图像过亮' as 'faultType',
+        count(case WHEN a.bright_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '图像过暗' as 'faultType',
+        count(case WHEN a.dark_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '图像偏色' as 'faultType',
+        count(case WHEN a.chroma_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        UNION ALL
+
+        SELECT
+        '黑白图像' as 'faultType',
+        count(case WHEN a.mono_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '噪声干扰' as 'faultType',
+        count(case WHEN a.noise_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '条纹干扰' as 'faultType',
+        count(case WHEN a.streak_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '画面冻结' as 'faultType',
+        count(case WHEN a.freeze_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '视频抖动' as 'faultType',
+        count(case WHEN a.shake_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '视频剧变' as 'faultType',
+        count(case WHEN a.flash_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '场景变换' as 'faultType',
+        count(case WHEN a.scene_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+
+        UNION ALL
+
+        SELECT
+        '视频遮挡' as 'faultType',
+        count(case WHEN a.cover_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+
+        UNION ALL
+
+        SELECT
+        '云台失控' as 'faultType',
+        count(case WHEN a.ptz_result='2' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        UNION ALL
+
+        SELECT
+        '登录失败' as 'faultType',
+        count(case WHEN a.channel_result='3' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+        UNION ALL
+
+        SELECT
+        '取流异常' as 'faultType',
+        count(case WHEN a.channel_result='4' then 1 else null end) as 'count'
+        FROM t_diagnose_result a
+        WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+
+    </select>
 
 </mapper>

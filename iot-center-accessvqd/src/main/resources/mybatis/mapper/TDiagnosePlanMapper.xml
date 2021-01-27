@@ -74,9 +74,11 @@
         a.plan_name,
         a.plan_type,
         a.user_id,
+        b.user_name,
         start_time,
         end_time
         from t_diagnose_plan a
+         LEFT JOIN sys_user b ON a.user_id = b.user_id
         where 1 = 1
             and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
         limit 1
@@ -108,11 +110,28 @@
         a.plan_name,
         a.plan_type,
         a.user_id,
+        b.user_name as'userName',
         a.start_time,
         end_time
         from t_diagnose_plan a
+        LEFT JOIN sys_user b ON a.user_id = b.user_id
         where 1 = 1
         <if test="planName != null and planName != ''">and a.plan_name like concat ('%',#{planName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
+    <select id="selectByPlanId" parameterType="java.lang.String" resultType="com.yjh.accessvqd.module.diagnose.entity.Plans">
+        select
+        a.diagnose_plan_id,
+        a.plan_name,
+        a.plan_type,
+        a.user_id,
+        b.user_name as'userName',
+        a.start_time,
+        end_time
+        from t_diagnose_plan a
+        LEFT JOIN sys_user b ON a.user_id = b.user_id
+        where 1 = 1
+        <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
@@ -135,4 +154,38 @@
             )
         </foreach>
     </insert>
+
+
+    <select id="selectLastPlan" resultType="com.yjh.accessvqd.module.diagnose.entity.PlanInfo">
+        SELECT
+            a.*, b.user_name
+        FROM
+            t_diagnose_plan a
+        LEFT JOIN sys_user b ON a.user_id = b.user_id
+        ORDER BY
+            start_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectNVRNode" resultType="com.yjh.accessvqd.module.diagnose.entity.NVRChannelTree">
+        SELECT
+        record_name as 'label',
+        record_id as 'id'
+    FROM
+        t_camera_recorder
+    </select>
+
+    <select id="selectChannelNode" parameterType="java.lang.String" resultType="com.yjh.accessvqd.module.diagnose.entity.NVRChannelTree">
+        SELECT
+            a.camera_name as 'label',
+            a.monitor_id as 'id',
+            a.record_id as 'upId',
+            2 as 'level'
+        FROM
+            t_camera_info a
+        WHERE
+            a.record_id = #{recordId,jdbcType=VARCHAR}
+            and a.monitor_id IS NOT NULL;
+
+    </select>
 </mapper>

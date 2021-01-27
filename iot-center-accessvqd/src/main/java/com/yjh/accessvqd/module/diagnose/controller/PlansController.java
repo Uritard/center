@@ -9,6 +9,7 @@ import com.yjh.accessvqd.module.diagnose.entity.ChanResult;
 import com.yjh.accessvqd.module.diagnose.entity.Plans;
 import com.yjh.accessvqd.module.diagnose.service.PlansService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,12 +62,29 @@ public class PlansController {
         return result;
     }
 
+    @ApiOperation(value = "诊断任务Id查询")
+    @RequestMapping(value = "/selectByPlanId", method = RequestMethod.GET)
+    public Result selectByPlanId(@RequestParam(value = "diagnosePlanId")String diagnosePlanId) {
+        Result result = new Result();
+        try {
+            result.setData(plansService.selectByPlanId(diagnosePlanId));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询失败" + e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "诊断任务新增/修改--下发")
-    @RequestMapping(value = "/diagnosePlanExecute", method = RequestMethod.PUT)
+    @RequestMapping(value = "/diagnosePlanExecute", method = RequestMethod.POST)
     public Result diagnosePlanExecute(@RequestBody Plans plans) {
         Result result = new Result();
         try {
-            result.setData(plansService.diagnosePlanUpAdd(plans));
+            if(plansService.diagnosePlanUpAdd(plans).equals("failed")){
+                result.setMessage(3030, "任务下发失败");
+            }else {
+                result.setData(plansService.diagnosePlanUpAdd(plans));
+            }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("任务下发失败" + e);
@@ -88,6 +106,19 @@ public class PlansController {
     }
 
 
+    @ApiModelProperty(value = "最后一次任务单")
+    @RequestMapping(value = "/theLastPlanInfo",method = RequestMethod.GET)
+    public Result theLastPlanInfo(){
+        Result result=new Result();
+        try {
+           result.setData(plansService.selectTheLastPlan());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询失败" + e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "接口测试")
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public Result test(@RequestParam String time) {
@@ -101,4 +132,17 @@ public class PlansController {
         return result;
     }
 
+
+    @ApiOperation(value = "查询NVR-channel树")
+    @RequestMapping(value = "/selectNVRChannelTree",method = RequestMethod.GET)
+    public Result selectNVRChannelTree(@RequestParam(value = "diagnosePlanId")String diagnosePlanId){
+        Result result=new Result();
+        try {
+            result.setData(plansService.selectNVRChannelTree(diagnosePlanId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("树查询失败：", e);
+        }
+        return result;
+    }
 }

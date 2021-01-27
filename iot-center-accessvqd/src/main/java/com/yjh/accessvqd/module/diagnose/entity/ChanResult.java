@@ -48,49 +48,49 @@ public class ChanResult implements Serializable {
     private Integer channelResult;
 
     @ApiModelProperty(value = "视频丢失")
-    private Integer signalResult;
+    private String signalResult;
 
     @ApiModelProperty(value = "图像模糊")
-    private Integer blurResult;
+    private String blurResult;
 
     @ApiModelProperty(value = "对比度")
-    private Integer contrastResult;
+    private String contrastResult;
 
     @ApiModelProperty(value = "图像过亮")
-    private Integer brightResult;
+    private String brightResult;
 
     @ApiModelProperty(value = "图像过暗")
-    private Integer darkResult;
+    private String darkResult;
 
     @ApiModelProperty(value = "图像偏色")
-    private Integer chromaResult;
+    private String chromaResult;
 
     @ApiModelProperty(value = "黑白图像")
-    private Integer monoResult;
+    private String monoResult;
 
     @ApiModelProperty(value = "噪声干扰")
-    private Integer noiseResult;
+    private String noiseResult;
 
     @ApiModelProperty(value = "条纹干扰")
-    private Integer streakResult;
+    private String streakResult;
 
     @ApiModelProperty(value = "画面冻结")
-    private Integer freezeResult;
+    private String freezeResult;
 
     @ApiModelProperty(value = "视频抖动")
-    private Integer shakeResult;
+    private String shakeResult;
 
     @ApiModelProperty(value = "视频剧变")
-    private Integer flashResult;
+    private String flashResult;
 
     @ApiModelProperty(value = "场景变换")
-    private Integer sceneResult;
+    private String sceneResult;
 
     @ApiModelProperty(value = "视频遮挡")
-    private Integer coverResult;
+    private String coverResult;
 
     @ApiModelProperty(value = "云台检测")
-    private Integer ptzResult;
+    private String ptzResult;
 
     @ApiModelProperty(value = "诊断抓图数据URL路径")
     private String snapshotUrl;
