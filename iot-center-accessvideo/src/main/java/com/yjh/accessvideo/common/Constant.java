@@ -1,6 +1,6 @@
 package com.yjh.accessvideo.common;
 
-import com.yjh.accessvideo.commons.logs.SpringBeanUtils;
+import com.yjh.accessvideo.common.logs.SpringBeanUtils;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.module.device.entity.XMLBaseModel;

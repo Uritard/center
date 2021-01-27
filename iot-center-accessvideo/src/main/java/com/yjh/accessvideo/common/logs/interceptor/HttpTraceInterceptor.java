@@ -1,7 +1,7 @@
 package com.yjh.accessvideo.common.logs.interceptor;
 
-import com.yjh.platform.common.logs.track.HttpTracing;
-import com.yjh.platform.common.utils.IPUtil;
+import com.yjh.accessvideo.common.logs.track.HttpTracing;
+import com.yjh.accessvideo.commons.utils.http.IPUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
