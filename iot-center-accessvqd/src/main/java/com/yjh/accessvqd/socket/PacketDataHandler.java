@@ -50,6 +50,7 @@ public class PacketDataHandler {
             log.info("对象:"+chanResult1);
             //获取监测点ID
             Set<String>keys=redisScan("diagnosePlan");
+            //诊断点结果与任务匹配
             for(String key:keys){
                 if(redisTemplate.opsForList().remove(key,0,chanResult1.getChannelId()) !=0){ //监测点ID移除成功
                     chanResult1.setDiagnosePlanId( key.replaceAll("diagnosePlan:",""));

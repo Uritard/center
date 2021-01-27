@@ -4,6 +4,9 @@ import com.yjh.accessvqd.commons.utils.weatherUtils.SerialPortUtils;
 
 public class Constant {
 
+    //VQD诊断图片存储路径
+    public static final String VQD_IMAGES_STORE_URL="192.168.33.241:81";
+
     public static final String USER_COUNT = "statistics:userCount";
 
     public static final String DEVICE_COUNT = "statistics:deviceCount";

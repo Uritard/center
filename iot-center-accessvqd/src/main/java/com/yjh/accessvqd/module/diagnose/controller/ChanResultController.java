@@ -10,6 +10,7 @@ import com.yjh.accessvqd.module.diagnose.entity.ChanResult;
 import com.yjh.accessvqd.module.diagnose.entity.DiagnoseResultDetail;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,6 +169,32 @@ public class ChanResultController {
     }
 
 
+    @ApiOperation(value = "获取任务信息List")
+    @RequestMapping(value = "/findQueryPlan",method = RequestMethod.GET)
+    public Result findQueryPlan(){
+        Result result=new Result();
+        try {
+            result.setData(chanResultService.findQueryItems(0));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取监测点信息List")
+    @RequestMapping(value = "/findQueryChannel",method = RequestMethod.GET)
+    public Result findQueryChannel(){
+        Result result=new Result();
+        try {
+            result.setData(chanResultService.findQueryItems(1));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询失败：" + e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "分页条件查询诊断结果详细信息")
     @RequestMapping(value = "/selectDiagnoseResultByPage", method = RequestMethod.GET)
     public Result selectDiagnoseResultByPage(@RequestParam(value = "planName",required = false)String planName,
@@ -196,10 +223,11 @@ public class ChanResultController {
 
     @ApiOperation(value = "故障点数统计")
     @RequestMapping(value = "/faultCount", method = RequestMethod.GET)
-    public Result faultCount(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId) {
+    public Result faultCount(@RequestParam(value = "planName",required = false)String planName,
+                             @RequestParam(value = "channelName",required = false)String channelName) {
         Result result = new Result();
         try {
-            result.setData(chanResultService.faultCounts(diagnosePlanId));
+            result.setData(chanResultService.faultCounts(planName, channelName));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询失败：" + e);
@@ -210,10 +238,11 @@ public class ChanResultController {
 
     @ApiOperation(value = "监测点状态点数统计")
     @RequestMapping(value = "/channelStatusCount", method = RequestMethod.GET)
-    public Result channelStatusCount(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId) {
+    public Result channelStatusCount(@RequestParam(value = "planName",required = false)String planName,
+                                     @RequestParam(value = "channelName",required = false)String channelName) {
         Result result = new Result();
         try {
-            result.setData(chanResultService.statusTypeChannel(diagnosePlanId));
+            result.setData(chanResultService.statusTypeChannel(planName, channelName));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询失败：" + e);
@@ -237,10 +266,12 @@ public class ChanResultController {
 
     @ApiOperation(value = "统计分析")
     @RequestMapping(value = "/staticalAnalysis", method = RequestMethod.POST)
-    public Result staticalAnalysis(@RequestBody Map<String,Object> map) {
+    public Result staticalAnalysis(@RequestBody List<Map<String,String>> checkedList,
+                                   @RequestParam(value = "startTime",required = false)String startTime,
+                                   @RequestParam(value = "endTime",required = false)String endTime) {
         Result result = new Result();
         try {
-            result.setData(chanResultService.staticalAnalysis(map));
+            result.setData(chanResultService.staticalAnalysis(checkedList, startTime, endTime));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询失败：" + e);

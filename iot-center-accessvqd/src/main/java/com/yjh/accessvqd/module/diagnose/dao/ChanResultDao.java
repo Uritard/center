@@ -55,10 +55,15 @@ public interface ChanResultDao {
                                                           @Param(value = "endTime")Date endTime,
                                                           @Param(value = "diagnosePlanId")String diagnosePlanId);
     //不同故障类型点数量统计
-    Map<String,Long>faultTypeSta(@Param(value = "diagnosePlanId")String diagnosePlanId);
+    Map<String,Long>faultTypeSta(@Param(value = "planName")String planName,
+                                 @Param(value = "channelName")String channelName);
     //不同监测点状态点数量统计
-    Map<String,Long>statusTypeChannel(@Param(value = "diagnosePlanId")String diagnosePlanId);
+    Map<String,Long>statusTypeChannel(@Param(value = "planName")String planName,
+                                      @Param(value = "channelName")String channelName);
 
     List<Map<String,Object>> staticalAnalysis(@Param(value = "startTime")Date startTime,
                                               @Param(value = "endTime")Date endTime);
+
+    //查询任务信息 或 监测点信息
+    List<Map<String,String>> selectQueryItems(@Param(value = "queryType")Integer queryType);
 }

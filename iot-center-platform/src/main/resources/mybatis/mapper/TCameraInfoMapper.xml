@@ -318,27 +318,6 @@
         <if test="pmsId != null and pmsId != ''">and a.pms_id = #{pmsId,jdbcType = VARCHAR}</if>
     </select>
 
-    <select id="selectNVRNode" resultType="com.yjh.platform.module.device.entity.NVRChannelTree">
-        SELECT
-        record_name as 'label',
-        record_id as 'id'
-    FROM
-        t_camera_recorder
-    </select>
-
-    <select id="selectChannelNode" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.NVRChannelTree">
-        SELECT
-            a.camera_name as 'label',
-            a.monitor_id as 'id',
-            a.record_id as 'upId',
-            2 as 'level'
-        FROM
-            t_camera_info a
-        WHERE
-            a.record_id = #{recordId,jdbcType=VARCHAR}
-            and a.monitor_id IS NOT NULL;
-
-    </select>
 
 
     <select id="selectCameraAll" resultType="java.lang.Long">

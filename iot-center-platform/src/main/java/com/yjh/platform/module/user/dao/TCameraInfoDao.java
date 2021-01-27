@@ -1,7 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.device.entity.NVRChannelTree;
 import com.yjh.platform.module.user.entity.CameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
@@ -67,9 +66,7 @@ public interface TCameraInfoDao {
 
     Long selectCameraIdByPmsId(@Param(value = "pmsId")String pmsId);
 
-    //查询NVR-ChannelTree
-    List<NVRChannelTree> selectNVRNode();
-    List<NVRChannelTree> selectChannelNode(@Param(value = "recordId")String recordId);
+
 
     List<Long> selectCameraAll();
 }

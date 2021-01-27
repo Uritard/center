@@ -1,5 +1,6 @@
 package com.yjh.accessvqd.module.diagnose.service;
 
+import com.yjh.accessvqd.common.Constant;
 import com.yjh.accessvqd.commons.logs.Logs;
 import com.yjh.accessvqd.module.diagnose.dao.ChanResultDao;
 import com.yjh.accessvqd.module.diagnose.entity.ChanResult;
@@ -28,6 +29,10 @@ public class ChanResultService {
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(ChanResult chanResult) {
+        if(!(chanResult.getSnapshotUrl().equals("(null)"))){
+            chanResult.setSnapshotUrl(chanResult.getSnapshotUrl().replaceAll("192.168.10.34:81", Constant.VQD_IMAGES_STORE_URL));
+        }
+
         return this.chanResultDao.insert(chanResult);
     }
 
@@ -67,6 +72,15 @@ public class ChanResultService {
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<ChanResult> list) {
         return this.chanResultDao.batchInsert(list);
+    }
+
+
+    @Logs(title = "查询诊断任务或监测点信息")
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,String>> findQueryItems(Integer queryType){
+        List<Map<String,String>> queryItems=new ArrayList<>();
+        queryItems=chanResultDao.selectQueryItems(queryType);
+        return queryItems;
     }
 
     @Logs(title = "分页查询诊断结果详细信息", code = "chanResult")
@@ -236,124 +250,113 @@ public class ChanResultService {
 
     @Logs(title = "统计不同故障类型的诊断点数")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Long> faultCounts(String diagnosePlanId) {
-        return chanResultDao.faultTypeSta(diagnosePlanId);
+    public Map<String, Long> faultCounts(String planName,String channelName) {
+        return chanResultDao.faultTypeSta(planName, channelName);
     }
 
     @Logs(title = "统计不同监测点状态")
-    public Map<String, Long> statusTypeChannel(String diagnosePlanId) {
-        return chanResultDao.statusTypeChannel(diagnosePlanId);
+    public Map<String, Long> statusTypeChannel(String planName,String channelName) {
+        return chanResultDao.statusTypeChannel(planName, channelName);
     }
 
     @Logs(title = "故障信息树")
-    public Map<String, Integer> faultTree() {
-        Map<String, Integer> faultItems = new HashMap<>();
-        faultItems.put("sta.signal",1 );
-        faultItems.put("sta.blur", 1);
-        faultItems.put("sta.contrast", 1);
-        faultItems.put("sta.bright", 1);
-        faultItems.put("sta.dark", 1);
-        faultItems.put("sta.chroma", 1);
-        faultItems.put("sta.mono", 1);
-        faultItems.put("sta.noise", 1);
-        faultItems.put("sta.streak", 1);
-        faultItems.put("sta.freeze", 1);
-        faultItems.put("sta.shake", 1);
-        faultItems.put("sta.flash", 1);
-        faultItems.put("sta.scene", 1);
-        faultItems.put("sta.cover",1 );
-        faultItems.put("sta.ptz", 1);
-        faultItems.put("sta.login", 1);
-        faultItems.put("sta.stream", 1);
+    public List<Map<String, String>>  faultTree() {
+        List<Map<String,String>>faultItems=new ArrayList<>();
+        String[]keys={"signal","blur","contrast","bright","dark","chroma","mono","noise","streak","freeze","shake","flash","scene","cover","ptz","login","stream"};
+        String[]names={"视频丢失","图像模糊","对比度","图像过亮","图像过暗","图像偏色","黑白图像","噪声干扰","条纹干扰","画面冻结","视频抖动","视频剧变","场景变换","视频遮挡","云台失控","登录失败","取流异常"};
+        for(int i=0;i<keys.length;i++){
+            Map<String,String> item=new HashMap<>();
+            item.put("checked","1");
+            item.put("key",keys[i]);
+            item.put("name",names[i]);
+            faultItems.add(item);
+        }
         return faultItems;
     }
 
     @Logs(title = "统计分析")
-    public Map<String,List<Map<String, Object>>> staticalAnalysis(Map<String,Object> faultInfo) throws ParseException {
+    public Map<String,List<Map<String, Object>>> staticalAnalysis(List<Map<String,String>> faultInfo,String startDate,String endDate) throws ParseException {
+
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date startTime=null;
         Date endTime=null;
-        if(Objects.nonNull(faultInfo.get("startTime"))){
-             startTime=simpleDateFormat.parse(faultInfo.get("startTime").toString());
-             endTime=simpleDateFormat.parse(faultInfo.get("endTime").toString());
-            faultInfo.remove("startTime");
-            faultInfo.remove("endTime");
+        if(Objects.nonNull(startDate)){
+             startTime=simpleDateFormat.parse(startDate);
+             endTime=simpleDateFormat.parse(endDate);
         }
         List<Map<String,Object>> charData=new ArrayList<>();
         List<Map<String,Object>> gridData=new ArrayList<>();
         List<Map<String,Object>> mapList=chanResultDao.staticalAnalysis(startTime,endTime);
-        Set<String> faultItems=faultInfo.keySet();
-        for(String item:faultItems){
-            switch (item){
-                case "sta.signal":
-                    charData.add(mapList.get(0));
-                    gridData.add(mapList.get(0));
-                break;
-                case "sta.blur":
-                    charData.add(mapList.get(1));
-                    gridData.add(mapList.get(1));
-                    break;
-                case "sta.contrast" :
-                    charData.add(mapList.get(2));
-                    gridData.add(mapList.get(2));
-                    break;
-                case "sta.bright":
-                    charData.add(mapList.get(3));
-                    gridData.add(mapList.get(3));
-                    break;
-                case "sta.dark":
-                    charData.add(mapList.get(4));
-                    gridData.add(mapList.get(4));
-                    break;
-                case "sta.chroma":
-                    charData.add(mapList.get(5));
-                    gridData.add(mapList.get(5));
-                    break;
-                case "sta.mono" :
-                    charData.add(mapList.get(6));
-                    gridData.add(mapList.get(6));
-                    break;
-                case "sta.noise":
-                    charData.add(mapList.get(7));
-                    gridData.add(mapList.get(7));
-                    break;
-                case "sta.streak":
-                    charData.add(mapList.get(8));
-                    gridData.add(mapList.get(8));
-                    break;
-                case "sta.freeze":
-                    charData.add(mapList.get(9));
-                    gridData.add(mapList.get(9));
-                    break;
-                case "sta.shake":
-                    charData.add(mapList.get(10));
-                    gridData.add(mapList.get(10));
-                    break;
-                case "sta.flash":
-                    charData.add(mapList.get(11));
-                    gridData.add(mapList.get(11));
-                    break;
-                case "sta.scene":
-                    charData.add(mapList.get(12));
-                    gridData.add(mapList.get(12));
-                    break;
-                case "sta.cover":
-                    charData.add(mapList.get(13));
-                    gridData.add(mapList.get(13));
-                    break;
-                case "sta.ptz":
-                    charData.add(mapList.get(14));
-                    gridData.add(mapList.get(14));
-                    break;
-                case "sta.login":
-                    charData.add(mapList.get(15));
-                    gridData.add(mapList.get(15));
-                    break;
-                case "sta.stream":
-                    charData.add(mapList.get(16));
-                    gridData.add(mapList.get(16));
-                    break;
-            }
+
+
+
+        if(faultInfo.get(0).get("checked").equals("1")){
+            charData.add(mapList.get(0));
+            gridData.add(mapList.get(0));
+        }
+        if(faultInfo.get(1).get("checked").equals("1")){
+            charData.add(mapList.get(1));
+            gridData.add(mapList.get(1));
+        }
+        if(faultInfo.get(2).get("checked").equals("1")){
+            charData.add(mapList.get(2));
+            gridData.add(mapList.get(2));
+        }
+        if(faultInfo.get(3).get("checked").equals("1")){
+            charData.add(mapList.get(3));
+            gridData.add(mapList.get(3));
+        }
+        if(faultInfo.get(4).get("checked").equals("1")){
+            charData.add(mapList.get(4));
+            gridData.add(mapList.get(4));
+        }
+        if(faultInfo.get(5).get("checked").equals("1")){
+            charData.add(mapList.get(5));
+            gridData.add(mapList.get(5));
+        }
+        if(faultInfo.get(6).get("checked").equals("1")){
+            charData.add(mapList.get(6));
+            gridData.add(mapList.get(6));
+        }
+        if(faultInfo.get(7).get("checked").equals("1")){
+            charData.add(mapList.get(7));
+            gridData.add(mapList.get(7));
+        }
+        if(faultInfo.get(8).get("checked").equals("1")){
+            charData.add(mapList.get(8));
+            gridData.add(mapList.get(8));
+        }
+        if(faultInfo.get(9).get("checked").equals("1")){
+            charData.add(mapList.get(9));
+            gridData.add(mapList.get(9));
+        }
+        if(faultInfo.get(10).get("checked").equals("1")){
+            charData.add(mapList.get(10));
+            gridData.add(mapList.get(10));
+        }
+        if(faultInfo.get(11).get("checked").equals("1")){
+            charData.add(mapList.get(11));
+            gridData.add(mapList.get(11));
+        }
+        if(faultInfo.get(12).get("checked").equals("1")){
+            charData.add(mapList.get(12));
+            gridData.add(mapList.get(12));
+        }
+        if(faultInfo.get(13).get("checked").equals("1")){
+            charData.add(mapList.get(13));
+            gridData.add(mapList.get(13));
+        }
+        if(faultInfo.get(14).get("checked").equals("1")){
+            charData.add(mapList.get(14));
+            gridData.add(mapList.get(14));
+        }
+        if(faultInfo.get(15).get("checked").equals("1")){
+            charData.add(mapList.get(15));
+            gridData.add(mapList.get(15));
+        }
+        if(faultInfo.get(16).get("checked").equals("1")){
+            charData.add(mapList.get(16));
+            gridData.add(mapList.get(16));
         }
 
         Map<String,List<Map<String, Object>>> map=new HashMap<>();

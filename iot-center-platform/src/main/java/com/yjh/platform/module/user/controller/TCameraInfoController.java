@@ -12,6 +12,7 @@ import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -280,18 +281,7 @@ public class TCameraInfoController {
         return result;
     }
 
-    @ApiOperation(value = "查询NVR-channel树")
-    @RequestMapping(value = "/selectNVRChannelTree",method = RequestMethod.GET)
-    public Result selectNVRChannelTree(){
-        Result result=new Result();
-        try {
-            result.setData(tCameraInfoService.selectNVRChannelTree());
-        }catch (Exception e){
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("树查询失败：", e);
-        }
-        return result;
-    }
+
 
 
 }

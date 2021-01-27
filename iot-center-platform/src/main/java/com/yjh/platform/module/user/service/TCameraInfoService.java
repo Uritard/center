@@ -8,7 +8,6 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
-import com.yjh.platform.module.device.entity.NVRChannelTree;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
@@ -258,19 +257,7 @@ public class TCameraInfoService {
     }
 
 
-
-    @Transactional(rollbackFor = Exception.class)
-    public List<NVRChannelTree> selectNVRChannelTree(){
-        List<NVRChannelTree> roots=tCameraInfoDao.selectNVRNode();
-        for(NVRChannelTree root:roots){
-            root.setUpId(Long.valueOf("-1"));
-            root.setLevel("1");
-            root.setChildren(tCameraInfoDao.selectChannelNode(root.getId()));
-        }
-        return roots;
-
-    }
-
+    
 }
 
 
