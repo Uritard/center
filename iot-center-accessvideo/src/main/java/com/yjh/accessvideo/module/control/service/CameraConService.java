@@ -699,9 +699,12 @@ public class CameraConService {
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:"+cameraId);
         log.info("camreaStatusMap: "+camreaStatusMap);
         log.info("camreaStatusMapState: "+camreaStatusMap.get("state"));
-        if (Objects.nonNull(camreaStatusMap.get("state")) && Objects.equals(camreaStatusMap.get("state"),1)) {
-            log.info("unable");
-            throw new BusinessException("this camera is unable to control.");
+        if (Objects.nonNull(camreaStatusMap.get("state"))) {
+            Integer state = Integer.parseInt(String.valueOf(camreaStatusMap.get("state")));
+            if (Objects.equals(state,1)){
+                log.info("unable");
+                throw new BusinessException("this camera is unable to control.");
+            }
         }
         return result;
     }
