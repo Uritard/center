@@ -225,11 +225,20 @@ public class RobotService {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
         log.info("机器人的id是：" + robotId);
 
+        String robotFactory = tRobotInfoDao.selectDictCode("robot_factory",robotMap.get(0).get("manufacturer").toString());
+        Integer robotType = null;
+        if ("1".equals(robotMap.get(0).get("manufacturer").toString())){
+            robotType = 156;
+        }else if ("2".equals(robotMap.get(0).get("manufacturer").toString())){
+            robotType = 155;
+        }else if ("3".equals(robotMap.get(0).get("manufacturer").toString())){
+            robotType = 399;
+        }
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
-                .setPhotePath(developRelativeUrl);
-//                .setRobotFactory("")
-//                .setRobotType();
+                .setPhotePath(developRelativeUrl)
+                .setRobotFactory(robotFactory)
+                .setRobotType(robotType);
         log.info("获得的tRobotInfo是：" + tRobotInfo);
 
         //更新机器人地图信息
@@ -340,17 +349,18 @@ public class RobotService {
                     .setItems(ItemList);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的机器人下发检修区域指令xml是<start>" + xmlString + "<end>");
-            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+//            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         }
 
-        String code = Constant.robotResultMap.get("Code");
+        /*String code = Constant.robotResultMap.get("Code");
         if ("200".equals(code)){
-//            log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
+            log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
             return "true";
         }else{
-//            log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
+            log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
             return "false";
-        }
+        }*/
+        return "success";
     }
     @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)

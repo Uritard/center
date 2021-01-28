@@ -54,14 +54,16 @@ public class TDeviceMaintenanceService{
 
         //给机器人下发检修区域指令
         {
-            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            List<String> deviceIdList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            Set<String> deviceList = new HashSet<>();
+            deviceList.addAll(deviceIdList);
             HashMap<String,Object> params = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             params.put("enable",1);
-            params.put("deviceList",inspectionCodeList);
+            params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
             params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
-            params.put("deviceLevel",3);
+            params.put("deviceLevel",2);//目前只支持主设备
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         List<TDeviceMaintenance> addList = new ArrayList<>();
@@ -96,11 +98,13 @@ public class TDeviceMaintenanceService{
         //给机器人下发检修区域指令
         {
             List<Long> list = tDeviceMaintenanceDao.selectDeviceIds(maintenanceId);
-            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            List<String> deviceIdList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            Set<String> deviceList = new HashSet<>();
+            deviceList.addAll(deviceIdList);
             HashMap<String,Object> params = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             params.put("enable",0);
-            params.put("deviceList",inspectionCodeList);
+            params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(new Date()));
             params.put("endTime",sdf.format(new Date()));
             params.put("deviceLevel",3);
@@ -129,11 +133,13 @@ public class TDeviceMaintenanceService{
         }
         //给机器人下发检修区域指令
         {
-            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            List<String> deviceIdList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            Set<String> deviceList = new HashSet<>();
+            deviceList.addAll(deviceIdList);
             HashMap<String,Object> params = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             params.put("enable",1);
-            params.put("deviceList",inspectionCodeList);
+            params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
             params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
             params.put("deviceLevel",3);
@@ -246,11 +252,13 @@ public class TDeviceMaintenanceService{
         //给机器人下发检修区域指令
         {
             List<Long> list = tDeviceMaintenanceDao.selectDeviceIds2(list1);
-            List<String> inspectionCodeList = tDeviceMaintenanceDao.selectCruiseIdAndDeviceId(list);
+            List<String> deviceIdList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            Set<String> deviceList = new HashSet<>();
+            deviceList.addAll(deviceIdList);
             HashMap<String,Object> params = new HashMap<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             params.put("enable",0);
-            params.put("deviceList",inspectionCodeList);
+            params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(new Date()));
             params.put("endTime",sdf.format(new Date()));
             params.put("deviceLevel",3);
