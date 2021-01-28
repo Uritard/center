@@ -1,7 +1,6 @@
 package com.yjh.accessrobot.commons.security;
 
 
-import com.yjh.accessrobot.commons.logs.LogsRegister;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -10,6 +9,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({LogsRegister.class})
 public @interface EnableSecurity {
 }
