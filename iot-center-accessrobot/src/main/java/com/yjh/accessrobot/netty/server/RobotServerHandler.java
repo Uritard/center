@@ -696,6 +696,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+fileName);//绝对路径
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());//图像框
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+                    cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
 

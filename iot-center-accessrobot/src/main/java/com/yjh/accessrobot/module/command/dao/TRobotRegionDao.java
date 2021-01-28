@@ -31,4 +31,6 @@ public interface TRobotRegionDao {
     List<TRobotRegion> selectByPage(TRobotRegion tRobotRegion);
 
     int batchInsert(List<TRobotRegion> list);
+    List<String> selectAllRobotRegion();
+    int batchDelete(List<String> list);
 }

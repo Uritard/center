@@ -167,7 +167,20 @@
             )
         </foreach>
     </insert>
-
-
+    <select id="selectAllRobotRegion" resultType="java.lang.String">
+        SELECT
+            a.region_id
+        FROM t_robot_region a
+    </select>
+    <delete id="batchDelete">
+        DELETE
+        FROM
+        t_robot_region
+        WHERE
+        region_id IN
+        <foreach collection="list" item="regionId" open="(" separator="," close=")">
+            #{regionId, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
 
 </mapper>

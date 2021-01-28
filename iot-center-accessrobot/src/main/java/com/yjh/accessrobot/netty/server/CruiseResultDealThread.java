@@ -123,7 +123,7 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
-//                  tCruiseTaskResultMap.put("is_warn",);
+                  tCruiseTaskResultMap.put("is_warn","0");
 
 //                    tCruiseTaskResultMap.put("taskId",taskId);
 //                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun().toString());
