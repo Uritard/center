@@ -168,6 +168,7 @@ public class HelloController {
 
     @ApiOperation(value = "二维码识别")
     @RequestMapping(value = "/QrDecode", method = RequestMethod.GET)
+    @Logs(title = "插入",content = "根据用户传递的参数新增",logType = 2)
     public Result QrDecode(@RequestParam(value = "filePath") String filePath) {
         Result result = new Result();
         try {
