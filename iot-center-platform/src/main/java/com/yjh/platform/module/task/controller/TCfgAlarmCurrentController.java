@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.service.TCfgAlarmCurrentService;
 import com.yjh.platform.module.task.entity.TCfgAlarmCurrent;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增活动告警数据",logType = 2)
     public Result insert(@RequestBody TCfgAlarmCurrent tCfgAlarmCurrent) {
         Result result = new Result();
         try {
@@ -54,6 +56,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除活动告警数据",logType = 4)
     public Result delete(@RequestParam(value = "alarmNo", required = true) Long alarmNo) {
         Result result = new Result();
         try {
@@ -70,6 +73,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改活动告警数据",logType = 3)
     public Result update(@RequestBody TCfgAlarmCurrent tCfgAlarmCurrent) {
         Result result = new Result();
         try {
@@ -86,6 +90,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询活动告警",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "alarmNo", required = true) Long alarmNo) {
         Result result = new Result();
         try {
@@ -100,6 +105,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询活动告警",logType = 1)
     public Result select(@RequestParam(value = "alarmNo", required = false) Long alarmNo,
                             @RequestParam(value = "deviceId", required = false) Long deviceId,
                             @RequestParam(value = "cunstomId", required = false) String cunstomId,
@@ -131,6 +137,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询活动告警",logType = 1)
     public Result selectByPage(@RequestBody TCfgAlarmCurrent tCfgAlarmCurrent,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -151,6 +158,7 @@ public class TCfgAlarmCurrentController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量新增",content = "根据用户传递的参数批量新增活动告警数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCfgAlarmCurrent> list) {
         Result result = new Result();
         try {

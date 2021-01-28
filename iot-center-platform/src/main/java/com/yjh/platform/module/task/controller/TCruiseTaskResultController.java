@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.CruiseResultCounter;
 import com.yjh.platform.module.task.service.TCruiseTaskResultService;
 import com.yjh.platform.module.task.entity.TCruiseTaskResult;
@@ -44,6 +45,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增任务点状态数据",logType = 2)
     public Result insert(@RequestBody TCruiseTaskResult tCruiseTaskResult) {
         Result result = new Result();
         try {
@@ -59,6 +61,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除任务点状态数据",logType = 4)
     public Result delete(@RequestParam(value = "taskResultId", required = true) String taskResultId) {
         Result result = new Result();
         try {
@@ -75,6 +78,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改任务点状态数据",logType = 3)
     public Result update(@RequestBody TCruiseTaskResult tCruiseTaskResult) {
         Result result = new Result();
         try {
@@ -91,6 +95,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询任务点状态信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "taskResultId", required = true) String taskResultId) {
         Result result = new Result();
         try {
@@ -105,6 +110,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询任务点状态信息",logType = 1)
     public Result select(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                             @RequestParam(value = "taskId", required = false) String taskId,
                          @RequestParam(value = "taskName", required = false) String taskName,
@@ -128,6 +134,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询任务点状态信息",logType = 1)
     public Result selectByPage(@RequestBody TCruiseTaskResult tCruiseTaskResult,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -148,6 +155,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入任务点状态数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseTaskResult> list) {
         Result result = new Result();
         try {
@@ -161,6 +169,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
     @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1)
     public Result selectCurrentCruiseTaskResult(@RequestParam String taskId){
         Result result=new Result();
         try {
@@ -176,6 +185,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取当前执行任务的实时告警信息")
     @RequestMapping(value = "/selectRealTimeWarnInfo",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数获取当前执行任务的实时告警信息",logType = 1)
     public Result selectRealTimeWarnInfo(@RequestParam String taskId){
         Result result=new Result();
         try {
@@ -190,6 +200,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取巡检任务进度")
     @RequestMapping(value = "/selectCruiseAdvance",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数获取巡视任务进度",logType = 1)
     public Result selectCruiseAdvance(@RequestParam String taskId){
         Result result=new Result();
        try{
@@ -216,6 +227,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间")
     @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询当前任务异常巡视点、为巡视巡视点、已巡视巡视点",logType = 1)
     public Result selectCruiseStatusCount(@RequestParam String taskId){
         Result result=new Result();
         try{
@@ -235,6 +247,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "C-获取当前任务下的摄像头/机器人信息以及其工作的巡检点结果状态")
     @RequestMapping(value = "/selectCruiseDeviceAndCruiseAdvance",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数获取当前任务下的摄像头、机器人信息",logType = 1)
     public Result selectCruiseDeviceAndCruiseAdvance(@RequestParam String taskId){
         Result result=new Result();
         try{
@@ -248,6 +261,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-巡视结果图片比对")
     @RequestMapping(value = "/PictureCompare",method = RequestMethod.GET)
+    @Logs(title = "操作",content = "根据用户传递的参数对巡视结果图片对比",logType = 5)
     public Result PictureCompare(@RequestParam(value = "taskId")String taskId,
                                  @RequestParam(value = "instanceId")Long instanceId){
         Result result=new Result();
@@ -263,6 +277,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "读取缓存中的任务下巡视点绑定的摄像头信息")
     @RequestMapping(value = "/cameraInfoByRedis",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "读取缓存中任务下的巡视点绑定摄像头信息",logType = 1)
     public Result cameraInfoByRedis(){
         Result result=new Result();
         try{

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
@@ -43,6 +44,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "插入用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增角色数据",logType = 2)
     public Result insert(@RequestBody  SysRole sysRole) {
 
         Result result = new Result();
@@ -59,6 +61,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除角色数据",logType = 4)
     public Result delete(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -75,6 +78,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改角色数据",logType = 3)
     public Result update(@RequestBody SysRole sysRole) {
         Result result = new Result();
         try {
@@ -91,6 +95,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -105,6 +110,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色信息",logType = 1)
     public Result select(@RequestParam(value = "roleId", required = false) Long roleId,
                             @RequestParam(value = "roleName", required = false) String roleName,
                             @RequestParam(value = "createTime", required = false) Date createTime,
@@ -123,6 +129,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询角色信息",logType = 1)
     public Result selectByPage(@RequestBody SysRole sysRole,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -143,6 +150,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的菜单信息")
     @RequestMapping(value = "/selectRelationMenu", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联的菜单信息",logType = 1)
     public Result selectRelationMenu(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -157,6 +165,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的区域信息")
     @RequestMapping(value = "/selectRelationRegion", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色id关联的区域信息",logType = 1)
     public Result selectRelationRegion(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -171,6 +180,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的相机信息")
     @RequestMapping(value = "/selectRelationCamera", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联的相机信息",logType = 1)
     public Result selectRelationCamera(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -185,6 +195,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的设备信息")
     @RequestMapping(value = "/selectRelationDevice", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联的设备信息",logType = 1)
     public Result selectRelationDevice(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -199,6 +210,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的权限信息")
     @RequestMapping(value = "/selectRelationAuthor", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联的权限信息",logType = 1)
     public Result selectRelationAuthor(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -213,6 +225,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "修改角色区域设备权限")
     @RequestMapping(value = "/updateRoleDeviceRight", method = RequestMethod.POST)
+    @Logs(title = "修改",content = "根据用户传递的参数修改角色区域树的设备权限",logType = 3)
     public Result updateRoleDeviceRight(@RequestBody Map<String, Object> req) {
         Result result = new Result();
         try {
@@ -226,6 +239,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "修改角色菜单权限")
     @RequestMapping(value = "/updateRoleMenuRight", method = RequestMethod.POST)
+    @Logs(title = "修改",content = "根据用户传递的参数修改角色菜单",logType = 3)
     public Result updateRoleMenuRight(@RequestBody Map<String, Object> req) {
         Result result = new Result();
         try {

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import com.yjh.platform.module.task.service.TCruisePlanAttrService;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
@@ -40,6 +41,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2)
     public Result insert(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
         Result result = new Result();
         try {
@@ -55,6 +57,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4)
     public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -71,6 +74,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改巡检预案属性数据",logType = 3)
     public Result update(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
         Result result = new Result();
         try {
@@ -87,6 +91,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -101,6 +106,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1)
     public Result select(@RequestParam(value = "planId", required = false) Long planId,
                             @RequestParam(value = "instanceId", required = false) Long instanceId,
                             @RequestParam(value = "pointType", required = false) Integer pointType,
@@ -128,6 +134,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1)
     public Result selectByPage(@RequestBody TCruisePlanAttr tCruisePlanAttr,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -148,6 +155,7 @@ public class TCruisePlanAttrController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡检预案属性数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruisePlanAttr> list) {
         Result result = new Result();
         try {

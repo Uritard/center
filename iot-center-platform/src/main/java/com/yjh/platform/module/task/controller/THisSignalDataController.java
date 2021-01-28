@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.service.THisSignalDataService;
 import com.yjh.platform.module.task.entity.THisSignalData;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增遥信历史数据",logType = 2)
     public Result insert(@RequestBody THisSignalData tHisSignalData) {
         Result result = new Result();
         try {
@@ -54,6 +56,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除遥信历史数据",logType = 4)
     public Result delete(@RequestParam(value = "Id")Long Id) {
         Result result = new Result();
         try {
@@ -70,6 +73,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改遥信历史数据",logType = 3)
     public Result update(@RequestBody THisSignalData tHisSignalData) {
         Result result = new Result();
         try {
@@ -86,6 +90,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询遥信历史数据",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "Id")Long Id) {
         Result result = new Result();
         try {
@@ -100,6 +105,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询遥信历史数据",logType = 1)
     public Result select(@RequestParam(value = "Id", required = false) Long Id,
                             @RequestParam(value = "meteId", required = false) Long meteId,
                             @RequestParam(value = "deviceId", required = false) Long deviceId,
@@ -120,6 +126,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询遥信历史数据",logType = 1)
     public Result selectByPage(@RequestBody THisSignalData tHisSignalData,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -140,6 +147,7 @@ public class THisSignalDataController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入遥信历史数据",logType = 2)
     public Result batchInsert(@RequestBody List<THisSignalData> list) {
         Result result = new Result();
         try {

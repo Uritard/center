@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -45,6 +46,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增巡检点数据",logType = 2)
     public Result insert(@RequestBody TCruiseDataResult tCruiseDataResult) {
         Result result = new Result();
         try {
@@ -60,6 +62,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除巡检点数据",logType = 4)
     public Result delete(@RequestParam(value = "cruiseDataId", required = true) Long cruiseDataId) {
         Result result = new Result();
         try {
@@ -76,6 +79,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改巡检点数据",logType = 3)
     public Result update(@RequestBody TCruiseDataResult tCruiseDataResult) {
         Result result = new Result();
         try {
@@ -92,6 +96,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检点数据",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "cruiseDataId", required = true) Long cruiseDataId) {
         Result result = new Result();
         try {
@@ -106,6 +111,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检点数据",logType = 1)
     public Result select(@RequestParam(value = "cruiseDataId", required = false) Long cruiseDataId,
                          @RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
                          @RequestParam(value = "cruiseId", required = false) Long cruiseId,
@@ -143,6 +149,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检点数据",logType = 1)
     public Result selectByPage(@RequestBody TCruiseDataResult tCruiseDataResult,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -163,6 +170,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡检点数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseDataResult> list) {
         Result result = new Result();
         try {
@@ -177,6 +185,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "巡视结果分析--测点查询")
     @RequestMapping(value = "/selectCruiseResultAnal", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询测点信息",logType = 1)
     public Result selectCruiseResultAnal(@RequestParam(value = "deviceId", required = false) Long deviceId,
                                          @RequestParam(value = "resultSwitch") String resultSwitch,
                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -210,6 +219,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视结果分析--测点查询2")
     @RequestMapping(value = "/selectCruiseResultAnalyze", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询测点信息",logType = 1)
     public Result selectCruiseResultAnalyze(@RequestParam(value = "regionId", required = false) Long regionId,
                                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                                          @RequestParam(value = "meteType", required = false) String meteType,
@@ -236,6 +246,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视报表")
     @RequestMapping(value = "/selectCruiseDataReport", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡视报表",logType = 1)
     public Result selectCruiseDataReport(@RequestParam(value = "cType", required = false) Integer cType,
                                         @RequestParam(value = "meteType", required = false) String meteType,
                                         @RequestParam(value = "meterType", required = false) Integer meterType,
@@ -264,6 +275,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
     @RequestMapping(value = "/selectCruiseDataResultByList2", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList2(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                                @RequestParam(value = "cType", required = false) Integer cType,
                                                @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
@@ -296,6 +308,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
     @RequestMapping(value = "/selectCruiseDataResultByList", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                                @RequestParam(value = "cType", required = false) Integer cType,
                                                @RequestParam(value = "deviceMeteId") Long deviceMeteId,
@@ -329,6 +342,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "获取折线图元素信息")
     @RequestMapping(value = "/selectBrokenLine", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数获取折线图信息",logType = 1)
     public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                    @RequestParam(value = "cType", required = false) Integer cType,
                                    @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,

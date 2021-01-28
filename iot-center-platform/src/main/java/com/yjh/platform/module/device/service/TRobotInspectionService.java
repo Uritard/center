@@ -163,6 +163,7 @@ public class TRobotInspectionService{
         Map<String,Object> mapForOnlineState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
         if(mapForOnlineState.size() != 0){
             re.put("onlineState",mapForOnlineState.get("value"));//网络状态
+            //todo 通知前端停止调接口
         }else {
             re.put("onlineState","");//网络状态
         }

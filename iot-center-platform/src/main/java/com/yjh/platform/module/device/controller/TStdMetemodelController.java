@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.ModelCreator;
 import com.yjh.platform.module.device.entity.ModelInfo;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
@@ -43,6 +44,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增系统测点模版",logType = 2)
     public Result add(@RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
         try {
@@ -58,6 +60,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除系统测点模版",logType = 4)
     public Result delete(@RequestParam(value = "modelId") Long modelId) {
         Result result = new Result();
         try {
@@ -74,6 +77,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改系统测点模版",logType = 3)
     public Result update(@RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
         try {
@@ -90,6 +94,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统测点模版",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "modelId") Long modelId) {
         Result result = new Result();
         try {
@@ -104,6 +109,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统测点模版",logType = 1)
     public Result select(@RequestParam(value = "modelId", required = false) Long modelId,
                             @RequestParam(value = "modelName", required = false) String modelName,
                             @RequestParam(value = "deviceType", required = false) Integer deviceType,
@@ -121,6 +127,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询系统测点模版",logType = 1)
     public Result selectByPage(@RequestBody TStdMeteModel tStdMeteModel,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -141,6 +148,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入系统测点模版",logType = 2)
     public Result batchAdd(@RequestBody List<TStdMeteModel> list) {
         Result result = new Result();
         try {
@@ -154,6 +162,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "根据模版的设备类型查询对应的初始测点信息")
     @RequestMapping(value = "/selectMeteByDeviceType", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据模板的设备类型查询测点信息",logType = 1)
     public Result selectMeteByDeviceType(@RequestParam(value = "deviceType") Integer deviceType) {
         Result result = new Result();
         try {
@@ -168,6 +177,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "批量插入模版测点")
     @RequestMapping(value = "/batchAddModelMete", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入模板测点",logType = 2)
     public Result batchAddModelMete(@RequestBody List<TStdMeteModelDetail> list) {
         Result result = new Result();
         try {
@@ -181,6 +191,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
+    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除数据",logType = 4)
     public Result batchDetele(@RequestParam(value = "list")List<String> list){
         Result result=new Result();
         try{
@@ -200,6 +211,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "查询设备类型-模板树")
     @RequestMapping(value = "/selectDeviceTypeModelTree",method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询设备类型模板树",logType = 1)
     public Result selectDeviceTypeModelTree(@RequestParam(value = "deviceType",required = false)String deviceType){
         Result result=new Result();
         try{
@@ -217,6 +229,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "新建模板")
     @RequestMapping(value = "/addModel",method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增数据",logType = 2)
     public Result addModel(@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
@@ -234,6 +247,7 @@ public class TStdMetemodelController {
 
    @ApiOperation(value = "查看当前模板信息")
    @RequestMapping(value = "/selectModel",method = RequestMethod.GET)
+   @Logs(title = "查询",content = "查询当前模板消息",logType = 1)
     public Result selectModel(@RequestParam(value = "modelId")Long modelId){
         Result result=new Result();
        try{
@@ -250,6 +264,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "修改当前模板信息")
     @RequestMapping(value = "updateModel",method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改数据",logType = 3)
     public Result updateModel (@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
@@ -269,6 +284,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "下载模板")
     @RequestMapping(value = "download",method = RequestMethod.GET)
+    @Logs(title = "操作",content = "下载模板",logType = 5)
     public Result download () {
         Result result =new Result();
         try {
@@ -286,6 +302,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "导入模板")
     @RequestMapping(value = "upload",method = RequestMethod.POST)
+    @Logs(title = "操作",content = "导入模板",logType = 5)
     public Result upload (@RequestParam(value="file", required=false) MultipartFile file) {
         Result result =new Result();
         try {

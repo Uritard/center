@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.service.TCruiseTaskResultDetailService;
 import com.yjh.platform.module.task.entity.TCruiseTaskResultDetail;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增任务点状态详细数据",logType = 2)
     public Result insert(@RequestBody TCruiseTaskResultDetail tCruiseTaskResultDetail) {
         Result result = new Result();
         try {
@@ -54,6 +56,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除任务点状态详细数据",logType = 4)
     public Result delete(@RequestParam(value = "cruiseResultId", required = true) String cruiseResultId) {
         Result result = new Result();
         try {
@@ -70,6 +73,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改任务点状态详细数据",logType = 3)
     public Result update(@RequestBody TCruiseTaskResultDetail tCruiseTaskResultDetail) {
         Result result = new Result();
         try {
@@ -86,6 +90,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询任务点状态详细信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "cruiseResultId", required = true) String cruiseResultId) {
         Result result = new Result();
         try {
@@ -100,6 +105,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询任务点状态详细信息",logType = 1)
     public Result select(@RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
                             @RequestParam(value = "taskResultId", required = false) String taskResultId,
                             @RequestParam(value = "deviceId", required = false) Long deviceId,
@@ -123,6 +129,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询任务点状态详细信息",logType = 1)
     public Result selectByPage(@RequestBody TCruiseTaskResultDetail tCruiseTaskResultDetail,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -143,6 +150,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入任务点状态详细数据",logType = 1)
     public Result batchInsert(@RequestBody List<TCruiseTaskResultDetail> list) {
         Result result = new Result();
         try {

@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -61,6 +62,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增系统用户数据",logType = 2)
     public Result insert(@RequestBody SysUser sysUser) {
 
         Result result = new Result();
@@ -78,6 +80,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除系统用户数据",logType = 4)
     public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -94,6 +97,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改系统用户数据",logType = 3)
     public Result update(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
@@ -110,6 +114,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统用户信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -124,6 +129,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户状态查询")
     @RequestMapping(value = "/selectByUserState", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统用户信息",logType = 1)
     public Result selectByUserState(@RequestParam(value = "state", required = true) Integer state) {
         Result result = new Result();
         try {
@@ -138,6 +144,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户名查询")
     @RequestMapping(value = "/selectByUserName", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统用户信息",logType = 1)
     public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
         Result result = new Result();
         try {
@@ -153,6 +160,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统用户信息",logType = 1)
     public Result select(@RequestParam(value = "userId", required = false) Long userId,
                          @RequestParam(value = "userName", required = false) String userName,
                          @RequestParam(value = "password", required = false) String password,
@@ -190,6 +198,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询系统用户信息",logType = 1)
     public Result selectByPage(@RequestBody SysUser sysUser,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -213,6 +222,7 @@ public class SysUserController {
 
     @ApiOperation(value = "根据用户ID查询关联的组织结构信息")
     @RequestMapping(value = "/selectRelationOrg", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联组织机构",logType = 1)
     public Result selectRelationOrg(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -227,6 +237,7 @@ public class SysUserController {
 
     @ApiOperation(value = "根据用户ID查询关联菜单权限")
     @RequestMapping(value = "/selectRelationMenu", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联菜单权限",logType = 1)
     public Result selectRelationMenu(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -241,6 +252,7 @@ public class SysUserController {
 
     @ApiOperation(value = "根据用户ID查询关联区域设备权限")
     @RequestMapping(value = "/selectRelationAuthor", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询角色关联设备权限",logType = 1)
     public Result selectRelationAuthor(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -255,6 +267,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @Logs(title = "操作",content = "用户登录",logType = 5)
     public Result userLogin(HttpServletRequest request, @RequestBody Map<String, String> userMap) {
         Result result = new Result();
         try {
@@ -269,6 +282,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户登出")
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    @Logs(title = "操作",content = "用户登出",logType = 5)
     public Result userLogout(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -283,6 +297,7 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增数据",logType = 2)
     public Result insertUser( @RequestBody SysUser sysUser) {
 
         Result result = new Result();
@@ -305,6 +320,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户帐号解锁")
     @RequestMapping(value = "/unlockUserAccount", method = RequestMethod.PUT)
+    @Logs(title = "操作",content = "用户账号解锁",logType = 5)
     public Result unlockUserAccount(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
@@ -342,6 +358,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户修改密码")
     @RequestMapping(value = "/changePassword", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "用户修改密码",logType = 3)
     public Result changePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {

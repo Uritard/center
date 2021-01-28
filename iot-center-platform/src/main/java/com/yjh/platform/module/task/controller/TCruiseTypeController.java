@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.TCruiseTypeDetail;
 import com.yjh.platform.module.task.service.TCruiseTypeService;
 import com.yjh.platform.module.task.entity.TCruiseType;
@@ -40,6 +41,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.GET)
+    @Logs(title = "新增",content = "根据用户传递的参数新增巡视类型关联实例点数据",logType = 2)
     public Result add(@RequestParam(value = "cruiseType") Integer cruiseType,
                       @RequestParam(value = "instanceList") String instanceList,
                       @RequestParam(value = "subType",required = false) String remake) {
@@ -57,6 +59,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除巡视类型关联实例点数据",logType = 4)
     public Result delete(@RequestParam(value = "subType", required = false) Integer subType) {
         Result result = new Result();
         try {
@@ -73,6 +76,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改巡视类型关联实例点数据",logType = 3)
     public Result update(@RequestBody TCruiseType tCruiseType) {
         Result result = new Result();
         try {
@@ -89,6 +93,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡视类型关联实例点信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "subType", required = true) Integer subType) {
         Result result = new Result();
         try {
@@ -103,6 +108,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡视类型关联实例点信息",logType = 1)
     public Result select(@RequestParam(value = "subType", required = true) Integer subType,
                          @RequestParam(value = "pageNum", required = false) Integer pageNum,
                          @RequestParam(value = "pageSize", required = false,defaultValue = "0") Integer pageSize) {
@@ -129,6 +135,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡视类型关联实例点信息",logType = 1)
     public Result selectByPage(@RequestBody TCruiseType tCruiseType,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -149,6 +156,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡视类型关联实例点数据",logType = 2)
     public Result batchAdd(@RequestBody List<TCruiseType> list) {
         Result result = new Result();
         try {
@@ -162,6 +170,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除巡视类型关联实例点数据",logType = 4)
     public Result batchDelete(@RequestParam(value = "subTypes") String subTypes) {
     Result result = new Result();
     try {

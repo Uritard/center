@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -50,6 +51,7 @@ public class TemplateToImportController {
 
     @ApiOperation(value = "测点模板导入", notes = "导入")
     @RequestMapping(value = "/importExcelMete", method = RequestMethod.POST)
+    @Logs(title = "操作",content = "测点模板导入",logType = 5)
     public Result importExcelMete(@RequestParam("excelFile") String pathName) {
         Result result = new Result();
         try {

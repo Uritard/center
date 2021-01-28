@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.controller;
 
 import com.mysql.jdbc.StringUtils;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增算法信息",logType = 2)
     public Result insert(@RequestBody TAlgorithmInfo tAlgorithmInfo) {
 
         Result result = new Result();
@@ -63,6 +65,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除算法信息",logType = 4)
     public Result delete(@RequestParam(value = "algorithmId", required = true) Long algorithmId) {
         Result result = new Result();
         try {
@@ -79,6 +82,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改算法信息",logType = 3)
     public Result update(@RequestBody TAlgorithmInfo tAlgorithmInfo) {
         Result result = new Result();
         try {
@@ -95,6 +99,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询算法信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "algorithmId", required = true) Long algorithmId) {
         Result result = new Result();
         try {
@@ -109,6 +114,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询算法信息",logType = 1)
     public Result select(@RequestParam(value = "algorithmId", required = false) Long algorithmId,
                             @RequestParam(value = "algorithmName", required = false) String algorithmName,
                             @RequestParam(value = "aliasName", required = false) String aliasName,
@@ -130,6 +136,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数对应查询算法信息",logType = 1)
     public Result selectByPage(@RequestBody TAlgorithmInfo tAlgorithmInfo,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -150,6 +157,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入算法信息",logType = 2)
     public Result batchInsert(@RequestBody List<TAlgorithmInfo> list) {
         Result result = new Result();
         try {

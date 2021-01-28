@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.service.SysOrgService;
 import com.yjh.platform.module.user.entity.SysOrg;
@@ -41,6 +42,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "新增组织机构")
     @RequestMapping(value = "/addOrg", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增组织机构数据",logType = 2)
     public Result insert(@RequestBody   SysOrg sysOrg) {
 
         Result result = new Result();
@@ -65,6 +67,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除组织机构数据",logType = 4)
     public Result delete(@RequestParam(value = "orgId", required = true) Long orgId) {
         Result result = new Result();
         try {
@@ -81,6 +84,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改组织机构数据",logType = 3)
     public Result update(@RequestBody SysOrg sysOrg) {
         Result result = new Result();
         try {
@@ -97,6 +101,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询组织机构信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "orgId", required = true) Long orgId) {
         Result result = new Result();
         try {
@@ -111,6 +116,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询组织机构信息",logType = 1)
     public Result select(@RequestParam(value = "orgId", required = false) Long orgId,
                          @RequestParam(value = "orgName", required = false) String orgName,
                          @RequestParam(value = "orgCode", required = false) String orgCode,
@@ -134,6 +140,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询组织机构信息",logType = 1)
     public Result selectByPage(@RequestBody SysOrg sysOrg,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -154,6 +161,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "组织机构树查询")
     @RequestMapping(value = "/selectOrgTree", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询组织区域树",logType = 1)
     public Result selectOrgTree() {
         Result result = new Result();
         try {
@@ -167,6 +175,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "根据组织机构名称模糊查询")
     @RequestMapping(value = "/selectOrgTreeByName", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询组织区域树",logType = 1)
     public Result selectOrgTreeByName(@RequestParam(value = "orgName", required = false) String orgName) {
         Result result = new Result();
         try {

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
@@ -40,6 +41,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增声纹设备数据",logType = 2)
     public Result add(@RequestBody TVoiceDevice tVoiceDevice) {
         Result result = new Result();
         try {
@@ -55,6 +57,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除声纹设备数据",logType = 4)
     public Result delete(@RequestParam(value = "voiceDeviceId", required = true) String voiceDeviceId) {
         Result result = new Result();
         try {
@@ -71,6 +74,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改声纹设备数据",logType = 3)
     public Result update(@RequestBody TVoiceDevice tVoiceDevice) {
         Result result = new Result();
         try {
@@ -87,6 +91,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询声纹设备",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "voiceDeviceId", required = true) String voiceDeviceId) {
         Result result = new Result();
         try {
@@ -101,6 +106,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询声纹设备",logType = 1)
     public Result select(@RequestParam(value = "voiceDeviceId", required = false) String voiceDeviceId,
                             @RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
                             @RequestParam(value = "stdDeviceId", required = false) Long stdDeviceId,
@@ -119,6 +125,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询声纹设备",logType = 1)
     public Result selectByPage(@RequestBody TVoiceDevice tVoiceDevice,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -139,6 +146,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入声纹设备数据",logType = 2)
     public Result batchAdd(@RequestBody List<TVoiceDevice> list) {
         Result result = new Result();
         try {
@@ -152,6 +160,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数批量删除声纹设备",logType = 1)
     public Result batchDelete(@RequestParam(value = "voiceDeviceIds") String voiceDeviceIds) {
     Result result = new Result();
     try {
@@ -169,6 +178,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "查询音频设备树")
     @RequestMapping(value = "/selectVoiceDeviceTree", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "音频设备树查询",logType = 1)
     public Result selectVoiceDeviceTree() {
         Result result = new Result();
         try {

@@ -40,7 +40,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "插入",content = "根据用户传递的参数新增数据",logType = 2)
+    @Logs(title = "新增",content = "根据用户传递的参数新增遥调数据",logType = 2)
     public Result add(@RequestBody TCfgTeleadjust tCfgTeleadjust) {
         Result result = new Result();
         try {
@@ -56,7 +56,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除数据",logType = 4)
+    @Logs(title = "删除",content = "根据用户传递的参数删除遥调数据",logType = 4)
     public Result delete(@RequestParam(value = "deviceId", required = true) String deviceId) {
         Result result = new Result();
         try {
@@ -73,7 +73,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "更新",content = "根据用户传递的参数修改数据",logType = 3)
+    @Logs(title = "更新",content = "根据用户传递的参数修改遥调数据",logType = 3)
     public Result update(@RequestBody TCfgTeleadjust tCfgTeleadjust) {
         Result result = new Result();
         try {
@@ -90,7 +90,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询遥调信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "deviceId", required = true) String deviceId) {
         Result result = new Result();
         try {
@@ -105,7 +105,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询遥调信息",logType = 1)
     public Result select(@RequestParam(value = "deviceId", required = false) String deviceId,
                             @RequestParam(value = "meteId", required = false) String meteId,
                             @RequestParam(value = "meteName", required = false) String meteName,
@@ -136,7 +136,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询遥调信息",logType = 1)
     public Result selectByPage(@RequestBody TCfgTeleadjust tCfgTeleadjust,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -157,7 +157,7 @@ public class TCfgTeleadjustController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入",logType = 1)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入遥调信息",logType = 2)
     public Result batchAdd(@RequestBody List<TCfgTeleadjust> list) {
         Result result = new Result();
         try {

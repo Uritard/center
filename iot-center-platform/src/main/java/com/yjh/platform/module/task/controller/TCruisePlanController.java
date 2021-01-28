@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruisePlanAttrService;
 import com.yjh.platform.module.task.service.TCruisePlanService;
@@ -42,6 +43,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "新增预案")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2)
     public Result insert(@RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
@@ -60,6 +62,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4)
     public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -76,6 +79,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改巡检预案属性数据",logType = 3)
     public Result update(@RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();
         try {
@@ -92,6 +96,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -106,6 +111,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询预案")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1)
     public Result select(@RequestParam(value = "planId", required = false) Long planId,
                             @RequestParam(value = "planName", required = false) String planName,
                             @RequestParam(value = "type", required = false) Integer type,
@@ -125,6 +131,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1)
     public Result selectByPage(@RequestBody TCruisePlan tCruisePlan,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -145,6 +152,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPlanPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1)
     public Result selectByPlanPage(@RequestBody TCruisePlan tCruisePlan,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -165,6 +173,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡检预案属性数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruisePlan> list) {
         Result result = new Result();
         try {
@@ -178,6 +187,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询标准设备下挂巡检点")
     @RequestMapping(value = "/findInstances", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询标准设备下的巡检点 ",logType = 1)
     public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -206,6 +216,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询预案详情")
     @RequestMapping(value = "/selectPlanDetail", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询预案详情",logType = 1)
     public Result selectPlanDetail(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -238,6 +249,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "巡检类型树")
     @RequestMapping(value = "/cruiseTypeTree", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "查询巡检类型树",logType = 1)
     public Result cruiseTypeTree() {
         Result result = new Result();
         try{

@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.common.handler.JurisdictionException;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.TCameraAlarm;
 import com.yjh.platform.module.task.service.TCameraAlarmService;
 
@@ -45,6 +46,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增可视设备本体告警数据",logType = 2)
     public Result insert(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -66,6 +68,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除可视设备本体告警数据",logType = 4)
     public Result delete(@RequestParam(value = "cameraAlarmId", required = true) Long cameraAlarmId) {
         Result result = new Result();
         try {
@@ -82,6 +85,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改可视设备本体告警数据",logType = 3)
     public Result update(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -105,6 +109,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询可视设备本体告警",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "cameraAlarmId", required = true) Long cameraAlarmId) {
         Result result = new Result();
         try {
@@ -119,6 +124,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询可视设备本体告警",logType = 1)
     public Result select(@RequestParam(value = "cameraAlarmId", required = false) Long cameraAlarmId,
                          @RequestParam(value = "alarmName", required = false) String alarmName,
                          @RequestParam(value = "cameraId", required = false) Long cameraId,
@@ -148,6 +154,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询可视设备本体告警",logType = 1)
     public Result selectByPage(@RequestBody TCameraAlarm tCameraAlarm,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -168,6 +175,7 @@ public class TCameraAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量新增",content = "根据用户传递的参数批量新增可视设备本体告警数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {

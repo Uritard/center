@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -40,6 +41,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增周期任务删除记录数据",logType = 2)
     public Result insert(@RequestBody TCruiseTaskDel tCruiseTaskDel) {
         Result result = new Result();
         try {
@@ -55,6 +57,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除周期任务删除记录数据",logType = 4)
     public Result delete(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
@@ -71,6 +74,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改周期任务删除记录数据",logType = 3)
     public Result update(@RequestBody TCruiseTaskDel tCruiseTaskDel) {
         Result result = new Result();
         try {
@@ -87,6 +91,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询周期任务删除记录信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
@@ -101,6 +106,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询周期任务删除记录信息",logType = 1)
     public Result select(@RequestParam(value = "taskId", required = false) String taskId,
                          @RequestParam(value = "delTime", required = false) Date delTime,
                          @RequestParam(value = "createTime", required = false) Date createTime) {
@@ -117,6 +123,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @Logs(title = "查询",content = "根据用户传递的参数分页查询周期任务删除记录信息",logType = 1)
     public Result selectByPage(@RequestBody TCruiseTaskDel tCruiseTaskDel,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -137,6 +144,7 @@ public class TCruiseTaskDelController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入周期任务删除记录数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseTaskDel> list) {
         Result result = new Result();
         try {

@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.handler.JurisdictionException;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMeteDetail;
 import com.yjh.platform.module.device.service.TStdMeteService;
@@ -47,6 +48,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @Logs(title = "新增",content = "根据用户传递的参数新增系统测点",logType = 2)
     public Result add(@RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -70,6 +72,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除系统测点",logType = 4)
     public Result delete(@RequestParam(value = "stdMeteId", required = true) Long stdMeteId) {
         Result result = new Result();
         try {
@@ -86,6 +89,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @Logs(title = "修改",content = "根据用户传递的参数修改系统测点",logType = 3)
     public Result update(@RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -111,6 +115,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统测点",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "stdMeteId", required = true) Long stdMeteId) {
         Result result = new Result();
         try {
@@ -125,6 +130,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "查询，名称模糊查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统测点",logType = 1)
     public Result select(@RequestParam(value = "stdMeteId", required = false) Long stdMeteId,
                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                          @RequestParam(value = "meteType", required = false) String meteType,
@@ -168,6 +174,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "分页查询，名称模糊查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据用户传递的参数查询系统测点",logType = 1)
     public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -192,6 +199,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入系统测点",logType = 2)
     public Result batchAdd(@RequestBody List<TStdMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -215,6 +223,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "根据设备类型查询mete")
     @RequestMapping(value = "/selectByDeviceType", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "根据设备类型查询测点",logType = 1)
     public Result selectByDeviceType(@RequestParam(value = "deviceType", required = true) Integer deviceType) {
         Result result = new Result();
         try {
@@ -231,6 +240,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "设备类型树")
     @RequestMapping(value = "/deviceTypeTree", method = RequestMethod.GET)
+    @Logs(title = "查询",content = "设备类型树",logType = 1)
     public Result deviceTypeTree() {
         Result result = new Result();
         try {
@@ -245,6 +255,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @Logs(title = "删除",content = "根据用户传递的参数删除系统测点",logType = 4)
     public Result batchDelete(@RequestParam(value = "stdMeteIds") String stdMeteIds) {
         Result result = new Result();
         try {

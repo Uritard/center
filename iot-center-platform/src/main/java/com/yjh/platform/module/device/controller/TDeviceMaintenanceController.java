@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 @RestController
 @RequestMapping("/tDeviceMaintenance/v1")
-@Api(value = "/tDeviceMaintenance", description = "设备区域检修表操作接口")
+@Api(value = "/tDeviceMaintenance", description = "设备检修区域表操作接口")
 public class TDeviceMaintenanceController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "插入",content = "根据用户传递的参数新增",logType = 2)
+    @Logs(title = "插入",content = "根据用户传递的参数新增设备检修区域",logType = 2)
     public Result add(@RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
@@ -61,7 +61,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除",logType = 4)
+    @Logs(title = "删除",content = "根据用户传递的参数删除设备检修区域",logType = 4)
     public Result delete(@RequestParam(value = "maintenanceId", required = true) Long maintenanceId) {
         Result result = new Result();
         try {
@@ -78,7 +78,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "更新",content = "根据用户传递的参数修改",logType = 3)
+    @Logs(title = "更新",content = "根据用户传递的参数修改设备检修区域",logType = 3)
     public Result update(@RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
@@ -95,7 +95,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询设备检修区域",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "maintenanceId", required = true) Long maintenanceId) {
         Result result = new Result();
         try {
@@ -110,7 +110,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询设备检修区域",logType = 1)
     public Result select(@RequestParam(value = "maintenanceId", required = false) Long maintenanceId,
                             @RequestParam(value = "maintenanceName", required = false) String maintenanceName,
                             @RequestParam(value = "deviceId", required = false) Long deviceId,
@@ -131,7 +131,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询设备检修区域",logType = 1)
     public Result selectByPage(@RequestParam(value = "maintenanceName", required = false) String maintenanceName,
                                @RequestParam(value = "effectiveState", required = false) Integer effectiveState,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -153,7 +153,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入",logType = 2)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入设备检修区域",logType = 2)
     public Result batchAdd(@RequestBody List<TDeviceMaintenance> list) {
         Result result = new Result();
         try {
@@ -167,7 +167,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
-    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除",logType = 4)
+    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除设备检修区域",logType = 4)
     public Result batchDelete(@RequestParam(value = "maintenanceIds") String maintenanceIds) {
     Result result = new Result();
     try {
@@ -184,7 +184,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询设备")
     @RequestMapping(value = "/selectDevice", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询设备",logType = 1)
     public Result selectDevice(@RequestParam(value = "deviceIds", required = true) String deviceIds) {
         Result result = new Result();
         try {
@@ -199,7 +199,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询设备下的巡视点")
     @RequestMapping(value = "/selectInstance", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+    @Logs(title = "查询",content = "根据用户传递的参数查询巡视点",logType = 1)
     public Result selectInstance(@RequestParam(value = "deviceId", required = true)Long deviceId) {
         Result result = new Result();
         try {
