@@ -34,12 +34,12 @@ public class UserContext {
 
         private Long userId;
 
-        private String name;
+        private String userName;
 
         public static OperatorDto build(Long userId, String userName){
             OperatorDto operatorDto = new OperatorDto();
             operatorDto.setUserId(userId);
-            operatorDto.setName(userName);
+            operatorDto.setUserName(userName);
             return operatorDto;
         }
     }

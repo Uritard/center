@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
@@ -368,6 +369,19 @@ public class SysUserService {
                 diGui(childrenList, listTree);
             }
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int insertIntoRedis(){
+        List<SysUser> list = this.sysUserDao.selectUser();
+        for (SysUser item:list) {
+            Map map = new HashMap();
+            map.put("userId",item.getUserId());
+            map.put("userName",item.getUserName());
+            String str = "userInfo:"+item.getUserId();
+            redisTemplate.opsForHash().putAll(str, map);
+        }
+        return 1;
     }
 
     /**

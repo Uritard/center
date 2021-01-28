@@ -200,7 +200,7 @@ public class SM2Utils {
 
         //测试验签2
         String publicKey = "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
-        String signStr = "MEUCIQC5bsYfSkFjD1c0qmLBwBgzNEgXLGYDcR8vdhwTPxNfIgIgYdb2yNaQt3Fc3C0gFbzblKGoLvE6OQ2EvxXX++Df2qs=";
+        String signStr = "MEQCIEOKhqkzH7h+nCCHX2TnwJIT1Keg+JyEH/7HWMlqArt4AiB88/sYlI4t+1iWYfv33LxhyGusOBFXVI5qKB8Hy7Tp5w==";
         String plainText = "12345678123456781234567812345678";
         String userId = "1234567812345678";
 

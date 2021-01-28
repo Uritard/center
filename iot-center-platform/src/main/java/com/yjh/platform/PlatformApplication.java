@@ -2,6 +2,7 @@ package com.yjh.platform;
 
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
 import org.apache.catalina.connector.Connector;
@@ -34,6 +35,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TSysParamService tSysParamService;
     @Autowired
     private TCameraInfoService tCameraInfoService;
+    @Autowired
+    private SysUserService sysUserService;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -45,9 +48,9 @@ public class PlatformApplication  implements CommandLineRunner {
 //        quartzTask.setJobName("PlatformScheduler");
 //        quartzTask.setJobGroup("Platform");
 //        jobManager.addJob(quartzTask);
-//        sss
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
+        sysUserService.insertIntoRedis();
     }
 
     @Bean

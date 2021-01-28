@@ -6,11 +6,14 @@ import com.yjh.logs.common.context.UserContext.OperatorDto;
 import com.yjh.logs.commons.logs.track.HttpTracing;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -21,16 +24,19 @@ import java.util.Objects;
 @Slf4j
 public class UserInfoInterceptor implements HandlerInterceptor, HttpTracing {
 
-    private static final String USER_INFO = "user_info";
+    @Autowired
+    private RedisTemplate redisTemplate;
+    private static final String USER_INFO = "userId";
 
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
         try {
             final String userInfoJson = request.getHeader(USER_INFO);
             if (StringUtils.isNotBlank(userInfoJson)) {
-                OperatorDto operatorDto = JSON.parseObject(userInfoJson, OperatorDto.class);
-                if(Objects.nonNull(operatorDto)){
-                    UserContext.init(operatorDto);
-                }
+                OperatorDto operatorDto = new OperatorDto();
+                Map userInfoMap = redisTemplate.opsForHash().entries("userInfo:"+userInfoJson);
+                operatorDto.setUserId(Long.parseLong(String.valueOf(userInfoMap.get("userId"))));
+                operatorDto.setUserName(String.valueOf(userInfoMap.get("userName")));
+                if(Objects.nonNull(operatorDto)){ UserContext.init(operatorDto); }
             }
         } catch (Exception ex) {
             log.error("[yjh-user-track] [用户信息] ", ex);

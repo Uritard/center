@@ -75,7 +75,7 @@ public class OperateLogDto {
         OperatorDto operatorDto = UserContext.getCurrentUser();
         if(Objects.nonNull(operatorDto)){
             sysOperateLog.setUserId(operatorDto.getUserId());
-            sysOperateLog.setUserName(operatorDto.getName());
+            sysOperateLog.setUserName(operatorDto.getUserName());
         }else {
             sysOperateLog.setUserId(99999999L);
             sysOperateLog.setUserName("SYSTEM");
