@@ -1,10 +1,15 @@
 
 package com.yjh.logs.common.handler;
 
+import com.google.common.collect.Lists;
+import com.yjh.logs.commons.logs.interceptor.HttpLogInterceptor;
+import com.yjh.logs.commons.logs.interceptor.HttpTraceInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
   * @ClassName: MyMvcConfiguration
@@ -14,16 +19,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
   *
   */
 @Configuration
-public class MyMvcConfiguration extends WebMvcConfigurationSupport {
+public class MyMvcConfiguration implements WebMvcConfigurer {
+
+
+    private final HttpLogInterceptor httpLogInterceptor;
+
+    private final HttpTraceInterceptor httpTraceInterceptor;
+
+    public MyMvcConfiguration(HttpLogInterceptor httpLogInterceptor, HttpTraceInterceptor httpTraceInterceptor) {
+        this.httpLogInterceptor = httpLogInterceptor;
+        this.httpTraceInterceptor = httpTraceInterceptor;
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        super.addInterceptors(registry);
-        registry.addInterceptor(new WebLogHandler())
-                //.excludePathPatterns("/configuration/ui/**")
-                .excludePathPatterns("/swagger-resources/**")
-                .excludePathPatterns("/webjars/**")
-                .excludePathPatterns("/swagger-ui.html/**");
+        List<String> swaggerPathList = Lists.newArrayList("/v2/api-docs", "/webjars/**", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html/**");
+        registry.addInterceptor(httpTraceInterceptor).addPathPatterns("/**").excludePathPatterns(swaggerPathList);
+        registry.addInterceptor(httpLogInterceptor).addPathPatterns("/**").excludePathPatterns(swaggerPathList);
     }
     /**
      * 配置静态访问资源
