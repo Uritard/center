@@ -156,6 +156,7 @@ public class SysUserController {
         Result result = new Result();
         try {
             List<SysUser> enUser=new ArrayList<>();
+            userName=Demo.decrypt(userName);
             List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
             for(SysUser list:sysUsers){
                 list.setUserName(Demo.encryption(list.getUserName()));
@@ -200,6 +201,8 @@ public class SysUserController {
         Result result = new Result();
         try {
             List<SysUser> enUser=new ArrayList<>();
+            userName=Demo.decrypt(userName);
+            password=Demo.decrypt(password);
             List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
             for(SysUser lists:list){
                 lists.setUserName(Demo.encryption(lists.getUserName()));
@@ -226,6 +229,8 @@ public class SysUserController {
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+            sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             List<Map<String, String>> enUser=new ArrayList<>();
             List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
             for(Map<String,String> map:list){

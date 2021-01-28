@@ -41,6 +41,8 @@ public class zuulFilter extends ZuulFilter {
         String contentType = request.getContentType();
         if (null == contentType || !contentType.contains("application/json")) {
             String tokenStr = request.getParameter("webcode");
+            String signStr = request.getParameter("signStr");
+            String plainText = request.getParameter("plainText");
             JSONObject jsonModel = new JSONObject(true);
             Map<String, String[]> params = new TreeMap<>(request.getParameterMap());
             for (Map.Entry<String, String[]> param : params.entrySet()) {
@@ -52,6 +54,12 @@ public class zuulFilter extends ZuulFilter {
             if (!token.equals(tokenStr)) {
                 log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的token: " + token);
                 //throw new RuntimeException("参数篡改");
+                ctx.setSendZuulResponse(false);
+                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                return false;
+            }
+            if (!Demo.verify(plainText, signStr)) {
+                log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
                 ctx.setSendZuulResponse(false);
                 ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                 return false;
@@ -77,11 +85,19 @@ public class zuulFilter extends ZuulFilter {
                 e.printStackTrace();
             }
             String token = request.getHeader("webcode") != null ? request.getHeader("webcode") : "";
+            String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
+            String plainText = request.getHeader("plainText") != null ? request.getHeader("plainText") : "";
             log.info("进入参数校验--------------原始token : " + token);
             String buliderString = stringBuilder.toString();
             String tokens = Demo.summary(buliderString);
             log.info("进入参数校验--------------后端解析token : " + tokens);
             if (!tokens.equals(token)) {
+                ctx.setSendZuulResponse(false);
+                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                return false;
+            }
+            if (!Demo.verify(plainText, signStr)) {
+                log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
                 ctx.setSendZuulResponse(false);
                 ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                 return false;

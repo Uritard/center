@@ -16,11 +16,13 @@ import java.math.BigInteger;
 public class Demo {
 
     // 国密规范测试用户ID
-    private static final String userId = "rzx";
+    private static final String userId ="1234567812345678";
+            //"rzx";
     // 国密规范测试私钥
     private static final String prik = "055C74CFB227BD9CDFF242D233096BC6FDBAFB59D001D5EE7F857ADFC6BF1501";
     //国密规范测试公钥
-    private static final String pubk = "04673FC4F3D41C9470E32AABCB5A958E2CE528959F373D0F7AB2B82E65BF4DE8FB67716A269993585451888C8450E92A75A6C34EDFF748097BEAD8E41C2976E8AA";
+    private static final String pubk =  "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
+            //"04673FC4F3D41C9470E32AABCB5A958E2CE528959F373D0F7AB2B82E65BF4DE8FB67716A269993585451888C8450E92A75A6C34EDFF748097BEAD8E41C2976E8AA";
 
 //    public static void main(String[] arg) {
 //        String msg = "123456789";//原始数据
@@ -106,14 +108,15 @@ public class Demo {
      * @return
      */
     public static boolean verify(String summary, String sign) {
-        String pubkS = new String(Base64.encode(Util.hexToByte(pubk)));
-        System.out.println("pubkS: " + pubkS);
-        System.out.println("");
-
-        System.out.println("验签 ");
+//        String pubkS = new String(Base64.encode(Util.hexToByte(pubk)));
+//        System.out.println("pubkS: " + pubkS);
+//        System.out.println("");
+//
+//        System.out.println("验签 ");
         boolean vs = false; //验签结果
         try {
-            vs = SM2Utils.verifySign(userId.getBytes(), Base64.decode(pubkS.getBytes()), Util.hexToByte(summary), Util.hexToByte(sign));
+            vs = SM2Utils.verifySign(userId.getBytes(),  Util.hexToByte(pubk), summary.getBytes(), Base64.decode(sign));
+           // vs = SM2Utils.verifySign(userId.getBytes(), Base64.decode(pubkS.getBytes()), Util.hexToByte(summary), Util.hexToByte(sign));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IOException e) {
