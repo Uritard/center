@@ -160,7 +160,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数批量删除声纹设备",logType = 1)
+    @Logs(title = "删除",content = "根据用户传递的参数批量删除声纹设备",logType = 4)
     public Result batchDelete(@RequestParam(value = "voiceDeviceIds") String voiceDeviceIds) {
     Result result = new Result();
     try {

@@ -4,6 +4,7 @@ import com.yjh.logs.commons.logs.Logs;
 import com.yjh.logs.commons.logs.OperateLogDto;
 import com.yjh.logs.module.log.dao.SysOperateLogDao;
 import com.yjh.logs.module.log.entity.SysOperateLog;
+import com.yjh.logs.module.log.entity.SysOperateLogDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -65,8 +67,42 @@ public class SysOperateLogService {
 
     @Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<SysOperateLog> selectByPage(SysOperateLog sysOperateLog) {
-        List<SysOperateLog> sysOperateLogList = sysOperateLogDao.selectByPage(sysOperateLog);
+    public List<SysOperateLogDetail> selectByPage(String userName,String title,Date startTime,Date endTime) {
+        List<SysOperateLogDetail> sysOperateLogList = sysOperateLogDao.selectByPage(userName,title,startTime,endTime);
+        for (SysOperateLogDetail item:sysOperateLogList) {
+            String type = item.getLogType();
+            if(type != null && !"".equals(type)){
+                if("1".equals(type)){
+                    type = "查询";
+                }
+                if("2".equals(type)){
+                    type = "新增";
+                }
+                if("3".equals(type)){
+                    type = "修改";
+                }
+                if("4".equals(type)){
+                    type = "删除";
+                }
+                if("5".equals(type)){
+                    type = "执行";
+                }
+                item.setLogType(type);
+            }
+            String state = item.getState();
+            if(state != null && !"".equals(state)){
+                if("1".equals(state)){
+                    state = "正常";
+                }
+                if("2".equals(state)){
+                    state = "错误";
+                }
+                if("3".equals(state)){
+                    state = "异常";
+                }
+                item.setState(state);
+            }
+        }
         return sysOperateLogList;
     }
 

@@ -149,7 +149,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数批量插入联合巡视预案属性数据",logType = 2)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入联合巡视预案属性数据",logType = 2)
     public Result batchInsert(@RequestBody List<TUnionTaskAttr> list) {
         Result result = new Result();
         try {

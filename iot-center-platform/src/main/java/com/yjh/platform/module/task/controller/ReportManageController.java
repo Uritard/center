@@ -133,7 +133,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "删除报表")
     @RequestMapping(value = "/reportDelete", method = RequestMethod.DELETE)
-    @Logs(title = "操作",content = "根据用户传递的参数生成报表",logType = 4)
+    @Logs(title = "操作",content = "根据用户传递的参数生成报表",logType = 5)
     public Result reportDelete(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {

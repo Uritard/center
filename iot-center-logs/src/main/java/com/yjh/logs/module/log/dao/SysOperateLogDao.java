@@ -1,11 +1,13 @@
 package com.yjh.logs.module.log.dao;
 
 import com.yjh.logs.module.log.entity.SysOperateLog;
+import com.yjh.logs.module.log.entity.SysOperateLogDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -31,7 +33,10 @@ public interface SysOperateLogDao {
                                @Param(value = "requestPath") String requestPath,
                                @Param(value = "requestMethod") Integer requestMethod,
                                @Param(value = "createTime") Date createTime);
-    List<SysOperateLog> selectByPage(SysOperateLog sysOperateLog);
+    List<SysOperateLogDetail> selectByPage(@Param(value = "userName") String userName,
+                                           @Param(value = "title") String title,
+                                           @Param(value = "startTime") Date startTime,
+                                           @Param(value = "endTime") Date endTime);
 
     int batchInsert(List<SysOperateLog> list);
 }

@@ -150,7 +150,7 @@ public class TCruiseTaskResultDetailController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入任务点状态详细数据",logType = 1)
+    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入任务点状态详细数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseTaskResultDetail> list) {
         Result result = new Result();
         try {

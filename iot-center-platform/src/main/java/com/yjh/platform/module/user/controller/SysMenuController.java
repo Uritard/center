@@ -78,7 +78,7 @@ public class SysMenuController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改菜单数据",logType = 1)
+    @Logs(title = "修改",content = "根据用户传递的参数修改菜单数据",logType = 3)
     public Result update(@RequestBody SysMenu sysMenu) {
         Result result = new Result();
         try {

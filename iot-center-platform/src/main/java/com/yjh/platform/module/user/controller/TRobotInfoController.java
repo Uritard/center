@@ -50,7 +50,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "下载",content = "根据用户传递的参数下载机器人信息",logType = 2)
+    @Logs(title = "新增",content = "根据用户传递的参数新增机器人信息",logType = 2)
     public Result insert(HttpServletRequest request, @RequestBody  TRobotInfo tRobotInfo) {
 
         Result result = new Result();

@@ -7,12 +7,14 @@ import com.yjh.logs.commons.result.BusinessException;
 import com.yjh.logs.commons.result.Result;
 import com.yjh.logs.commons.result.ResultCodeEnum;
 import com.yjh.logs.module.log.entity.SysOperateLog;
+import com.yjh.logs.module.log.entity.SysOperateLogDetail;
 import com.yjh.logs.module.log.service.SysOperateLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -127,15 +129,18 @@ public class SysOperateLogController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody SysOperateLog sysOperateLog,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    public Result selectByPage(@RequestParam(value = "userName", required = false) String userName,
+                               @RequestParam(value = "title", required = false) String title,
+                               @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startTime,
+                               @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date endTime,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
-            List<SysOperateLog> list = sysOperateLogService.selectByPage(sysOperateLog);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            List<SysOperateLogDetail> list = sysOperateLogService.selectByPage(userName,title,startTime,endTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
