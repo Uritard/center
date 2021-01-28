@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotRegionDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotRegion">
+        <id column="region_id" jdbcType="VARCHAR" property="regionId" />
+        <result column="region_name" jdbcType="VARCHAR" property="regionName" />
+        <result column="sort" jdbcType="INTEGER" property="sort" />
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="up_region_id" jdbcType="VARCHAR" property="upRegionId" />
+        <result column="up_region_ids" jdbcType="VARCHAR" property="upRegionIds" />
+        <result column="region_type" jdbcType="INTEGER" property="regionType" />
+        <result column="station_id" jdbcType="VARCHAR" property="stationId" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        region_id, region_name, sort, device_type, up_region_id, up_region_ids, region_type, station_id, state, create_time
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="regionId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotRegion">
+        insert into t_robot_region(
+            region_id,
+            region_name,
+            sort,
+            device_type,
+            up_region_id,
+            up_region_ids,
+            region_type,
+            station_id,
+            state,
+            create_time
+        )values(
+                #{regionId, jdbcType=VARCHAR},
+                #{regionName, jdbcType=VARCHAR},
+                #{sort, jdbcType=INTEGER},
+                #{deviceType, jdbcType=VARCHAR},
+                #{upRegionId, jdbcType=VARCHAR},
+                #{upRegionIds, jdbcType=VARCHAR},
+                #{regionType, jdbcType=INTEGER},
+                #{stationId, jdbcType=VARCHAR},
+                #{state, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_robot_region
+                where region_id = #{regionId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotRegion">
+        update t_robot_region a <set>
+        <if test="regionId != null ">a.region_id = #{regionId},</if>
+        <if test="regionName != null ">a.region_name = #{regionName},</if>
+        <if test="sort != null ">a.sort = #{sort},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType},</if>
+        <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
+        <if test="upRegionIds != null ">a.up_region_ids = #{upRegionIds},</if>
+        <if test="regionType != null ">a.region_type = #{regionType},</if>
+        <if test="stationId != null ">a.station_id = #{stationId},</if>
+        <if test="state != null ">a.state = #{state},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
+    </set>
+            where a.region_id = #{regionId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.TRobotRegion">
+        select
+        a.region_id,
+        a.region_name,
+        a.sort,
+        a.device_type,
+        a.up_region_id,
+        a.up_region_ids,
+        a.region_type,
+        a.station_id,
+        a.state,
+        a.create_time
+        from t_robot_region a
+        where 1 = 1
+            and a.region_id = #{regionId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessrobot.module.command.entity.TRobotRegion" resultType="com.yjh.accessrobot.module.command.entity.TRobotRegion">
+        select
+        a.region_id,
+        a.region_name,
+        a.sort,
+        a.device_type,
+        a.up_region_id,
+        a.up_region_ids,
+        a.region_type,
+        a.station_id,
+        a.state,
+        a.create_time
+        from t_robot_region a
+        where 1 = 1
+        <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=VARCHAR}</if>
+        <if test="regionName != null and regionName != ''"> and a.region_name = #{regionName, jdbcType=VARCHAR}</if>
+        <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>
+        <if test="upRegionIds != null and upRegionIds != ''"> and a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR}</if>
+        <if test="regionType != null "> and a.region_type = #{regionType, jdbcType=INTEGER}</if>
+        <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
+        <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotRegion" resultType="com.yjh.accessrobot.module.command.entity.TRobotRegion">
+        select
+        a.region_id,
+        a.region_name,
+        a.sort,
+        a.device_type,
+        a.up_region_id,
+        a.up_region_ids,
+        a.region_type,
+        a.station_id,
+        a.state,
+        a.create_time
+        from t_robot_region a
+        where 1 = 1
+        <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=VARCHAR}</if>
+        <if test="regionName != null and regionName != ''"> and a.region_name = #{regionName, jdbcType=VARCHAR}</if>
+        <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
+        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>
+        <if test="upRegionIds != null and upRegionIds != ''"> and a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR}</if>
+        <if test="regionType != null "> and a.region_type = #{regionType, jdbcType=INTEGER}</if>
+        <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
+        <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_robot_region(
+            region_id,
+            region_name,
+            sort,
+            device_type,
+            up_region_id,
+            up_region_ids,
+            region_type,
+            station_id,
+            state,
+            create_time
+        )values
+        <foreach collection="list" item="TRobotRegion" separator=",">
+            (
+                #{TRobotRegion.regionId, jdbcType=VARCHAR},
+                #{TRobotRegion.regionName, jdbcType=VARCHAR},
+                #{TRobotRegion.sort, jdbcType=INTEGER},
+                #{TRobotRegion.deviceType, jdbcType=VARCHAR},
+                #{TRobotRegion.upRegionId, jdbcType=VARCHAR},
+                #{TRobotRegion.upRegionIds, jdbcType=VARCHAR},
+                #{TRobotRegion.regionType, jdbcType=INTEGER},
+                #{TRobotRegion.stationId, jdbcType=VARCHAR},
+                #{TRobotRegion.state, jdbcType=INTEGER},
+                #{TRobotRegion.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

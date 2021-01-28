@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
-* @author YC
-* @since 2020-11-19
-*/
+ * @author YC
+ * @since 2020-11-19
+ */
 @Service
 public class TRobotInspectionService {
 
@@ -49,8 +49,12 @@ public class TRobotInspectionService {
 
     @Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInspection> select(Long inspectionId,String inspectionCode,Long robotId, String inspectionName, Integer inspectionType, String alarmTop, String alarmBottom, String defaultValue, Integer inspectionPosition, Integer collectStatus, Integer calibrationStatus, String unit) {
-        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode,robotId, inspectionName, inspectionType, alarmTop, alarmBottom, defaultValue, inspectionPosition, collectStatus, calibrationStatus, unit);
+    public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName,
+                                         String componentId,String meterType,String appearanceType,String saveTypeList,
+                                         String recognitionTypeList,String phase,String deviceInfo) {
+        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName,
+                componentId,meterType,appearanceType,saveTypeList,
+                recognitionTypeList,phase,deviceInfo);
         return tRobotInspectionList;
     }
 

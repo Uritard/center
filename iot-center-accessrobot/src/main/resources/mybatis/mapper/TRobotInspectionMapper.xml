@@ -23,12 +23,6 @@
             robot_id,
             inspection_name,
             component_id,
-            component_name,
-            bay_id,
-            bay_name,
-            main_device_id,
-            main_device_name,
-            device_type,
             meter_type,
             appearance_type,
             save_type_list,
@@ -41,12 +35,6 @@
                 #{robotId, jdbcType=BIGINT},
                 #{inspectionName, jdbcType=VARCHAR},
                 #{componentId, jdbcType=VARCHAR},
-                #{componentName, jdbcType=VARCHAR},
-                #{bayId, jdbcType=VARCHAR},
-                #{bayName, jdbcType=VARCHAR},
-                #{mainDeviceId, jdbcType=VARCHAR},
-                #{mainDeviceName, jdbcType=VARCHAR},
-                #{deviceType, jdbcType=VARCHAR},
                 #{meterType, jdbcType=VARCHAR},
                 #{appearanceType, jdbcType=VARCHAR},
                 #{saveTypeList, jdbcType=VARCHAR},
@@ -67,12 +55,6 @@
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
         <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=INTEGER},</if>
-        <if test="componentName != null and componentName != ''">a.component_name = #{componentName, jdbcType=VARCHAR},</if>
-        <if test="bayId != null and bayId != ''">a.bay_id = #{bayId, jdbcType=VARCHAR},</if>
-        <if test="bayName != null and bayName != ''">a.bay_name = #{bayName, jdbcType=VARCHAR},</if>
-        <if test="mainDeviceId != null and mainDeviceId != ''">a.main_device_id = #{mainDeviceId, jdbcType=VARCHAR},</if>
-        <if test="mainDeviceName != null and mainDeviceName != ''">a.main_device_name = #{mainDeviceName, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
         <if test="meterType != null and meterType != ''">a.meter_type = #{meterType, jdbcType=VARCHAR},</if>
         <if test="appearanceType != null and appearanceType != ''">a.appearance_type = #{appearanceType, jdbcType=VARCHAR},</if>
         <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
@@ -81,23 +63,22 @@
         <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>
 
     </set>
-            where a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}
+        where a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
         select
-        a.inspection_id,
-        a.inspection_code,
-        a.robot_id,
-        a.inspection_name,
-        a.inspection_type,
-        a.alarm_top,
-        a.alarm_bottom,
-        a.default_value,
-        a.inspection_position,
-        a.collect_status,
-        a.calibration_status,
-        a.unit
+            a.inspection_id,
+            a.inspection_code,
+            a.robot_id,
+            a.inspection_name,
+            a.component_id,
+            a.meter_type,
+            a.appearance_type,
+            a.save_type_list,
+            a.recognition_type_list,
+            a.phase,
+            a.device_info
         from t_robot_inspection a
         where 1 = 1
             and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
@@ -110,28 +91,26 @@
         a.inspection_code,
         a.robot_id,
         a.inspection_name,
-        a.inspection_type,
-        a.alarm_top,
-        a.alarm_bottom,
-        a.default_value,
-        a.inspection_position,
-        a.collect_status,
-        a.calibration_status,
-        a.unit
+        a.component_id,
+        a.meter_type,
+        a.appearance_type,
+        a.save_type_list,
+        a.recognition_type_list,
+        a.phase,
+        a.device_info
         from t_robot_inspection a
         where 1 = 1
         <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="inspectionType != null and inspectionType != ''"> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
-        <if test="alarmTop != null and alarmTop != ''"> and a.alarm_top = #{alarmTop, jdbcType=VARCHAR}</if>
-        <if test="alarmBottom != null and alarmBottom != ''"> and a.alarm_bottom = #{alarmBottom, jdbcType=VARCHAR}</if>
-        <if test="defaultValue != null and defaultValue != ''"> and a.default_value = #{defaultValue, jdbcType=VARCHAR}</if>
-        <if test="inspectionPosition != null and inspectionPosition != ''"> and a.inspection_position = #{inspectionPosition, jdbcType=INTEGER}</if>
-        <if test="collectStatus != null and collectStatus != ''"> and a.collect_status = #{collectStatus, jdbcType=INTEGER}</if>
-        <if test="calibrationStatus != null and calibrationStatus != ''"> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
-        <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=INTEGER},</if>
+        <if test="meterType != null and meterType != ''">a.meter_type = #{meterType, jdbcType=VARCHAR},</if>
+        <if test="appearanceType != null and appearanceType != ''">a.appearance_type = #{appearanceType, jdbcType=VARCHAR},</if>
+        <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
+        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
+        <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
+        <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
@@ -167,9 +146,9 @@
     <!--机器人测点表中现有的点-->
     <select id="selectAllByRobotId" resultType="java.lang.String">
         SELECT
-            a.inspection_code
+        a.inspection_code
         FROM
-            t_robot_inspection a
+        t_robot_inspection a
         WHERE 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
@@ -233,37 +212,25 @@
     <!--批量插入机器人测点表数据-->
     <insert id="batchInsertTRobotInspection">
         insert into t_robot_inspection(
-            inspection_id,
-            inspection_code,
-            robot_id,
-            inspection_name,
-            component_id,
-            component_name,
-            bay_id,
-            bay_name,
-            main_device_id,
-            main_device_name,
-            device_type,
-            meter_type,
-            appearance_type,
-            save_type_list,
-            recognition_type_list,
-            phase,
-            device_info
+        inspection_id,
+        inspection_code,
+        robot_id,
+        inspection_name,
+        component_id,
+        meter_type,
+        appearance_type,
+        save_type_list,
+        recognition_type_list,
+        phase,
+        device_info
         )values
         <foreach collection="list" item="TRobotInspection" separator=",">
             (
-                #{TRobotInspection.inspectionId, jdbcType=BIGINT},
-                #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
-                #{TRobotInspection.robotId, jdbcType=BIGINT},
-                #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
+            #{TRobotInspection.inspectionId, jdbcType=BIGINT},
+            #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
+            #{TRobotInspection.robotId, jdbcType=BIGINT},
+            #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
             #{TRobotInspection.componentId, jdbcType=VARCHAR},
-            #{TRobotInspection.componentName, jdbcType=VARCHAR},
-            #{TRobotInspection.bayId, jdbcType=VARCHAR},
-            #{TRobotInspection.bayName, jdbcType=VARCHAR},
-            #{TRobotInspection.mainDeviceId, jdbcType=VARCHAR},
-            #{TRobotInspection.mainDeviceName, jdbcType=VARCHAR},
-            #{TRobotInspection.deviceType, jdbcType=VARCHAR},
             #{TRobotInspection.meterType, jdbcType=VARCHAR},
             #{TRobotInspection.appearanceType, jdbcType=VARCHAR},
             #{TRobotInspection.saveTypeList, jdbcType=VARCHAR},

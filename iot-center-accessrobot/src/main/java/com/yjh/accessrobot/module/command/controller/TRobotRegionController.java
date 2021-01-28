@@ -5,8 +5,8 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
-import com.yjh.accessrobot.module.command.entity.TRobotInspection;
-import com.yjh.accessrobot.module.command.service.TRobotInspectionService;
+import com.yjh.accessrobot.module.command.entity.TRobotRegion;
+import com.yjh.accessrobot.module.command.service.TRobotRegionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,28 +22,28 @@ import java.util.Map;
 
 /**
  * @author YC
- * @since 2020-11-19
+ * @since 2021-01-28
  */
 @RestController
-@RequestMapping("/t-robot-inspection/v1")
-@Api(value = "/t-robot-inspection", description = "机器人巡检点信息表操作接口")
-public class TRobotInspectionController {
+@RequestMapping("/t-robot-region/v1")
+@Api(value = "/t-robot-region", description = "机器人区域层级表操作接口")
+public class TRobotRegionController {
 
     @Autowired
-    private final TRobotInspectionService tRobotInspectionService;
+    private final TRobotRegionService tRobotRegionService;
 
-    private Logger log = LoggerFactory.getLogger(TRobotInspectionController.class);
+    private Logger log = LoggerFactory.getLogger(TRobotRegionController.class);
 
-    public TRobotInspectionController(TRobotInspectionService tRobotInspectionService) {
-        this.tRobotInspectionService = tRobotInspectionService;
+    public TRobotRegionController(TRobotRegionService tRobotRegionService) {
+        this.tRobotRegionService = tRobotRegionService;
     }
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TRobotInspection tRobotInspection) {
+    public Result insert(@RequestBody TRobotRegion tRobotRegion) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.insert(tRobotInspection));
+            result.setData(tRobotRegionService.insert(tRobotRegion));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -54,10 +55,10 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "inspectionId", required = true) Long inspectionId) {
+    public Result delete(@RequestParam(value = "regionId", required = true) String regionId) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.deleteByPrimaryId(inspectionId));
+            result.setData(tRobotRegionService.deleteByPrimaryId(regionId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -70,10 +71,10 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TRobotInspection tRobotInspection) {
+    public Result update(@RequestBody TRobotRegion tRobotRegion) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.update(tRobotInspection));
+            result.setData(tRobotRegionService.update(tRobotRegion));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
@@ -86,11 +87,11 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "inspectionId", required = true) Long inspectionId) {
+    public Result selectByPrimaryId(@RequestParam(value = "regionId", required = true) String regionId) {
         Result result = new Result();
         try {
-            TRobotInspection tRobotInspection = tRobotInspectionService.selectByPrimaryId(inspectionId);
-            result.setData(tRobotInspection);
+            TRobotRegion tRobotRegion = tRobotRegionService.selectByPrimaryId(regionId);
+            result.setData(tRobotRegion);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -100,40 +101,37 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    public Result select(@RequestParam(value = "inspectionId", required = false) Long inspectionId,
-                         @RequestParam(value = "inspectionCode", required = false)String inspectionCode,
-                         @RequestParam(value = "robotId", required = false) Long robotId,
-                         @RequestParam(value = "inspectionName", required = false) String inspectionName,
-                         @RequestParam(value = "componentId", required = false) String componentId,
-                         @RequestParam(value = "meterType", required = false) String meterType,
-                         @RequestParam(value = "appearanceType", required = false) String appearanceType,
-                         @RequestParam(value = "saveTypeList", required = false) String saveTypeList,
-                         @RequestParam(value = "recognitionTypeList", required = false) String recognitionTypeList,
-                         @RequestParam(value = "phase", required = false) String phase,
-                         @RequestParam(value = "deviceInfo", required = false) String deviceInfo) {
+    public Result select(@RequestParam(value = "regionId", required = false) String regionId,
+                         @RequestParam(value = "regionName", required = false) String regionName,
+                         @RequestParam(value = "sort", required = false) Integer sort,
+                         @RequestParam(value = "deviceType", required = false) String deviceType,
+                         @RequestParam(value = "upRegionId", required = false) String upRegionId,
+                         @RequestParam(value = "upRegionIds", required = false) String upRegionIds,
+                         @RequestParam(value = "regionType", required = false) Integer regionType,
+                         @RequestParam(value = "stationId", required = false) String stationId,
+                         @RequestParam(value = "state", required = false) Integer state,
+                         @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName,
-                    componentId,meterType,appearanceType,saveTypeList,
-                    recognitionTypeList,phase,deviceInfo);
+            List<TRobotRegion> list = tRobotRegionService.select(regionId, regionName, sort, deviceType, upRegionId, upRegionIds, regionType, stationId, state, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("机器人巡检点查询失败描述：", e);
+            log.error("失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TRobotInspection tRobotInspection,
+    public Result selectByPage(@RequestBody TRobotRegion tRobotRegion,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TRobotInspection> list = tRobotInspectionService.selectByPage(tRobotInspection);
+            Page page = PageHelper.startPage(pageNum, pageSize);
+            List<TRobotRegion> list = tRobotRegionService.selectByPage(tRobotRegion);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -146,13 +144,13 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<TRobotInspection> list) {
+    public Result batchInsert(@RequestBody List<TRobotRegion> list) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.batchInsert(list));
+        result.setData(tRobotRegionService.batchInsert(list));
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量插入失败：" + e);
+        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        log.error("批量插入失败：" + e);
         }
         return result;
     }

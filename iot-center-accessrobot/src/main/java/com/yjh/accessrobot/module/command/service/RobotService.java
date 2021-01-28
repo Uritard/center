@@ -15,13 +15,13 @@ import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -181,6 +181,11 @@ public class RobotService {
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus());
         //机器人状态改变给前端推送webSocket
+        /*Map<String,Object> jasonMap=new HashMap<>();
+        jasonMap.put("type","robotStatus");
+        jasonMap.put("status",tRobotInfo.getRobotStatus());
+        String json= JSON.toJSONString(jasonMap);
+        WebSocketServer.sendMsg(json);*/
         return res;
     }
 
@@ -193,7 +198,7 @@ public class RobotService {
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
         log.info("图片路径为：" + picPath);
         /*
-         * 将ftp图copy到40环境
+         * 将ftp图copy到开发环境
          * */
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
@@ -223,6 +228,8 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
+//                .setRobotFactory("")
+//                .setRobotType();
         log.info("获得的tRobotInfo是：" + tRobotInfo);
 
         //更新机器人地图信息
@@ -233,7 +240,24 @@ public class RobotService {
             TRobotInspection tRobotInspection = new TRobotInspection()
                     .setInspectionCode(deviceMap.get("device_id").toString())
                     .setRobotId(robotId)
-                    .setInspectionName(deviceMap.get("device_name").toString());
+                    .setInspectionName(deviceMap.get("device_name").toString())
+                    .setSaveTypeList(deviceMap.get("save_type_list").toString())
+                    .setRecognitionTypeList(deviceMap.get("recognition_type_list").toString());
+            /*if (!"".equals(deviceMap.get("component_id").toString())){
+                tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
+            }
+            if (!"".equals(deviceMap.get("meter_type").toString())){
+                tRobotInspection.setMeterType(deviceMap.get("meter_type").toString());
+            }
+            if (!"".equals(deviceMap.get("appearance_type").toString())){
+                tRobotInspection.setAppearanceType(deviceMap.get("appearance_type").toString());
+            }
+            if (!"".equals(deviceMap.get("phase").toString())){
+                tRobotInspection.setPhase(deviceMap.get("phase").toString());
+            }
+            if (!"".equals(deviceMap.get("device_info").toString())){
+                tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
+            }*/
             deviceList.add(tRobotInspection);
         }
         log.info("获得的deviceList是：" + deviceList);
@@ -316,7 +340,7 @@ public class RobotService {
                     .setItems(ItemList);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的机器人下发检修区域指令xml是<start>" + xmlString + "<end>");
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         }
 
         String code = Constant.robotResultMap.get("Code");

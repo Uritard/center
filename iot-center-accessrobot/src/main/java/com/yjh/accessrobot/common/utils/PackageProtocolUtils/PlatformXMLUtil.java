@@ -2,8 +2,10 @@ package com.yjh.accessrobot.common.utils.PackageProtocolUtils;
 
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.*;
-import org.dom4j.tree.DefaultAttribute;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -23,49 +25,67 @@ public class PlatformXMLUtil {
 //            doc = DocumentHelper.parseText(xml); // 将字符串转为XML
             Element rootElt = doc.getRootElement(); // 获取根节点
             List<Element> list = rootElt.elements();// 获取根节点下所有节点
-            for (Element element : list) { // 遍历节点
-                if (element.getName().equals("SendCode")) {
-                    xmlBaseModel.setSendCode(element.getText());
-                }
-                if (element.getName().equals("ReceiveCode")) {
-                    xmlBaseModel.setReceiveCode(element.getText());
-                }
-                if (element.getName().equals("Code")) {
-                    xmlBaseModel.setCode(element.getText());
-                }
-                if (element.getName().equals("Type")) {
-                    xmlBaseModel.setType(element.getText());
-                }
-                if (element.getName().equals("Command")) {
-                    xmlBaseModel.setCommand(element.getText());
-                }
-                if (element.getName().equals("Time")) {
-                    xmlBaseModel.setTime(element.getText());
-                }
-                if(element.getName().equals("Items")){
-                    List<Element> items = element.elements();
-                    if (items.size()!= 0){
-                        for(Element item : items){
-                            List<Attribute> attributes = item.attributes();
-                            Map<String, Object> map = new HashMap<String, Object>();
-                            for(Attribute defaultAttribute : attributes){
-                                map.put(defaultAttribute.getName(),defaultAttribute.getValue());// 节点的属性name为map的key，value为map的value
-                            }
-                            itemsList.add(map);
-                        }
-                    }else {
+
+            if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model")) {
+                for (Element element : list) {
+                    if (element.getName().equals("Item")) {
                         Map<String, Object> map = new HashMap<String, Object>();
-                        if (element.attribute("value")!=null){
-                            map.put(element.attribute("value").getName(),element.attribute("value").getValue());
+                        List<Attribute> attributeList = element.attributes();
+                        for (Attribute attribute : attributeList) {
+                            map.put(attribute.getName(), attribute.getValue());
                         }
-                        if (element.attribute("direction")!=null){
-                            map.put(element.attribute("direction").getName(),element.attribute("direction").getValue());
-                        }
-                        if (!map.isEmpty()){
+                        if (!map.isEmpty()) {
                             itemsList.add(map);
                         }
+                        xmlBaseModel.setItems(itemsList);
                     }
-                    xmlBaseModel.setItems(itemsList);
+                }
+                xmlBaseModel.setItems(itemsList);
+            } else if (rootElt.getName().equals("Robot")) {
+                for (Element element : list) { // 遍历节点
+                    if (element.getName().equals("SendCode")) {
+                        xmlBaseModel.setSendCode(element.getText());
+                    }
+                    if (element.getName().equals("ReceiveCode")) {
+                        xmlBaseModel.setReceiveCode(element.getText());
+                    }
+                    if (element.getName().equals("Code")) {
+                        xmlBaseModel.setCode(element.getText());
+                    }
+                    if (element.getName().equals("Type")) {
+                        xmlBaseModel.setType(element.getText());
+                    }
+                    if (element.getName().equals("Command")) {
+                        xmlBaseModel.setCommand(element.getText());
+                    }
+                    if (element.getName().equals("Time")) {
+                        xmlBaseModel.setTime(element.getText());
+                    }
+                    if (element.getName().equals("Items")) {
+                        List<Element> items = element.elements();
+                        if (items.size() != 0) {
+                            for (Element item : items) {
+                                List<Attribute> attributes = item.attributes();
+                                Map<String, Object> map = new HashMap<String, Object>();
+                                for (Attribute defaultAttribute : attributes) {
+                                    map.put(defaultAttribute.getName(), defaultAttribute.getValue());// 节点的属性name为map的key，value为map的value
+                                }
+                                itemsList.add(map);
+                            }
+                        } else {
+                            Map<String, Object> map = new HashMap<String, Object>();
+                            if (element.attribute("value") != null) {
+                                map.put(element.attribute("value").getName(), element.attribute("value").getValue());
+                            }
+                            if (element.attribute("direction") != null) {
+                                map.put(element.attribute("direction").getName(), element.attribute("direction").getValue());
+                            }
+                            if (!map.isEmpty()) {
+                                itemsList.add(map);
+                            }
+                        }
+                        xmlBaseModel.setItems(itemsList);
+                    }
                 }
             }
         }  catch (Exception e) {

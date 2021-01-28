@@ -114,12 +114,6 @@ public class TRobotInspectionController {
                          @RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "inspectionName", required = false) String inspectionName,
                          @RequestParam(value = "componentId", required = false) String componentId,
-                         @RequestParam(value = "componentName", required = false) String componentName,
-                         @RequestParam(value = "bayId", required = false) String bayId,
-                         @RequestParam(value = "bayName", required = false) String bayName,
-                         @RequestParam(value = "mainDeviceId", required = false) String mainDeviceId,
-                         @RequestParam(value = "mainDeviceName", required = false) String mainDeviceName,
-                         @RequestParam(value = "deviceType", required = false) String deviceType,
                          @RequestParam(value = "meterType", required = false) String meterType,
                          @RequestParam(value = "appearanceType", required = false) String appearanceType,
                          @RequestParam(value = "saveTypeList", required = false) String saveTypeList,
@@ -129,7 +123,7 @@ public class TRobotInspectionController {
         Result result = new Result();
         try {
             List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName,
-                    componentId,componentName,bayId,bayName,mainDeviceId,mainDeviceName,deviceType,meterType,appearanceType,saveTypeList,
+                    componentId,meterType,appearanceType,saveTypeList,
                     recognitionTypeList,phase,deviceInfo);
             result.setData(list);
         } catch (Exception e) {
@@ -143,8 +137,8 @@ public class TRobotInspectionController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询",content = "根据用户传递的参数分页查询机器人巡检点信息",logType = 1)
     public Result selectByPage(@RequestBody TRobotInspection tRobotInspection,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -166,10 +160,10 @@ public class TRobotInspectionController {
     public Result batchAdd(@RequestBody List<TRobotInspection> list) {
         Result result = new Result();
         try {
-        result.setData(tRobotInspectionService.batchInsert(list));
+            result.setData(tRobotInspectionService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("机器人巡检点批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人巡检点批量插入失败：" + e);
         }
         return result;
     }

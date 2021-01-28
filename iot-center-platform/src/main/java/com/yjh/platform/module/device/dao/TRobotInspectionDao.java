@@ -25,12 +25,6 @@ public interface TRobotInspectionDao {
                                   @Param(value = "robotId") Long robotId,
                                   @Param(value = "inspectionName") String inspectionName,
                                   @Param(value = "componentId") String componentId,
-                                  @Param(value = "componentName") String componentName,
-                                  @Param(value = "bayId") String bayId,
-                                  @Param(value = "bayName") String bayName,
-                                  @Param(value = "mainDeviceId") String mainDeviceId,
-                                  @Param(value = "mainDeviceName") String mainDeviceName,
-                                  @Param(value = "deviceType") String deviceType,
                                   @Param(value = "meterType") String meterType,
                                   @Param(value = "appearanceType") String appearanceType,
                                   @Param(value = "saveTypeList") String saveTypeList,
@@ -42,7 +36,7 @@ public interface TRobotInspectionDao {
     int batchInsert(List<TRobotInspection> list);
     List<String> selectForRobotTask(@Param(value = "list") List<Long> list);
     List<Long> selectRobotTaskInstanceId(@Param(value = "list") List<Long> list,
-                                       @Param(value = "robotCode") String robotCode);
+                                         @Param(value = "robotCode") String robotCode);
     List<TCruisePointAttr> selectRobotTaskMessage(@Param(value = "list") String[] list);
 
     List<Robot> selectRobotInfo();

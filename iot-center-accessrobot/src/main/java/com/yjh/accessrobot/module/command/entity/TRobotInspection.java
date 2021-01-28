@@ -43,18 +43,6 @@ public class TRobotInspection implements Serializable {
 
     @ApiModelProperty(value = "部件ID")
     private String componentId;
-    @ApiModelProperty(value = "部件名称")
-    private String componentName;
-    @ApiModelProperty(value = "间隔id")
-    private String bayId;
-    @ApiModelProperty(value = "间隔名称")
-    private String bayName;
-    @ApiModelProperty(value = "主设备id")
-    private String mainDeviceId;
-    @ApiModelProperty(value = "主设备名称")
-    private String mainDeviceName;
-    @ApiModelProperty(value = "主设备类型")
-    private String deviceType;
     @ApiModelProperty(value = "表计类型")
     private String meterType;
     @ApiModelProperty(value = "外观类型")

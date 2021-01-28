@@ -1,7 +1,6 @@
 package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Robot;
@@ -23,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* @author tt
-* @since 2020-08-08
-*/
+ * @author tt
+ * @since 2020-08-08
+ */
 @Service
 public class TRobotInspectionService{
 
@@ -64,11 +63,10 @@ public class TRobotInspectionService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName,
-                                         String componentId,String componentName,String bayId,String bayName,String mainDeviceId,
-                                         String mainDeviceName,String deviceType,String meterType,String appearanceType,String saveTypeList,
+                                         String componentId,String meterType,String appearanceType,String saveTypeList,
                                          String recognitionTypeList,String phase,String deviceInfo) {
         List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName,
-                componentId,componentName,bayId,bayName,mainDeviceId,mainDeviceName,deviceType,meterType,appearanceType,saveTypeList,
+                componentId,meterType,appearanceType,saveTypeList,
                 recognitionTypeList,phase,deviceInfo);
         return tRobotInspectionList;
     }

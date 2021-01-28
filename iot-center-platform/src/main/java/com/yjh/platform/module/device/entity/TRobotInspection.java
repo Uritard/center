@@ -29,12 +29,12 @@ public class TRobotInspection implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "设备检测点编码")
     @TableId(value = "inspection_id", type = IdType.AUTO)
-     @TableField(value = "inspection_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "inspection_id",updateStrategy = FieldStrategy.IGNORED)
     private Long inspectionId;
 
     @Length(max = 68,message = "inspectionCode长度必须小于等于68")
     @ApiModelProperty(value = "机器人检测点编码")
-     @TableField(value = "inspection_code",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "inspection_code",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionCode;
 
     @Max(value=999999999999999999l)
@@ -44,23 +44,11 @@ public class TRobotInspection implements Serializable {
 
     @Length(max = 60,message = "inspectionName长度必须小于等于60")
     @ApiModelProperty(value = "测点名称")
-      @TableField(value = "inspection_name",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "inspection_name",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionName;
 
     @ApiModelProperty(value = "部件ID")
     private String componentId;
-    @ApiModelProperty(value = "部件名称")
-    private String componentName;
-    @ApiModelProperty(value = "间隔id")
-    private String bayId;
-    @ApiModelProperty(value = "间隔名称")
-    private String bayName;
-    @ApiModelProperty(value = "主设备id")
-    private String mainDeviceId;
-    @ApiModelProperty(value = "主设备名称")
-    private String mainDeviceName;
-    @ApiModelProperty(value = "主设备类型")
-    private String deviceType;
     @ApiModelProperty(value = "表计类型")
     private String meterType;
     @ApiModelProperty(value = "外观类型")
