@@ -32,8 +32,6 @@ public class DiagnoseResultDetail extends ChanResult {
     private String devBrand;
     @ApiModelProperty(value = "区域-region")
     private String regionName;
-    @ApiModelProperty(value = "诊断状态")
-    private String status;
     @ApiModelProperty(value = "分辨率")
     private String resolving;
 

@@ -124,7 +124,8 @@ public class PlansController {
     public Result test(@RequestParam String time) {
         Result result = new Result();
         try {
-            result.setData("---");
+            String str="视频丢失,视频抖动,";
+            result.setData(str.substring(0,str.length()-1));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("任务下发失败" + e);

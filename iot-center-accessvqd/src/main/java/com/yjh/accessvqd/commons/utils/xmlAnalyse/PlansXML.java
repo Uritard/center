@@ -49,9 +49,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime1(start.getText());
+                                plans.setStartTime2(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime1(end.getText());
+                                plans.setEndTime2(end.getText());
                             }
 
                         }
@@ -60,9 +60,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime1(start.getText());
+                                plans.setStartTime3(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime1(end.getText());
+                                plans.setEndTime3(end.getText());
                             }
 
                         }
@@ -71,9 +71,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime1(start.getText());
+                                plans.setStartTime4(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime1(end.getText());
+                                plans.setEndTime4(end.getText());
                             }
 
                         }
@@ -82,9 +82,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime1(start.getText());
+                                plans.setStartTime5(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime1(end.getText());
+                                plans.setEndTime5(end.getText());
                             }
 
                         }
@@ -93,9 +93,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime1(start.getText());
+                                plans.setStartTime6(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime1(end.getText());
+                                plans.setEndTime6(end.getText());
                             }
 
                         }
@@ -104,9 +104,9 @@ public class PlansXML {
                             Element time=diagnoseTime.element("Time");
                             if(Objects.nonNull(time)) {
                                 Element start = time.element("StartTime");
-                                plans.setStartTime1(start.getText());
+                                plans.setStartTime7(start.getText());
                                 Element end = time.element("EndTime");
-                                plans.setEndTime1(end.getText());
+                                plans.setEndTime7(end.getText());
                             }
 
                         }
@@ -200,9 +200,9 @@ public class PlansXML {
                         Element time=diagnoseTime.element("Time");
                         if(Objects.nonNull(time)) {
                             Element start = time.element("StartTime");
-                            plans.setStartTime1(start.getText());
+                            plans.setStartTime2(start.getText());
                             Element end = time.element("EndTime");
-                            plans.setEndTime1(end.getText());
+                            plans.setEndTime2(end.getText());
                         }
 
                     }
@@ -211,9 +211,9 @@ public class PlansXML {
                         Element time=diagnoseTime.element("Time");
                         if(Objects.nonNull(time)) {
                             Element start = time.element("StartTime");
-                            plans.setStartTime1(start.getText());
+                            plans.setStartTime3(start.getText());
                             Element end = time.element("EndTime");
-                            plans.setEndTime1(end.getText());
+                            plans.setEndTime3(end.getText());
                         }
 
                     }
@@ -222,9 +222,9 @@ public class PlansXML {
                         Element time=diagnoseTime.element("Time");
                         if(Objects.nonNull(time)) {
                             Element start = time.element("StartTime");
-                            plans.setStartTime1(start.getText());
+                            plans.setStartTime4(start.getText());
                             Element end = time.element("EndTime");
-                            plans.setEndTime1(end.getText());
+                            plans.setEndTime4(end.getText());
                         }
 
                     }
@@ -233,9 +233,9 @@ public class PlansXML {
                         Element time=diagnoseTime.element("Time");
                         if(Objects.nonNull(time)) {
                             Element start = time.element("StartTime");
-                            plans.setStartTime1(start.getText());
+                            plans.setStartTime5(start.getText());
                             Element end = time.element("EndTime");
-                            plans.setEndTime1(end.getText());
+                            plans.setEndTime5(end.getText());
                         }
 
                     }
@@ -244,9 +244,9 @@ public class PlansXML {
                         Element time=diagnoseTime.element("Time");
                         if(Objects.nonNull(time)) {
                             Element start = time.element("StartTime");
-                            plans.setStartTime1(start.getText());
+                            plans.setStartTime6(start.getText());
                             Element end = time.element("EndTime");
-                            plans.setEndTime1(end.getText());
+                            plans.setEndTime6(end.getText());
                         }
 
                     }
@@ -255,9 +255,9 @@ public class PlansXML {
                         Element time=diagnoseTime.element("Time");
                         if(Objects.nonNull(time)) {
                             Element start = time.element("StartTime");
-                            plans.setStartTime1(start.getText());
+                            plans.setStartTime7(start.getText());
                             Element end = time.element("EndTime");
-                            plans.setEndTime1(end.getText());
+                            plans.setEndTime7(end.getText());
                         }
 
                     }

@@ -53,7 +53,8 @@ public interface ChanResultDao {
                                                           @Param(value = "channelName")String channelName,
                                                           @Param(value = "startTime")Date startTime,
                                                           @Param(value = "endTime")Date endTime,
-                                                          @Param(value = "diagnosePlanId")String diagnosePlanId);
+                                                          @Param(value = "diagnosePlanId")String diagnosePlanId,
+                                                          @Param(value = "status")String status);
     //不同故障类型点数量统计
     Map<String,Long>faultTypeSta(@Param(value = "planName")String planName,
                                  @Param(value = "channelName")String channelName);

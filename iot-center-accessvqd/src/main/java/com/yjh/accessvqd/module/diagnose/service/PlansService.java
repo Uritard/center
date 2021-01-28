@@ -101,18 +101,54 @@ public class PlansService {
                         List<String> weeks = new ArrayList<>();
                         if (Objects.nonNull(cyclePlan.getStartTime1()))
                             weeks.add("mon");
-                        if (Objects.nonNull(cyclePlan.getStartTime2()))
+                        if (Objects.nonNull(cyclePlan.getStartTime2())){
                             weeks.add("tues");
-                        if (Objects.nonNull(cyclePlan.getStartTime3()))
+                            cyclePlan.setStartTime1(cyclePlan.getStartTime2());
+                            cyclePlan.setEndTime1(cyclePlan.getEndTime2());
+                            cyclePlan.setStartTime2(null);
+                            cyclePlan.setEndTime2(null);
+                        }
+
+                        if (Objects.nonNull(cyclePlan.getStartTime3())){
                             weeks.add("wed");
-                        if (Objects.nonNull(cyclePlan.getStartTime4()))
+                            cyclePlan.setStartTime1(cyclePlan.getStartTime3());
+                            cyclePlan.setEndTime1(cyclePlan.getEndTime3());
+                            cyclePlan.setStartTime3(null);
+                            cyclePlan.setEndTime3(null);
+                        }
+
+                        if (Objects.nonNull(cyclePlan.getStartTime4())){
                             weeks.add("thur");
-                        if (Objects.nonNull(cyclePlan.getStartTime5()))
+                            cyclePlan.setStartTime1(cyclePlan.getStartTime4());
+                            cyclePlan.setEndTime1(cyclePlan.getEndTime4());
+                            cyclePlan.setStartTime4(null);
+                            cyclePlan.setEndTime4(null);
+                        }
+
+                        if (Objects.nonNull(cyclePlan.getStartTime5())){
                             weeks.add("fri");
-                        if (Objects.nonNull(cyclePlan.getStartTime6()))
+                            cyclePlan.setStartTime1(cyclePlan.getStartTime5());
+                            cyclePlan.setEndTime1(cyclePlan.getEndTime5());
+                            cyclePlan.setStartTime5(null);
+                            cyclePlan.setEndTime5(null);
+                        }
+
+                        if (Objects.nonNull(cyclePlan.getStartTime6())){
                             weeks.add("sat");
-                        if (Objects.nonNull(cyclePlan.getStartTime7()))
+                            cyclePlan.setStartTime1(cyclePlan.getStartTime6());
+                            cyclePlan.setEndTime1(cyclePlan.getEndTime6());
+                            cyclePlan.setStartTime6(null);
+                            cyclePlan.setEndTime6(null);
+                        }
+
+                        if (Objects.nonNull(cyclePlan.getStartTime7())){
                             weeks.add("sun");
+                            cyclePlan.setStartTime1(cyclePlan.getStartTime7());
+                            cyclePlan.setEndTime1(cyclePlan.getEndTime7());
+                            cyclePlan.setStartTime7(null);
+                            cyclePlan.setEndTime7(null);
+                        }
+
                         cyclePlan.setWeeks(weeks);
                         finalResults.add(cyclePlan);//周期任务完整信息放入结果集
                     }
@@ -171,18 +207,53 @@ public class PlansService {
                 List<String> weeks = new ArrayList<>();
                 if (Objects.nonNull(plans.getStartTime1()))
                     weeks.add("mon");
-                if (Objects.nonNull(plans.getStartTime2()))
+                if (Objects.nonNull(plans.getStartTime2())){
                     weeks.add("tues");
-                if (Objects.nonNull(plans.getStartTime3()))
+                    plans.setStartTime1(plans.getStartTime2());
+                    plans.setEndTime1(plans.getEndTime2());
+                    plans.setStartTime2(null);
+                    plans.setEndTime2(null);
+                }
+                if (Objects.nonNull(plans.getStartTime3())){
                     weeks.add("wed");
-                if (Objects.nonNull(plans.getStartTime4()))
+                    plans.setStartTime1(plans.getStartTime3());
+                    plans.setEndTime1(plans.getEndTime3());
+                    plans.setStartTime3(null);
+                    plans.setEndTime3(null);
+                }
+
+                if (Objects.nonNull(plans.getStartTime4())){
                     weeks.add("thur");
-                if (Objects.nonNull(plans.getStartTime5()))
+                    plans.setStartTime1(plans.getStartTime4());
+                    plans.setEndTime1(plans.getEndTime4());
+                    plans.setStartTime4(null);
+                    plans.setEndTime4(null);
+                }
+
+                if (Objects.nonNull(plans.getStartTime5())){
                     weeks.add("fri");
-                if (Objects.nonNull(plans.getStartTime6()))
+                    plans.setStartTime1(plans.getStartTime5());
+                    plans.setEndTime1(plans.getEndTime5());
+                    plans.setStartTime5(null);
+                    plans.setEndTime5(null);
+                }
+
+                if (Objects.nonNull(plans.getStartTime6())){
                     weeks.add("sat");
-                if (Objects.nonNull(plans.getStartTime7()))
+                    plans.setStartTime1(plans.getStartTime6());
+                    plans.setEndTime1(plans.getEndTime6());
+                    plans.setStartTime6(null);
+                    plans.setEndTime6(null);
+                }
+
+                if (Objects.nonNull(plans.getStartTime7())){
                     weeks.add("sun");
+                    plans.setStartTime1(plans.getStartTime7());
+                    plans.setEndTime1(plans.getEndTime7());
+                    plans.setStartTime7(null);
+                    plans.setEndTime7(null);
+                }
+
                 plans.setWeeks(weeks);
 
             } catch (Exception e) {
@@ -284,7 +355,7 @@ public class PlansService {
 //                }
 //            }
         } catch (Exception e) {
-            status="failed";
+            status = "failed";
             log.error("计划任务新增或修改失败" + e);
         }
         return status;
@@ -325,34 +396,34 @@ public class PlansService {
     }
 
 
-    @Logs(title = "查询NVR-监测点树",code ="tCameraInfo")
+    @Logs(title = "查询NVR-监测点树", code = "tCameraInfo")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> selectNVRChannelTree(String diagnosePlanId) {
-        Map<String,Object>finalResult=new HashMap<>();
-        List<String>checked=new ArrayList<>();
-        List<NVRChannelTree> roots=tDiagnosePlanDao.selectNVRNode();
-        for(NVRChannelTree root:roots){
+    public Map<String, Object> selectNVRChannelTree(String diagnosePlanId) {
+        Map<String, Object> finalResult = new HashMap<>();
+        List<String> checked = new ArrayList<>();
+        List<NVRChannelTree> roots = tDiagnosePlanDao.selectNVRNode();
+        for (NVRChannelTree root : roots) {
             root.setUpId(Long.valueOf("-1"));
             root.setLevel("1");
             root.setChildren(tDiagnosePlanDao.selectChannelNode(root.getId()));
         }
-        if(tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId).size() !=0){
-            for(TDiagnosePlanAttr attr:tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId)){
-               checked.add(attr.getChannelId());
+        if (tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId).size() != 0) {
+            for (TDiagnosePlanAttr attr : tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId)) {
+                checked.add(attr.getChannelId());
             }
-        }else {
+        } else {
             try {
-                String xmlIds=HttpClientUtils.getInstance().getUrl(diagnosePlan_URl+"/"+diagnosePlanId+"/"+"TaskList",null);
+                String xmlIds = HttpClientUtils.getInstance().getUrl(diagnosePlan_URl + "/" + diagnosePlanId + "/" + "TaskList", null);
 //                String xmlIds=HttpClientUtils.getInstance().getUrl(diagnosePlan_URl+"/"+diagnosePlanId,null);
-                log.info("result---------:"+PlansXML.unpackingXMLByPlanId(xmlIds));
-                checked=PlansXML.unpackingXmlTaskList(xmlIds);
-            }catch (IOException | DocumentException i){
-                log.error("查询错误："+i);
+                log.info("result---------:" + PlansXML.unpackingXMLByPlanId(xmlIds));
+                checked = PlansXML.unpackingXmlTaskList(xmlIds);
+            } catch (IOException | DocumentException i) {
+                log.error("查询错误：" + i);
             }
 
         }
-        finalResult.put("checked",checked);
-        finalResult.put("tree",roots);
+        finalResult.put("checked", checked);
+        finalResult.put("tree", roots);
         return finalResult;
 
     }

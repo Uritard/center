@@ -104,4 +104,7 @@ public class ChanResult implements Serializable {
     @ApiModelProperty(value = "诊断结果-内容")
     private String resultContent;
 
+    @ApiModelProperty(value = "诊断状态")
+    private String status;
+
 }

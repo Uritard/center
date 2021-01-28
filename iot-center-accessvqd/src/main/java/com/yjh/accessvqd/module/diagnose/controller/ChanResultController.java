@@ -202,13 +202,14 @@ public class ChanResultController {
                                              @RequestParam(value = "startTime",required = false)Date startTime,
                                              @RequestParam(value = "endTime",required = false)Date endTime,
                                              @RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
+                                             @RequestParam(value = "status",required = false)String status,
                                              @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                              @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String,Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<DiagnoseResultDetail> list = chanResultService.selectDiagnoseResultByPage(planName, channelName, startTime,endTime,diagnosePlanId);
+            List<DiagnoseResultDetail> list = chanResultService.selectDiagnoseResultByPage(planName, channelName, startTime,endTime,diagnosePlanId,status);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

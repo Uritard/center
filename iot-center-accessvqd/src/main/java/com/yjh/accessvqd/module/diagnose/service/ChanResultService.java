@@ -32,6 +32,38 @@ public class ChanResultService {
         if(!(chanResult.getSnapshotUrl().equals("(null)"))){
             chanResult.setSnapshotUrl(chanResult.getSnapshotUrl().replaceAll("192.168.10.34:81", Constant.VQD_IMAGES_STORE_URL));
         }
+        switch (chanResult.getChannelResult()){
+            case 0:
+                chanResult.setStatus("未检测");
+                chanResult.setResultContent("未检测");
+                break;
+            case 1:
+                chanResult.setStatus("正常");
+                chanResult.setResultContent("正常");
+                break;
+            case 2:
+                chanResult.setStatus("故障");
+                checkItems(chanResult);
+                break;
+            case 3:
+                chanResult.setStatus("故障");
+                chanResult.setResultContent("登录异常");
+                break;
+            case 4:
+                chanResult.setStatus("故障");
+                chanResult.setResultContent("取流异常");
+                break;
+            case 5:
+                chanResult.setStatus("故障");
+                chanResult.setResultContent("解码失败");
+                break;
+            case 6:
+                chanResult.setStatus("故障");
+                chanResult.setResultContent("取流延时");
+                break;
+
+        }
+
 
         return this.chanResultDao.insert(chanResult);
     }
@@ -85,8 +117,8 @@ public class ChanResultService {
 
     @Logs(title = "分页查询诊断结果详细信息", code = "chanResult")
     @Transactional(rollbackFor = Exception.class)
-    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String planName, String channelName, Date startTime, Date endTime, String diagnosePlanId) {
-        List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(planName, channelName, startTime, endTime, diagnosePlanId);
+    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String planName, String channelName, Date startTime, Date endTime, String diagnosePlanId,String status) {
+        List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(planName, channelName, startTime, endTime, diagnosePlanId,status);
         log.info("result：" + details);
         for (DiagnoseResultDetail detail : details) {
             detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
@@ -104,98 +136,74 @@ public class ChanResultService {
     }
 
 
-    public DiagnoseResultDetail checkItemsOperate(DiagnoseResultDetail diagnoseResultDetail) {
-        // TODO: 2021/1/25  1.诊断状态判定  2.诊断结果汇总
-        String content = "";//诊断结果汇总
-        if (diagnoseResultDetail.getChannelResult() > 1) {
-            diagnoseResultDetail.setStatus("故障");
-            switch (diagnoseResultDetail.getChannelResult()) {
-                case 2:
-                    content = "异常";
-                    break;
-                case 3:
-                    content = "登录失败";
-                    break;
-                case 4:
-                    content = "取流异常";
-                    break;
-                case 5:
-                    content = "解码失败";
-                    break;
-                case 6:
-                    content = "取流延时";
-                    break;
+    public ChanResult checkItems(ChanResult chanResult){
+        String content="";
 
-            }
-        } else {
-            if (diagnoseResultDetail.getSignalResult().equals("2")) {
-                content = "信号丢失";
-            }
-            if (diagnoseResultDetail.getBlurResult().equals("2")) {
-                content = content + "图像模糊";
-            }
-
-            if (diagnoseResultDetail.getContrastResult().equals("2")) {
-                content = content + "对比度";
-            }
-
-            if (diagnoseResultDetail.getBrightResult().equals("2")) {
-                content = content + "图像过亮";
-            }
-
-            if (diagnoseResultDetail.getDarkResult().equals("2")) {
-                content = content + "图像过暗";
-            }
-
-            if (diagnoseResultDetail.getChromaResult().equals("2")) {
-                content = content + "图像偏色";
-            }
-
-            if (diagnoseResultDetail.getMonoResult().equals("2")) {
-                content = content + "黑白图像";
-            }
-
-            if (diagnoseResultDetail.getNoiseResult().equals("2")) {
-                content = content + "噪声干扰";
-            }
-
-            if (diagnoseResultDetail.getStreakResult().equals("2")) {
-                content = content + "条纹干扰";
-            }
-
-            if (diagnoseResultDetail.getFreezeResult().equals("2")) {
-                content = content + "画面冻结";
-            }
-
-            if (diagnoseResultDetail.getShakeResult().equals("2")) {
-                content = content + "视频抖动";
-            }
-
-            if (diagnoseResultDetail.getFlashResult().equals("2")) {
-                content = content + "视频剧变";
-            }
-
-            if (diagnoseResultDetail.getSceneResult().equals("2")) {
-                content = content + "场景变换";
-            }
-
-            if (diagnoseResultDetail.getCoverResult().equals("2")) {
-                content = content + "视频遮挡";
-            }
-
-            if (diagnoseResultDetail.getPtzResult().equals("2")) {
-                content = content + "云台失控";
-            }
-
-
-            if (content.equals("")) {
-                diagnoseResultDetail.setStatus("正常");
-            } else {
-                diagnoseResultDetail.setStatus("故障");
-            }
-
+        if (chanResult.getSignalResult().equals("2")) {
+            content = "信号丢失 ";
+        }
+        if (chanResult.getBlurResult().equals("2")) {
+            content = content + "图像模糊 ";
         }
 
+        if (chanResult.getContrastResult().equals("2")) {
+            content = content + "对比度 ";
+        }
+
+        if (chanResult.getBrightResult().equals("2")) {
+            content = content + "图像过亮 ";
+        }
+
+        if (chanResult.getDarkResult().equals("2")) {
+            content = content + "图像过暗 ";
+        }
+
+        if (chanResult.getChromaResult().equals("2")) {
+            content = content + "图像偏色 ";
+        }
+
+        if (chanResult.getMonoResult().equals("2")) {
+            content = content + "黑白图像 ";
+        }
+
+        if (chanResult.getNoiseResult().equals("2")) {
+            content = content + "噪声干扰 ";
+        }
+
+        if (chanResult.getStreakResult().equals("2")) {
+            content = content + "条纹干扰 ";
+        }
+
+        if (chanResult.getFreezeResult().equals("2")) {
+            content = content + "画面冻结 ";
+        }
+
+        if (chanResult.getShakeResult().equals("2")) {
+            content = content + "视频抖动 ";
+        }
+
+        if (chanResult.getFlashResult().equals("2")) {
+            content = content + "视频剧变 ";
+        }
+
+        if (chanResult.getSceneResult().equals("2")) {
+            content = content + "场景变换 ";
+        }
+
+        if (chanResult.getCoverResult().equals("2")) {
+            content = content + "视频遮挡 ";
+        }
+
+        if (chanResult.getPtzResult().equals("2")) {
+            content = content + "云台失控";
+        }
+
+        String temContent=content.replaceAll("\\s+",",");
+        chanResult.setResultContent(temContent.substring(0,temContent.length()-1));
+        return chanResult;
+    }
+
+    public DiagnoseResultDetail checkItemsOperate(DiagnoseResultDetail diagnoseResultDetail) {
         //检测项赋值
         diagnoseResultDetail.setSignalResult(checkResult(diagnoseResultDetail.getSignalResult()));
         diagnoseResultDetail.setBlurResult(checkResult(diagnoseResultDetail.getBlurResult()));
@@ -212,9 +220,6 @@ public class ChanResultService {
         diagnoseResultDetail.setSceneResult(checkResult(diagnoseResultDetail.getSceneResult()));
         diagnoseResultDetail.setCoverResult(checkResult(diagnoseResultDetail.getCoverResult()));
         diagnoseResultDetail.setPtzResult(checkResult(diagnoseResultDetail.getPtzResult()));
-
-        diagnoseResultDetail.setResultContent(content);
-
 
         return diagnoseResultDetail;
     }

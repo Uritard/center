@@ -30,11 +30,12 @@
         <result column="width" jdbcType="VARCHAR" property="width"/>
         <result column="height" jdbcType="VARCHAR" property="height"/>
         <result column="diagnose_plan_id" jdbcType="VARCHAR" property="diagnosePlanId"/>
+        <result column="status" jdbcType="VARCHAR" property="status"></result>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        diagnose_result_id, channel_id, ip, chan_index, check_time, channel_result, signal_result, blur_result, contrast_result, bright_result, dark_result, chroma_result, mono_result, noise_result, streak_result, freeze_result, shake_result, flash_result, scene_result, cover_result, ptz_result, snapshot_url, result_content,width,height,diagnose_plan_id
+        diagnose_result_id, channel_id, ip, chan_index, check_time, channel_result, signal_result, blur_result, contrast_result, bright_result, dark_result, chroma_result, mono_result, noise_result, streak_result, freeze_result, shake_result, flash_result, scene_result, cover_result, ptz_result, snapshot_url, result_content,width,height,diagnose_plan_id,status
     </sql>
 
 
@@ -66,7 +67,8 @@
             result_content,
             width,
             height,
-            diagnose_plan_id
+            diagnose_plan_id,
+            status
         )values(
                 #{diagnoseResultId, jdbcType=BIGINT},
                 #{channelId, jdbcType=VARCHAR},
@@ -93,7 +95,8 @@
                 #{resultContent, jdbcType=VARCHAR},
                 #{width, jdbcType=VARCHAR},
                 #{height, jdbcType=VARCHAR},
-                #{diagnosePlanId, jdbcType=VARCHAR}
+                #{diagnosePlanId, jdbcType=VARCHAR},
+                #{status,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -149,8 +152,9 @@
             <if test="width != null and width != ''">a.width = #{width, jdbcType=VARCHAR},</if>
             <if test="height != null and height != ''">a.height = #{height, jdbcType=VARCHAR},</if>
             <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id =
-                #{diagnosePlanId, jdbcType=VARCHAR}
+                #{diagnosePlanId, jdbcType=VARCHAR},
             </if>
+            <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR}</if>
         </set>
         where a.diagnose_result_id = #{diagnoseResultId, jdbcType=BIGINT}
     </update>
@@ -183,7 +187,8 @@
         a.result_content,
         a.width,
         a.height,
-        a.diagnose_plan_id
+        a.diagnose_plan_id,
+        a.status
         from t_diagnose_result a
         where 1 = 1
             and a.diagnose_result_id = #{diagnoseResultId, jdbcType=BIGINT}
@@ -218,7 +223,8 @@
         a.result_content,
         a.width,
         a.height,
-        a.diagnose_plan_id
+        a.diagnose_plan_id,
+        a.status
         from t_diagnose_result a
         where 1 = 1
         <if test="diagnoseResultId != null and diagnoseResultId != ''">and a.diagnose_result_id =
@@ -262,6 +268,7 @@
         <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id =
             #{diagnosePlanId, jdbcType=VARCHAR}
         </if>
+        <if test="status != null and status != ''">and a.status = #{status, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessvqd.module.diagnose.entity.ChanResult"
@@ -292,7 +299,8 @@
         a.result_content,
         a.width,
         a.height,
-        diagnose_plan_id
+        diagnose_plan_id,
+        status
         from t_diagnose_result a
         where 1 = 1
         <if test="diagnoseResultId != null and diagnoseResultId != ''">and a.diagnose_result_id =
@@ -336,6 +344,7 @@
         <if test="diagnosePlanId != null and diagnosePlanId != ''">and a.diagnose_plan_id =
             #{diagnosePlanId, jdbcType=VARCHAR}
         </if>
+        <if test="status != null and status != ''">and a.status = #{status, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
@@ -365,7 +374,8 @@
         result_content,
         width,
         height,
-        diagnose_plan_id
+        diagnose_plan_id,
+        status
         )values
         <foreach collection="list" item="TDiagnoseResult" separator=",">
             (
@@ -391,10 +401,11 @@
             #{TDiagnoseResult.coverResult, jdbcType=VARCHAR},
             #{TDiagnoseResult.ptzResult, jdbcType=VARCHAR},
             #{TDiagnoseResult.snapshotUrl, jdbcType=VARCHAR},
-            #{TDiagnoseResult.resultContent, jdbcType=VARCHAR}
-            #{TDiagnoseResult.width, jdbcType=VARCHAR}
-            #{TDiagnoseResult.height, jdbcType=VARCHAR}
-            #{TDiagnoseResult.diagnosePlanId, jdbcType=VARCHAR}
+            #{TDiagnoseResult.resultContent, jdbcType=VARCHAR},
+            #{TDiagnoseResult.width, jdbcType=VARCHAR},
+            #{TDiagnoseResult.height, jdbcType=VARCHAR},
+            #{TDiagnoseResult.diagnosePlanId, jdbcType=VARCHAR},
+            #{TDiagnoseResult.status, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -409,6 +420,7 @@
         f.dict_note as 'devBrand',
         e.region_name as 'regionName',
         a.channel_result,
+        a.status,
         a.check_time,
         a.result_content,
         a.signal_result,
@@ -448,6 +460,7 @@
         <if test="diagnosePlanId !=null and diagnosePlanId !=''">and a.diagnose_plan_id
             =#{diagnosePlanId,jdbcType=VARCHAR}
         </if>
+        <if test="status !=null and status !=''">and a.`status`= #{status,jdbcType=VARCHAR}</if>
     </select>
 
     <select id="faultTypeSta"  resultType="java.util.Map">
