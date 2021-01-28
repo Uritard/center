@@ -438,7 +438,8 @@
         a.scene_result,
         a.cover_result,
         a.ptz_result,
-        a.snapshot_url
+        a.snapshot_url,
+        c.camera_id
         FROM
         t_diagnose_result a JOIN t_diagnose_plan b ON a.diagnose_plan_id=b.diagnose_plan_id
         LEFT JOIN t_camera_info c ON a.channel_id=c.monitor_id

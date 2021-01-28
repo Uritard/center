@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
@@ -34,6 +35,12 @@ public class DiagnoseResultDetail extends ChanResult {
     private String regionName;
     @ApiModelProperty(value = "分辨率")
     private String resolving;
+    @ApiModelProperty(value = "相机ID")
+    private Long cameraId;
+    @ApiModelProperty(value = "视频地址")
+    private String rtmpUrl;
+    @ApiModelProperty(value = "流地址")
+    private String flvUrl;
 
 
 }

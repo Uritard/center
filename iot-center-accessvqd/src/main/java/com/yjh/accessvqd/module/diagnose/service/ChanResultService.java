@@ -2,6 +2,9 @@ package com.yjh.accessvqd.module.diagnose.service;
 
 import com.yjh.accessvqd.common.Constant;
 import com.yjh.accessvqd.commons.logs.Logs;
+import com.yjh.accessvqd.commons.logs.SpringBeanUtils;
+import com.yjh.accessvqd.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessvqd.commons.result.Result;
 import com.yjh.accessvqd.module.diagnose.dao.ChanResultDao;
 import com.yjh.accessvqd.module.diagnose.entity.ChanResult;
 import com.yjh.accessvqd.module.diagnose.entity.DiagnoseResultDetail;
@@ -123,6 +126,12 @@ public class ChanResultService {
         for (DiagnoseResultDetail detail : details) {
             detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
             checkItemsOperate(detail);
+            HashMap<String,Long> camera=new HashMap<>();
+            camera.put("cameraId",detail.getCameraId());
+            Result result=sendGetRequest(Constant.START_CAMERA_URL,camera);
+            Map<String,String> videoInfo=(Map<String, String>)result.getData();
+           detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
+           detail.setFlvUrl(videoInfo.get("flvUrl"));
             switch (detail.getDevType()){
                 case "0":
                     detail.setDevType("枪机");
@@ -368,5 +377,20 @@ public class ChanResultService {
         map.put("charData",charData);
         map.put("gridData",gridData);
         return map;
+    }
+
+    //跨发GET请求带参
+    public Result sendGetRequest(String url, HashMap<String, Long> params) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.getForObject(url, Result.class, params);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
+
     }
 }

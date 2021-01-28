@@ -215,7 +215,7 @@ public class ChanResultController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量插入失败：" + e);
+            log.error("查询失败：" + e);
         }
         return result;
     }
