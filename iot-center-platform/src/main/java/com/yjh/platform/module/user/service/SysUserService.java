@@ -379,7 +379,7 @@ public class SysUserService {
             map.put("userId",item.getUserId());
             map.put("userName",item.getUserName());
             String str = "userInfo:"+item.getUserId();
-            redisTemplate.opsForHash().putAll(str, map);
+            redisTemplate.opsForHash().putAll(str, Object2Map.toStringMap(map));
         }
         return 1;
     }
