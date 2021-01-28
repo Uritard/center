@@ -198,17 +198,15 @@ public class SM2Utils {
 //        boolean vs = SM2Utils.verifySign(userId.getBytes(), ByteUtil.toByteArray(publicKey), plainText.getBytes(), siginData.getBytes());
 //        System.out.println("签名验证结果 - " + vs);
 
-        //测试验签1
-        System.out.println("验签: ");
-        String signStr = "MEUCIHLlmxj2h4cDBLP+XZNeMugFK/Umlw/abes/HvW1sBg/AiEAgkDfFAwxVjtEndPnbjAw16mt0Com3OhTDnvC2Z8FpE8=";
-        String pubs = "KN1sf5a9aTugawGErt+sOniSdozhQBc75Terb0ggv8OtgFfyDd7ZVRVIXpxz3LNxJ6Z6S06ZPlwb85814+Ya3g==";
-        String pub_key = "04" + Util.getHexString(Base64.decode(pubs.getBytes()));
-        byte [] c = Base64.decode(signStr);
-        System.out.println("c: " + Util.byteToHex(c));
-        boolean vs = SM2Utils.verifySign("1234567812345678".getBytes(), Util.hexToByte(pub_key), "123".getBytes(), c);
-        System.out.println("vs - " + vs);
-        String str = "12345678123456781234567812345678";
-        System.out.println(Util.getHexString(Base64.decode(str.getBytes())));
+        //测试验签2
+        String publicKey = "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
+        String signStr = "MEUCIQC5bsYfSkFjD1c0qmLBwBgzNEgXLGYDcR8vdhwTPxNfIgIgYdb2yNaQt3Fc3C0gFbzblKGoLvE6OQ2EvxXX++Df2qs=";
+        String plainText = "12345678123456781234567812345678";
+        String userId = "1234567812345678";
+
+        byte[] signBytes = Base64.decode(signStr);
+        boolean vs = SM2Utils.verifySign(userId.getBytes(), Util.hexToByte(publicKey), plainText.getBytes(), signBytes);
+        System.out.println("签名验证结果 - " + vs);
 
     }
 }
