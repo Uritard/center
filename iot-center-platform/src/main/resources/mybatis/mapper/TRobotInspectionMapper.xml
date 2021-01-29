@@ -35,8 +35,8 @@
                 #{robotId, jdbcType=BIGINT},
                 #{inspectionName, jdbcType=VARCHAR},
                 #{componentId, jdbcType=VARCHAR},
-                #{meterType, jdbcType=VARCHAR},
-                #{appearanceType, jdbcType=VARCHAR},
+                #{meterType, jdbcType=INTEGER},
+                #{appearanceType, jdbcType=INTEGER},
                 #{saveTypeList, jdbcType=VARCHAR},
                 #{recognitionTypeList, jdbcType=VARCHAR},
                 #{phase, jdbcType=VARCHAR},
@@ -54,9 +54,9 @@
         <if test="inspectionCode != null and inspectionCode != ''"> a.inspection_code = #{inspectionCode, jdbcType=VARCHAR},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="inspectionName != null and inspectionName != ''">a.inspection_name = #{inspectionName, jdbcType=VARCHAR},</if>
-        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=INTEGER},</if>
-        <if test="meterType != null and meterType != ''">a.meter_type = #{meterType, jdbcType=VARCHAR},</if>
-        <if test="appearanceType != null and appearanceType != ''">a.appearance_type = #{appearanceType, jdbcType=VARCHAR},</if>
+        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>
+        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
+        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
         <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
         <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
         <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
@@ -103,9 +103,9 @@
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=INTEGER},</if>
-        <if test="meterType != null and meterType != ''">a.meter_type = #{meterType, jdbcType=VARCHAR},</if>
-        <if test="appearanceType != null and appearanceType != ''">a.appearance_type = #{appearanceType, jdbcType=VARCHAR},</if>
+        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>
+        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
+        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
         <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
         <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
         <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
@@ -131,9 +131,9 @@
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=INTEGER},</if>
-        <if test="meterType != null and meterType != ''">a.meter_type = #{meterType, jdbcType=VARCHAR},</if>
-        <if test="appearanceType != null and appearanceType != ''">a.appearance_type = #{appearanceType, jdbcType=VARCHAR},</if>
+        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>
+        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
+        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
         <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
         <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
         <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
@@ -161,8 +161,8 @@
             #{TRobotInspection.robotId, jdbcType=BIGINT},
             #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
             #{TRobotInspection.componentId, jdbcType=VARCHAR},
-            #{TRobotInspection.meterType, jdbcType=VARCHAR},
-            #{TRobotInspection.appearanceType, jdbcType=VARCHAR},
+            #{TRobotInspection.meterType, jdbcType=INTEGER},
+            #{TRobotInspection.appearanceType, jdbcType=INTEGER},
             #{TRobotInspection.saveTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.recognitionTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.phase, jdbcType=VARCHAR},

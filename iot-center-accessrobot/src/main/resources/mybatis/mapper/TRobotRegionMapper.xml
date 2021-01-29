@@ -38,7 +38,7 @@
                 #{regionId, jdbcType=VARCHAR},
                 #{regionName, jdbcType=VARCHAR},
                 #{sort, jdbcType=INTEGER},
-                #{deviceType, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=INTEGER},
                 #{upRegionId, jdbcType=VARCHAR},
                 #{upRegionIds, jdbcType=VARCHAR},
                 #{regionType, jdbcType=INTEGER},
@@ -104,7 +104,7 @@
         <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=VARCHAR}</if>
         <if test="regionName != null and regionName != ''"> and a.region_name = #{regionName, jdbcType=VARCHAR}</if>
         <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>
         <if test="upRegionIds != null and upRegionIds != ''"> and a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR}</if>
         <if test="regionType != null "> and a.region_type = #{regionType, jdbcType=INTEGER}</if>
@@ -130,7 +130,7 @@
         <if test="regionId != null and regionId != ''"> and a.region_id = #{regionId, jdbcType=VARCHAR}</if>
         <if test="regionName != null and regionName != ''"> and a.region_name = #{regionName, jdbcType=VARCHAR}</if>
         <if test="sort != null "> and a.sort = #{sort, jdbcType=INTEGER}</if>
-        <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=VARCHAR}</if>
         <if test="upRegionIds != null and upRegionIds != ''"> and a.up_region_ids = #{upRegionIds, jdbcType=VARCHAR}</if>
         <if test="regionType != null "> and a.region_type = #{regionType, jdbcType=INTEGER}</if>
@@ -157,7 +157,7 @@
                 #{TRobotRegion.regionId, jdbcType=VARCHAR},
                 #{TRobotRegion.regionName, jdbcType=VARCHAR},
                 #{TRobotRegion.sort, jdbcType=INTEGER},
-                #{TRobotRegion.deviceType, jdbcType=VARCHAR},
+                #{TRobotRegion.deviceType, jdbcType=INTEGER},
                 #{TRobotRegion.upRegionId, jdbcType=VARCHAR},
                 #{TRobotRegion.upRegionIds, jdbcType=VARCHAR},
                 #{TRobotRegion.regionType, jdbcType=INTEGER},

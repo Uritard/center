@@ -32,7 +32,7 @@ public class TRobotRegion implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "如果是设备，为设备类型的值")
-    private String deviceType;
+    private Integer deviceType;
 
     @ApiModelProperty(value = "上级区域ID")
     private String upRegionId;

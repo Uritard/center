@@ -21,7 +21,7 @@ public class ReportDataRepo {
     private static final String[] TASK_REPORT_TITLE = {"巡检记录报告"};
     //任务
     private static final String[] TASK_INFO = {
-            "站所名称", "巡检任务名称", "测点数", "关联测点数", "未处理数", "巡检时间"
+            "站所名称", "巡检任务名称", "测点数", "关联测点数", "巡检时间"
     };
     //分项预览
     private static final String[] TASK_ITEM = {
@@ -275,8 +275,8 @@ public class ReportDataRepo {
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{taskVoInfo.getMeteRelationNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum().toString()},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+        /*elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum().toString()},
+                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));*/
         if (null != taskVoInfo.getCruiseDate()){
             elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));

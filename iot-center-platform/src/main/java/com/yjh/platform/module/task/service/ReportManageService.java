@@ -54,8 +54,8 @@ public class ReportManageService {
         Integer meteNum = reportManageDao.selectMeteNum(list);
         taskVO.setMeteNum(meteNum);
         //未处理数
-        Integer abnormalNum = reportManageDao.selectAbnormalNum(list);
-        taskVO.setAbnormalNum(abnormalNum);
+        /*Integer abnormalNum = reportManageDao.selectAbnormalNum(list);
+        taskVO.setAbnormalNum(abnormalNum);*/
         //关联测点数
         taskVO.setMeteRelationNum(0);
         //任务名称
@@ -236,8 +236,8 @@ public class ReportManageService {
         Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
         taskVO.setMeteNum(meteNum);
         //未处理数
-        Integer abnormalNum = reportManageDao.selectAbnormalNumByTask(taskId);
-        taskVO.setAbnormalNum(abnormalNum);
+        /*Integer abnormalNum = reportManageDao.selectAbnormalNumByTask(taskId);
+        taskVO.setAbnormalNum(abnormalNum);*/
         //关联测点数
         taskVO.setMeteRelationNum(0);
         //站所名称、任务名称、巡检时间

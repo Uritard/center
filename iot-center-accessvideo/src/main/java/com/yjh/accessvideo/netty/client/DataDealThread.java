@@ -370,6 +370,7 @@ public class DataDealThread implements Runnable {
                                                             Map<String, Object> jasonMaps2 = new HashMap<>();
                                                             jasonMaps2.put("type", "alarmPopUp");
                                                             jasonMaps2.put("warnId", tWarnInfo.getWarnId());
+                                                            jasonMaps2.put("defectModel", tWarnInfo.getDefectModel());
                                                             String json = JSON.toJSONString(jasonMaps2);
                                                             log.info("发送给前端的消息：" + json);
                                                             WebSocketServer.sendMsg(json);

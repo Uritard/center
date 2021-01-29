@@ -63,7 +63,7 @@ public class TRobotInspectionService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName,
-                                         String componentId,String meterType,String appearanceType,String saveTypeList,
+                                         String componentId,Integer meterType,Integer appearanceType,String saveTypeList,
                                          String recognitionTypeList,String phase,String deviceInfo) {
         List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName,
                 componentId,meterType,appearanceType,saveTypeList,

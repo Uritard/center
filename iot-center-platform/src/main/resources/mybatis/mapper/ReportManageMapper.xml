@@ -254,7 +254,7 @@
     <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
         SELECT
             a.task_name,
-            a.execute_time as cruise_date
+            a.start_time as cruise_date
         from
             t_cruise_task a
         where 1 = 1

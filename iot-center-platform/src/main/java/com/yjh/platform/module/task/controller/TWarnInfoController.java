@@ -418,10 +418,11 @@ public class TWarnInfoController {
     @ApiOperation(value = "告警弹框")
     @RequestMapping(value = "/warnPopUp",method = RequestMethod.GET)
     @Logs(title = "操作",content = "告警弹窗",logType = 5)
-    public Result warnPopUp(@RequestParam(value = "warnId", required = true) Long warnId) {
+    public Result warnPopUp(@RequestParam(value = "warnId", required = true) Long warnId,
+                            @RequestParam(value = "defectModel", required = true) Integer defectModel) {
         Result result = new Result();
         try {
-            TWarnInfoDetail tWarnInfoDetail = tWarnInfoService.selectWarnPopUp(warnId);
+            TWarnInfoDetail tWarnInfoDetail = tWarnInfoService.selectWarnPopUp(warnId,defectModel);
             result.setData(tWarnInfoDetail);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -104,7 +104,7 @@ public class TRobotRegionController {
     public Result select(@RequestParam(value = "regionId", required = false) String regionId,
                          @RequestParam(value = "regionName", required = false) String regionName,
                          @RequestParam(value = "sort", required = false) Integer sort,
-                         @RequestParam(value = "deviceType", required = false) String deviceType,
+                         @RequestParam(value = "deviceType", required = false) Integer deviceType,
                          @RequestParam(value = "upRegionId", required = false) String upRegionId,
                          @RequestParam(value = "upRegionIds", required = false) String upRegionIds,
                          @RequestParam(value = "regionType", required = false) Integer regionType,

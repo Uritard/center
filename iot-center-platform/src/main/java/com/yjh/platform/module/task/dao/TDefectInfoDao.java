@@ -61,4 +61,6 @@ public interface TDefectInfoDao {
     List<Map<String,Object>> countByAlarmLevel();
     List<WarnInfoForHomePage>selectThereWarn(@Param(value = "alarmLevel")Integer alarmLevel);
 
+    TWarnInfoDetail selectWarnPopUp(@Param(value = "warnId") Long warnId);
+
 }

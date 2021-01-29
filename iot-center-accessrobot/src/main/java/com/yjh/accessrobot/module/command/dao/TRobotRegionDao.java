@@ -21,7 +21,7 @@ public interface TRobotRegionDao {
     List<TRobotRegion> select(@Param(value = "regionId") String regionId,
                               @Param(value = "regionName") String regionName,
                               @Param(value = "sort") Integer sort,
-                              @Param(value = "deviceType") String deviceType,
+                              @Param(value = "deviceType") Integer deviceType,
                               @Param(value = "upRegionId") String upRegionId,
                               @Param(value = "upRegionIds") String upRegionIds,
                               @Param(value = "regionType") Integer regionType,

@@ -259,17 +259,19 @@ public class RobotService {
                     .setRecognitionTypeList(deviceMap.get("recognition_type_list").toString());
             /*if (!"".equals(deviceMap.get("component_id").toString())){
                 tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
-            }
+            }*/
             if (!"".equals(deviceMap.get("meter_type").toString())){
-                tRobotInspection.setMeterType(deviceMap.get("meter_type").toString());
+                Integer meterType = selectDictCode("meterType",deviceMap.get("meter_type").toString(),"meter_type");
+                tRobotInspection.setMeterType(meterType);
             }
             if (!"".equals(deviceMap.get("appearance_type").toString())){
-                tRobotInspection.setAppearanceType(deviceMap.get("appearance_type").toString());
+                Integer appearanceType = selectDictCode("appearanceType",deviceMap.get("appearance_type").toString(),"appearance_type");
+                tRobotInspection.setAppearanceType(appearanceType);
             }
             if (!"".equals(deviceMap.get("phase").toString())){
                 tRobotInspection.setPhase(deviceMap.get("phase").toString());
             }
-            if (!"".equals(deviceMap.get("device_info").toString())){
+            /*if (!"".equals(deviceMap.get("device_info").toString())){
                 tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
             }*/
             deviceList.add(tRobotInspection);
@@ -378,6 +380,7 @@ public class RobotService {
         }*/
         return 1;
     }
+
     //@Logs(title = "机器人收到下发任务指令/控制指令后，巡视主机接收响应处理", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> receivingResponse(XMLBaseModel xmlBaseModel) {
@@ -536,17 +539,6 @@ public class RobotService {
 
                 //根据不同的机器人对应不同的管道发送指令
                 RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).SendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
-
-                //启动一个线程
-//                Map<String,String> threadMap = new HashMap<>();
-//                threadMap.put("instanceIdList",instanceIdList.toString());
-//                threadMap.put("taskCode",rTII.getTaskId());
-//                threadMap.put("robotCode",rTII.getRobotCode());
-//                Constant.flagMap.put(rTII.getTaskId(),0);
-//
-//                OneDealThread oneDealThread = new OneDealThread(threadMap,redisTemplate);
-//                TaskExecutePool.getInstance().execute(oneDealThread);
-
             }
 
         }
@@ -864,6 +856,166 @@ public class RobotService {
             log.error(e.getMessage(), e);
         }
         return re;
+    }
+    public Integer selectDictCode(String valueName,String value,String colName){
+        String dictNote = null;
+        if (valueName.equals("appearanceType")){
+            switch (value){
+                case "1":
+                    dictNote = "电子围栏";
+                    break;
+                case "2":
+                    dictNote = "红外对射";
+                    break;
+                case "3":
+                    dictNote = "泡沫喷淋";
+                    break;
+                case "4":
+                    dictNote = "消防水泵";
+                    break;
+                case "5":
+                    dictNote = "消防栓";
+                    break;
+                case "6":
+                    dictNote = "消防室";
+                    break;
+                case "7":
+                    dictNote = "设备室";
+                    break;
+                case "8":
+                    dictNote = "照明灯";
+                    break;
+                case "9":
+                    dictNote = "摄像头";
+                    break;
+                case "10":
+                    dictNote = "水位线";
+                    break;
+                case "11":
+                    dictNote = "排水泵";
+                    break;
+                case "12":
+                    dictNote = "沉降监测点";
+                    break;
+            }
+        }else if (valueName.equals("meterType")){
+            switch (value){
+                case "1":
+                    dictNote = "油位表";
+                    break;
+                case "2":
+                    dictNote = "避雷器动作次数表";
+                    break;
+                case "3":
+                    dictNote = "泄漏电流表";
+                    break;
+                case "4":
+                    dictNote = "SF6压力表";
+                    break;
+                case "5":
+                    dictNote = "液压表";
+                    break;
+                case "7":
+                    dictNote = "开关动作次数表";
+                    break;
+                case "8":
+                    dictNote = "档位表";
+                    break;
+                case "9":
+                    dictNote = "气压表";
+                    break;
+            }
+        }else if (valueName.equals("deviceType")){
+            switch (value){
+                case "1":
+                    dictNote = "油浸式变压器";
+                    break;
+                case "2":
+                    dictNote = "断路器";
+                    break;
+                case "3":
+                    dictNote = "组合电器";
+                    break;
+                case "4":
+                    dictNote = "隔离开关";
+                    break;
+                case "5":
+                    dictNote = "开关柜";
+                    break;
+                case "6":
+                    dictNote = "电流互感器";
+                    break;
+                case "7":
+                    dictNote = "电压互感器";
+                    break;
+                case "8":
+                    dictNote = "避雷器";
+                    break;
+                case "9":
+                    dictNote = "并联电容器组";
+                    break;
+                case "10":
+                    dictNote = "干式电抗器";
+                    break;
+                case "11":
+                    dictNote = "串联补偿装置";
+                    break;
+                case "12":
+                    dictNote = "母线及绝缘子";
+                    break;
+                case "13":
+                    dictNote = "穿墙套管";
+                    break;
+                case "14":
+                    dictNote = "消弧线圈";
+                    break;
+                case "15":
+                    dictNote = "高频阻波器";
+                    break;
+                case "16":
+                    dictNote = "耦合电容器";
+                    break;
+                case "17":
+                    dictNote = "高压熔断器";
+                    break;
+                case "18":
+                    dictNote = "中性点隔直装置";
+                    break;
+                case "19":
+                    dictNote = "接地装置";
+                    break;
+                case "20":
+                    dictNote = "端子箱及检修电源箱";
+                    break;
+                case "21":
+                    dictNote = "站用变";
+                    break;
+                case "22":
+                    dictNote = "站用交流电源";
+                    break;
+                case "23":
+                    dictNote = "站用直流电源";
+                    break;
+                case "24":
+                    dictNote = "构支架";
+                    break;
+                case "25":
+                    dictNote = "辅助设施";
+                    break;
+                case "26":
+                    dictNote = "土建设施";
+                    break;
+                case "27":
+                    dictNote = "避雷针";
+                    break;
+                case "28":
+                    dictNote = "避雷器动作次数表";
+                    break;
+            }
+        }
+
+        Integer dictCode = Integer.valueOf(tRobotInfoDao.selectDictCode(colName,dictNote));
+        return dictCode;
     }
 
 }

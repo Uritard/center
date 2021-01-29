@@ -388,8 +388,13 @@ public class TWarnInfoService{
     }
     //告警弹窗
     @Transactional(rollbackFor = Exception.class)
-    public TWarnInfoDetail selectWarnPopUp(Long warnId){
-        TWarnInfoDetail tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(warnId);
+    public TWarnInfoDetail selectWarnPopUp(Long warnId,Integer defectModel){
+        TWarnInfoDetail tWarnInfoDetail = new TWarnInfoDetail();
+        if (defectModel == 405){//告警信息
+            tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(warnId);
+        }else {//缺陷信息
+            tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(warnId);
+        }
         return tWarnInfoDetail;
     }
     //读批量redis

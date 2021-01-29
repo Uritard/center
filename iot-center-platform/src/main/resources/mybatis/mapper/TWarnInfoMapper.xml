@@ -717,7 +717,7 @@
     <select id="warnCountsNonIdentify" resultType="java.lang.Integer">
               SELECT
             (
-                a.countNum + b.countNum + d.countNum
+                a.countNum + b.countNum
             ) AS total
         FROM
             (
@@ -733,18 +733,10 @@
                     SELECT
                         count(*) AS countNum
                     FROM
-                        t_robot_alarm
+                        t_defect_info
                     WHERE
-                        alarm_state = 276
-                ) b,
-                (
-                    SELECT
-                        count(*) AS countNum
-                    FROM
-                        t_camera_alarm
-                    WHERE
-                        alarm_state = 276
-                ) d
+                        conf_mode = 276
+                ) b
             )
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
