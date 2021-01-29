@@ -122,11 +122,11 @@
             instance_id,
             remark
         )values
-        <foreach collection="list" item="TCruiseType" separator=",">
+        <foreach collection="list" item="TCruiseTypeDetail" separator=",">
             (
-                #{TCruiseType.subType, jdbcType=INTEGER},
-                #{TCruiseType.instanceId, jdbcType=BIGINT},
-                #{TCruiseType.remark, jdbcType=VARCHAR}
+                #{TCruiseTypeDetail.subType, jdbcType=INTEGER},
+                #{TCruiseTypeDetail.instanceId, jdbcType=BIGINT},
+                #{TCruiseTypeDetail.remark, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -160,5 +160,213 @@
         select instance_id from t_cruise_point_instance
                 where instance_id = #{instanceId, jdbcType=BIGINT}
     </select>
+    <select id="selectAll" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "213" as subType,
+        b.instance_id
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+        FROM  t_cruise_point_instance b
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where 1 = 1
+        ORDER BY b.device_id, b.custom_id
+    </select>
 
+    <select id="selectByAnalyse" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "322" as sub_type,
+        b.instance_id,
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+				from t_algorithm_conf_bak a
+        left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where a.algorithm_id = (select algorithm_id from t_algorithm_info where analyse_type = 9)
+				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        ORDER BY b.device_id, b.custom_id
+    </select>
+    <select id="selectByMeterTypeByOil" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "323" as sub_type,
+        b.instance_id,
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+				from t_std_devicemete a
+        left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where a.meter_type in (417,411)
+				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        ORDER BY b.device_id, b.custom_id
+    </select>
+    <select id="selectByMeterTypeByArrester" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "324" as sub_type,
+        b.instance_id,
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+				from t_std_devicemete a
+        left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where a.meter_type = 412
+				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        ORDER BY b.device_id, b.custom_id
+    </select>
+    <select id="selectByMeterTypeBySF6" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "325" as sub_type,
+        b.instance_id,
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+				from t_std_devicemete a
+        left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where a.meter_type = 414
+				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        ORDER BY b.device_id, b.custom_id
+    </select>
+    <select id="selectByMeterTypeByYY" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "326" as sub_type,
+        b.instance_id,
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+				from t_std_devicemete a
+        left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where a.meter_type = 415
+				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        ORDER BY b.device_id, b.custom_id
+    </select>
+    <select id="selectByAnalyseByWg" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
+        select
+        "326" as sub_type,
+        b.instance_id,
+        (CASE
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+        END) AS instance_name,
+        b.device_id,
+        d.device_name,
+        b.custom_id,
+        i.dict_note AS custom_name,
+        b.cruise_type,
+        e.dict_note AS cruise_type_name
+				from t_algorithm_conf_bak a
+        left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where a.algorithm_id in (select algorithm_id from t_algorithm_info where analyse_type in(8,7,6,5) )
+				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        ORDER BY b.device_id, b.custom_id
+    </select>
 </mapper>

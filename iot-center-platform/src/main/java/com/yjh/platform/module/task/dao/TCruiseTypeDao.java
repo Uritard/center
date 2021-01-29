@@ -21,8 +21,15 @@ public interface TCruiseTypeDao {
     List<TCruiseTypeDetail> select(@Param(value = "subType") Integer subType);
     List<TCruiseTypeDetail> selectByPage(TCruiseType tCruiseType);
 
-    int batchAdd(List<TCruiseType> list);
+    int batchAdd(List<TCruiseTypeDetail> list);
     int batchDelete(List<String> list);
     List<Long> selectIdList(@Param(value = "subType") Integer subType);
     int deleteForInstanceId(@Param(value = "list")List<Long> list);
+    List<TCruiseTypeDetail>selectAll();
+    List<TCruiseTypeDetail>selectByAnalyse();
+    List<TCruiseTypeDetail>selectByMeterTypeByOil();
+    List<TCruiseTypeDetail>selectByMeterTypeByArrester();
+    List<TCruiseTypeDetail>selectByMeterTypeBySF6();
+    List<TCruiseTypeDetail>selectByMeterTypeByYY();
+    List<TCruiseTypeDetail>selectByAnalyseByWg();
 }

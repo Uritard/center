@@ -22,7 +22,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
 
 
     
-    private String meteKindName;
+    //private String meteKindName;
 
     private String unitName;
 

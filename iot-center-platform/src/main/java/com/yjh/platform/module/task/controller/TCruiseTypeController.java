@@ -157,7 +157,7 @@ public class TCruiseTypeController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡视类型关联实例点数据",logType = 2)
-    public Result batchAdd(@RequestBody List<TCruiseType> list) {
+    public Result batchAdd(@RequestBody List<TCruiseTypeDetail> list) {
         Result result = new Result();
         try {
         result.setData(tCruiseTypeService.batchAdd(list));

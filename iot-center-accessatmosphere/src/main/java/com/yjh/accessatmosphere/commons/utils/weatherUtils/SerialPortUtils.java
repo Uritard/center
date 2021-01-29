@@ -197,9 +197,9 @@ public class SerialPortUtils implements SerialPortEventListener {
         info.put("humidityUnit","%RH");
 
         String airPressure = str[9].replaceAll("Pa=","").replaceAll("H","");//气压 Pa=001022.4H;
-        temp = Double.valueOf(airPressure)/1000;
+        temp = Double.valueOf(airPressure);
         info.put("airPressure",df.format(temp).toString());
-        info.put("airPressureUnit","kPa");
+        info.put("airPressureUnit","hPa");
 
         String precipitation = str[10].replaceAll("Rc=","").replaceAll("M","");//降雨量 Rc=0000.0M
         temp = Double.valueOf(precipitation);

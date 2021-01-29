@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
@@ -136,7 +137,7 @@ public class TSequentialConfService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String sequential(String meteId){
+    public String sequential(String meteId) throws Exception{
         {
             Map<String,String> map = this.sequentialInfo(meteId).get(0);
             Map<String, Object> jasonMaps2 = new HashMap<>();
@@ -146,6 +147,7 @@ public class TSequentialConfService{
             jasonMaps2.put("state", map.get("state"));
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
+            WebSocketServer.sendMsg(json);
             //结果
 //            {"type": "newSequentialResult",
 //                    "cfgDeviceId": "1001",
@@ -160,10 +162,21 @@ public class TSequentialConfService{
 //                    "state": "控合"
 //            }
 
-
+            Thread.sleep(20000);
             //todo 生成一个巡视任务
 
             //todo 发给算法进行分析
+
+            //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
+            Map<String, Object> jasonMapsResult = new HashMap<>();
+            jasonMapsResult.put("type", "newSequentialResult");
+            jasonMapsResult.put("cfgDeviceId", meteId);
+            jasonMapsResult.put("sort", map.get("sort"));
+            jasonMapsResult.put("state", map.get("state"));
+            jasonMapsResult.put("identifyResult", map.get("state"));
+            String jsonResult = JSON.toJSONString(jasonMapsResult);
+            log.info("发送给前端的消息：" + jsonResult);
+            WebSocketServer.sendMsg(jsonResult);
 
             //todo 生成顺控文件
         }

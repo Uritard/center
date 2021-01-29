@@ -30,9 +30,9 @@ public class TCruiseTypeService{
            return this.deleteByPrimaryId(cruiseType);
         }
         List<String> list1= Arrays.asList(instanceList.split(","));
-        List<TCruiseType> list = new ArrayList<>();
+        List<TCruiseTypeDetail> list = new ArrayList<>();
         for (String item:list1) {
-            TCruiseType tCruiseType= new TCruiseType();
+            TCruiseTypeDetail tCruiseType= new TCruiseTypeDetail();
             tCruiseType.setSubType(cruiseType);
             tCruiseType.setInstanceId(Long.valueOf(item));
             tCruiseType.setRemark(remark);
@@ -59,7 +59,64 @@ public class TCruiseTypeService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTypeDetail> select(Integer subType) {
-        List<TCruiseTypeDetail> tCruiseTypeList = tCruiseTypeDao.select(subType);
+        List<TCruiseTypeDetail> tCruiseTypeList = new ArrayList<>();
+        if(subType == 213 ){
+            //全面巡视
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectAll();
+            }
+        }
+        if(subType == 322 ){
+            //红外测温
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectByAnalyse();
+            }
+        }
+        if(subType == 323 ){
+            //油温有位
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByOil();
+            }
+        }
+        if(subType == 324 ){
+            //避雷器
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByArrester();
+            }
+        }
+        if(subType == 325 ){
+            //SF6
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeBySF6();
+            }
+        }
+        if(subType == 326 ){
+            //液压表
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByYY();
+            }
+        }
+        if(subType == 327 ){
+            //位置状态识别
+            tCruiseTypeList = tCruiseTypeDao.select(subType);
+            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
+                //库里没有
+                tCruiseTypeList = tCruiseTypeDao.selectByAnalyseByWg();
+            }
+        }
+        this.batchAdd(tCruiseTypeList);
         return tCruiseTypeList;
     }
 
@@ -70,7 +127,7 @@ public class TCruiseTypeService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int batchAdd(List<TCruiseType> list) {
+    public int batchAdd(List<TCruiseTypeDetail> list) {
         return this.tCruiseTypeDao.batchAdd(list);
     }
 
