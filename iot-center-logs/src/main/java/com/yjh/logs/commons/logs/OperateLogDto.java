@@ -9,6 +9,8 @@ import com.yjh.logs.module.log.entity.SysOperateLog;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,6 +25,8 @@ import java.util.Objects;
 @Getter
 @Setter
 public class OperateLogDto {
+
+    private Logger log = LoggerFactory.getLogger(OperateLogDto.class);
 
     private static final int OPERATE_RESULT_SUCCESS = 1;
 
@@ -73,6 +77,7 @@ public class OperateLogDto {
         }
         sysOperateLog.setCreateTime(new Date());
         OperatorDto operatorDto = UserContext.getCurrentUser();
+        log.info("operatorDto: "+operatorDto);
         if(Objects.nonNull(operatorDto)){
             sysOperateLog.setUserId(operatorDto.getUserId());
             sysOperateLog.setUserName(operatorDto.getUserName());
