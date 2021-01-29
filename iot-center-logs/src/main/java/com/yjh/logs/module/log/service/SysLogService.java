@@ -1,10 +1,8 @@
 package com.yjh.logs.module.log.service;
 
-import com.yjh.logs.commons.logs.Logs;
-import com.yjh.logs.commons.logs.OperateLogDto;
-import com.yjh.logs.module.log.dao.SysOperateLogDao;
-import com.yjh.logs.module.log.entity.SysOperateLog;
-import com.yjh.logs.module.log.entity.SysOperateLogDetail;
+import com.yjh.logs.module.log.dao.SysLogDao;
+import com.yjh.logs.module.log.entity.SysLog;
+import com.yjh.logs.module.log.entity.SysLogDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -21,49 +18,48 @@ import java.util.Objects;
 * @since 2021-01-14
 */
 @Service
-public class SysOperateLogService {
+public class SysLogService {
 
     @Autowired
-    private SysOperateLogDao sysOperateLogDao;
+    private SysLogDao sysLogDao;
 
-    private Logger log = LoggerFactory.getLogger(SysOperateLogService.class);
+    private Logger log = LoggerFactory.getLogger(SysLogService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public int insert(OperateLogDto operateLogDto) {
+    public int insert(SysLog sysLog) {
 
-        if(Objects.isNull(operateLogDto)){
-            log.error("SysOperateLogService.addOperateLog >>> error: parameter is null.");
+        if(Objects.isNull(sysLog)){
+            log.error("SysLogService.addOperateLog >>> error: parameter is null.");
             return 1;
         }
-        SysOperateLog sysOperateLog = operateLogDto.formatSysOpLog();
-        return sysOperateLogDao.insert(sysOperateLog);
+        return sysLogDao.insert(sysLog);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long logId) {
-        return this.sysOperateLogDao.deleteByPrimaryId(logId);
+        return this.sysLogDao.deleteByPrimaryId(logId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int update(SysOperateLog sysOperateLog) {
-        return this.sysOperateLogDao.update(sysOperateLog);
+    public int update(SysLog sysLog) {
+        return this.sysLogDao.update(sysLog);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public SysOperateLog selectByPrimaryId(Long logId) {
-        return this.sysOperateLogDao.selectByPrimaryId(logId);
+    public SysLog selectByPrimaryId(Long logId) {
+        return this.sysLogDao.selectByPrimaryId(logId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysOperateLog> select(Long logId, String traceId, String logType, String ip, String title, Integer state, String content, Long userId, String userName, String requestOrigin, String requestPath, Integer requestMethod, Date createTime) {
-        List<SysOperateLog> sysOperateLogList = sysOperateLogDao.select(logId, traceId, logType, ip, title, state, content, userId, userName, requestOrigin, requestPath, requestMethod, createTime);
-        return sysOperateLogList;
+    public List<SysLog> select(Long logId, String logType, String ip, String title, Integer state, String content, Long userId, String userName, String requestOrigin, String requestPath, Integer requestMethod, Date createTime) {
+        List<SysLog> sysLogList = sysLogDao.select(logId, logType, ip, title, state, content, userId, userName, requestOrigin, requestPath, requestMethod, createTime);
+        return sysLogList;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysOperateLogDetail> selectByPage(String userName,String title,Date startTime,Date endTime) {
-        List<SysOperateLogDetail> sysOperateLogList = sysOperateLogDao.selectByPage(userName,title,startTime,endTime);
-        for (SysOperateLogDetail item:sysOperateLogList) {
+    public List<SysLogDetail> selectByPage(String userName, String title, Date startTime, Date endTime) {
+        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPage(userName,title,startTime,endTime);
+        for (SysLogDetail item:sysOperateLogList) {
             String type = item.getLogType();
             if(type != null && !"".equals(type)){
                 if("1".equals(type)){
@@ -101,8 +97,8 @@ public class SysOperateLogService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<SysOperateLog> list) {
-        return this.sysOperateLogDao.batchInsert(list);
+    public int batchInsert(List<SysLog> list) {
+        return this.sysLogDao.batchInsert(list);
     }
 
 }

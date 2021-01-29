@@ -16,7 +16,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "SysOperateLog对象", description = "审计日志表")
-public class SysOperateLogDetail {
+public class SysLogDetail {
     private Long logId;
     private String userName;
     private String title;

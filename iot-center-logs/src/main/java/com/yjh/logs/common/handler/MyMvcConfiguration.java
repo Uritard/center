@@ -1,15 +1,10 @@
 
 package com.yjh.logs.common.handler;
 
-import com.google.common.collect.Lists;
-import com.yjh.logs.commons.logs.interceptor.HttpLogInterceptor;
-import com.yjh.logs.commons.logs.interceptor.HttpTraceInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 /**
   * @ClassName: MyMvcConfiguration
@@ -19,23 +14,16 @@ import java.util.List;
   *
   */
 @Configuration
-public class MyMvcConfiguration implements WebMvcConfigurer {
-
-
-    private final HttpLogInterceptor httpLogInterceptor;
-
-    private final HttpTraceInterceptor httpTraceInterceptor;
-
-    public MyMvcConfiguration(HttpLogInterceptor httpLogInterceptor, HttpTraceInterceptor httpTraceInterceptor) {
-        this.httpLogInterceptor = httpLogInterceptor;
-        this.httpTraceInterceptor = httpTraceInterceptor;
-    }
+public class MyMvcConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        List<String> swaggerPathList = Lists.newArrayList("/v2/api-docs", "/webjars/**", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html/**");
-        registry.addInterceptor(httpTraceInterceptor).addPathPatterns("/**").excludePathPatterns(swaggerPathList);
-        registry.addInterceptor(httpLogInterceptor).addPathPatterns("/**").excludePathPatterns(swaggerPathList);
+        super.addInterceptors(registry);
+        registry.addInterceptor(new WebLogHandler())
+                //.excludePathPatterns("/configuration/ui/**")
+                .excludePathPatterns("/swagger-resources/**")
+                .excludePathPatterns("/webjars/**")
+                .excludePathPatterns("/swagger-ui.html/**");
     }
     /**
      * 配置静态访问资源

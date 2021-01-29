@@ -1,27 +1,25 @@
 package com.yjh.logs.module.log.dao;
 
-import com.yjh.logs.module.log.entity.SysOperateLog;
-import com.yjh.logs.module.log.entity.SysOperateLogDetail;
+import com.yjh.logs.module.log.entity.SysLog;
+import com.yjh.logs.module.log.entity.SysLogDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author tt
  * @since 2021-01-14
  */
 @Repository
-public interface SysOperateLogDao {
+public interface SysLogDao {
 
-    int insert(SysOperateLog sysOperateLog);
+    int insert(SysLog sysLog);
     int deleteByPrimaryId(@Param(value = "logId") Long logId);
-    int update(SysOperateLog sysOperateLog);
-    SysOperateLog selectByPrimaryId(@Param(value = "logId") Long logId);
-    List<SysOperateLog> select(@Param(value = "logId") Long logId,
-                               @Param(value = "traceId") String traceId,
+    int update(SysLog sysLog);
+    SysLog selectByPrimaryId(@Param(value = "logId") Long logId);
+    List<SysLog> select(@Param(value = "logId") Long logId,
                                @Param(value = "logType") String logType,
                                @Param(value = "ip") String ip,
                                @Param(value = "title") String title,
@@ -33,10 +31,10 @@ public interface SysOperateLogDao {
                                @Param(value = "requestPath") String requestPath,
                                @Param(value = "requestMethod") Integer requestMethod,
                                @Param(value = "createTime") Date createTime);
-    List<SysOperateLogDetail> selectByPage(@Param(value = "userName") String userName,
-                                           @Param(value = "title") String title,
-                                           @Param(value = "startTime") Date startTime,
-                                           @Param(value = "endTime") Date endTime);
+    List<SysLogDetail> selectByPage(@Param(value = "userName") String userName,
+                                    @Param(value = "title") String title,
+                                    @Param(value = "startTime") Date startTime,
+                                    @Param(value = "endTime") Date endTime);
 
-    int batchInsert(List<SysOperateLog> list);
+    int batchInsert(List<SysLog> list);
 }

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.logs.module.log.dao.SysOperateLogDao">
+<mapper namespace="com.yjh.logs.module.log.dao.SysLogDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yjh.logs.module.log.entity.SysOperateLog">
+    <resultMap id="BaseResultMap" type="com.yjh.logs.module.log.entity.SysLog">
         <id column="log_id" jdbcType="BIGINT" property="logId" />
-        <result column="trace_id" jdbcType="VARCHAR" property="traceId" />
         <result column="log_type" jdbcType="VARCHAR" property="logType" />
         <result column="ip" jdbcType="VARCHAR" property="ip" />
         <result column="title" jdbcType="VARCHAR" property="title" />
@@ -21,14 +20,13 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        log_id, trace_id, log_type, ip, title, state, content, user_id, user_name, request_origin, request_path, request_method, create_time
+        log_id, log_type, ip, title, state, content, user_id, user_name, request_origin, request_path, request_method, create_time
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="logId" parameterType="com.yjh.logs.module.log.entity.SysOperateLog">
-        insert into sys_operate_log(
+    <insert id="insert" useGeneratedKeys="true" keyProperty="logId" parameterType="com.yjh.logs.module.log.entity.SysLog">
+        insert into sys_logs(
             log_id,
-            trace_id,
             log_type,
             ip,
             title,
@@ -42,7 +40,6 @@
             create_time
         )values(
                 #{logId, jdbcType=BIGINT},
-                #{traceId, jdbcType=VARCHAR},
                 #{logType, jdbcType=VARCHAR},
                 #{ip, jdbcType=VARCHAR},
                 #{title, jdbcType=VARCHAR},
@@ -58,14 +55,13 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from sys_operate_log
+        delete from sys_logs
                 where log_id = #{logId, jdbcType=BIGINT}
     </delete>
 
-    <update id="update" parameterType="com.yjh.logs.module.log.entity.SysOperateLog">
-        update sys_operate_log a <set>
+    <update id="update" parameterType="com.yjh.logs.module.log.entity.SysLog">
+        update sys_logs a <set>
         <if test="logId != null and logId != ''">a.log_id = #{logId, jdbcType=BIGINT},</if>
-        <if test="traceId != null and traceId != ''">a.trace_id = #{traceId, jdbcType=VARCHAR},</if>
         <if test="logType != null and logType != ''">a.log_type = #{logType, jdbcType=VARCHAR},</if>
         <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
         <if test="title != null and title != ''">a.title = #{title, jdbcType=VARCHAR},</if>
@@ -81,10 +77,9 @@
             where a.log_id = #{logId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.logs.module.log.entity.SysOperateLog">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.logs.module.log.entity.SysLog">
         select
         a.log_id,
-        a.trace_id,
         a.log_type,
         a.ip,
         a.title,
@@ -96,16 +91,15 @@
         a.request_path,
         a.request_method,
         a.create_time
-        from sys_operate_log a
+        from sys_logs a
         where 1 = 1
             and a.log_id = #{logId, jdbcType=BIGINT}
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.logs.module.log.entity.SysOperateLog" resultType="com.yjh.logs.module.log.entity.SysOperateLog">
+    <select id="select" parameterType="com.yjh.logs.module.log.entity.SysLog" resultType="com.yjh.logs.module.log.entity.SysLog">
         select
         a.log_id,
-        a.trace_id,
         a.log_type,
         a.ip,
         a.title,
@@ -117,10 +111,9 @@
         a.request_path,
         a.request_method,
         a.create_time
-        from sys_operate_log a
+        from sys_logs a
         where 1 = 1
         <if test="logId != null and logId != ''"> and a.log_id = #{logId, jdbcType=BIGINT}</if>
-        <if test="traceId != null and traceId != ''"> and a.trace_id = #{traceId, jdbcType=VARCHAR}</if>
         <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
         <if test="ip != null and ip != ''"> and a.ip = #{ip, jdbcType=VARCHAR}</if>
         <if test="title != null and title != ''"> and a.title = #{title, jdbcType=VARCHAR}</if>
@@ -134,7 +127,7 @@
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
 
-    <select id="selectByPage"  resultType="com.yjh.logs.module.log.entity.SysOperateLogDetail">
+    <select id="selectByPage"  resultType="com.yjh.logs.module.log.entity.SysLogDetail">
         select
         a.log_id as logId,
         a.user_name as userName,
@@ -143,7 +136,7 @@
         a.log_type as logType,
         a.content,
         a.create_time as createTime
-        from sys_operate_log a
+        from sys_logs a
         where 1 = 1
         <if test="title != null and title != ''"> and a.title like concat('%',#{title, jdbcType=VARCHAR},'%') </if>
         <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
@@ -152,9 +145,8 @@
     </select>
 
     <insert id="batchInsert">
-        insert into sys_operate_log(
+        insert into sys_logs(
             log_id,
-            trace_id,
             log_type,
             ip,
             title,
@@ -167,10 +159,9 @@
             request_method,
             create_time
         )values
-        <foreach collection="list" item="SysOperateLog" separator=",">
+        <foreach collection="list" item="SysLog" separator=",">
             (
                 #{SysOperateLog.logId, jdbcType=BIGINT},
-                #{SysOperateLog.traceId, jdbcType=VARCHAR},
                 #{SysOperateLog.logType, jdbcType=VARCHAR},
                 #{SysOperateLog.ip, jdbcType=VARCHAR},
                 #{SysOperateLog.title, jdbcType=VARCHAR},

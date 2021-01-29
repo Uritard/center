@@ -18,8 +18,8 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "SysOperateLog对象", description = "审计日志表")
-public class SysOperateLog implements Serializable {
+@ApiModel(value = "SysLog对象", description = "审计日志表")
+public class SysLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,9 +27,6 @@ public class SysOperateLog implements Serializable {
     @ApiModelProperty(value = "主键ID")
     @TableId(value = "log_id", type = IdType.AUTO)
     private Long logId;
-
-    @ApiModelProperty(value = "链路追踪ID")
-    private String traceId;
 
     @ApiModelProperty(value = "操作类型(1-查询;2-新增;3-修改;4-删除;5-执行)")
     private String logType;
