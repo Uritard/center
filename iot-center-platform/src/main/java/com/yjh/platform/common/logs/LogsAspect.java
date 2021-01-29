@@ -67,9 +67,7 @@ public class LogsAspect {
             if (Objects.nonNull(request.getHeader("userId")) && !Objects.equals(request.getHeader("userId"), "undefined")) {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName"));
-            } else {
-                userName = request.getParameter("userName");
-            }
+            } else { userName = "admin"; }
         }
         ip = IPUtil.getRemoteIP(request);
         Object result = null;

@@ -267,7 +267,6 @@ public class SysUserController {
 
     @ApiOperation(value = "用户登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @Logs(title = "操作",content = "用户登录",logType = 5)
     public Result userLogin(HttpServletRequest request, @RequestBody Map<String, String> userMap) {
         Result result = new Result();
         try {

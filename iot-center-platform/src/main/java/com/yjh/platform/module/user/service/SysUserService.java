@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
@@ -102,8 +103,8 @@ public class SysUserService {
                     params.set("userId", sysUserLogin.getUserId());
                     params.set("userName", userName);
                     params.set("content", "用户登录");
-                    //LogsAspect logsAspect = new LogsAspect();
-                    //logsAspect.post(params);
+                    LogsAspect logsAspect = new LogsAspect();
+                    logsAspect.post(params);
                     String userIds = String.valueOf(sysUserLogin.getUserId());
                     String keys = Constant.account_lock_time.replace("userAccountID", userIds);
                     //系统当前时间
@@ -203,8 +204,8 @@ public class SysUserService {
                 }
                 params.set("userName", userName);
                 params.set("content", "用户名或密码错误登录失败");
-//                LogsAspect logsAspect = new LogsAspect();
-//                logsAspect.post(params);
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
                 if (sysUserList.size() == 0) {
                     mapResult.put("info", ResultCodeEnum.CODE10101.getName());
                     mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
