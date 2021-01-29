@@ -96,7 +96,7 @@ public class SysUserService {
                     String appKey = getRandomNickname(10);
                     sysUserLogin.setAppkey(appKey);
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                    params.set("logType", "iot-center-platform:module");
+                    params.set("logType", "5");
                     params.set("ip", request.getRequestURI());
                     params.set("title", "登录");
                     params.set("state", 1);
@@ -193,7 +193,7 @@ public class SysUserService {
                 //登陆错误判断用户是否存在
                 List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userMap.get("userName"));
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "iot-center-platform:module");
+                params.set("logType", "5");
                 params.set("ip", request.getRequestURI());
                 params.set("title", "登录");
                 params.set("state", 1);

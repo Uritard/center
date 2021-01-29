@@ -74,7 +74,7 @@ public class LogsAspect {
         if (annotation != null) {
             try {
                 serviceId = logsConfig.getName();
-                params.set("logType", serviceId+":"+annotation.code());
+                params.set("logType", annotation.logType());
                 params.set("ip", ip);
                 params.set("title", annotation.title());
                 params.set("state", 1);
@@ -109,7 +109,7 @@ public class LogsAspect {
             return joinPoint.proceed();
         } catch (Throwable e) {
             serviceId = logsConfig.getName();
-            params.set("logType", serviceId);
+            params.set("logType", annotation.logType());
             params.set("ip", ip);
             params.set("title", "内部接口错误");
             params.set("state", 3);
