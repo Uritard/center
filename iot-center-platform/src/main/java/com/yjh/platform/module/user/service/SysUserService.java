@@ -4,7 +4,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.IPUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -98,7 +97,7 @@ public class SysUserService {
                     sysUserLogin.setAppkey(appKey);
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                     params.set("logType", "5");
-                    params.set("ip", IPUtil.getRemoteIP(request));
+                    params.set("ip", request.getRemoteHost());
                     params.set("title", "登录");
                     params.set("state", 1);
                     params.set("userId", sysUserLogin.getUserId());
@@ -198,7 +197,7 @@ public class SysUserService {
                 List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userMap.get("userName"));
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "5");
-                params.set("ip", IPUtil.getRemoteIP(request));
+                params.set("ip", request.getRemoteHost());
                 params.set("title", "登录");
                 params.set("state", 1);
                 if (sysUserList.size() == 0) {

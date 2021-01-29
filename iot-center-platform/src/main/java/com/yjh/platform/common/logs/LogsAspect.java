@@ -69,11 +69,12 @@ public class LogsAspect {
                 userName = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName"));
             } else { userName = "admin"; }
         }
-        ip = IPUtil.getRemoteIP(request);
+//        ip = IPUtil.getRemoteIP(request);
+        ip = request.getRemoteHost();
         Object result = null;
         if (annotation != null) {
             try {
-                serviceId = logsConfig.getName();
+//                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());
                 params.set("ip", ip);
                 params.set("title", annotation.title());
