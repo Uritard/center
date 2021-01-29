@@ -159,6 +159,7 @@ public class TStdMetemodelService {
           detail.setMeteType(mete.getMeteType());
           detail.setMeteKind(mete.getMeteKind());//插入meteKind
           detail.setUnit(mete.getUnit());
+          detail.setAnalyseType(mete.getAnalyseType());
           detail.setAlarmNote(mete.getAlarmNote());
           detail.setAlarmExplain(mete.getAlarmExplain());
           detail.setAlarmType(mete.getAlarmType());

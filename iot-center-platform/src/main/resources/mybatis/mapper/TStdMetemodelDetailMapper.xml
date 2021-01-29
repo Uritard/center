@@ -79,7 +79,7 @@
                 #{meteName, jdbcType=VARCHAR},
                 #{meteType, jdbcType=VARCHAR},
                 #{meteKind, jdbcType=INTEGER},
-                #{analyse_type, jdbcType=INTEGER},
+                #{analyseType, jdbcType=INTEGER},
                 #{unit, jdbcType=VARCHAR},
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmExplain, jdbcType=VARCHAR},

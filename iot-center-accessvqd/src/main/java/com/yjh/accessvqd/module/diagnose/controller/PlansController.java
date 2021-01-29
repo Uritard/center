@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,13 +78,17 @@ public class PlansController {
 
     @ApiOperation(value = "诊断任务新增/修改--下发")
     @RequestMapping(value = "/diagnosePlanExecute", method = RequestMethod.POST)
-    public Result diagnosePlanExecute(@RequestBody Plans plans) {
+    public Result diagnosePlanExecute(HttpServletRequest request, @RequestBody Plans plans) {
         Result result = new Result();
         try {
-            if(plansService.diagnosePlanUpAdd(plans).equals("failed")){
-                result.setMessage(3030, "任务下发失败");
+            plans.setUserId(Long.valueOf(request.getHeader("userId").toString()));
+            String status=plansService.diagnosePlanUpAdd(plans);
+            if(status.equals("failed")){
+                result.setMessage(3030,"任务下发失败");
+            }else if(status.equals("success")){
+                result.setData(status);
             }else {
-                result.setData(plansService.diagnosePlanUpAdd(plans));
+                result.setMessage(800,status);
             }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -124,8 +129,14 @@ public class PlansController {
     public Result test(@RequestParam String time) {
         Result result = new Result();
         try {
-            String str="视频丢失,视频抖动,";
-            result.setData(str.substring(0,str.length()-1));
+            String str="signal,blur";
+            String[] arr=str.split(",");
+            List<String> r1=new ArrayList<>();
+            for(int i=0;i<arr.length;i++){
+                r1.add(arr[i]+"----");
+
+            }
+            result.setData(r1);
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("任务下发失败" + e);
@@ -136,7 +147,7 @@ public class PlansController {
 
     @ApiOperation(value = "查询NVR-channel树")
     @RequestMapping(value = "/selectNVRChannelTree",method = RequestMethod.GET)
-    public Result selectNVRChannelTree(@RequestParam(value = "diagnosePlanId")String diagnosePlanId){
+    public Result selectNVRChannelTree(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId){
         Result result=new Result();
         try {
             result.setData(plansService.selectNVRChannelTree(diagnosePlanId));

@@ -2,6 +2,7 @@ package com.yjh.accessvqd.module.diagnose.dao;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.accessvqd.module.diagnose.entity.NVRChannelTree;
 import com.yjh.accessvqd.module.diagnose.entity.PlanInfo;
@@ -39,5 +40,11 @@ public interface TDiagnosePlanDao {
 
     //查询NVR-ChannelTree
     List<NVRChannelTree> selectNVRNode();
-    List<NVRChannelTree> selectChannelNode(@Param(value = "recordId")String recordId);
+    List<NVRChannelTree> selectChannelNode(@Param(value = "recordId")String recordId,
+                                           List<String>list);
+
+    //查询所有任务ID
+    List<Map<String,String>> selectPlanInfo();
+    //查询某立即任务下绑定的监测点ID
+    List<String>selectAtOnceTaskList(@Param(value = "planId")String planId);
 }

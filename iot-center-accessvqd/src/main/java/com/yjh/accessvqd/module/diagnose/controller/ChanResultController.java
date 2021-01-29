@@ -17,10 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.yjh.accessvqd.module.diagnose.service.ChanResultService;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author czh
@@ -197,10 +195,9 @@ public class ChanResultController {
 
     @ApiOperation(value = "分页条件查询诊断结果详细信息")
     @RequestMapping(value = "/selectDiagnoseResultByPage", method = RequestMethod.GET)
-    public Result selectDiagnoseResultByPage(@RequestParam(value = "planName",required = false)String planName,
-                                             @RequestParam(value = "channelName",required = false)String channelName,
-                                             @RequestParam(value = "startTime",required = false)Date startTime,
-                                             @RequestParam(value = "endTime",required = false)Date endTime,
+    public Result selectDiagnoseResultByPage(@RequestParam(value = "pointId",required = false)String pointId,
+                                             @RequestParam(value = "startTime",required = false)String startTime,
+                                             @RequestParam(value = "endTime",required = false)String endTime,
                                              @RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
                                              @RequestParam(value = "status",required = false)String status,
                                              @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -209,7 +206,20 @@ public class ChanResultController {
         Map<String,Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<DiagnoseResultDetail> list = chanResultService.selectDiagnoseResultByPage(planName, channelName, startTime,endTime,diagnosePlanId,status);
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date startDate=null;
+            Date endDate=null;
+            if(Objects.nonNull(startTime)){
+                if(!(startTime.equals("")))
+                    startDate=simpleDateFormat.parse(startTime);
+            }
+
+            if(Objects.nonNull(endTime)){
+                if(!(endTime.equals("")))
+                    endDate=simpleDateFormat.parse(endTime);
+            }
+
+            List<DiagnoseResultDetail> list = chanResultService.selectDiagnoseResultByPage(pointId,startDate ,endDate,diagnosePlanId,status);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -224,11 +234,11 @@ public class ChanResultController {
 
     @ApiOperation(value = "故障点数统计")
     @RequestMapping(value = "/faultCount", method = RequestMethod.GET)
-    public Result faultCount(@RequestParam(value = "planName",required = false)String planName,
-                             @RequestParam(value = "channelName",required = false)String channelName) {
+    public Result faultCount(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
+                             @RequestParam(value = "channelId",required = false)String channelId) {
         Result result = new Result();
         try {
-            result.setData(chanResultService.faultCounts(planName, channelName));
+            result.setData(chanResultService.faultCounts(diagnosePlanId, channelId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询失败：" + e);
@@ -239,11 +249,11 @@ public class ChanResultController {
 
     @ApiOperation(value = "监测点状态点数统计")
     @RequestMapping(value = "/channelStatusCount", method = RequestMethod.GET)
-    public Result channelStatusCount(@RequestParam(value = "planName",required = false)String planName,
-                                     @RequestParam(value = "channelName",required = false)String channelName) {
+    public Result channelStatusCount(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
+                                     @RequestParam(value = "channelId",required = false)String channelId) {
         Result result = new Result();
         try {
-            result.setData(chanResultService.statusTypeChannel(planName, channelName));
+            result.setData(chanResultService.statusTypeChannel(diagnosePlanId, channelId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询失败：" + e);
@@ -266,13 +276,13 @@ public class ChanResultController {
     }
 
     @ApiOperation(value = "统计分析")
-    @RequestMapping(value = "/staticalAnalysis", method = RequestMethod.POST)
-    public Result staticalAnalysis(@RequestBody List<Map<String,String>> checkedList,
+    @RequestMapping(value = "/staticalAnalysis", method = RequestMethod.GET)
+    public Result staticalAnalysis(@RequestParam (value = "checked")String checked,
                                    @RequestParam(value = "startTime",required = false)String startTime,
                                    @RequestParam(value = "endTime",required = false)String endTime) {
         Result result = new Result();
         try {
-            result.setData(chanResultService.staticalAnalysis(checkedList, startTime, endTime));
+            result.setData(chanResultService.staticalAnalysis(checked, startTime, endTime));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询失败：" + e);

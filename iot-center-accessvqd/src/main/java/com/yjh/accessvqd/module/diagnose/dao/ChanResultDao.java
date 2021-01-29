@@ -49,19 +49,19 @@ public interface ChanResultDao {
     int batchInsert(List<ChanResult> list);
 
     //分页条件查询诊断结果
-    List<DiagnoseResultDetail> selectDiagnoseResultByPage(@Param(value = "planName")String planName,
-                                                          @Param(value = "channelName")String channelName,
+    List<DiagnoseResultDetail> selectDiagnoseResultByPage(@Param(value = "pointId")String pointId,
                                                           @Param(value = "startTime")Date startTime,
                                                           @Param(value = "endTime")Date endTime,
                                                           @Param(value = "diagnosePlanId")String diagnosePlanId,
                                                           @Param(value = "status")String status);
     //不同故障类型点数量统计
-    Map<String,Long>faultTypeSta(@Param(value = "planName")String planName,
-                                 @Param(value = "channelName")String channelName);
+    Map<String,Long>faultTypeSta(@Param(value = "planId")String planId,
+                                 @Param(value = "channelId")String channelId);
     //不同监测点状态点数量统计
-    Map<String,Long>statusTypeChannel(@Param(value = "planName")String planName,
-                                      @Param(value = "channelName")String channelName);
+    Map<String,Long>statusTypeChannel(@Param(value = "planId")String planId,
+                                      @Param(value = "channelId")String channelId);
 
+    //结果统计分析
     List<Map<String,Object>> staticalAnalysis(@Param(value = "startTime")Date startTime,
                                               @Param(value = "endTime")Date endTime);
 

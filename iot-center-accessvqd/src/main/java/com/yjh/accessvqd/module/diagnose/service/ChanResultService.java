@@ -120,12 +120,13 @@ public class ChanResultService {
 
     @Logs(title = "分页查询诊断结果详细信息", code = "chanResult")
     @Transactional(rollbackFor = Exception.class)
-    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String planName, String channelName, Date startTime, Date endTime, String diagnosePlanId,String status) {
-        List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(planName, channelName, startTime, endTime, diagnosePlanId,status);
+    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId,String status) {
+        List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(pointId, startTime, endTime, diagnosePlanId,status);
         log.info("result：" + details);
         for (DiagnoseResultDetail detail : details) {
             detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
             checkItemsOperate(detail);
+            //获取视频地址
             HashMap<String,Long> camera=new HashMap<>();
             camera.put("cameraId",detail.getCameraId());
             Result result=sendGetRequest(Constant.START_CAMERA_URL,camera);
@@ -264,13 +265,13 @@ public class ChanResultService {
 
     @Logs(title = "统计不同故障类型的诊断点数")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Long> faultCounts(String planName,String channelName) {
-        return chanResultDao.faultTypeSta(planName, channelName);
+    public Map<String, Long> faultCounts(String planId,String channelId) {
+        return chanResultDao.faultTypeSta(planId, channelId);
     }
 
     @Logs(title = "统计不同监测点状态")
-    public Map<String, Long> statusTypeChannel(String planName,String channelName) {
-        return chanResultDao.statusTypeChannel(planName, channelName);
+    public Map<String, Long> statusTypeChannel(String planId,String channelId) {
+        return chanResultDao.statusTypeChannel(planId, channelId);
     }
 
     @Logs(title = "故障信息树")
@@ -289,89 +290,169 @@ public class ChanResultService {
     }
 
     @Logs(title = "统计分析")
-    public Map<String,List<Map<String, Object>>> staticalAnalysis(List<Map<String,String>> faultInfo,String startDate,String endDate) throws ParseException {
+    public Map<String,List<Map<String, Object>>> staticalAnalysis(String faultInfo,String startDate,String endDate) throws ParseException {
 
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date startTime=null;
         Date endTime=null;
         if(Objects.nonNull(startDate)){
-             startTime=simpleDateFormat.parse(startDate);
-             endTime=simpleDateFormat.parse(endDate);
+            if(!(startDate.equals(""))){
+                startTime=simpleDateFormat.parse(startDate);
+            }
+
+        }
+        if(Objects.nonNull(endDate)){
+            if(!(endDate.equals(""))){
+                endTime=simpleDateFormat.parse(endDate);
+            }
+
         }
         List<Map<String,Object>> charData=new ArrayList<>();
         List<Map<String,Object>> gridData=new ArrayList<>();
         List<Map<String,Object>> mapList=chanResultDao.staticalAnalysis(startTime,endTime);
 
+        String[] faultArr=faultInfo.split(",");
+        for(int i=0;i<faultArr.length;i++){
+            switch (faultArr[i]){
+                case "signal":
+                    charData.add(mapList.get(0));
+                    gridData.add(mapList.get(0));
+                    break;
+                case "blur":
+                    charData.add(mapList.get(1));
+                    gridData.add(mapList.get(1));
+                    break;
+                case "contrast":
+                    charData.add(mapList.get(2));
+                    gridData.add(mapList.get(2));
+                    break;
+                case "bright":
+                    charData.add(mapList.get(3));
+                    gridData.add(mapList.get(3));
+                    break;
+                case "dark":
+                    charData.add(mapList.get(4));
+                    gridData.add(mapList.get(4));
+                    break;
+                case "chroma":
+                    charData.add(mapList.get(5));
+                    gridData.add(mapList.get(5));
+                    break;
+                case "mono":
+                    charData.add(mapList.get(6));
+                    gridData.add(mapList.get(6));
+                    break;
+                case "noise":
+                    charData.add(mapList.get(7));
+                    gridData.add(mapList.get(7));
+                    break;
+                case "streak":
+                    charData.add(mapList.get(8));
+                    gridData.add(mapList.get(8));
+                    break;
+                case "freeze":
+                    charData.add(mapList.get(9));
+                    gridData.add(mapList.get(9));
+                    break;
+                case "shake":
+                    charData.add(mapList.get(10));
+                    gridData.add(mapList.get(10));
+                    break;
+                case "flash":
+                    charData.add(mapList.get(11));
+                    gridData.add(mapList.get(11));
+                    break;
+                case "scene":
+                    charData.add(mapList.get(12));
+                    gridData.add(mapList.get(12));
+                    break;
+                case "cover":
+                    charData.add(mapList.get(13));
+                    gridData.add(mapList.get(13));
+                    break;
+                case "ptz":
+                    charData.add(mapList.get(14));
+                    gridData.add(mapList.get(14));
+                    break;
+                case "login":
+                    charData.add(mapList.get(15));
+                    gridData.add(mapList.get(15));
+                    break;
+                case "stream":
+                    charData.add(mapList.get(16));
+                    gridData.add(mapList.get(16));
+                    break;
+            }
+        }
 
-
-        if(faultInfo.get(0).get("checked").equals("1")){
-            charData.add(mapList.get(0));
-            gridData.add(mapList.get(0));
-        }
-        if(faultInfo.get(1).get("checked").equals("1")){
-            charData.add(mapList.get(1));
-            gridData.add(mapList.get(1));
-        }
-        if(faultInfo.get(2).get("checked").equals("1")){
-            charData.add(mapList.get(2));
-            gridData.add(mapList.get(2));
-        }
-        if(faultInfo.get(3).get("checked").equals("1")){
-            charData.add(mapList.get(3));
-            gridData.add(mapList.get(3));
-        }
-        if(faultInfo.get(4).get("checked").equals("1")){
-            charData.add(mapList.get(4));
-            gridData.add(mapList.get(4));
-        }
-        if(faultInfo.get(5).get("checked").equals("1")){
-            charData.add(mapList.get(5));
-            gridData.add(mapList.get(5));
-        }
-        if(faultInfo.get(6).get("checked").equals("1")){
-            charData.add(mapList.get(6));
-            gridData.add(mapList.get(6));
-        }
-        if(faultInfo.get(7).get("checked").equals("1")){
-            charData.add(mapList.get(7));
-            gridData.add(mapList.get(7));
-        }
-        if(faultInfo.get(8).get("checked").equals("1")){
-            charData.add(mapList.get(8));
-            gridData.add(mapList.get(8));
-        }
-        if(faultInfo.get(9).get("checked").equals("1")){
-            charData.add(mapList.get(9));
-            gridData.add(mapList.get(9));
-        }
-        if(faultInfo.get(10).get("checked").equals("1")){
-            charData.add(mapList.get(10));
-            gridData.add(mapList.get(10));
-        }
-        if(faultInfo.get(11).get("checked").equals("1")){
-            charData.add(mapList.get(11));
-            gridData.add(mapList.get(11));
-        }
-        if(faultInfo.get(12).get("checked").equals("1")){
-            charData.add(mapList.get(12));
-            gridData.add(mapList.get(12));
-        }
-        if(faultInfo.get(13).get("checked").equals("1")){
-            charData.add(mapList.get(13));
-            gridData.add(mapList.get(13));
-        }
-        if(faultInfo.get(14).get("checked").equals("1")){
-            charData.add(mapList.get(14));
-            gridData.add(mapList.get(14));
-        }
-        if(faultInfo.get(15).get("checked").equals("1")){
-            charData.add(mapList.get(15));
-            gridData.add(mapList.get(15));
-        }
-        if(faultInfo.get(16).get("checked").equals("1")){
-            charData.add(mapList.get(16));
-            gridData.add(mapList.get(16));
-        }
+//        if(faultInfo.get(0).get("checked").equals("1")){
+//            charData.add(mapList.get(0));
+//            gridData.add(mapList.get(0));
+//        }
+//        if(faultInfo.get(1).get("checked").equals("1")){
+//            charData.add(mapList.get(1));
+//            gridData.add(mapList.get(1));
+//        }
+//        if(faultInfo.get(2).get("checked").equals("1")){
+//            charData.add(mapList.get(2));
+//            gridData.add(mapList.get(2));
+//        }
+//        if(faultInfo.get(3).get("checked").equals("1")){
+//            charData.add(mapList.get(3));
+//            gridData.add(mapList.get(3));
+//        }
+//        if(faultInfo.get(4).get("checked").equals("1")){
+//            charData.add(mapList.get(4));
+//            gridData.add(mapList.get(4));
+//        }
+//        if(faultInfo.get(5).get("checked").equals("1")){
+//            charData.add(mapList.get(5));
+//            gridData.add(mapList.get(5));
+//        }
+//        if(faultInfo.get(6).get("checked").equals("1")){
+//            charData.add(mapList.get(6));
+//            gridData.add(mapList.get(6));
+//        }
+//        if(faultInfo.get(7).get("checked").equals("1")){
+//            charData.add(mapList.get(7));
+//            gridData.add(mapList.get(7));
+//        }
+//        if(faultInfo.get(8).get("checked").equals("1")){
+//            charData.add(mapList.get(8));
+//            gridData.add(mapList.get(8));
+//        }
+//        if(faultInfo.get(9).get("checked").equals("1")){
+//            charData.add(mapList.get(9));
+//            gridData.add(mapList.get(9));
+//        }
+//        if(faultInfo.get(10).get("checked").equals("1")){
+//            charData.add(mapList.get(10));
+//            gridData.add(mapList.get(10));
+//        }
+//        if(faultInfo.get(11).get("checked").equals("1")){
+//            charData.add(mapList.get(11));
+//            gridData.add(mapList.get(11));
+//        }
+//        if(faultInfo.get(12).get("checked").equals("1")){
+//            charData.add(mapList.get(12));
+//            gridData.add(mapList.get(12));
+//        }
+//        if(faultInfo.get(13).get("checked").equals("1")){
+//            charData.add(mapList.get(13));
+//            gridData.add(mapList.get(13));
+//        }
+//        if(faultInfo.get(14).get("checked").equals("1")){
+//            charData.add(mapList.get(14));
+//            gridData.add(mapList.get(14));
+//        }
+//        if(faultInfo.get(15).get("checked").equals("1")){
+//            charData.add(mapList.get(15));
+//            gridData.add(mapList.get(15));
+//        }
+//        if(faultInfo.get(16).get("checked").equals("1")){
+//            charData.add(mapList.get(16));
+//            gridData.add(mapList.get(16));
+//        }
 
         Map<String,List<Map<String, Object>>> map=new HashMap<>();
         map.put("charData",charData);
