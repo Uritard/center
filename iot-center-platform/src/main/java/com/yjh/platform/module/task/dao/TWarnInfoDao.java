@@ -64,7 +64,9 @@ public interface TWarnInfoDao {
                                            @Param(value = "endTime")String endTime);
     List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
     List<WarnStatistical> countWarnOnMonth();
-    List<WarnStatistical> countWarnAndDefectOnMonth();
+    List<WarnStatistical> countWarnAndDefectOnMonth1();//近一月告警
+    List<WarnStatistical> countWarnAndDefectOnMonth2();//近一月缺陷
+
 
     //查询未审核告警信息数量(查询所有未被核查的告警信息条数)
     Integer warnCountsNonIdentify();

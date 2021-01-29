@@ -510,8 +510,8 @@
         a.defect_id,
         a.device_id,
         b.device_name,
-        b.custom_name,
         k.mete_name,
+        b.custom_name,
         a.defect_content,
         a.defect_level AS alarm_level,
         c.dict_note AS alarm_level_name,
@@ -627,7 +627,7 @@
          ORDER BY c_ount desc
     </select>
     <!--统计近一月的所有告警和缺陷个数-->
-    <select id="countWarnAndDefectOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+    <select id="countWarnAndDefectOnMonth1" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
         a.timeNode,
         ifnull( b.count, 0 ) AS count
@@ -645,6 +645,29 @@
         t_warn_info
         WHERE
         DATEDIFF( now( ), warn_time )  &lt;= 31
+        GROUP BY
+        date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
+    </select>
+    <select id="countWarnAndDefectOnMonth2" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+        a.timeNode,
+        ifnull( b.count, 0 ) AS count
+        FROM
+        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
+        from mysql.help_topic
+        where help_topic_id  &lt; day(last_day(curdate()))
+        order by help_topic_id) a
+        LEFT JOIN (
+        SELECT
+        DATE(defect_time) date,
+        defect_time,
+        count( 1 ) AS count
+        FROM
+        t_defect_info
+        WHERE
+        DATEDIFF( now( ), defect_time )  &lt;= 31
         GROUP BY
         date
         ) b ON a.timeNode = b.date

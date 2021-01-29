@@ -262,8 +262,8 @@ public class ReportDataRepo {
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[4]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[5]},
-                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
+        /*elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[5]},
+                TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));*/
         rowIndex++;
         rowCount++;
 

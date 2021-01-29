@@ -150,8 +150,23 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnAndDefectOnMonth() {
-        List<WarnStatistical> list = tWarnInfoDao.countWarnAndDefectOnMonth();
-        return list;
+        List<WarnStatistical> WarnList = tWarnInfoDao.countWarnAndDefectOnMonth1();//近一月告警
+//        log.info("WarnList==="+WarnList);
+        List<WarnStatistical> defectList = tWarnInfoDao.countWarnAndDefectOnMonth2();//近一月缺陷
+//        log.info("defectList==="+defectList);
+        List<WarnStatistical> finalLst = new ArrayList<>();
+        for (WarnStatistical ws : WarnList){
+            for (WarnStatistical ws1 : defectList){
+                if (ws.getTimeNode().equals(ws1.getTimeNode())){
+                    WarnStatistical wsl = new WarnStatistical();
+                    wsl.setTimeNode(ws.getTimeNode());
+                    wsl.setCount(ws.getCount() + ws1.getCount());
+                    finalLst.add(wsl);
+                }
+            }
+        }
+//        log.info("最后的list是==="+finalLst);
+        return finalLst;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnOnMonth() {
