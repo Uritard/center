@@ -1,8 +1,11 @@
 package com.yjh.gateway.commons.utils.smUtil;
 
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECFieldElement.Fp;
@@ -112,20 +115,20 @@ public class SM2 {
 		do {
 			do {
 				// 正是环境
-				/*AsymmetricCipherKeyPair keypair = ecc_key_pair_generator.generateKeyPair();
+				AsymmetricCipherKeyPair keypair = ecc_key_pair_generator.generateKeyPair();
 				ECPrivateKeyParameters ecpriv = (ECPrivateKeyParameters) keypair.getPrivate();
 				ECPublicKeyParameters ecpub = (ECPublicKeyParameters) keypair.getPublic();
 				k = ecpriv.getD();
-				kp = ecpub.getQ();*/
+				kp = ecpub.getQ();
 				
 				// 国密规范测试 随机数k
-				String kS = "6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F";
-		        k = new BigInteger(kS, 16);
-		        kp = this.ecc_point_g.multiply(k);
-				
-		        System.out.println("计算曲线点X1: " + kp.getX().toBigInteger().toString(16));
-				System.out.println("计算曲线点Y1: " + kp.getY().toBigInteger().toString(16));
-				System.out.println("");
+//				String kS = "6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F";
+//		        k = new BigInteger(kS, 16);
+//		        kp = this.ecc_point_g.multiply(k);
+//
+//		        System.out.println("计算曲线点X1: " + kp.getX().toBigInteger().toString(16));
+//				System.out.println("计算曲线点Y1: " + kp.getY().toBigInteger().toString(16));
+//				System.out.println("");
 
 				// r
 				r = e.add(kp.getX().toBigInteger());
@@ -154,16 +157,16 @@ public class SM2 {
             return;
         } else {
             ECPoint x1y1 = ecc_point_g.multiply(sm2Result.s);
-            System.out.println("计算曲线点X0: " + x1y1.getX().toBigInteger().toString(16));
-			System.out.println("计算曲线点Y0: " + x1y1.getY().toBigInteger().toString(16));
-			System.out.println("");
+//            System.out.println("计算曲线点X0: " + x1y1.getX().toBigInteger().toString(16));
+//			System.out.println("计算曲线点Y0: " + x1y1.getY().toBigInteger().toString(16));
+//			System.out.println("");
 			
             x1y1 = x1y1.add(userKey.multiply(t));
-            System.out.println("计算曲线点X1: " + x1y1.getX().toBigInteger().toString(16));
-			System.out.println("计算曲线点Y1: " + x1y1.getY().toBigInteger().toString(16));
-			System.out.println("");
+//            System.out.println("计算曲线点X1: " + x1y1.getX().toBigInteger().toString(16));
+//			System.out.println("计算曲线点Y1: " + x1y1.getY().toBigInteger().toString(16));
+//			System.out.println("");
             sm2Result.R = e.add(x1y1.getX().toBigInteger()).mod(ecc_n);
-            System.out.println("R: " + sm2Result.R.toString(16));
+//            System.out.println("R: " + sm2Result.R.toString(16));
             return;
         }
     }
