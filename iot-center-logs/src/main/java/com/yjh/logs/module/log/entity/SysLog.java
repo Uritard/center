@@ -56,7 +56,7 @@ public class SysLog implements Serializable {
     private String requestPath;
 
     @ApiModelProperty(value = "请求方式(1-GET;2-HEAD;3-POST;4-PUT;5-DELETE;6-CONNECT;7-OPTIONS;8-TRACE;9-PATCH)")
-    private Integer requestMethod;
+    private String requestMethod;
 
     @ApiModelProperty(value = "更新时间")
     private Date createTime;

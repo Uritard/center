@@ -81,6 +81,9 @@ public class LogsAspect {
                 content.append(annotation.content());
                 params.set("userId", userId);
                 params.set("userName", userName);
+                params.set("requestOrigin", request.getRequestURL());
+                params.set("requestPath", request.getRequestURI());
+                params.set("requestMethod", request.getMethod());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

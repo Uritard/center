@@ -29,7 +29,7 @@ public interface SysLogDao {
                                @Param(value = "userName") String userName,
                                @Param(value = "requestOrigin") String requestOrigin,
                                @Param(value = "requestPath") String requestPath,
-                               @Param(value = "requestMethod") Integer requestMethod,
+                               @Param(value = "requestMethod") String requestMethod,
                                @Param(value = "createTime") Date createTime);
     List<SysLogDetail> selectByPage(@Param(value = "userName") String userName,
                                     @Param(value = "title") String title,

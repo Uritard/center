@@ -51,7 +51,7 @@ public class SysLogService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLog> select(Long logId, String logType, String ip, String title, Integer state, String content, Long userId, String userName, String requestOrigin, String requestPath, Integer requestMethod, Date createTime) {
+    public List<SysLog> select(Long logId, String logType, String ip, String title, Integer state, String content, Long userId, String userName, String requestOrigin, String requestPath, String requestMethod, Date createTime) {
         List<SysLog> sysLogList = sysLogDao.select(logId, logType, ip, title, state, content, userId, userName, requestOrigin, requestPath, requestMethod, createTime);
         return sysLogList;
     }

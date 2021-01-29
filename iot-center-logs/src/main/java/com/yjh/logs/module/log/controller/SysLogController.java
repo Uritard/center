@@ -48,7 +48,10 @@ public class SysLogController {
                          @RequestParam(value = "state", required = false) Integer state,
                          @RequestParam(value = "content", required = false) String content,
                          @RequestParam(value = "userId", required = false) Long userId,
-                         @RequestParam(value = "userName", required = false) String userName) {
+                         @RequestParam(value = "userName", required = false) String userName,
+                         @RequestParam(value = "requestOrigin", required = false) String requestOrigin,
+                         @RequestParam(value = "requestPath", required = false) String requestPath,
+                         @RequestParam(value = "requestMethod", required = false) String requestMethod) {
         Result result = new Result();
         try {
             SysLog sysLog = new SysLog();
@@ -59,6 +62,10 @@ public class SysLogController {
             sysLog.setContent(content);
             sysLog.setUserId(userId);
             sysLog.setUserName(userName);
+            sysLog.setRequestOrigin(requestOrigin);
+            sysLog.setRequestPath(requestPath);
+            sysLog.setRequestMethod(requestMethod);
+            sysLog.setCreateTime(new Date());
             Random random = new Random();
             if (state == 1) {
                 new Thread(() -> {
@@ -166,7 +173,7 @@ public class SysLogController {
                          @RequestParam(value = "userName", required = false) String userName,
                          @RequestParam(value = "requestOrigin", required = false) String requestOrigin,
                          @RequestParam(value = "requestPath", required = false) String requestPath,
-                         @RequestParam(value = "requestMethod", required = false) Integer requestMethod,
+                         @RequestParam(value = "requestMethod", required = false) String requestMethod,
                          @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
