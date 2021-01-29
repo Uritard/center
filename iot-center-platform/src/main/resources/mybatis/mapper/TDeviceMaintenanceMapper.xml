@@ -188,7 +188,7 @@
     </foreach>
     </select>
 
-    <select id="selectDeviceIdList" resultType="java.lang.Long">
+    <select id="selectDeviceIdListByIns" resultType="java.lang.Long">
         select DISTINCT
         a.device_id
         from t_cruise_point_instance a
@@ -216,5 +216,13 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
+    </select>
+    <select id="selectDeviceByRegion" resultType="java.lang.Long">
+        select
+        a.device_id
+        from t_std_device a
+        where a.up_region_id in <foreach collection="list" item="upRegionId" separator="," open="(" close=")" index="index">
+        #{upRegionId,jdbcType=BIGINT}
+    </foreach>
     </select>
 </mapper>

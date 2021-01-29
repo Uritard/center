@@ -298,24 +298,40 @@ public class TDeviceMaintenanceService{
              String device_level = item.get("device_level").toString();
              String device_list = item.get("device_list").toString();
              String[] dd = device_list.split(",");
-             List<Long> instanceIdList = new ArrayList<>();
+             List<Long> idList = new ArrayList<>();
              for (String str:dd) {
-                 instanceIdList.add(Long.valueOf(str));
+                 idList.add(Long.valueOf(str));
              }
-             List<Long> deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdList(instanceIdList);
-             if("1".equals(enable)){
-                 //设置检修区域
-                TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
-                tDeviceMaintenance.setMaintenanceName("检修区域"+start_time);
-                tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
-                tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
-                tDeviceMaintenance.setDeviceIdList(deviceIdLst);
-                this.add(tDeviceMaintenance);
+             if(!"".equals(device_level)){
+                 List<Long> deviceIdLst = new ArrayList<>();
+//                 if("1".equals(device_level)){
+//                   deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
+//                 }
+                 if("2".equals(device_level)){
+                    deviceIdLst = idList;
+                 }
+//                 if("3".equals(device_level)){
+//                      deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
+//                 }
+//                 if("4".equals(device_level)){
+//
+//                 }
+
+                 if("1".equals(enable)){
+                     //设置检修区域
+                     TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
+                     tDeviceMaintenance.setMaintenanceName("检修区域"+start_time);
+                     tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
+                     tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
+                     tDeviceMaintenance.setDeviceIdList(deviceIdLst);
+                     this.add(tDeviceMaintenance);
+                 }
+                 if("0".equals(enable)){
+                     //删除检修区域
+                     tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst,"检修区域"+start_time);
+                 }
              }
-             if("0".equals(enable)){
-                //删除检修区域
-                 tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst,"检修区域"+start_time);
-             }
+
 
         }
         return 1;

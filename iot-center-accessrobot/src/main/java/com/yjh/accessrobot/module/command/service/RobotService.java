@@ -52,7 +52,7 @@ public class RobotService {
     @Resource
     private SysUserDao sysUserDao;
 
-    @Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
+    //@Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) throws Exception{
         Map scmap = new HashMap();
@@ -124,7 +124,7 @@ public class RobotService {
 
     }
 
-    @Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
+    //@Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public boolean feignRobotTransfer(String robotCode) throws Exception {
         boolean res = false;
@@ -175,7 +175,7 @@ public class RobotService {
         return requestProtocol;
     }
 
-    @Logs(title = "机器人在线状态更新", code = "Robot")
+    //@Logs(title = "机器人在线状态更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int updateRobotInfo(String robotCode, String robotStatus) {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
@@ -193,7 +193,7 @@ public class RobotService {
         return res;
     }
 
-    @Logs(title = "机器人模型同步到数据库", code = "Robot")
+    //@Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
         //从缓存中获取系统参数
@@ -378,7 +378,7 @@ public class RobotService {
         }*/
         return 1;
     }
-    @Logs(title = "机器人收到下发任务指令/控制指令后，巡视主机接收响应处理", code = "Robot")
+    //@Logs(title = "机器人收到下发任务指令/控制指令后，巡视主机接收响应处理", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> receivingResponse(XMLBaseModel xmlBaseModel) {
         Constant.robotResultMap.put("Type",xmlBaseModel.getType());
@@ -387,7 +387,7 @@ public class RobotService {
         return Constant.robotResultMap;
     }
 
-    @Logs(title = "巡视主机向机器人下发检修区域指令接口", code = "Robot")
+    //@Logs(title = "巡视主机向机器人下发检修区域指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public String deviceMaintenanceIssued(Map<String,Object> resMap) {
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
@@ -428,7 +428,7 @@ public class RobotService {
         }*/
         return "success";
     }
-    @Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
+    //@Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
         log.info("传来的ItemMap是==" + ItemMap);
@@ -553,7 +553,7 @@ public class RobotService {
         return 1;
     }
 
-    @Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
+    //@Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap) throws Exception {
         log.info("robotTaskControlMap===" + robotTaskControlMap);
@@ -745,51 +745,51 @@ public class RobotService {
         return 1;
     }
 
-    @Logs(title = "根据taskId查询相关内容", code = "Robot")
+    //@Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectTaskResultId(String taskId) {
         TCruiseResult tCruiseResult = tRobotInfoDao.selectTaskResultId(taskId);
         return tCruiseResult;
     }
 
-    @Logs(title = "根据taskId查询相关内容2", code = "Robot")
+    //@Logs(title = "根据taskId查询相关内容2", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
 
-    @Logs(title = "根据robotCode查询robotId", code = "Robot")
+    //@Logs(title = "根据robotCode查询robotId", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Long selectRobotIdByCode(String robotCode) {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
         return robotId;
     }
 
-    @Logs(title = "机器人本体告警信息入库", code = "Robot")
+    //@Logs(title = "机器人本体告警信息入库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {
         return this.tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
     }
 
-    @Logs(title = "TCDR信息入库--批量插", code = "Robot")
+    //@Logs(title = "TCDR信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseDataResult(List<TCruiseDataResult> tCruiseDataResultList) {
         return this.tRobotInfoDao.batchInsertCruiseDataResult(tCruiseDataResultList);
     }
 
-    @Logs(title = "TCTRD信息入库--批量插", code = "Robot")
+    //@Logs(title = "TCTRD信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList) {
         return this.tRobotInfoDao.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetailList);
     }
 
-    @Logs(title = "TCR信息更新", code = "Robot")
+    //@Logs(title = "TCR信息更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int updateTCruiseResult(TCruiseResult tCruiseResult) {
         return this.tRobotInfoDao.updateTCruiseResult(tCruiseResult);
     }
 
-    @Logs(title = "TCTR信息更新", code = "Robot")
+    //@Logs(title = "TCTR信息更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
@@ -826,7 +826,7 @@ public class RobotService {
     }
 
 
-    @Logs(title ="站端控制机器人",code = "Robot")
+    //@Logs(title ="站端控制机器人",code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
@@ -842,7 +842,7 @@ public class RobotService {
         return "success";
     }
 
-    @Logs(title ="机器人数据上报巡视主机",code = "Robot")
+    //@Logs(title ="机器人数据上报巡视主机",code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public String upToCruise(XMLBaseModel xmlBaseModel){
         Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();

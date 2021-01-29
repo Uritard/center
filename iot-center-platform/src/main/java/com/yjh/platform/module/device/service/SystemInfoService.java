@@ -154,6 +154,9 @@ public class SystemInfoService {
             recordIdMap.put("recordId",item.getRecordId() );
             Result re = getNVRInfo(recordIdMap);
 
+            if(re == null){
+                continue;
+            }
             Map<String,String> map = (Map<String,String>)re.getData();
             if(map.get("errorMessage: ") != null){
                 continue;

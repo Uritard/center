@@ -37,8 +37,12 @@ public interface TDeviceMaintenanceDao {
     List<Long> selectDeviceIds(@Param(value = "maintenanceId") Long maintenanceId);
     List<Long> selectDeviceIds2(@Param(value = "list") List<String> list);
 
-    List<Long> selectDeviceIdList(@Param(value = "list") List<Long> list);
+    List<Long> selectDeviceIdListByIns(@Param(value = "list") List<Long> list);
     int deleteByDeviceIdList(@Param(value = "list") List<Long> list,
                              @Param(value = "name") String name);
+
     List<String> selectRobotDeviceId(@Param(value = "list") List<Long> list);
+    List<String> selectCruiseIdAndDeviceId(@Param(value = "list") List<Long> list);
+    List<Long>selectDeviceByRegion(@Param(value = "list") List<Long> list);
+
 }
