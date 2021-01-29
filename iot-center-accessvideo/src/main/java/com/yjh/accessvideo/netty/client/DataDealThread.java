@@ -166,6 +166,7 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("taskId", jsonObjectResult.get("taskId").toString());
                                             warnMap.put("value", jsonObjectResult.get("resultValue").toString());
                                             warnMap.put("imagePath", cruiseResult.get("picpath").toString());
+                                            warnMap.put("confMode","276");
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                                             warnMap.put("defectModel",analyseDataOperateService.selectDictCode("defect_model","其他"));
                                             log.info("开始告警判断");
@@ -300,6 +301,7 @@ public class DataDealThread implements Runnable {
                                                     tWarnInfo.setStdMeteId(Long.valueOf(warningMsg.get("stdMeteId").toString()));
                                                     tWarnInfo.setTaskId(warningMsg.get("taskId").toString());
                                                     tWarnInfo.setValue(warningMsg.get("value").toString());
+                                                    tWarnInfo.setConfMode(Integer.valueOf(warningMsg.get("confMode").toString()));
                                                     tWarnInfo.setImagePath(warningMsg.get("imagePath").toString());
                                                     tWarnInfo.setAlarmSource(Integer.valueOf(warningMsg.get("alarmSource").toString()));
                                                     tWarnInfo.setWarnName(warningMsg.get("warnName").toString());

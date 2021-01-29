@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -206,16 +207,16 @@ public class PlansService {
                 plans.setEndTime(temPlan.getEndTime());
                 List<String> weeks = new ArrayList<>();
                 if (Objects.nonNull(plans.getStartTime1()))
-                    weeks.add("mon");
+                    weeks.add("1");
                 if (Objects.nonNull(plans.getStartTime2())){
-                    weeks.add("tues");
+                    weeks.add("2");
                     plans.setStartTime1(plans.getStartTime2());
                     plans.setEndTime1(plans.getEndTime2());
                     plans.setStartTime2(null);
                     plans.setEndTime2(null);
                 }
                 if (Objects.nonNull(plans.getStartTime3())){
-                    weeks.add("wed");
+                    weeks.add("3");
                     plans.setStartTime1(plans.getStartTime3());
                     plans.setEndTime1(plans.getEndTime3());
                     plans.setStartTime3(null);
@@ -223,7 +224,7 @@ public class PlansService {
                 }
 
                 if (Objects.nonNull(plans.getStartTime4())){
-                    weeks.add("thur");
+                    weeks.add("4");
                     plans.setStartTime1(plans.getStartTime4());
                     plans.setEndTime1(plans.getEndTime4());
                     plans.setStartTime4(null);
@@ -231,7 +232,7 @@ public class PlansService {
                 }
 
                 if (Objects.nonNull(plans.getStartTime5())){
-                    weeks.add("fri");
+                    weeks.add("5");
                     plans.setStartTime1(plans.getStartTime5());
                     plans.setEndTime1(plans.getEndTime5());
                     plans.setStartTime5(null);
@@ -239,7 +240,7 @@ public class PlansService {
                 }
 
                 if (Objects.nonNull(plans.getStartTime6())){
-                    weeks.add("sat");
+                    weeks.add("6");
                     plans.setStartTime1(plans.getStartTime6());
                     plans.setEndTime1(plans.getEndTime6());
                     plans.setStartTime6(null);
@@ -247,7 +248,7 @@ public class PlansService {
                 }
 
                 if (Objects.nonNull(plans.getStartTime7())){
-                    weeks.add("sun");
+                    weeks.add("7");
                     plans.setStartTime1(plans.getStartTime7());
                     plans.setEndTime1(plans.getEndTime7());
                     plans.setStartTime7(null);
@@ -268,21 +269,22 @@ public class PlansService {
     @Logs(title = "诊断任务新增与修改")
     @Transactional(rollbackFor = Exception.class)
     public String diagnosePlanUpAdd(Plans plans) {
-        String status = "finish";
+        String status = "监测点无效";
         try {
             //新增信息标志
             boolean addFlag = Objects.isNull(tDiagnosePlanDao.selectByPrimaryId(plans.getDiagnosePlanId()));
 
 
             if (addFlag == true) { //新增
+                // TODO: 2021/1/28 添加用户ID
                 plans.setDiagnosePlanId(String.valueOf(UUID.randomUUID()).replace("-", ""));
                 List<TDiagnosePlanAttr> taskList = new ArrayList<>();//立即任务-taskList对象
                 TDiagnosePlanDetail tDiagnosePlanDetail = new TDiagnosePlanDetail();//立即任务-详细检测项对象
                 List<String> channelIds = new ArrayList<>();//本次任务下的监测点ID
+                plans.setCheckFlag("1");
                 switch (plans.getPeriod()) {
                     case "-1":
                         plans.setPlanType("立即任务");
-
 
                         for (String taskId : plans.getTaskList()) { //立即任务监测点ID封装
                             TDiagnosePlanAttr tDiagnosePlanAttr = new TDiagnosePlanAttr();
@@ -317,6 +319,7 @@ public class PlansService {
                 String result = HttpClientUtils.getInstance().putUrl(diagnosePlan_URl + "/" + plans.getDiagnosePlanId(), PlansXML.generatePlansXMl(plans));
                 status = ResponseXML.unPackingXMl(result);
                 if (status.equals("成功")) {
+                    status="success";
                     channelIds = plans.getTaskList();
                     redisTemplate.opsForList().rightPushAll("diagnosePlan:" + plans.getDiagnosePlanId(), channelIds);
                     tDiagnosePlanDao.insert(plans);//插入所有任务的基本信息
@@ -325,6 +328,9 @@ public class PlansService {
                         log.info("taskList:-------------" + taskList);
                         tDiagnosePlanAttrDao.batchInsert(taskList);//插入立即任务的监测点ID
                     }
+
+                }else {
+                    return status;
                 }
             } else {   //修改
                 switch (plans.getPeriod()) {
@@ -338,6 +344,9 @@ public class PlansService {
                 if (status.equals("成功")) {
                     plans.setStartTime(new Date());
                     tDiagnosePlanDao.update(plans);
+                    status="success";
+                }else {
+                    return status;
                 }
 
             }
@@ -377,8 +386,6 @@ public class PlansService {
                     status = ResponseXML.unPackingXMl(result);
                     if (status.equals("正常")) {
                         tDiagnosePlanDao.deleteByPrimaryId(planId);
-                        tDiagnosePlanDetailDao.deleteByPrimaryId(planId);
-                        tDiagnosePlanAttrDao.deleteByPrimaryId(planId);
                         status = "success-cycle";
                     }
                 }
@@ -400,13 +407,10 @@ public class PlansService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectNVRChannelTree(String diagnosePlanId) {
         Map<String, Object> finalResult = new HashMap<>();
-        List<String> checked = new ArrayList<>();
-        List<NVRChannelTree> roots = tDiagnosePlanDao.selectNVRNode();
-        for (NVRChannelTree root : roots) {
-            root.setUpId(Long.valueOf("-1"));
-            root.setLevel("1");
-            root.setChildren(tDiagnosePlanDao.selectChannelNode(root.getId()));
-        }
+        List<String> checked = new ArrayList<>();//当前任务已勾选的监测点ID
+        Set<String> usingChannelId=new HashSet<>();//存放已有任务绑定的监测点ID
+
+        //获取checkedIdList
         if (tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId).size() != 0) {
             for (TDiagnosePlanAttr attr : tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId)) {
                 checked.add(attr.getChannelId());
@@ -422,6 +426,38 @@ public class PlansService {
             }
 
         }
+
+
+        //获取已执行任务绑定的channelIDList
+        for(Map<String,String> planMap:tDiagnosePlanDao.selectPlanInfo()){
+            if(planMap.get("planType").equals("周期任务")){
+                try{
+                    String xmlIds = HttpClientUtils.getInstance().getUrl(diagnosePlan_URl + "/" + planMap.get("planId") + "/" + "TaskList", null);
+                    usingChannelId.addAll(PlansXML.unpackingXmlTaskList(xmlIds));
+                }catch (IOException | DocumentException i){
+                    log.error("信息树初始化失败");
+                }
+
+
+            }else {
+                usingChannelId.addAll(tDiagnosePlanDao.selectAtOnceTaskList(planMap.get("planId")));
+            }
+        }
+
+        List<String>ids=new ArrayList<>();
+        ids.addAll(usingChannelId);
+        ids.removeAll(checked);//任务修改时，树显示被修改的任务下的监测点ID
+        log.info("list：----"+ids);
+
+        List<NVRChannelTree> roots = tDiagnosePlanDao.selectNVRNode();
+
+        for (NVRChannelTree root : roots) {
+            root.setUpId(Long.valueOf("-1"));
+            root.setLevel("1");
+            root.setChildren(tDiagnosePlanDao.selectChannelNode(root.getId(),ids));
+        }
+
+
         finalResult.put("checked", checked);
         finalResult.put("tree", roots);
         return finalResult;

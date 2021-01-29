@@ -163,7 +163,7 @@
             t_diagnose_plan a
         LEFT JOIN sys_user b ON a.user_id = b.user_id
         ORDER BY
-            start_time DESC
+            end_time DESC
         LIMIT 1
     </select>
 
@@ -175,7 +175,7 @@
         t_camera_recorder
     </select>
 
-    <select id="selectChannelNode" parameterType="java.lang.String" resultType="com.yjh.accessvqd.module.diagnose.entity.NVRChannelTree">
+    <select id="selectChannelNode"  resultType="com.yjh.accessvqd.module.diagnose.entity.NVRChannelTree">
         SELECT
             a.camera_name as 'label',
             a.monitor_id as 'id',
@@ -185,7 +185,26 @@
             t_camera_info a
         WHERE
             a.record_id = #{recordId,jdbcType=VARCHAR}
-            and a.monitor_id IS NOT NULL;
+            and a.monitor_id IS NOT NULL
+            and a.monitor_id NOT IN(
+        <foreach collection="list" item="usingId" separator=",">
+            #{usingId}
+        </foreach>
+        )
 
+    </select>
+
+    <select id="selectPlanInfo" resultType="java.util.Map">
+        select
+        diagnose_plan_id as 'planId',
+        plan_type as 'planType'
+        from t_diagnose_plan
+    </select>
+
+    <select id="selectAtOnceTaskList" parameterType="java.lang.String" resultType="java.lang.String">
+        select
+        channel_id
+        from t_diagnose_plan_attr
+        where diagnose_plan_id =#{planId,jdbcType=VARCHAR}
     </select>
 </mapper>

@@ -342,7 +342,7 @@ public class PlansXML {
         if (plans.getPeriod().equals("0")) {
             Element childNode4 = root.addElement("week");
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("mon")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("1")) {
                 Element childNode41 = childNode4.addElement("mon");
                 Element childNode41A = childNode41.addElement("DiagnoseTime");
                 Element childNode41AT = childNode41A.addElement("Time");
@@ -352,7 +352,7 @@ public class PlansXML {
                 childNode41ATe.setText(plans.getEndTime1());
             }
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("tues")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("2")) {
                 Element childNode42 = childNode4.addElement("tues");
                 Element childNode42A = childNode42.addElement("DiagnoseTime");
                 Element childNode42AT = childNode42A.addElement("Time");
@@ -363,7 +363,7 @@ public class PlansXML {
             }
 
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("wed")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("3")) {
                 Element childNode43 = childNode4.addElement("wed");
                 Element childNode43A = childNode43.addElement("DiagnoseTime");
                 Element childNode43AT = childNode43A.addElement("Time");
@@ -374,7 +374,7 @@ public class PlansXML {
             }
 
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("thur")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("4")) {
                 Element childNode44 = childNode4.addElement("thur");
                 Element childNode44A = childNode44.addElement("DiagnoseTime");
                 Element childNode44AT = childNode44A.addElement("Time");
@@ -385,7 +385,7 @@ public class PlansXML {
             }
 
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("fri")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("5")) {
                 Element childNode45 = childNode4.addElement("fri");
                 Element childNode45A = childNode45.addElement("DiagnoseTime");
                 Element childNode45AT = childNode45A.addElement("Time");
@@ -396,7 +396,7 @@ public class PlansXML {
             }
 
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("sat")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("6")) {
                 Element childNode46 = childNode4.addElement("sat");
                 Element childNode46A = childNode46.addElement("DiagnoseTime");
                 Element childNode46AT = childNode46A.addElement("Time");
@@ -407,7 +407,7 @@ public class PlansXML {
             }
 
 
-            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("sun")) {
+            if (plans.getWeeks().size() != 0 && plans.getWeeks().contains("7")) {
                 Element childNode47 = childNode4.addElement("sun");
                 Element childNode47A = childNode47.addElement("DiagnoseTime");
                 Element childNode47AT = childNode47A.addElement("Time");

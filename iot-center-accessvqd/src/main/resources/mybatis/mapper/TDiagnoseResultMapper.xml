@@ -439,6 +439,8 @@
         a.cover_result,
         a.ptz_result,
         a.snapshot_url,
+        a.width,
+        a.height,
         c.camera_id
         FROM
         t_diagnose_result a JOIN t_diagnose_plan b ON a.diagnose_plan_id=b.diagnose_plan_id
@@ -447,21 +449,16 @@
         LEFT JOIN t_std_region e ON c.up_region_id=e.region_id
         LEFT JOIN t_dict_business f ON c.vendor_id=f.dict_code
         WHERE 1=1
-        <if test="planName != null and planName != ''">AND b.plan_name like
-            concat('%',#{planName, jdbcType=VARCHAR},'%')
-        </if>
-        <if test="channelName != null and channelName != ''">AND c.camera_name like
-            concat('%',#{channelName, jdbcType=VARCHAR},'%')
-        </if>
-        <if test="startTime != null and startTime != '' ">
-            <if test="endTime != null and endTime !=''">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
+        <if test="pointId !='-1' and pointId != null">and a.channel_id =#{pointId,jdbcType=VARCHAR}</if>
+        <if test="startTime != null  ">
+            <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
             </if>
         </if>
-        <if test="diagnosePlanId !=null and diagnosePlanId !=''">and a.diagnose_plan_id
+        <if test="diagnosePlanId !='-1' and diagnosePlanId != null">and a.diagnose_plan_id
             =#{diagnosePlanId,jdbcType=VARCHAR}
         </if>
-        <if test="status !=null and status !=''">and a.`status`= #{status,jdbcType=VARCHAR}</if>
+        <if test="status !='全部' and status !=null">and a.`status`= #{status,jdbcType=VARCHAR}</if>
     </select>
 
     <select id="faultTypeSta"  resultType="java.util.Map">
@@ -486,8 +483,8 @@
         JOIN t_diagnose_plan b ON a.diagnose_plan_id=b.diagnose_plan_id
         LEFT JOIN t_camera_info c ON a.channel_id=c.monitor_id
         WHERE 1=1
-        <if test="planName !=null and planName !=''">AND b.plan_name like concat('%',#{planName,jdbcType=VARCHAR},'%')</if>
-        <if test="channelName !=null and channelName !=''">AND c.camera_name like concat ('%',#{channelName,jdbcType=VARCHAR},'%')</if>
+        <if test="planId !=null and planId !=''">AND b.diagnose_plan_id =#{planId,jdbcType=VARCHAR}</if>
+        <if test="channelId !=null and channelId !=''">AND c.monitor_id =#{channelId,jdbcType=VARCHAR}</if>
     </select>
 
     <select id="statusTypeChannel"  resultType="java.util.Map">
@@ -501,17 +498,18 @@
         JOIN t_diagnose_plan b ON a.diagnose_plan_id=b.diagnose_plan_id
         LEFT JOIN t_camera_info c ON a.channel_id=c.monitor_id
         WHERE 1=1
-        <if test="planName !=null and planName !=''">AND b.plan_name like concat('%',#{planName,jdbcType=VARCHAR},'%') </if>
-        <if test="channelName !=null and channelName !=''">AND c.camera_name like concat ('%',#{channelName,jdbcType=VARCHAR},'%')</if>
+        <if test="planId !=null and planId !=''">AND b.diagnose_plan_id =#{planId,jdbcType=VARCHAR}</if>
+        <if test="channelId !=null and channelId !=''">AND c.monitor_id =#{channelId,jdbcType=VARCHAR}</if>
     </select>
 
 
     <select id="staticalAnalysis" resultType="java.util.Map">
                 SELECT
         '信号丢失' as 'faultType',
-        count(case WHEN a.signal_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.signal_result='2'
         <if test="startTime != null ">
             <if test="endTime != null">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -522,9 +520,10 @@
 
         SELECT
         '图像模糊' as 'faultType',
-        count(case WHEN a.blur_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.blur_result='2'
         <if test="startTime != null">
             <if test="endTime != null">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -535,9 +534,10 @@
 
         SELECT
         '对比度' as 'faultType',
-        count(case WHEN a.contrast_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.contrast_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -548,9 +548,10 @@
 
         SELECT
         '图像过亮' as 'faultType',
-        count(case WHEN a.bright_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.bright_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -561,9 +562,10 @@
 
         SELECT
         '图像过暗' as 'faultType',
-        count(case WHEN a.dark_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.dark_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -574,9 +576,10 @@
 
         SELECT
         '图像偏色' as 'faultType',
-        count(case WHEN a.chroma_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.chroma_result='2'
         <if test="startTime != null ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -586,9 +589,10 @@
 
         SELECT
         '黑白图像' as 'faultType',
-        count(case WHEN a.mono_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.mono_result='2'
         <if test="startTime != null ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -599,9 +603,10 @@
 
         SELECT
         '噪声干扰' as 'faultType',
-        count(case WHEN a.noise_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.noise_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -612,9 +617,10 @@
 
         SELECT
         '条纹干扰' as 'faultType',
-        count(case WHEN a.streak_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.streak_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -625,9 +631,10 @@
 
         SELECT
         '画面冻结' as 'faultType',
-        count(case WHEN a.freeze_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.freeze_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -638,9 +645,10 @@
 
         SELECT
         '视频抖动' as 'faultType',
-        count(case WHEN a.shake_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.shake_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -651,9 +659,10 @@
 
         SELECT
         '视频剧变' as 'faultType',
-        count(case WHEN a.flash_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.flash_result='2'
         <if test="startTime != null ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -664,9 +673,10 @@
 
         SELECT
         '场景变换' as 'faultType',
-        count(case WHEN a.scene_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.scene_result='2'
         <if test="startTime != null ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -678,9 +688,10 @@
 
         SELECT
         '视频遮挡' as 'faultType',
-        count(case WHEN a.cover_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.cover_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -692,9 +703,10 @@
 
         SELECT
         '云台失控' as 'faultType',
-        count(case WHEN a.ptz_result='2' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.ptz_result='2'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -704,9 +716,10 @@
 
         SELECT
         '登录失败' as 'faultType',
-        count(case WHEN a.channel_result='3' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.channel_result='3'
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -717,9 +730,10 @@
 
         SELECT
         '取流异常' as 'faultType',
-        count(case WHEN a.channel_result='4' then 1 else null end) as 'count'
+        count(DISTINCT channel_id) as 'count'
         FROM t_diagnose_result a
         WHERE 1=1
+        and a.channel_result='4'
         <if test="startTime != null ">
             <if test="endTime != null ">and a.check_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
@@ -734,8 +748,8 @@
         b.diagnose_plan_id as 'planId',
         b.plan_name as 'planName'
         </if>
-        <if test="queryType ==1">
 
+        <if test="queryType ==1">
         c.monitor_id as 'channelId',
         c.camera_name as 'channelName'
         </if>
