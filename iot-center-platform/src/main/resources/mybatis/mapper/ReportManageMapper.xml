@@ -254,10 +254,12 @@
     <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
         SELECT
             a.task_name,
-            a.start_time as cruise_date
+            a.start_time as cruise_date,
+            b.region_name
         from
-            t_cruise_task a
+            t_cruise_task a,t_std_region b
         where 1 = 1
+        and b.up_region_id = -1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 

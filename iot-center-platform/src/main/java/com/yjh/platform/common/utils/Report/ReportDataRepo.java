@@ -278,10 +278,10 @@ public class ReportDataRepo {
         /*elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));*/
         if (null != taskVoInfo.getCruiseDate()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         }
         rowIndex++;
@@ -291,7 +291,7 @@ public class ReportDataRepo {
     }
 
     private static int prepareReportTitle(List<TableCellElement> elements) {
-        elements.add(new TableCellElement(0, 0, 0, 6, TASK_REPORT_TITLE,
+        elements.add(new TableCellElement(0, 0, 0, 5, TASK_REPORT_TITLE,
                 TableCellElement.TYPE_TEXT_STRING, (short) 15, 30, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         return 1;
     }
