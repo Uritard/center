@@ -428,7 +428,7 @@
             from t_cruise_result a,t_cruise_task_result b
             where a.task_result_id = b.task_result_id
             and c_type = dict_code
-            and a.execute_time BETWEEN #{Start} and #{End}
+            and a.execute_time BETWEEN #{start} and #{end}
         ) AS "count"
     from t_dict_business
     where dict_code IN

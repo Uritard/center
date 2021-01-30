@@ -26,13 +26,9 @@ public class TCruiseDataResultService {
 
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
-    @Autowired
-    private TDictBusinessDao tDictBusinessDao;
 
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
-    private Object Comparator;
-    private Object CruiseResultAnalMeteInfo;
 
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
@@ -64,14 +60,12 @@ public class TCruiseDataResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResult> select(Long cruiseDataId, String cruiseResultId, Long cruiseId,String cruiseName, Integer cruiseType, Integer cruiseAbnormal,String resultDesc, String resultNum, String modifyNum, String picpath, String personcheck, String origpic, String evaluationState, Integer identifyState, Integer identifyResult, Date createtime, String remark,String checkUser,Date checkDate,Integer isWarn ,Integer cruiseResult ) {
-        List<TCruiseDataResult> tCruiseDataResultList = tCruiseDataResultDao.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,  cruiseAbnormal,resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,checkUser,checkDate,isWarn,cruiseResult);
-        return tCruiseDataResultList;
+        return tCruiseDataResultDao.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,  cruiseAbnormal,resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,checkUser,checkDate,isWarn,cruiseResult);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResult> selectByPage(TCruiseDataResult tCruiseDataResult) {
-        List<TCruiseDataResult> tCruiseDataResultList = tCruiseDataResultDao.selectByPage(tCruiseDataResult);
-        return tCruiseDataResultList;
+        return tCruiseDataResultDao.selectByPage(tCruiseDataResult);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -161,52 +155,12 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalMeteInfo> selectCruiseResultAnal(List<Long>deviceIds,String resultSwitch) {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=new ArrayList<>();
-//        List<Long> deviceIds = new ArrayList<>();
 
         //判断deviceId是否为空 决定 全查/条件查
-        if (deviceIds.size()>0&&deviceIds.get(0)==996) {
+        if (deviceIds.size() > 0&&deviceIds.get(0)==996) {
             cruiseResultAnalMeteInfos = tStdDevicemeteDao.selectDeviceMete();
             log.info("执行完成");
-        } else {
-//            if (Objects.nonNull(tStdDeviceDao.selectByPrimaryId(deviceId))) {
-//                deviceIds.add(deviceId);
-//            } else {
-//                List<Long> regionIds = new ArrayList<>();
-//                regionIds.add(deviceId);
-//                if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
-//                    log.info("case1");
-//                    deviceIds.addAll(tStdDeviceDao.selectDeviceIdsByRegion(regionIds));
-//                } else {
-//                    log.info("case2");
-//                    regionIds.clear();
-//                    List<Long> upRegionIds = new ArrayList<>();//组织区域上层ID
-//                    List<Long> upRegionIdsTem=new ArrayList<>();
-//                    upRegionIds.add(deviceId);
-//                    regionIds.addAll(tStdRegionDao.selectRegionByUpId(upRegionIds));
-//                    upRegionIdsTem.addAll(tStdRegionDao.selectRegionByUpId(upRegionIds));
-//                    while (upRegionIdsTem.size()!=0){
-//                        upRegionIdsTem.addAll(tStdRegionDao.selectRegionByUpId(upRegionIdsTem));
-//                        regionIds.addAll(tStdRegionDao.selectRegionByUpId(upRegionIdsTem));
-//                        upRegionIdsTem.removeAll(regionIds);
-//                        if(upRegionIdsTem.size()==0)
-//                            break;
-//                    }
-//
-//                    if(regionIds.size()!=0){
-//                        if (tStdDeviceDao.selectDeviceIdsByRegion(regionIds).size() != 0) {
-//                            deviceIds = tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
-//                            log.info("jumpOut:" + deviceIds.size());
-//                        }
-//                    }
-//
-//
-//                }
-//            }
-//
-//
-//            for (Long deviceId1 : deviceIds) {
-//                log.info("device:-----" + deviceId1);
-//            }
+        }else {
             if(deviceIds.size()>0){
                 cruiseResultAnalMeteInfos = tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceIds);
             }
@@ -289,26 +243,25 @@ public class TCruiseDataResultService {
 
         List<Long> regionIdList = new ArrayList<>();
         List<Long> deviceIdList = new ArrayList<>();
-        if (regionId == null){
+        if (regionId == null) {
             regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-            log.info("regionIdList是==="+regionIdList);
-            log.info("deviceIdList是==="+deviceIdList);
+            deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            log.info("regionIdList是===" + regionIdList);
         }else {
             regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            if (regionIdList != null && regionIdList.size() > 0){
+            if (regionIdList != null&& regionIdList.size() > 0){
                 deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
             }else {
                 deviceIdList.add(regionId);
             }
             log.info("regionIdList是==="+regionIdList);
-            log.info("deviceIdList是==="+deviceIdList);
         }
 
+        log.info("deviceIdList是==="+deviceIdList);
         Map<String, Object> resultMap = new HashMap<>();
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
-        if (deviceIdList != null && deviceIdList.size() > 0) {
+        if (deviceIdList != null&& deviceIdList.size() > 0) {
             cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
             for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
                 if (Objects.isNull(cRAI.getIdentifyResult())) {
@@ -347,8 +300,7 @@ public class TCruiseDataResultService {
                                                  String endTime,
                                                  String meteType,
                                                  Integer meterType) {
-        List<BrokenLineInfo> brokenLineInfos = tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
-        return brokenLineInfos;
+        return tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
     }
 
 }

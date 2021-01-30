@@ -145,7 +145,7 @@
         <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
         <if test="unit != null ">a.unit = #{unit},</if>
         <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
-        <if test="alarmType != null '">a.alarm_type = #{alarmType},</if>
+        <if test="alarmType != null ">a.alarm_type = #{alarmType},</if>
         <if test="upEffect != null">a.up_effect = #{upEffect, jdbcType=REAL},</if>
         <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=REAL},</if>
         <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>

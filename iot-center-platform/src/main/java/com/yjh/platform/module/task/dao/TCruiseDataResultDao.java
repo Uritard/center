@@ -79,6 +79,4 @@ public interface TCruiseDataResultDao {
                                           @Param(value = "endTime") String endTime,
                                           @Param(value = "meteType") String meteType,
                                           @Param(value = "meterType") Integer meterType);
-
-//    List<CruiseResultDetailReport> selectCruiseResultDetail(@Param(value = "deviceMeteId")Long deviceMeteId);
 }

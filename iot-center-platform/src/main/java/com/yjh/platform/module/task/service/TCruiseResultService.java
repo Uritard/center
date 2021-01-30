@@ -6,11 +6,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 
-import com.alibaba.druid.util.StringUtils;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Sets;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -26,14 +21,8 @@ import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 
@@ -60,9 +49,6 @@ public class TCruiseResultService{
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
 
-    private RedisTemplate redisTemplate;
-
-
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseResult tCruiseResult) {
         return this.tCruiseResultDao.insert(tCruiseResult);
@@ -85,14 +71,12 @@ public class TCruiseResultService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseResult> select(String taskResultId, String taskId, String taskName, String areaId, Integer cType, Integer cState, Integer modifyState, Integer taskCount, Integer taskWait, String checkUser, Date checkDate, String weather, Date createTime, Date executeTime, String taskCode, String remark) {
-        List<TCruiseResult> tCruiseResultList = tCruiseResultDao.select(taskResultId, taskId,taskName, areaId, cType, cState, modifyState, taskCount, taskWait, checkUser, checkDate, weather, createTime, executeTime, taskCode, remark);
-        return tCruiseResultList;
+        return tCruiseResultDao.select(taskResultId, taskId,taskName, areaId, cType, cState, modifyState, taskCount, taskWait, checkUser, checkDate, weather, createTime, executeTime, taskCode, remark);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cType, Integer cState) {
-        List<TCruiseResultExpand> tCruiseResultExpandList = tCruiseResultDao.selectTaskByPage(taskName,cState,cType);
-        return tCruiseResultExpandList;
+        return tCruiseResultDao.selectTaskByPage(taskName,cState,cType);
     }
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId,int pageNum,int pageSize) {
@@ -115,7 +99,7 @@ public class TCruiseResultService{
         return resultMap;
     }
     @Transactional(rollbackFor = Exception.class)
-    public int manualReview(CruiseManualReview cruiseManualReview,String userId) throws Exception{
+    public int manualReview(CruiseManualReview cruiseManualReview,String userId){
         //获取审核人
         Integer userID = Integer.valueOf(userId);
         String userName = tCruiseResultDao.selectUserName(userID);
@@ -128,22 +112,16 @@ public class TCruiseResultService{
 
         log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
         Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
-        log.info("judgeCondition是==="+judgeCondition);
         String personCheck = judgeCondition.get("person_check").toString();
-//        log.info("人工审核的测点值信息是==="+personCheck);
         int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
-//        log.info("查询的告警条件isWarn是==="+isWarn);
         String taskId = judgeCondition.get("task_id").toString();
-//        log.info("查询的告警条件taskId是==="+taskId);
         String picPath = judgeCondition.get("picpath").toString();
-//        log.info("查询的图片路径是==="+picPath);
         Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
-//        log.info("查询的告警条件instanceId是==="+instanceId);
         Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
-//        log.info("人工审核的实际结果是==="+identifyResult);
+        log.info("人工审核的实际结果是==="+identifyResult);
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
-        log.info("tStdDevicemete==="+tStdDevicemete);
+        log.info("tStdDeviceMete==="+tStdDevicemete);
 
         //组装告警基本信息
         TWarnInfo warnInfo = new TWarnInfo();
@@ -164,7 +142,7 @@ public class TCruiseResultService{
         warnInfo.setTaskId(taskId);
         log.info("warnInfo=="+warnInfo);
 
-        HashMap<String,Object> params = new HashMap<>();
+        Map<String,Object> params = new HashMap<>();
         params.put("value",personCheck);
         params.put("stdDeviceMeteName",tStdDevicemete.getMeteName());
         params.put("meteKind",tStdDevicemete.getMeteKind());
@@ -194,11 +172,10 @@ public class TCruiseResultService{
         }
 
         //判断该点是否已在告警表
-        if ("".equals(judgeCondition.get("is_warn").toString()) || judgeCondition.get("is_warn").toString() != null) {
             if (isWarn == 1) {
                 //存在
                 //判断该点是否产生告警以及告警信息
-                if (isWarN){//触发告警
+                if (Boolean.TRUE.equals(isWarN)){//触发告警
                     // 修改告警信息表
                     tCruiseResultDao.updateWarnInfo(taskId, instanceId,
                             map.get("warnName").toString(),
@@ -211,7 +188,7 @@ public class TCruiseResultService{
             }else {
                 //不存在
                 //判断该点是否产生告警以及告警信息
-                if (isWarN){//触发告警
+                if (Boolean.TRUE.equals(isWarN)){//触发告警
                     warnInfo.setWarnName(map.get("warnName").toString());
                     warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
                     warnInfo.setWarnContent(map.get("warnContent").toString());
@@ -222,7 +199,6 @@ public class TCruiseResultService{
                     tWarnInfoDao.insert(warnInfo);
                 }
             }
-        }
         /*if ( isWarn == 1){
             tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
             if (identifyResult == 261){//结果正确
@@ -284,7 +260,7 @@ public class TCruiseResultService{
 
         return result1+result2;
     }
-    public Result sendPostRequest(String url, HashMap<String,Object> params) {
+    public Result sendPostRequest(String url, Map<String,Object> params) {
         Result response = null;
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
@@ -323,16 +299,12 @@ public class TCruiseResultService{
         return cruiseManualReview.getCheckDate();
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<StatisticalResult> taskStatistical() throws Exception{
+    public List<StatisticalResult> taskStatistical(){
 
         String weekStart = tCruiseResultDao.selectOnMonday();//本周一的日期
         String weekEnd = tCruiseResultDao.selectOnSunday();//本周日的日期
         String lastWeekStart = tCruiseResultDao.selectLastMonday();//上周一的日期
         String lastWeekend = tCruiseResultDao.selectLastSunday();//上周日的日期
-        log.info("weekStart=="+weekStart);
-        log.info("weekEnd=="+weekEnd);
-        log.info("lastWeekStart=="+lastWeekStart);
-        log.info("lastWeekend=="+lastWeekend);
 
         String colName1 = "plan_type";
 
@@ -359,13 +331,11 @@ public class TCruiseResultService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalTools> cruiseStatisticalByStatus() {
-        List<StatisticalTools> statisticalToolsList = tCruiseResultDao.cruiseStatisticalByStatus();
-        return statisticalToolsList;
+        return tCruiseResultDao.cruiseStatisticalByStatus();
     }
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseStatistical> cruiseStatisticalByAbnormal() {
-        List<CruiseStatistical> tsList = tCruiseResultDao.cruiseStatisticalByAbnormal();
-        return tsList;
+        return tCruiseResultDao.cruiseStatisticalByAbnormal();
     }
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruiseResult> list) {
@@ -385,35 +355,5 @@ public class TCruiseResultService{
 
         return novelTaskList ;
     }
-
-
-
-
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
-    }
-
-
 }
 

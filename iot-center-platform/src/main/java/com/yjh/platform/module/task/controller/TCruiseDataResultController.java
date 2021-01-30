@@ -29,7 +29,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/tCruiseDataResult/v1")
-@Api(value = "/tCruiseDataResult", description = "巡检点数据表操作接口")
+@Api(value = "/tCruiseDataResult")
 public class TCruiseDataResultController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping(value = "/add")
     @Logs(title = "新增",content = "根据用户传递的参数新增巡检点数据",logType = 2)
     public Result insert(@RequestBody TCruiseDataResult tCruiseDataResult) {
         Result result = new Result();
@@ -61,7 +61,7 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete")
     @Logs(title = "删除",content = "根据用户传递的参数删除巡检点数据",logType = 4)
     public Result delete(@RequestParam(value = "cruiseDataId", required = true) Long cruiseDataId) {
         Result result = new Result();
@@ -78,7 +78,7 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @PutMapping(value = "/update")
     @Logs(title = "修改",content = "根据用户传递的参数修改巡检点数据",logType = 3)
     public Result update(@RequestBody TCruiseDataResult tCruiseDataResult) {
         Result result = new Result();
@@ -95,7 +95,7 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPrimaryId")
     @Logs(title = "查询",content = "根据用户传递的参数查询巡检点数据",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "cruiseDataId", required = true) Long cruiseDataId) {
         Result result = new Result();
@@ -104,13 +104,13 @@ public class TCruiseDataResultController {
             result.setData(tCruiseDataResult);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("主键查询失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "查询")
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @GetMapping(value = "/select")
     @Logs(title = "查询",content = "根据用户传递的参数查询巡检点数据",logType = 1)
     public Result select(@RequestParam(value = "cruiseDataId", required = false) Long cruiseDataId,
                          @RequestParam(value = "cruiseResultId", required = false) String cruiseResultId,
@@ -142,13 +142,13 @@ public class TCruiseDataResultController {
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("查询失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @PostMapping(value = "/selectByPage")
     @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检点数据",logType = 1)
     public Result selectByPage(@RequestBody TCruiseDataResult tCruiseDataResult,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -163,13 +163,13 @@ public class TCruiseDataResultController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("分页查询失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @PostMapping(value = "/batchInsert")
     @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡检点数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseDataResult> list) {
         Result result = new Result();
@@ -184,7 +184,7 @@ public class TCruiseDataResultController {
 
 
     @ApiOperation(value = "巡视结果分析--测点查询")
-    @RequestMapping(value = "/selectCruiseResultAnal", method = RequestMethod.GET)
+    @GetMapping(value = "/selectCruiseResultAnal")
     @Logs(title = "查询",content = "查询测点信息",logType = 1)
     public Result selectCruiseResultAnal(@RequestParam(value = "deviceId", required = false) Long deviceId,
                                          @RequestParam(value = "resultSwitch") String resultSwitch,
@@ -202,7 +202,6 @@ public class TCruiseDataResultController {
                     regionIds = tStdDeviceService.selectRegionIdTree(deviceId);
                     deviceIds = tStdDeviceService.selectDeviceIdsByRegion(regionIds);
                 }
-              log.info("regionIds-----------:"+regionIds);
             }else {
                 deviceIds.add(Long.valueOf(996));
             }
@@ -213,12 +212,12 @@ public class TCruiseDataResultController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("巡视结果分析--测点查询失败描述：", e);
         }
         return result;
     }
     @ApiOperation(value = "巡视结果分析--测点查询2")
-    @RequestMapping(value = "/selectCruiseResultAnalyze", method = RequestMethod.GET)
+    @GetMapping(value = "/selectCruiseResultAnalyze")
     @Logs(title = "查询",content = "查询测点信息",logType = 1)
     public Result selectCruiseResultAnalyze(@RequestParam(value = "regionId", required = false) Long regionId,
                                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
@@ -230,22 +229,17 @@ public class TCruiseDataResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-//            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             resultMap = tCruiseDataResultService.selectCruiseResultAnalyze(regionId,deviceType,meteType,meterType,cruiseRes,pageNum,pageSize);
-
-//            List<CruiseResultAnalMeteInfo> list = tCruiseDataResultService.selectCruiseResultAnalyze(regionId,deviceType,meteType,meterType,cruiseRes);
-//            resultMap.put("count", page.getTotal());
-//            resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("巡视结果分析--测点查询2失败描述：", e);
         }
 
         return result;
     }
     @ApiOperation(value = "巡视报表")
-    @RequestMapping(value = "/selectCruiseDataReport", method = RequestMethod.GET)
+    @GetMapping(value = "/selectCruiseDataReport")
     @Logs(title = "查询",content = "根据用户传递的参数查询巡视报表",logType = 1)
     public Result selectCruiseDataReport(@RequestParam(value = "cType", required = false) Integer cType,
                                         @RequestParam(value = "meteType", required = false) String meteType,
@@ -269,12 +263,12 @@ public class TCruiseDataResultController {
             result.setData(resultMap);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("巡视报表失败描述：", e);
         }
         return result;
     }
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
-    @RequestMapping(value = "/selectCruiseDataResultByList2", method = RequestMethod.GET)
+    @GetMapping(value = "/selectCruiseDataResultByList2")
     @Logs(title = "查询",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList2(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                                @RequestParam(value = "cType", required = false) Integer cType,
@@ -296,18 +290,17 @@ public class TCruiseDataResultController {
                 endTime = null;
             }
             List<CruiseResultAnalyzeInfo>  list = tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
-//            resultMap = tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
         return result;
     }
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
-    @RequestMapping(value = "/selectCruiseDataResultByList", method = RequestMethod.GET)
+    @GetMapping(value = "/selectCruiseDataResultByList")
     @Logs(title = "查询",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                                @RequestParam(value = "cType", required = false) Integer cType,
@@ -336,12 +329,12 @@ public class TCruiseDataResultController {
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
         return result;
     }
     @ApiOperation(value = "获取折线图元素信息")
-    @RequestMapping(value = "/selectBrokenLine", method = RequestMethod.GET)
+    @GetMapping(value = "/selectBrokenLine")
     @Logs(title = "查询",content = "根据用户传递的参数获取折线图信息",logType = 1)
     public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                    @RequestParam(value = "cType", required = false) Integer cType,
@@ -361,7 +354,7 @@ public class TCruiseDataResultController {
             result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("获取折线图元素信息失败描述：", e);
         }
         return result;
     }

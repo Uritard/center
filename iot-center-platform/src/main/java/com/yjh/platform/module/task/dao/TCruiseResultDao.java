@@ -71,8 +71,8 @@ public interface TCruiseResultDao {
     String selectLastMonday();
     String selectLastSunday();
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
-                                           @Param(value = "Start")String Start,
-                                           @Param(value = "End")String End);
+                                           @Param(value = "start")String start,
+                                           @Param(value = "end")String end);
     List<CruiseStatistical> cruiseStatistical();
     CruiseStatistical cruiseStatistical2();
 
