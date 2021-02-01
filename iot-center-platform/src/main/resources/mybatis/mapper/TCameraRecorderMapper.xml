@@ -145,7 +145,7 @@
         <if test="transPort != null ">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
         <if test="userName != null ">a.user_name = #{userName},</if>
-        <if test="pwd != null and ">a.pwd = #{pwd},</if>
+        <if test="pwd != null ">a.pwd = #{pwd},</if>
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUr},</if>
         <if test="maxChannel != null ">a.max_channel = #{maxChannel, jdbcType=INTEGER},</if>
         <if test="hddSize != null ">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>

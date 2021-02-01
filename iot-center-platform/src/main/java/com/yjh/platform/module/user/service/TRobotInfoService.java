@@ -263,10 +263,11 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int generateXMLByFile() throws IOException {
+    public String generateXMLByFile() throws IOException {
         BufferedReader br = null;
         InputStreamReader in = null;
-        String filePath = "D:/testform/PMS/PMS.txt";
+        String filePath = "D:/testform/PMS/PMS.txt";//从这读
+        String xmlPath = "D:/testform/generateXML/Robot_PMS_System.xml";//往这写
         try {
             //读取文件
             in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
@@ -313,12 +314,12 @@ public class TRobotInfoService{
             OutputFormat format = OutputFormat.createPrettyPrint();
             format.setEncoding("UTF-8");
             //生成xml文件
-            File file = new File("D:/testform/Robot_PMS_System.xml");
+            File file = new File(xmlPath);
             XMLWriter writer = new XMLWriter(new FileOutputStream(file), format);
             writer.setEscapeText(false);
             writer.write(document);
             writer.close();
-            System.out.println("生成Robot_PMS_System.xml成功");
+            log.info("生成Robot_PMS_System.xml成功");
 
         } catch (IOException e) {
             log.info("读取文件错误: "+e);
@@ -330,6 +331,6 @@ public class TRobotInfoService{
                 in.close();
             }
         }
-        return 1;
+        return xmlPath;
     }
 }

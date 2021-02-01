@@ -142,7 +142,7 @@
         <if test="address != null ">a.address = #{address},</if>
         <if test="latitude != null">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
         <if test="longitude != null ">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
-        <if test="unit != null and">a.unit = #{unit},</if>
+        <if test="unit != null ">a.unit = #{unit},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>
