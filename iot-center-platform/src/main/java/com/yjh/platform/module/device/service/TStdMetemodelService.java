@@ -489,8 +489,9 @@ public class TStdMetemodelService {
     @Transactional(rollbackFor = Exception.class)
     public Result insertModel(MultipartFile file) throws Exception  {
         Result result = new Result();
+        result.setCode(209);
         String  pathName = excelDataImport(file);
-        //获取自带你表的值pathName
+        //获取字典表的值pathName
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
         List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
@@ -626,7 +627,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setUnit(item);
+                tStdMete.setAnalyseType(Integer.valueOf(nameMap.get(item)));
             }
 
 
@@ -640,7 +641,7 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setAnalyseType(Integer.valueOf(nameMap.get(item)));
+                tStdMete.setUnit(item);
             }
 
             cell = row.getCell(10);
@@ -939,6 +940,7 @@ public class TStdMetemodelService {
             result.setData(isRepetition);
         }
         deleteDir(new File(pathName));
+        result.setCode(200);
         return result;
     }
 
