@@ -151,9 +151,9 @@ public class TWarnInfoService{
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnAndDefectOnMonth() {
         List<WarnStatistical> WarnList = tWarnInfoDao.countWarnAndDefectOnMonth1();//近一月告警
-//        log.info("WarnList==="+WarnList);
+        log.info("WarnList==="+WarnList);
         List<WarnStatistical> defectList = tWarnInfoDao.countWarnAndDefectOnMonth2();//近一月缺陷
-//        log.info("defectList==="+defectList);
+        log.info("defectList==="+defectList);
         List<WarnStatistical> finalLst = new ArrayList<>();
         for (WarnStatistical ws : WarnList){
             for (WarnStatistical ws1 : defectList){

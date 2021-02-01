@@ -632,10 +632,13 @@
         a.timeNode,
         ifnull( b.count, 0 ) AS count
         FROM
-        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
-        from mysql.help_topic
-        where help_topic_id  &lt; day(last_day(curdate()))
-        order by help_topic_id) a
+        (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac-1 DAY), '%Y-%m-%d') as timeNode
+        FROM (
+                        SELECT @ai:=@ai+1 as ac from
+                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
+                        (SELECT @ai:=0) xc0
+        ) c )a
         LEFT JOIN (
         SELECT
         DATE(warn_time) date,
@@ -655,10 +658,13 @@
         a.timeNode,
         ifnull( b.count, 0 ) AS count
         FROM
-        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
-        from mysql.help_topic
-        where help_topic_id  &lt; day(last_day(curdate()))
-        order by help_topic_id) a
+        (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac-1 DAY), '%Y-%m-%d') as timeNode
+        FROM (
+                        SELECT @ai:=@ai+1 as ac from
+                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
+                        (SELECT @ai:=0) xc0
+        ) c )a
         LEFT JOIN (
         SELECT
         DATE(defect_time) date,
