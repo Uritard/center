@@ -95,6 +95,10 @@ public class ChannelsXML {
                     channel.setPort(child.getText());
                 if(child.getName().equals("chanIndex"))
                     channel.setChanIndex(child.getText());
+                if(child.getName().equals("userName"))
+                    channel.setUserName(child.getText());
+                if(child.getName().equals("userPwd"))
+                    channel.setUserPwd(child.getText());
                 if(child.getName().equals("signalPoint"))
                     channel.setSignalPoint(child.getText());
                 if(child.getName().equals("blurPoint"))

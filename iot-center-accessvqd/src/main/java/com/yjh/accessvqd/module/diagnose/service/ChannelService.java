@@ -9,6 +9,7 @@ import com.yjh.accessvqd.commons.utils.xmlAnalyse.DataServerXML;
 import com.yjh.accessvqd.commons.utils.xmlAnalyse.ResponseXML;
 import com.yjh.accessvqd.module.diagnose.entity.Channel;
 import com.yjh.accessvqd.module.diagnose.entity.DataServer;
+import com.yjh.accessvqd.module.diagnose.entity.TestList;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -26,13 +28,23 @@ import java.util.List;
  */
 @Service
 public class ChannelService {
-    @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/dataServers")
+    @Value("${diagnose.url}"+"/PSIA/Custom/SelfExt/AS/VQDDiagnose/dataServers")
     private String diagnoseURL;
 
-    @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/channels")
+    @Value("${diagnose.url}"+"/PSIA/Custom/SelfExt/AS/VQDDiagnose/channels")
     private String channelURl;
 
     private Logger log= LoggerFactory.getLogger(ChannelService.class);
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public String userPwdEncrypt(String passWord){
+        String key = "ivms6@hikvision$";
+        String iv="8807599889957088";
+        TestList test = new TestList();
+        byte[] js = test.encrypt(passWord.getBytes(),key.getBytes(),iv.getBytes());
+        return Base64.getEncoder().encodeToString(js);
+    }
 
     @Logs(title = "数据服务器信息配置-查询",code = "accessvqd/diagnose")
     @Transactional(rollbackFor = Exception.class)
@@ -123,6 +135,8 @@ public class ChannelService {
     public String addChannel(Channel channel){
         String status=null;
         try {
+
+            channel.setUserPwd(userPwdEncrypt(channel.getUserPwd()));
             String result=HttpClientUtils.getInstance().putUrl(channelURl+"/"+channel.getId(), ChannelsXML.generateChannelXML(channel));
             status= ResponseXML.unPackingXMl(result);
         }catch (Exception e){

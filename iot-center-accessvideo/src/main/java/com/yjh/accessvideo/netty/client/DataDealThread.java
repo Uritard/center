@@ -186,9 +186,9 @@ public class DataDealThread implements Runnable {
                                                         warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "状态异常");
                                                         warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                         if (tStdDevicemeteM.getAlarmState() == 0) {
-                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateZero() + "状态触发告警");
+                                                            warnMap.put("warnContent",  tStdDevicemeteM.getMeteName() +":"+ tStdDevicemeteM.getStateZero() + "--"+analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(),"alarm_level"));
                                                         } else {
-                                                            warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + tStdDevicemeteM.getStateOne() + "状态触发告警");
+                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() +":"+ tStdDevicemeteM.getStateOne() + "--"+analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(),"alarm_level"));
                                                         }
                                                         warnMap.put("outRange", "--");
 
@@ -229,7 +229,7 @@ public class DataDealThread implements Runnable {
                                                         switch (warnRuleMeter) {
                                                             case 1:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
-                                                                warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "预警");
+                                                                warnMap.put("warnContent",  tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--"+"预警");
                                                                 alarm_level = "1";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit1()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
@@ -239,7 +239,7 @@ public class DataDealThread implements Runnable {
                                                                 break;
                                                             case 2:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-                                                                warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "一般");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--" + "一般");
                                                                 alarm_level = "2";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit2()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
@@ -249,7 +249,7 @@ public class DataDealThread implements Runnable {
                                                                 break;
                                                             case 3:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
-                                                                warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "严重");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--" + "严重");
                                                                 alarm_level = "3";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit3()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit3()));
@@ -260,7 +260,7 @@ public class DataDealThread implements Runnable {
 
                                                             case 4:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
-                                                                warnMap.put("warnContent", "主设备告警:" + tStdDevicemeteM.getMeteName() + "危急");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--"+ "危急");
                                                                 alarm_level = "4";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit4()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit4()));
@@ -520,6 +520,7 @@ public class DataDealThread implements Runnable {
                         Constant.otherServer(map,Constant.TCP_URL);
                     }
 
+                    log.info("Border_______---------______________________________________________________________________________________________");
                     //若本任务上一次有巡视数据，则正常或异常点数要进行加和
                     if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
                         tNormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal").toString()) + tNormal;

@@ -1,6 +1,7 @@
 package com.yjh.accessvqd.common;
 
 import com.yjh.accessvqd.commons.utils.weatherUtils.SerialPortUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 public class Constant {
 

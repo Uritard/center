@@ -31,7 +31,7 @@ public class PlansService {
 
     private Logger log = LoggerFactory.getLogger(PlansService.class);
 
-    @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/plans")
+    @Value("${diagnose.url}"+"/PSIA/Custom/SelfExt/AS/VQDDiagnose/plans")
     private String diagnosePlan_URl;
 
     @Autowired
@@ -410,6 +410,7 @@ public class PlansService {
         List<String> checked = new ArrayList<>();//当前任务已勾选的监测点ID
         Set<String> usingChannelId=new HashSet<>();//存放已有任务绑定的监测点ID
 
+
         //获取checkedIdList
         if (tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId).size() != 0) {
             for (TDiagnosePlanAttr attr : tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId)) {
@@ -450,16 +451,19 @@ public class PlansService {
         log.info("list：----"+ids);
 
         List<NVRChannelTree> roots = tDiagnosePlanDao.selectNVRNode();
-
+        List<NVRChannelTree> invisibleRoots=new ArrayList<>();//放入有子节点的NVR信息
         for (NVRChannelTree root : roots) {
             root.setUpId(Long.valueOf("-1"));
             root.setLevel("1");
             root.setChildren(tDiagnosePlanDao.selectChannelNode(root.getId(),ids));
+            if(root.getChildren().size() !=0){  //NVR筛选
+                invisibleRoots.add(root);
+            }
         }
 
 
         finalResult.put("checked", checked);
-        finalResult.put("tree", roots);
+        finalResult.put("tree", invisibleRoots);
         return finalResult;
 
     }

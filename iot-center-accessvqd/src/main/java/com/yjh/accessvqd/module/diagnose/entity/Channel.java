@@ -33,7 +33,7 @@ public class Channel implements Serializable {
     @ApiModelProperty(value = "登录用户名")
     private String userName="administrator";
     @ApiModelProperty(value = "登录密码")
-    private String userPwd="BIhWBdVruB9R";
+    private String userPwd;
     @ApiModelProperty(value = "信号丢失阈值")
     private String signalPoint;
     @ApiModelProperty(value = "图像模糊阈值")

@@ -40,11 +40,7 @@ public class ChannelController {
     public Result userPwdEncrypt(@RequestParam String pass){
         Result result=new Result();
         try {
-            String key = "ivms6@hikvision$";
-            String iv="8807599889957088";
-            TestList test = new TestList();
-            byte[] js = test.encrypt(pass.getBytes(),key.getBytes(),iv.getBytes());
-            result.setData(Base64.getEncoder().encodeToString(js));
+           result.setData(channelService.userPwdEncrypt(pass));
         }catch (Exception e){
             log.error("加密失败："+e);
         }
