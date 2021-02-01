@@ -71,7 +71,7 @@ public class AccessUdpApplication implements CommandLineRunner {
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
         TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
-        devicePath = tSysParam.getContent();
+        devicePath = tSysParam.getContent()+"/"+"efile.txt";
         log.info("设备文件路径：  "+devicePath);
         BufferedReader br = null;
         InputStreamReader in = null;

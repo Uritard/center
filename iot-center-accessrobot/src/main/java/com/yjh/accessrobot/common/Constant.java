@@ -34,7 +34,7 @@ public class Constant {
             .expirationPolicy(ExpirationPolicy.CREATED)
             .build();
 
-    public static String SEND_ROBOT_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+    public static String SEND_ROBOT_URL = "http://192.168.9.40:18720/iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
     public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
         Result re = new Result();
@@ -45,7 +45,7 @@ public class Constant {
         return re;
     }
 
-    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+    public static final String TCP_URL = "http://192.168.9.40:18720/iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
     public static Map<String,String> robotResultMap =  new HashMap<>();
 

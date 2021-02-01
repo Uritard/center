@@ -41,7 +41,7 @@ public class Constant {
 
     public static final String WARN_JUDGE = "http://iot-center-accessvideo/AnalysisDataOperate/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 
-    public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
+    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
         ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         if (null != serviceRestTemplate) {
@@ -56,5 +56,5 @@ public class Constant {
     public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
 
     public static final String Maintenance_Issued = "http://iot-center-accessrobot/robot/v1/deviceMaintenanceIssued";
-
+    public static final String UDP_SEND ="http://iot-center-accessudp/sysLogs/v1/sendFile";
 }

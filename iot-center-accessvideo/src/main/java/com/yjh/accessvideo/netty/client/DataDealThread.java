@@ -343,7 +343,7 @@ public class DataDealThread implements Runnable {
                                                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
                                                         map.put("list",list);
                                                         log.info("告警上报：-"+map);
-                                                        Constant.otherServer(map,Constant.TCP_URL);
+                                                        //Constant.otherServer(map,Constant.TCP_URL);
                                                     }
 
                                                     // webSocket通知前端刷新告警统计数量
@@ -517,7 +517,7 @@ public class DataDealThread implements Runnable {
                         Map<String,List<XMLBaseModel>> map = new HashMap<>();
                         map.put("list",list);
                         log.info("结果信息上报：-"+map);
-                        Constant.otherServer(map,Constant.TCP_URL);
+                        //Constant.otherServer(map,Constant.TCP_URL);
                     }
 
                     log.info("Border_______---------______________________________________________________________________________________________");

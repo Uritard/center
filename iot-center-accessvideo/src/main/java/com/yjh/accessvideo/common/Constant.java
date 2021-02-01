@@ -46,5 +46,5 @@ public class Constant {
         }
         return re;
     }
-    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+    public static final String TCP_URL = "http://192.168.9.40:18720/iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 }

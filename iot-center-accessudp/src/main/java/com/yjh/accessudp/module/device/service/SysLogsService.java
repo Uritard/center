@@ -63,7 +63,7 @@ public class SysLogsService{
             br.close();
             in.close();
         } catch (IOException e) {
-            log.info("读取联动设备错误: "+e);
+            log.info("读取文件错误: "+e);
         } finally {
             if(br != null ){
                 br.close();

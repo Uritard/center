@@ -1,16 +1,23 @@
 package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.user.controller.TSequentialConfController;
+import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TSequentialConf;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.yjh.platform.module.user.entity.TSysParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,7 +35,7 @@ public class TSequentialConfService{
     @Autowired
     private TSequentialConfDao tSequentialConfDao;
     @Autowired
-    private TCfgDataCurrentDao tCfgDataCurrentDao;
+    private TSysParamDao tSysParamDao;
 
 
     private Logger log = LoggerFactory.getLogger(TSequentialConfService.class);
@@ -168,6 +175,37 @@ public class TSequentialConfService{
             //todo 发给算法进行分析
 
             //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
+            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+            //String devicePath = tSysParam.getContent()+"/"+"sequential.txt";
+            String devicePath = "D:/code/qhTest/sequential.txt";
+            try{
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                //File txt=new File("D:/code/qhTest/sequential.txt");
+                File txt=new File(devicePath);
+                if (!txt.exists()) {
+                    txt.createNewFile();
+                }
+                if(txt.exists()){
+                    txt.delete();
+                }
+                FileWriter fw = new FileWriter(txt, true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
+                bw.write("<DeviceInfo::设备状态>\r\n");
+                bw.write("@序号\t站序号\t监控索引号\t设备名称  设备状态  事件时标\r\n");
+                bw.write("#1\t"+1+"\t"+meteId+"\t"+map.get("deviceName")+"\t"+map.get("state")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
+                bw.write("</DeviceInfo::设备状态>\r\n");
+                bw.flush();
+                bw.close();
+                fw.close();
+                //将生成的顺控确认文件发送给主辅监控系统
+                Map<String,List<String>> mapForSend = new HashMap<>();
+                List<String> list = new ArrayList<>();
+                list.add(devicePath);
+                mapForSend.put("list",list);
+                //Constant.otherServer(mapForSend,Constant.UDP_SEND);
+            }catch (Exception e){log.info("生成顺控确认文件失败"+e.getMessage());}
+
             Map<String, Object> jasonMapsResult = new HashMap<>();
             jasonMapsResult.put("type", "newSequentialResult");
             jasonMapsResult.put("cfgDeviceId", meteId);

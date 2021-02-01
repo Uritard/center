@@ -54,7 +54,7 @@ public class SysLogsController {
         return result;
     }
 
-    @ApiOperation(value = "主键查询")
+    @ApiOperation(value = "测试")
     @RequestMapping(value = "/data", method = RequestMethod.GET)
     public Result data(@RequestParam(value = "regex") String regex) {
         Result result = new Result();
@@ -95,6 +95,20 @@ public class SysLogsController {
             tCfgMeteDao.insertForTelesignal(list);
 
             result.setData("sysLogs");
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "将生成好的文件发送")
+    @RequestMapping(value = "/sendFile", method = RequestMethod.POST)
+    public Result sendFile(@RequestParam("map") Map<String,List<String>> map){
+        Result result = new Result();
+        try {
+            String path  = map.get("list").get(0);
+            result.setData(this.sysLogsService.sendFile(path));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);
