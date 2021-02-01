@@ -337,6 +337,10 @@ public class CameraConController {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
+            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
+            String filePath = capturePresetPath + filePathTem;
+            String cmd = "rm -f "+filePath;
+            Runtime.getRuntime().exec(cmd);
             result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.CLE_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

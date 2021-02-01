@@ -423,7 +423,7 @@
     </delete>
 
     <select id="selectColumnName" resultType="java.lang.String">
-         select COLUMN_COMMENT from information_schema.COLUMNS where table_name = 't_std_mete'
+         SELECT DISTINCT column_comment FROM information_schema.columns WHERE table_name = 't_std_mete' AND column_comment != '';
     </select>
 
     <select id="selectForDict" resultType="java.lang.String">
@@ -445,7 +445,9 @@
         select
         a.dict_note AS "id",
         a.dict_code AS "value"
-        from t_dict_business a order by value desc
+        from t_dict_business a
+        where a.col_name in ("device_type","mete_type","alarm_level","alarm_type","analyse_type","defect_type")
+        order by value desc
     </select>
 
     <select id="selectTSTDMeteAll" resultType="com.yjh.platform.module.device.entity.TStdMete">
