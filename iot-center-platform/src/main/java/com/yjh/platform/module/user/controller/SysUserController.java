@@ -305,6 +305,7 @@ public class SysUserController {
             sysUser.setCreatorId(creatorId);
             sysUser.setPassword("Yjh@123!");
             sysUserService.insert(sysUser);
+            sysUserService.insertIntoRedis();
             result.setData(sysUser);
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_username") != -1) {
