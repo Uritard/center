@@ -246,7 +246,7 @@ public class ReportDataRepo {
 
         TaskVO taskVoInfo = param.getTaskVO();
 
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 6, new String[]{TASK_TITLE_CONTENT[0]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 5, new String[]{TASK_TITLE_CONTENT[0]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_LEFT).setBold(true));
 
         rowIndex++;

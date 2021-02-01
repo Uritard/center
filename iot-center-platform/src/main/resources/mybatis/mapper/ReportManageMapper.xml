@@ -255,7 +255,7 @@
         SELECT
             a.task_name,
             a.start_time as cruise_date,
-            b.region_name
+            b.region_name as station_name
         from
             t_cruise_task a,t_std_region b
         where 1 = 1
