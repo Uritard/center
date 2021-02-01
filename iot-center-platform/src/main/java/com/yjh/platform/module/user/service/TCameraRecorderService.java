@@ -116,8 +116,8 @@ public class TCameraRecorderService {
         Long recorderId = tCameraRecorderDao.selectRecorderIdByPmsId(pmsId);
 
         Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-//        String filePathAndName = resMap.get("content") +  "/PMS/RecorderPMS.xml";
-        String filePathAndName = "D:/testform/PMS/录像机PMS系统.xml";
+        String filePathAndName = resMap.get("content") +  "/PMS/RecorderPMS.xml";
+//        String filePathAndName = "D:/testform/PMS/录像机PMS系统.xml";
         log.info("路径是==="+filePathAndName);
 
         SAXReader reader = new SAXReader();

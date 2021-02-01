@@ -544,7 +544,32 @@ public class RobotService {
         }
         return 1;
     }
+    @Transactional(rollbackFor = Exception.class)
+    public int feignRobotTaskIssued2(Map<String,Object> resMap){
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>();
+        map.put("task_code",resMap.get("taskCode"));
+        map.put("task_name",resMap.get("taskName"));
+        map.put("priority",4);
+        map.put("device_level",3);
+        map.put("device_list",resMap.get("device_list"));
+        mapList.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setType("102")
+                .setSendCode(resMap.get("sendCode").toString())
+                .setReceiveCode(resMap.get("receiveCode").toString())
+                .setCode(resMap.get("taskCode").toString())
+                .setTime(sdf.format(new Date()))
+                .setCommand("1")
+                .setItems(mapList);
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+        log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
 
+        //根据不同的机器人对应不同的管道发送指令
+        RobotServerHandler.getRobotServerHandlerMap().get(resMap.get("receiveCode").toString())
+                .SendHeartBeat(generateByteOrder(xmlString,resMap.get("receiveCode").toString()), resMap.get("receiveCode").toString());
+        return 1;
+    }
     //@Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap) throws Exception {

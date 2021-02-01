@@ -99,8 +99,8 @@ public class TRobotInfoService{
         String userName = tRobotInfoDao.selectUserName(userId);
 
         Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-//        String filePathAndName = resMap.get("content") +  "/PMS/RobotPMS.xml";
-        String filePathAndName = "D:/testform/PMS/机器人PMS系统.xml";
+        String filePathAndName = resMap.get("content") +  "/PMS/RobotPMS.xml";
+//        String filePathAndName = "D:/testform/PMS/机器人PMS系统.xml";
         log.info("路径是==="+filePathAndName);
 
         SAXReader reader = new SAXReader();
