@@ -4,6 +4,7 @@ import com.yjh.accessrobot.common.handler.ThrowErrorHandler;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
     @Bean
+    @LoadBalanced
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         //Response status code 4XX or 5XX to the client.

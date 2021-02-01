@@ -291,7 +291,7 @@ public class ReportDataRepo {
     }
 
     private static int prepareReportTitle(List<TableCellElement> elements) {
-        elements.add(new TableCellElement(0, 0, 0, 6, TASK_REPORT_TITLE,
+        elements.add(new TableCellElement(0, 0, 0, 5, TASK_REPORT_TITLE,
                 TableCellElement.TYPE_TEXT_STRING, (short) 15, 30, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         return 1;
     }
