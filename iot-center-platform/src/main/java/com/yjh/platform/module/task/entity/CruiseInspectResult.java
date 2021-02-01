@@ -46,8 +46,6 @@ public class CruiseInspectResult implements Serializable {
     private String unit;
     @ApiModelProperty(value = "图片路径")
     private String imagePath;
-    @ApiModelProperty(value = "摄像头ID")
-    private Long cameraId;
     @ApiModelProperty(value = "视频与流地址信息列表")
     private Object videoInfo;
 

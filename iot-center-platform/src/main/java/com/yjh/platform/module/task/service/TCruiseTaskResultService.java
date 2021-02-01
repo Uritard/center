@@ -195,17 +195,25 @@ public class TCruiseTaskResultService {
                     }else {
                         cruiseInspectResult.setImagePath("");
                     }
+
+                    Map<String,String> videoInfo=new HashMap<>();
                     if (Objects.nonNull(resultMap.get("cameraId"))) {
                         HashMap<String,Long> camera=new HashMap<>();
                         camera.put("cameraId",Long.valueOf(resultMap.get("cameraId").toString()));
                         Result result=sendGetRequest(Constant.START_CAMERA_URL,camera);
-                        cruiseInspectResult.setVideoInfo(result.getData());
-                        cruiseInspectResult.setCameraId(Long.valueOf(resultMap.get("cameraId").toString()));
+
+
+                        videoInfo.putAll((Map<String, String>) result.getData());
+                        videoInfo.put("cameraId",resultMap.get("cameraId").toString());
+                        cruiseInspectResult.setVideoInfo(videoInfo);
                     } else {
                         HashMap<String,Long> robot=new HashMap<>();
                         robot.put("robotId",tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
                         Result result=sendGetRequest(Constant.START_ROBOT_CAMERA_URL,robot);
-                        cruiseInspectResult.setVideoInfo(result.getData());
+
+                        videoInfo.putAll((Map<String, String>) result.getData());
+                        videoInfo.put("cameraId",null);
+                        cruiseInspectResult.setVideoInfo(videoInfo);
                     }
                     inspectResult=cruiseInspectResult;
                 }
