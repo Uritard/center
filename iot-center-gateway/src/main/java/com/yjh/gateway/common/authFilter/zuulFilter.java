@@ -46,7 +46,7 @@ public class zuulFilter extends ZuulFilter {
             JSONObject jsonModel = new JSONObject(true);
             Map<String, String[]> params = new TreeMap<>(request.getParameterMap());
             for (Map.Entry<String, String[]> param : params.entrySet()) {
-                if (!"webcode".equals(param.getKey())) {
+                if (!"webcode".equals(param.getKey())||!"signStr".equals(param.getKey())||!"plainText".equals(param.getKey())) {
                     jsonModel.put(param.getKey(), ((String[]) param.getValue())[0]);
                 }
             }
