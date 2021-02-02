@@ -265,7 +265,7 @@ public class TSequentialConfService{
             list.add(devicePath);
             mapForSend.put("list",list);
             Constant.otherServer(mapForSend,Constant.UDP_SEND);
-        }catch (Exception e){log.info("生成顺控确认文件失败"+e);}
+        }catch (Exception e){log.error("生成顺控确认文件失败"+e);}
 
         return "ok";
     }

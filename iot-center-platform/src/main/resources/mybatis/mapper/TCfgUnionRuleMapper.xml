@@ -65,7 +65,7 @@
         <if test="planId != null ">a.plan_id = #{planId},</if>
         <if test="ruleName != null ">a.rule_name = #{ruleName},</if>
         <if test="ruleType != null ">a.rule_type = #{ruleType},</if>
-        <if test="ruleContent != null ">a.rule_content = #{ruleConten},</if>
+        <if test="ruleContent != null ">a.rule_content = #{ruleContent},</if>
         <if test="ruleDelay != null">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
         <if test="description != null ">a.description = #{description},</if>
         <if test="inputParam != null ">a.input_param = #{inputParam},</if>
