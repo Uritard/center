@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.commons.logs.Logs;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
@@ -28,7 +28,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author tt
@@ -866,20 +865,21 @@ public class RobotService {
         List<XMLBaseModel> list = new ArrayList<>();
         list.add(xmlBaseModel);
         robotMap.put("list",list);
-        //robotTaskStates(robotMap);
+        robotTaskStates(robotMap);
         return "success";
     }
 
     public Result robotTaskStates(Map<String,List<XMLBaseModel>> robotMap) {
         Result re = new Result();
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re = serviceRestTemplate.postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
+//        try {
+//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+//            if (null != serviceRestTemplate) {
+//                re = serviceRestTemplate.postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
+//            }
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//        }
         return re;
     }
     public Integer selectDictCode(String valueName,String value,String colName){

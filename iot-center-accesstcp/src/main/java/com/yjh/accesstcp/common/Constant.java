@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.common;
 
+import com.yjh.accesstcp.common.utils.StaticContextAccessor;
 import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
@@ -7,6 +8,7 @@ import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
 import org.apache.poi.ss.formula.functions.T;
 import org.quartz.CronExpression;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
@@ -81,12 +83,11 @@ public class Constant {
     //检修区域路径 todo 记得改
     public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/systemSend";
 
-    public static <T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
+    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re = serviceRestTemplate.postForObject(url, map, Result.class);
-            }
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
 

@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.module.command.service;
 
-import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import org.springframework.beans.factory.annotation.Autowired;

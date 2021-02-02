@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.common;
 
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
@@ -7,6 +8,7 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import io.netty.channel.ChannelHandlerContext;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,18 +36,17 @@ public class Constant {
             .expirationPolicy(ExpirationPolicy.CREATED)
             .build();
 
-    public static String SEND_ROBOT_URL = "http://192.168.9.40:18720/iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+    public static String SEND_ROBOT_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
-    public static Result otherServer(Map<String, List<XMLBaseModel>> map, String url) throws Exception{
+    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
-        ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        if (null != serviceRestTemplate) {
-            re = serviceRestTemplate.postForObject(url, map, Result.class);
-        }
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
 
-    public static final String TCP_URL = "http://192.168.9.40:18720/iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
     public static Map<String,String> robotResultMap =  new HashMap<>();
 

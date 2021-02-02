@@ -102,9 +102,9 @@ public class SysLogsController {
         return result;
     }
 
-    @ApiOperation(value = "将生成好的文件发送")
+    @ApiOperation(value = "将生成好的文件发送给反向隔离装置")
     @RequestMapping(value = "/sendFile", method = RequestMethod.POST)
-    public Result sendFile(@RequestParam("map") Map<String,List<String>> map){
+    public Result sendFile(@RequestBody Map<String,List<String>> map){
         Result result = new Result();
         try {
             String path  = map.get("list").get(0);

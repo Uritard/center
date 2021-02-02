@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.module.command.service;
 
-import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.entity.TRobotInspection;
 import org.slf4j.Logger;

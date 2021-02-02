@@ -238,8 +238,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 //其实传输位置 9-12
                 Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
                 List<String> listByte = new ArrayList<>();
-                for(int i =14;i<valueLength;i++){
-                    listByte.add(udp[i]);
+                for(int i =0;i<valueLength;i++){
+                    listByte.add(udp[14+i]);
                 }
                 Constant.data.put(xuHao,listByte);
 

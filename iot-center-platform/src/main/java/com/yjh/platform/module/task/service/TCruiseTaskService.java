@@ -492,6 +492,12 @@ public class TCruiseTaskService {
                 robotTaskStatesMap.put("robotCodeList",robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
+            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+            jasonMapOnFinished.put("type","taskPause");
+            jasonMapOnFinished.put("taskId",taskId);
+            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息："+jsonMessage);
+            WebSocketServer.sendMsg(jsonMessage);
         } catch (Exception e) {
             log.error("任务暂停异常: "+e);
             e.printStackTrace();

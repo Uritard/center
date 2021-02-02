@@ -3,7 +3,9 @@ package com.yjh.platform.module.user.service;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.dao.TCfgDeviceDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TCfgDevice;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.user.controller.TSequentialConfController;
@@ -36,6 +38,8 @@ public class TSequentialConfService{
     private TSequentialConfDao tSequentialConfDao;
     @Autowired
     private TSysParamDao tSysParamDao;
+    @Autowired
+    private TCfgDeviceDao tCfgDeviceDao;
 
 
     private Logger log = LoggerFactory.getLogger(TSequentialConfService.class);
@@ -104,41 +108,41 @@ public class TSequentialConfService{
     public List<AreaInfo> selectForCfgDeviceTree(String cfgDeviceName){
         List<AreaInfo> list = new LinkedList<>();
         //遥信
-        List<AreaInfo> listItem1 = this.tSequentialConfDao.selectForTCfgMete(1,cfgDeviceName);
-        AreaInfo areaInfoItem1 = new AreaInfo();
-        areaInfoItem1.setId(1L);
-        areaInfoItem1.setUpId(-1L);
-        areaInfoItem1.setLabel("遥信");
-        areaInfoItem1.setChildren(listItem1);
-        areaInfoItem1.setInfoType("meteKind");
-        list.add(areaInfoItem1);
+//        List<AreaInfo> listItem1 = this.tSequentialConfDao.selectForTCfgMete(1,cfgDeviceName);
+//        AreaInfo areaInfoItem1 = new AreaInfo();
+//        areaInfoItem1.setId(-1L);
+//        areaInfoItem1.setUpId(null);
+//        areaInfoItem1.setLabel("遥控设备树");
+//        areaInfoItem1.setChildren(listItem1);
+//        areaInfoItem1.setInfoType("tree");
+        //list.add(areaInfoItem1);
         //遥测
-        List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2,cfgDeviceName);
-        AreaInfo areaInfoItem2 = new AreaInfo();
-        areaInfoItem2.setId(2L);
-        areaInfoItem2.setUpId(-2L);
-        areaInfoItem2.setLabel("遥测");
-        areaInfoItem2.setChildren(listItem2);
-        areaInfoItem2.setInfoType("meteKind");
-        list.add(areaInfoItem2);
+//        List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2,cfgDeviceName);
+//        AreaInfo areaInfoItem2 = new AreaInfo();
+//        areaInfoItem2.setId(2L);
+//        areaInfoItem2.setUpId(-2L);
+//        areaInfoItem2.setLabel("遥测");
+//        areaInfoItem2.setChildren(listItem2);
+//        areaInfoItem2.setInfoType("meteKind");
+        //list.add(areaInfoItem2);
         //遥测
         List<AreaInfo> listItem3 = this.tSequentialConfDao.selectForTCfgMete(3,cfgDeviceName);
         AreaInfo areaInfoItem3 = new AreaInfo();
-        areaInfoItem2.setId(3L);
-        areaInfoItem2.setUpId(-3L);
-        areaInfoItem2.setLabel("遥控");
-        areaInfoItem2.setChildren(listItem3);
-        areaInfoItem2.setInfoType("meteKind");
+        areaInfoItem3.setId(3L);
+        areaInfoItem3.setUpId(-1L);
+        areaInfoItem3.setLabel("遥控");
+        areaInfoItem3.setChildren(listItem3);
+        areaInfoItem3.setInfoType("meteKind");
         list.add(areaInfoItem3);
         //遥测
-        List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4,cfgDeviceName);
-        AreaInfo areaInfoItem4 = new AreaInfo();
-        areaInfoItem2.setId(4L);
-        areaInfoItem2.setUpId(-4L);
-        areaInfoItem2.setLabel("遥调");
-        areaInfoItem2.setChildren(listItem4);
-        areaInfoItem2.setInfoType("meteKind");
-        list.add(areaInfoItem4);
+//        List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4,cfgDeviceName);
+//        AreaInfo areaInfoItem4 = new AreaInfo();
+//        areaInfoItem2.setId(4L);
+//        areaInfoItem2.setUpId(-4L);
+//        areaInfoItem2.setLabel("遥调");
+//        areaInfoItem2.setChildren(listItem4);
+//        areaInfoItem2.setInfoType("meteKind");
+        //list.add(areaInfoItem4);
 
         return list;
     }
@@ -182,17 +186,18 @@ public class TSequentialConfService{
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 //File txt=new File("D:/code/qhTest/sequential.txt");
                 File txt=new File(devicePath);
-                if (!txt.exists()) {
-                    txt.createNewFile();
-                }
+
                 if(txt.exists()){
                     txt.delete();
+                }
+                if (!txt.exists()) {
+                    txt.createNewFile();
                 }
                 FileWriter fw = new FileWriter(txt, true);
                 BufferedWriter bw = new BufferedWriter(fw);
                 bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
                 bw.write("<DeviceInfo::设备状态>\r\n");
-                bw.write("@序号\t站序号\t监控索引号\t设备名称  设备状态  事件时标\r\n");
+                bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
                 bw.write("#1\t"+1+"\t"+meteId+"\t"+map.get("deviceName")+"\t"+map.get("state")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
                 bw.write("</DeviceInfo::设备状态>\r\n");
                 bw.flush();
@@ -203,7 +208,7 @@ public class TSequentialConfService{
                 List<String> list = new ArrayList<>();
                 list.add(devicePath);
                 mapForSend.put("list",list);
-                //Constant.otherServer(mapForSend,Constant.UDP_SEND);
+                Constant.otherServer(mapForSend,Constant.UDP_SEND);
             }catch (Exception e){log.info("生成顺控确认文件失败"+e.getMessage());}
 
             Map<String, Object> jasonMapsResult = new HashMap<>();
@@ -225,6 +230,44 @@ public class TSequentialConfService{
     public List<Map<String,String>> sequentialInfo(String cfgDeviceId){
         //todo 写入识别结果
          return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public String unionTask(String cfgDeviceId,String order){
+
+        TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
+        TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+        String devicePath = tSysParam.getContent()+"/"+"unionTask.txt";
+        //String devicePath = "D:/code/qhTest/unionTask.txt";
+        try{
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //File txt=new File("D:/code/qhTest/sequential.txt");
+            File txt=new File(devicePath);
+
+            if(txt.exists()){
+                txt.delete();
+            }
+            if (!txt.exists()) {
+                txt.createNewFile();
+            }
+            FileWriter fw = new FileWriter(txt, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
+            bw.write("<DeviceInfo::控制状态信息>\r\n");
+            bw.write("@序号\t站序号\t监控索引号\t设备名称\t类型\t联动指令\r\n");
+            bw.write("#1\t"+1+"\t"+cfgDeviceId+"\t"+tCfgDevice.getDeviceName()+"\t"+"遥控"+"\t"+order+"\r\n");
+            bw.write("</DeviceInfo::设备资源信息>\r\n");
+            bw.flush();
+            bw.close();
+            fw.close();
+            //将生成的反向联动文件发送给主辅监控系统
+            Map<String,List<String>> mapForSend = new HashMap<>();
+            List<String> list = new ArrayList<>();
+            list.add(devicePath);
+            mapForSend.put("list",list);
+            Constant.otherServer(mapForSend,Constant.UDP_SEND);
+        }catch (Exception e){log.info("生成顺控确认文件失败"+e);}
+
+        return "ok";
     }
 
 

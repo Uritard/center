@@ -135,7 +135,7 @@
     <select id="selectByParamType" resultType="com.yjh.platform.module.user.entity.TSysParam">
         select *
         from t_sys_param
-        where param_type = #{paramType,jdbcType=VARCHAR}
+        where param_code = #{paramType,jdbcType=VARCHAR}
     </select>
 
 </mapper>

@@ -29,9 +29,11 @@ public class SysLogsService{
     private String SERVER_HOSTNAME;
 
     // 服务器端口
-    public static final int SERVER_PORT = 9300;
+    @Value("${spring.send.server.port}")
+    private int SERVER_PORT;
     // 本地发送端口
-    public static final int LOCAL_PORT = 9999;
+    @Value("${spring.send.local.port}")
+     static int LOCAL_PORT;
     private String data;
 
     private Logger log = LoggerFactory.getLogger(SysLogsService.class);
@@ -81,7 +83,7 @@ public class SysLogsService{
         return "fail";
     }
 
-    public int Device(String info) throws Exception {
+    private int Device(String info) throws Exception {
         try {
             log.info("sss");
             DatagramSocket socket = new DatagramSocket(LOCAL_PORT);
@@ -153,7 +155,12 @@ public class SysLogsService{
             for(int cai = 0;cai<240;cai++){
                 list2.add(valueNeiRong[cai+(j-1)*240]);//数据
             }
-            //jishu = jishu +j;
+            //计算校验和
+            Integer add = 0;
+            for (int k = 5; k < list2.size(); k++) {
+                add = add+list2.get(k);
+            }
+            list2.add(add.byteValue());
             byte[] uspRe = new byte[list2.size()];
             int zui = 0;
             for (byte item:list2) {
@@ -175,7 +182,7 @@ public class SysLogsService{
             Integer x = i;
             list2.add(x.byteValue());//序号 9
 
-            //起始位置 9-13
+            //起始位置 10-13
             Integer shuai = i;
             list2.add(new Byte((byte)(shuai & 0xff)));
             list2.add(new Byte((byte)(shuai >> 8 & 0xff)));
@@ -190,7 +197,12 @@ public class SysLogsService{
             for(int cai = 0;cai<valueLength;cai++){
                 list2.add(valueNeiRong[(j-1)*240+cai]);//数据
             }
-            //jishu = jishu +240;
+            //计算校验和
+            Integer add = 0;
+            for (int k = 5; k < list2.size(); k++) {
+                add = add+list2.get(k);
+            }
+            list2.add(add.byteValue());
             byte[] uspRe = new byte[list2.size()];
             int zui = 0;
             for (byte item:list2) {
@@ -201,38 +213,6 @@ public class SysLogsService{
                     SERVER_PORT);
             socket.send(dp);
         }
-
-
-
-
-//        Integer h = 0x1;//后续 8
-//        list.add(h.byteValue());
-//        Integer x = xuHao;
-//        list.add(x.byteValue());//序号 9
-//
-//        //起始位置 9-13
-//        Integer shuai = 6;
-//        list.add(shuai.byteValue());
-//        list.add(shuai.byteValue());
-//        list.add(shuai.byteValue());
-//        list.add(shuai.byteValue());
-//
-//        String value = info;
-//        byte[] valueNeiRong = value.getBytes();//文件内容 15- 66
-//        Integer valueLength = valueNeiRong.length;
-//        list.add(valueLength.byteValue());//数据长度 14
-//        for (byte item:valueNeiRong) {
-//            list.add(item);
-//        }
-//
-//        byte[] uspRe = new byte[list.size()];
-//        int i = 0;
-//        for (byte item:list) {
-//            uspRe[i] = item;
-//            i++;
-//        }
-
-        //return uspRe;
     }
 
 }

@@ -3,7 +3,9 @@ package com.yjh.platform.common;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,10 +45,9 @@ public class Constant {
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
-        ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        if (null != serviceRestTemplate) {
-            re = serviceRestTemplate.postForObject(url, map, Result.class);
-        }
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";

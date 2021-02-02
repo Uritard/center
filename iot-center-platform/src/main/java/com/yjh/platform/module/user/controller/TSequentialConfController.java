@@ -188,21 +188,21 @@ public class TSequentialConfController {
     }
 
 
-    @ApiOperation(value = "查询顺控设备树")
-    @RequestMapping(value = "/sequenceControlResponse", method = RequestMethod.GET)
-    //@Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
-    public Result sequenceControlResponse(@RequestParam(value = "map", required = false) Map<String,List<Long>> map) {
-        Result result = new Result();
-        try {
-
-            //List<AreaInfo> list = tSequentialConfService.selectForCfgDeviceTree(cfgDeviceName);
-            result.setData(1);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
-        }
-        return result;
-    }
+//    //@ApiOperation(value = "查询顺控设备树")
+//    @RequestMapping(value = "/sequenceControlResponse", method = RequestMethod.GET)
+//    //@Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
+//    public Result sequenceControlResponse(@RequestParam(value = "map", required = false) Map<String,List<Long>> map) {
+//        Result result = new Result();
+//        try {
+//
+//            //List<AreaInfo> list = tSequentialConfService.selectForCfgDeviceTree(cfgDeviceName);
+//            result.setData(1);
+//        } catch (Exception e) {
+//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+//            log.error("失败描述：", e);
+//        }
+//        return result;
+//    }
 
     @ApiOperation(value = "查询顺控设备树")
     @RequestMapping(value = "/selectForCfgDeviceTree", method = RequestMethod.GET)
@@ -245,5 +245,18 @@ public class TSequentialConfController {
         return result;
     }
 
+    @ApiOperation(value = "反向联动任务下发")
+    @RequestMapping(value = "/unionTask",method = RequestMethod.GET)
+    public Result unionTask(@RequestParam(value = "cfgDeviceId",required = false) String cfgDeviceId,
+                            @RequestParam(value = "order",required = false) String order){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.unionTask(cfgDeviceId,order));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 
 }
