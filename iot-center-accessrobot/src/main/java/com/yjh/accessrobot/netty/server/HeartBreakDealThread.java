@@ -5,6 +5,7 @@ import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.security.PublicKey;
 import java.util.Map;
 
 /**
@@ -36,10 +37,11 @@ public class HeartBreakDealThread implements Runnable {
                 log.info("睡觉时间=="+sleepTime);
                 
                 Thread.sleep(sleepTime);
-                int heartNum = (Constant.heartNumMap.get("heartNum")).intValue();
-                heartNum--;
-                log.info("判断条件是==="+heartNum);
-                if (heartNum < -3){
+                processMethod();
+
+                int res = Constant.heartNum;
+                log.info("判断条件是==="+res);
+                if (res < -3){
                     robotServerHandler.ProcSend(robotCode);
                     StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
                     robotStatusMap.put("value","1");//异常
@@ -51,5 +53,8 @@ public class HeartBreakDealThread implements Runnable {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+    public synchronized void processMethod(){
+        Constant.heartNum--;
     }
 }

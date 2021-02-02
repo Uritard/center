@@ -297,7 +297,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
                     send(ctx, heartProtocol,xmlBaseModel.getSendCode());
                     //若心跳能够正常收发，将机器人置为在线状态
-                    Constant.heartNumMap.put("heartNum",0);
+                    Constant.heartNum = 0;
                     Constant.flag = 1;
                     if (Constant.flag2 == 0){
                         robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
