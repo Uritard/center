@@ -44,7 +44,7 @@ public class SysLogsService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String sendFile(String devicePath)throws Exception {
+    public String sendFile(String devicePath)throws IOException {
         //读取联动设备的信息
         //TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
         //String devicePath = "D:/code/qhTest/deviceInfo666.txt";
@@ -65,6 +65,7 @@ public class SysLogsService{
             br.close();
             in.close();
         } catch (IOException e) {
+            e.printStackTrace();
             log.info("读取文件错误: "+e);
         } finally {
             if(br != null ){
@@ -79,7 +80,7 @@ public class SysLogsService{
             this.data = info;
             Device(info);
             return info;
-        }catch (Exception e){e.getMessage();}
+        }catch (Exception e){ e.printStackTrace();}
         return "fail";
     }
 
