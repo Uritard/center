@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/tWarnInfo/v1")
-@Api(value = "/tWarnInfo", description = "告警信息表操作接口")
+@Api(value = "/tWarnInfo")
 public class TWarnInfoController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping(value = "/add")
     @Logs(title = "新增",content = "根据用户传递的参数新增告警信息数据",logType =2)
     public Result insert(@RequestBody TWarnInfo tWarnInfo) {
         Result result = new Result();
@@ -58,7 +58,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete")
     @Logs(title = "删除",content = "根据用户传递的参数删除告警信息数据",logType = 4)
     public Result delete(@RequestParam(value = "warnId", required = true) Long warnId) {
         Result result = new Result();
@@ -75,7 +75,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @PutMapping(value = "/update")
     @Logs(title = "修改",content = "根据用户传递的参数修改告警信息数据",logType = 3)
     public Result update(@RequestBody TWarnInfo tWarnInfo) {
         Result result = new Result();
@@ -91,8 +91,8 @@ public class TWarnInfoController {
         return result;
     }
 
-    @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @ApiOperation(value = "")
+    @GetMapping(value = "/selectByPrimaryId")
     @Logs(title = "查询",content = "根据用户传递的参数查询告警信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "warnId", required = true) Long warnId) {
         Result result = new Result();
@@ -101,13 +101,13 @@ public class TWarnInfoController {
             result.setData(tWarnInfo);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("主键查询失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "查询")
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @GetMapping(value = "/select")
     @Logs(title = "查询",content = "根据用户传递的参数查询告警信息",logType = 1)
     public Result select(@RequestParam(value = "warnId", required = false) Long warnId,
                             @RequestParam(value = "warnLevel", required = false) Integer warnLevel,
@@ -146,7 +146,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @PostMapping(value = "/selectByPage")
     @Logs(title = "查询",content = "根据用户传递的参数分页查询告警信息",logType = 1)
     public Result selectByPage(@RequestBody TWarnInfo tWarnInfo,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -167,7 +167,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @PostMapping(value = "/batchInsert")
     @Logs(title = "批量插入",content = "根据用户传递的参数批量插入告警信息数据",logType = 2)
     public Result batchInsert(@RequestBody List<TWarnInfo> list) {
         Result result = new Result();
@@ -175,12 +175,12 @@ public class TWarnInfoController {
         result.setData(tWarnInfoService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+        log.error("批量插入失败描述：" + e);
         }
         return result;
     }
     @ApiOperation(value = "查询所有告警")
-    @RequestMapping(value = "/selectWarnByPage", method = RequestMethod.GET)
+    @GetMapping(value = "/selectWarnByPage")
     @Logs(title = "查询",content = "根据用户传递的参数查询所有告警",logType = 1)
     public Result selectWarnByPage(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                                    @RequestParam(value = "confMode", required = false) Integer confMode,
@@ -206,7 +206,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "告警确认")
-    @RequestMapping(value = "/WarnConfirm", method = RequestMethod.GET)
+    @GetMapping(value = "/WarnConfirm")
     @Logs(title = "操作",content = "根据用户传递的参数进行告警确认",logType = 5)
     public Result WarnConfirm(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                               @RequestParam(value = "confMode", required = false) Integer confMode,
@@ -232,7 +232,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "告警核查")
-    @RequestMapping(value = "/warnReview",method = RequestMethod.GET)
+    @GetMapping(value = "/warnReview")
     @Logs(title = "操作",content = "根据用户传递的参数进行告警核查",logType = 5)
     public Result warnReview(@RequestParam(value = "warnId", required = false) Long warnId,
                              @RequestParam(value = "dealInfo", required = false) String dealInfo,
@@ -254,7 +254,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "根据告警来源统计告警个数")
-    @RequestMapping(value = "/countByAlarmSource", method = RequestMethod.GET)
+    @GetMapping(value = "/countByAlarmSource")
     @Logs(title = "查询",content = "根据告警来源统计告警个数",logType = 1)
     public Result countByAlarmSource(){
         Result result = new Result();
@@ -263,12 +263,12 @@ public class TWarnInfoController {
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("统计告警数据失败描述：", e);
+            log.error("根据告警来源统计告警个数失败描述：", e);
         }
         return result;
     }
     @ApiOperation(value = "根据设备类型统计告警个数-近一月")
-    @RequestMapping(value = "/countByDeviceType", method = RequestMethod.GET)
+    @GetMapping(value = "/countByDeviceType")
     @Logs(title = "查询",content = "根据设备类型统计近一个月的告警个数",logType = 1)
     public Result countByDeviceType(){
         Result result = new Result();
@@ -282,7 +282,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "根据设备类型统计告警和缺陷个数-近一月")
-    @RequestMapping(value = "/countAlarmByDeviceType", method = RequestMethod.GET)
+    @GetMapping(value = "/countAlarmByDeviceType")
     @Logs(title = "查询",content = "根据设备类型统计告警和缺陷个数",logType = 1)
     public Result countAlarmByDeviceType(){
         Result result = new Result();
@@ -296,7 +296,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "统计近一月的所有告警个数-折线图")
-    @RequestMapping(value = "/countWarnOnMonth", method = RequestMethod.GET)
+    @GetMapping(value = "/countWarnOnMonth")
     @Logs(title = "查询",content = "统计近一个月的所有告警",logType = 1)
     public Result countWarnOnMonth(){
         Result result = new Result();
@@ -310,7 +310,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "统计近一月的所有告警和缺陷个数-折线图")
-    @RequestMapping(value = "/countWarnAndDefectOnMonth", method = RequestMethod.GET)
+    @GetMapping(value = "/countWarnAndDefectOnMonth")
     @Logs(title = "查询",content = "统计近一个月的所有告警和缺陷",logType = 1)
     public Result countWarnAndDefectOnMonth(){
         Result result = new Result();
@@ -324,7 +324,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "根据告警处理状态统计告警个数-近一月")
-    @RequestMapping(value = "/countWarnConfMode", method = RequestMethod.GET)
+    @GetMapping(value = "/countWarnConfMode")
     @Logs(title = "查询",content = "根据告警处理状态统计近一个月的告警个数",logType = 1)
     public Result countWarnConfMode(){
         Result result = new Result();
@@ -338,7 +338,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "根据告警和缺陷处理状态统计告警个数-近一月")
-    @RequestMapping(value = "/countWarnDefectConfMode", method = RequestMethod.GET)
+    @GetMapping(value = "/countWarnDefectConfMode")
     @Logs(title = "查询",content = "根据告警和缺陷处理状态统计告警个数",logType = 1)
     public Result countWarnDefectConfMode(){
         Result result = new Result();
@@ -352,7 +352,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "查看告警处理情况")
-    @RequestMapping(value = "/selectAlarmProcess", method = RequestMethod.GET)
+    @GetMapping(value = "/selectAlarmProcess")
     @Logs(title = "查询",content = "根据用户传递的参数查询告警处理状况",logType = 1)
     public Result selectAlarmProcess(@RequestParam(value = "warnId") Long warnId){
         Result result = new Result();
@@ -366,7 +366,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "进行告警处理")
-    @RequestMapping(value = "/alarmProcess", method = RequestMethod.PUT)
+    @PutMapping(value = "/alarmProcess")
     @Logs(title = "操作",content = "进行告警处理",logType = 5)
     public Result alarmProcess(@RequestBody TWarnInfo tWarnInfo, HttpServletRequest request){
         Result result = new Result();
@@ -383,7 +383,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "告警核查")
-    @RequestMapping(value = "/alarmAndDefectProcess", method = RequestMethod.PUT)
+    @PutMapping(value = "/alarmAndDefectProcess")
     @Logs(title = "操作",content = "告警核查",logType = 5)
     public Result alarmAndDefectProcess(@RequestBody AlarmAndDefectProcess alarmAndDefectProcess, HttpServletRequest request){
         Result result = new Result();
@@ -401,7 +401,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "告警信息计数统计(未核查)")
-    @RequestMapping(value = "/warnCountsNonIdentify",method = RequestMethod.GET)
+    @GetMapping(value = "/warnCountsNonIdentify")
     @Logs(title = "查询",content = "统计未核查的告警",logType = 1)
     public Result warnCountsNonIdentify(){
         Result result=new Result();
@@ -416,7 +416,7 @@ public class TWarnInfoController {
         return  result;
     }
     @ApiOperation(value = "告警弹框")
-    @RequestMapping(value = "/warnPopUp",method = RequestMethod.GET)
+    @GetMapping(value = "/warnPopUp")
     @Logs(title = "操作",content = "告警弹窗",logType = 5)
     public Result warnPopUp(@RequestParam(value = "warnId", required = true) Long warnId,
                             @RequestParam(value = "defectModel", required = true) Integer defectModel) {

@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/tRobotInfo/v1")
-@Api(value = "/tRobotInfo", description = "机器人表操作接口")
+@Api(value = "/tRobotInfo")
 public class TRobotInfoController {
 
     @Autowired
@@ -49,7 +49,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping(value = "/add")
     @Logs(title = "新增",content = "根据用户传递的参数新增机器人信息",logType = 2)
     public Result insert(HttpServletRequest request, @RequestBody  TRobotInfo tRobotInfo) {
 
@@ -79,7 +79,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete")
     @Logs(title = "删除",content = "根据用户传递的参数删除机器人信息",logType = 4)
     public Result delete(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
@@ -96,7 +96,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @PutMapping(value = "/update")
     @Logs(title = "修改",content = "根据用户传递的参数修改机器人信息",logType = 3)
     public Result update(HttpServletRequest request, @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
@@ -114,7 +114,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPrimaryId")
     @Logs(title = "查询",content = "根据用户传递的参数查询机器人信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
@@ -129,7 +129,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "查询")
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @GetMapping(value = "/select")
     @Logs(title = "查询",content = "根据用户传递的参数查询机器人信息",logType = 1)
     public Result select(@RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "robotCode", required = false) String robotCode,
@@ -181,7 +181,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "分页模糊查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPage")
     @Logs(title = "查询",content = "根据用户传递的参数分页查询机器人信息",logType = 1)
     public Result selectByPage(@RequestParam(value = "robotName", required = false) String robotName,
                                 @RequestParam(value = "upRegionId", required = false) Long upRegionId,
@@ -210,7 +210,7 @@ public class TRobotInfoController {
         return result;
     }
     @ApiOperation(value = "从PMS系统同步机器人信息")
-    @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
+    @GetMapping(value = "/synchronizeFromPMS")
     @Logs(title = "操作",content = "从pms系统同步机器人信息",logType = 5)
     public Result synchronizeFromPMS(@RequestParam(value = "robotCode") String robotCode,HttpServletRequest request) {
         Result result = new Result();
@@ -224,7 +224,7 @@ public class TRobotInfoController {
         return result;
     }
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @PostMapping(value = "/batchInsert")
     @Logs(title = "批量插入",content = "根据用户传递的参数批量插入机器人信息",logType = 2)
     public Result batchInsert(@RequestBody List<TRobotInfo> list) {
         Result result = new Result();
@@ -238,7 +238,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "查询所有机器人巡检点信息树")
-    @RequestMapping(value = "/selectInspectionTree", method = RequestMethod.GET)
+    @GetMapping(value = "/selectInspectionTree")
     @Logs(title = "查询",content = "根据用户传递的参数查询机器人巡检点树",logType = 1)
     public Result selectInspectionTree() {
         Result result = new Result();
@@ -253,7 +253,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/batchDelete")
     @Logs(title = "批量删除",content = "根据用户传递的参数批量删除机器人信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "robotIds", required = true) String robotIds) {
         Result result = new Result();
@@ -269,7 +269,7 @@ public class TRobotInfoController {
         return result;
     }
     @ApiOperation(value = "从PMS系统同步机器人台账信息2")
-    @RequestMapping(value = "/synchronizeFromPMS2", method = RequestMethod.GET)
+    @GetMapping(value = "/synchronizeFromPMS2")
     @Logs(title = "操作",content = "从pms系统同步机器人台账信息",logType = 5)
     public Result synchronizeFromPMS2() {
         Result result = new Result();
@@ -285,7 +285,7 @@ public class TRobotInfoController {
         return result;
     }
     @ApiOperation(value = "读取从PMS系统获取的文件再生成xml")
-    @RequestMapping(value = "/generateXMLByFile", method = RequestMethod.GET)
+    @GetMapping(value = "/generateXMLByFile")
     @Logs(title = "操作",content = "读取pms系统的文件并生成xml",logType = 5)
     public Result generateXMLByFile() {
         Result result = new Result();

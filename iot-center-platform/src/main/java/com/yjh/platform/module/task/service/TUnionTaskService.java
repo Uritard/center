@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
@@ -36,8 +35,6 @@ public class TUnionTaskService{
 
     private Logger log = LoggerFactory.getLogger(TUnionTaskService.class);
 
-
-    private DateTimeUtil dateTimeUtil;
     @Transactional(rollbackFor = Exception.class)
     public int insert(TUnionTask tUnionTask) {
         return this.tUnionTaskDao.insert(tUnionTask);
@@ -60,17 +57,12 @@ public class TUnionTaskService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTask> select(String unionId, Long ruleId, String unionName, Integer ruleDelay, Integer isFinish,  Long robotId,  Integer remark1, Integer remark2, String remark3, String paramValues, Date startTime, Date createTime) {
-        List<TUnionTask> tUnionTaskList = tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, remark1, remark2, remark3, paramValues, startTime, createTime);
-        return tUnionTaskList;
+        return tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, remark1, remark2, remark3, paramValues, startTime, createTime);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTask> selectByPage(TUnionTask tUnionTask) {
-        List<TUnionTask> tUnionTaskList = tUnionTaskDao.selectByPage(tUnionTask);
-
-        int a = insertRecord(12l,"123122",9000000037L,null,new Date(),"测试用的断面数据");
-        System.out.println("哈哈啊哈哈哈："+a);
-        return tUnionTaskList;
+        return tUnionTaskDao.selectByPage(tUnionTask);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -80,7 +72,7 @@ public class TUnionTaskService{
     @Transactional(rollbackFor = Exception.class)
     public List<TUnionTaskExpand> selectHistory(String ruleName,Date endDateTemp,Date startDateTemp) {
         List<TUnionTaskExpand> tUnionTaskList  = tUnionTaskDao.selectHistory(ruleName,endDateTemp,startDateTemp);
-        System.out.println("tUnionTaskList是："+tUnionTaskList);
+        log.info("tUnionTaskList是："+tUnionTaskList);
         for (TUnionTaskExpand tUnionTaskExpand:tUnionTaskList)
         {
             if (tUnionTaskExpand.getIsFinish() == 0){
@@ -93,116 +85,15 @@ public class TUnionTaskService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> historyStatisticalByWeek() {
-        /*List<String> weekDates = dateTimeUtil.getDayDateList(8);
-
-        String firstTime1 = weekDates.get(0);
-        String firstTime2 = weekDates.get(1);
-        String firstTime3 = weekDates.get(2);
-        String firstTime4 = weekDates.get(3);
-        String firstTime5 = weekDates.get(4);
-        String firstTime6 = weekDates.get(5);
-        String firstTime7 = weekDates.get(6);
-        String firstTime8 = weekDates.get(7);*/
-
-
-        List<WarnStatistical> list = tUnionTaskDao.getHistoryByWeek();
-        /*List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
-
-        Iterator<String> iter = map.keySet().iterator();
-        while(iter.hasNext()){
-            String key=iter.next();
-            String timeNode =  key.substring(0,10);
-            Number mapValue = (Number)map.get(key);
-            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
-            tutHistoryStatistical.setTimeNode(timeNode);
-            tutHistoryStatistical.setCount(mapValue);
-            tutHistoryStatisticalList.add(tutHistoryStatistical);
-        }
-
-        Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
-            @Override
-            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                Date date1 = null;
-                Date date2 = null;
-                try {
-                    date1 = simpleDateFormat.parse(o1.getTimeNode());
-                    date2 = simpleDateFormat.parse(o2.getTimeNode());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                int flag = date1.compareTo(date2);
-                if (flag == -1) {
-                    flag = -1;
-                } else if (flag == 1) {
-                    flag = 1;
-                }
-                return flag;
-            }
-        });*/
-        return list;
+        return tUnionTaskDao.getHistoryByWeek();
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> historyStatisticalByYear() {
-        /*List<String> yearDates = dateTimeUtil.getYearDateList1(13);
-
-        String firstTime1 = yearDates.get(0);
-        String firstTime2 = yearDates.get(1);
-        String firstTime3 = yearDates.get(2);
-        String firstTime4 = yearDates.get(3);
-        String firstTime5 = yearDates.get(4);
-        String firstTime6 = yearDates.get(5);
-        String firstTime7 = yearDates.get(6);
-        String firstTime8 = yearDates.get(7);
-        String firstTime9 = yearDates.get(8);
-        String firstTime10 = yearDates.get(9);
-        String firstTime11 = yearDates.get(10);
-        String firstTime12 = yearDates.get(11);
-        String firstTime13 = yearDates.get(12);*/
-
-        List<WarnStatistical> list = tUnionTaskDao.getHistoryByYear();
-        /*List<TutHistoryStatistical> tutHistoryStatisticalList = new ArrayList<>();
-
-        Iterator<String> iter = map.keySet().iterator();
-        while(iter.hasNext()){
-            String key=iter.next();
-            String timeNode =  key.substring(0,7);
-            Number mapValue = (Number)map.get(key);
-
-            TutHistoryStatistical tutHistoryStatistical = new TutHistoryStatistical();
-            tutHistoryStatistical.setTimeNode(timeNode);
-            tutHistoryStatistical.setCount(mapValue);
-            tutHistoryStatisticalList.add(tutHistoryStatistical);
-        }*/
-        /*Collections.sort(tutHistoryStatisticalList, new Comparator<TutHistoryStatistical>() {
-            @Override
-            public int compare(TutHistoryStatistical o1, TutHistoryStatistical o2) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
-
-                Date date1 = null;
-                Date date2 = null;
-                try {
-                    date1 = simpleDateFormat.parse(o1.getTimeNode());
-                    date2 = simpleDateFormat.parse(o2.getTimeNode());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                int flag = date1.compareTo(date2);
-                if (flag == -1) {
-                    flag = -1;
-                } else if (flag == 1) {
-                    flag = 1;
-                }
-                return flag;
-            }
-        });*/
-        return list;
+        return tUnionTaskDao.getHistoryByYear();
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> historyStatisticalByMonth() {
-        List<WarnStatistical> list = tUnionTaskDao.getHistoryByMonth();
-        return list;
+        return tUnionTaskDao.getHistoryByMonth();
     }
     @Transactional(rollbackFor = Exception.class)
     public int insertRecord(Long meteId,String unionId,Long ruleId,Long robotId,Date createTime,String paramValues) {
@@ -227,7 +118,6 @@ public class TUnionTaskService{
 
         //新增联合巡视预案属性数据
         List<TUnionTaskDetail> tUnionTaskDetailList = tUnionTaskDao.selectUnionDetail(ruleId);
-        System.out.println("---------------------"+tUnionTaskDetailList);
         List<TUnionTaskAttr> tUnionTaskAttrList = new ArrayList<>();
         for(TUnionTaskDetail tUnionTaskDetail:tUnionTaskDetailList){
             TUnionTaskAttr tUnionTaskAttr = new TUnionTaskAttr();
@@ -258,13 +148,12 @@ public class TUnionTaskService{
     //联动弹窗--联动信息
     @Transactional(rollbackFor = Exception.class)
     public LinkageInformation linkageInformation(String taskId) {
-        LinkageInformation linkageInformation = TUnionTaskAttrDao.linkageInformation(taskId);
-        return linkageInformation;
+        return TUnionTaskAttrDao.linkageInformation(taskId);
     }
 
     //联动弹窗--监测数据
     @Transactional(rollbackFor = Exception.class)
-    public List<LinkageMonitorData> linkageMonitorData(String taskId) throws Exception{
+    public List<LinkageMonitorData> linkageMonitorData(String taskId) throws InterruptedException{
         Thread.sleep(1000);
         //根据任务Id查询相关内容
         List<LinkageMonitorData> linkageMonitorDataList = TUnionTaskAttrDao.selectDeviceInfo(taskId);
@@ -289,7 +178,6 @@ public class TUnionTaskService{
                 lmd.setPicpath(redisInfoMap.get("picpath"));
             }
         }
-//        log.info("linkageMonitorDataList==="+linkageMonitorDataList);
         return linkageMonitorDataList;
     }
 }

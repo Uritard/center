@@ -3,7 +3,6 @@ package com.yjh.accessrobot.netty.server;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -18,12 +17,10 @@ public class AlarmResultDealThread implements Runnable{
     private static final String DATETIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
 
-    private RedisTemplate redisTemplate;
     private Map<String,String> robotAlarmMap;
 
-    public AlarmResultDealThread(Map<String,String> robotAlarmMap,RedisTemplate redisTemplate){
+    public AlarmResultDealThread(Map<String,String> robotAlarmMap){
         this.robotAlarmMap = robotAlarmMap;
-        this.redisTemplate = redisTemplate;
     }
 
     @Override

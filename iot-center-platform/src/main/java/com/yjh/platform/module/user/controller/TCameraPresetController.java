@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -34,7 +33,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/tCameraPreset/v1")
-@Api(value = "/tCameraPreset", description = "摄像机预置位表操作接口")
+@Api(value = "/tCameraPreset")
 public class TCameraPresetController {
 
     @Autowired
@@ -47,7 +46,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping(value = "/add")
     @Logs(title = "新增",content = "根据用户传递的参数新增预置位信息",logType = 2)
     public Result insert(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
@@ -70,12 +69,10 @@ public class TCameraPresetController {
                     params.put("presetId",tCameraPreset1.getPresetId());
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-//                System.out.println("data是："+response1.getData());
                     if (response1.getData().equals(true)) {
                         Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                         JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
                         tCameraPreset1.setPresetImg((String) json.get("urlPath"));
-//                    System.out.println("PresetImg是："+json.get("urlPath"));
                         tCameraPresetService.update(tCameraPreset1);//存图
                         result.setData(resultNum);
                     } else {
@@ -96,7 +93,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete")
     @Logs(title = "删除",content = "根据用户传递的参数删除预置位信息",logType = 4)
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
@@ -107,9 +104,7 @@ public class TCameraPresetController {
 
             params.put("cameraId",tCameraPreset.getCameraId());
             params.put("presetId",tCameraPreset.getPresetId());
-//            System.out.println("params是："+params);
             Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);
-//            System.out.println("data是："+response.getData());
 
             int resultNum = 0;
             //操作数据库
@@ -140,26 +135,24 @@ public class TCameraPresetController {
         return response;
     }
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/deleteSelectedPreset", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/deleteSelectedPreset")
     @Logs(title = "批量删除",content = "根据用户传递的参数批量删除预置位信息",logType = 4)
     public Result deleteSelectedPreset(@RequestParam(value = "presetIds") String presetIds) {
         Result result = new Result();
         try {
-            String presetId[] = presetIds.split(",");
-            Long pr1 = Long.valueOf(presetId[0]);
+            String presetIdArray[] = presetIds.split(",");
+            Long pr1 = Long.valueOf(presetIdArray[0]);
             TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(pr1);
 
-            for (int i = 0;i<presetId.length;i++){
+            for (int i = 0;i<presetIdArray.length;i++){
                 HashMap<String,Long> params = new HashMap<>();
                 params.put("cameraId",tCameraPreset.getCameraId());
-                params.put("presetId",Long.valueOf(presetId[i]));
-//                System.out.println("params是："+params);
+                params.put("presetId",Long.valueOf(presetIdArray[i]));
                 Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);
-//                System.out.println("data是："+response.getData());
                 //操作数据库
                 int resultNum = 0;
                 if (response.getData().equals(true)) {
-                    resultNum = tCameraPresetService.deleteByPrimaryId(Long.valueOf(presetId[i]));
+                    resultNum = tCameraPresetService.deleteByPrimaryId(Long.valueOf(presetIdArray[i]));
                 }
                 result.setData(resultNum);
             }
@@ -174,7 +167,7 @@ public class TCameraPresetController {
         return result;
     }
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @PutMapping(value = "/update")
     @Logs(title = "修改",content = "根据用户传递的参数修改预置位信息",logType = 3)
     public Result update(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
@@ -191,7 +184,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPrimaryId")
     @Logs(title = "查询",content = "根据用户传递的参数查询预置位信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
@@ -200,13 +193,13 @@ public class TCameraPresetController {
             result.setData(tCameraPreset);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("失败描述：", e);
+            log.error("主键查询失败描述：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "根据摄像机id查询所有预置位信息")
-    @RequestMapping(value = "/selectByCameraId", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByCameraId")
     @Logs(title = "查询",content = "根据摄像机查询预置位信息",logType = 1)
     public Result selectByCameraId(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -227,7 +220,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "根据预置位名称查询信息")
-    @RequestMapping(value = "/selectByPresetName", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPresetName")
     @Logs(title = "查询",content = "根据用户传递的参数预置位信息",logType = 1)
     public Result selectByPresetName(@RequestParam(value = "presetName", required = false) String presetName,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -247,7 +240,7 @@ public class TCameraPresetController {
         return result;
     }
     @ApiOperation(value = "查询")
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @GetMapping(value = "/select")
     @Logs(title = "查询",content = "根据用户传递的参数查询预置位信息",logType = 1)
     public Result select(@RequestParam(value = "presetId", required = false) Long presetId,
                          @RequestParam(value = "cameraId", required = false) Long cameraId,
@@ -272,7 +265,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @PostMapping(value = "/selectByPage")
     @Logs(title = "查询",content = "根据用户传递的参数分页查询预置位信息",logType = 1)
     public Result selectByPage(@RequestBody TCameraPreset tCameraPreset,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -293,7 +286,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
+    @PostMapping(value = "/batchInsert")
     @Logs(title = "批量插入",content = "根据用户传递的参数批量插入预置位信息",logType = 2)
     public Result batchInsert(@RequestBody List<TCameraPreset> list) {
         Result result = new Result();
@@ -307,7 +300,7 @@ public class TCameraPresetController {
     }
 
     @ApiOperation(value = "查询预置位树")
-    @RequestMapping(value = "/selectPresetTree", method = RequestMethod.GET)
+    @GetMapping(value = "/selectPresetTree")
     @Logs(title = "查询",content = "根据用户传递的参数查询预置位树信息",logType = 1)
     public Result selectPresetTree(@RequestParam(value = "cameraId", required = false) Long cameraId) {
         Result result = new Result();

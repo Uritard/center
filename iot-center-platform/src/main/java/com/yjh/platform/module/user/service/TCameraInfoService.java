@@ -2,11 +2,9 @@ package com.yjh.platform.module.user.service;
 
 
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
@@ -14,6 +12,7 @@ import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
@@ -81,14 +80,12 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> selectByRegionId(Long regionId) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.selectByRegionId(regionId);
-        return tCameraInfoByDictList;
+        return tCameraInfoDao.selectByRegionId(regionId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> selectByCameraName(String cameraName) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.selectByCameraName(cameraName);
-        return tCameraInfoByDictList;
+        return tCameraInfoDao.selectByCameraName(cameraName);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -97,10 +94,9 @@ public class TCameraInfoService {
                                           Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
                                           String url, Integer port, Integer cameraType, Integer isControl, String latitude,
                                           String longitude, String address,String unit) {
-        List<TCameraInfoByDict> tCameraInfoByDictList = tCameraInfoDao.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
+        return tCameraInfoDao.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
                 recordId, upRegionId, channelNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType, cameraIp, url,
                 port, cameraType,isControl,latitude, longitude, address, unit);
-        return tCameraInfoByDictList;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -110,14 +106,12 @@ public class TCameraInfoService {
 
         Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
-        log.info("recordIdList==="+recordIdList);
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
             Result re = cameraStates(recordIdMap);
             map.putAll((Map<String,String>)re.getData());
         }
-        log.info("map==="+map);
         for (TCameraInfoByDict xi : tCameraInfoByDict){
             if (map.containsKey(xi.getCameraId().toString())){
                 if ("0".equals(map.get(xi.getCameraId().toString()))){
@@ -139,12 +133,12 @@ public class TCameraInfoService {
                 re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return re;
     }
     @Transactional(rollbackFor = Exception.class)
-    public boolean synchronizeFromPMS(String pmsId) throws Exception{
+    public boolean synchronizeFromPMS(String pmsId) throws DocumentException {
         Long cameraId = tCameraInfoDao.selectCameraIdByPmsId(pmsId);
 
         Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");

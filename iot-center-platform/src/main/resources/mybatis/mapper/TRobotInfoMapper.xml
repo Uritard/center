@@ -466,4 +466,10 @@
     <select id="selectUserName" resultType="java.lang.String">
         select user_name from sys_user where user_id = #{userID}
     </select>
+    <select id="selectAllRobotCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+       select
+            a.robot_id,
+            a.robot_code
+        FROM t_robot_info a
+    </select>
 </mapper>

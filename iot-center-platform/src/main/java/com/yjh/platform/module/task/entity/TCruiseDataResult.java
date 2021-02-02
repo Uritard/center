@@ -126,6 +126,9 @@ public class TCruiseDataResult implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date checkDate;
 
-
+    @ApiModelProperty(value = "机器人巡检图片分析,相对")
+    private String picPathAnl;
+    @ApiModelProperty(value = "机器人巡检图片分析,绝对")
+    private String origPicAnl;
 
 }

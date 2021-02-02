@@ -1,12 +1,10 @@
 package com.yjh.accessrobot.netty.server;
 
 import com.yjh.accessrobot.common.Constant;
-import com.yjh.accessrobot.common.utils.ByteUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import com.yjh.accessrobot.module.device.entity.MessageEntity;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
 import com.yjh.accessrobot.thread.TaskExecutePool;
 import io.netty.buffer.ByteBuf;
@@ -16,12 +14,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -37,8 +36,6 @@ import static com.yjh.accessrobot.common.Constant.maps;
 public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     public RobotServerHandler() {
-        hisT3 = System.currentTimeMillis();
-        T3 = 15000;
     }
 
     private SysLogsService sysLogsService;
@@ -67,18 +64,16 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     //场站号
     private String strRobotCode = "TT";
     private boolean isThreadStart = true;
-    private static final String DATETIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
-    SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
+    private String redisValue = "content";
+    private static final String DATE_TIME_FORMAT_TPL = "yyyy-MM-dd HH:mm:ss";
+    SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT_TPL);
     String todayTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
-    ByteUtil byteUtil = new ByteUtil();
 
     public boolean getIsThreadStart() {
         return isThreadStart;
     }
 
-    private long hisT3;
-    private long T3;
 
     private byte[] bufBytes = new byte[1024];
     private ChannelHandlerContext ctx;
@@ -129,8 +124,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             strRobotCode = strRobotCode.replace("\0", "");
             Object strid2 = redisTemplate.opsForHash().entries(String.format("dmp_device_base:104_%s", strRobotCode)).get("deviceId");
             if (strid2 != null) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date dataTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(df.format(new Date()));
                 log.info("offlineClientId:" + strid2 + "  channel.isActive(): " + channel.isActive());
             }
         }
@@ -172,17 +165,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
 //        lookByte(bytes);//看指令
 
-        String body = new String(bytes, "UTF-8");
-        String bodyTem = body.substring(21);
+        String body = new String(bytes, StandardCharsets.UTF_8);
 
         log.info("还没处理的Packet="+Packet);
-//        String zzbds = "^(?:(?=.*[0-9].*)(?=.*[A-Za-z].*)(?=.*[\\W].*))[\\W0-9A-Za-z]{0,}$";
-        String zzbds ="^.*<?xml.*";
-        if (!Packet.matches(zzbds)){
-            Packet = "";
-        }
-        log.info("处理过的Packet="+Packet);
-
         log.info("机器人发来的内容="+body);
         String temporaryBody = Packet + body ;//临时
         String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
@@ -190,74 +175,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         handlingMethod(bytes,finalBody);
 
+        String zzbds ="^.*<?xml.*";
+        if (!Packet.matches(zzbds)){
+            Packet = "";
+        }
+        log.info("处理过的Packet="+Packet);
+
         ReferenceCountUtil.release(byteBuf);
     }
-    /* 看指令的工具
-    *
-    * */
-    public void lookByte(byte[] bytes){
-        byte[] startIdentifierByte = new byte[2];
-        byte[] sendSessionIdByte = new byte[8];
-        byte[] receiveSessionIdByte = new byte[8];
-        byte[] sessionSourceIdByte = new byte[1];
-        byte[] xmlByteLengthByte = new byte[4];
-        byte[] endIdentifierByte = new byte[2];
-        //1.起始标志符
-        System.arraycopy(bytes,0,startIdentifierByte,0,2);
-        StringBuilder startStr = new StringBuilder();
-        for (byte byteitem : startIdentifierByte) {
-            startStr.append(String.format("%02x ", byteitem));
-        }
-        log.info("起始标志符指令为："+startStr);
-        //2.发送会话序列号
-        System.arraycopy(bytes,2,sendSessionIdByte,0,8);
-        StringBuilder sendSessionIdStr = new StringBuilder();
-        for (byte byteitem : sendSessionIdByte) {
-            sendSessionIdStr.append(String.format("%02x ", byteitem));
-        }
-        log.info("发送会话序列号指令为："+sendSessionIdStr);
-        long ssi = PlatformPacketUtil.reserve(sendSessionIdByte);//发送会话序列号的字节长度
-        log.info("发送会话序列号为："+ssi);
-        //3.接收会话序列号
-        System.arraycopy(bytes,10,receiveSessionIdByte,0,8);
-        StringBuilder receiveSessionIdStr = new StringBuilder();
-        for (byte byteitem : receiveSessionIdByte) {
-            receiveSessionIdStr.append(String.format("%02x ", byteitem));
-        }
-        log.info("接收会话序列号指令为："+receiveSessionIdStr);
-        //4.会话源标识
-        System.arraycopy(bytes,18,sessionSourceIdByte,0,1);
-        StringBuilder sessionSourceIdStr = new StringBuilder();
-        for (byte byteitem : sessionSourceIdByte) {
-            sessionSourceIdStr.append(String.format("%02x ", byteitem));
-        }
-        log.info("会话源标识指令为："+sessionSourceIdStr);
-        //5.xml的字节长度
-        System.arraycopy(bytes,19,xmlByteLengthByte,0,4);
-        StringBuilder xmlByteLengthStr = new StringBuilder();
-        for (byte byteitem : xmlByteLengthByte) {
-            xmlByteLengthStr.append(String.format("%02x ", byteitem));
-        }
-        log.info("xml的字节长度指令为："+xmlByteLengthStr);
-        long xmlByteLength = PlatformPacketUtil.reserve(xmlByteLengthByte);//xml的字节长度
-        log.info("xml的字节长度为："+xmlByteLength);
-        byte[] xmlByte = new byte[(int)xmlByteLength];
-        //6.xml的内容
-        System.arraycopy(bytes,23,xmlByte,0,(int)xmlByteLength);
-        StringBuilder Str1 = new StringBuilder();
-        for (byte byteitem : xmlByte) {
-            Str1.append(String.format("%02x ", byteitem));
-        }
-        log.info("发送的xml内容指令是<start>" + Str1 + "<end>");
-        //7.结束标志符号
-        System.arraycopy(bytes,bytes.length-2,endIdentifierByte,0,2);
-        StringBuilder endStr = new StringBuilder();
-        for (byte byteitem : endIdentifierByte) {
-            endStr.append(String.format("%02x ", byteitem));
-        }
-        log.info("结束标志符号指令是<start>" + endStr + "<end>");
-    }
-
     /*拆包工具
     *
     * */
@@ -293,7 +218,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        }
     }
     private void stringToXml(byte[] bytes,String xmlContext)throws Exception{
-//        if (null != xmlContext){
             Document document = DocumentHelper.parseText(xmlContext);//String转XML
             XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
             log.info("解析出来的xml是：" + xmlRes);
@@ -308,11 +232,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             } else {
                 doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
             }
-//        }else {
-//            log.info("xmlContext的值是null,啥也不是");
-//            Packet = "";
-//        }
-
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception  {
         log.info("robotServerHandlerMap==="+robotServerHandlerMap);
@@ -323,23 +242,34 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
         Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
         Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
-
+        Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+        Iterator<String> iterator = allRobotCodeMap.keySet().iterator();
+        List<String> allRobotCodeList = new ArrayList<>();
+        while(iterator.hasNext()){
+            String key=iterator.next();
+            String value = allRobotCodeMap.get(key);
+            allRobotCodeList.add(value);
+        }
+        if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
+            log.info("我们这边存在这个机器人,连它");
+        }else {
+            log.info("对不起,不存在这个机器人");
+        }
 
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
                 //注册指令(发送响应)
                 case "2511":
                     log.info("巡视主机收到注册指令了");
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     List<Map<String, Object>> ItemsList = new ArrayList<>();
                     Map<String, Object> Items = new HashMap<>();
 
-                    Items.put("heart_beat_interval", heartbeatIntervalMap.get("content"));//心跳间隔
-                    Items.put("robot_run_interval", runDataIntervalMap.get("content"));//机器人运行数据间隔
-                    Items.put("weather_interval", weatherDataIntervalMap.get("content"));//微气象数据间隔
+                    Items.put("heart_beat_interval", heartbeatIntervalMap.get(redisValue));//心跳间隔
+                    Items.put("robot_run_interval", runDataIntervalMap.get(redisValue));//机器人运行数据间隔
+                    Items.put("weather_interval", weatherDataIntervalMap.get(redisValue));//微气象数据间隔
                     ItemsList.add(Items);
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
-                            .setSendCode(platformServerMap.get("content"))
+                            .setSendCode(platformServerMap.get(redisValue))
                             .setReceiveCode(xmlBaseModel.getSendCode())//Client01
                             .setType("251")
                             .setCode("200")
@@ -385,10 +315,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         //处理模型同步的响应
                         String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
                         String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
-                        XMLBaseModel deviceModel = getXmlMessage(filePathMap.get("content") + "/" +deviceFile);
+                        XMLBaseModel deviceModel = getXmlMessage(filePathMap.get(redisValue) + "/" +deviceFile);
                         List<Map<String,Object>> deviceMap = deviceModel.getItems();
                         log.info("deviceMap是："+deviceMap);
-                        XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + "/" +robotFile);
+                        XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" +robotFile);
                         List<Map<String,Object>> robotMap = robotModel.getItems();
                         log.info("robotMap是："+robotMap);
                         robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
@@ -404,6 +334,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //处理任务下发/控制的响应
                     log.info("巡视主机收到的响应是==="+xmlBaseModel.toString());
                     robotService.receivingResponse(xmlBaseModel);
+                    break;
+                default:
                     break;
             }
         }else {
@@ -502,20 +434,20 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         Map<String, String> robotRoadMap = new HashMap<>();
                         robotRoadMap.put("robotName", res.get("robot_name").toString());
                         String filePath = res.get("file_path").toString();//文件名称
-                        String fenGe[] = filePath.split("/");
-                        String fileName = fenGe[fenGe.length - 1];
+                        String splitArray[] = filePath.split("/");
+                        String fileName = splitArray[splitArray.length - 1];
                         log.info("巡检路线图片名称=="+fileName);
-                        String taskId = fenGe[fenGe.length - 3];
+                        String taskId = splitArray[splitArray.length - 3];
                         /*
                         将ftp服务器上的文件复制到开发环境
                         * */
-                        String temporaryPath = filePathMap.get("content") + "/" +filePath;//文件在ftp服务器上的绝对路径
+                        String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
                         log.info("temporaryPath是==="+temporaryPath);
 
                         //开发环境图片相对路径文件目录
-                        String developRelativeUrl =  relativeImgMap.get("content") +  "/"+ todayTime+ "/"+ taskId + "/Road";
+                        String developRelativeUrl =  relativeImgMap.get(redisValue) +  "/"+ todayTime+ "/"+ taskId + "/Road";
                         //开发环境图片绝对路径文件目录
-                        String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime+ "/"+taskId + "/Road";
+                        String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime+ "/"+taskId + "/Road";
                         log.info("developAbsoluteUrl是==="+developAbsoluteUrl);
                         File f=new File(developAbsoluteUrl);
                         if (!f.exists()){
@@ -558,11 +490,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     robotAlarmMap.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
                     robotAlarmMap.put("robotCode",xmlBaseModel.getSendCode());
                     robotAlarmMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
-                    robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get("content").toString());//告警内容
+                    robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get(redisValue).toString());//告警内容
                     log.info("机器人异常告警数据是："+robotAlarmMap);
 
                     //处理告警数据
-                    AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap,redisTemplate);
+                    AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap);
                     TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
                     String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
@@ -653,18 +585,18 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //1.红外图谱2.可见光照片3.音频
                     cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());//采集文件类型
                     String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();//文件名称
-                    String fenGe[] = filePath.split("/");
-                    String fileName = fenGe[fenGe.length - 1];
+                    String splitArray[] = filePath.split("/");
+                    String fileName = splitArray[splitArray.length - 1];
                     /*
                     将ftp服务器上的文件复制到开发环境
                     * */
-                    String temporaryPath = filePathMap.get("content") + "/" +filePath;//文件在ftp服务器上的绝对路径
+                    String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
                     log.info("temporaryPath是==="+temporaryPath);
 
                     //开发环境图片绝对路径文件目录
-                    String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                    String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                     //开发环境图片相对路径文件目
-                    String developRelativeUrl = relativeImgMap.get("content")+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                    String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
 
                     if (xmlBaseModel.getItems().get(0).get("file_type").toString().equals("1")){//红外图谱文件
                         developAbsoluteUrl = developAbsoluteUrl + "FIR";
@@ -728,7 +660,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("信息上报：-"+cruiseResult);
                     Constant.otherServer(cruiseResult,Constant.TCP_URL);
                 }
-
+                    break;
+                default:
                     break;
             }
         }
@@ -736,7 +669,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     //快速创建command=3 的消息体
     private XMLBaseModel sendMessageForCommandThree(boolean flag,String sendCode){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         XMLBaseModel xmlBaseModelEmpty = new XMLBaseModel();
         xmlBaseModelEmpty.setCommand("3");
         xmlBaseModelEmpty.setTime(sdf.format(new Date()));
@@ -747,21 +679,17 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return xmlBaseModelEmpty;
     }
     //通过文件路径解析XML
-    public static XMLBaseModel getXmlMessage(String filePathAndName) throws Exception {
+    public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
         //创建SAXReader的对象reader
         SAXReader reader = new SAXReader();
         //通过reader对象的read方法加载文件,获取docuemnt对象。
         Document document = reader.read(new File(filePathAndName));
-        XMLBaseModel xmlRM = PlatformXMLUtil.readStringXmlOut(document);
-        return xmlRM;
+        return PlatformXMLUtil.readStringXmlOut(document);
     }
-
-    private void handlerData() { }
 
     void ProcSend(String robotCode) {
         log.info("没有收到心跳报文......");
         robotServerHandlerMap.remove(robotCode);//断开链接
-        return;
 //                try {
 //                    ctx.close().sync();
 //                    ctx.flush();
@@ -786,172 +714,72 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             ReferenceCountUtil.release(ctx);
         }
     }
-
-    private boolean isTimeout(long value) {
-        if ((System.currentTimeMillis() - value) < T3) {
-            hisT3 = System.currentTimeMillis();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public void SendHeartBeat (byte[] protocolBytes,String robotCode) {
         send(ctx,protocolBytes,robotCode);
     }
-
-    public static Map<String, Object> getMessage(String messageXML) throws Exception {
-        Map<String, Object> message = new HashMap<String, Object>();
-        //将报文XML交给DocumentHelper解析为Document
-        Document document = DocumentHelper.parseText(messageXML);
-        //获取根节点
-        Element root = document.getRootElement();
-
-        //将报文头信息添加到返回内容中
-        Element head = root.element("head");
-        String ver = head == null || head.attributeValue("ver") == null ? "" : head.attributeValue("ver");
-        String MsgType = head == null || head.attributeValue("MsgType") == null ? "" : head.attributeValue("MsgType");
-        String SessionId = head == null || head.attributeValue("SessionId") == null ? "" : head.attributeValue("SessionId");
-        String Result = root.element("Result") == null || root.element("Result").attributeValue("val") == null ? "" : root.element("Result").attributeValue("val");
-        if (isEmpty(Result)) {
-            Result = root.element("result") == null || root.element("result").attributeValue("val") == null ? "" : root.element("result").attributeValue("val");
-        }
-        message.put("ver", ver);
-        message.put("MsgType", MsgType);
-        message.put("SessionId", SessionId);
-        message.put("RootResult", Result);
-
-        //从根节点中获取body标签
-        Element body = root.element("body");
-        if (body == null || body.elements().size() == 0) {
-            return message;
-        }
-        //获取body下所有元素
-        List<Element> elements = body.elements();
-        Map<String, Object> node = null;
-        List<Map<String, Object>> listGroup = null;
-        List<MessageEntity> elementGroup = null;
-        //container用于记录重复名称的列表，方便归类
-        Map<String, List> container = new HashMap<String, List>();
-        for (Element element : elements) {
-            //如果获取的元素非最基层元素，则进行列表解析
-            if (element.hasContent()) {
-                node = new HashMap<String, Object>();
-                node = readList(element);
-                //如果列表存在重复，则使用container记录并存入List，后再put到返回对象中
-                if (element.attribute("val") == null || body.elements(element.getName()).size() > 1) {
-                    if (container.get(element.getName()) == null) {
-                        listGroup = new LinkedList<Map<String, Object>>();
-                    } else {
-                        listGroup = container.get(element.getName());
-                    }
-
-                    listGroup.add(node);
-
-                    container.put(element.getName(), listGroup);
-                } else {
-                    message.put(element.getName(), node);
-                }
-
-                continue;
-            }
-            //如果不是列表元素，则将数据转为对象存储进Map
-            MessageEntity messageEntity = new MessageEntity();
-            messageEntity.setProperty(element.getName());
-            messageEntity.setValue(element.attributeValue("val"));
-
-            if (body.elements(element.getName()).size() > 1) {
-                if (container.get(element.getName()) == null) {
-                    elementGroup = new LinkedList<MessageEntity>();
-                } else {
-                    elementGroup = container.get(element.getName());
-                }
-
-                elementGroup.add(messageEntity);
-
-                container.put(element.getName(), elementGroup);
-            } else {
-                message.put(element.getName(), messageEntity);
-            }
-        }
-        //将最后整理的列表附加到返回Map中
-        for (String ListName : container.keySet()) {
-            message.put(ListName, container.get(ListName));
-        }
-
-        return message;
-    }
-
-    /**
-     * 检测字符串是否为空(null,"","null")
+    /* 看指令的工具
      *
-     * @param s
-     * @return 为空则返回true，不否则返回false
-     */
-    public static boolean isEmpty(String s) {
-        return s == null || "".equals(s) || "null".equals(s);
+     * */
+    public void lookByte(byte[] bytes){
+        byte[] startIdentifierByte = new byte[2];
+        byte[] sendSessionIdByte = new byte[8];
+        byte[] receiveSessionIdByte = new byte[8];
+        byte[] sessionSourceIdByte = new byte[1];
+        byte[] xmlByteLengthByte = new byte[4];
+        byte[] endIdentifierByte = new byte[2];
+        //1.起始标志符
+        System.arraycopy(bytes,0,startIdentifierByte,0,2);
+        StringBuilder startStr = new StringBuilder();
+        for (byte byteitem : startIdentifierByte) {
+            startStr.append(String.format("%02x ", byteitem));
+        }
+        log.info("起始标志符指令为："+startStr);
+        //2.发送会话序列号
+        System.arraycopy(bytes,2,sendSessionIdByte,0,8);
+        StringBuilder sendSessionIdStr = new StringBuilder();
+        for (byte byteitem : sendSessionIdByte) {
+            sendSessionIdStr.append(String.format("%02x ", byteitem));
+        }
+        log.info("发送会话序列号指令为："+sendSessionIdStr);
+        long ssi = PlatformPacketUtil.reserve(sendSessionIdByte);//发送会话序列号的字节长度
+        log.info("发送会话序列号为："+ssi);
+        //3.接收会话序列号
+        System.arraycopy(bytes,10,receiveSessionIdByte,0,8);
+        StringBuilder receiveSessionIdStr = new StringBuilder();
+        for (byte byteitem : receiveSessionIdByte) {
+            receiveSessionIdStr.append(String.format("%02x ", byteitem));
+        }
+        log.info("接收会话序列号指令为："+receiveSessionIdStr);
+        //4.会话源标识
+        System.arraycopy(bytes,18,sessionSourceIdByte,0,1);
+        StringBuilder sessionSourceIdStr = new StringBuilder();
+        for (byte byteitem : sessionSourceIdByte) {
+            sessionSourceIdStr.append(String.format("%02x ", byteitem));
+        }
+        log.info("会话源标识指令为："+sessionSourceIdStr);
+        //5.xml的字节长度
+        System.arraycopy(bytes,19,xmlByteLengthByte,0,4);
+        StringBuilder xmlByteLengthStr = new StringBuilder();
+        for (byte byteitem : xmlByteLengthByte) {
+            xmlByteLengthStr.append(String.format("%02x ", byteitem));
+        }
+        log.info("xml的字节长度指令为："+xmlByteLengthStr);
+        long xmlByteLength = PlatformPacketUtil.reserve(xmlByteLengthByte);//xml的字节长度
+        log.info("xml的字节长度为："+xmlByteLength);
+        byte[] xmlByte = new byte[(int)xmlByteLength];
+        //6.xml的内容
+        System.arraycopy(bytes,23,xmlByte,0,(int)xmlByteLength);
+        StringBuilder Str1 = new StringBuilder();
+        for (byte byteitem : xmlByte) {
+            Str1.append(String.format("%02x ", byteitem));
+        }
+        log.info("发送的xml内容指令是<start>" + Str1 + "<end>");
+        //7.结束标志符号
+        System.arraycopy(bytes,bytes.length-2,endIdentifierByte,0,2);
+        StringBuilder endStr = new StringBuilder();
+        for (byte byteitem : endIdentifierByte) {
+            endStr.append(String.format("%02x ", byteitem));
+        }
+        log.info("结束标志符号指令是<start>" + endStr + "<end>");
     }
-
-    /**
-     * 列表解析方法
-     *
-     * @param param 列表元素
-     * @return 报文Map对象
-     */
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> readList(Element param) {
-        if (param == null || param.elements().size() == 0) {
-            return null;
-        }
-        List<Element> elements = param.elements();
-        Map<String, Object> message = new HashMap<String, Object>();
-        Map<String, Object> node = null;
-        List<Map<String, Object>> listGroup = null;
-        List<MessageEntity> elementGroup = null;
-        Map<String, List> container = new HashMap<String, List>();
-        for (Element element : elements) {
-            if (element.hasContent()) {
-                node = new HashMap<String, Object>();
-                node = readList(element);
-
-                if (element.attribute("val") == null || param.elements(element.getName()).size() > 0) {
-                    if (container.get(element.getName()) == null) {
-                        listGroup = new LinkedList<Map<String, Object>>();
-                    } else {
-                        listGroup = container.get(element.getName());
-                    }
-
-                    listGroup.add(node);
-
-                    container.put(element.getName(), listGroup);
-                } else {
-                    message.put(element.getName(), node);
-                }
-
-                continue;
-            }
-
-            MessageEntity messageEntity = new MessageEntity();
-            messageEntity.setProperty(element.getName());
-            messageEntity.setValue(element.attributeValue("val"));
-            if (param.elements(element.getName()).size() > 1) {
-                if (container.get(element.getName()) == null) {
-                    elementGroup = new LinkedList<MessageEntity>();
-                } else {
-                    elementGroup = container.get(element.getName());
-                }
-
-                elementGroup.add(messageEntity);
-
-                container.put(element.getName(), elementGroup);
-            } else {
-                message.put(element.getName(), messageEntity);
-            }
-        }
-        for (String ListName : container.keySet()) {
-            message.put(ListName, container.get(ListName));
-        }
-        return message;
-    }
-
 }

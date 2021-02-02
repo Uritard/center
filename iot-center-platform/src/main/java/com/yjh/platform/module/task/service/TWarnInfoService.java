@@ -3,7 +3,6 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
@@ -114,7 +113,7 @@ public class TWarnInfoService{
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
             String key = iter.next();
-            Number mapValue =  (Number)map.get(key);
+            Number mapValue = map.get(key);
             TJContentInfo tjContentInfo = new TJContentInfo();
             tjContentInfo.setCount(mapValue);
             tjContentInfo.setContent(key);
@@ -170,54 +169,7 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnOnMonth() {
-        /*List<String> monthDates = dateTimeUtil.getDayDateList(30);
-        String firstTime1 = monthDates.get(0);
-        Date startingTime = dateTimeUtil.parse(firstTime1);
-        String endTime = dateTimeUtil.getDayBefore(startingTime);
-        String startTime = monthDates.get(29);
-        log.info("startTime==="+startTime);
-        log.info("endTime==="+endTime);*/
-        List<WarnStatistical> list = tWarnInfoDao.countWarnOnMonth();
-        /*List<WarnStatistical> list1 = new ArrayList<>();
-
-        for (int i = 0;i < monthDates.size();i++){
-            int flag = 0;
-            for (int j = 0;j < list.size();j++){
-                if (monthDates.get(i).substring(0, 10).equals(list.get(j).getTimeNode())){
-                    flag++;
-                }
-            }
-            if (flag == 0){
-                WarnStatistical ws = new WarnStatistical();
-                ws.setCount(0);
-                ws.setTimeNode(monthDates.get(i).substring(0, 10));
-                list1.add(ws);
-            }
-        }
-        list.addAll(list1);
-        Collections.sort(list, new Comparator<WarnStatistical>() {
-            @Override
-            public int compare(WarnStatistical o1, WarnStatistical o2) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                Date date1 = null;
-                Date date2 = null;
-                try {
-                    date1 = simpleDateFormat.parse(o1.getTimeNode());
-                    date2 = simpleDateFormat.parse(o2.getTimeNode());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                int flag = date1.compareTo(date2);
-                if (flag == -1) {
-                    flag = -1;
-                } else if (flag == 1) {
-                    flag = 1;
-                }
-                return flag;
-            }
-        });*/
-        return list;
+        return tWarnInfoDao.countWarnOnMonth();
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countWarnConfMode() {
@@ -233,7 +185,7 @@ public class TWarnInfoService{
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
             String key = iter.next();
-            Number mapValue =  (Number)map.get(key);
+            Number mapValue =  map.get(key);
             TJContentInfo tjContentInfo = new TJContentInfo();
             tjContentInfo.setCount(mapValue);
             tjContentInfo.setContent(key);
@@ -256,7 +208,7 @@ public class TWarnInfoService{
         Iterator<String> iter = map.keySet().iterator();
         while (iter.hasNext()) {
             String key = iter.next();
-            Number mapValue =  (Number)map.get(key);
+            Number mapValue =  map.get(key);
             TJContentInfo tjContentInfo = new TJContentInfo();
             tjContentInfo.setCount(mapValue);
             tjContentInfo.setContent(key);
@@ -288,7 +240,7 @@ public class TWarnInfoService{
             jasonMap.put("type", "finishedOneAlarm");
             jasonMap.put("alarmId", warnId);
             String json = JSON.toJSONString(jasonMap);
-            System.out.println(("发送给前端的消息===" + json));
+            log.info(("发送给前端的消息===" + json));
             WebSocketServer.sendMsg(json);
         }
         return jieGuo;
@@ -348,7 +300,7 @@ public class TWarnInfoService{
                 jasonMap.put("type","finishedOneAlarm");
                 jasonMap.put("alarmId",warnId);
                 String json= JSON.toJSONString(jasonMap);
-                System.out.println(("发送给前端的消息==="+json));
+                log.info(("发送给前端的消息==="+json));
                 WebSocketServer.sendMsg(json);
             }
         }else if (alarmSource == 888)
@@ -368,7 +320,7 @@ public class TWarnInfoService{
                 jasonMap.put("type","finishedOneAlarm");
                 jasonMap.put("alarmId",warnId);
                 String json= JSON.toJSONString(jasonMap);
-                System.out.println(("发送给前端的消息==="+json));
+                log.info(("发送给前端的消息==="+json));
                 WebSocketServer.sendMsg(json);
             }
         }else{
@@ -387,7 +339,7 @@ public class TWarnInfoService{
                 jasonMap.put("type","finishedOneAlarm");
                 jasonMap.put("alarmId",warnId);
                 String json= JSON.toJSONString(jasonMap);
-                System.out.println(("发送给前端的消息==="+json));
+                log.info(("发送给前端的消息==="+json));
                 WebSocketServer.sendMsg(json);
             }
         }
@@ -399,9 +351,7 @@ public class TWarnInfoService{
         //总告警数量=redis中的数量+数据库中的数量
         Set<String> warnKeys=redisScan("warnInfo:");
         Set<String> defectKeys=redisScan("defectInfo:");
-
-        Integer finalCounts=warnKeys.size() + defectKeys.size() + tWarnInfoDao.warnCountsNonIdentify();
-        return finalCounts;
+        return warnKeys.size() + defectKeys.size() + tWarnInfoDao.warnCountsNonIdentify();
     }
     //告警弹窗
     @Transactional(rollbackFor = Exception.class)

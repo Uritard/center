@@ -1,6 +1,5 @@
 package com.yjh.platform.module.user.service;
 
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -45,12 +45,19 @@ public class TRobotInfoService{
         tRobotInfo.setCreateBy(userName);
         tRobotInfo.setCreateDate(new Date());
         tRobotInfo.setRobotStatus("离线");
-        return this.tRobotInfoDao.insert(tRobotInfo);
+        int res = this.tRobotInfoDao.insert(tRobotInfo);
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(tRobotInfo.getRobotCode());
+        redisTemplate.opsForHash().put("AllRobotCode",robotId.toString(),tRobotInfo.getRobotCode());
+
+        return res;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long robotId) {
-        return this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
+        TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+        int res =  this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
+        redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
+        return res;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -58,10 +65,10 @@ public class TRobotInfoService{
         String userName = tRobotInfoDao.selectUserName(userId);
         tRobotInfo.setUpdateBy(userName);
         tRobotInfo.setUpdateDate(new Date());
-
-        return this.tRobotInfoDao.update(tRobotInfo);
+        int res = this.tRobotInfoDao.update(tRobotInfo);
+        redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+        return res;
     }
-
     @Transactional(rollbackFor = Exception.class)
     public TRobotInfo selectByPrimaryId(Long robotId) {
         return this.tRobotInfoDao.selectByPrimaryId(robotId);
@@ -75,23 +82,29 @@ public class TRobotInfoService{
                                    Date commissionDateString, Long upRegionId, String robotPosition, String robotSource,
                                    String address,String buildingUser,String appearanceNumber,String defectRecord,String repairRecord,
                                    String exitPutIntoRecord,String remarks) {
-        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
+        return tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
                 upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
                 photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition,
                 robotSource,address,buildingUser,appearanceNumber,defectRecord,repairRecord,exitPutIntoRecord,remarks);
-        return tRobotInfoList;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> selectByPage(String robotName,String buildingUser,Integer robotFactory,Integer robotType,String robotSource,Integer isUse,
                                           String address, List<Long> regionIdList) {
         List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
+        for (TRobotInfo tRobotInfo : tRobotInfoList){
+            redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+        }
         return tRobotInfoList;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TRobotInfo> list) {
-        return this.tRobotInfoDao.batchInsert(list);
+        int res = tRobotInfoDao.batchInsert(list);
+        for (TRobotInfo tRobotInfo : list){
+            redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+        }
+        return res;
     }
     @Transactional(rollbackFor = Exception.class)
     public boolean synchronizeFromPMS(String robotCode,Long userId) throws Exception {
@@ -221,7 +234,7 @@ public class TRobotInfoService{
         InputStreamReader in = null;
         String filePath = "D:/testform/PMS/PMS.txt";
         try  {
-            in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
+            in = new InputStreamReader(new FileInputStream(new File(filePath)), StandardCharsets.UTF_8);
             br = new BufferedReader(in);
             String line;
             String[] strArray = null;
@@ -270,7 +283,7 @@ public class TRobotInfoService{
         String xmlPath = "D:/testform/generateXML/Robot_PMS_System.xml";//往这写
         try {
             //读取文件
-            in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
+            in = new InputStreamReader(new FileInputStream(new File(filePath)), StandardCharsets.UTF_8);
             br = new BufferedReader(in);
             String line;
             String[] strArray = null;

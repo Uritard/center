@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -82,5 +83,6 @@ public interface TRobotInfoDao {
                           @Param(value = "dictNote")String dictNote);
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectUserName(@Param(value = "userID")Long  userID);
+    List<TRobotInfo> selectAllRobotCode();
 
 }

@@ -28,9 +28,6 @@ public class CruiseResultDealThread implements Runnable{
     private static final String DATETIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
 
-//    @Autowired
-//    private RobotService robotService;
-//    @Autowired
     private RedisTemplate redisTemplate;
 
     private Map<String,String> cruiseResultMap;
@@ -93,20 +90,12 @@ public class CruiseResultDealThread implements Runnable{
 
                     str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + ":" + instanceId;//redis缓存名称
 
-//                    tCruiseTaskResultMap.put("instanceId",instanceId);
-//                    tCruiseTaskResultMap.put("cruiseResultId",tCruiseResult.getTaskResultId() + instanceId);
                     tCruiseTaskResultMap.put("cruiseTime",cruiseResultMap.get("time"));
-//                    tCruiseTaskResultMap.put("cruiseId",instanceId);
                     tCruiseTaskResultMap.put("cruiseTaskTime",cruiseTime);
-
-//                    Map<String,String> map = redisTemplate.opsForHash().entries("countForAbnormal:"+taskId);
-//                    tCruiseTaskResultMap.put("startTime",map.get("taskStart"));
-//                    tCruiseTaskResultMap.put("cruiseType","228");
                     tCruiseTaskResultMap.put("taskResultId",tCruiseResult.getTaskResultId());
                     tCruiseTaskResultMap.put("taskName",tCruiseResult.getTaskName());
                     tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("cruiseStatus","252");
-
 
                     if (!"".equals(cruiseResultMap.get("value"))){
                         tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
@@ -123,18 +112,8 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
-                  tCruiseTaskResultMap.put("is_warn","0");
+                    tCruiseTaskResultMap.put("is_warn","0");
 
-//                    tCruiseTaskResultMap.put("taskId",taskId);
-//                    tCruiseTaskResultMap.put("runExecute",tCruiseTask.getIfRun().toString());
-//                    if(tCruiseTask.getAreaId() == null){
-//                        tCruiseTaskResultMap.put("areaId","null");
-//                    }else {
-//                        tCruiseTaskResultMap.put("areaId",tCruiseTask.getAreaId());
-//                    }
-//                    tCruiseTaskResultMap.put("cType",tCruiseTask.getType().toString());
-//                    tCruiseTaskResultMap.put("taskCount",robotInfoKeys.size() + "");
-//                    tCruiseTaskResultMap.put("taskCode",taskId);
                     log.info("tCruiseTaskResultMap是==="+tCruiseTaskResultMap);
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
 
@@ -161,7 +140,7 @@ public class CruiseResultDealThread implements Runnable{
 
             //统计巡视主机下发给机器人的巡检点大小
             Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode"));
-            String instanceList = (String)redisInfoMap2.get("instanceIdList");
+            String instanceList = redisInfoMap2.get("instanceIdList");
             instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
             String[] instanceIdArray = instanceList.split(", ");
             List<String> instanceIdList = new ArrayList<>();
@@ -181,18 +160,14 @@ public class CruiseResultDealThread implements Runnable{
             boolean taskFlag = (df.parse(overDayTime).getTime() < new Date().getTime());
             log.info("是否超期==="+taskFlag);*/
 
-            /*if (taskStatus == null) {
-                taskStatus = "";
-            }*/
-            /*if (taskStatus.equals("2") || taskStatus.equals("4")
-                    || */
+
             if(instanceIdList.size() == resultList.size() ) {
                 log.info("完成！！！");
 
                 List<Long> instanceIDList = Constant.flagMap.get(taskId);
                 log.info("做过的点instanceIDList====" + instanceIDList);
 
-                if (instanceIDList != null && instanceIDList.size() > 0){
+                if (instanceIDList != null && !instanceIDList.isEmpty()){
                     for (Long instanceId : instanceIDList){
                         instanceIdList.remove(instanceId.toString());
                     }
@@ -265,7 +240,7 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("res2的内容是===" + res2);
 
                 //将公共类的instanceIdList清空
-                if (Constant.flagMap.get(taskId) != null && Constant.flagMap.get(taskId).size() > 0){
+                if (Constant.flagMap.get(taskId) != null && !Constant.flagMap.get(taskId).isEmpty()){
                     log.info("进来了？？？");
                     for (Long instancedId : Constant.flagMap.get(taskId)){
                         instanceIdList.remove(instancedId.toString());

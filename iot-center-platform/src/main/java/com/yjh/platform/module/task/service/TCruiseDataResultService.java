@@ -2,13 +2,11 @@ package com.yjh.platform.module.task.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,37 +73,31 @@ public class TCruiseDataResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
-        List<Long> regionIdList = new ArrayList<>();
         List<Long> deviceIdList = new ArrayList<>();
         if (regionId == null){
-            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
             deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-            log.info("regionIdList是==="+regionIdList);
         }else {
-            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            if (regionIdList != null && regionIdList.size() > 0){
+            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            if (regionIdList != null && !regionIdList.isEmpty()){
                 deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
             }else {
                 deviceIdList.add(regionId);
             }
-            log.info("regionIdList是==="+regionIdList);
         }
-        log.info("deviceIdList是==="+deviceIdList);
 
         Map<String, Object> resultMap = new HashMap<>();
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        if (deviceIdList != null && deviceIdList.size() > 0){
+        if (deviceIdList != null && !deviceIdList.isEmpty()){
             cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
         }
 
         //获取同一设备下的有巡检结果的标准测点
         List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
-            log.info("设备信息：" + deviceInfo);
             //通过测点ID获取相应的符合条件的巡检点结果
             CruiseResultAnalyzeMeteInfo cruiseResultAnalMeteInfo = tCruiseDataResultDao.selectMeteCruiseByDeviceId2(deviceInfo.getDeviceId(), deviceInfo.getDeviceMeteId());
-            log.info("CrusieResultAnalMeteInfo:" + cruiseResultAnalMeteInfo);
             deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
             deviceInfo.setCruiseResult(cruiseResultAnalMeteInfo.getCruiseResult());
             deviceInfo.setCruiseResultName(cruiseResultAnalMeteInfo.getCruiseResultName());
@@ -157,21 +149,19 @@ public class TCruiseDataResultService {
         List<CruiseResultAnalMeteInfo> cruiseResultAnalMeteInfos=new ArrayList<>();
 
         //判断deviceId是否为空 决定 全查/条件查
-        if (deviceIds.size() > 0&&deviceIds.get(0)==996) {
+        if (!deviceIds.isEmpty()&&deviceIds.get(0)==996) {
             cruiseResultAnalMeteInfos = tStdDevicemeteDao.selectDeviceMete();
             log.info("执行完成");
         }else {
-            if(deviceIds.size()>0){
+            if(!deviceIds.isEmpty()){
                 cruiseResultAnalMeteInfos = tStdDevicemeteDao.selectDeviceMeteByDeviceId(deviceIds);
             }
         }
         //获取同一设备下的有巡检结果的标准测点
        List<CruiseResultAnalMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalMeteInfo deviceInfo : cruiseResultAnalMeteInfos) {
-            log.info("设备信息：" + deviceInfo);
             //通过测点ID获取相应的符合条件的巡检点结果
             CruiseResultAnalMeteInfo cruiseResultAnalMeteInfo = tCruiseDataResultDao.selectMeteCruiseByDeviceId(deviceInfo.getDeviceId(), deviceInfo.getDeviceMeteId());
-            log.info("CrusieResultAnalMeteInfo:" + cruiseResultAnalMeteInfo);
             deviceInfo.setInstanceId(cruiseResultAnalMeteInfo.getInstanceId());
             deviceInfo.setCruiseResult(cruiseResultAnalMeteInfo.getCruiseResult());
             deviceInfo.setCruiseResultName(cruiseResultAnalMeteInfo.getCruiseResultName());
@@ -195,29 +185,12 @@ public class TCruiseDataResultService {
                 }
 
             }
-            log.info("resultSwitch-------------------------------:"+resultSwitch);
-            if(resultSwitch.equals("abnormal")){
-                if(deviceInfo.getFinalState()==1){
+            if(resultSwitch.equals("abnormal") && deviceInfo.getFinalState()==1){
                     abnormalFilters.add(deviceInfo);
-                }
             }
         }
 
         cruiseResultAnalMeteInfos.removeAll(abnormalFilters);
-
-        //按时间降序排列
-//        Collections.sort(cruiseResultAnalMeteInfos, new Comparator<CruiseResultAnalMeteInfo>() {
-//            @Override
-//            public int compare(CruiseResultAnalMeteInfo o1, CruiseResultAnalMeteInfo o2) {
-//                int flag = o1.getEndTime().compareTo(o2.getEndTime());
-//                if(flag == -1){
-//                    flag = 1;
-//                }else if(flag == 1){
-//                    flag = -1;
-//                }
-//                return flag;
-//            }
-//        });
         return cruiseResultAnalMeteInfos;
     }
 
@@ -241,27 +214,23 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectCruiseDataReport( Integer cType, String meteType, Integer meterType, String endTime, String startTime,Long regionId,String instanceName,int pageNum,int pageSize) {
 
-        List<Long> regionIdList = new ArrayList<>();
         List<Long> deviceIdList = new ArrayList<>();
         if (regionId == null) {
-            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
             deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-            log.info("regionIdList是===" + regionIdList);
         }else {
-            regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            if (regionIdList != null&& regionIdList.size() > 0){
+            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
+            if (regionIdList != null&& !regionIdList.isEmpty()){
                 deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
             }else {
                 deviceIdList.add(regionId);
             }
-            log.info("regionIdList是==="+regionIdList);
         }
 
-        log.info("deviceIdList是==="+deviceIdList);
         Map<String, Object> resultMap = new HashMap<>();
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
-        if (deviceIdList != null&& deviceIdList.size() > 0) {
+        if (deviceIdList != null&& !deviceIdList.isEmpty()) {
             cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
             for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
                 if (Objects.isNull(cRAI.getIdentifyResult())) {

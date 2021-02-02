@@ -82,15 +82,13 @@ public class TCruiseResultService{
     public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId,int pageNum,int pageSize) {
 
         List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId子节点
-        log.info("regionIdList是==="+regionIdList);
         List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-        log.info("deviceIdList是==="+deviceIdList);
 
         Map<String, Object> resultMap = new HashMap<>();
 
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
-        if (deviceIdList != null &&deviceIdList.size() > 0){
+        if (deviceIdList != null && !deviceIdList.isEmpty()){
             cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList);
         }
 
@@ -274,22 +272,22 @@ public class TCruiseResultService{
     }
     public Date findLastDate(List<CruiseManualReview> list) {
         CruiseManualReview cruiseManualReview = new CruiseManualReview();
-        Long dates[] = new Long[list.size()];
+        Long datesArray[] = new Long[list.size()];
 
         for (int i = 0; i < list.size(); i++) {
             // 把date类型的时间对象转换为long类型，时间越往后，long的值就越大，
             // 所以就依靠这个原理来判断距离现在最近的时间
             Date timeTempOne = list.get(i).getCheckDate();
             if(timeTempOne!=null){
-                dates[i] = timeTempOne.getTime();
+                datesArray[i] = timeTempOne.getTime();
             } else {
-                dates[i] = Long.valueOf(0);
+                datesArray[i] = Long.valueOf(0);
             }
         }
-        Long maxIndex = dates[0];// 定义最大值为该数组的第一个数
-        for (int j = 0; j < dates.length; j++) {
-            if (maxIndex < dates[j]) {
-                maxIndex = dates[j];
+        Long maxIndex = datesArray[0];// 定义最大值为该数组的第一个数
+        for (int j = 0; j < datesArray.length; j++) {
+            if (maxIndex < datesArray[j]) {
+                maxIndex = datesArray[j];
                 cruiseManualReview = list.get(j);
             } else {
                 // 找到了这个j

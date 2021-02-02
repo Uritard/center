@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
  */
 public class PlatformPacketUtil {
     private final static byte[] hex = "0123456789ABCDEF".getBytes();
-    private String packet = "";
     private static PlatformPacketUtil packetUtil = null;
 
     public synchronized static PlatformPacketUtil getInstance() {
