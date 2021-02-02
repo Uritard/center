@@ -313,12 +313,11 @@
         left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name =
         "defect_type")
         where 1 = 1
-
         <if test="deviceType != null ">and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''">and a.mete_name LIKE
             CONCAT('%',#{meteName, jdbcType=VARCHAR},'%')
         </if>
-        order by a.device_type,a.mete_kind ,a.mete_type desc
+        order by a.device_type,a.mete_kind ,a.mete_type,a.std_mete_id desc
     </select>
 
     <insert id="batchAdd">

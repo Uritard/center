@@ -131,17 +131,20 @@ public class HomePageService {
                 long diff = endTime.getTime()-startTime.getTime();
                 long days = diff / (1000 * 60 * 60 * 24);
                 long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
-                long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
+//                long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
                 String usedTime= "";
                 if(days != 0){
                     usedTime =usedTime+days+"天";
                 }
-                if(hours != 0){
-                    usedTime =usedTime+hours+"小时";
+                if(days == 0){
+                    usedTime =hours/24L+"天";
                 }
-                if(minutes != 0){
-                    usedTime =usedTime+minutes+"分";
-                }
+//                if(hours != 0){
+//                    usedTime =usedTime+hours+"小时";
+//                }
+//                if(minutes != 0){
+//                    usedTime =usedTime+minutes+"分";
+//                }
                 item.setCommissionDate(usedTime);
             }
 

@@ -13,9 +13,7 @@ import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TSequentialConf;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -241,7 +239,7 @@ public class TSequentialConfService{
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             //File txt=new File("D:/code/qhTest/sequential.txt");
-            File txt=new File(devicePath,"UTF-8");
+            File txt=new File(devicePath);
 
             if(txt.exists()){
                 txt.delete();
@@ -250,7 +248,11 @@ public class TSequentialConfService{
                 txt.createNewFile();
             }
             FileWriter fw = new FileWriter(txt, true);
-            BufferedWriter bw = new BufferedWriter(fw);
+            //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
+            BufferedWriter bw = new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(txt), "UTF-8"));
+
             bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::控制状态信息>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t类型\t联动指令\r\n");

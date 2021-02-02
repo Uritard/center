@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
+import static org.apache.catalina.startup.ExpandWar.expand;
 
 /**
 * @author tt
@@ -381,6 +382,7 @@ public class TStdMetemodelService {
                 cell.setCellStyle(style);
                 if(i == 1){
                     cell.setCellValue("*"+list.get(i));
+                    continue;
                 }
                 if(i == 2){
                     cell.setCellValue("*"+list.get(i));
@@ -437,7 +439,7 @@ public class TStdMetemodelService {
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
-                if(i == 12){
+                if(i == 13){
                     cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
@@ -487,460 +489,476 @@ public class TStdMetemodelService {
         return path +"/"+ fileName;
     }
     @Transactional(rollbackFor = Exception.class)
-    public Result insertModel(MultipartFile file) throws Exception  {
+    public Result insertModel(MultipartFile file)   {
+        FileInputStream in = null;
+        HSSFWorkbook wb = null;
         Result result = new Result();
-        result.setCode(209);
-        String  pathName = excelDataImport(file);
-        //获取字典表的值pathName
-        ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
-        tStdMetemodelDetailDao.selectForDictNote(resultHandler);
-        List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
-        Map<String, String> nameMap = resultHandler.getMappedResults();
-        HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream(pathName));//创建工作簿
-        Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
-        int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
-        List<TStdMete> tStdMeteList = new ArrayList<>();
-        StringBuffer errMsg = new StringBuffer();
-        String item = null;
-        String isRepetition = "";
-        for (int i = 1; i <= total; i++) {
-            Row row = sheet.getRow(i);
-            TStdMete tStdMete = new TStdMete();
-            //第2列
-            if(row.getCell(1) == null || row.getCell(1).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(1).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(1).getStringCellValue()))){
-                errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列不能为空<br>");
-                result.setMessage(errMsg.toString());
-                return result;
-            }
-            //第3列
-            if(row.getCell(2) == null || row.getCell(2).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(2).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(2).getStringCellValue()))){
-                errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列不能为空<br>");
-                result.setMessage(errMsg.toString());
-                return result;
-            }
-            //第5列
-            if(row.getCell(4) == null || row.getCell(4).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(4).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(4).getStringCellValue()))){
-                errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列不能为空<br>");
-                result.setMessage(errMsg.toString());
-                return result;
-            }
-            Cell cell = row.getCell(1);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            if(checkString(item)){
-                errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列含有特殊字符<br>");
-                result.setMessage(errMsg.toString());
-                return result;
-            }
-            tStdMete.setDeviceType(Integer.valueOf(nameMap.get(item)));
-
-            cell = row.getCell(2);
-            //设置单元格类型
-            cell.setCellType(CellType.STRING);
-            item = cell.getStringCellValue();
-            if(checkString(item)){
-                errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列含有特殊字符<br>");
-                result.setMessage(errMsg.toString());
-                return result;
-            }
-            tStdMete.setMeteType(nameMap.get(item).toString());
-
-            cell = row.getCell(3);
-            if(cell != null){
+        try {
+            result.setCode(209);
+            String pathName = excelDataImport(file);
+            //获取字典表的值pathName
+            ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
+            tStdMetemodelDetailDao.selectForDictNote(resultHandler);
+            List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
+            Map<String, String> nameMap = resultHandler.getMappedResults();
+            in = new FileInputStream(pathName);
+            wb = new HSSFWorkbook(in);//创建工作簿
+            Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
+            int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
+            List<TStdMete> tStdMeteList = new ArrayList<>();
+            StringBuffer errMsg = new StringBuffer();
+            String item = null;
+            String isRepetition = "";
+            for (int i = 1; i <= total; i++) {
+                Row row = sheet.getRow(i);
+                TStdMete tStdMete = new TStdMete();
+                //第2列
+                if (row.getCell(1) == null || row.getCell(1).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(1).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(1).getStringCellValue()))) {
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列不能为空<br>");
+                    result.setMessage(errMsg.toString());
+                    return result;
+                }
+                //第3列
+                if (row.getCell(2) == null || row.getCell(2).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(2).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(2).getStringCellValue()))) {
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列不能为空<br>");
+                    result.setMessage(errMsg.toString());
+                    return result;
+                }
+                //第5列
+                if (row.getCell(4) == null || row.getCell(4).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(4).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(4).getStringCellValue()))) {
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列不能为空<br>");
+                    result.setMessage(errMsg.toString());
+                    return result;
+                }
+                Cell cell = row.getCell(1);
                 //设置单元格类型
                 cell.setCellType(CellType.STRING);
                 item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (4) + "列含有特殊字符<br>");
+                if (checkString(item)) {
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列含有特殊字符<br>");
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                Integer meteKind = item.contains("遥信")?1:(item.contains("遥测")?2:(item.contains("遥控")?3:(item.contains("遥调")?4:null)));
-                tStdMete.setMeteKind(meteKind);
-            }
+                tStdMete.setDeviceType(Integer.valueOf(nameMap.get(item)));
 
-
-            cell = row.getCell(4);
-            if(cell != null){
+                cell = row.getCell(2);
                 //设置单元格类型
                 cell.setCellType(CellType.STRING);
                 item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列含有特殊字符<br>");
+                if (checkString(item)) {
+                    errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列含有特殊字符<br>");
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                tStdMete.setMeteName(item);
-            }
+                tStdMete.setMeteType(nameMap.get(item).toString());
+
+                cell = row.getCell(3);
+                if (cell != null) {
+                    //设置单元格类型
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (4) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    Integer meteKind = item.contains("遥信") ? 1 : (item.contains("遥测") ? 2 : (item.contains("遥控") ? 3 : (item.contains("遥调") ? 4 : null)));
+                    tStdMete.setMeteKind(meteKind);
+                }
 
 
-            cell = row.getCell(5);
-            if(cell != null){
+                cell = row.getCell(4);
+                if (cell != null) {
+                    //设置单元格类型
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setMeteName(item);
+                }
+
+
+                cell = row.getCell(5);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (6) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (6) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmNote(item);
                 }
-                tStdMete.setAlarmNote(item);
-            }
 
 
-            cell = row.getCell(6);
-            if(cell != null){
+                cell = row.getCell(6);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (7) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (7) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmExplain(item);
                 }
-                tStdMete.setAlarmExplain(item);
-            }
 
 
-            cell = row.getCell(7);
-            if(cell != null){
+                cell = row.getCell(7);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (8) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (8) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmType(nameMap.get(item).toString());
                 }
-                tStdMete.setAlarmType(nameMap.get(item).toString());
-            }
 
 
-            cell = row.getCell(8);
-            if(cell != null){
+                cell = row.getCell(8);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (9) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (9) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAnalyseType(Integer.valueOf(nameMap.get(item)));
                 }
-                tStdMete.setAnalyseType(Integer.valueOf(nameMap.get(item)));
-            }
 
 
-            cell = row.getCell(9);
-            if(cell != null){
+                cell = row.getCell(9);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (10) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (10) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setUnit(item);
                 }
-                tStdMete.setUnit(item);
-            }
 
-            cell = row.getCell(10);
-            if(cell != null){
+                cell = row.getCell(10);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (11) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (11) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setUpEffect(Float.valueOf(item));
                 }
-                tStdMete.setUpEffect(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(11);
-            if(cell != null){
+                cell = row.getCell(11);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (12) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (12) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setDownEffect(Float.valueOf(item));
                 }
-                tStdMete.setDownEffect(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(12);
-            if(cell != null){
+                cell = row.getCell(12);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (13) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (13) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmLevel(Integer.valueOf(nameMap.get(item)));
                 }
-                tStdMete.setAlarmLevel(Integer.valueOf(nameMap.get(item)));
-            }
 
 
-            cell = row.getCell(13);
-            if(cell != null){
+                cell = row.getCell(13);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (14) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (14) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmLimit(Integer.valueOf(item));
                 }
-                tStdMete.setAlarmLimit(Integer.valueOf(item));
-            }
 
 
-            cell = row.getCell(14);
-            if(cell != null){
+                cell = row.getCell(14);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (15) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (15) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmDelay(Integer.valueOf(item));
                 }
-                tStdMete.setAlarmDelay(Integer.valueOf(item));
-            }
 
-            cell = row.getCell(15);
-            if(cell != null){
+                cell = row.getCell(15);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (16) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (16) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setStateZero(item);
                 }
-                tStdMete.setStateZero(item);
-            }
 
-            cell = row.getCell(16);
-            if(cell != null){
+                cell = row.getCell(16);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (17) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (17) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setStateOne(item);
                 }
-                tStdMete.setStateOne(item);
-            }
 
 
-
-
-            cell = row.getCell(17);
-            if(cell != null){
+                cell = row.getCell(17);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (18) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (18) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setHighLimit1(Float.valueOf(item));
                 }
-                tStdMete.setHighLimit1(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(18);
-            if(cell != null){
+                cell = row.getCell(18);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (19) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (19) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setLowLimit1(Float.valueOf(item));
                 }
-                tStdMete.setLowLimit1(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(19);
-            if(cell != null){
+                cell = row.getCell(19);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (20) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (20) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setHighLimit2(Float.valueOf(item));
                 }
-                tStdMete.setHighLimit2(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(20);
-            if(cell != null){
-                //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (21) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                cell = row.getCell(20);
+                if (cell != null) {
+                    //设置单元格类型
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (21) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setLowLimit2(Float.valueOf(item));
                 }
-                tStdMete.setLowLimit2(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(21);
-            if(cell != null){
+                cell = row.getCell(21);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (22) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (22) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setHighLimit3(Float.valueOf(item));
                 }
-                tStdMete.setHighLimit3(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(22);
-            if(cell != null){
+                cell = row.getCell(22);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (23) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (23) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setLowLimit3(Float.valueOf(item));
                 }
-                tStdMete.setLowLimit3(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(23);
-            if(cell != null){
+                cell = row.getCell(23);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (24) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (24) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setHighLimit4(Float.valueOf(item));
                 }
-                tStdMete.setHighLimit4(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(24);
-            if(cell != null){
+                cell = row.getCell(24);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (25) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (25) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setLowLimit4(Float.valueOf(item));
                 }
-                tStdMete.setLowLimit4(Float.valueOf(item));
-            }
 
 
-            cell = row.getCell(25);
-            if(cell != null){
+                cell = row.getCell(25);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (26) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (26) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setAlarmCnt(Integer.valueOf(item));
                 }
-                tStdMete.setAlarmCnt(Integer.valueOf(item));
-            }
 
 
-            cell = row.getCell(26);
-            if(cell != null){
+                cell = row.getCell(26);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (27) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (27) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
                 }
-                tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
-            }
 
 
-            cell = row.getCell(27);
-            if(cell != null){
+                cell = row.getCell(27);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (28) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (28) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
                 }
-                tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
-            }
 
 
-
-            cell = row.getCell(28);
-            if(cell != null){
+                cell = row.getCell(28);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (29) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (29) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setModulus(Integer.valueOf(item));
                 }
-                tStdMete.setModulus(Integer.valueOf(item));
-            }
 
 
-            cell = row.getCell(29);
-            if(cell != null){
+                cell = row.getCell(29);
+                if (cell != null) {
 //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if(checkString(item)){
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (30) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (30) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setRemark(item);
                 }
-                tStdMete.setRemark(item);
+                if (isIn(meteList, tStdMete)) {
+                    isRepetition = isRepetition + "," + (i + 1);
+                    continue;
+                }
+                tStdMeteList.add(tStdMete);
             }
-            if(isIn(meteList,tStdMete)){
-                isRepetition = isRepetition+","+(i+1);
-                continue;
+            if (tStdMeteList.size() > 0) {
+                tStdMeteDao.batchAdd(tStdMeteList);
             }
-            tStdMeteList.add(tStdMete);
+
+            if ("".equals(isRepetition)) {
+                result.setData("ok");
+            } else {
+                isRepetition = "第" + isRepetition.replaceFirst(",", "") + "行与数据库数据重复，其他数据已导入";
+                result.setData(isRepetition);
+            }
+            deleteDir(new File(pathName));
+            result.setCode(200);
+            return result;
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (wb != null) {
+                    wb.close();
+                }
+            } catch (Exception e) {
+                e.getMessage();
+            }
         }
-        if(tStdMeteList.size() > 0){
-            tStdMeteDao.batchAdd(tStdMeteList);
-        }
-
-        if("".equals(isRepetition)){
-            result.setData("ok");
-        }else {
-            isRepetition = "第"+isRepetition.replaceFirst(",","")+"行与数据库数据重复，其他数据已导入";
-            result.setData(isRepetition);
-        }
-        deleteDir(new File(pathName));
-        result.setCode(200);
         return result;
     }
 
