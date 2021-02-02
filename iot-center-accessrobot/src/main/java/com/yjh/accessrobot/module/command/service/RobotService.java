@@ -181,8 +181,9 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setRobotStatus(robotStatus);
-        int res = tRobotInfoDao.update(tRobotInfo);
         log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus());
+
+        int res = tRobotInfoDao.update(tRobotInfo);
         //机器人状态改变给前端推送webSocket
         /*Map<String,Object> jasonMap=new HashMap<>();
         jasonMap.put("type","robotStatus");
@@ -205,8 +206,8 @@ public class RobotService {
          * */
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
-        String fenGe[] = picPath.split("/");
-        String fileName = fenGe[fenGe.length - 1];
+        String splitArray[] = picPath.split("/");
+        String fileName = splitArray[splitArray.length - 1];
         String developMap = absoluteImgMap.get("content") + "/Map";
         File f = new File(developMap);
         if (!f.exists()) {
@@ -317,7 +318,7 @@ public class RobotService {
         }
         log.info("最后要插库的deviceList是===" + addList);
         log.info("准备要删除的inspectionCodeList是===" + nowList);
-        if (nowList != null && nowList.size() > 0) {
+        if (nowList != null && !nowList.isEmpty()) {
             List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
             log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
             List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
@@ -328,7 +329,7 @@ public class RobotService {
             int res3 = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);//删库TCPA
             log.info("TRI删除条数==" + res1 + ",TCPI删除条数==" + res2 + ",TCPA删除条数==" + res3);
         }
-        if (addList != null && addList.size() > 0) {
+        if (addList != null && !addList.isEmpty()) {
             //插库TRI
             int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
             log.info("TRI插入条数==" + res);
@@ -461,6 +462,8 @@ public class RobotService {
                         break;
                     case 218://自定义
                         planType = 3;
+                        break;
+                    default:
                         break;
                 }
                 //根据instanceIdList查询inspectionCodeList
@@ -613,7 +616,7 @@ public class RobotService {
 
         //统计巡视主机下发给机器人的巡检点大小
         Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
-        String instanceList = (String) redisInfoMap2.get("instanceIdList");
+        String instanceList = redisInfoMap2.get("instanceIdList");
         instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
         String[] instanceIdArray = instanceList.split(", ");
         List<String> instanceIdList = new ArrayList<>();
@@ -625,7 +628,7 @@ public class RobotService {
         List<Long> instanceIDList = Constant.flagMap.get(taskId);//做过的点
         log.info("做过的点instanceIDList====" + instanceIDList);
 
-        if (instanceIDList != null && instanceIDList.size() > 0) {
+        if (instanceIDList != null && !instanceIDList.isEmpty()) {
             for (Long instanceId : instanceIDList) {
                 instanceIdList.remove(instanceId.toString());
             }
@@ -717,7 +720,7 @@ public class RobotService {
         log.info("instancedList的内容是===" + instancedList);
 
         //将插过库的点放进公共类
-        if (instanceIDList != null && instanceIDList.size() > 0) {
+        if (instanceIDList != null && !instanceIDList.isEmpty()) {
             log.info("将插过库的点放进公共类");
             instanceIDList.addAll(instancedList);
             Constant.flagMap.put(taskId, instancedList);
@@ -764,8 +767,7 @@ public class RobotService {
     //@Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectTaskResultId(String taskId) {
-        TCruiseResult tCruiseResult = tRobotInfoDao.selectTaskResultId(taskId);
-        return tCruiseResult;
+        return tRobotInfoDao.selectTaskResultId(taskId);
     }
 
     //@Logs(title = "根据taskId查询相关内容2", code = "Robot")
@@ -777,8 +779,7 @@ public class RobotService {
     //@Logs(title = "根据robotCode查询robotId", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Long selectRobotIdByCode(String robotCode) {
-        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-        return robotId;
+        return tRobotInfoDao.selectRobotIdByCode(robotCode);
     }
 
     //@Logs(title = "机器人本体告警信息入库", code = "Robot")

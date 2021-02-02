@@ -65,6 +65,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private String strRobotCode = "TT";
     private boolean isThreadStart = true;
     private String redisValue = "content";
+    private String code = "";
     private static final String DATE_TIME_FORMAT_TPL = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT_TPL);
     String todayTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -166,20 +167,19 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        lookByte(bytes);//看指令
 
         String body = new String(bytes, StandardCharsets.UTF_8);
+        log.info("机器人发来的内容="+body);
 
         log.info("还没处理的Packet="+Packet);
-        log.info("机器人发来的内容="+body);
-        String temporaryBody = Packet + body ;//临时
-        String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
-        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
-
-        handlingMethod(bytes,finalBody);
-
         String zzbds ="^.*<?xml.*";
         if (!Packet.matches(zzbds)){
             Packet = "";
         }
         log.info("处理过的Packet="+Packet);
+        String temporaryBody = Packet + body ;//临时
+        String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
+        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
+
+        handlingMethod(bytes,finalBody);
 
         ReferenceCountUtil.release(byteBuf);
     }
@@ -252,8 +252,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
             log.info("我们这边存在这个机器人,连它");
+             code = "200";//成功
         }else {
             log.info("对不起,不存在这个机器人");
+             code = "400";//拒绝
         }
 
         if ("251".equals(xmlBaseModel.getType())){
@@ -272,7 +274,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             .setSendCode(platformServerMap.get(redisValue))
                             .setReceiveCode(xmlBaseModel.getSendCode())//Client01
                             .setType("251")
-                            .setCode("200")
+                            .setCode(code)
                             .setCommand("4")
                             .setTime(sdf.format(new Date()))
                             .setItems(ItemsList);
