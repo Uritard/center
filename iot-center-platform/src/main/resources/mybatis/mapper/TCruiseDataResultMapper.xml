@@ -40,8 +40,10 @@
             result_desc,
             result_num,
             modify_num,
+            pic_path_anl,
             picpath,
             person_check,
+            orig_pic_anl,
             origpic,
             cruise_abnormal,
             cruise_result,
@@ -62,8 +64,10 @@
                 #{resultDesc, jdbcType=VARCHAR},
                 #{resultNum, jdbcType=VARCHAR},
                 #{modifyNum, jdbcType=VARCHAR},
+                #{picPathAnl, jdbcType=VARCHAR},
                 #{picpath, jdbcType=VARCHAR},
                 #{personCheck, jdbcType=VARCHAR},
+                #{origPicAnl, jdbcType=VARCHAR},
                 #{origpic, jdbcType=VARCHAR},
                 #{cruiseAbnormal, jdbcType=INTEGER},
                 #{cruiseResult, jdbcType=INTEGER},
@@ -93,8 +97,10 @@
         <if test="resultDesc != null ">a.result_desc = #{resultDesc},</if>
         <if test="resultNum != null ">a.result_num = #{resultNum},</if>
         <if test="modifyNum != null ">a.modify_num = #{modifyNum},</if>
+        <if test="picPathAnl != null ">a.pic_path_anl = #{picPathAnl},</if>
         <if test="picpath != null ">a.picpath = #{picpath},</if>
         <if test="personCheck != null ">a.person_check = #{personCheck},</if>
+        <if test="origPicAnl != null ">a.orig_pic_anl = #{origPicAnl},</if>
         <if test="origpic != null ">a.origpic = #{origpic},</if>
         <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
         <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
@@ -120,9 +126,11 @@
         a.result_desc,
         a.result_num,
         a.modify_num,
+        a.pic_path_anl,
         a.picpath,
         a.person_check,
         a.origpic,
+        a.orig_pic_anl,
         a.cruise_abnormal,
         a.cruise_result,
         a.evaluation_state,
@@ -149,8 +157,10 @@
         a.result_desc,
         a.result_num,
         a.modify_num,
+        a.pic_path_anl,
         a.picpath,
         a.person_check,
+        a.orig_pic_anl,
         a.origpic,
         a.cruise_abnormal,
         a.cruise_result,
@@ -173,8 +183,10 @@
         <if test="resultDesc != null and resultDesc != ''">and a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
         <if test="resultNum != null and resultNum != ''">and a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
         <if test="modifyNum != null and modifyNum != ''">and a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picPathAnl != null and picPathAnl != ''">and a.pic_path_anl = #{picPathAnl, jdbcType=VARCHAR},</if>
         <if test="picpath != null and picpath != ''">and a.picpath = #{picpath, jdbcType=VARCHAR},</if>
         <if test="personCheck != null and personCheck != ''">and a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
+        <if test="origPicAnl != null and origPicAnl != ''">and a.orig_pic_anl = #{origPicAnl, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">and a.origpic = #{origpic, jdbcType=VARCHAR},</if>
         <if test="cruiseAbnormal != null">and a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
         <if test="cruiseResult != null">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
@@ -200,8 +212,10 @@
         a.result_desc,
         a.result_num,
         a.modify_num,
+        a.pic_path_anl,
         a.picpath,
         a.person_check,
+        a.orig_pic_anl,
         a.origpic,
         a.cruise_abnormal,
         a.cruise_result,
@@ -224,8 +238,10 @@
         <if test="resultDesc != null and resultDesc != ''">and a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
         <if test="resultNum != null and resultNum != ''">and a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
         <if test="modifyNum != null and modifyNum != ''">and a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picPathAnl != null and picPathAnl != ''">and a.pic_path_anl = #{picPathAnl, jdbcType=VARCHAR},</if>
         <if test="picpath != null and picpath != ''">and a.picpath = #{picpath, jdbcType=VARCHAR},</if>
         <if test="personCheck != null and personCheck != ''">and a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
+        <if test="origPicAnl != null and origPicAnl != ''">and a.orig_pic_anl = #{origPicAnl, jdbcType=VARCHAR},</if>
         <if test="origpic != null and origpic != ''">and a.origpic = #{origpic, jdbcType=VARCHAR},</if>
         <if test="cruiseAbnormal != null">and a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
         <if test="cruiseResult != null">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
@@ -250,32 +266,36 @@
             result_desc,
             result_num,
             modify_num,
+            pic_path_anl,
             picpath,
-        person_check,
+            person_check,
+            orig_pic_anl,
             origpic,
-        cruise_abnormal,
-        cruise_result,
+            cruise_abnormal,
+            cruise_result,
             evaluation_state,
             identify_state,
             identify_result,
             createtime,
             remark,
-        check_user,
-        check_date,
-        is_warn
+            check_user,
+            check_date,
+            is_warn
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
                 #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
                 #{TCruiseDataResult.cruiseResultId, jdbcType=VARCHAR},
                 #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
-            #{TCruiseDataResult.cruiseName, jdbcType=VARCHAR},
+                #{TCruiseDataResult.cruiseName, jdbcType=VARCHAR},
                 #{TCruiseDataResult.cruiseType, jdbcType=INTEGER},
                 #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
                 #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
                 #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
+                #{TCruiseDataResult.picPathAnl, jdbcType=VARCHAR},
                 #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
                 #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
+                #{TCruiseDataResult.origPicAnl, jdbcType=VARCHAR},
                 #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
                 #{TCruiseDataResult.cruiseAbnormal, jdbcType=INTEGER},
                 #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},
@@ -284,9 +304,9 @@
                 #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
                 #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
                 #{TCruiseDataResult.remark, jdbcType=VARCHAR},
-            #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
-            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
-            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
+                #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
+                #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
+                #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

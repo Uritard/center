@@ -135,6 +135,10 @@ public class TStdRegionService{
             }
         }
     }
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectDownId(Long  regionId) {
+        return tStdRegionDao.selectDownId(regionId);
+    }
 
 }
 

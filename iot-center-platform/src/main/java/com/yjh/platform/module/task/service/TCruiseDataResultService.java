@@ -57,8 +57,8 @@ public class TCruiseDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseDataResult> select(Long cruiseDataId, String cruiseResultId, Long cruiseId,String cruiseName, Integer cruiseType, Integer cruiseAbnormal,String resultDesc, String resultNum, String modifyNum, String picpath, String personcheck, String origpic, String evaluationState, Integer identifyState, Integer identifyResult, Date createtime, String remark,String checkUser,Date checkDate,Integer isWarn ,Integer cruiseResult ) {
-        return tCruiseDataResultDao.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,  cruiseAbnormal,resultDesc, resultNum, modifyNum, picpath, personcheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,checkUser,checkDate,isWarn,cruiseResult);
+    public List<TCruiseDataResult> select(Long cruiseDataId, String cruiseResultId, Long cruiseId,String cruiseName, Integer cruiseType, Integer cruiseAbnormal,String resultDesc, String resultNum, String modifyNum, String picPathAnl,String picpath, String personcheck,String origPicAnl, String origpic, String evaluationState, Integer identifyState, Integer identifyResult, Date createtime, String remark,String checkUser,Date checkDate,Integer isWarn ,Integer cruiseResult ) {
+        return tCruiseDataResultDao.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType,  cruiseAbnormal,resultDesc, resultNum, modifyNum,picPathAnl, picpath, personcheck,origPicAnl, origpic, evaluationState, identifyState, identifyResult, createtime, remark,checkUser,checkDate,isWarn,cruiseResult);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -72,23 +72,8 @@ public class TCruiseDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectCruiseResultAnalyze(Long regionId,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
-        List<Long> deviceIdList = new ArrayList<>();
-        if (regionId == null){
-            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-        }else {
-            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            if (regionIdList != null && !regionIdList.isEmpty()){
-                deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-            }else {
-                deviceIdList.add(regionId);
-            }
-        }
-
-        Map<String, Object> resultMap = new HashMap<>();
+    public List<CruiseResultAnalyzeMeteInfo>  selectCruiseResultAnalyze(List<Long> deviceIdList,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         if (deviceIdList != null && !deviceIdList.isEmpty()){
             cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
         }
@@ -139,9 +124,8 @@ public class TCruiseDataResultService {
                 return flag;
             }
         });
-        resultMap.put("count",page.getTotal());
-        resultMap.put("list", cruiseResultAnalMeteInfoList);
-        return resultMap;
+
+        return cruiseResultAnalMeteInfoList;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -212,23 +196,7 @@ public class TCruiseDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectCruiseDataReport( Integer cType, String meteType, Integer meterType, String endTime, String startTime,Long regionId,String instanceName,int pageNum,int pageSize) {
-
-        List<Long> deviceIdList = new ArrayList<>();
-        if (regionId == null) {
-            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-        }else {
-            List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId的子节点
-            if (regionIdList != null&& !regionIdList.isEmpty()){
-                deviceIdList =  tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-            }else {
-                deviceIdList.add(regionId);
-            }
-        }
-
-        Map<String, Object> resultMap = new HashMap<>();
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+    public List<CruiseResultAnalyzeInfo>  selectCruiseDataReport( Integer cType, String meteType, Integer meterType, String endTime, String startTime,List<Long> deviceIdList,String instanceName) {
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
         if (deviceIdList != null&& !deviceIdList.isEmpty()) {
             cruiseResultAnalyzeInfoList = tCruiseDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
@@ -241,10 +209,7 @@ public class TCruiseDataResultService {
                 }
             }
         }
-        resultMap.put("count", page.getTotal());
-        resultMap.put("list", cruiseResultAnalyzeInfoList);
-
-        return resultMap;
+        return cruiseResultAnalyzeInfoList;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime,int pageNum,int pageSize){

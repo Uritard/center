@@ -7,10 +7,8 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.task.entity.CruiseResultAnalInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
+import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +37,8 @@ public class TCruiseDataResultController {
 
     @Autowired
     private TStdDeviceService tStdDeviceService;
+    @Autowired
+    private TStdRegionService tStdRegionService;
 
     public TCruiseDataResultController(TCruiseDataResultService tCruiseDataResultService) {
         this.tCruiseDataResultService = tCruiseDataResultService;
@@ -121,8 +121,10 @@ public class TCruiseDataResultController {
                          @RequestParam(value = "resultDesc", required = false) String resultDesc,
                          @RequestParam(value = "resultNum", required = false) String resultNum,
                          @RequestParam(value = "modifyNum", required = false) String modifyNum,
+                         @RequestParam(value = "picPathAnl", required = false) String picPathAnl,
                          @RequestParam(value = "picpath", required = false) String picpath,
                          @RequestParam(value = "personCheck", required = false) String personCheck,
+                         @RequestParam(value = "origPicAnl", required = false) String origPicAnl,
                          @RequestParam(value = "origpic", required = false) String origpic,
                          @RequestParam(value = "evaluationState", required = false) String evaluationState,
                          @RequestParam(value = "identifyState", required = false) Integer identifyState,
@@ -136,8 +138,8 @@ public class TCruiseDataResultController {
 
         Result result = new Result();
         try {
-            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType, cruiseAbnormal, resultDesc, resultNum, modifyNum, picpath,
-                    personCheck, origpic, evaluationState, identifyState, identifyResult, createtime, remark,
+            List<TCruiseDataResult> list = tCruiseDataResultService.select(cruiseDataId, cruiseResultId, cruiseId, cruiseName, cruiseType, cruiseAbnormal, resultDesc, resultNum, modifyNum, picPathAnl,picpath,
+                    personCheck, origPicAnl,origpic, evaluationState, identifyState, identifyResult, createtime, remark,
                     checkUser, checkDate, isWarn, cruiseResult);
             result.setData(list);
         } catch (Exception e) {
@@ -229,7 +231,22 @@ public class TCruiseDataResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            resultMap = tCruiseDataResultService.selectCruiseResultAnalyze(regionId,deviceType,meteType,meterType,cruiseRes,pageNum,pageSize);
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,pageNum,pageSize);
+            resultMap.put("count",page.getTotal());
+            resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -259,7 +276,22 @@ public class TCruiseDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            resultMap = (tCruiseDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,regionId,instanceName,pageNum,pageSize));
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = tCruiseDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,deviceIdList,instanceName);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -518,7 +518,9 @@ public class TStdDeviceService{
     public List<Long> selectDeviceIdsByRegion(List<Long> regionIds){
         return tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
     }
-
+    public List<Long> selectDeviceIdListByRegion(List<Long> regionIds){
+        return tStdDeviceDao.selectDeviceIdListByRegion(regionIds);
+    }
 
 }
 

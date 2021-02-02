@@ -497,10 +497,13 @@
         result_desc,
         result_num,
         modify_num,
+        pic_path_anl,
         picpath,
         person_check,
+        orig_pic_anl,
         origpic,
         cruise_abnormal,
+        cruise_result,
         evaluation_state,
         identify_state,
         identify_result,
@@ -508,8 +511,7 @@
         remark,
         check_user,
         check_date,
-        is_warn,
-        cruise_result
+        is_warn
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
@@ -521,10 +523,13 @@
             #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
             #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
             #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.picPathAnl, jdbcType=VARCHAR},
             #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
             #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origPicAnl, jdbcType=VARCHAR},
             #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
             #{TCruiseDataResult.cruiseAbnormal, jdbcType=INTEGER},
+            #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},
             #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
             #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
             #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
@@ -532,8 +537,7 @@
             #{TCruiseDataResult.remark, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
-            #{TCruiseDataResult.isWarn, jdbcType=INTEGER},
-            #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER}
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

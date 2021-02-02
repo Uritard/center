@@ -109,5 +109,10 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "是否产生告警1.是0.否")
     private Integer isWarn;
 
+    @ApiModelProperty(value = "机器人巡检图片分析,相对")
+    private String picPathAnl;
+    @ApiModelProperty(value = "机器人巡检图片分析,绝对")
+    private String origPicAnl;
+
 
 }
