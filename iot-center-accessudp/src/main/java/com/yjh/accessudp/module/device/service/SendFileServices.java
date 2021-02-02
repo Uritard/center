@@ -1,6 +1,6 @@
 package com.yjh.accessudp.module.device.service;
 
-import com.yjh.accessudp.module.device.entity.SysLogs;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,8 @@ public class SendFileServices {
     private String SERVER_PORT;
     // 本地发送端口
     @Value("${spring.send.local.port}")
-    static String LOCAL_PORT;
+    private String LOCAL_PORT;
+
     private String data;
 
     private Logger log = LoggerFactory.getLogger(SendFileServices.class);
@@ -75,8 +76,11 @@ public class SendFileServices {
 
     private int Device(String info)  {
         try {
-            log.info("开始发送");
-            DatagramSocket socket = new DatagramSocket(Integer.valueOf(LOCAL_PORT));
+            log.info("开始发送"+LOCAL_PORT);
+            log.info("开始发送"+SERVER_PORT);
+            log.info("开始发送"+SERVER_HOSTNAME);
+            DatagramSocket socket = new DatagramSocket(Integer.valueOf(LOCAL_PORT).intValue());
+            log.info("ok了");
             udpForDevice(info,socket);
             log.info("结束发送");
             log.info("InetAddress.getByName(SERVER_HOSTNAME): "+ InetAddress.getByName(SERVER_HOSTNAME));

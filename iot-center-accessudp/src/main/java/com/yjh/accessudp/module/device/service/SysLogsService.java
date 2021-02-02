@@ -32,8 +32,8 @@ public class SysLogsService{
     @Value("${spring.send.server.port}")
     private String SERVER_PORT;
     // 本地发送端口
-    @Value("${spring.send.local.port}")
-     static String LOCAL_PORT;
+//    @Value("${spring.send.local.port}")
+//     static String LOCAL_PORT;
     private String data;
 
     private Logger log = LoggerFactory.getLogger(SysLogsService.class);

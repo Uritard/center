@@ -99,7 +99,9 @@ public class TCameraGroupController {
     public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId) {
         Result result = new Result();
         try {
-            if(groupId == -1){
+            if(groupId == null || "".equals(groupId)){
+                result.setData("");
+            }else if(groupId == -1){
                 result.setData(new ArrayList<>());
             }else {
                 TCameraGroupDetail tCameraGroupDetail = tCameraGroupService.selectByPrimaryId(groupId);

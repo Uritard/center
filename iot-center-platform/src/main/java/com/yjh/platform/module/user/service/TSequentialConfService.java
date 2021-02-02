@@ -241,7 +241,7 @@ public class TSequentialConfService{
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             //File txt=new File("D:/code/qhTest/sequential.txt");
-            File txt=new File(devicePath);
+            File txt=new File(devicePath,"UTF-8");
 
             if(txt.exists()){
                 txt.delete();

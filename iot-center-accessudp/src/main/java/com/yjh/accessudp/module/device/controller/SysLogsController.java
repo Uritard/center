@@ -108,7 +108,7 @@ public class SysLogsController {
         Result result = new Result();
         try {
             String path  = map.get("list").get(0);
-            result.setData(this.sysLogsService.sendFile(path));
+//            result.setData(this.sysLogsService.sendFile(path));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);
