@@ -44,7 +44,7 @@ public class SysLogsService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String sendFile(String devicePath)throws IOException {
+    public String sendFile(String devicePath)throws Exception {
         //读取联动设备的信息
         //TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
         //String devicePath = "D:/code/qhTest/deviceInfo666.txt";
