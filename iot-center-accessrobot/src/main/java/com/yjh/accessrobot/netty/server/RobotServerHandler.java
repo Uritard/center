@@ -171,7 +171,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         log.info("还没处理的Packet="+Packet);
         String zzbds ="^.*<?xml.*";
-        if (!Packet.matches(zzbds)){
+        Pattern pattern1 = Pattern.compile(zzbds);
+        Matcher matcher1 = pattern1.matcher(Packet);
+        if (!matcher1.find()){
             Packet = "";
         }
         log.info("处理过的Packet="+Packet);

@@ -246,7 +246,7 @@ public class ReportDataRepo {
 
         TaskVO taskVoInfo = param.getTaskVO();
 
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 5, new String[]{TASK_TITLE_CONTENT[0]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 6, new String[]{TASK_TITLE_CONTENT[0]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_LEFT).setBold(true));
 
         rowIndex++;
@@ -256,11 +256,11 @@ public class ReportDataRepo {
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         elements.add(new TableCellElement(rowIndex, rowIndex, 2, 2, new String[]{TASK_INFO[1]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{TASK_INFO[2]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{TASK_INFO[2]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{TASK_INFO[3]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[3]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[4]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[4]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         /*elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[5]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));*/
@@ -271,17 +271,17 @@ public class ReportDataRepo {
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         elements.add(new TableCellElement(rowIndex, rowIndex, 2, 2, new String[]{taskVoInfo.getTaskName()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{taskVoInfo.getMeteNum().toString()},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{taskVoInfo.getMeteNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{taskVoInfo.getMeteRelationNum().toString()},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getMeteRelationNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         /*elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{taskVoInfo.getAbnormalNum().toString()},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));*/
         if (null != taskVoInfo.getCruiseDate()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
         }
         rowIndex++;

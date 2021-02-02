@@ -5,7 +5,6 @@ import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.security.PublicKey;
 import java.util.Map;
 
 /**
@@ -35,12 +34,7 @@ public class HeartBreakDealThread implements Runnable {
 
                 long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
                 log.info("睡觉时间=="+sleepTime);
-                
-                Thread.sleep(sleepTime);
-                processMethod();
-
-                int res = Constant.heartNum;
-                log.info("判断条件是==="+res);
+                int res = processMethod(sleepTime);
                 if (res < -3){
                     robotServerHandler.ProcSend(robotCode);
                     StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
@@ -54,7 +48,11 @@ public class HeartBreakDealThread implements Runnable {
             log.error(e.getMessage(), e);
         }
     }
-    public synchronized void processMethod(){
+    public synchronized int processMethod(long sleepTime) throws InterruptedException{
+        Thread.sleep(sleepTime);
         Constant.heartNum--;
+        int res = Constant.heartNum;
+        log.info("判断条件是==="+res);
+        return res;
     }
 }
