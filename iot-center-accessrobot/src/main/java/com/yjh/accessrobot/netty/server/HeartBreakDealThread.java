@@ -36,10 +36,10 @@ public class HeartBreakDealThread implements Runnable {
                 log.info("睡觉时间=="+sleepTime);
                 
                 Thread.sleep(sleepTime);
-                Constant.heartNum--;
-                int res = Constant.heartNum;
-                log.info("判断条件是==="+res);
-                if (res < -3){
+                int heartNum = (Constant.heartNumMap.get("heartNum")).intValue();
+                heartNum--;
+                log.info("判断条件是==="+heartNum);
+                if (heartNum < -3){
                     robotServerHandler.ProcSend(robotCode);
                     StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
                     robotStatusMap.put("value","1");//异常

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class Constant {
@@ -21,7 +22,7 @@ public class Constant {
     public static final byte HEARTBEAT = 0x03;
 
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
-    public static int heartNum = 0;
+    public static Map<String,Integer> heartNumMap = new ConcurrentHashMap<String, Integer>(){{put("heartNum",0);}};
     public static int flag = 0;
     public static int flag2 = 0;
     public static String Packet = "";
