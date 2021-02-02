@@ -148,4 +148,19 @@ public class SM3Digest
 		sm3.doFinal(md, 0);
 		return Hex.encode(md);
 	}
+
+    public static void main(String[] args) {
+//        System.out.println("sm3EncryptByte(): "+sm3Encrypt("shit"));
+
+        JSONObject json = new JSONObject(true);
+        json.put("user","xtgly");
+        json.put("pass","d9b610cd9d5aeb67d3a2da321b8ab14bdbf7811f68857d54e41f2fbd068010afdaf37304d53526fcf066e2f7caacb24a4cc9c22da3ef792d56ed860c586649518790bf31f1452b6d68a551a850e4e9c679960aed451f6c21a740cc87fc6dae2b7d1afbc340c0d34c8a3e46");
+        json.put("pbKey","048108703AD33E84CFD6F28F1FD920338F37195FE4807615DE451BE8C572CDBFC92C4AE7E640A9B01E48B5611FBCDFE848292CF1AB9634265E114138D9203A621F");
+        String jsonStr = JSON.toJSONString(json, SerializeConfig.getGlobalInstance(),
+                SerializerFeature.QuoteFieldNames);
+
+        System.out.printf(jsonStr);
+        String va = sm3Encrypt("xtgly");
+        System.out.printf(va);
+    }
 }
