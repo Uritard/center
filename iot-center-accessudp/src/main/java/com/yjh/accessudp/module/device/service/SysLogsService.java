@@ -30,10 +30,10 @@ public class SysLogsService{
 
     // 服务器端口
     @Value("${spring.send.server.port}")
-    private int SERVER_PORT;
+    private String SERVER_PORT;
     // 本地发送端口
     @Value("${spring.send.local.port}")
-     static int LOCAL_PORT;
+     static String LOCAL_PORT;
     private String data;
 
     private Logger log = LoggerFactory.getLogger(SysLogsService.class);
@@ -86,7 +86,7 @@ public class SysLogsService{
     private int Device(String info) throws Exception {
         try {
             log.info("sss");
-            DatagramSocket socket = new DatagramSocket(LOCAL_PORT);
+            DatagramSocket socket = new DatagramSocket(Integer.valueOf(LOCAL_PORT));
             udpForDevice(info,socket);
             log.info("InetAddress.getByName(SERVER_HOSTNAME): "+ InetAddress.getByName(SERVER_HOSTNAME));
             socket.close();
@@ -168,7 +168,7 @@ public class SysLogsService{
                 zui++;
             }
             DatagramPacket dp = new DatagramPacket(uspRe, uspRe.length, InetAddress.getByName(SERVER_HOSTNAME),
-                    SERVER_PORT);
+                    Integer.valueOf(SERVER_PORT));
             socket.send(dp);
             System.out.println(j);
 
@@ -210,7 +210,7 @@ public class SysLogsService{
                 zui++;
             }
             DatagramPacket dp = new DatagramPacket(uspRe, uspRe.length, InetAddress.getByName(SERVER_HOSTNAME),
-                    SERVER_PORT);
+                    Integer.valueOf(SERVER_PORT));
             socket.send(dp);
         }
     }
