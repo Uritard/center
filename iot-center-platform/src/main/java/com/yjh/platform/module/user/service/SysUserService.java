@@ -89,7 +89,7 @@ public class SysUserService {
             String password = userMap.get("password");
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
-            if (!Objects.equals(null, sysUserLogin)) {
+            if (!Objects.equals(null, sysUserLogin) && userName.equals(sysUserLogin.getUserName()) && password.equals(sysUserLogin.getPassword())) {
                 String userAvoid=Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
                 if (!replayAvoid.equals(userAvoid)) {
                     Constant.userInfo.put(String.valueOf(sysUserLogin.getUserId()),replayAvoid);
