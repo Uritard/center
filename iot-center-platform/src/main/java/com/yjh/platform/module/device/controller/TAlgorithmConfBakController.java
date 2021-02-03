@@ -94,7 +94,7 @@ public class TAlgorithmConfBakController {
     public Result selectByPrimaryId(@RequestParam(value = "deviceMeteId", required = true) Long deviceMeteId) {
         Result result = new Result();
         try {
-            TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakService.selectByPrimaryId(deviceMeteId);
+            List<TAlgorithmConfBak> tAlgorithmConfBak = tAlgorithmConfBakService.selectByPrimaryId(deviceMeteId);
             result.setData(tAlgorithmConfBak);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

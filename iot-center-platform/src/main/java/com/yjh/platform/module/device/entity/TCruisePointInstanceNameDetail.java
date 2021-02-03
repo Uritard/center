@@ -19,6 +19,7 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String cruiseName;
     private String analyseType;
     private String realCode;
+    private String isAi;
 
 
 }

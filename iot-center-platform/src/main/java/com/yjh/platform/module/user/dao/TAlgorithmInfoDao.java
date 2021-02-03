@@ -28,4 +28,5 @@ public interface TAlgorithmInfoDao {
 
     int batchInsert(List<TAlgorithmInfo> list);
     TAlgorithmInfo selectByAnalyseType(@Param(value = "analyseType") String analyseType);
+    List<TAlgorithmInfo> selectByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
 }

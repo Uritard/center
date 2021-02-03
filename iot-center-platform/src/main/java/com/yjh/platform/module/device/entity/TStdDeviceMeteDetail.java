@@ -44,6 +44,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     @Max(value=999999999)
     private Integer analyseType;
     private String analyseTypeName;
+    private String isAi;
 
 }
 

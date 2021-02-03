@@ -15,6 +15,7 @@
         <result column="device_type" jdbcType="INTEGER" property="deviceType" />
         <result column="position_type" jdbcType="VARCHAR" property="positionType" />
         <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
+        <result column="is_ai" jdbcType="VARCHAR" property="isAi" />
         <result column="unit" jdbcType="VARCHAR" property="unit" />
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
@@ -39,7 +40,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, position_type,analyse_type, unit, alarm_note, alarm
+        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, position_type,analyse_type,is_ai, unit, alarm_note, alarm
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
         mete_type, modulus, remark,state_zero,state_one,alarm_state
     </sql>
@@ -59,6 +60,7 @@
             device_type,
             position_type,
             analyse_type,
+            is_ai,
             unit,
             alarm_note,
             alarm_type,
@@ -95,6 +97,7 @@
                 #{deviceType, jdbcType=INTEGER},
                 #{positionType, jdbcType=VARCHAR},
                 #{analyseType, jdbcType=INTEGER},
+                #{isAi, jdbcType=VARCHAR},
                 #{unit, jdbcType=VARCHAR},
                 #{alarmNote, jdbcType=VARCHAR},
                 #{alarmType, jdbcType=VARCHAR},
@@ -143,6 +146,7 @@
         <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="positionType != null ">a.position_type = #{positionType},</if>
         <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
+        <if test="isAi != null ">a.is_ai = #{isAi},</if>
         <if test="unit != null ">a.unit = #{unit},</if>
         <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
         <if test="alarmType != null ">a.alarm_type = #{alarmType},</if>
@@ -185,6 +189,7 @@
         a.device_type,
         a.position_type,
         a.analyse_type,
+        a.is_ai,
         a.unit,
         a.alarm_note,
         a.alarm_type,
@@ -223,6 +228,8 @@
         a.appearance_type,
         a.device_type,
         a.position_type,
+        a.analyse_type,
+        a.is_ai,
         a.unit,
         a.alarm_note,
         a.alarm_type,
@@ -323,6 +330,7 @@
         a.appearance_type,
         a.device_type,
         a.position_type,
+        a.is_ai,
         a.unit,
         a.alarm_note,
         a.alarm_type,
@@ -416,6 +424,7 @@
             device_type,
             position_type,
         analyse_type,
+        is_ai,
             unit,
             alarm_note,
             alarm_type,
@@ -450,6 +459,7 @@
             #{TStdDevicemete.deviceType, jdbcType=INTEGER},
                 #{TStdDevicemete.positionType, jdbcType=VARCHAR},
             #{TStdDevicemete.analyseType, jdbcType=INTEGER},
+            #{TStdDevicemete.isAi, jdbcType=VARCHAR},
                 #{TStdDevicemete.unit, jdbcType=VARCHAR},
                 #{TStdDevicemete.alarmNote, jdbcType=VARCHAR},
                 #{TStdDevicemete.alarmType, jdbcType=VARCHAR},

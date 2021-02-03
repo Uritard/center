@@ -78,6 +78,15 @@ public class TStdDevicemeteService{
                 tAlgorithmConfBakDao.add(tAlgorithmConfBak);
             }
         }
+        if("on".equals(tStdDeviceMeteDetail.getIsAi())){
+            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType("398");
+            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
+            if(tAlgorithmInfo != null){
+                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+            }
+        }
         return  1;
     }
 
@@ -121,28 +130,24 @@ public class TStdDevicemeteService{
         //修改测点配置的算法
         //配置算法
         if(tStdDeviceMeteDetail.getAnalyseType() != null){
-            TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
-            if(tAlgorithmConfBak == null){
-                tAlgorithmConfBak = new TAlgorithmConfBak();
-                TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(String.valueOf(tStdDeviceMeteDetail.getAnalyseType()));
-                if(tAlgorithmInfo != null){
-                    tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
-                    tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                    tAlgorithmConfBakDao.add(tAlgorithmConfBak);
-                }
-
-            }else {
-                TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(String.valueOf(tStdDeviceMeteDetail.getAnalyseType()));
-                if(tAlgorithmInfo != null){
-                    tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
-                    tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                    tAlgorithmConfBakDao.update(tAlgorithmConfBak);
-                }
+            tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+            TAlgorithmConfBak tAlgorithmConfBak  = new TAlgorithmConfBak();
+            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(String.valueOf(tStdDeviceMeteDetail.getAnalyseType()));
+            if(tAlgorithmInfo != null){
+                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
             }
         }else {
-            TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
-            if(tAlgorithmConfBak != null){
-                tAlgorithmConfBakDao.deleteByPrimaryId(tAlgorithmConfBak.getDeviceMeteId());
+            tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+        }
+        if("on".equals(tStdDeviceMeteDetail.getIsAi())){
+            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType("398");
+            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
+            if(tAlgorithmInfo != null){
+                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
             }
         }
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在

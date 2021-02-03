@@ -136,9 +136,9 @@ public class HomePageService {
                 if(days != 0){
                     usedTime =usedTime+days+"天";
                 }
-                if(days == 0){
-                    usedTime =hours/24L+"天";
-                }
+//                if(days == 0){
+//                    usedTime =hours/24L+"天";
+//                }
 //                if(hours != 0){
 //                    usedTime =usedTime+hours+"小时";
 //                }

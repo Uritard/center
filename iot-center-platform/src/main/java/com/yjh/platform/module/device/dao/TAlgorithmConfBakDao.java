@@ -18,7 +18,7 @@ public interface TAlgorithmConfBakDao {
     int add(TAlgorithmConfBak tAlgorithmConfBak);
     int deleteByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     int update(TAlgorithmConfBak tAlgorithmConfBak);
-    TAlgorithmConfBak selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    List<TAlgorithmConfBak> selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<TAlgorithmConfBak> select(@Param(value = "deviceMeteId") Long deviceMeteId,
                                 @Param(value = "algorithmId") Long algorithmId,
                                 @Param(value = "configName") String configName,

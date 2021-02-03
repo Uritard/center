@@ -437,11 +437,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
 
                         }else {
-                            //todo  现在是测点配置了算法 从测点寻找算法id
-                            //TAlgorithmConfBak tAlgorithmConfBak = tAlgorithmConfBakDao.selectByPrimaryId(item.getDeviceMeteId());
-                            //TAlgorithmConf tAlgorithmConf = tAlgorithmConfDao.selectByPrimaryId(item.getCruiseId());
-                            TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByAnalyseType(item.getAnalyseType());
-                            if(tAlgorithmInfo != null){//配置了算法
+                            if(item.getAnalyseType() != null || "on".equals(item.getIsAi())){//配置了算法
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
 
@@ -469,28 +465,28 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     analysisInstanceList.add(item.getInstanceId().toString());
                                     redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                                 }
-                                Analysis analysis = new Analysis();
-                                analysis.setTaskId(tCruiseTask.getTaskId());
-                                analysis.setInstanceId(item.getInstanceId());
-                                analysis.setPicPath(absPath);
-                                //todo
-                                //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConfBak.getAlgorithmId());
-                                //TAlgorithmInfo tAlgorithmInfo = tAlgorithmInfoDao.selectByPrimaryId(tAlgorithmConf.getAlgorithmId());
-                                analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                                analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
-                                analysis.setIsAi(tAlgorithmInfo.getIsAi());
+                                List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
+                                for (TAlgorithmInfo tAlgorithmInfo:tAlgorithmInfoList) {
+                                    Analysis analysis = new Analysis();
+                                    analysis.setTaskId(tCruiseTask.getTaskId());
+                                    analysis.setInstanceId(item.getInstanceId());
+                                    analysis.setPicPath(absPath);
+                                    analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                                    analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
+                                    analysis.setIsAi(tAlgorithmInfo.getIsAi());
+                                    List<Analysis> analysisList = new ArrayList<>();
+                                    analysisList.add(analysis);
+                                    Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                                    analysisMap.put("list",analysisList);
+                                    log.info("算法信息：    "+analysisMap);
+                                    if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
+                                        analysis(analysisMap);
+                                    }else {
+                                        defect(analysisMap);
+                                    }
+                                }
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
-                                List<Analysis> analysisList = new ArrayList<>();
-                                analysisList.add(analysis);
-                                Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-                                analysisMap.put("list",analysisList);
-                                log.info("算法信息：    "+analysisMap);
-                                if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
-                                    analysis(analysisMap);
-                                }else {
-                                    defect(analysisMap);
-                                }
                                 // webSocket通知前端调用巡视监控的接口
                                 Map<String,Object> jasonMapOnFinished=new HashMap<>();
                                 jasonMapOnFinished.put("type","finishedOneInstance");

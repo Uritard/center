@@ -43,7 +43,7 @@ public class TAlgorithmConfBakService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public TAlgorithmConfBak selectByPrimaryId(Long deviceMeteId) {
+    public List<TAlgorithmConfBak> selectByPrimaryId(Long deviceMeteId) {
         return this.tAlgorithmConfBakDao.selectByPrimaryId(deviceMeteId);
     }
 

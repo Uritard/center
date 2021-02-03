@@ -74,6 +74,10 @@ public class TStdDeviceMete implements Serializable {
     @TableField(value = "position_type",updateStrategy = FieldStrategy.IGNORED)
     private String positionType;
 
+    private Integer analyseType;
+
+    private String isAi;
+
     @Length(max = 50, message = "unit长度必须小于等于50")
     @ApiModelProperty(value = "单位")
     @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)

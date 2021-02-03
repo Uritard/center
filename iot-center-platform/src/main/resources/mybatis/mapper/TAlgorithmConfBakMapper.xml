@@ -67,6 +67,7 @@
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+            and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
@@ -188,7 +189,7 @@
             b.*
         FROM
             t_algorithm_info a
-        left join t_dict_business b on a.analyse_type = b.dict_code and (b.col_name = "analyse_type" or b.col_name = "defect_type")
+        left join t_dict_business b on a.analyse_type = b.dict_code and b.col_name = "analyse_type"
         where  a.analyse_type IS NOT NULL
     </select>
 </mapper>
