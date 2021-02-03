@@ -832,8 +832,6 @@ public class CameraConService {
     }
 */
 
-
-    @Logs(title = "获取到视频存入指定文件中 保存为Mp4格式文件", code = "getDVRConfig", content = "获取到实时视频存入指定文件中 保存为Mp4格式文")
     public String getDVRToPlace(long cameraId, String startTime, String stopTime) throws ParseException {
         //返回结果
         String  judge = null;

@@ -401,6 +401,7 @@ public class CameraConController {
 
     @ApiOperation(value = "获取到视频存入指定文件中 保存为Mp4格式文件")
     @RequestMapping(value = "/getDVRToPlace", method = RequestMethod.GET)
+    @Logs(title = "获取到视频存入指定文件中 保存为Mp4格式文件", code = "getDVRConfig", content = "获取到实时视频存入指定文件中 保存为Mp4格式文")
     public Result getDVRToPlace(@RequestParam(value = "cameraId") Long cameraId,
                                 @RequestParam(value = "startTime") String startTime,
                                 @RequestParam(value = "endTime") String endTime)  {
