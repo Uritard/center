@@ -5,9 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SM3Digest
 {
+    private static Logger log = LoggerFactory.getLogger(SM3Digest.class);
+
 	/** SM3值的长度 */
 	private static final int BYTE_LENGTH = 32;
 
@@ -161,6 +165,6 @@ public class SM3Digest
 
         System.out.printf(jsonStr);
         String va = sm3Encrypt("xtgly");
-        System.out.printf(va);
+        log.info(va);
     }
 }
