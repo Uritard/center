@@ -1,6 +1,6 @@
 package com.yjh.accessvideo.module.control.controller;
 
-import com.yjh.accessvideo.common.logs.Logs;
+
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
@@ -327,6 +327,7 @@ public class CameraConController {
             String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
             String cmd = "rm -f "+filePath;
+            log.info("删除语句"+cmd);
             Runtime.getRuntime().exec(cmd);
             result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.CLE_PRESET));
         } catch (BusinessException b) {
@@ -401,7 +402,6 @@ public class CameraConController {
 
     @ApiOperation(value = "获取到视频存入指定文件中 保存为Mp4格式文件")
     @RequestMapping(value = "/getDVRToPlace", method = RequestMethod.GET)
-    @Logs(title = "获取到视频存入指定文件中 保存为Mp4格式文件", code = "getDVRConfig", content = "获取到实时视频存入指定文件中 保存为Mp4格式文")
     public Result getDVRToPlace(@RequestParam(value = "cameraId") Long cameraId,
                                 @RequestParam(value = "startTime") String startTime,
                                 @RequestParam(value = "endTime") String endTime)  {
