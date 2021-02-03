@@ -38,5 +38,5 @@ public interface TStdRegionDao {
 
     //根据上层ID查询子层区域ID
     List<Long> selectRegionByUpId(List<Long> upRegionIds);
-
+    List<Long>selectDevice(@Param(value = "list") List<Long> list);
 }

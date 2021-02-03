@@ -190,6 +190,7 @@
         FROM
             t_algorithm_info a
         left join t_dict_business b on a.analyse_type = b.dict_code and b.col_name = "analyse_type"
-        where  a.analyse_type IS NOT NULL
+        where  a.analyse_type in (select dict_code from t_dict_business where col_name = "analyse_type")
+				and a.analyse_type IS NOT NULL
     </select>
 </mapper>

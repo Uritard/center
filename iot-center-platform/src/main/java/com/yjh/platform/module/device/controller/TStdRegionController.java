@@ -67,7 +67,12 @@ public class TStdRegionController {
     public Result delete(@RequestParam(value = "regionId", required = true) Long regionId) {
         Result result = new Result();
         try {
-            result.setData(tStdRegionService.deleteByPrimaryId(regionId));
+            int re  = tStdRegionService.deleteByPrimaryId(regionId);
+            if(re == -1){
+                result.setCode(209,"此区域下存在子区域或者设备");
+            }else {
+                result.setData(re);
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除区域异常:", e);

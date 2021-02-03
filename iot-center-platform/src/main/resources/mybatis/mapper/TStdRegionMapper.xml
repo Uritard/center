@@ -200,4 +200,23 @@
             #{upRegionIds,jdbcType=BIGINT}
         </foreach>
     </select>
+
+    <select id="selectDevice" resultType="java.lang.Long">
+        SELECT
+            a.device_id
+        FROM t_std_device a WHERE a.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        #{upRegionId, jdbcType=BIGINT}</foreach>
+        UNION all(
+        SELECT
+        b.camera_id
+        FROM t_camera_info b WHERE b.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        #{upRegionId, jdbcType=BIGINT}</foreach>
+        )
+        UNION all(
+        SELECT
+        c.robot_id
+        FROM t_robot_info c WHERE c.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        #{upRegionId, jdbcType=BIGINT}</foreach>
+        )
+    </select>
 </mapper>
