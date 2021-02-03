@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.controller;
 
+import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
@@ -43,6 +44,7 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.GET)
+    @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,

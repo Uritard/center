@@ -222,32 +222,16 @@ public class HomePageService {
     public Map<String,Object> stationInfo() throws Exception{
         DecimalFormat df = new DecimalFormat("#0.0");
         Map<String,Object> mapForRe = new HashMap<>();
-        //获取投运时间
-        //platform
-        String platform = redisTemplate.opsForHash().entries("t_sys_param:systemPlatFromServices").get("content").toString()+"/";
-        List<Map<String,Object>> mapForTime = systemInfoService.getServices();
-        for (Map<String,Object> item: mapForTime) {
-            if(platform.equals(item.get("url"))){
-                String time = (String)item.get("usedTime");
-                String day = "0";
-                String hour = "0";
-                String minute = "0";
-                if(time.contains("天")){
-                     day = time.split("天")[0];
-                    mapForRe.put("timeValue",day);
-                    mapForRe.put("timeUnit","天");
-                }else if(time.contains("小时")){
-                        hour = time.split("小时")[0];
-                    mapForRe.put("timeValue",hour);
-                    mapForRe.put("timeUnit","小时");
-                }else if(time.contains("分")){
-                        minute = time.split("分")[0];
-                    Double i = Double.valueOf(minute);
-                    mapForRe.put("timeValue",df.format(i/60));
-                    mapForRe.put("timeUnit","小时");
-                }
-            }
-        }
+        //获取投运时间 commissioningTime
+        String commissioningTime = redisTemplate.opsForHash().entries("t_sys_param:commissioningTime").get("content").toString();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date startTime = simpleDateFormat.parse(commissioningTime);
+        //计算时间
+        Date endTime = new Date();
+        long diff = endTime.getTime()-startTime.getTime();
+        long days = diff / (1000 * 60 * 60 * 24);
+        mapForRe.put("timeValue",days);
+        mapForRe.put("timeUnit","天");
         //电压等级
         String stationVoltageGrade = redisTemplate.opsForHash().entries("t_sys_param:stationVoltageGrade").get("content").toString();
         mapForRe.put("stationVoltageGrade",stationVoltageGrade);
