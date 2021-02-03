@@ -5,6 +5,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.logs.Logs;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
@@ -25,6 +26,8 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -59,6 +62,12 @@ public class CameraConService {
 
     @Value("${spring.redis.host}")
     private String hostIp;
+
+    @Value("${nvr.capture.video}")
+    private String videoPath;//视频保存位置
+
+    @Value("${nvr.capture.savePath}")
+    private String savePath;//下载视频地址
 
     @Value("${realtime.video.definition}")
     private String videoDefinition;
@@ -707,6 +716,261 @@ public class CameraConService {
             }
         }
         return result;
+    }
+
+    /* @Logs(title = "获取到视频存入指定文件中 保存为Mp4格式文件", code = "getDVRConfig", content = "获取到实时视频存入指定文件中 保存为Mp4格式文")
+    public int getDVRToPlace(long cameraId, String startTime, String stopTime) throws ParseException {
+        int judge = 0;
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            //注册
+            registerNVR(cameraConInfo.getRecordId());
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //生成文件名
+            String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date()) + ".mp4";
+            log.info("生成文件名" + fileName);
+            //保存文件地址
+            String path = videoPath + fileName;
+            HCNetSDK.NET_DVR_PLAYCOND pDownloadCond = new HCNetSDK.NET_DVR_PLAYCOND();
+            //通道号
+            pDownloadCond.dwChannel = cameraConInfo.getChannelNum();
+            log.info("dwChannel：" + cameraConInfo.getChannelNum());
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            Calendar c = Calendar.getInstance();
+
+            //开始时间
+            HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
+            HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
+            Date startTimes = format.parse(startTime);//
+            c.setTime(startTimes);
+            log.info("startTime获取到：" + startTime);
+            log.info("stopTime时间转：" + stopTime);
+            struStartTime.dwYear = c.get(java.util.Calendar.YEAR);
+            struStartTime.dwMonth = c.get(java.util.Calendar.MONTH) + 1;
+            struStartTime.dwDay = c.get(java.util.Calendar.DATE);
+            struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
+            struStartTime.dwMinute = c.get(java.util.Calendar.MINUTE);
+            struStartTime.dwSecond = c.get(Calendar.SECOND);
+            pDownloadCond.struStartTime = struStartTime;
+            log.info("pDownloadCond.struStartTime 开始时间结束："+pDownloadCond.struStartTime);
+            //结束时间
+            Date endTimes = format.parse(stopTime);//
+            c.setTime(endTimes);
+            struStopTim.dwYear = c.get(java.util.Calendar.YEAR);
+            struStopTim.dwMonth = c.get(java.util.Calendar.MONTH) + 1;
+            struStopTim.dwDay = c.get(java.util.Calendar.DATE);
+            struStopTim.dwHour = c.get(Calendar.HOUR_OF_DAY);
+            struStopTim.dwMinute = c.get(java.util.Calendar.MINUTE);
+            struStopTim.dwSecond = c.get(Calendar.SECOND);
+            pDownloadCond.struStopTime = struStopTim;
+            log.info(" pDownloadCond.struStopTime结束时间"+ pDownloadCond.struStopTime);
+            log.info("时间赋值成功");
+            NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
+            log.info("lChannel赋值成功:" + lChannel);
+
+            //流ID，使用流ID方式时dwChannel设为0xffffffff
+            //pDownloadCond.byStreamID="0xffffffff".getBytes();
+            //是否抽帧：0- 不抽帧，1- 抽帧
+            //pDownloadCond.byDrawFrame=1;
+            //码流类型：0- 主码流，1- 子码流，2- 码流三
+            pDownloadCond.byStreamType = 0;
+            log.info("lUserIDLong：" + lUserIDLong);
+            log.info("path：" + path);
+
+            //按时间段截取视频
+            NativeLong fileV40 = hCNetSDK.NET_DVR_GetFileByTime_V40(lUserIDLong, path, pDownloadCond);
+            log.info("fileV40：-------" + fileV40);
+            if (fileV40.longValue() < 0)
+            {
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("get camera video path, error code: " + iErr);
+            } else
+            {
+                int iErr ;
+                hCNetSDK.NET_DVR_SetLogToFile(3, "/home/yjh_iot_center/sdklog", false);
+                //使用NET_DVR_GetFileByTime_V40接口必须使用一下播放接口才能下载视频到本地
+                 iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("get camera video fileV40大于0: " + iErr);
+               // boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileV40, hCNetSDK.NET_DVR_PLAYSTART, 0, null);
+                boolean PlayBackControl=hCNetSDK.NET_DVR_PlayBackControl_V40(fileV40,hCNetSDK.NET_DVR_PLAYSTART,null,0,null,null);
+                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + hCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + hCNetSDK.NET_DVR_GETTOTALTIME);
+                if (PlayBackControl)
+                {
+                    log.info("NET_DVR_PlayBackControl成功调用");
+                    iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("NET_DVR_PlayBackControl成功调用后NET_DVR_GetLastError：" + iErr);
+                    //成功把地址保持在redis中
+                    //IntByReference LPOutValue = new IntByReference();
+                   // log.info("LPOutValue 下载进度:" + LPOutValue);
+                    //hCNetSDK.NET_DVR_PlayBackControl(fileV40, hCNetSDK.NET_DVR_PLAYSTART, 0, null);
+                    hCNetSDK.NET_DVR_PlayBackControl_V40(fileV40,hCNetSDK.NET_DVR_PLAYSTART,null,0,null,null);
+                      Downloadtimer = new Timer();//新建定时器
+                      Downloadtimer.schedule(new DownloadTask(), 0, 5000);//0秒后开始响应函数
+                    log.info("redis put ");
+                        redisTemplate.opsForHash().put("fileV40", "fileV40", fileV40);
+                    log.info("redis put ok "+fileV40);
+                       // log.info("LPOutValue 下载进度:" + LPOutValue.getValue());
+                        redisTemplate.opsForHash().put("vidioPth", "vidioPth", savePath + fileName);
+                        redisTemplate.opsForHash().put("fileName", "fileName", fileName);
+                        String url = "chmod 777 " + savePath + fileName;
+                        Runtime.getRuntime().exec(url);
+                        log.info("Make video success,Please video  in " + savePath + fileName);
+                        judge = 1;
+                } else
+                 {
+                    judge = 0;
+                    iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("get camera video NET_DVR_PlayBackControl, error code: " + iErr);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return judge;
+    }
+*/
+
+
+    @Logs(title = "获取到视频存入指定文件中 保存为Mp4格式文件", code = "getDVRConfig", content = "获取到实时视频存入指定文件中 保存为Mp4格式文")
+    public String getDVRToPlace(long cameraId, String startTime, String stopTime) throws ParseException {
+        //返回结果
+        String  judge = null;
+        //错误码
+        int iErr = 0;
+        try {
+            //查询视频参数
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            if (hCNetSDK.NET_DVR_Init()) {
+                log.info("初始化成功开始注册登录：");
+                String login = registerNVR(cameraConInfo.getRecordId());
+                if (!login.isEmpty()) {
+                    log.info("登录成功：" + login);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    //生成文件名
+                    String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date()) + ".mp4";
+                    log.info("生成文件名" + fileName);
+                    //保存文件地址
+                    String path = videoPath + fileName;
+                    log.info("保存文件地址：" + path);
+                    lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+                    log.info("lUserIDLong获取到：" + lUserIDLong);
+                    Calendar c = Calendar.getInstance();
+                    //开始时间
+                    HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
+                    HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
+                    Date startTimes = format.parse(startTime);//
+                    c.setTime(startTimes);
+                    log.info("startTime获取到：" + startTime);
+                    log.info("stopTime时间转：" + stopTime);
+                    struStartTime.dwYear = c.get(Calendar.YEAR);
+                    ;
+                    struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
+                    struStartTime.dwDay = c.get(Calendar.DATE);
+                    struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
+                    struStartTime.dwMinute = c.get(Calendar.MINUTE);
+                    struStartTime.dwSecond = c.get(Calendar.SECOND);
+                    // log.info("struStartTime 开始时间结束："+struStartTime.toString());
+                    //结束时间
+                    Date endTimes = format.parse(stopTime);//
+                    c.setTime(endTimes);
+                    struStopTim.dwYear = c.get(Calendar.YEAR);
+                    struStopTim.dwMonth = c.get(Calendar.MONTH) + 1;
+                    struStopTim.dwDay = c.get(Calendar.DATE);
+                    struStopTim.dwHour = c.get(Calendar.HOUR_OF_DAY);
+                    struStopTim.dwMinute = c.get(Calendar.MINUTE);
+                    struStopTim.dwSecond = c.get(Calendar.SECOND);
+                    log.info("时间赋值成功");
+                    NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
+                    log.info("lChannel赋值成功:" + lChannel);
+                    //查找文件存在不存在
+                    NativeLong findFile= hCNetSDK.NET_DVR_FindFile(lUserIDLong,lChannel,0,struStartTime,struStopTim);
+                    log.info("findFile查找文件接口:" +"findFile："+findFile+"lUserIDLong:"+lUserIDLong+"lChannel:"+lChannel);
+                    if (findFile.longValue()>-1) {
+                        //获取时间断的视频接口
+                        NativeLong fileByTime = hCNetSDK.NET_DVR_GetFileByTime(lUserIDLong, lChannel, struStartTime, struStopTim, path);
+                        log.info("调用NET_DVR_GetFileByTime接口获取到：" + fileByTime+"lUserIDLong:"+lUserIDLong+"lChannel"+lChannel+"path"+path);
+                        if (fileByTime.longValue() < 0) {
+                            iErr = hCNetSDK.NET_DVR_GetLastError();
+                            log.error("get camera video NET_DVR_GetFileByTime, error code: " + iErr);
+                            judge = null;
+                        } else {
+                            if (fileByTime.longValue() < 100) {
+                                //  hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/sdklog",false);
+                                //使用NET_DVR_GetFileByTime_V40接口必须使用一下播放接口才能下载视频到本地
+                                boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileByTime, hCNetSDK.NET_DVR_PLAYSTART, 0, null);
+                                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + hCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + hCNetSDK.NET_DVR_GETTOTALTIME);
+                                if (PlayBackControl) {
+                                    log.info("NET_DVR_PlayBackControl成功调用");
+                                    iErr = hCNetSDK.NET_DVR_GetLastError();
+                                    log.info("NET_DVR_PlayBackControl成功调用后NET_DVR_GetLastError：" + iErr);
+                                    IntByReference nPos = new IntByReference(0);
+                                    while (1 == 1)//获取下载进度，确认下载结束，则停止下载
+                                    {
+                                        NativeLong m_lLoadHandle = fileByTime;
+                                        hCNetSDK.NET_DVR_PlayBackControl(m_lLoadHandle, HCNetSDK.NET_DVR_PLAYGETPOS, 0, nPos);
+                                        log.info("NET_DVR_PlayBackControl循环内接口参数"+"m_lLoadHandle"+m_lLoadHandle+"nPos"+nPos);
+                                        if (nPos.getValue() > 100) {
+                                            hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
+                                            m_lLoadHandle.setValue(-1);
+                                            log.info("由于网络原因或DVR忙,下载异常终止!");
+                                            judge = null;
+                                            break;
+                                        } else if (nPos.getValue() == 100) {
+                                            hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
+                                            m_lLoadHandle.setValue(-1);
+                                            log.info("按时间下载结束!");
+                                            String url = "chmod 777 " + videoPath + fileName;
+                                            Runtime.getRuntime().exec(url);
+                                            log.info("nPos.getValue!:>>>" + nPos.getValue());
+                                            judge = savePath + fileName;
+                                            hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
+                                            hCNetSDK.NET_DVR_Cleanup();
+                                            break;
+                                        }
+                                    }
+
+                                } else {
+                                    judge = null;
+                                    iErr = hCNetSDK.NET_DVR_GetLastError();
+                                    log.error("get camera video NET_DVR_PlayBackControl, error code: " + iErr);
+                                }
+                            } else {
+                                judge = null;
+                                int rr = hCNetSDK.NET_DVR_GetLastError();
+                                log.info("get camera video NET_DVR_GetFileByTime大于100返回, error rr: " + rr);
+                            }
+
+                        }
+                    }else
+                    {
+                        judge = null;
+                        int rr = hCNetSDK.NET_DVR_GetLastError();
+                        log.info("get file by time  NET_DVR_FindFile返回, error rr: " + rr);
+                    }
+
+                } else {
+                    iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("登录 接口获取到：iErr"+iErr);
+                    log.info("视频登录失败！！！");
+                    judge = null;
+
+                }
+            }
+            else
+            {
+                iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.info("调用NET_DVR_Init 接口获取到："+iErr);
+                log.info("视频初始化失败！！！");
+                judge = null;
+            }
+        } catch (Exception e) {
+            iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("获取视频方发异常：");
+            judge = null;
+        }
+        return judge;
     }
 
 }

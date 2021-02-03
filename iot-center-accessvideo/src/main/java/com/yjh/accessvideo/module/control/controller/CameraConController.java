@@ -399,4 +399,23 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "获取到视频存入指定文件中 保存为Mp4格式文件")
+    @RequestMapping(value = "/getDVRToPlace", method = RequestMethod.GET)
+    public Result getDVRToPlace(@RequestParam(value = "cameraId") Long cameraId,
+                                @RequestParam(value = "startTime") String startTime,
+                                @RequestParam(value = "endTime") String endTime)  {
+        Result result = new Result();
+        try {
+            String  url= cameraConService.getDVRToPlace(cameraId,startTime,endTime);
+            log.info("service返回值："+url);
+            if(null!=url) {
+                result.setData(url);
+            } else { result.setData(ResultCodeEnum.CODE1); }
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.CODE1);
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
+
 }
