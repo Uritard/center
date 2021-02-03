@@ -162,6 +162,29 @@
 
     </select>
 
+    <select id="selectListByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDevice">
+         select
+        a.device_id,
+        a.custom_id,
+        a.device_code,
+        a.device_name,
+        a.alias_name,
+        a.device_type,
+        a.position_type,
+        a.model_id,
+        a.region_path,
+        a.up_region_id,
+        a.up_region_name,
+        a.custom_name,
+        a.custom_type,
+        a.status,
+        a.update_time,
+        a.create_time
+        from t_std_device a
+        where 1 = 1
+            and a.device_id = #{deviceId, jdbcType=BIGINT}
+    </select>
+
     <select id="selectByPrimaryIdAll" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
         a.device_id ,
