@@ -40,7 +40,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增标准化设备参数",logType = 2)
+    @Logs(title = "新增标准化设备参数",content = "根据用户传递的参数新增标准化设备参数",logType = 2)
     public Result add(@RequestBody TStdDeviceAttr tStdDeviceAttr) {
         Result result = new Result();
         try {
@@ -56,7 +56,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除标准化设备参数",logType = 4)
+    @Logs(title = "删除标准化设备参数",content = "根据用户传递的参数删除标准化设备参数",logType = 4)
     public Result delete(@RequestParam(value = "deviceId", required = true) Long deviceId) {
         Result result = new Result();
         try {
@@ -73,7 +73,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改标准化设备参数",logType = 3)
+    @Logs(title = "修改标准化设备参数",content = "根据用户传递的参数修改标准化设备参数",logType = 3)
     public Result update(@RequestBody TStdDeviceAttr tStdDeviceAttr) {
         Result result = new Result();
         try {
@@ -90,7 +90,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
+    @Logs(title = "查询标准化设备参数",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "deviceId", required = true) Long deviceId) {
         Result result = new Result();
         try {
@@ -105,7 +105,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
+    @Logs(title = "查询标准化设备参数",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
     public Result select(@RequestParam(value = "deviceId", required = false) Long deviceId,
                             @RequestParam(value = "deviceModel", required = false) Integer deviceModel,
                             @RequestParam(value = "pmsType", required = false) String pmsType,
@@ -140,7 +140,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
+    @Logs(title = "查询标准化设备参数",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
     public Result selectByPage(@RequestBody TStdDeviceAttr tStdDeviceAttr,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -161,7 +161,7 @@ public class TStdDeviceAttrController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量新增",content = "根据用户传递的参数批量新增标准化设备参数",logType = 2)
+    @Logs(title = "批量新增标准化设备参数",content = "根据用户传递的参数批量新增标准化设备参数",logType = 2)
     public Result batchAdd(@RequestBody List<TStdDeviceAttr> list) {
         Result result = new Result();
         try {

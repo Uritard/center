@@ -50,7 +50,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增相机信息",logType = 2)
+    @Logs(title = "新增相机信息",content = "根据用户传递的参数新增相机信息",logType = 2)
     public Result insert(@RequestBody  TCameraInfo tCameraInfo) {
 
         Result result = new Result();
@@ -67,7 +67,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除相机信息",logType = 4)
+    @Logs(title = "删除相机信息",content = "根据用户传递的参数删除相机信息",logType = 4)
     public Result delete(@RequestParam(value = "cameraId", required = true) Long cameraId) {
         Result result = new Result();
         try {
@@ -84,7 +84,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedCamera", method = RequestMethod.DELETE)
-    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除相机信息",logType = 4)
+    @Logs(title = "批量删除相机信息",content = "根据用户传递的参数批量删除相机信息",logType = 4)
     public Result deleteSelectedCamera(@RequestParam(value = "cameraIds", required = true) String cameraIds) {
         Result result = new Result();
         try {
@@ -101,7 +101,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改相机信息",logType = 3)
+    @Logs(title = "修改相机信息",content = "根据用户传递的参数修改相机信息",logType = 3)
     public Result update(@RequestBody TCameraInfo tCameraInfo) {
         Result result = new Result();
         try {
@@ -118,7 +118,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询相机信息",logType = 1)
+    @Logs(title = "查询相机信息",content = "根据用户传递的参数查询相机信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "cameraId", required = true) Long cameraId) {
         Result result = new Result();
         try {
@@ -133,7 +133,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "根据间隔id查询所有摄像机信息")
     @RequestMapping(value = "/selectByRegionId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询相机信息",logType = 1)
+    @Logs(title = "查询相机信息",content = "根据用户传递的参数查询相机信息",logType = 1)
     public Result selectByRegionId(@RequestParam(value = "regionId", required = false) Long regionId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -154,7 +154,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "根据摄像机名称查询信息")
     @RequestMapping(value = "/selectByCameraName", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询相机信息",logType = 1)
+    @Logs(title = "查询相机信息",content = "根据用户传递的参数查询相机信息",logType = 1)
     public Result selectByCameraName(@RequestParam(value = "cameraName", required = false) String cameraName,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -175,7 +175,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询相机信息",logType = 1)
+    @Logs(title = "查询相机信息",content = "根据用户传递的参数查询相机信息",logType = 1)
     public Result select(@RequestParam(value = "cameraId", required = false) Long cameraId,
                          @RequestParam(value = "cameraName", required = false) String cameraName,
                          @RequestParam(value = "cameraModel", required = false) Integer cameraModel,
@@ -214,7 +214,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询相机信息",logType = 1)
+    @Logs(title = "查询相机信息",content = "根据用户传递的参数分页查询相机信息",logType = 1)
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
                                 @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "address", required = false) String address,
@@ -242,7 +242,7 @@ public class TCameraInfoController {
     }
     @ApiOperation(value = "从PMS系统同步摄像机信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "从pms系统同步摄像机信息",logType = 5)
+    @Logs(title = "从PMS系统同步摄像机信息",content = "从pms系统同步摄像机信息",logType = 5)
     public Result synchronizeFromPMS(@RequestParam(value = "pmsId") String pmsId) {
         Result result = new Result();
         try {
@@ -255,7 +255,7 @@ public class TCameraInfoController {
     }
     @ApiOperation(value = "B-查询一个任务下的摄像头信息")
     @RequestMapping(value = "/selectCameraByTaskId",method =RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数任务下的相机信息",logType = 1)
+    @Logs(title = "查询一个任务下的摄像头信息",content = "根据用户传递的参数任务下的相机信息",logType = 1)
     public Result selectCameraByTaskId(@RequestParam(value = "taskId")Long taskId){
         Result result=new Result();
      try{
@@ -269,7 +269,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "查询所有摄像头预置位信息树")
     @RequestMapping(value = "/selectPresetTree", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "查询相机预置位树",logType = 1)
+    @Logs(title = "查询所有摄像头预置位信息树",content = "查询相机预置位树",logType = 1)
     public Result selectPresetTree() {
         Result result = new Result();
         try {

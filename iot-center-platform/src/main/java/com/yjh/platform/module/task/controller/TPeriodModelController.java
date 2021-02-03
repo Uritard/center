@@ -41,7 +41,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增周期任务模版数据",logType = 2)
+    @Logs(title = "新增周期任务模版",content = "根据用户传递的参数新增周期任务模版数据",logType = 2)
     public Result insert(@RequestBody TPeriodModelAdd tPeriodModelAdd) {
         Result result = new Result();
         try {
@@ -72,7 +72,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除周期任务模版数据",logType = 4)
+    @Logs(title = "删除周期任务模版",content = "根据用户传递的参数删除周期任务模版数据",logType = 4)
     public Result delete(@RequestParam(value = "periodId", required = true) Long periodId) {
         Result result = new Result();
         try {
@@ -89,7 +89,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改周期任务模版数据",logType = 3)
+    @Logs(title = "修改周期任务模版",content = "根据用户传递的参数修改周期任务模版数据",logType = 3)
     public Result update(@RequestBody TPeriodModelAdd tPeriodModelAdd) {
         Result result = new Result();
         try {
@@ -121,7 +121,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询周期任务模版信息",logType = 1)
+    @Logs(title = "查询周期任务模版",content = "根据用户传递的参数查询周期任务模版信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "periodId", required = true) Long periodId) {
         Result result = new Result();
         try {
@@ -136,7 +136,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询周期任务模版信息",logType = 1)
+    @Logs(title = "查询周期任务模版",content = "根据用户传递的参数查询周期任务模版信息",logType = 1)
     public Result select(@RequestParam(value = "periodId", required = false) Long periodId,
                             @RequestParam(value = "cronExpression", required = false) String cronExpression,
                             @RequestParam(value = "remark", required = false) String remark,
@@ -155,7 +155,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询周期任务模版信息",logType = 1)
+    @Logs(title = "查询周期任务模版",content = "根据用户传递的参数分页查询周期任务模版信息",logType = 1)
     public Result selectByPage(@RequestBody TPeriodModel tPeriodModel,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -176,7 +176,7 @@ public class TPeriodModelController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入周期任务模版数据",logType = 2)
+    @Logs(title = "批量插入周期任务模版",content = "根据用户传递的参数批量插入周期任务模版数据",logType = 2)
     public Result batchInsert(@RequestBody List<TPeriodModel> list) {
         Result result = new Result();
         try {

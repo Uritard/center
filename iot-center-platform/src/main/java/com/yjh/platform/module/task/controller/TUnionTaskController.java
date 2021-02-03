@@ -45,7 +45,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增数据",logType = 2)
+    @Logs(title = "新增巡检任务数据",content = "根据用户传递的参数新增巡检任务数据",logType = 2)
     public Result insert(@RequestBody TUnionTask tUnionTask) {
         Result result = new Result();
         try {
@@ -61,7 +61,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除巡检任务数据",logType = 4)
+    @Logs(title = "删除巡检任务数据",content = "根据用户传递的参数删除巡检任务数据",logType = 4)
     public Result delete(@RequestParam(value = "unionId", required = true) String unionId) {
         Result result = new Result();
         try {
@@ -78,7 +78,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改巡检任务数据",logType = 3)
+    @Logs(title = "修改巡检任务数据",content = "根据用户传递的参数修改巡检任务数据",logType = 3)
     public Result update(@RequestBody TUnionTask tUnionTask) {
         Result result = new Result();
         try {
@@ -95,7 +95,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
+    @Logs(title = "查询巡检任务数据",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "unionId", required = true) String unionId) {
         Result result = new Result();
         try {
@@ -110,7 +110,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
+    @Logs(title = "查询巡检任务数据",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
     public Result select(@RequestParam(value = "unionId", required = false) String unionId,
                          @RequestParam(value = "ruleId", required = false) Long ruleId,
                          @RequestParam(value = "unionName", required = false) String unionName,
@@ -137,7 +137,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检任务信息",logType = 1)
+    @Logs(title = "查询巡检任务数据",content = "根据用户传递的参数分页查询巡检任务信息",logType = 1)
     public Result selectByPage(@RequestBody TUnionTask tUnionTask,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -158,7 +158,7 @@ public class TUnionTaskController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡检任务数据",logType = 2)
+    @Logs(title = "批量插入巡检任务数据",content = "根据用户传递的参数批量插入巡检任务数据",logType = 2)
     public Result batchInsert(@RequestBody List<TUnionTask> list) {
         Result result = new Result();
         try {
@@ -171,7 +171,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "查看联动历史记录")
     @RequestMapping(value = "/selectHistory", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询联动历史记录",logType = 1)
+    @Logs(title = "查看联动历史记录",content = "根据用户传递的参数查询联动历史记录",logType = 1)
     public Result selectHistory(@RequestParam(value = "ruleName", required = false) String ruleName,
                                 @RequestParam(value = "endDate", required = false) String endDate,
                                 @RequestParam(value = "startDate", required = false) String startDate,
@@ -204,7 +204,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动历史记录统计")
     @RequestMapping(value = "/historyStatistical", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数统计联动历史记录",logType = 1)
+    @Logs(title = "联动历史记录统计",content = "根据用户传递的参数统计联动历史记录",logType = 1)
     public Result historyStatistical(@RequestParam(value = "dateMarked")String dateMarked) {
         Result result = new Result();
         try {
@@ -224,7 +224,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动弹框--联动信息")
     @RequestMapping(value = "/linkageInformation",method = RequestMethod.GET)
-    @Logs(title = "操作",content = "联动弹窗滚动联动信息",logType = 5)
+    @Logs(title = "联动弹框",content = "联动弹窗滚动联动信息",logType = 5)
     public Result linkageInformation(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
@@ -239,7 +239,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动弹框--监测数据")
     @RequestMapping(value = "/linkageMonitorData",method = RequestMethod.GET)
-    @Logs(title = "操作",content = "联动弹窗滚动检测数据信息",logType = 5)
+    @Logs(title = "联动弹框",content = "联动弹窗滚动检测数据信息",logType = 5)
     public Result linkageMonitorData(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {

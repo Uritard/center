@@ -42,7 +42,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增缺陷信息数据",logType = 2)
+    @Logs(title = "新增陷信息数据",content = "根据用户传递的参数新增缺陷信息数据",logType = 2)
     public Result insert(@RequestBody TDefectInfo tDefectInfo) {
         Result result = new Result();
         try {
@@ -58,7 +58,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除缺陷信息数据",logType = 4)
+    @Logs(title = "删除陷信息数据",content = "根据用户传递的参数删除缺陷信息数据",logType = 4)
     public Result delete(@RequestParam(value = "defectId", required = true) Long defectId) {
         Result result = new Result();
         try {
@@ -75,7 +75,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改缺陷信息数据",logType = 3)
+    @Logs(title = "修改陷信息数据",content = "根据用户传递的参数修改缺陷信息数据",logType = 3)
     public Result update(@RequestBody TDefectInfo tDefectInfo) {
         Result result = new Result();
         try {
@@ -92,7 +92,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询缺陷信息",logType = 1)
+    @Logs(title = "查询陷信息数据",content = "根据用户传递的参数查询缺陷信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "defectId", required = true) Long defectId) {
         Result result = new Result();
         try {
@@ -107,7 +107,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询缺陷信息",logType = 1)
+    @Logs(title = "查询陷信息数据",content = "根据用户传递的参数查询缺陷信息",logType = 1)
     public Result select(@RequestParam(value = "defectId", required = false) Long defectId,
                             @RequestParam(value = "defectLevel", required = false) Integer defectLevel,
                             @RequestParam(value = "defectTime", required = false) Date defectTime,
@@ -146,7 +146,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询缺陷信息",logType = 1)
+    @Logs(title = "查询陷信息数据",content = "根据用户传递的参数分页查询缺陷信息",logType = 1)
     public Result selectByPage(@RequestBody TDefectInfo tDefectInfo,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -167,7 +167,7 @@ public class TDefectInfoController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入缺陷信息数据",logType = 2)
+    @Logs(title = "批量插入陷信息数据",content = "根据用户传递的参数批量插入缺陷信息数据",logType = 2)
     public Result batchInsert(@RequestBody List<TDefectInfo> list) {
         Result result = new Result();
         try {
@@ -180,7 +180,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "查询所有缺陷")
     @RequestMapping(value = "/selectDefectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询所有缺陷",logType = 1)
+    @Logs(title = "查询陷信息数据",content = "根据用户传递的参数查询所有缺陷",logType = 1)
     public Result selectDefectByPage(@RequestParam(value = "confMode", required = false) Integer confMode,
                                      @RequestParam(value = "defectModel", required = false) Integer defectModel,
                                      @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
@@ -205,7 +205,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "统计近一月的所有缺陷个数-柱图")
     @RequestMapping(value = "/countDefectOnMonth", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "统计近一个月的所有缺陷",logType = 1)
+    @Logs(title = "统计近一月的所有缺陷个数",content = "统计近一个月的所有缺陷",logType = 1)
     public Result countDefectOnMonth(){
         Result result = new Result();
         try {
@@ -219,7 +219,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "根据缺陷类型统计缺陷个数-柱图")
     @RequestMapping(value = "/countByDefectType", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据缺陷类型统计缺陷个数",logType = 1)
+    @Logs(title = "统计近一月的所有缺陷个数",content = "根据缺陷类型统计缺陷个数",logType = 1)
     public Result countByDeviceType(){
         Result result = new Result();
         try {
@@ -233,7 +233,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "根据缺陷处理状态统计缺陷个数-饼图")
     @RequestMapping(value = "/countDefectConfMode", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据缺陷处理状态统计缺陷个数",logType = 1)
+    @Logs(title = "根据缺陷处理状态统计缺陷个数",content = "根据缺陷处理状态统计缺陷个数",logType = 1)
     public Result countDefectConfMode(){
         Result result = new Result();
         try {
@@ -247,7 +247,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "查看缺陷处理情况")
     @RequestMapping(value = "/selectDefectProcess", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "查看缺陷处理情况",logType = 1)
+    @Logs(title = "查看缺陷处理情况",content = "查看缺陷处理情况",logType = 1)
     public Result selectDefectProcess(@RequestParam(value = "warnId") Long defectId){
         Result result = new Result();
         try {
@@ -261,7 +261,7 @@ public class TDefectInfoController {
     }
     @ApiOperation(value = "进行缺陷处理")
     @RequestMapping(value = "/defectProcess", method = RequestMethod.PUT)
-    @Logs(title = "操作",content = "进行缺陷处理",logType = 5)
+    @Logs(title = "进行缺陷处理",content = "进行缺陷处理",logType = 5)
     public Result defectProcess(@RequestBody TDefectInfo tDefectInfo,HttpServletRequest request){
         Result result = new Result();
         String userId = request.getHeader("userId");

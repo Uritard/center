@@ -44,7 +44,7 @@ public class ReportManageController {
 
     @ApiOperation(value = "生成报表")
     @RequestMapping(value = "/reportGenerate", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "生成报表",logType = 5)
+    @Logs(title = "生成报表",content = "生成报表",logType = 5)
     public Result reportGenerate(@RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                  @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                  @RequestParam(value="deviceIds")String deviceIds,
@@ -64,7 +64,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "下载报表")
     @RequestMapping(value = "/reportDownload", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "下载报表",logType = 5)
+    @Logs(title = "下载报表",content = "下载报表",logType = 5)
     public Result reportDownload(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {
@@ -111,7 +111,7 @@ public class ReportManageController {
 //    }
     @ApiOperation(value = "查询报表生成记录")
     @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询报表生成记录",logType = 1)
+    @Logs(title = "查询报表生成记录",content = "根据用户传递的参数查询报表生成记录",logType = 1)
     public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
                                @RequestParam(value = "startTime", required = false) String startTime,
                                @RequestParam(value = "endTime", required = false) String endTime,
@@ -133,7 +133,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "删除报表")
     @RequestMapping(value = "/reportDelete", method = RequestMethod.DELETE)
-    @Logs(title = "操作",content = "根据用户传递的参数生成报表",logType = 5)
+    @Logs(title = "删除报表",content = "根据用户传递的参数删除报表",logType = 5)
     public Result reportDelete(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {
@@ -162,7 +162,7 @@ public class ReportManageController {
 //    }
     @ApiOperation(value = "审核完成后根据任务生成巡检记录报告")
     @RequestMapping(value = "/reportByTask", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "审核报表",logType = 5)
+    @Logs(title = "审核报表",content = "审核完成后根据任务生成巡检记录报告",logType = 5)
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
@@ -178,7 +178,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "下载巡视报告")
     @RequestMapping(value = "/downLoadCruiseReport", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "下载巡视报告",logType = 5)
+    @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 5)
     public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
@@ -208,7 +208,7 @@ public class ReportManageController {
 
     @ApiOperation(value = "巡视结果分析报表生成")
     @RequestMapping(value = "/cruiseResultAnalyseReporter",method = RequestMethod.GET)
-    @Logs(title = "操作",content = "生成巡视结果",logType = 5)
+    @Logs(title = "巡视结果分析报表生成",content = "巡视结果分析报表生成",logType = 5)
     public Result cruiseResultAnalyseReporter(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
         Result result=new Result();
         try {

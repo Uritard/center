@@ -44,7 +44,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增机器人本体告警数据",logType = 2)
+    @Logs(title = "新增机器人本体告警表",content = "根据用户传递的参数新增机器人本体告警数据",logType = 2)
     public Result insert(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -66,7 +66,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除机器人本体告警数据",logType = 4)
+    @Logs(title = "删除机器人本体告警表",content = "根据用户传递的参数删除机器人本体告警数据",logType = 4)
     public Result delete(@RequestParam(value = "robotAlarmId", required = true) Long robotAlarmId) {
         Result result = new Result();
         try {
@@ -83,7 +83,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改机器人本体告警数据",logType = 3)
+    @Logs(title = "修改机器人本体告警表",content = "根据用户传递的参数修改机器人本体告警数据",logType = 3)
     public Result update(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -107,7 +107,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询机器人本体告警信息",logType = 1)
+    @Logs(title = "查询机器人本体告警表",content = "根据用户传递的参数查询机器人本体告警信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "robotAlarmId", required = true) Long robotAlarmId) {
         Result result = new Result();
         try {
@@ -122,7 +122,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询机器人本体告警信息",logType = 1)
+    @Logs(title = "查询机器人本体告警表",content = "根据用户传递的参数查询机器人本体告警信息",logType = 1)
     public Result select(@RequestParam(value = "robotAlarmId", required = false) Long robotAlarmId,
                             @RequestParam(value = "alarmName", required = false) String alarmName,
                             @RequestParam(value = "robotId", required = false) Long robotId,
@@ -153,7 +153,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询机器人本体告警信息",logType = 1)
+    @Logs(title = "查询机器人本体告警表",content = "根据用户传递的参数分页查询机器人本体告警信息",logType = 1)
     public Result selectByPage(@RequestBody TRobotAlarm tRobotAlarm,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -174,7 +174,7 @@ public class TRobotAlarmController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入机器人本体告警数据",logType = 2)
+    @Logs(title = "批量插入机器人本体告警表",content = "根据用户传递的参数批量插入机器人本体告警数据",logType = 2)
     public Result batchInsert(@RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {

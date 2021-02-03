@@ -118,7 +118,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除巡检任务数据",logType = 4)
+    @Logs(title = "删除巡检任务",content = "根据用户传递的参数删除巡检任务数据",logType = 4)
     public Result delete(@RequestParam(value = "taskId", required = true) String taskId,
                          @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
@@ -136,7 +136,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改巡检任务数据",logType = 3)
+    @Logs(title = "修改巡检任务",content = "根据用户传递的参数修改巡检任务数据",logType = 3)
     public Result update(@RequestBody TCruiseTask tCruiseTask) {
         Result result = new Result();
         try {
@@ -153,7 +153,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
+    @Logs(title = "查询巡检任务",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
@@ -168,7 +168,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
+    @Logs(title = "查询巡检任务",content = "根据用户传递的参数查询巡检任务信息",logType = 1)
     public Result select(@RequestParam(value = "taskId", required = false) String taskId,
                          @RequestParam(value = "taskName", required = false) String taskName,
                          @RequestParam(value = "planId", required = false) Long planId,
@@ -194,7 +194,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检任务信息",logType = 1)
+    @Logs(title = "查询巡检任务",content = "根据用户传递的参数分页查询巡检任务信息",logType = 1)
     public Result selectByPage(@RequestBody TCruiseTask tCruiseTask,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -215,7 +215,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入巡检任务信息",logType = 2)
+    @Logs(title = "批量插入巡检任务",content = "根据用户传递的参数批量插入巡检任务信息",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseTask> list) {
         Result result = new Result();
         try {
@@ -230,7 +230,7 @@ public class TCruiseTaskController {
     //任务统计
     @ApiOperation(value = "任务统计")
     @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数统计任务",logType = 1)
+    @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1)
     public Result taskCount(@RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskStartDate){
         Result result = new Result();
         try {
@@ -245,7 +245,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "查询任务巡检点状态信息")
     @RequestMapping(value = "/selectPointStatus", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数查询任务巡检点状态信息",logType = 1)
+    @Logs(title = "查询任务巡检点状态信息",content = "根据用户传递的参数查询任务巡检点状态信息",logType = 1)
     public Result selectPointStatus(@RequestParam(value = "taskId", required = false) String taskId,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -266,7 +266,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务暂停")
     @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "任务暂停",logType = 5)
+    @Logs(title = "任务暂停",content = "任务暂停",logType = 5)
     public Result taskPause(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -283,7 +283,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务继续")
     @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "任务继续",logType = 5)
+    @Logs(title = "任务继续",content = "任务继续",logType = 5)
     public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -300,7 +300,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务终止")
     @RequestMapping(value = "/taskShutDown", method = RequestMethod.GET)
-    @Logs(title = "操作",content = "任务终止",logType = 5)
+    @Logs(title = "任务终止",content = "任务终止",logType = 5)
     public Result taskShutDown(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -318,7 +318,7 @@ public class TCruiseTaskController {
     //任务统计
     @ApiOperation(value = "任务查询")
     @RequestMapping(value = "/taskCountByCondition", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询任务",logType = 1)
+    @Logs(title = "任务查询",content = "根据用户传递的参数查询任务",logType = 1)
     public Result taskCountByCondition(@RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startTime,
                                        @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                        @RequestParam(value = "taskState", required = false)  String taskState,
@@ -336,7 +336,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增数据",logType = 2)
+    @Logs(title = "新增任务",content = "根据用户传递的参数新增数据",logType = 2)
     public Result taskConfirmation(HttpServletRequest request,@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {

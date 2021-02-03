@@ -43,7 +43,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增历史告警数据",logType = 2)
+    @Logs(title = "新增历史告警数据",content = "根据用户传递的参数新增历史告警数据",logType = 2)
     public Result insert(@RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
         Result result = new Result();
         try {
@@ -59,7 +59,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除历史告警数据",logType = 4)
+    @Logs(title = "删除历史告警数据",content = "根据用户传递的参数删除历史告警数据",logType = 4)
     public Result delete(@RequestParam(value = "alarmNo", required = true) Long alarmNo) {
         Result result = new Result();
         try {
@@ -76,7 +76,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改历史告警数据",logType = 3)
+    @Logs(title = "修改历史告警数据",content = "根据用户传递的参数修改历史告警数据",logType = 3)
     public Result update(@RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
         Result result = new Result();
         try {
@@ -93,7 +93,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询历史告警信息",logType = 1)
+    @Logs(title = "查询历史告警数据",content = "根据用户传递的参数查询历史告警信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "alarmNo", required = true) Long alarmNo) {
         Result result = new Result();
         try {
@@ -108,7 +108,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询历史告警信息",logType = 1)
+    @Logs(title = "查询历史告警数据",content = "根据用户传递的参数查询历史告警信息",logType = 1)
     public Result select(@RequestParam(value = "alarmNo", required = false) Long alarmNo,
                             @RequestParam(value = "deviceId", required = false) Long deviceId,
                             @RequestParam(value = "cunstomId", required = false) String cunstomId,
@@ -145,7 +145,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询历史告警信息",logType = 1)
+    @Logs(title = "查询历史告警数据",content = "根据用户传递的参数分页查询历史告警信息",logType = 1)
     public Result selectByPage(@RequestParam(value = "alarmNo", required = false) Long alarmNo,
                                @RequestParam(value = "deviceId", required = false) Long deviceId,
                                @RequestParam(value = "cunstomId", required = false) String cunstomId,
@@ -188,7 +188,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入历史告警数据",logType = 2)
+    @Logs(title = "批量插入历史告警数据",content = "根据用户传递的参数批量插入历史告警数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCfgAlarmHistory> list) {
         Result result = new Result();
         try {
@@ -203,7 +203,7 @@ public class TCfgAlarmHistoryController {
 
     @ApiOperation(value = "查询联动详细结果")
     @RequestMapping(value = "/selectUnionCruiseResult", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "查询联动详细结果",logType = 1)
+    @Logs(title = "查询联动详细结果",content = "查询联动详细结果",logType = 1)
     public Result selectUnionCruiseResult(@RequestParam(value = "unionId", required = false) String  unionId,
                                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                           @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {

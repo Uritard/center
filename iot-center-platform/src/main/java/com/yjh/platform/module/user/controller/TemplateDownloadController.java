@@ -47,7 +47,7 @@ public class TemplateDownloadController {
 
     @ApiOperation(value = "模板生成", notes = "生成")
     @RequestMapping(value = "/templateGenerate", method = RequestMethod.POST)
-    @Logs(title = "操作",content = "生成模板",logType = 5)
+    @Logs(title = "模板生成",content = "生成模板",logType = 5)
     public Result templateGenerate(@RequestParam("modelName") String modelName) {
         Result result = new Result();
         try {
@@ -63,7 +63,7 @@ public class TemplateDownloadController {
         }
     @ApiOperation(value = "模板下载", notes = "模板下载")
     @RequestMapping(value = "/templateDownload", method = RequestMethod.POST)
-    @Logs(title = "操作",content = "模板下载",logType = 5)
+    @Logs(title = "模板下载",content = "模板下载",logType = 5)
     public ResponseEntity<byte[]> templateDownload(InputStream is, String name) throws Exception {
         System.out.println("开始下载文件");
 

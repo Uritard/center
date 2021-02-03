@@ -43,7 +43,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-    @Logs(title = "新增",content = "根据用户传递的参数新增巡检任务结果数据",logType = 2)
+    @Logs(title = "新增巡检任务结果数据",content = "根据用户传递的参数新增巡检任务结果数据",logType = 2)
     public Result insert(@RequestBody TCruiseResult tCruiseResult) {
         Result result = new Result();
         try {
@@ -59,7 +59,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/delete")
-    @Logs(title = "删除",content = "根据用户传递的参数删除巡检任务结果数据",logType = 4)
+    @Logs(title = "删除巡检任务结果数据",content = "根据用户传递的参数删除巡检任务结果数据",logType = 4)
     public Result delete(@RequestParam(value = "taskResultId", required = true) String taskResultId) {
         Result result = new Result();
         try {
@@ -76,7 +76,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
-    @Logs(title = "修改",content = "根据用户传递的参数修改巡检任务结果数据",logType = 3)
+    @Logs(title = "修改巡检任务结果数据",content = "根据用户传递的参数修改巡检任务结果数据",logType = 3)
     public Result update(@RequestBody TCruiseResult tCruiseResult) {
         Result result = new Result();
         try {
@@ -93,7 +93,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "主键查询")
     @GetMapping(value = "/selectByPrimaryId")
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡检任务结果信息",logType = 1)
+    @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数查询巡检任务结果信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "taskResultId", required = true) String taskResultId) {
         Result result = new Result();
         try {
@@ -108,7 +108,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "查询")
     @GetMapping(value = "/select")
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡检任务结果信息",logType = 1)
+    @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数查询巡检任务结果信息",logType = 1)
     public Result select(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                          @RequestParam(value = "taskId", required = false) String taskId,
                          @RequestParam(value = "taskName", required = false) String taskName,
@@ -138,7 +138,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "分页查询--巡视结果任务查询")
     @GetMapping(value = "/selectTaskByPage")
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询巡检任务结果信息",logType = 1)
+    @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数分页查询巡检任务结果信息",logType = 1)
     public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
                                    @RequestParam(value = "cState", required = false) Integer cState,
                                    @RequestParam(value = "cType", required = false) Integer cType,
@@ -162,7 +162,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "巡视任务结果统计")
     @GetMapping(value = "/taskStatistical")
-    @Logs(title = "查询",content = "根据用户传递的参数统计巡视任务结果",logType = 1)
+    @Logs(title = "巡视任务结果统计",content = "根据用户传递的参数统计巡视任务结果",logType = 1)
     public Result taskStatistical() {
         Result result = new Result();
         try {
@@ -176,7 +176,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "巡视点结果统计")
     @GetMapping(value = "/cruiseStatistical")
-    @Logs(title = "查询",content = "根据用户传递的参数统计巡视点结果",logType = 1)
+    @Logs(title = "巡视点结果统计",content = "根据用户传递的参数统计巡视点结果",logType = 1)
     public Result cruiseStatistical() {
         Result result = new Result();
         try {
@@ -190,7 +190,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "巡视点结果统计--根据正常异常状态统计")
     @GetMapping(value = "/cruiseStatisticalByStatus")
-    @Logs(title = "查询",content = "根据用户传递的参数统计正异常的巡视点",logType = 1)
+    @Logs(title = "根据正常异常状态统计",content = "根据用户传递的参数统计正异常的巡视点",logType = 1)
     public Result cruiseStatisticalByStatus() {
         Result result = new Result();
         try {
@@ -204,7 +204,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "巡视点结果统计--根据异常分类统计")
     @GetMapping(value = "/cruiseStatisticalByAbnormal")
-    @Logs(title = "查询",content = "根据用户传递的参数根据异常的分类进行统计",logType = 1)
+    @Logs(title = "根据异常分类统计",content = "根据用户传递的参数根据异常的分类进行统计",logType = 1)
     public Result cruiseStatisticalByAbnormal() {
         Result result = new Result();
         try {
@@ -218,7 +218,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @GetMapping(value = "/selectCruiseByPage")
-    @Logs(title = "查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
+    @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
@@ -248,7 +248,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "人工复核")
     @PutMapping(value = "/manualReview")
-    @Logs(title = "操作",content = "人工复核",logType = 5)
+    @Logs(title = "人工复核",content = "人工复核",logType = 5)
     public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
 
         String userId = request.getHeader("userId");
@@ -267,7 +267,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "批量插入")
     @PostMapping(value = "/batchInsert")
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入数据",logType = 2)
+    @Logs(title = "批量插入数据",content = "根据用户传递的参数批量插入数据",logType = 2)
     public Result batchInsert(@RequestBody List<TCruiseResult> list) {
         Result result = new Result();
         try {
@@ -281,7 +281,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "A-查询正在执行的任务")
     @GetMapping(value = "/selectTaskIsRunning")
-    @Logs(title = "查询",content = "根据用户传递的参数查询正在执行的任务",logType = 1)
+    @Logs(title = "查询正在执行的任务",content = "根据用户传递的参数查询正在执行的任务",logType = 1)
     public Result selectTaskIsRunning(){
         Result result=new Result();
         try{

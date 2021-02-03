@@ -47,7 +47,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-    @Logs(title = "新增",content = "根据用户传递的参数新增预置位信息",logType = 2)
+    @Logs(title = "新增新增预置位信息",content = "根据用户传递的参数新增预置位信息",logType = 2)
     public Result insert(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
@@ -94,7 +94,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/delete")
-    @Logs(title = "删除",content = "根据用户传递的参数删除预置位信息",logType = 4)
+    @Logs(title = "删除新增预置位信息",content = "根据用户传递的参数删除预置位信息",logType = 4)
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
@@ -136,7 +136,7 @@ public class TCameraPresetController {
     }
     @ApiOperation(value = "批量删除")
     @DeleteMapping(value = "/deleteSelectedPreset")
-    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除预置位信息",logType = 4)
+    @Logs(title = "批量删除新增预置位信息",content = "根据用户传递的参数批量删除预置位信息",logType = 4)
     public Result deleteSelectedPreset(@RequestParam(value = "presetIds") String presetIds) {
         Result result = new Result();
         try {
@@ -168,7 +168,7 @@ public class TCameraPresetController {
     }
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
-    @Logs(title = "修改",content = "根据用户传递的参数修改预置位信息",logType = 3)
+    @Logs(title = "修改新增预置位信息",content = "根据用户传递的参数修改预置位信息",logType = 3)
     public Result update(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
@@ -185,7 +185,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "主键查询")
     @GetMapping(value = "/selectByPrimaryId")
-    @Logs(title = "查询",content = "根据用户传递的参数查询预置位信息",logType = 1)
+    @Logs(title = "查询新增预置位信息",content = "根据用户传递的参数查询预置位信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
@@ -200,7 +200,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "根据摄像机id查询所有预置位信息")
     @GetMapping(value = "/selectByCameraId")
-    @Logs(title = "查询",content = "根据摄像机查询预置位信息",logType = 1)
+    @Logs(title = "根据摄像机id查询所有预置位信息",content = "根据摄像机查询预置位信息",logType = 1)
     public Result selectByCameraId(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -221,7 +221,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "根据预置位名称查询信息")
     @GetMapping(value = "/selectByPresetName")
-    @Logs(title = "查询",content = "根据用户传递的参数预置位信息",logType = 1)
+    @Logs(title = "根据预置位名称查询信息",content = "根据用户传递的参数预置位信息",logType = 1)
     public Result selectByPresetName(@RequestParam(value = "presetName", required = false) String presetName,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -241,7 +241,7 @@ public class TCameraPresetController {
     }
     @ApiOperation(value = "查询")
     @GetMapping(value = "/select")
-    @Logs(title = "查询",content = "根据用户传递的参数查询预置位信息",logType = 1)
+    @Logs(title = "查询预置位信息",content = "根据用户传递的参数查询预置位信息",logType = 1)
     public Result select(@RequestParam(value = "presetId", required = false) Long presetId,
                          @RequestParam(value = "cameraId", required = false) Long cameraId,
                          @RequestParam(value = "presetNum", required = false) Integer presetNum,
@@ -266,7 +266,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "分页查询")
     @PostMapping(value = "/selectByPage")
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询预置位信息",logType = 1)
+    @Logs(title = "查询预置位信息",content = "根据用户传递的参数分页查询预置位信息",logType = 1)
     public Result selectByPage(@RequestBody TCameraPreset tCameraPreset,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -287,7 +287,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "批量插入")
     @PostMapping(value = "/batchInsert")
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入预置位信息",logType = 2)
+    @Logs(title = "批量插入预置位信息",content = "根据用户传递的参数批量插入预置位信息",logType = 2)
     public Result batchInsert(@RequestBody List<TCameraPreset> list) {
         Result result = new Result();
         try {
@@ -301,7 +301,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "查询预置位树")
     @GetMapping(value = "/selectPresetTree")
-    @Logs(title = "查询",content = "根据用户传递的参数查询预置位树信息",logType = 1)
+    @Logs(title = "查询预置位树",content = "根据用户传递的参数查询预置位树信息",logType = 1)
     public Result selectPresetTree(@RequestParam(value = "cameraId", required = false) Long cameraId) {
         Result result = new Result();
         try {

@@ -44,7 +44,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增分屏配置信息",logType = 2)
+    @Logs(title = "新增分屏配置信息",content = "根据用户传递的参数新增分屏配置信息",logType = 2)
     public Result add(@RequestBody TCameraScreen tCameraScreen) {
 
         Result result = new Result();
@@ -61,7 +61,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除分屏配置信息",logType = 4)
+    @Logs(title = "删除分屏配置信息",content = "根据用户传递的参数删除分屏配置信息",logType = 4)
     public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -78,7 +78,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改分屏配置信息",logType = 3)
+    @Logs(title = "修改分屏配置信息",content = "根据用户传递的参数修改分屏配置信息",logType = 3)
     public Result update(HttpServletRequest request,@RequestBody TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
@@ -96,7 +96,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询分屏配置信息",logType = 1)
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询分屏配置信息",logType = 1)
     public Result selectByPrimaryId(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -111,7 +111,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询分屏配置信息",logType = 1)
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询分屏配置信息",logType = 1)
     public Result select(@RequestParam(value = "userId", required = false) Long userId,
                             @RequestParam(value = "screenNum", required = false) String screenNum,
                             @RequestParam(value = "cameraIds", required = false) String cameraIds,
@@ -129,7 +129,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询分屏配置信息",logType = 1)
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数分页查询分屏配置信息",logType = 1)
     public Result selectByPage(@RequestBody TCameraScreen tCameraScreen,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -150,7 +150,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入分屏配置信息",logType = 2)
+    @Logs(title = "批量插入分屏配置信息",content = "根据用户传递的参数批量插入分屏配置信息",logType = 2)
     public Result batchAdd(@RequestBody List<TCameraScreen> list) {
         Result result = new Result();
         try {
@@ -164,7 +164,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
-    @Logs(title = "批量删除",content = "根据用户传递的参数批量删除分屏配置信息",logType = 4)
+    @Logs(title = "批量删除分屏配置信息",content = "根据用户传递的参数批量删除分屏配置信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "userIds") String userIds) {
     Result result = new Result();
     try {
@@ -181,7 +181,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "摄像机状态树")
     @RequestMapping(value = "/cameraStateTree", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询摄像机状态树",logType = 1)
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1)
     public Result cameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
                                   @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();

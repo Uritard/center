@@ -41,7 +41,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增角色菜单数据",logType = 2)
+    @Logs(title = "新增角色菜单数据",content = "根据用户传递的参数新增角色菜单数据",logType = 2)
     public Result insert(@RequestBody  SysRoleMenu sysRoleMenu) {
 
         Result result = new Result();
@@ -58,7 +58,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除角色菜单数据",logType = 4)
+    @Logs(title = "删除角色菜单数据",content = "根据用户传递的参数删除角色菜单数据",logType = 4)
     public Result delete(@RequestParam(value = "rpId", required = true) Long rpId) {
         Result result = new Result();
         try {
@@ -75,7 +75,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "根据角色ID删除角色菜单")
     @RequestMapping(value = "/deleteByRoleId", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除角色菜单",logType = 4)
+    @Logs(title = "删除角色菜单数据",content = "根据用户传递的参数删除角色菜单",logType = 4)
     public Result deleteByRoleId(@RequestParam(value = "RoleId", required = true) Long RoleId) {
         Result result = new Result();
         try {
@@ -92,7 +92,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改角色菜单数据",logType = 3)
+    @Logs(title = "修改角色菜单数据",content = "根据用户传递的参数修改角色菜单数据",logType = 3)
     public Result update(@RequestBody SysRoleMenu sysRoleMenu) {
         Result result = new Result();
         try {
@@ -109,7 +109,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询角色菜单信息",logType = 1)
+    @Logs(title = "查询角色菜单数据",content = "根据用户传递的参数查询角色菜单信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "rpId", required = true) Long rpId) {
         Result result = new Result();
         try {
@@ -124,7 +124,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询角色菜单信息",logType = 1)
+    @Logs(title = "查询角色菜单数据",content = "根据用户传递的参数查询角色菜单信息",logType = 1)
     public Result select(@RequestParam(value = "rpId", required = false) Long rpId,
                             @RequestParam(value = "menuCode", required = false) String menuCode,
                             @RequestParam(value = "sort", required = false) Integer sort,
@@ -143,7 +143,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询角色菜单信息",logType = 1)
+    @Logs(title = "查询角色菜单数据",content = "根据用户传递的参数分页查询角色菜单信息",logType = 1)
     public Result selectByPage(@RequestBody SysRoleMenu sysRoleMenu,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -164,7 +164,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "角色菜单表批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入角色菜单信息",logType = 2)
+    @Logs(title = "批量插入角色菜单数据",content = "根据用户传递的参数批量插入角色菜单信息",logType = 2)
     public Result batchInsert(@RequestBody List<SysRoleMenu> list) {
         Result result = new Result();
         try {

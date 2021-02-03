@@ -47,7 +47,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "新增区域")
     @RequestMapping(value = "/addRegion", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增标准区域数据",logType = 2)
+    @Logs(title = "新增区域",content = "根据用户传递的参数新增标准区域数据",logType = 2)
     public Result insert(@RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
@@ -63,7 +63,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除标准区域数据",logType = 4)
+    @Logs(title = "删除区域",content = "根据用户传递的参数删除标准区域数据",logType = 4)
     public Result delete(@RequestParam(value = "regionId", required = true) Long regionId) {
         Result result = new Result();
         try {
@@ -85,7 +85,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改标准区域",logType = 3)
+    @Logs(title = "修改区域",content = "根据用户传递的参数修改标准区域",logType = 3)
     public Result update(@RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
@@ -102,7 +102,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询标准区域",logType = 1)
+    @Logs(title = "查询区域",content = "根据用户传递的参数查询标准区域",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "regionId", required = true) Long regionId) {
         Result result = new Result();
         try {
@@ -117,7 +117,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询标准区域",logType = 1)
+    @Logs(title = "查询区域",content = "根据用户传递的参数查询标准区域",logType = 1)
     public Result select(@RequestParam(value = "regionId", required = false) Long regionId,
                             @RequestParam(value = "regionName", required = false) String regionName,
                             @RequestParam(value = "sort", required = false) Integer sort,
@@ -140,7 +140,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数查询标准区域",logType = 1)
+    @Logs(title = "查询区域",content = "根据用户传递的参数查询标准区域",logType = 1)
     public Result selectByPage(@RequestBody TStdRegion tStdRegion,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -161,7 +161,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "根据区域名称模糊查询区域树")
     @RequestMapping(value = "/selectRegTreeByName", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用区域名称模糊查询区域树",logType = 1)
+    @Logs(title = "根据区域名称模糊查询区域树",content = "根据用区域名称模糊查询区域树",logType = 1)
     public Result selectRegTreeByRegName(@RequestParam(value = "regionName", required = false) String regionName) {
         Result result = new Result();
         try {

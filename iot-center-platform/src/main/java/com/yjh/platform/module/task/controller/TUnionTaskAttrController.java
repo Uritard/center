@@ -40,7 +40,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增",content = "根据用户传递的参数新增联合巡视预案属性数据",logType = 2)
+    @Logs(title = "新增联合巡视预案属性数据",content = "根据用户传递的参数新增联合巡视预案属性数据",logType = 2)
     public Result insert(@RequestBody TUnionTaskAttr tUnionTaskAttr) {
         Result result = new Result();
         try {
@@ -56,7 +56,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除联合巡视预案属性数据",logType = 4)
+    @Logs(title = "删除联合巡视预案属性数据",content = "根据用户传递的参数删除联合巡视预案属性数据",logType = 4)
     public Result delete(@RequestParam(value = "unionId", required = true) String unionId) {
         Result result = new Result();
         try {
@@ -73,7 +73,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改",content = "根据用户传递的参数修改联合巡视预案属性数据",logType = 3)
+    @Logs(title = "修改联合巡视预案属性数据",content = "根据用户传递的参数修改联合巡视预案属性数据",logType = 3)
     public Result update(@RequestBody TUnionTaskAttr tUnionTaskAttr) {
         Result result = new Result();
         try {
@@ -90,7 +90,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询联合巡视预案属性信息",logType = 1)
+    @Logs(title = "查询联合巡视预案属性数据",content = "根据用户传递的参数查询联合巡视预案属性信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "unionId", required = true) String unionId) {
         Result result = new Result();
         try {
@@ -105,7 +105,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询联合巡视预案属性信息",logType = 1)
+    @Logs(title = "查询联合巡视预案属性数据",content = "根据用户传递的参数查询联合巡视预案属性信息",logType = 1)
     public Result select(@RequestParam(value = "unionId", required = false) String unionId,
                             @RequestParam(value = "instanceId", required = false) Long instanceId,
                             @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
@@ -128,7 +128,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数发查询联合巡视预案属性信息",logType = 1)
+    @Logs(title = "查询联合巡视预案属性数据",content = "根据用户传递的参数发查询联合巡视预案属性信息",logType = 1)
     public Result selectByPage(@RequestBody TUnionTaskAttr tUnionTaskAttr,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -149,7 +149,7 @@ public class TUnionTaskAttrController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入联合巡视预案属性数据",logType = 2)
+    @Logs(title = "批量插入联合巡视预案属性数据",content = "根据用户传递的参数批量插入联合巡视预案属性数据",logType = 2)
     public Result batchInsert(@RequestBody List<TUnionTaskAttr> list) {
         Result result = new Result();
         try {

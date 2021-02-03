@@ -43,7 +43,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "插入",content = "根据用户传递的参数新增机器人巡检点信息",logType = 2)
+    @Logs(title = "插入机器人巡检点信息",content = "根据用户传递的参数新增机器人巡检点信息",logType = 2)
     public Result add(@RequestBody TRobotInspection tRobotInspection) {
         Result result = new Result();
         try {
@@ -59,7 +59,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除",content = "根据用户传递的参数删除机器人巡检点信息",logType = 4)
+    @Logs(title = "删除机器人巡检点信息",content = "根据用户传递的参数删除机器人巡检点信息",logType = 4)
     public Result delete(@RequestParam(value = "inspectionId", required = true) Long inspectionId) {
         Result result = new Result();
         try {
@@ -76,7 +76,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "更新",content = "根据用户传递的参数修改机器人巡检点信息",logType = 3)
+    @Logs(title = "更新机器人巡检点信息",content = "根据用户传递的参数修改机器人巡检点信息",logType = 3)
     public Result update(@RequestBody TRobotInspection tRobotInspection) {
         Result result = new Result();
         try {
@@ -93,7 +93,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询机器人巡检点信息",logType = 1)
+    @Logs(title = "查询机器人巡检点信息",content = "根据用户传递的参数查询机器人巡检点信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "inspectionId", required = true) Long inspectionId) {
         Result result = new Result();
         try {
@@ -108,7 +108,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询机器人巡检点信息",logType = 1)
+    @Logs(title = "查询机器人巡检点信息",content = "根据用户传递的参数查询机器人巡检点信息",logType = 1)
     public Result select(@RequestParam(value = "inspectionId", required = false) Long inspectionId,
                          @RequestParam(value = "inspectionCode", required = false)String inspectionCode,
                          @RequestParam(value = "robotId", required = false) Long robotId,
@@ -135,7 +135,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询",content = "根据用户传递的参数分页查询机器人巡检点信息",logType = 1)
+    @Logs(title = "查询机器人巡检点信息",content = "根据用户传递的参数分页查询机器人巡检点信息",logType = 1)
     public Result selectByPage(@RequestBody TRobotInspection tRobotInspection,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -156,7 +156,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入",content = "根据用户传递的参数批量插入机器人巡检点信息",logType = 2)
+    @Logs(title = "批量插入机器人巡检点信息",content = "根据用户传递的参数批量插入机器人巡检点信息",logType = 2)
     public Result batchAdd(@RequestBody List<TRobotInspection> list) {
         Result result = new Result();
         try {
@@ -170,7 +170,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "机器人任务数据")
     @RequestMapping(value = "/selectRobotTaskMessage", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询机器人任务数据",logType = 1)
+    @Logs(title = "机器人任务数据",content = "根据用户传递的参数查询机器人任务数据",logType = 1)
     public Result selectRobotTaskMessage(@RequestParam(value = "robotId") Long robotId){
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -200,7 +200,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人信息")
     @RequestMapping(value = "/selectRobotInfo", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "查询机器人信息",logType = 1)
+    @Logs(title = "查询机器人信息",content = "查询机器人信息",logType = 1)
     public Result selectRobotInfo() {
         Result result = new Result();
         try {
@@ -214,7 +214,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人状态信息")
     @RequestMapping(value = "/selectRobotStatus", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询机器人状态信息",logType = 1)
+    @Logs(title = "查询机器人状态信息",content = "根据用户传递的参数查询机器人状态信息",logType = 1)
     public Result selectRobotStatus(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
