@@ -135,6 +135,7 @@
         a.update_time = CURRENT_TIMESTAMP(),
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
+            and a.custom_id = #{customId,jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDevice">

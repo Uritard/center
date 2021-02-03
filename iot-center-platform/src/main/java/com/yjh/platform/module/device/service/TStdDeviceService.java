@@ -184,7 +184,6 @@ public class TStdDeviceService{
             tStdDevice.setStatus(tStdDeviceDetail.getStatus());
             tStdDeviceDao.update(tStdDevice);
         }
-        
 //        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tStdDeviceDetail.getDeviceId());
 //        if(tStdDevice.getModelId() != tStdDeviceDetail.getModelId()){
 //            tStdDeviceDao.deleteByPrimaryId(tStdDeviceDetail.getDeviceId());//删除所有设备
