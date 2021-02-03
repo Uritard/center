@@ -71,7 +71,13 @@ public class SysOrgController {
     public Result delete(@RequestParam(value = "orgId", required = true) Long orgId) {
         Result result = new Result();
         try {
-            result.setData(sysOrgService.deleteByPrimaryId(orgId));
+            int re  = sysOrgService.deleteByPrimaryId(orgId);
+            if(re == -1){
+                result.setCode(209,"此组织下存在子组织");
+            }else {
+                result.setData(re);
+            }
+
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除组织机构异常:", e);

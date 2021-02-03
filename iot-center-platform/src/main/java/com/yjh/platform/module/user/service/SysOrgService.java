@@ -39,11 +39,11 @@ public class SysOrgService{
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long orgId) {
         List<Long> list = sysOrgDao.selectDownId(orgId);
-        if(list != null && list.size() > 0){
-           return sysOrgDao.batchDelete(list);
-        }else {
-            return this.sysOrgDao.deleteByPrimaryId(orgId);
+        if(list != null && list.size() > 1){
+           return -1;
         }
+        return this.sysOrgDao.deleteByPrimaryId(orgId);
+
     }
 
     @Transactional(rollbackFor = Exception.class)

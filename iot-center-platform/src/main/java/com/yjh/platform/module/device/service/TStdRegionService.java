@@ -30,11 +30,14 @@ public class TStdRegionService{
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long regionId) {
         List<Long> list = tStdRegionDao.selectDownId(regionId);
-        if(list != null && list.size() > 0){
-            return tStdRegionDao.batchDelete(list);
-        }else {
-            return this.tStdRegionDao.deleteByPrimaryId(regionId);
+        if(list.size()>1){
+            return -1;
         }
+        List<Long> deviceList = tStdRegionDao.selectDevice(list);
+        if(deviceList != null && deviceList.size() > 0){
+            return -1;
+        }
+        return this.tStdRegionDao.deleteByPrimaryId(regionId);
     }
 
     @Transactional(rollbackFor = Exception.class)
