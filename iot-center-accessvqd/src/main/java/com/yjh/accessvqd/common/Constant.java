@@ -1,7 +1,13 @@
 package com.yjh.accessvqd.common;
 
+import com.yjh.accessvqd.common.utils.StaticContextAccessor;
+import com.yjh.accessvqd.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessvqd.commons.result.Result;
 import com.yjh.accessvqd.commons.utils.weatherUtils.SerialPortUtils;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.List;
+import java.util.Map;
 
 public class Constant {
 
@@ -9,6 +15,14 @@ public class Constant {
     public static final String VQD_IMAGES_STORE_URL="192.168.33.241:81";
     //accessVideo视频播放
     public static final String START_CAMERA_URL = "http://192.168.9.40:18715/camera/v1/startRealPlay?cameraId={cameraId}";
+
+    public static Result otherServer(Long cameraId, String url) throws Exception{
+        Result re = new Result();
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url,Result.class,cameraId);
+        return re;
+    }
 
     public static final String USER_COUNT = "statistics:userCount";
 

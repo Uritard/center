@@ -50,6 +50,7 @@ public class PlansService {
     @Logs(title = "诊断计划列表查询")
     @Transactional(rollbackFor = Exception.class)
     public List<Plans> getPlanList(String planName) {
+        log.info("url:"+diagnosePlan_URl);
         List<Plans> plans = new ArrayList<>();//调用api查询的周期任务list
         List<Plans> plansList = new ArrayList<>();//任务基本信息库中的任务
         List<String> cyclePlanId = new ArrayList<>();//存放周期任务ID
@@ -410,7 +411,8 @@ public class PlansService {
         List<String> checked = new ArrayList<>();//当前任务已勾选的监测点ID
         Set<String> usingChannelId=new HashSet<>();//存放已有任务绑定的监测点ID
 
-
+        log.info("id:"+diagnosePlanId);
+        log.info("bool:"+Objects.isNull(diagnosePlanId));
         //获取checkedIdList
         if (tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId).size() != 0) {
             for (TDiagnosePlanAttr attr : tDiagnosePlanAttrDao.selectByPrimaryId(diagnosePlanId)) {
@@ -449,6 +451,7 @@ public class PlansService {
         ids.addAll(usingChannelId);
         ids.removeAll(checked);//任务修改时，树显示被修改的任务下的监测点ID
         log.info("list：----"+ids);
+
 
         List<NVRChannelTree> roots = tDiagnosePlanDao.selectNVRNode();
         List<NVRChannelTree> invisibleRoots=new ArrayList<>();//放入有子节点的NVR信息

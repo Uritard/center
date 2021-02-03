@@ -186,11 +186,13 @@
         WHERE
             a.record_id = #{recordId,jdbcType=VARCHAR}
             and a.monitor_id IS NOT NULL
+            <if test="list.size !=0">
             and a.monitor_id NOT IN(
         <foreach collection="list" item="usingId" separator=",">
             #{usingId}
         </foreach>
         )
+            </if>
 
     </select>
 

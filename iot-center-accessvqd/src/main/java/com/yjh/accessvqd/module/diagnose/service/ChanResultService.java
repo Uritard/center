@@ -120,16 +120,14 @@ public class ChanResultService {
 
     @Logs(title = "分页查询诊断结果详细信息", code = "chanResult")
     @Transactional(rollbackFor = Exception.class)
-    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId,String status) {
+    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId,String status) throws Exception {
         List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(pointId, startTime, endTime, diagnosePlanId,status);
         log.info("result：" + details);
         for (DiagnoseResultDetail detail : details) {
             detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
             checkItemsOperate(detail);
             //获取视频地址
-            HashMap<String,Long> camera=new HashMap<>();
-            camera.put("cameraId",detail.getCameraId());
-            Result result=sendGetRequest(Constant.START_CAMERA_URL,camera);
+            Result result=Constant.otherServer(detail.getCameraId(),Constant.START_CAMERA_URL);
             Map<String,String> videoInfo=(Map<String, String>)result.getData();
            detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
            detail.setFlvUrl(videoInfo.get("flvUrl"));
@@ -460,7 +458,6 @@ public class ChanResultService {
         return map;
     }
 
-    //跨发GET请求带参
     public Result sendGetRequest(String url, HashMap<String, Long> params) {
         Result response = null;
         try {
