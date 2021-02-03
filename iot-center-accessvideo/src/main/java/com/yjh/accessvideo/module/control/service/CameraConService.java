@@ -670,6 +670,7 @@ public class CameraConService {
             return recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError();
         } else {
             Constant.maps.put(String.valueOf(recordId), lUserID);
+            log.info("Constant.maps: "+Constant.maps);
             log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
             return "NVR "+recorderConInfo.getRecordName()+" register success.";
         }
