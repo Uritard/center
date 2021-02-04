@@ -393,7 +393,7 @@ public class CameraConController {
         try {
             int lUserID = Constant.maps.get("recordId");
             log.info("lUserID: "+lUserID);
-            result.setData(cameraConService.registerNVR(recordId));
+//            result.setData(cameraConService.registerNVR(recordId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
