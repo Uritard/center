@@ -1,6 +1,7 @@
 package com.yjh.accessvideo.module.control.controller;
 
 
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
@@ -390,6 +391,8 @@ public class CameraConController {
     public Result registerNVR(@RequestParam(value = "recordId") Long recordId) {
         Result result = new Result();
         try {
+            int lUserID = Constant.maps.get("recordId");
+            log.info("lUserID: "+lUserID);
             result.setData(cameraConService.registerNVR(recordId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
