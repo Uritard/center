@@ -640,40 +640,43 @@ public class CameraConService {
     public String registerNVR(Long recordId) {
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
+        lUserID = Constant.maps.get("recordId");
+        log.info("lUserID: "+lUserID);
+        return "lUserID";
 
-        if (lUserID > -1) {
-            //NVR log out first...
-            hCNetSDK.NET_DVR_Logout(lUserID);
-            lUserID = -1;
-        }
-        String m_sDeviceIP = recorderConInfo.getRecordIp();
-        String m_sUsername = recorderConInfo.getUserName();
-        String m_sPassword = recorderConInfo.getPwd();
-        Short m_port = recorderConInfo.getHttpPort().shortValue();
-        log.info("register nvr"+recorderConInfo.getRecordName()+", ip is "+m_sDeviceIP+", port is "+m_port);
-        //注册
-        m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-        System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
-        m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-        System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
-        m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-        System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
-
-        m_strLoginInfo.wPort = m_port;
-        m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
-
-        m_strLoginInfo.write();
-        lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-        log.info("m_sDeviceIP: "+m_sDeviceIP+", lUserID: "+lUserID);
-        if (lUserID == -1) {
-            log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
-            return recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError();
-        } else {
-            Constant.maps.put(String.valueOf(recordId), lUserID);
-            log.info("Constant.maps: "+Constant.maps);
-            log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
-            return "NVR "+recorderConInfo.getRecordName()+" register success.";
-        }
+//        if (lUserID > -1) {
+//            //NVR log out first...
+//            hCNetSDK.NET_DVR_Logout(lUserID);
+//            lUserID = -1;
+//        }
+//        String m_sDeviceIP = recorderConInfo.getRecordIp();
+//        String m_sUsername = recorderConInfo.getUserName();
+//        String m_sPassword = recorderConInfo.getPwd();
+//        Short m_port = recorderConInfo.getHttpPort().shortValue();
+//        log.info("register nvr"+recorderConInfo.getRecordName()+", ip is "+m_sDeviceIP+", port is "+m_port);
+//        //注册
+//        m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+//        System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
+//        m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+//        System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
+//        m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+//        System.arraycopy(m_sPassword.getBytes(), 0, m_strLoginInfo.sPassword, 0, m_sPassword.length());
+//
+//        m_strLoginInfo.wPort = m_port;
+//        m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+//
+//        m_strLoginInfo.write();
+//        lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+//        log.info("m_sDeviceIP: "+m_sDeviceIP+", lUserID: "+lUserID);
+//        if (lUserID == -1) {
+//            log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
+//            return recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError();
+//        } else {
+//            Constant.maps.put(String.valueOf(recordId), lUserID);
+//            log.info("Constant.maps: "+Constant.maps);
+//            log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
+//            return "NVR "+recorderConInfo.getRecordName()+" register success.";
+//        }
 
     }
 
