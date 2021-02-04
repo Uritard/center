@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.utils.mp3.SpectrumMp3;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
@@ -186,6 +187,22 @@ public class TVoiceDeviceController {
         try {
             List<AreaInfo> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName);
             result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "音频分析")
+    @RequestMapping(value = "/voiceAnalyse", method = RequestMethod.GET)
+//    @Logs(title = "音频分析",content = "音频频谱分析",logType = 5)
+    public Result voiceAnalyse(@RequestParam(value = "voicePath") String voicePath) {
+        Result result = new Result();
+        try {
+            SpectrumMp3 spectrumMp3 = new SpectrumMp3(voicePath);
+            spectrumMp3.analyticalDecibels();
+            result.setData(spectrumMp3.getMaxVoice());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
