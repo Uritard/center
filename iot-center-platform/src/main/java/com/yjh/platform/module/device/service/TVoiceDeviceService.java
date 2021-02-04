@@ -1,14 +1,16 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
+import java.util.*;
 
 import com.yjh.platform.module.device.entity.VoiceDevice;
+import com.yjh.platform.module.user.entity.AreaInfoDetail;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -45,8 +47,8 @@ public class TVoiceDeviceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TVoiceDevice> select(String voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, String configId) {
-        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId);
+    public List<TVoiceDevice> select(String voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, String configId,Long upRegionId) {
+        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId, upRegionId);
         return tVoiceDeviceList;
     }
 
@@ -69,26 +71,63 @@ public class TVoiceDeviceService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<VoiceDevice> selectVoiceDeviceTree() {
-        List<VoiceDevice> re = new ArrayList<>();
-        VoiceDevice voiceDeviceTree = new VoiceDevice();
-        voiceDeviceTree.setInfoType("tree");
-        voiceDeviceTree.setLabel("音频设备树");
-        voiceDeviceTree.setId("-1");
-        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.selectAll();
-        List<VoiceDevice> child = new ArrayList<>();
-        for (TVoiceDevice item:tVoiceDeviceList) {
-            VoiceDevice childDevice = new VoiceDevice();
-            childDevice.setId(item.getVoiceDeviceId());
-            childDevice.setLabel(item.getVoiceDeviceName());
-            childDevice.setUpId("1");
-            childDevice.setInfoType("device");
-            childDevice.setUpName("音频设备树");
-            child.add(childDevice);
+    public List<AreaInfo> selectVoiceDeviceTree(String voiceDeviceName) {
+//        List<VoiceDevice> re = new ArrayList<>();
+//        VoiceDevice voiceDeviceTree = new VoiceDevice();
+//        voiceDeviceTree.setInfoType("tree");
+//        voiceDeviceTree.setLabel("音频设备树");
+//        voiceDeviceTree.setId("-1");
+//        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.selectAll();
+//        List<VoiceDevice> child = new ArrayList<>();
+//        for (TVoiceDevice item:tVoiceDeviceList) {
+//            VoiceDevice childDevice = new VoiceDevice();
+//            childDevice.setId(item.getVoiceDeviceId());
+//            childDevice.setLabel(item.getVoiceDeviceName());
+//            childDevice.setUpId("1");
+//            childDevice.setInfoType("device");
+//            childDevice.setUpName("音频设备树");
+//            child.add(childDevice);
+//        }
+//        voiceDeviceTree.setChildren(child);
+//        re.add(voiceDeviceTree);
+//        return re;
+        List<AreaInfo> listTree = new ArrayList<>();
+        listTree = tVoiceDeviceDao.selectAll(voiceDeviceName);
+        List<AreaInfo> areaInfoCountryList = new ArrayList<>();
+        for(Iterator<AreaInfo> it = listTree.iterator(); it.hasNext();){
+            AreaInfo areaInfoMap = it.next();
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+                AreaInfo areaInfoCountry = new AreaInfo();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountryList.add(areaInfoCountry);
+            }
         }
-        voiceDeviceTree.setChildren(child);
-        re.add(voiceDeviceTree);
-        return re;
+        //获取相机的状态
+        diGui(areaInfoCountryList, listTree);
+        return areaInfoCountryList;
+    }
+    private void diGui(List<AreaInfo> areaInfoList, List<AreaInfo> listTree) {
+        for(AreaInfo areaInfo : areaInfoList){
+            List<AreaInfo> childrenList = new ArrayList<>();
+            for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
+                AreaInfo areaInfoMap = it.next();
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                    AreaInfo areaInfoTem = new AreaInfo();
+                    areaInfoTem.setId(areaInfoMap.getId());
+                    areaInfoTem.setUpId(areaInfoMap.getUpId());
+                    areaInfoTem.setLabel(areaInfoMap.getLabel());
+                    areaInfoTem.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    childrenList.add(areaInfoTem);
+                }
+            }
+            if (childrenList.size()>0 ) {
+                areaInfo.setChildren(childrenList);
+                diGui(childrenList, listTree);
+            }
+        }
     }
 }
 

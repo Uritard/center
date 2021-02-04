@@ -9,6 +9,7 @@
         <result column="std_device_id" jdbcType="BIGINT" property="stdDeviceId" />
         <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
         <result column="config_id" jdbcType="VARCHAR" property="configId" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -23,13 +24,15 @@
             voice_device_name,
             std_device_id,
             device_type,
-            config_id
+            config_id,
+            up_region_id
         )values(
                 #{voiceDeviceId, jdbcType=VARCHAR},
                 #{voiceDeviceName, jdbcType=VARCHAR},
                 #{stdDeviceId, jdbcType=BIGINT},
                 #{deviceType, jdbcType=VARCHAR},
-                #{configId, jdbcType=VARCHAR}
+                #{configId, jdbcType=VARCHAR},
+                #{upRegionId, jdbcType=BIGINT}
         )
     </insert>
 
@@ -40,11 +43,12 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice">
         update t_voice_device a <set>
-        <if test="voiceDeviceId != null and voiceDeviceId != ''">a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR},</if>
-        <if test="voiceDeviceName != null and voiceDeviceName != ''">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
-        <if test="stdDeviceId != null and stdDeviceId != ''">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="configId != null and configId != ''">a.config_id = #{configId, jdbcType=VARCHAR},</if>
+        <if test="voiceDeviceId != null">a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR},</if>
+        <if test="voiceDeviceName != null">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
+        <if test="stdDeviceId != null">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
+        <if test="deviceType != null">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="configId != null">a.config_id = #{configId, jdbcType=VARCHAR},</if>
+        <if test="upRegionId != null">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
     </set>
             where a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}
     </update>
@@ -55,7 +59,8 @@
         a.voice_device_name,
         a.std_device_id,
         a.device_type,
-        a.config_id
+        a.config_id,
+        a.up_region_id
         from t_voice_device a
         where 1 = 1
             and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}
@@ -68,7 +73,8 @@
         a.voice_device_name,
         a.std_device_id,
         a.device_type,
-        a.config_id
+        a.config_id,
+        a.up_region_id
         from t_voice_device a
         where 1 = 1
         <if test="voiceDeviceId != null and voiceDeviceId != ''"> and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}</if>
@@ -76,6 +82,7 @@
         <if test="stdDeviceId != null and stdDeviceId != ''"> and a.std_device_id = #{stdDeviceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="configId != null and configId != ''"> and a.config_id = #{configId, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
@@ -84,14 +91,16 @@
         a.voice_device_name,
         a.std_device_id,
         a.device_type,
-        a.config_id
+        a.config_id,
+        a.up_region_id
         from t_voice_device a
         where 1 = 1
         <if test="voiceDeviceId != null and voiceDeviceId != ''"> and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}</if>
-        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR}</if>
+        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
         <if test="stdDeviceId != null and stdDeviceId != ''"> and a.std_device_id = #{stdDeviceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="configId != null and configId != ''"> and a.config_id = #{configId, jdbcType=VARCHAR}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
     </select>
 
     <insert id="batchAdd">
@@ -100,7 +109,8 @@
             voice_device_name,
             std_device_id,
             device_type,
-            config_id
+            config_id,
+        up_region_id
         )values
         <foreach collection="list" item="TVoiceDevice" separator=",">
             (
@@ -108,7 +118,8 @@
                 #{TVoiceDevice.voiceDeviceName, jdbcType=VARCHAR},
                 #{TVoiceDevice.stdDeviceId, jdbcType=BIGINT},
                 #{TVoiceDevice.deviceType, jdbcType=VARCHAR},
-                #{TVoiceDevice.configId, jdbcType=VARCHAR}
+                #{TVoiceDevice.configId, jdbcType=VARCHAR},
+            #{TVoiceDevice.upRegionId, jdbcType=BIGINT},
             )
         </foreach>
     </insert>
@@ -122,9 +133,22 @@
             )
     </delete>
 
-    <select id="selectAll" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
-        select *
-        from t_voice_device
+    <select id="selectAll" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "tree" AS infoType
+        FROM t_std_region a
+        LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+        SELECT
+            a.voice_device_id AS id,
+            a.voice_device_name AS label,
+            a.up_region_id AS upId,
+            b.region_name as upName,
+            "device" AS infoType
+        FROM
+            t_voice_device a
+            LEFT JOIN t_std_region b on a.up_region_id = b.region_id
+        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
+    )
     </select>
 
 </mapper>

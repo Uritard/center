@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
@@ -111,10 +112,11 @@ public class TVoiceDeviceController {
                             @RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
                             @RequestParam(value = "stdDeviceId", required = false) Long stdDeviceId,
                             @RequestParam(value = "deviceType", required = false) String deviceType,
-                            @RequestParam(value = "configId", required = false) String configId) {
+                            @RequestParam(value = "configId", required = false) String configId,
+                         @RequestParam(value = "upRegionId", required = false)Long upRegionId) {
         Result result = new Result();
         try {
-            List<TVoiceDevice> list = tVoiceDeviceService.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId);
+            List<TVoiceDevice> list = tVoiceDeviceService.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId, upRegionId);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -179,10 +181,10 @@ public class TVoiceDeviceController {
     @ApiOperation(value = "查询音频设备树")
     @RequestMapping(value = "/selectVoiceDeviceTree", method = RequestMethod.GET)
     @Logs(title = "查询音频设备树",content = "音频设备树查询",logType = 1)
-    public Result selectVoiceDeviceTree() {
+    public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName",required = false)String voiceDeviceName) {
         Result result = new Result();
         try {
-            List<VoiceDevice> list = tVoiceDeviceService.selectVoiceDeviceTree();
+            List<AreaInfo> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -2,12 +2,15 @@ package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.module.device.controller.TRobotInspectionController;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,8 @@ public class TRobotInspectionService{
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
+    private Logger log = LoggerFactory.getLogger(TRobotInspectionService.class);
 
 
 
@@ -101,7 +106,7 @@ public class TRobotInspectionService{
             //jasonMap.put("taskId",tCruiseTask.getTaskId());
             String json= JSON.toJSONString(jasonMap);
             WebSocketServer.sendMsg(json);
-            //log.info("发送给前端的消息：   "+json);
+            log.info("发送给前端的消息-停止调接口：   "+json);
             return  null;
         }
         String instanceList = (String)mapForRobotInstance.get("instanceIdList");

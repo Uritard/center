@@ -184,6 +184,7 @@ public class TRobotInspectionController {
                     jasonMap.put("type","noTask");
                     //jasonMap.put("taskId",tCruiseTask.getTaskId());
                     String json= JSON.toJSONString(jasonMap);
+                    log.info("发送给前端的消息-停止调接口：   "+json);
                     WebSocketServer.sendMsg(json);
                 }
                 resultMap.put("taskProgress",taskProgress);

@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -21,10 +22,11 @@ public interface TVoiceDeviceDao {
                                 @Param(value = "voiceDeviceName") String voiceDeviceName,
                                 @Param(value = "stdDeviceId") Long stdDeviceId,
                                 @Param(value = "deviceType") String deviceType,
-                                @Param(value = "configId") String configId);
+                                @Param(value = "configId") String configId,
+                              @Param(value = "upRegionId")Long upRegionId);
     List<TVoiceDevice> selectByPage(TVoiceDevice tVoiceDevice);
 
     int batchAdd(List<TVoiceDevice> list);
     int batchDelete(List<String> list);
-    List<TVoiceDevice> selectAll();
+    List<AreaInfo> selectAll(@Param(value = "voiceDeviceName") String voiceDeviceName);
 }

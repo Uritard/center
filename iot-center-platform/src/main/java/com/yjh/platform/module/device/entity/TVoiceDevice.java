@@ -42,5 +42,9 @@ public class TVoiceDevice implements Serializable {
     @Length(max = 32, message = "configId长度必须小于等于32")
     private String configId;
 
+    @Max(value = 999999999999999999l)
+    @ApiModelProperty(value = "上级区域id")
+    private Long upRegionId;
+
 
 }
