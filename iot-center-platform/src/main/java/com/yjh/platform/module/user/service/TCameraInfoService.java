@@ -5,11 +5,10 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.module.user.dao.TCameraInfoDao;
-import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.dao.TCameraScreenDao;
-import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
+import org.apache.commons.lang.RandomStringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -45,11 +44,47 @@ public class TCameraInfoService {
     private TCameraScreenDao tCameraScreenDao;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private TCameraRecorderDao tCameraRecorderDao;
+    @Autowired
+    private TDictBusinessDao tDictBusinessDao;
 
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraInfo tCameraInfo) {
+        //摄像头新增前先新增诊断监测点
+        TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
+        Channel channel=new Channel();
+        try {
+            diagnosePointStandardThreshold(channel);
+            channel.setId(RandomStringUtils.randomAlphanumeric(12));
+            channel.setIp(recorder.getRecordIp());
+            channel.setPort(recorder.getHttpPort().toString());
+            channel.setUserName(recorder.getUserName());
+            channel.setUserPwd(recorder.getPwd());
+            Integer realChannelNum=tCameraInfo.getChannelNum()+32;
+            channel.setChanIndex(realChannelNum.toString());
+            channel.setProtocol("0");
+            switch (tCameraInfo.getIsControl()){
+                case 0:
+                    channel.setDevType("1");
+                    break;
+                case 1:
+                    channel.setDevType("0");
+                    break;
+                default:
+                    break;
+            }
+            channel.setDevBrand("0");
+
+            HttpClientUtils.getInstance().postUrl(Constant.DIAGNOSE_CHANNEL_OPERATE,channel.toString());
+
+        }catch (Exception e){
+            log.error("监测点新增失败："+e);
+        }
+
+        tCameraInfo.setMonitorId(channel.getId());
         this.tCameraInfoDao.insert(tCameraInfo);
         return this.intoRedis();
     }
@@ -252,6 +287,29 @@ public class TCameraInfoService {
        return 1;
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    public Channel diagnosePointStandardThreshold(Channel channel){
+        channel.setSignalPoint("90");
+        channel.setBlurPoint("65");
+        channel.setContrastPoint("75");
+        channel.setBrightPoint("55");
+        channel.setDarkPoint("55");
+        channel.setChromaPoint("25");
+        channel.setMonoPoint("90");
+        channel.setNoisePoint("60");
+        channel.setStreakPoint("25");
+        channel.setFreezePoint("90");
+        channel.setShakePoint("10");
+        channel.setFlashPoint("40");
+        channel.setScenePoint("10");
+        channel.setCoverPoint("80");
+        channel.setPtzPoint("10");
+
+        channel.setCheckFlag("1");
+        channel.setStreamType("0");
+        return channel;
+    }
 
 
 }
