@@ -326,7 +326,7 @@ public class CameraConController {
             cameraConService.isCameraControlled(cameraId);
             String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
-            String cmd = "rm -f "+filePath;
+            String cmd = "rm -rf /"+presetId;
             log.info("删除语句"+cmd);
             Runtime.getRuntime().exec(cmd);
             result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.CLE_PRESET));

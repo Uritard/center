@@ -127,6 +127,9 @@ public class TCameraScreenService{
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
             Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
             map.putAll((Map<String,String>)re.getData());
         }
         for(Map<String,String> item:listForState){
