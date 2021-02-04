@@ -841,6 +841,7 @@ public class CameraConService {
         try {
             //查询视频参数
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+30);
             if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");
                 String login = registerNVR(cameraConInfo.getRecordId());
