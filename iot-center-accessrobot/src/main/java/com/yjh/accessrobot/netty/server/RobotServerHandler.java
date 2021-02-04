@@ -244,6 +244,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
         Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
         Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
+
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
         Iterator<String> iterator = allRobotCodeMap.keySet().iterator();
         List<String> allRobotCodeList = new ArrayList<>();

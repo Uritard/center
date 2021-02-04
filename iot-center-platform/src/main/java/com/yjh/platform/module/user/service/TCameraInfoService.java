@@ -110,7 +110,9 @@ public class TCameraInfoService {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
             Result re = cameraStates(recordIdMap);
-            map.putAll((Map<String,String>)re.getData());
+            if (Objects.nonNull(re)){
+                map.putAll((Map<String,String>)re.getData());
+            }
         }
         for (TCameraInfoByDict xi : tCameraInfoByDict){
             if (map.containsKey(xi.getCameraId().toString())){
@@ -120,7 +122,7 @@ public class TCameraInfoService {
                     xi.setCameraStatus("在线");
                 }
             }else{
-                xi.setCameraStatus("离线");
+                xi.setCameraStatus("未知");
             }
         }
         return tCameraInfoByDict;

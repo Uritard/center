@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YC
@@ -63,5 +64,5 @@ public interface TRobotInfoDao {
     int updateTCruiseResult(TCruiseResult tCruiseResult);
     int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
 
-
+    List<AlgorithmDeviceMete> selectAlgorithm(@Param(value = "inspectionCode") String inspectionCode);
 }

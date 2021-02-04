@@ -4,6 +4,7 @@ import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.module.command.entity.Analysis;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
 import com.yjh.accessrobot.module.command.entity.TCruiseResult;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
@@ -109,16 +110,17 @@ public class RobotController {
     }
     /*用完就删*/
     @ApiOperation(value = "方法测试")
-    @RequestMapping(value = "/xixixi", method = RequestMethod.POST)
-    public Result xixixi(@Valid @RequestBody TCruiseResult tCruiseResult){
+    @PostMapping(value = "/methodTest")
+    public Result methodTest(@RequestParam(value = "inspectionCode",required = false) String inspectionCode,
+                             @RequestBody Analysis analysis){
         Result result = new Result();
         try {
-            result.setData(robotService.updateTCruiseResult(tCruiseResult));
+            result.setData(robotService.AnalyzeAfterRobot(analysis,inspectionCode));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("机器人控制接口调用错误:", e);
+            log.error("测试接口调用错误:", e);
         }
         return result;
     }

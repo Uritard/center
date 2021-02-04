@@ -50,4 +50,9 @@ public class Constant {
 
     public static Map<String,String> robotResultMap =  new HashMap<>();
 
+    //算法接口
+    public static  String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
+    //缺陷接口
+    public static  String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+
 }

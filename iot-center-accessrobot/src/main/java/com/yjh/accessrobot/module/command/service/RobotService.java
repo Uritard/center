@@ -114,11 +114,15 @@ public class RobotService {
         String code = Constant.robotResultMap.get("Code");
         if ("200".equals(code)){
             log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
+            scmap.put("code", 3);
+            scmap.put("result", "success");
         }else{
             log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
+            scmap.put("code", 3);
+            scmap.put("result", "fail");
         }
-        scmap.put("code", 3);
-        scmap.put("result", "success");
+        /*scmap.put("code", 3);
+        scmap.put("result", "success");*/
         return scmap;
 
     }
@@ -278,15 +282,15 @@ public class RobotService {
 
             //机器人区域层级
             /*TRobotRegion tr1 = new TRobotRegion();
-            tr1.setRegionId(deviceMap.get("区域id").toString());
-            tr1.setRegionName(deviceMap.get("区域名称").toString());
+            tr1.setRegionId(deviceMap.get("place_id").toString());
+            tr1.setRegionName(deviceMap.get("place_name").toString());
             tr1.setUpRegionId("-1");
             tRobotRegionList.add(tr1);
 
             TRobotRegion tr2 = new TRobotRegion();
             tr2.setRegionId(deviceMap.get("bay_id").toString());
             tr2.setRegionName(deviceMap.get("bay_name").toString());
-            tr2.setUpRegionId(deviceMap.get("区域id").toString());
+            tr2.setUpRegionId(deviceMap.get("place_id").toString());
             tRobotRegionList.add(tr2);
 
             TRobotRegion tr3 = new TRobotRegion();
@@ -679,7 +683,9 @@ public class RobotService {
                         .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
                         .setCruiseName(redisInfoMap.get("cruiseName"))
                         .setCruiseType(228)//机器人
+//                        .setPicPathAnl(redisInfoMap.get(""))
                         .setPicpath(redisInfoMap.get("picpath"))
+//                        .setOrigPicAnl(redisInfoMap.get(""))
                         .setOrigpic(redisInfoMap.get("origpic"))
                         .setIsWarn(0)
                         .setEvaluationState(257)
@@ -1044,5 +1050,55 @@ public class RobotService {
         return dictCode;
     }
 
+    //机器人巡视结果交给算法再分析
+    public List<AlgorithmDeviceMete> AnalyzeAfterRobot(Analysis analysisItem,String inspectionCode){
+        List<AlgorithmDeviceMete> algorithmDeviceMeteList = tRobotInfoDao.selectAlgorithm(inspectionCode);
+
+        Map<String,Object> picModelPathMap  = redisTemplate.opsForHash().entries("t_sys_param:robotPicModelPath");//机器人标定文件路径
+        String picModelPath = picModelPathMap.get("content").toString();
+
+        for (AlgorithmDeviceMete algorithmDeviceMete:algorithmDeviceMeteList) {
+            Analysis analysis = new Analysis();
+            analysis.setTaskId(analysisItem.getTaskId());
+            analysis.setInstanceId(analysisItem.getInstanceId());
+            analysis.setPicPath(analysisItem.getPicPath());
+            analysis.setAnalyseType(algorithmDeviceMete.getAnalyseType());
+            analysis.setPicModelPath(picModelPath+"/"+algorithmDeviceMete.getInspectionCode());
+            analysis.setIsAi(algorithmDeviceMete.getIsAi());
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+            analysisMap.put("list",analysisList);
+            log.info("算法信息==="+analysisMap);
+            if(algorithmDeviceMete.getIsAi() == 1){//0-缺陷 1-表记
+                analysis(analysisMap);
+            }else {
+                defect(analysisMap);
+            }
+        }
+        return algorithmDeviceMeteList;
+    }
+    //表记分析
+    private void analysis(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(Constant.ALGORITHM_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+    //缺陷分析
+    private void defect(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(Constant.DEFECT_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }
 

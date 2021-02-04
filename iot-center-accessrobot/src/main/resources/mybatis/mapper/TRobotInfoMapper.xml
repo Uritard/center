@@ -589,4 +589,31 @@
                 #{remark, jdbcType=VARCHAR}
         )
     </insert>
+
+    <select id="selectAlgorithm" resultType="com.yjh.accessrobot.module.command.entity.AlgorithmDeviceMete">
+        SELECT
+            a.inspection_code,
+            a.inspection_id,
+            b.instance_id,
+            b.device_mete_id,
+            e.algorithm_id,
+            f.algorithm_name,
+            f.alias_name,
+            f.algorithm_code,
+            f.analyse_type,
+            f.is_ai
+        FROM
+            t_robot_inspection a,
+            t_cruise_point_instance b,
+            t_std_devicemete d,
+            t_algorithm_conf_bak e,
+            t_algorithm_info f
+        WHERE 1 = 1
+        <if test="inspectionCode != null and inspectionCode != ''">and a.inspection_code = #{inspectionCode,jdbcType=VARCHAR}</if>
+        and a.inspection_id = b.cruise_id
+        and b.device_mete_id = d.device_mete_id
+        and d.device_mete_id = e.device_mete_id
+        and e.algorithm_id = f.algorithm_id
+
+    </select>
 </mapper>
