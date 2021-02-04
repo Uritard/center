@@ -83,13 +83,11 @@ public class TCameraRecorderService {
 
         for(TCameraRecorderByDict res : tCameraRecorderByDictList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
-            log.info("recordId==="+res.getRecordId());
             recordIdMap.put("recordId", res.getRecordId());
             Result re = recorderStates(recordIdMap);
             log.info("re---"+re);
             if (Objects.nonNull(re)){
                 Map<String,Object> mapRes = JSONObject.parseObject(JSON.toJSONString(re.getData()));
-                log.info("object转map的东西==="+mapRes);
                 if ("403".equals(mapRes.get("errorCode: ").toString())){
                     res.setRecorderStatus("离线");
                 }else {

@@ -121,25 +121,6 @@ public class TCruiseResultService{
         TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
         log.info("tStdDeviceMete==="+tStdDevicemete);
 
-        //组装告警基本信息
-        TWarnInfo warnInfo = new TWarnInfo();
-        warnInfo.setWarnTime(new Date());
-        if (Objects.nonNull(tStdDevicemete.getAlarmType())){
-            warnInfo.setWarnType(Integer.parseInt(tStdDevicemete.getAlarmType()));
-        }
-        warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
-        warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-        warnInfo.setInstanceId(instanceId);
-        warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-        warnInfo.setConfMode(275);//已核查
-        warnInfo.setDealType(286);//属实
-        warnInfo.setDefectModel(405);//其他
-        warnInfo.setAlarmSource(282);//主辅设备
-        warnInfo.setImagePath(picPath);
-        warnInfo.setValue(personCheck);
-        warnInfo.setTaskId(taskId);
-        log.info("warnInfo=="+warnInfo);
-
         Map<String,Object> params = new HashMap<>();
         params.put("value",personCheck);
         params.put("stdDeviceMeteName",tStdDevicemete.getMeteName());
@@ -159,8 +140,6 @@ public class TCruiseResultService{
         log.info("params的值是==="+params);
 
         Result result = sendPostRequest(Constant.WARN_JUDGE,params);
-        log.info("result==="+result);
-
         Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
         log.info("object转map的东西==="+map);
         Boolean isWarN = (Boolean)map.get("isWarn");
@@ -168,6 +147,23 @@ public class TCruiseResultService{
         if (Objects.nonNull(map.get("outRange"))){
             outRange = map.get("outRange").toString();
         }
+
+        //组装告警基本信息
+        TWarnInfo warnInfo = new TWarnInfo();
+        warnInfo.setWarnTime(new Date());
+        warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
+        warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+        warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+        warnInfo.setInstanceId(instanceId);
+        warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+        warnInfo.setConfMode(275);//已核查
+        warnInfo.setDealType(286);//属实
+        warnInfo.setDefectModel(405);//其他
+        warnInfo.setAlarmSource(282);//主辅设备
+        warnInfo.setImagePath(picPath);
+        warnInfo.setValue(personCheck);
+        warnInfo.setTaskId(taskId);
+        log.info("warnInfo=="+warnInfo);
 
         //判断该点是否已在告警表
             if (isWarn == 1) {
@@ -244,7 +240,8 @@ public class TCruiseResultService{
 
             //自动生成巡视报告
             String taskID = cruiseManualReview.getTaskId();
-            reportManageService.cruiseReportGenerate(taskID);
+            String reportFilePath = reportManageService.cruiseReportGenerate(taskID);
+            log.info("自动生成巡视报告的路径是=="+reportFilePath);
         }
 //        insert QrDecode as device's real code. by tt.
         TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
@@ -299,10 +296,15 @@ public class TCruiseResultService{
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalResult> taskStatistical(){
 
-        String weekStart = tCruiseResultDao.selectOnMonday();//本周一的日期
-        String weekEnd = tCruiseResultDao.selectOnSunday();//本周日的日期
-        String lastWeekStart = tCruiseResultDao.selectLastMonday();//上周一的日期
-        String lastWeekend = tCruiseResultDao.selectLastSunday();//上周日的日期
+        String weekStart = tCruiseResultDao.selectOnMonday() + " 00:00:00";//本周一的日期
+        String weekEnd = tCruiseResultDao.selectOnSunday() + " 23:59:59";//本周日的日期
+        String lastWeekStart = tCruiseResultDao.selectLastMonday() + " 00:00:00";//上周一的日期
+        String lastWeekend = tCruiseResultDao.selectLastSunday()+ " 23:59:59";//上周日的日期
+        log.info("这周一=="+weekStart);
+        log.info("这周日=="+weekEnd);
+        log.info("上周一=="+lastWeekStart);
+        log.info("上周日=="+lastWeekend);
+
 
         String colName1 = "plan_type";
 

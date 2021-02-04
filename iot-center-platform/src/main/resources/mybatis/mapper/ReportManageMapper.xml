@@ -35,28 +35,33 @@
 		e.cruise_result_id,
 		f.cruise_data_id,
 		a.device_id,
+		e.device_name,
 		b.device_mete_id,
 		d.instance_id,
-        b.mete_type,
-        q.dict_note as mete_type_name,
+		e.instance_name,
+		b.mete_type,
+		q.dict_note as mete_type_name,
 		f.evaluation_state,
 		p.dict_note as evaluation_state_name,
-		e.device_name ,
-		e.instance_name,
-		h.dict_note as identify_result,
+		f.result_num,
 		f.origpic as picpath,
-		g.dict_note as cruise_result,
-		e.cruise_time
+		f.cruise_result,
+		g.dict_note as cruise_result_name,
+		e.cruise_time,
+		y.real_code,
+		f.person_check,
+		f.identify_result,
+		z.dict_note as identify_result_name
 		FROM t_std_device a
 		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
 		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
 		LEFT JOIN t_cruise_task_result_detail e on e.instance_id = d.instance_id
 		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
 		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
-		LEFT JOIN t_dict_business h on h.dict_code = f.identify_result
 		LEFT JOIN t_dict_business p on p.dict_code = f.evaluation_state
         LEFT JOIN t_dict_business q on q.dict_code = b.mete_type
-
+        LEFT JOIN t_std_device_attr y on y.device_id = b.device_id
+        LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
     </sql>
     <sql id="TongYong2">
         select
@@ -76,7 +81,11 @@
 		f.origpic as picpath,
 		F.cruise_result,
 		g.dict_note as cruise_result_name,
-		e.cruise_time
+		e.cruise_time,
+		y.real_code,
+		f.person_check,
+		f.identify_result,
+		z.dict_note as identify_result_name
 		FROM t_std_device a
 		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
 		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
@@ -86,6 +95,8 @@
 		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
 		LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
 		LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
+		LEFT JOIN t_std_device_attr y on y.device_id = b.device_id
+        LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
     </sql>
     <delete id="reportDelete" parameterType="java.lang.String">
         delete from t_report_info
@@ -136,7 +147,6 @@
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         <include refid="TongYong"></include>
         where 1 = 1
-
          and a.device_id in
             <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
                 #{deviceIds, jdbcType=BIGINT}
@@ -163,6 +173,7 @@
         <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
             #{deviceIds, jdbcType=BIGINT}
         </foreach>
+        <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
         GROUP BY device_mete_id
         )big_table
     </select>
@@ -190,6 +201,7 @@
                     <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
                         #{deviceIds, jdbcType=BIGINT}
                     </foreach>
+                    <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
                     GROUP BY device_mete_id
                 ) big_table
                 where mete_type = dict_code

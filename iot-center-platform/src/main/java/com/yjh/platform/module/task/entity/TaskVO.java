@@ -27,9 +27,9 @@ public class TaskVO implements Serializable {
     private String taskName;
     @ApiModelProperty(value = "测点数")
     private Integer meteNum;
-    @ApiModelProperty(value = "关联测点数")
+    /*@ApiModelProperty(value = "关联测点数")
     private Integer meteRelationNum;
-    /*@ApiModelProperty(value = "未处理数")
+    @ApiModelProperty(value = "未处理数")
     private Integer abnormalNum;*/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "巡检时间")

@@ -14,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -30,7 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/reportManage/v1")
-@Api(value = "/reportManage", description = "报表管理接口")
+@Api(value = "/reportManage")
 public class ReportManageController {
 
     private Logger log = LoggerFactory.getLogger(ReportManageController.class);
@@ -43,7 +40,7 @@ public class ReportManageController {
     }
 
     @ApiOperation(value = "生成报表")
-    @RequestMapping(value = "/reportGenerate", method = RequestMethod.GET)
+    @GetMapping(value = "/reportGenerate")
     @Logs(title = "生成报表",content = "生成报表",logType = 5)
     public Result reportGenerate(@RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                  @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
@@ -58,12 +55,12 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("生成报表错误:", e);
+            log.error("生成报表发生错误:", e);
         }
         return result;
     }
     @ApiOperation(value = "下载报表")
-    @RequestMapping(value = "/reportDownload", method = RequestMethod.GET)
+    @GetMapping(value = "/reportDownload")
     @Logs(title = "下载报表",content = "下载报表",logType = 5)
     public Result reportDownload(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
@@ -110,7 +107,7 @@ public class ReportManageController {
 //        return result;
 //    }
     @ApiOperation(value = "查询报表生成记录")
-    @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
+    @GetMapping(value = "/reportSelect")
     @Logs(title = "查询报表生成记录",content = "根据用户传递的参数查询报表生成记录",logType = 1)
     public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
                                @RequestParam(value = "startTime", required = false) String startTime,
@@ -132,7 +129,7 @@ public class ReportManageController {
         return result;
     }
     @ApiOperation(value = "删除报表")
-    @RequestMapping(value = "/reportDelete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/reportDelete")
     @Logs(title = "删除报表",content = "根据用户传递的参数删除报表",logType = 5)
     public Result reportDelete(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
@@ -161,7 +158,7 @@ public class ReportManageController {
 //        return result;
 //    }
     @ApiOperation(value = "审核完成后根据任务生成巡检记录报告")
-    @RequestMapping(value = "/reportByTask", method = RequestMethod.GET)
+    @GetMapping(value = "/reportByTask")
     @Logs(title = "审核报表",content = "审核完成后根据任务生成巡检记录报告",logType = 5)
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
@@ -172,12 +169,12 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("生成报表错误:", e);
+            log.error("审核完成后根据任务生成巡检记录报告发生错误:", e);
         }
         return result;
     }
     @ApiOperation(value = "下载巡视报告")
-    @RequestMapping(value = "/downLoadCruiseReport", method = RequestMethod.GET)
+    @GetMapping(value = "/downLoadCruiseReport")
     @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 5)
     public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
@@ -187,12 +184,12 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("生成报表错误:", e);
+            log.error("下载巡视报告发生错误:", e);
         }
         return result;
     }
-    @ApiOperation(value = "啥也不是")
-    @RequestMapping(value = "/xixixi", method = RequestMethod.GET)
+    @ApiOperation(value = "测试方法，用完就删")
+    @GetMapping(value = "/xixixi")
     public Result test(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
@@ -201,13 +198,13 @@ public class ReportManageController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("生成报表错误:", e);
+            log.error("测试方法发生错误:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "巡视结果分析报表生成")
-    @RequestMapping(value = "/cruiseResultAnalyseReporter",method = RequestMethod.GET)
+    @GetMapping(value = "/cruiseResultAnalyseReporter")
     @Logs(title = "巡视结果分析报表生成",content = "巡视结果分析报表生成",logType = 5)
     public Result cruiseResultAnalyseReporter(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
         Result result=new Result();
@@ -216,7 +213,7 @@ public class ReportManageController {
 
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-            log.error("报表生成失败："+e);
+            log.error("报表生成失败：",e);
         }
         return result;
     }

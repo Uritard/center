@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.service;
 
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Report.ReportDataRepo;
 import com.yjh.platform.common.utils.Report.ReportHelper;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -38,6 +38,7 @@ public class ReportManageService {
     private TStdDevicemeteDao tStdDevicemeteDao;
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private DateTimeUtil dateTimeUtil;
     @Transactional(rollbackFor = Exception.class)
@@ -51,42 +52,24 @@ public class ReportManageService {
         String stationName = reportManageDao.selectStationName();
         taskVO.setStationName(stationName);
         //测点数
-        Integer meteNum = reportManageDao.selectMeteNum(list);
+        Integer meteNum = reportManageDao.selectMeteNum(list,startTime,endTime);
         taskVO.setMeteNum(meteNum);
-        //未处理数
-        /*Integer abnormalNum = reportManageDao.selectAbnormalNum(list);
-        taskVO.setAbnormalNum(abnormalNum);*/
-        //关联测点数
-        taskVO.setMeteRelationNum(0);
-        //任务名称
-//        taskVO.setTaskName("全站巡视");
         recordData.setTaskVO(taskVO);
         //2.分项预览
-        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list);
+        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list,startTime,endTime);
         recordData.setCpTypeItems(cpTypeItems);
-        //3.环境监测-暂无
-//        List<EnvironmentResult> evnRecordList = new ArrayList<>();
-//        recordData.setEvnRecordList(evnRecordList);
-//        //4.关联设备-暂无
-//        List<RelationDevice> rcpRecordList = new ArrayList<>();
-//        recordData.setRcpRecordList(rcpRecordList);
-        //5.明细-所选设备的所有测点巡检结果详情
-
+        //3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
         recordData.setTCDRDList(tCDRDList);
 
-        SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = new Date();
-        String nowTime = f.format(date);
-
-//        String fileName = nowTime+"-"+reportType+".xlsx";
+//        String fileName = sdf.format(new Date())+"-"+reportType+".xlsx";
+//        String fileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
         //生成随机的文件名称
         String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
-//        String fileName = reportName+"_"+reportType+"_"+nowTime+".xlsx";
-//        String reportPath2 = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+//        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String finalFileName = null;
         try {
-            finalFileName = new String(fileName.getBytes("UTF-8"),"UTF-8");
+            finalFileName = new String(fileName.getBytes(StandardCharsets.UTF_8),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -128,23 +111,17 @@ public class ReportManageService {
                 .setReportId(String.valueOf(UUID.randomUUID()).replace("-", ""))
                 .setReportName(reportName)
                 .setReportType(reportType)
-                .setGenerateDate(date)
+                .setGenerateDate(new Date())
                 .setReportEnvId(fileName);
-        int res = reportManageDao.insertReport(reportInfo);
-        return res;
+        return reportManageDao.insertReport(reportInfo);
     }
     @Transactional(rollbackFor = Exception.class)
     public String reportDownload(String reportId) {
-//        String reportPathA = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/";
-//        String filePath = reportPathA+fileName;
-
         String fileName = reportManageDao.selectReportEnvId(reportId);
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportRelative");
         String reportPath = map.get("content");
-        log.info("reportPath:"+reportPath);
         String filePath = reportPath+"/"+fileName;
-
         log.info("filePath:"+filePath);
         return filePath;
     }
@@ -167,7 +144,7 @@ public class ReportManageService {
         long count = 0;
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
-            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
             String lineForId = null;
             while ((lineForId = readerForId.readLine()) != null) {
                 count = Long.parseLong(lineForId);
@@ -177,7 +154,6 @@ public class ReportManageService {
         }
         log.info("删除前文件的个数："+count);
         String fileName = reportManageDao.selectReportEnvId(reportId);
-//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String filePath = reportPath+"/"+fileName;
         log.info("filePath:"+filePath);
         String url2 = "rm -f "+filePath;
@@ -191,7 +167,7 @@ public class ReportManageService {
         long count2 = 0;
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", url3});
-            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
             String lineForId = null;
             while ((lineForId = readerForId.readLine()) != null) {
                 count2 = Long.parseLong(lineForId);
@@ -206,40 +182,14 @@ public class ReportManageService {
         }
         return res;
     }
-//    @Transactional(rollbackFor = Exception.class)
-//    public boolean reportBatchDelete(String reportPath,List<TReportInfo> fileNameList) {
-//        for (TReportInfo res:fileNameList) {
-//            String reportName = res.getReportName();
-//            String reportType = res.getReportType();
-//            Date startTime = res.getGenerateDate();
-//            String time2 =  DateTimeUtil.changeTime2(startTime);
-//            String fileName = reportName+"-"+time2+"-"+reportType+".xlsx";
-//            String filePathAndName = reportPath+"/"+fileName;
-//           String filePathAndName = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-//           String url = "rm -f "+filePathAndName;
-//            try {
-//                Process processForId = Runtime.getRuntime().exec(url);
-//                processForId.waitFor();
-//            } catch (Exception e) {
-//                e.getMessage();
-//            }
-//        }
-//        return  true;
-//    }
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
-
         //测点数
         Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
         taskVO.setMeteNum(meteNum);
-        //未处理数
-        /*Integer abnormalNum = reportManageDao.selectAbnormalNumByTask(taskId);
-        taskVO.setAbnormalNum(abnormalNum);*/
-        //关联测点数
-        taskVO.setMeteRelationNum(0);
         //站所名称、任务名称、巡检时间
         TaskVO someThing = reportManageDao.selectTaskNameAndTime(taskId);
         taskVO.setStationName(someThing.getStationName());
@@ -249,20 +199,19 @@ public class ReportManageService {
         //2.分项预览
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
         recordData.setCpTypeItems(cpTypeItems);
-        //5.明细-所选设备的所有测点巡检结果详情
-
+        //3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         recordData.setTCDRDList(tCDRDList);
-//        String taskName = recordData.getTaskVO().getTaskName();
-//        String cruiseDate = dateTimeUtil.format(recordData.getTaskVO().getCruiseDate());
-//        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
+        /*String taskName = recordData.getTaskVO().getTaskName();
+        String cruiseDate = sdf.format(recordData.getTaskVO().getCruiseDate());
+        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称*/
         String reportName =  taskId + ".xlsx";//报表名称
 
-//        String filePath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+//        String filePathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
 
         String finalFileName = null;
         try {
-            finalFileName = new String(reportName.getBytes("UTF-8"),"UTF-8");
+            finalFileName = new String(reportName.getBytes(StandardCharsets.UTF_8),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -273,20 +222,20 @@ public class ReportManageService {
         log.info("reportPath:"+reportPath);
 
         File temporaryFile = new File(reportPath);
-        String reportPath2 = null;
+        String newReportPath = null;
         if (!temporaryFile.exists() && !temporaryFile.isDirectory())
         {
             temporaryFile.mkdir();
-            reportPath2 = reportPath+"/"+finalFileName;
-            log.info("不存在，创建的文件绝对路径是==="+reportPath2);
+            newReportPath = reportPath+"/"+finalFileName;
+            log.info("不存在，创建的文件绝对路径是==="+newReportPath);
             File file = new File(reportPath);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
-            reportPath2 = reportPath+"/"+finalFileName;
-            log.info("存在，该文件绝对路径是==="+reportPath2);
-            File file = new File(reportPath2);
+            newReportPath = reportPath+"/"+finalFileName;
+            log.info("存在，该文件绝对路径是==="+newReportPath);
+            File file = new File(newReportPath);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
@@ -308,16 +257,9 @@ public class ReportManageService {
         return fileRelativePath;
     }
     @Transactional(rollbackFor = Exception.class)
-    public String reportByCondition(String taskId,Integer deviceType,Integer cruiseType,String startTime,String endTime) {
-//        List<Long> regionIdList = tStdRegionDao.selectDownId();
-        return "";
-    }
-    @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> test(String taskId){
-        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
-        return tCDRDList;
+        return reportManageDao.selectTaskResult(taskId);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public String cruiseResultAnalyseReporter(Long deviceMeteId){
 

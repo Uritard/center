@@ -21,9 +21,9 @@ import java.util.Date;
 public class TCruiseDataResultDetail implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "设备名称")
+    @ApiModelProperty(value = "巡视设备")
     private String deviceName;
-    @ApiModelProperty(value = "检测内容")
+    @ApiModelProperty(value = "巡视点")
     private String instanceName;
     @ApiModelProperty(value = "巡视值")
     private String resultNum;
@@ -32,8 +32,16 @@ public class TCruiseDataResultDetail implements Serializable {
     @ApiModelProperty(value = "识别状态")
     private String cruiseResultName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @ApiModelProperty(value = "巡检时间")
+    @ApiModelProperty(value = "巡视时间")
     private Date cruiseTime;
     @ApiModelProperty(value = "序号")
     private int px;
+    @ApiModelProperty(value = "实物编码")
+    private String realCode;
+    @ApiModelProperty(value = "审核值")
+    private String personCheck;
+    @ApiModelProperty(value = "审核结果")
+    private String identifyResultName;
+    @ApiModelProperty(value = "审核状态")
+    private String evaluationStateName;
 }
