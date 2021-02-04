@@ -640,7 +640,7 @@ public class CameraConService {
     public String registerNVR(Long recordId) {
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        lUserID = Constant.maps.get("recordId");
+        lUserID = Constant.maps.get(String.valueOf(recordId));
         log.info("lUserID: "+lUserID);
 
         if (lUserID > -1) {
