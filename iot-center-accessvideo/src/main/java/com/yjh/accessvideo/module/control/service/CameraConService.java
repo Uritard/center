@@ -609,8 +609,8 @@ public class CameraConService {
             Pointer lpPicConfig = m_struHDCfg.getPointer();
             if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig, m_struHDCfg.size(), ibrBytesReturned)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
-                log.error("get camera status fail, error code: "+iErr);
-                channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
+                log.error("get NVR status fail, error code: "+iErr);
+                channleStatusMap.put("get NVR status fail, error code: ", String.valueOf(iErr));
                 return channleStatusMap;
             }
             m_struHDCfg.read();

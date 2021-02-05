@@ -158,14 +158,20 @@ public class SystemInfoService {
                 continue;
             }
             Map<String,String> map = (Map<String,String>)re.getData();
-            if(map.get("errorMessage: ") != null){
-                continue;
+            if(map.get("freeTotal") != null && map.get("capacityTotal")!= null){
+                Integer use = Integer.valueOf(map.get("freeTotal"));
+                Integer all = Integer.valueOf(map.get("capacityTotal"));
+                Integer other = all - use;
+                map.put("use",other.toString());
+                map.put("recoderName",item.getRecordName());
+            }else {
+                map.put("recordId",item.getRecordId().toString());
+                map.put("recordName",item.getRecordName());
+                map.put("freeTotal","-");
+                map.put("capacityTotal","-");
+                map.put("use","-");
             }
-            Integer use = Integer.valueOf(map.get("freeTotal"));
-            Integer all = Integer.valueOf(map.get("capacityTotal"));
-            Integer other = all - use;
-            map.put("use",other.toString());
-            map.put("recoderName",item.getRecordName());
+
             reList.add(map);
         }
         return reList;
