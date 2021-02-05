@@ -53,7 +53,7 @@ public class TCameraGroupService{
             for (String item : cameraList) {
                 TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(item));
                 if(tCameraInfo == null){
-                    tCameraGroup.setCameraIds(tCameraGroup.getCameraIds().replace(","+item,"").replace(item,""));
+                    tCameraGroup.setCameraIds(tCameraGroup.getCameraIds().replace(item+",","").replace(","+item,"").replace(item,""));
                     flag = true;
                     continue;
                 }

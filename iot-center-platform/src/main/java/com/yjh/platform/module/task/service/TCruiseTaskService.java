@@ -493,7 +493,7 @@ public class TCruiseTaskService {
                 robotTaskStates(robotTaskStatesMap);
             }
             Map<String,Object> jasonMapOnFinished=new HashMap<>();
-            jasonMapOnFinished.put("type","taskPause");
+            jasonMapOnFinished.put("type","taskChange");
             jasonMapOnFinished.put("taskId",taskId);
             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
             log.info("发送给前端的消息："+jsonMessage);
@@ -544,6 +544,13 @@ public class TCruiseTaskService {
             robotTaskStatesMap.put("robotCodeList",robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
+
+        Map<String,Object> jasonMapOnFinished=new HashMap<>();
+        jasonMapOnFinished.put("type","taskChange");
+        jasonMapOnFinished.put("taskId",taskId);
+        String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+        log.info("发送给前端的消息："+jsonMessage);
+        WebSocketServer.sendMsg(jsonMessage);
 
         //任务状态上报站端
         //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);

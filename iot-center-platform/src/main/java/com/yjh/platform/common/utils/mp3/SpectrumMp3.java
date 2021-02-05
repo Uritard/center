@@ -7,7 +7,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -150,6 +152,7 @@ public class SpectrumMp3 {
 
 		int listMax = list.stream().mapToInt(Integer::valueOf).max().getAsInt();
 		if (listMax == getMaxVoice()) {
+		//if (listMax == 100) {
 			log.info("文件中分贝大小:" + listMax);
 			try {
 				ImageIO.write(spectrumImage, "png", new File(filePath + fileName + ".png"));
@@ -165,6 +168,7 @@ public class SpectrumMp3 {
 	}
  
 	public void analyticalDecibels() {
+		//SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		WaveOutMp3 wi = new WaveOutMp3(file);
 		wi.open();
 		wi.start();
@@ -175,6 +179,7 @@ public class SpectrumMp3 {
 		int i, j,nByteRead = 0;
 		try {
 			long start = System.currentTimeMillis();
+			Date kaishi = new Date();
 			while (nByteRead!=-1) {
 
 				// 从混音器录制数据并转换为short类型的PCM
@@ -190,6 +195,8 @@ public class SpectrumMp3 {
 				drawHistogram(realIO);
 			}
 			System.out.println("时间:"+(System.currentTimeMillis() - start));
+//			System.out.println("开始："+simpleDateFormat.format(kaishi));
+//			System.out.println("结束："+simpleDateFormat.format(new Date()));
 			int max = getMaxVoice();
             this.max.stream().filter(a -> max != a).distinct().forEach(str -> {
 				File file = new File(filePath + str + ".png");

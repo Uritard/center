@@ -133,8 +133,8 @@
             )
     </delete>
 
-    <select id="selectAll" resultType="com.yjh.platform.module.device.entity.AreaInfo">
-        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "tree" AS infoType
+    <select id="selectAll" resultType="com.yjh.platform.module.device.entity.VoiceDevice">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
         FROM t_std_region a
         LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
         UNION ALL (
@@ -149,6 +149,15 @@
             LEFT JOIN t_std_region b on a.up_region_id = b.region_id
         <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
     )
+    </select>
+    <select id="selectVoiceInfo" resultType="com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail">
+        SELECT
+            a.*,
+            b.dbValue
+        FROM
+            t_voice_device a
+        left join t_voice_config b on a.config_id = b.config_id
+        where a.voice_device_id =#{voiceDeviceId}
     </select>
 
 </mapper>

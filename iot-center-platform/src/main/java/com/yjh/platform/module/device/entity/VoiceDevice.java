@@ -37,4 +37,6 @@ public class VoiceDevice {
 
     @ApiModelProperty(value = "子类")
     private List<VoiceDevice> children;
+
+    private String filePath;
 }

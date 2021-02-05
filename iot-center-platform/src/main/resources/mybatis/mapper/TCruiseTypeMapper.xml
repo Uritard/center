@@ -156,14 +156,14 @@
         )
     </delete>
 
-    <select id="selectForInstanceId">
-        select instance_id from t_cruise_point_instance
-                where instance_id = #{instanceId, jdbcType=BIGINT}
-    </select>
+<!--    <select id="selectForInstanceId">-->
+<!--        select instance_id from t_cruise_point_instance-->
+<!--                where instance_id = #{instanceId, jdbcType=BIGINT}-->
+<!--    </select>-->
     <select id="selectAll" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
         "213" as subType,
-        b.instance_id
+        b.instance_id,
         (CASE
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name

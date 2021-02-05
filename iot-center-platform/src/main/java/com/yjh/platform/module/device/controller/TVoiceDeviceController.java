@@ -6,6 +6,9 @@ import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
+
+import java.beans.Encoder;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,6 +24,8 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ws.schild.jave.MultimediaInfo;
+import ws.schild.jave.MultimediaObject;
 
 
 /**
@@ -28,8 +33,8 @@ import org.slf4j.LoggerFactory;
  * @since 2020-12-01
  */
 @RestController
-@RequestMapping("/t-voice-device/v1")
-@Api(value = "/t-voice-device", description = "声纹设备表操作接口")
+@RequestMapping("/tVoiceDevice/v1")
+@Api(value = "/tVoiceDevice", description = "声纹设备表操作接口")
 public class TVoiceDeviceController {
 
     @Autowired
@@ -185,7 +190,7 @@ public class TVoiceDeviceController {
     public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName",required = false)String voiceDeviceName) {
         Result result = new Result();
         try {
-            List<AreaInfo> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName);
+            List<VoiceDevice> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -197,12 +202,11 @@ public class TVoiceDeviceController {
     @ApiOperation(value = "音频分析")
     @RequestMapping(value = "/voiceAnalyse", method = RequestMethod.GET)
 //    @Logs(title = "音频分析",content = "音频频谱分析",logType = 5)
-    public Result voiceAnalyse(@RequestParam(value = "voicePath") String voicePath) {
+    public Result voiceAnalyse(@RequestParam(value = "voicePath") String voicePath,
+                               @RequestParam(value = "voiceDeviceId") String voiceDeviceId) {
         Result result = new Result();
         try {
-            SpectrumMp3 spectrumMp3 = new SpectrumMp3(voicePath);
-            spectrumMp3.analyticalDecibels();
-            result.setData(spectrumMp3.getMaxVoice());
+            result.setData(tVoiceDeviceService.voiceAnalyse(voicePath, voiceDeviceId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

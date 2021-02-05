@@ -66,6 +66,9 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectAll();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
         if(subType == 322 ){
@@ -74,6 +77,9 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectByAnalyse();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
         if(subType == 323 ){
@@ -82,6 +88,9 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByOil();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
         if(subType == 324 ){
@@ -90,6 +99,9 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByArrester();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
         if(subType == 325 ){
@@ -98,6 +110,9 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeBySF6();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
         if(subType == 326 ){
@@ -106,6 +121,9 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByYY();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
         if(subType == 327 ){
@@ -114,9 +132,11 @@ public class TCruiseTypeService{
             if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
                 //库里没有
                 tCruiseTypeList = tCruiseTypeDao.selectByAnalyseByWg();
+                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
+                    this.batchAdd(tCruiseTypeList);
+                }
             }
         }
-        this.batchAdd(tCruiseTypeList);
         return tCruiseTypeList;
     }
 

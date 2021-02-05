@@ -103,7 +103,7 @@
         <if test="paramName != null and paramName != ''"> and a.param_name LIKE CONCAT('%',#{paramName, jdbcType=VARCHAR},'%')</if>
         <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
-         order by a.param_name
+         order by a.param_type,a.param_code,a.param_id
     </select>
 
     <insert id="batchInsert">
