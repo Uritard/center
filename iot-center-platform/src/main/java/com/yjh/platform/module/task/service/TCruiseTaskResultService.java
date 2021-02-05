@@ -148,7 +148,6 @@ public class TCruiseTaskResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectCruiseTaskResult(String taskId) throws ParseException {
-        Integer testFlag = 0;
         //最终结果集容器
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
@@ -201,14 +200,30 @@ public class TCruiseTaskResultService {
 
             Map<String, String> videoInfo = new HashMap<>();
             if (Objects.nonNull(resultMap.get("cameraId"))) {
-                HashMap<String, Long> camera = new HashMap<>();
-                camera.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
-                Result result = sendGetRequest(Constant.START_CAMERA_URL, camera);
-                testFlag = testFlag+1;
+                if(redisTemplate.opsForHash().entries("cruiseVideo:"+taskId+(cruiseInspectResult.getInstanceId()).toString()).size()==0){
+                    HashMap<String, Long> camera = new HashMap<>();
+                    camera.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
+                    try{
+                        Result result = sendGetRequest(Constant.START_CAMERA_URL, camera);
+                        videoInfo.putAll((Map<String, String>) result.getData());
+                        log.info("result："+result);
+                    }catch (Exception e){
+                        log.error("播放失败："+e);
+                        videoInfo.put("flvUrl","null");
+                        videoInfo.put("rtmpUrl","null");
+                    }finally {
+                        videoInfo.put("cameraId", resultMap.get("cameraId").toString());
+                        redisTemplate.opsForHash().putAll("cruiseVideo:"+taskId+(cruiseInspectResult.getInstanceId()).toString(),videoInfo);
+                    }
+                }else {
+                    Map<String,Object>cruiseVideoInfo=redisTemplate.opsForHash().entries("cruiseVideo:"+taskId+(cruiseInspectResult.getInstanceId()).toString());
+                    videoInfo.put("cameraId",cruiseVideoInfo.get("cameraId").toString());
+                    videoInfo.put("flvUrl",cruiseVideoInfo.get("flvUrl").toString());
+                    videoInfo.put("rtmpUrl",cruiseVideoInfo.get("rtmpUrl").toString());
 
-                videoInfo.putAll((Map<String, String>) result.getData());
-                videoInfo.put("cameraId", resultMap.get("cameraId").toString());
+                }
                 cruiseInspectResult.setVideoInfo(videoInfo);
+
             } else {
                 HashMap<String, Long> robot = new HashMap<>();
                 robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
@@ -280,10 +295,26 @@ public class TCruiseTaskResultService {
         resultsMap.put("index", index);
         resultsMap.put("list", cruiseInspectResults);
 
-        log.info("testFlag:----------" + testFlag);
         completeResult.add(resultsMap);
         return completeResult;
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String cruiseCameraStop(String taskId){
+        String stopResult="失败";
+         Set<String> cruiseVideos=redisScan("cruiseVideo:"+taskId);
+         for(String cruiseVideo:cruiseVideos){
+             Map<String,Object>videoInfo=redisTemplate.opsForHash().entries(cruiseVideo);
+
+             HashMap<String, Object> camera = new HashMap<>();
+             camera.put("cameraId", Long.valueOf(videoInfo.get("cameraId").toString()));
+             camera.put("rtmpUrl",videoInfo.get("rtmpUrl").toString());
+             Result result = sendStopRequest(Constant.STOP_CAMERA_URL, camera);
+             stopResult=result.getData().toString();
+         }
+       return stopResult;
+    }
+
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -695,6 +726,21 @@ public class TCruiseTaskResultService {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
                 response = serviceRestTemplate.getForObject(url, Result.class, params);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
+
+    }
+
+
+    public Result sendStopRequest(String url, HashMap<String, Object> params) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.getForObject(url, Result.class, params.get("cameraId"),params.get("rtmpUrl"));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

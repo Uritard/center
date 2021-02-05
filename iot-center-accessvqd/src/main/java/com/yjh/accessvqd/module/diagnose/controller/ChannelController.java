@@ -126,7 +126,7 @@ public class ChannelController {
     }
 
     @ApiOperation(value = "新增&修改单个监测点")
-    @RequestMapping(value = "updateChannel",method = RequestMethod.PUT)
+    @RequestMapping(value = "updateChannel",method = RequestMethod.POST)
     public Result updateChannel(@RequestBody Channel channel){
         Result result=new Result();
         try {

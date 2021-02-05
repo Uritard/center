@@ -183,6 +183,23 @@ public class TCruiseTaskResultController {
 
     }
 
+    @ApiOperation(value = "A-关闭结束任务视频流")
+    @RequestMapping(value = "/cruiseCameraStop",method = RequestMethod.GET)
+    @Logs(title = "获取当前任务下的巡检点的执行信息",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1)
+    public Result cruiseCameraStop(@RequestParam String taskId){
+        Result result=new Result();
+        try {
+            result.setData(tCruiseTaskResultService.cruiseCameraStop(taskId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+
+        return result;
+
+    }
+
+
     @ApiOperation(value = "A-获取当前执行任务的实时告警信息")
     @RequestMapping(value = "/selectRealTimeWarnInfo",method = RequestMethod.GET)
     @Logs(title = "获取当前执行任务的实时告警信息",content = "根据用户传递的参数获取当前执行任务的实时告警信息",logType = 1)

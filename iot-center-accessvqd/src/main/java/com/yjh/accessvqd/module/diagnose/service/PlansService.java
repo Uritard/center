@@ -375,6 +375,7 @@ public class PlansService {
     @Transactional(rollbackFor = Exception.class)
     public String diagnosePlanDelete(List<String> planIds) {
         String status = null;
+
         try {
             for (String planId : planIds) {
                 if (tDiagnosePlanAttrDao.selectByPrimaryId(planId).size() != 0) {//立即任务
@@ -385,10 +386,18 @@ public class PlansService {
                 } else {
                     String result = HttpClientUtils.getInstance().deleteUrl(diagnosePlan_URl + "/" + planId, null);
                     status = ResponseXML.unPackingXMl(result);
-                    if (status.equals("正常")) {
+                    if (status.equals("成功")) {
                         tDiagnosePlanDao.deleteByPrimaryId(planId);
                         status = "success-cycle";
                     }
+                }
+
+                //删除任务时清空redis中任务下的所有监测点
+                if(redisTemplate.opsForList().size("diagnosePlan:"+planId) !=0){
+                    for(int i=0;i<redisTemplate.opsForList().size("diagnosePlan:"+planId);i++){
+                        redisTemplate.delete("diagnosePlan:"+planId);
+                    }
+
                 }
             }
         } catch (Exception e) {

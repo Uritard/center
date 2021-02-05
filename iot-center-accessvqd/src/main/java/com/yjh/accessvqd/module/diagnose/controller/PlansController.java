@@ -11,6 +11,7 @@ import com.yjh.accessvqd.module.diagnose.service.PlansService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -127,16 +125,10 @@ public class PlansController {
     @ApiOperation(value = "接口测试")
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public Result test(@RequestParam String time) {
+
         Result result = new Result();
         try {
-            String str="signal,blur";
-            String[] arr=str.split(",");
-            List<String> r1=new ArrayList<>();
-            for(int i=0;i<arr.length;i++){
-                r1.add(arr[i]+"----");
-
-            }
-            result.setData(r1);
+            result.setData(RandomStringUtils.randomAlphanumeric(15));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("任务下发失败" + e);

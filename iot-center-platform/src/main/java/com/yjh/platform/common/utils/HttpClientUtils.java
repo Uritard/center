@@ -10,6 +10,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -160,6 +161,17 @@ public class HttpClientUtils {
         httpPost.setHeader("Accept", "application/json");
         httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
         CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
+    }
+
+    public String putUrl(String url, String json) throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPut.setHeader("Accept", "application/json");
+        httpPut.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPut);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, "UTF-8");
     }

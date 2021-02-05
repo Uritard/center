@@ -46,8 +46,6 @@ public class TCameraInfoService {
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
-    @Autowired
-    private TDictBusinessDao tDictBusinessDao;
 
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
@@ -78,10 +76,12 @@ public class TCameraInfoService {
             }
             channel.setDevBrand("0");
 
-            HttpClientUtils.getInstance().postUrl(Constant.DIAGNOSE_CHANNEL_OPERATE,channel.toString());
+         Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
 
+            log.info("channel:"+channel);
         }catch (Exception e){
             log.error("监测点新增失败："+e);
+            return 1;
         }
 
         tCameraInfo.setMonitorId(channel.getId());
@@ -105,6 +105,25 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraInfo tCameraInfo) {
+        TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
+        try {
+            Result result=Constant.otherServerGet(tCameraInfo.getMonitorId(),Constant.DIAGNOSE_CHANNEL_GET);
+            log.info("result:"+result.getData());
+            Channel channel=(Channel)result.getData();
+
+            channel.setIp(recorder.getRecordIp());
+            channel.setPort(recorder.getHttpPort().toString());
+            channel.setUserName(recorder.getUserName());
+            channel.setUserPwd(recorder.getPwd());
+            Integer realChannelNum=tCameraInfo.getChannelNum()+32;
+            channel.setChanIndex(realChannelNum.toString());
+
+            Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+        }catch (Exception e){
+            log.error("监测点修改失败："+e);
+        }
+
+
         return this.tCameraInfoDao.update(tCameraInfo);
     }
 

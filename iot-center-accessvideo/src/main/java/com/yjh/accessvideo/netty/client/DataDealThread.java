@@ -158,7 +158,7 @@ public class DataDealThread implements Runnable {
                                             //初始化告警信息redis表
                                             String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             Map<String, String> warnMap = new HashMap<>();
-                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmNote());
+                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
                                             warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
                                             warnMap.put("customId", tCruisePointInstance.getCustomId());
                                             warnMap.put("instanceId", jsonObjectResult.get("instanceId").toString());

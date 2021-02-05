@@ -135,6 +135,7 @@ public class ChannelService {
     public String addChannel(Channel channel){
         String status=null;
         try {
+            log.info("channel:----------"+channel);
             channel.setUserPwd(userPwdEncrypt(channel.getUserPwd()));
             String result=HttpClientUtils.getInstance().putUrl(channelURl+"/"+channel.getId(), ChannelsXML.generateChannelXML(channel));
             status= ResponseXML.unPackingXMl(result);

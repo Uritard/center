@@ -5,6 +5,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
+import com.yjh.platform.module.user.entity.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
@@ -45,6 +46,8 @@ public class Constant {
 
     public static final String DIAGNOSE_CHANNEL_OPERATE="http://iot-center-accessvqd/channelOperate/v1/updateChannel";
 
+    public static final String DIAGNOSE_CHANNEL_GET="http://iot-center-accessvqd/channelOperate/v1/getChannel?channelId={channelId}";
+
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
@@ -56,8 +59,29 @@ public class Constant {
 
     public static Map<String,String> userInfo= new HashMap<>();
     public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
+    public static final String STOP_CAMERA_URL= "http://iot-center-accessvideo/camera/v1/stopRealPlay?cameraId={cameraId}&rtmpUrl={rtmpUrl}";
     public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
 
     public static final String Maintenance_Issued = "http://iot-center-accessrobot/robot/v1/deviceMaintenanceIssued";
     public static final String UDP_SEND ="http://iot-center-accessudp/sendFile/v1/sendFile";
+
+    //请求视频诊断监控点新增与修改
+    public static Result otherServerEntity(Channel channel, String url) throws Exception{
+        Result re = new Result();
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, channel, Result.class);
+        return re;
+    }
+
+
+    public static Result otherServerGet(String channelId, String url) throws Exception{
+        Result re = new Result();
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url,Result.class,channelId);
+        return re;
+    }
+
+
 }

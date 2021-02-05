@@ -122,6 +122,7 @@ public class ChanResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId,String status) throws Exception {
         List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(pointId, startTime, endTime, diagnosePlanId,status);
+        log.info("details:---------"+details);
         log.info("result：" + details);
         for (DiagnoseResultDetail detail : details) {
             detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
