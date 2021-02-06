@@ -181,12 +181,7 @@ public class SM2Utils {
 //        String dbPCode = "04823CAFFAC4EB11421C38854473CCD1BAABFDB261D7752C8C3065F619C581F25F540E438B8212B1F59AB22EDEC3861719CA3A1BF6DC40F7625CBA09E40892D7491244662AB0D9D60BD05DEC8B36ECB07C66B6BD190EFD42BEA2B05A6097BDBD1C49B954CE04E2EF3A8DD3";
 //
 //        System.out.println("前端解密：" + new String(SM2Utils.decrypt(Util.hexToByte(privateKey), Util.hexToByte("04" + webPCode))));
-//        System.out.println("后端解密：" + new String(SM2Utils.decrypt(Util.hexToByte(privateKey), Util.hexToByte(dbPCode))));
-//
-//        String pCodeEncryption = SM2Utils.encrypt(Util.hexStringToBytes(publicKey), "central123".getBytes());
-//        System.out.println("加密：" + pCodeEncryption);
 
-//        String privateKey = "4F9ACC3A24CB9557754ABA7ED0D6F1CC849AEFBEE7C9197F5E569A2D4AC792D5";
 //        String publicKey = "04D012B3DA830A808D0733D1BE231EC8F48FDB13FCC09B7678769F0BF68262EE79922140C786C5E02283AC78D3198F2BFB2A07E4B1949A627BEB0950142FD191B3";
 //        //测试验签
 //        String plainText = "{\"startIndex\":1,\"pageSize\":17,\"markName\":\"\",\"detailLog\":\"查询条件：所有标记\"}";
@@ -199,14 +194,21 @@ public class SM2Utils {
 //        System.out.println("签名验证结果 - " + vs);
 
         //测试验签2
-        String publicKey = "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
-        String signStr = "MEQCIEOKhqkzH7h+nCCHX2TnwJIT1Keg+JyEH/7HWMlqArt4AiB88/sYlI4t+1iWYfv33LxhyGusOBFXVI5qKB8Hy7Tp5w==";
-        String plainText = "12345678123456781234567812345678";
-        String userId = "1234567812345678";
+//        String publicKey = "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
+//        String signStr = "MEQCIEOKhqkzH7h+nCCHX2TnwJIT1Keg+JyEH/7HWMlqArt4AiB88/sYlI4t+1iWYfv33LxhyGusOBFXVI5qKB8Hy7Tp5w==";
+//        String plainText = "12345678123456781234567812345678";
+//        String userId = "1234567812345678";
+//
+//        byte[] signBytes = Base64.decode(signStr);
+//        boolean vs = SM2Utils.verifySign(userId.getBytes(), Util.hexToByte(publicKey), plainText.getBytes(), signBytes);
+//        System.out.println("签名验证结果 - " + vs);
 
-        byte[] signBytes = Base64.decode(signStr);
-        boolean vs = SM2Utils.verifySign(userId.getBytes(), Util.hexToByte(publicKey), plainText.getBytes(), signBytes);
-        System.out.println("签名验证结果 - " + vs);
+
+        String privateKey = "00AFB685CF8993EF80FF9B6F8DD92486710C719AB3820B9D48A13A12ED9FD6CFE1";
+        System.out.println("后端解密：" + new String(SM2Utils.decrypt(Util.hexToByte(privateKey), Util.hexToByte("04d958d8411ace8bd6c2fd236f357a6ef5f2d28be83e17446cc62e66caec6d86a85a6fe5c24795d092bfbb67f937a664229c3e281946b0be8ac74bb53d57ffd13c7bfacc5985d1a49c9f431aadb46309f96adee8d96f6a467d161dbcd60d79dcc5f541994a7a"))));
+        String publicKey = "048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
+        String pCodeEncryption = SM2Utils.encrypt(Util.hexStringToBytes(publicKey), "admin".getBytes());
+        System.out.println("加密：" + pCodeEncryption);
 
     }
 }
