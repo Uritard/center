@@ -131,39 +131,39 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
         update t_robot_info a <set>
-        <if test="robotId != null and robotId != ''"> a.robot_id = #{robotId, jdbcType=BIGINT},</if>
-        <if test="robotCode != null and robotCode != ''"> a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
-        <if test="robotName != null and robotName != ''">a.robot_name = #{robotName, jdbcType=VARCHAR},</if>
-        <if test="robotStatus != null and robotStatus != ''">a.robot_status = #{robotStatus, jdbcType=VARCHAR},</if>
+        <if test="robotId != null "> a.robot_id = #{robotId},</if>
+        <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
+        <if test="robotName != null ">a.robot_name = #{robotName},</if>
+        <if test="robotStatus != null ">a.robot_status = #{robotStatus},</if>
         <if test="robotType != null ">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
-        <if test="robotIp != null and robotIp != ''">a.robot_ip = #{robotIp, jdbcType=VARCHAR},</if>
+        <if test="robotIp != null ">a.robot_ip = #{robotIp},</if>
         <if test="robotPort != null ">a.robot_port = #{robotPort, jdbcType=INTEGER},</if>
-        <if test="lightIp != null and lightIp != ''">a.light_ip = #{lightIp, jdbcType=VARCHAR},</if>
-        <if test="lightPort != null and lightPort != ''">a.light_port = #{lightPort, jdbcType=VARCHAR},</if>
-        <if test="lightUsername != null and lightUsername != ''">a.light_username = #{lightUsername, jdbcType=VARCHAR},</if>
-        <if test="lightPassword != null and lightPassword != ''">a.light_password = #{lightPassword, jdbcType=VARCHAR},</if>
-        <if test="lnferadIp != null and lnferadIp != ''">a.lnferad_IP = #{lnferadIp, jdbcType=VARCHAR},</if>
+        <if test="lightIp != null ">a.light_ip = #{lightIp},</if>
+        <if test="lightPort != null ">a.light_port = #{lightPort},</if>
+        <if test="lightUsername != null ">a.light_username = #{lightUsername},</if>
+        <if test="lightPassword != null ">a.light_password = #{lightPassword},</if>
+        <if test="lnferadIp != null ">a.lnferad_IP = #{lnferadIp},</if>
         <if test="inferadPort != null">a.Inferad_Port = #{inferadPort, jdbcType=INTEGER},</if>
-        <if test="inferadUsername != null and inferadUsername != ''">a.Inferad_username = #{inferadUsername, jdbcType=VARCHAR},</if>
-        <if test="inferadPassword != null and inferadPassword != ''">a.Inferad_password = #{inferadPassword, jdbcType=VARCHAR},</if>
-        <if test="photePath != null and photePath != ''">a.phote_path = #{photePath, jdbcType=VARCHAR},</if>
-        <if test="createBy != null and createBy != ''">a.create_by = #{createBy, jdbcType=VARCHAR},</if>
+        <if test="inferadUsername != null">a.Inferad_username = #{inferadUsername},</if>
+        <if test="inferadPassword != null ">a.Inferad_password = #{inferadPassword},</if>
+        <if test="photePath != null ">a.phote_path = #{photePath},</if>
+        <if test="createBy != null">a.create_by = #{createBy},</if>
         <if test="createDate != null">a.create_date = #{createDate, jdbcType=TIMESTAMP},</if>
-        <if test="updateBy != null and updateBy != ''">a.update_by = #{updateBy, jdbcType=VARCHAR},</if>
+        <if test="updateBy != null ">a.update_by = #{updateBy},</if>
         <if test="updateDate != null">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
-        <if test="robotFactory != null and robotFactory !=''">a.robot_factory = #{robotFactory, jdbcType=VARCHAR},</if>
-        <if test="isUse != null and isUse !=''">a.is_use = #{isUse, jdbcType=VARCHAR},</if>
+        <if test="robotFactory != null ">a.robot_factory = #{robotFactory},</if>
+        <if test="isUse != null ">a.is_use = #{isUse},</if>
         <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="upRegionId != null and upRegionId !=''">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
-        <if test="robotPosition != null and robotPosition !=''">a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
-        <if test="robotSource != null and robotSource !=''">a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
-        <if test="address != null and address !=''">a.address = #{address, jdbcType=VARCHAR},</if>
-        <if test="buildingUser != null and buildingUser !=''">a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
-        <if test="appearanceNumber != null and appearanceNumber !=''">a.appearance_number = #{appearanceNumber, jdbcType=VARCHAR},</if>
-        <if test="defectRecord != null and defectRecord !=''">a.defect_record = #{defectRecord, jdbcType=VARCHAR},</if>
-        <if test="repairRecord != null and repairRecord !=''">a.repair_record = #{repairRecord, jdbcType=VARCHAR},</if>
-        <if test="exitPutIntoRecord != null and exitPutIntoRecord !=''">a.exit_putInto_record = #{exitPutIntoRecord, jdbcType=VARCHAR},</if>
-        <if test="remarks != null and remarks != ''">a.remarks = #{remarks, jdbcType=VARCHAR},</if>
+        <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
+        <if test="robotPosition != null">a.robot_position = #{robotPosition},</if>
+        <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
+        <if test="address != null ">a.address = #{address},</if>
+        <if test="buildingUser != null ">a.building_user = #{buildingUser},</if>
+        <if test="appearanceNumber != null ">a.appearance_number = #{appearanceNumber},</if>
+        <if test="defectRecord != null ">a.defect_record = #{defectRecord},</if>
+        <if test="repairRecord != null ">a.repair_record = #{repairRecord},</if>
+        <if test="exitPutIntoRecord != null ">a.exit_putInto_record = #{exitPutIntoRecord},</if>
+        <if test="remarks != null ">a.remarks = #{remarks},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>

@@ -39,6 +39,7 @@ public class TStdDeviceMete implements Serializable {
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "标准测点ID")
+    @TableField(value = "mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long meteId;
 
     @Length(max = 50, message = "customId长度必须小于等于50")

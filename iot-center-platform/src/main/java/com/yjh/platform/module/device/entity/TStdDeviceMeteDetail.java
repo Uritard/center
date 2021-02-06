@@ -1,5 +1,7 @@
 package com.yjh.platform.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,7 +27,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     //private String meteKindName;
 
     private String unitName;
-
+    @TableField(value = "custom_id",updateStrategy = FieldStrategy.IGNORED)
     private String customType;
 
     private String customTypeName;

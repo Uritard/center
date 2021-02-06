@@ -2,6 +2,9 @@ package com.yjh.platform.module.device.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,10 +29,12 @@ public class TStdRegion implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "区域ID")
+    @TableField(value = "region_id",updateStrategy = FieldStrategy.IGNORED)
     private Long regionId;
 
     @Length(max = 128,message = "regionName长度必须小于等于128")
     @ApiModelProperty(value = "区域名称")
+    @TableField(value = "region_name",updateStrategy = FieldStrategy.IGNORED)
     private String regionName;
 
     @Max(value=9)
@@ -38,10 +43,12 @@ public class TStdRegion implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "上级区域ID")
+    @TableField(value = "up_region_id",updateStrategy = FieldStrategy.IGNORED)
     private Long upRegionId;
 
     @Length(max = 255,message = "upRegionIds长度必须小于等于255")
     @ApiModelProperty(value = "区域ID层级")
+    @TableField(value = "up_region_ids",updateStrategy = FieldStrategy.IGNORED)
     private String upRegionIds;
 
     @Max(value=999999999)
@@ -50,6 +57,7 @@ public class TStdRegion implements Serializable {
 
     @Length(max = 32,message = "stationId长度必须小于等于32")
     @ApiModelProperty(value = "变电站ID")
+     @TableField(value = "station_id",updateStrategy = FieldStrategy.IGNORED)
     private String stationId;
 
     @Max(value=9)

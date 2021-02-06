@@ -2,6 +2,9 @@ package com.yjh.platform.module.device.entity;
 
 import java.math.BigDecimal;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,12 +27,14 @@ public class TStdMeteModelDetail extends TStdDeviceMeteDetail implements Seriali
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "监控量模板ID")
+    @TableField(value = "model_id",updateStrategy = FieldStrategy.IGNORED)
     private Long modelId;
 
     @ApiModelProperty(value = "部位类型名称")
     private String customTypeName;
 
     @ApiModelProperty(value = "测点类型名称")
+    @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
     private String meteTypeName;
 
     @ApiModelProperty(value = "设备类型")
@@ -39,6 +44,7 @@ public class TStdMeteModelDetail extends TStdDeviceMeteDetail implements Seriali
     private String deviceTypeName;
 
     @ApiModelProperty(value = "信号解释")
+    @TableField(value = "alarm_explain",updateStrategy = FieldStrategy.IGNORED)
     private String alarmExplain;
 
 

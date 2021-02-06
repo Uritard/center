@@ -48,18 +48,23 @@ public class TRobotInspection implements Serializable {
     private String inspectionName;
 
     @ApiModelProperty(value = "部件ID")
+      @TableField(value = "component_id",updateStrategy = FieldStrategy.IGNORED)
     private String componentId;
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
     @ApiModelProperty(value = "外观类型")
     private Integer appearanceType;
     @ApiModelProperty(value = "采集/保存文件类型列表")
+     @TableField(value = "save_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String saveTypeList;
     @ApiModelProperty(value = "识别类型列表")
+    @TableField(value = "recognition_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String recognitionTypeList;
     @ApiModelProperty(value = "相位，A相B相C相")
+    @TableField(value = "phase",updateStrategy = FieldStrategy.IGNORED)
     private String phase;
     @ApiModelProperty(value = "备注信息")
+    @TableField(value = "device_info",updateStrategy = FieldStrategy.IGNORED)
     private String deviceInfo;
 
 

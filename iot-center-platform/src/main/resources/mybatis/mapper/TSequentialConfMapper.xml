@@ -43,11 +43,11 @@
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TSequentialConf">
         update t_sequential_conf a <set>
-        <if test="cfgDeviceId != null and cfgDeviceId != ''">a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR},</if>
-        <if test="cfgMeteId != null and cfgMeteId != ''">a.cfg_mete_id = #{cfgMeteId, jdbcType=VARCHAR},</if>
-        <if test="cameraId != null and cameraId != ''">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
-        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
-        <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=VARCHAR},</if>
+        <if test="cfgDeviceId != null ">a.cfg_device_id = #{cfgDeviceId},</if>
+        <if test="cfgMeteId != null ">a.cfg_mete_id = #{cfgMeteId},</if>
+        <if test="cameraId != null ">a.camera_id = #{cameraId},</if>
+        <if test="presetId != null ">a.preset_id = #{presetId},</if>
+        <if test="identifyResult != null">a.identify_result = #{identifyResult},</if>
         CURRENT_TIMESTAMP(),
     </set>
             where a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR}

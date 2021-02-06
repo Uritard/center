@@ -109,6 +109,7 @@ public class SYAllInfo implements Serializable {
 
 
     @ApiModelProperty(value = "关联设备编码")
+    @TableField(value = "relation_code",updateStrategy = FieldStrategy.IGNORED)
     private String relationCode;
 
 
