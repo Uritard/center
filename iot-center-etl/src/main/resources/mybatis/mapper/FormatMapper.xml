@@ -29,7 +29,7 @@
                 where test_id = #{testId, jdbcType=VARCHAR}
     </delete>
 
-    "update" parameterType="com.yjh.etl.module.device.entity.Format">
+    <update id="update" parameterType="com.yjh.etl.module.device.entity.Format">
         update format a <set>
         <if test="testId != null ">a.test_id = #{testId},</if>
         <if test="testType != null">a.test_type = #{testType},</if>

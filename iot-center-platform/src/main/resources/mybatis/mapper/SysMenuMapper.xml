@@ -68,7 +68,7 @@
                 where menu_id = #{menuId, jdbcType=BIGINT}
     </delete>
 
-    "update" parameterType="com.yjh.platform.module.user.entity.SysMenu">
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.SysMenu">
         update sys_menu a <set>
         <if test="menuId != null ">a.menu_id = #{menuId},</if>
         <if test="menuName != null">a.menu_name = #{menuName},</if>

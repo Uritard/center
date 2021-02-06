@@ -105,7 +105,7 @@
                 where diagnose_result_id = #{diagnoseResultId, jdbcType=BIGINT}
     </delete>
 
-    "update" parameterType="com.yjh.accessvqd.module.diagnose.entity.ChanResult">
+    <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.ChanResult">
         update t_diagnose_result a
         <set>
             <if test="diagnoseResultId != null ">a.diagnose_result_id =
