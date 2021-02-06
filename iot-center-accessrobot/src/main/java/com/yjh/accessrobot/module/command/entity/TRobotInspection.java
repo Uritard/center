@@ -1,6 +1,8 @@
 package com.yjh.accessrobot.module.command.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,29 +33,37 @@ public class TRobotInspection implements Serializable {
 
     @Length(max = 68,message = "inspectionCode长度必须小于等于68")
     @ApiModelProperty(value = "机器人检测点编码")
+    @TableField(value = "inspection_code",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionCode;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人ID")
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
     @Length(max = 60,message = "inspectionName长度必须小于等于60")
     @ApiModelProperty(value = "测点名称")
+    @TableField(value = "inspection_name",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionName;
 
     @ApiModelProperty(value = "部件ID")
+    @TableField(value = "component_id",updateStrategy = FieldStrategy.IGNORED)
     private String componentId;
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
     @ApiModelProperty(value = "外观类型")
     private Integer appearanceType;
     @ApiModelProperty(value = "采集/保存文件类型列表")
+    @TableField(value = "save_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String saveTypeList;
     @ApiModelProperty(value = "识别类型列表")
+    @TableField(value = "recognition_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String recognitionTypeList;
     @ApiModelProperty(value = "相位，A相B相C相")
+    @TableField(value = "phase",updateStrategy = FieldStrategy.IGNORED)
     private String phase;
     @ApiModelProperty(value = "备注信息")
+    @TableField(value = "device_info",updateStrategy = FieldStrategy.IGNORED)
     private String deviceInfo;
 
 }

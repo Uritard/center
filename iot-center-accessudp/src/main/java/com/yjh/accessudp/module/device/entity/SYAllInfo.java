@@ -1,5 +1,7 @@
 package com.yjh.accessudp.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,24 +22,30 @@ import java.util.Date;
 public class SYAllInfo implements Serializable {
 
         @ApiModelProperty(value = "监控量编码")
+        @TableField(value = "mete_id",updateStrategy = FieldStrategy.IGNORED)
         private String meteId;
 
         @ApiModelProperty(value = "测点标准化编码")
+        @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
         private String meteType;
 
         @ApiModelProperty(value = "四遥类型 0：遥信，1：遥测，2：遥控，3：遥调，4：遥脉")
         private Integer meteKind;
 
         @ApiModelProperty(value = "测点标准名")
+        @TableField(value = "mete_name",updateStrategy = FieldStrategy.IGNORED)
         private String meteName;
 
         @ApiModelProperty(value = "测点编码")
+        @TableField(value = "mete_code",updateStrategy = FieldStrategy.IGNORED)
         private String meteCode;
 
         @ApiModelProperty(value = "单位")
+        @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
         private String unit;
 
         @ApiModelProperty(value = "测点解释")
+         @TableField(value = "mete_explain_type",updateStrategy = FieldStrategy.IGNORED)
         private String meteExplainType;
 
         private Date createTime;
@@ -46,63 +54,70 @@ public class SYAllInfo implements Serializable {
 
         @ApiModelProperty(value = "系数")
         private Integer modulus;
-
+        @TableField(value = "station_name",updateStrategy = FieldStrategy.IGNORED)
         private String stationName;
-
+        @TableField(value = "station_id",updateStrategy = FieldStrategy.IGNORED)
         private String stationId;
-
+         @TableField(value = "up_effect",updateStrategy = FieldStrategy.IGNORED)
         private Integer upEffect;
-
+         @TableField(value = "down_effect",updateStrategy = FieldStrategy.IGNORED)
         private Integer downEffect;
 
         private Integer alarmlevel;
 
         private Integer alarmthresbhold;
 
+        @TableField(value = "describer",updateStrategy = FieldStrategy.IGNORED)
         private String describer;
 
         private Integer metePrecision;
-
+         @TableField(value = "change_limit",updateStrategy = FieldStrategy.IGNORED)
         private Float changeLimit;
-
+        @TableField(value = "hilimit1",updateStrategy = FieldStrategy.IGNORED)
         private Float hilimit1;
-
+        @TableField(value = "lolimit1",updateStrategy = FieldStrategy.IGNORED)
         private Float lolimit1;
-
+        @TableField(value = "hilimit2",updateStrategy = FieldStrategy.IGNORED)
         private Float hilimit2;
-
+        @TableField(value = "lolimit2",updateStrategy = FieldStrategy.IGNORED)
         private Float lolimit2;
-
+        @TableField(value = "hilimit3",updateStrategy = FieldStrategy.IGNORED)
         private Float hilimit3;
-
+        @TableField(value = "lolimit3",updateStrategy = FieldStrategy.IGNORED)
         private Float lolimit3;
-
+        @TableField(value = "hilimit4",updateStrategy = FieldStrategy.IGNORED)
         private Float hilimit4;
-
+        @TableField(value = "stander",updateStrategy = FieldStrategy.IGNORED)
         private Float stander;
 
         private Integer controlenable;
 
 
         @ApiModelProperty(value = "设备编号")
+        @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
         private String deviceId;
 
         @ApiModelProperty(value = "设备名称")
+        @TableField(value = "device_name",updateStrategy = FieldStrategy.IGNORED)
         private String deviceName;
 
         @ApiModelProperty(value = "设备类型")
+        @TableField(value = "device_type",updateStrategy = FieldStrategy.IGNORED)
         private String deviceType;
 
         @ApiModelProperty(value = "设备编码+设备测点地址")
+        @TableField(value = "device_code",updateStrategy = FieldStrategy.IGNORED)
         private String deviceCode;
 
 
 
         @ApiModelProperty(value = "关联设备编码")
+        @TableField(value = "relation_code",updateStrategy = FieldStrategy.IGNORED)
         private String relationCode;
 
 
         @ApiModelProperty(value = "描述")
+        @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
         private String remark;
 
 
@@ -116,12 +131,15 @@ public class SYAllInfo implements Serializable {
         private Integer adjustKind;
 
         @ApiModelProperty(value = "当前值")
+        @TableField(value = "last_value",updateStrategy = FieldStrategy.IGNORED)
         private Float lastValue;
 
         @ApiModelProperty(value = "更新时间")
+         @TableField(value = "last_time",updateStrategy = FieldStrategy.IGNORED)
         private Date lastTime;
 
         @ApiModelProperty(value = "监控量描述")
+        @TableField(value = "description",updateStrategy = FieldStrategy.IGNORED)
         private String description;
 
         @ApiModelProperty(value = "可控状态")
