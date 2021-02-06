@@ -234,7 +234,13 @@ public class TVoiceDeviceService{
             Map<String,String> map = new HashMap<>();
             map.put("startTime",simpleDateFormat.format(timeList.get(j)*hm- TimeZone.getDefault().getRawOffset()));
             map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
-            map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
+            if(timeList.get(j+1) == (DBList.size()-1)){
+                //真个文件满足
+                map.put("time",second.toString());
+            } else {
+                map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
+            }
+
             map.put("result",findBig(DBList,timeList.get(j),timeList.get(j+1)).toString());
             reList.add(map);
         }
