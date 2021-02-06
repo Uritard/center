@@ -59,7 +59,7 @@
                 where log_id = #{logId, jdbcType=BIGINT}
     </delete>
 
-    <update id="update" parameterType="com.yjh.logs.module.log.entity.SysLog">
+    "update" parameterType="com.yjh.logs.module.log.entity.SysLog">
         update sys_logs a <set>
         <if test="logId != null ">a.log_id = #{logId},</if>
         <if test="logType != null ">a.log_type = #{logType},</if>

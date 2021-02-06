@@ -68,7 +68,7 @@
                 where robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}
     </delete>
 
-    <update id="update" parameterType="com.yjh.platform.module.task.entity.RobotAlarm">
+    "update" parameterType="com.yjh.platform.module.task.entity.RobotAlarm">
         update robot_alarm a <set>
         <if test="robotAlarmId != null ">a.robot_alarm_id = #{robotAlarmId},</if>
         <if test="stationId != null">a.station_id = #{stationId},</if>

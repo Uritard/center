@@ -39,7 +39,7 @@
         #{enabled,jdbcType=INTEGER}, #{path,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateByPrimaryKey" parameterType="com.yjh.gateway.module.gateway.entity.Route">
+    "updateByPrimaryKey" parameterType="com.yjh.gateway.module.gateway.entity.Route">
         update sys_route
         set service_id = #{serviceId,jdbcType=VARCHAR},
         url = #{url,jdbcType=VARCHAR},
@@ -52,7 +52,7 @@
         where route_id = #{routeId,jdbcType=BIGINT}
     </update>
 
-    <update id="updateStatus" parameterType="com.yjh.gateway.module.gateway.entity.Route">
+    "updateStatus" parameterType="com.yjh.gateway.module.gateway.entity.Route">
         update sys_route
         set enabled = #{enabled,jdbcType=INTEGER}
         where route_id = #{routeId,jdbcType=BIGINT}
