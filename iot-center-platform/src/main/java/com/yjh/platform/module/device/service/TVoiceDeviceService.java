@@ -237,7 +237,7 @@ public class TVoiceDeviceService{
             if(timeList.get(j+1) == (DBList.size()-1)){
                 //整个文件满足
                 map.put("endTime",simpleDateFormat.format(second- TimeZone.getDefault().getRawOffset()));
-                map.put("time",second.toString());
+                map.put("time",String.valueOf(second/1000F));
             } else {
                 map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
                 map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
