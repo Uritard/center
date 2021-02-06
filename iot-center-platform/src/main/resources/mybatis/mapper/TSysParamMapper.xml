@@ -44,11 +44,11 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TSysParam">
         update t_sys_param a <set>
         <if test="paramId != null ">a.param_id = #{paramId, jdbcType=INTEGER},</if>
-        <if test="paramCode != null and paramCode != ''">a.param_code = #{paramCode, jdbcType=VARCHAR},</if>
+        <if test="paramCode != null">a.param_code = #{paramCode},</if>
         <if test="paramType != null ">a.param_type = #{paramType, jdbcType=INTEGER},</if>
-        <if test="paramName != null and paramName != ''">a.param_name = #{paramName, jdbcType=VARCHAR},</if>
-        <if test="content != null and content != ''">a.content = #{content, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="paramName != null ">a.param_name = #{paramName},</if>
+        <if test="content != null ">a.content = #{content},</if>
+        <if test="remark != null">a.remark = #{remark},</if>
     </set>
             where a.param_id = #{paramId, jdbcType=INTEGER}
     </update>

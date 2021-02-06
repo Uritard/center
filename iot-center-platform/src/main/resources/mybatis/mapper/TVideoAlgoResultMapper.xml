@@ -82,23 +82,23 @@
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
         update t_video_algo_result a <set>
-        <if test="id!= null and id != ''">a.id = #{id, jdbcType=BIGINT},</if>
-        <if test="pointId != null and pointId != ''">a.point_id = #{pointId, jdbcType=BIGINT},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=BIGINT},</if>
-        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
-        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
-        <if test="picUrl != null and picUrl != ''">a.pic_url = #{picUrl, jdbcType=VARCHAR},</if>
-        <if test="cusId != null and cusId != ''">a.cus_id = #{cusId, jdbcType=VARCHAR},</if>
-        <if test="algorithmId != null and algorithmId != ''">a.algorithm_id = #{algorithmId, jdbcType=BIGINT},</if>
-        <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR},</if>
-        <if test="analyseResult != null and analyseResult != ''">a.analyse_result = #{analyseResult, jdbcType=VARCHAR},</if>
-        <if test="picOrignal != null and picOrignal != ''">a.pic_orignal = #{picOrignal, jdbcType=VARCHAR},</if>
+        <if test="id!= null ">a.id = #{id},</if>
+        <if test="pointId != null ">a.point_id = #{pointId},</if>
+        <if test="taskId != null ">a.task_id = #{taskId},</if>
+        <if test="planId != null ">a.plan_id = #{planId},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="presetId != null">a.preset_id = #{presetId},</if>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        <if test="picUrl != null ">a.pic_url = #{picUrl},</if>
+        <if test="cusId != null ">a.cus_id = #{cusId},</if>
+        <if test="algorithmId != null ">a.algorithm_id = #{algorithmId},</if>
+        <if test="status != null ">a.status = #{status},</if>
+        <if test="analyseResult != null ">a.analyse_result = #{analyseResult},</if>
+        <if test="picOrignal != null ">a.pic_orignal = #{picOrignal},</if>
         <if test="evaluationState != null ">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
-        <if test="signpic != null and signpic != ''">a.signpic = #{signpic, jdbcType=VARCHAR},</if>
-        <if test="algorithmType != null and algorithmType != ''">a.algorithm_type = #{algorithmType, jdbcType=VARCHAR},</if>
-        <if test="algorithmSonType != null and algorithmSonType != ''">a.algorithm_son_type = #{algorithmSonType, jdbcType=VARCHAR},</if>
+        <if test="signpic != null ">a.signpic = #{signpic},</if>
+        <if test="algorithmType != null ">a.algorithm_type = #{algorithmType},</if>
+        <if test="algorithmSonType != null ">a.algorithm_son_type = #{algorithmSonType},</if>
         a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
         a.create_time = #{createTime, jdbcType=TIMESTAMP},
     </set>

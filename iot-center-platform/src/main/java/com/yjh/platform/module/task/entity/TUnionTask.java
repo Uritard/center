@@ -4,6 +4,8 @@ import java.awt.*;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,22 +32,27 @@ public class TUnionTask implements Serializable {
 
     @Length(max = 50,message = "unionId长度必须小于等于50")
     @ApiModelProperty(value = "巡检任务")
+    @TableField(value = "union_id",updateStrategy = FieldStrategy.IGNORED)
     private String unionId;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "规则id")
+    @TableField(value = "rule_id",updateStrategy = FieldStrategy.IGNORED)
     private Long ruleId;
 
     @Length(max = 128,message = "unionName长度必须小于等于128")
     @ApiModelProperty(value = "任务名称")
+    @TableField(value = "union_name",updateStrategy = FieldStrategy.IGNORED)
     private String unionName;
 
     @Max(value=999999999)
     @ApiModelProperty(value = "延迟时间")
+
     private Integer ruleDelay;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人id")
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
     @Max(value=999999999999999999l)
@@ -58,22 +65,26 @@ public class TUnionTask implements Serializable {
 
     @Length(max = 256,message = "remark3长度必须小于等于256")
     @ApiModelProperty(value = "备注3")
+    @TableField(value = "remark3",updateStrategy = FieldStrategy.IGNORED)
     private String remark3;
 
     @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "巡视时间")
+    @TableField(value = "start_time",updateStrategy = FieldStrategy.IGNORED)
     private Date startTime;
 
     @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
+    @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private Date createTime;
 
     @Length(max = 2000,message = "remark3长度必须小于等于2000")
     @ApiModelProperty(value = "断面数据")
+    @TableField(value = "param_values",updateStrategy = FieldStrategy.IGNORED)
     private String paramValues;
 
     @Max(value=999999999)

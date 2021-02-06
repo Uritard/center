@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -32,6 +34,7 @@ public class TSysParam implements Serializable {
 
     @Length(max = 11,message = "paramCode长度必须小于等于11")
     @ApiModelProperty(value = "参数编码")
+    @TableField(value = "param_code",updateStrategy = FieldStrategy.IGNORED)
     private String paramCode;
 
     @Length(max = 50,message = "paramType长度必须小于等于50")
@@ -42,14 +45,17 @@ public class TSysParam implements Serializable {
 
     @Length(max = 50,message = "paramName长度必须小于等于50")
     @ApiModelProperty(value = "参数名称")
+    @TableField(value = "param_name",updateStrategy = FieldStrategy.IGNORED)
     private String paramName;
 
     @Length(max = 1000,message = "content长度必须小于等于1000")
     @ApiModelProperty(value = "参数内容")
+    @TableField(value = "content",updateStrategy = FieldStrategy.IGNORED)
     private String content;
 
     @Length(max = 128,message = "remark长度必须小于等于128")
     @ApiModelProperty(value = "描述")
+    @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
 
