@@ -54,6 +54,12 @@ public class TRobotInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long robotId) {
+        {//机器人有巡视点
+            List<Long> list = tRobotInfoDao.selectHaveIns(robotId);
+            if(list != null && list.size()>0){
+                return -1;
+            }
+        }
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
         int res =  this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
         redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
@@ -224,7 +230,11 @@ public class TRobotInfoService{
         int i = 0;
         List<String> robotIdList= Arrays.asList(robotIds.split(","));
         for (String item: robotIdList) {
-            i = i+ this.deleteByPrimaryId(Long.valueOf(item));
+            int j =this.deleteByPrimaryId(Long.valueOf(item));
+            if(j == -1){
+                return -1;
+            }
+            i = i+j;
         }
         return i;
     }

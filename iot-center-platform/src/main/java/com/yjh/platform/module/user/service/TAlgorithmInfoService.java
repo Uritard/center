@@ -27,6 +27,12 @@ public class TAlgorithmInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long algorithmId) {
+        {//算法已配置了预置位
+            List<Long> list = tAlgorithmInfoDao.selectHaveDevice(algorithmId);
+            if(list!= null && list.size()>0){
+                return -1;
+            }
+        }
         return this.tAlgorithmInfoDao.deleteByPrimaryId(algorithmId);
     }
 
@@ -57,6 +63,12 @@ public class TAlgorithmInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TAlgorithmInfo> list) {
+        for(TAlgorithmInfo item:list){
+            List<Long> listHave = tAlgorithmInfoDao.selectHaveDevice(item.getAlgorithmId());
+            if(listHave!= null && listHave.size()>0){
+                return -1;
+            }
+        }
         return this.tAlgorithmInfoDao.batchInsert(list);
     }
 

@@ -324,4 +324,12 @@
         select camera_id
         from t_camera_info
     </select>
+    
+    <select id="selectHavePreset" resultType="java.lang.Long">
+        SELECT
+            a.preset_id
+        FROM
+            t_camera_preset a
+            where a.camera_id = #{cameraId, jdbcType=BIGINT}
+    </select>
 </mapper>

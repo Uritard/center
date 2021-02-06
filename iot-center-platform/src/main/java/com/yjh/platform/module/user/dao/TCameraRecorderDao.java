@@ -48,4 +48,5 @@ public interface TCameraRecorderDao {
     int batchInsert(List<TCameraRecorder> list);
     List<TCameraRecorderDetail> selectIdAndName();
     Long selectRecorderIdByPmsId(@Param(value = "pmsId")String pmsId);
+    List<Long>selectHaveCamera(@Param(value = "recordId") Long recordId);
 }

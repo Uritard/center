@@ -308,5 +308,11 @@
         <if test="pmsId != null and pmsId != ''">and a.pms_id = #{pmsId,jdbcType = VARCHAR}</if>
     </select>
 
-
+    <select id="selectHaveCamera" resultType="java.lang.Long">
+        SELECT
+            a.camera_id
+        FROM
+            t_camera_info a
+            where a.record_id = #{recordId, jdbcType=BIGINT}
+    </select>
 </mapper>

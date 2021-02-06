@@ -38,6 +38,11 @@ public class TCameraPresetService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long presetId) {
         List<Long> instanceIdList = tCameraPresetDao.selectInstanceIdList(presetId);
+        {//检查此预置位是否被配成巡检点
+            if(instanceIdList != null && instanceIdList.size()>0){
+                return -1;
+            }
+        }
         if(instanceIdList != null && instanceIdList.size() >0){
             tCameraPresetDao.deleteInstance(instanceIdList);//tcpi
             tCameraPresetDao.deletePlanInstance(instanceIdList);//tcplan
@@ -92,6 +97,12 @@ public class TCameraPresetService {
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCameraPreset> list) {
+        for(TCameraPreset item:list){
+            List<Long> listHave = tCameraPresetDao.selectInstanceIdList(item.getPresetId());
+            if(listHave!= null && listHave.size()>0){
+                return -1;
+            }
+        }
         return this.tCameraPresetDao.batchInsert(list);
     }
 

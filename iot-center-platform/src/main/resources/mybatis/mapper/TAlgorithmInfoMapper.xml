@@ -161,5 +161,11 @@
         where a.device_mete_id = #{deviceMeteId}
     </select>
 
-
+    <select id="selectHaveDevice" resultType="java.lang.Long">
+        SELECT
+            a.algorithm_id
+        FROM
+            t_algorithm_conf_bak a
+        where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
+    </select>
 </mapper>

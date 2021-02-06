@@ -153,8 +153,13 @@ public class TStdDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryIdALL(Long deviceId) {
-                tStdDeviceAttrDao.deleteByPrimaryId(deviceId);//删除属性
-                List<Long> devList = tStdDevicemeteDao.selectByDevId(deviceId);
+        List<Long> devList = tStdDevicemeteDao.selectByDevId(deviceId);
+        {//设备下存在测点
+            if(devList != null && devList.size()>0){
+             return -1;
+            }
+        }
+        tStdDeviceAttrDao.deleteByPrimaryId(deviceId);//删除属性
         for (Long item: devList) {
             tStdDevicemeteService.deleteByPrimaryId(item);
         }
@@ -522,7 +527,10 @@ public class TStdDeviceService{
     public int batchDelete(String list){
         List<String> list1= Arrays.asList(list.split(","));
         for (String item:list1) {
-            this.deleteByPrimaryIdALL(Long.valueOf(item));
+            int re  = this.deleteByPrimaryIdALL(Long.valueOf(item));
+            if(re == -1){
+                return -1;
+            }
         }
         return 1;
     }
