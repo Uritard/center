@@ -61,18 +61,18 @@
 
     <update id="update" parameterType="com.yjh.logs.module.log.entity.SysLog">
         update sys_logs a <set>
-        <if test="logId != null and logId != ''">a.log_id = #{logId, jdbcType=BIGINT},</if>
-        <if test="logType != null and logType != ''">a.log_type = #{logType, jdbcType=VARCHAR},</if>
-        <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
-        <if test="title != null and title != ''">a.title = #{title, jdbcType=VARCHAR},</if>
-        <if test="state != null and state != ''">a.state = #{state, jdbcType=INTEGER},</if>
-        <if test="content != null and content != ''">a.content = #{content, jdbcType=VARCHAR},</if>
-        <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
-        <if test="userName != null and userName != ''">a.user_name = #{userName, jdbcType=VARCHAR},</if>
-        <if test="requestOrigin != null and requestOrigin != ''">a.request_origin = #{requestOrigin, jdbcType=VARCHAR},</if>
-        <if test="requestPath != null and requestPath != ''">a.request_path = #{requestPath, jdbcType=VARCHAR},</if>
-        <if test="requestMethod != null and requestMethod != ''">a.request_method = #{requestMethod, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="logId != null ">a.log_id = #{logId},</if>
+        <if test="logType != null ">a.log_type = #{logType},</if>
+        <if test="ip != null and ">a.ip = #{ip},</if>
+        <if test="title != null ">a.title = #{title},</if>
+        <if test="state != null ">a.state = #{state},</if>
+        <if test="content != null ">a.content = #{content},</if>
+        <if test="userId != null ">a.user_id = #{userId},</if>
+        <if test="userName != null">a.user_name = #{userName},</if>
+        <if test="requestOrigin != null ">a.request_origin = #{requestOrigin},</if>
+        <if test="requestPath != null ">a.request_path = #{requestPath},</if>
+        <if test="requestMethod != null ">a.request_method = #{requestMethod},</if>
+        <if test="createTime != null ">a.create_time = #{createTime},</if>
     </set>
             where a.log_id = #{logId, jdbcType=BIGINT}
     </update>

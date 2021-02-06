@@ -46,12 +46,12 @@
     <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.Plans">
         update t_diagnose_plan a
         <set>
-            <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id =
-                #{diagnosePlanId, jdbcType=VARCHAR},
+            <if test="diagnosePlanId != null ">a.diagnose_plan_id =
+                #{diagnosePlanId},
             </if>
-            <if test="planName != null and planName != ''">a.plan_name = #{planName, jdbcType=VARCHAR},</if>
-            <if test="planType != null and planType != ''">a.plan_type = #{planType, jdbcType=VARCHAR},</if>
-            <if test="userId != null and userId != ''">a.user_id = #{userId, jdbcType=BIGINT},</if>
+            <if test="planName != null  ">a.plan_name = #{planName},</if>
+            <if test="planType != null ">a.plan_type = #{planType},</if>
+            <if test="userId != null ">a.user_id = #{userId},</if>
             <if test="startTime != null">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
             <if test="endTime != null">a.start_time = #{endTime, jdbcType=TIMESTAMP},</if>
         </set>

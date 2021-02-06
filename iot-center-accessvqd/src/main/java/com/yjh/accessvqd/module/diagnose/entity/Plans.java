@@ -27,6 +27,7 @@ public class Plans extends PlanInfo implements Serializable  {
     @ApiModelProperty(value = "是否检测，0-不检测 1-检测")
     private String checkFlag;
     @ApiModelProperty(value = "-1：立即计划，0-星期计划")
+
     private String period;
     @ApiModelProperty(value = "执行星期")
     private List<String> weeks;

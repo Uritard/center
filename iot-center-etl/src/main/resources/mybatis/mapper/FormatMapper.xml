@@ -31,8 +31,8 @@
 
     <update id="update" parameterType="com.yjh.etl.module.device.entity.Format">
         update format a <set>
-        <if test="testId != null and testId != ''">a.test_id = #{testId, jdbcType=VARCHAR},</if>
-        <if test="testType != null and testType != ''">a.test_type = #{testType, jdbcType=VARCHAR},</if>
+        <if test="testId != null ">a.test_id = #{testId},</if>
+        <if test="testType != null">a.test_type = #{testType},</if>
     </set>
             where a.test_id = #{testId, jdbcType=VARCHAR}
     </update>

@@ -1,6 +1,8 @@
 package com.yjh.accessvqd.module.diagnose.entity;
 
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,15 +21,19 @@ public class PlanInfo{
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "诊断任务ID")
+    @TableField(value = "diagnosePlanId",updateStrategy = FieldStrategy.IGNORED)
     private String diagnosePlanId;
 
     @ApiModelProperty(value = "诊断任务名称")
+    @TableField(value = "plan_name",updateStrategy = FieldStrategy.IGNORED)
     private String planName;
 
     @ApiModelProperty(value = "诊断类型(-1即时计划 0星期计划)")
+    @TableField(value = "plan_type",updateStrategy = FieldStrategy.IGNORED)
     private String planType;
 
     @ApiModelProperty(value = "用户ID")
+    @TableField(value = "user_id",updateStrategy = FieldStrategy.IGNORED)
     private Long userId;
 
     @ApiModelProperty(value = "用户名")

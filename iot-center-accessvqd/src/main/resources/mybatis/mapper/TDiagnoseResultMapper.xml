@@ -108,53 +108,53 @@
     <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.ChanResult">
         update t_diagnose_result a
         <set>
-            <if test="diagnoseResultId != null and diagnoseResultId != ''">a.diagnose_result_id =
-                #{diagnoseResultId, jdbcType=BIGINT},
+            <if test="diagnoseResultId != null ">a.diagnose_result_id =
+                #{diagnoseResultId},
             </if>
-            <if test="channelId != null and channelId != ''">a.channel_id = #{channelId, jdbcType=VARCHAR},</if>
-            <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
-            <if test="chanIndex != null and chanIndex != ''">a.chan_index = #{chanIndex, jdbcType=VARCHAR},</if>
-            <if test="checkTime != null and checkTime != ''">a.check_time = #{checkTime, jdbcType=TIMESTAMP},</if>
-            <if test="channelResult != null and channelResult != ''">a.channel_result =
-                #{channelResult, jdbcType=INTEGER},
+            <if test="channelId != null ">a.channel_id = #{channelId},</if>
+            <if test="ip != null  ">a.ip = #{ip},</if>
+            <if test="chanIndex != null ">a.chan_index = #{chanIndex},</if>
+            <if test="checkTime != null ">a.check_time = #{checkTime},</if>
+            <if test="channelResult != null">a.channel_result =
+                #{channelResult},
             </if>
-            <if test="signalResult != null and signalResult != ''">a.signal_result =
-                #{signalResult, jdbcType=VARCHAR},
+            <if test="signalResult != null ">a.signal_result =
+                #{signalResult},
             </if>
-            <if test="blurResult != null and blurResult != ''">a.blur_result = #{blurResult, jdbcType=VARCHAR},</if>
-            <if test="contrastResult != null and contrastResult != ''">a.contrast_result =
-                #{contrastResult, jdbcType=VARCHAR},
+            <if test="blurResult != null ">a.blur_result = #{blurResult},</if>
+            <if test="contrastResult != null ">a.contrast_result =
+                #{contrastResult},
             </if>
-            <if test="brightResult != null and brightResult != ''">a.bright_result =
-                #{brightResult, jdbcType=VARCHAR},
+            <if test="brightResult != null ">a.bright_result =
+                #{brightResult},
             </if>
-            <if test="darkResult != null and darkResult != ''">a.dark_result = #{darkResult, jdbcType=VARCHAR},</if>
-            <if test="chromaResult != null and chromaResult != ''">a.chroma_result =
-                #{chromaResult, jdbcType=VARCHAR},
+            <if test="darkResult != null ">a.dark_result = #{darkResult},</if>
+            <if test="chromaResult != null ">a.chroma_result =
+                #{chromaResult},
             </if>
-            <if test="monoResult != null and monoResult != ''">a.mono_result = #{monoResult, jdbcType=INTEGER},</if>
-            <if test="noiseResult != null and noiseResult != ''">a.noise_result = #{noiseResult, jdbcType=INTEGER},</if>
-            <if test="streakResult != null and streakResult != ''">a.streak_result =
-                #{streakResult, jdbcType=INTEGER},
+            <if test="monoResult != null ">a.mono_result = #{monoResult},</if>
+            <if test="noiseResult != null ">a.noise_result = #{noiseResult},</if>
+            <if test="streakResult != null ">a.streak_result =
+                #{streakResult},
             </if>
-            <if test="freezeResult != null and freezeResult != ''">a.freeze_result =
-                #{freezeResult, jdbcType=INTEGER},
+            <if test="freezeResult != null ">a.freeze_result =
+                #{freezeResult},
             </if>
-            <if test="shakeResult != null and shakeResult != ''">a.shake_result = #{shakeResult, jdbcType=INTEGER},</if>
-            <if test="flashResult != null and flashResult != ''">a.flash_result = #{flashResult, jdbcType=INTEGER},</if>
-            <if test="sceneResult != null and sceneResult != ''">a.scene_result = #{sceneResult, jdbcType=INTEGER},</if>
-            <if test="coverResult != null and coverResult != ''">a.cover_result = #{coverResult, jdbcType=INTEGER},</if>
-            <if test="ptzResult != null and ptzResult != ''">a.ptz_result = #{ptzResult, jdbcType=INTEGER},</if>
-            <if test="snapshotUrl != null and snapshotUrl != ''">a.snapshot_url = #{snapshotUrl, jdbcType=VARCHAR},</if>
-            <if test="resultContent != null and resultContent != ''">a.result_content =
-                #{resultContent, jdbcType=VARCHAR},
+            <if test="shakeResult != null ">a.shake_result = #{shakeResult},</if>
+            <if test="flashResult != null ">a.flash_result = #{flashResult},</if>
+            <if test="sceneResult != null ">a.scene_result = #{sceneResult},</if>
+            <if test="coverResult != null ">a.cover_result = #{coverResult},</if>
+            <if test="ptzResult != null ">a.ptz_result = #{ptzResult},</if>
+            <if test="snapshotUrl != null ">a.snapshot_url = #{snapshotUrl},</if>
+            <if test="resultContent != null ">a.result_content =
+                #{resultContent},
             </if>
-            <if test="width != null and width != ''">a.width = #{width, jdbcType=VARCHAR},</if>
-            <if test="height != null and height != ''">a.height = #{height, jdbcType=VARCHAR},</if>
-            <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id =
-                #{diagnosePlanId, jdbcType=VARCHAR},
+            <if test="width != null ">a.width = #{width},</if>
+            <if test="height != null">a.height = #{height},</if>
+            <if test="diagnosePlanId != null">a.diagnose_plan_id =
+                #{diagnosePlanId},
             </if>
-            <if test="status != null and status != ''">a.status = #{status, jdbcType=VARCHAR}</if>
+            <if test="status != null ">a.status = #{status}</if>
         </set>
         where a.diagnose_result_id = #{diagnoseResultId, jdbcType=BIGINT}
     </update>
