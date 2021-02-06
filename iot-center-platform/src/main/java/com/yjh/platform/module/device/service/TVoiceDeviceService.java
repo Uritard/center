@@ -236,8 +236,10 @@ public class TVoiceDeviceService{
             map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
             if(timeList.get(j+1) == (DBList.size()-1)){
                 //整个文件满足
+                map.put("endTime",simpleDateFormat.format(second- TimeZone.getDefault().getRawOffset()));
                 map.put("time",second.toString());
             } else {
+                map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
                 map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
             }
 
