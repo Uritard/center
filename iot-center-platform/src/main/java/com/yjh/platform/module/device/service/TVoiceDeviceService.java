@@ -143,8 +143,8 @@ public class TVoiceDeviceService{
                     List<VoiceDevice> fileList = new ArrayList<>();
                     if("device".equals(areaInfoTem.getInfoType())){
                         boolean flag = false;
-                        File file = new File("D:/code/qhTest"+"/"+areaInfoTem.getId());
-                        //File file = new File(path);
+                        //File file = new File("D:/code/qhTest"+"/"+areaInfoTem.getId());
+                        File file = new File(path+"/"+areaInfoTem.getId());
                         File[] tempList = file.listFiles();
                         if(tempList != null && tempList.length>0){
                             for (int i = 0; i < tempList.length; i++) {
@@ -235,7 +235,7 @@ public class TVoiceDeviceService{
             map.put("startTime",simpleDateFormat.format(timeList.get(j)*hm- TimeZone.getDefault().getRawOffset()));
             map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
             if(timeList.get(j+1) == (DBList.size()-1)){
-                //真个文件满足
+                //整个文件满足
                 map.put("time",second.toString());
             } else {
                 map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
