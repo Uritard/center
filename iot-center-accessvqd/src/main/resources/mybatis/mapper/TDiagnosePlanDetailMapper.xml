@@ -73,22 +73,22 @@
 
     <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanDetail">
         update t_diagnose_plan_detail a <set>
-        <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR},</if>
-        <if test="signalOpt != null and signalOpt != ''">a.signal_opt = #{signalOpt, jdbcType=VARCHAR},</if>
-        <if test="blurOpt != null and blurOpt != ''">a.blur_opt = #{blurOpt, jdbcType=VARCHAR},</if>
-        <if test="contrastOpt != null and contrastOpt != ''">a.contrast_opt = #{contrastOpt, jdbcType=VARCHAR},</if>
-        <if test="brightOpt != null and brightOpt != ''">a.bright_opt = #{brightOpt, jdbcType=VARCHAR},</if>
-        <if test="darkOpt != null and darkOpt != ''">a.dark_opt = #{darkOpt, jdbcType=VARCHAR},</if>
-        <if test="chromaOpt != null and chromaOpt != ''">a.chroma_opt = #{chromaOpt, jdbcType=VARCHAR},</if>
-        <if test="monoOpt != null and monoOpt != ''">a.mono_opt = #{monoOpt, jdbcType=VARCHAR},</if>
-        <if test="noiseOpt != null and noiseOpt != ''">a.noise_opt = #{noiseOpt, jdbcType=VARCHAR},</if>
-        <if test="streakOpt != null and streakOpt != ''">a.streak_opt = #{streakOpt, jdbcType=VARCHAR},</if>
-        <if test="freezeOpt != null and freezeOpt != ''">a.freeze_opt = #{freezeOpt, jdbcType=VARCHAR},</if>
-        <if test="shakeOpt != null and shakeOpt != ''">a.shake_opt = #{shakeOpt, jdbcType=VARCHAR},</if>
-        <if test="flashOpt != null and flashOpt != ''">a.flash_opt = #{flashOpt, jdbcType=VARCHAR},</if>
-        <if test="sceneOpt != null and sceneOpt != ''">a.scene_opt = #{sceneOpt, jdbcType=VARCHAR},</if>
-        <if test="coverOpt != null and coverOpt != ''">a.cover_opt = #{coverOpt, jdbcType=VARCHAR},</if>
-        <if test="ptzOpt != null and ptzOpt != ''">a.ptz_opt = #{ptzOpt, jdbcType=VARCHAR},</if>
+        <if test="diagnosePlanId != null">a.diagnose_plan_id = #{diagnosePlanId},</if>
+        <if test="signalOpt != null">a.signal_opt = #{signalOpt},</if>
+        <if test="blurOpt != null ">a.blur_opt = #{blurOpt},</if>
+        <if test="contrastOpt != null ">a.contrast_opt = #{contrastOpt},</if>
+        <if test="brightOpt != null ">a.bright_opt = #{brightOpt},</if>
+        <if test="darkOpt != null ">a.dark_opt = #{darkOpt},</if>
+        <if test="chromaOpt != null">a.chroma_opt = #{chromaOpt},</if>
+        <if test="monoOpt != null a">a.mono_opt = #{monoOpt},</if>
+        <if test="noiseOpt != null ">a.noise_opt = #{noiseOpt},</if>
+        <if test="streakOpt != null ">a.streak_opt = #{streakOpt},</if>
+        <if test="freezeOpt != null ">a.freeze_opt = #{freezeOpt},</if>
+        <if test="shakeOpt != null">a.shake_opt = #{shakeOpt},</if>
+        <if test="flashOpt != null ">a.flash_opt = #{flashOpt},</if>
+        <if test="sceneOpt != null ">a.scene_opt = #{sceneOpt},</if>
+        <if test="coverOpt != null ">a.cover_opt = #{coverOpt},</if>
+        <if test="ptzOpt != null ">a.ptz_opt = #{ptzOpt},</if>
     </set>
             where a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
     </update>

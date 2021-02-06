@@ -1,5 +1,7 @@
 package com.yjh.accessvideo.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,9 +24,11 @@ public class Format implements Serializable {
 
 
     @ApiModelProperty(value = "主键ID")
+    @TableField(value = "test_id",updateStrategy = FieldStrategy.IGNORED)
     private String testId;
 
     @ApiModelProperty(value = "分类标志")
+    @TableField(value = "test_type",updateStrategy = FieldStrategy.IGNORED)
     private String testType;
 
 

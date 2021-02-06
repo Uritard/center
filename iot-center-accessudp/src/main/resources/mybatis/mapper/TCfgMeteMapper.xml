@@ -246,20 +246,20 @@
 
     <update id="updateForTelecontrol" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
         update t_cfg_telecontrol a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="meteId != null">a.mete_id = #{meteId},</if>
+        <if test="meteName != null ">a.mete_name = #{meteName},</if>
         <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
         <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
         <if test="controlStatus != null ">a.control_status = #{controlStatus, jdbcType=INTEGER},</if>
-        <if test="enableString != null and enableString != ''">a.enable_string = #{enableString, jdbcType=VARCHAR},</if>
-        <if test="succeedString != null and succeedString != ''">a.succeed_string = #{succeedString, jdbcType=VARCHAR},</if>
-        <if test="triggerString != null and triggerString != ''">a.trigger_string = #{triggerString, jdbcType=VARCHAR},</if>
+        <if test="enableString != null ">a.enable_string = #{enableString},</if>
+        <if test="succeedString != null ">a.succeed_string = #{succeedString},</if>
+        <if test="triggerString != null ">a.trigger_string = #{triggerString},</if>
         <if test="controlValue != null ">a.control_value = #{controlValue, jdbcType=INTEGER},</if>
-        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
-        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+        <if test="meteCode != null ">a.mete_code = #{meteCode},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType},</if>
+        <if test="description != null ">a.description = #{description},</if>
+        <if test="describer != null ">a.describer = #{describer},</if>
     </set>
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
@@ -337,37 +337,37 @@
 
     <update id="updateForTelemeter" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
         update t_cfg_telemeter a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
-        <if test="upEffect != null and upEffect != ''">a.up_effect = #{upEffect, jdbcType=REAL},</if>
-        <if test="downEffect != null and downEffect != ''">a.down_effect = #{downEffect, jdbcType=REAL},</if>
+        <if test="deviceId != null">a.device_id = #{deviceId},</if>
+        <if test="meteId != null ">a.mete_id = #{meteId},</if>
+        <if test="meteName != null">a.mete_name = #{meteName},</if>
+        <if test="upEffect != null ">a.up_effect = #{upEffect},</if>
+        <if test="downEffect != null">a.down_effect = #{downEffect},</if>
         <if test="metePrecision != null ">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
-        <if test="unit != null and unit != ''">a.unit = #{unit, jdbcType=VARCHAR},</if>
+        <if test="unit != null and ">a.unit = #{unit},</if>
         <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
         <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
-        <if test="limitBand != null and limitBand != ''">a.limit_band = #{limitBand, jdbcType=REAL},</if>
-        <if test="changeLimit != null and changeLimit != ''">a.change_limit = #{changeLimit, jdbcType=REAL},</if>
-        <if test="validMid != null and validMid != ''">a.valid_mid = #{validMid, jdbcType=VARCHAR},</if>
-        <if test="validString != null and validString != ''">a.valid_string = #{validString, jdbcType=VARCHAR},</if>
-        <if test="invalidValue != null and invalidValue != ''">a.invalid_value = #{invalidValue, jdbcType=REAL},</if>
-        <if test="lastValue != null and lastValue != ''">a.last_value = #{lastValue, jdbcType=REAL},</if>
-        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
-        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
-        <if test="hilimit1 != null and hilimit1 != ''">a.hilimit1 = #{hilimit1, jdbcType=REAL},</if>
-        <if test="lolimit1 != null and lolimit1 != ''">a.lolimit1 = #{lolimit1, jdbcType=REAL},</if>
-        <if test="hilimit2 != null and hilimit2 != ''">a.hilimit2 = #{hilimit2, jdbcType=REAL},</if>
-        <if test="lolimit2 != null and lolimit2 != ''">a.lolimit2 = #{lolimit2, jdbcType=REAL},</if>
-        <if test="hilimit3 != null and hilimit3 != ''">a.hilimit3 = #{hilimit3, jdbcType=REAL},</if>
-        <if test="lolimit3 != null and lolimit3 != ''">a.lolimit3 = #{lolimit3, jdbcType=REAL},</if>
-        <if test="hilimit4 != null and hilimit4 != ''">a.hilimit4 = #{hilimit4, jdbcType=REAL},</if>
-        <if test="lolimit4 != null and lolimit4 != ''">a.lolimit4 = #{lolimit4, jdbcType=REAL},</if>
-        <if test="stander != null and stander != ''">a.stander = #{stander, jdbcType=REAL},</if>
+        <if test="limitBand != null ">a.limit_band = #{limitBand},</if>
+        <if test="changeLimit != null ">a.change_limit = #{changeLimit},</if>
+        <if test="validMid != null ">a.valid_mid = #{validMid},</if>
+        <if test="validString != null ">a.valid_string = #{validString},</if>
+        <if test="invalidValue != null">a.invalid_value = #{invalidValue},</if>
+        <if test="lastValue != null">a.last_value = #{lastValue},</if>
+        <if test="lastTime != null">a.last_time = #{lastTime},</if>
+        <if test="meteCode != null">a.mete_code = #{meteCode},</if>
+        <if test="deviceType != null ">a.device_type = #{deviceType},</if>
+        <if test="description != null ">a.description = #{description},</if>
+        <if test="hilimit1 != null ">a.hilimit1 = #{hilimit1},</if>
+        <if test="lolimit1 != null ">a.lolimit1 = #{lolimit1},</if>
+        <if test="hilimit2 != null ">a.hilimit2 = #{hilimit2},</if>
+        <if test="lolimit2 != null ">a.lolimit2 = #{lolimit2},</if>
+        <if test="hilimit3 != null ">a.hilimit3 = #{hilimit3},</if>
+        <if test="lolimit3 != null ">a.lolimit3 = #{lolimit3},</if>
+        <if test="hilimit4 != null ">a.hilimit4 = #{hilimit4},</if>
+        <if test="lolimit4 != null ">a.lolimit4 = #{lolimit4},</if>
+        <if test="stander != null ">a.stander = #{stander, jdbcType=REAL},</if>
         <if test="isshield != null ">a.isshield = #{isshield, jdbcType=INTEGER},</if>
-        <if test="storageperiod != null and storageperiod != ''">a.storageperiod = #{storageperiod, jdbcType=BIGINT},</if>
-        <if test="linkMeteId != null and linkMeteId != ''">a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR},</if>
+        <if test="storageperiod != null ">a.storageperiod = #{storageperiod},</if>
+        <if test="linkMeteId != null ">a.link_mete_id = #{linkMeteId},</if>
     </set>
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
@@ -437,33 +437,33 @@
 
     <update id="updateForTelesignal" parameterType="com.yjh.accessudp.module.device.entity.SYAllInfo">
         update t_cfg_telesignal a <set>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=VARCHAR},</if>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=VARCHAR},</if>
-        <if test="meteName != null and meteName != ''">a.mete_name = #{meteName, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="meteId != null ">a.mete_id = #{meteId},</if>
+        <if test="meteName != null ">a.mete_name = #{meteName},</if>
         <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
         <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=INTEGER},</if>
         <if test="meteIndex != null ">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
         <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
         <if test="signalKind != null ">a.signal_kind = #{signalKind, jdbcType=INTEGER},</if>
         <if test="lastValue != null ">a.last_value = #{lastValue, jdbcType=INTEGER},</if>
-        <if test="lastTime != null and lastTime != ''">a.last_time = #{lastTime, jdbcType=TIMESTAMP},</if>
+        <if test="lastTime != null">a.last_time = #{lastTime},</if>
         <if test="explainType != null ">a.explain_type = #{explainType, jdbcType=INTEGER},</if>
         <if test="reportType != null ">a.report_type = #{reportType, jdbcType=INTEGER},</if>
         <if test="reportLevel != null ">a.report_level = #{reportLevel, jdbcType=INTEGER},</if>
         <if test="maskType != null ">a.mask_type = #{maskType, jdbcType=INTEGER},</if>
-        <if test="maskMid != null and maskMid != ''">a.mask_mid = #{maskMid, jdbcType=VARCHAR},</if>
-        <if test="maskString != null and maskString != ''">a.mask_string = #{maskString, jdbcType=VARCHAR},</if>
+        <if test="maskMid != null ">a.mask_mid = #{maskMid},</if>
+        <if test="maskString != null ">a.mask_string = #{maskString},</if>
         <if test="maskValue != null ">a.mask_value = #{maskValue, jdbcType=INTEGER},</if>
         <if test="delayTime != null ">a.delay_time = #{delayTime, jdbcType=INTEGER},</if>
-        <if test="meteCode != null and meteCode != ''">a.mete_code = #{meteCode, jdbcType=VARCHAR},</if>
-        <if test="deviceType != null and deviceType != ''">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="description != null and description != ''">a.description = #{description, jdbcType=VARCHAR},</if>
+        <if test="meteCode != null ">a.mete_code = #{meteCode},</if>
+        <if test="deviceType != null">a.device_type = #{deviceType},</if>
+        <if test="description != null ">a.description = #{description},</if>
         <if test="isshield != null ">a.isshield = #{isshield, jdbcType=INTEGER},</if>
-        <if test="storageperiod != null and storageperiod != ''">a.storageperiod = #{storageperiod, jdbcType=BIGINT},</if>
-        <if test="describer != null and describer != ''">a.describer = #{describer, jdbcType=VARCHAR},</if>
+        <if test="storageperiod != null ">a.storageperiod = #{storageperiod},</if>
+        <if test="describer != null ">a.describer = #{describer},</if>
         <if test="alarmthresbhold != null ">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
         <if test="alarmlevel != null ">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
-        <if test="linkMeteId != null and linkMeteId != ''">a.link_mete_id = #{linkMeteId, jdbcType=VARCHAR},</if>
+        <if test="linkMeteId != null ">a.link_mete_id = #{linkMeteId},</if>
     </set>
         where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
@@ -498,14 +498,14 @@
 
     <update id="updateTCfgDataCurrent" parameterType="com.yjh.accessudp.module.device.entity.TCfgDataCurrent">
         update t_cfg_data_current a <set>
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
+        <if test="meteId != null">a.mete_id = #{meteId},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="cunstomId != null">a.cunstom_id = #{cunstomId},</if>
         a.record_time = #{recordTime, jdbcType=TIMESTAMP},
         <if test="meteKind != null">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
-        <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=VARCHAR},</if>
-        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
-        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+        <if test="regionId != null ">a.region_id = #{regionId},</if>
+        <if test="meteValue != null">a.mete_value = #{meteValue},</if>
+        <if test="lastMeteValue != null ">a.last_mete_value = #{lastMeteValue},</if>
     </set>
         where a.mete_id = #{meteId, jdbcType=BIGINT}
     </update>

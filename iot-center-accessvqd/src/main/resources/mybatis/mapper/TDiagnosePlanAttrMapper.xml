@@ -31,8 +31,8 @@
 
     <update id="update" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
         update t_diagnose_plan_attr a <set>
-        <if test="diagnosePlanId != null and diagnosePlanId != ''">a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR},</if>
-        <if test="channelId != null and channelId != ''">a.channel_id = #{channelId, jdbcType=VARCHAR},</if>
+        <if test="diagnosePlanId != null ">a.diagnose_plan_id = #{diagnosePlanId},</if>
+        <if test="channelId != null ">a.channel_id = #{channelId},</if>
     </set>
             where a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
     </update>

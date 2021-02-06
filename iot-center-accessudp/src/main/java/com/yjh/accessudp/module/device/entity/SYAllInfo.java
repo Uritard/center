@@ -146,27 +146,34 @@ public class SYAllInfo implements Serializable {
         private Integer controlStatus;
 
         @ApiModelProperty(value = "控制使能条件表达式")
+         @TableField(value = "enable_string",updateStrategy = FieldStrategy.IGNORED)
         private String enableString;
 
         @ApiModelProperty(value = "控制成功条件表达式")
+        @TableField(value = "succeed_string",updateStrategy = FieldStrategy.IGNORED)
         private String succeedString;
 
         @ApiModelProperty(value = "触发条件表达式")
+        @TableField(value = "trigger_string",updateStrategy = FieldStrategy.IGNORED)
         private String triggerString;
 
         @ApiModelProperty(value = "控制参数")
         private Integer controlValue;
 
         @ApiModelProperty(value = "上下限带宽")
+         @TableField(value = "limit_band",updateStrategy = FieldStrategy.IGNORED)
         private Float limitBand;
 
         @ApiModelProperty(value = "有效性表达式变量串")
+        @TableField(value = "valid_mid",updateStrategy = FieldStrategy.IGNORED)
         private String validMid;
 
         @ApiModelProperty(value = "有效性判断表达式")
+         @TableField(value = "valid_string",updateStrategy = FieldStrategy.IGNORED)
         private String validString;
 
         @ApiModelProperty(value = "无效时的值")
+        @TableField(value = "invalid_value",updateStrategy = FieldStrategy.IGNORED)
         private Float invalidValue;
 
         @ApiModelProperty(value = "四级告警下限")
@@ -176,9 +183,11 @@ public class SYAllInfo implements Serializable {
         private Integer isshield;
 
         @ApiModelProperty(value = "存储周期")
+         @TableField(value = "storageperiod",updateStrategy = FieldStrategy.IGNORED)
         private Long storageperiod;
 
         @ApiModelProperty(value = "关联的遥信量")
+        @TableField(value = "link_mete_id",updateStrategy = FieldStrategy.IGNORED)
         private String linkMeteId;
 
         @ApiModelProperty(value = "遥信量种类")
@@ -197,9 +206,11 @@ public class SYAllInfo implements Serializable {
         private Integer maskType;
 
         @ApiModelProperty(value = "屏蔽表达式变量串")
+        @TableField(value = "mask_mid",updateStrategy = FieldStrategy.IGNORED)
         private String maskMid;
 
         @ApiModelProperty(value = "屏蔽表达式")
+        @TableField(value = "mask_string",updateStrategy = FieldStrategy.IGNORED)
         private String maskString;
 
         @ApiModelProperty(value = "屏蔽值")

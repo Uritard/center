@@ -2,6 +2,9 @@ package com.yjh.accessvideo.module.device.entity;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,9 +25,11 @@ public class TCruiseTaskResult implements Serializable {
 
 
     @ApiModelProperty(value = "任务结果UUID")
+    @TableField(value = "task_result_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskResultId;
 
     @ApiModelProperty(value = "巡检任务ID")
+    @TableField(value = "task_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskId;
 
     private String taskName;
@@ -35,6 +40,7 @@ public class TCruiseTaskResult implements Serializable {
     private Integer taskAlarm;
 
     @ApiModelProperty(value = "执行类型")
+    @TableField(value = "run_execute",updateStrategy = FieldStrategy.IGNORED)
     private String runExecute;
 
     @ApiModelProperty(value = "巡检时间")
@@ -47,6 +53,7 @@ public class TCruiseTaskResult implements Serializable {
     private Integer cruiseResult;
 
     @ApiModelProperty(value = "备注")
+     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
 

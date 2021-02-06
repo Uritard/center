@@ -1,6 +1,9 @@
 package com.yjh.accessvqd.module.diagnose.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,9 +22,9 @@ public class TDiagnosePlanAttr implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
+    @TableField(value = "diagnose_plan_id",updateStrategy = FieldStrategy.IGNORED)
     private String diagnosePlanId;
-
+    @TableField(value = "channel_id",updateStrategy = FieldStrategy.IGNORED)
     private String channelId;
 
 

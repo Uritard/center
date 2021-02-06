@@ -388,21 +388,21 @@
 
     <update id="updateCruiseResult" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseResult">
         update t_cruise_result a <set>
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="taskResultId != null ">a.task_result_id = #{taskResultId},</if>
+        <if test="taskId != null ">a.task_id = #{taskId},</if>
+        <if test="areaId != null">a.area_id = #{areaId},</if>
         <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
         <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
         <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
         <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
         <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
-        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkUser != null ">a.check_user = #{checkUser},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP},
-        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
+        <if test="weather != null ">a.weather = #{weather},</if>
         a.create_time = #{createTime, jdbcType=TIMESTAMP},
         a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
-        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="taskCode != null ">a.task_code = #{taskCode},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
     </update>
@@ -456,15 +456,15 @@
 
     <update id="updateCruiseTaskResult" parameterType="com.yjh.accessvideo.module.device.entity.TCruiseTaskResult">
         update t_cruise_task_result a <set>
-        <if test="taskResultId != null and taskResultId != ''">a.task_result_id = #{taskResultId, jdbcType=VARCHAR},</if>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskResultId != null ">a.task_result_id = #{taskResultId},</if>
+        <if test="taskId != null ">a.task_id = #{taskId},</if>
         <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
         <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
-        <if test="runExecute != null and runExecute != ''">a.run_execute = #{runExecute, jdbcType=VARCHAR},</if>
+        <if test="runExecute != null ">a.run_execute = #{runExecute},</if>
         a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},
         <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
         <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="remark != null ">a.remark = #{remark},</if>
     </set>
         where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
     </update>
