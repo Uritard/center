@@ -109,7 +109,7 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         Thread.sleep(500);
         String code = Constant.robotResultMap.get("Code");
         if ("200".equals(code)){
@@ -147,7 +147,7 @@ public class RobotService {
         RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
         log.info("sendId是<start>" + sendId + "<end>");
         if (sendId != null) {
-            sendId.SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+            sendId.sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         }
         Thread.sleep(500);
         if (Constant.flag == 1) {
@@ -544,7 +544,7 @@ public class RobotService {
                 log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
 
                 //根据不同的机器人对应不同的管道发送指令
-                RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).SendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
+                RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
             }
 
         }
@@ -573,7 +573,7 @@ public class RobotService {
 
         //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(resMap.get("receiveCode").toString())
-                .SendHeartBeat(generateByteOrder(xmlString,resMap.get("receiveCode").toString()), resMap.get("receiveCode").toString());
+                .sendHeartBeat(generateByteOrder(xmlString,resMap.get("receiveCode").toString()), resMap.get("receiveCode").toString());
         return 1;
     }
     //@Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
@@ -605,7 +605,7 @@ public class RobotService {
                 log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
 
                 //根据不同的机器人对应不同的管道发送指令
-                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
 
                 if (commandValue.equals("2") || commandValue.equals("4")) {
                     insertForPause(robotCode, taskId, Integer.valueOf(commandValue));
@@ -861,7 +861,7 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(xmlBaseModel.getCode()).SendHeartBeat( generateByteOrder(xmlString,xmlBaseModel.getCode()),xmlBaseModel.getCode());
+        RobotServerHandler.getRobotServerHandlerMap().get(xmlBaseModel.getCode()).sendHeartBeat( generateByteOrder(xmlString,xmlBaseModel.getCode()),xmlBaseModel.getCode());
         return "success";
     }
 

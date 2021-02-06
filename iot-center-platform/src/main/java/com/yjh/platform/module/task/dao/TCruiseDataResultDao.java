@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author czh
@@ -55,6 +56,8 @@ public interface TCruiseDataResultDao {
                                                         @Param(value = "deviceMeteId") Long deviceMeteId);
     CruiseResultAnalyzeMeteInfo selectMeteCruiseByDeviceId2(@Param(value = "deviceId") Long deviceId,
                                                         @Param(value = "deviceMeteId") Long deviceMeteId);
+    CruiseResultAnalyzeMeteInfo selectMeteCruiseByDeviceId3(@Param(value = "deviceId") Long deviceId,
+                                    @Param(value = "deviceMeteId") Long deviceMeteId);
     List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "cruiseType") Integer cruiseType,
                                                             @Param(value = "cType") Integer cType,
                                                             @Param(value = "deviceMeteId") Long deviceMeteId,

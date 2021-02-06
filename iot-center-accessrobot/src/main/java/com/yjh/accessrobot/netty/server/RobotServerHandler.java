@@ -148,17 +148,25 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //        ctx.flush();
     }
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public  void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //接收机器人发送的指令
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
 
         StringBuilder Str = new StringBuilder();
-        for (byte byteitem : bytes) {
-            Str.append(String.format("%02x ", byteitem));
+        for (byte byteItem : bytes) {
+            Str.append(String.format("%02x ", byteItem));
         }
-        log.info("机器人发送的的指令是<start>" + Str + "<end>");
+        String socketMessageHex = Str.toString().replace(" ","").toLowerCase();
+        log.info("socketMessageHex:"+socketMessageHex);
+
+
+        /*PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
+        TaskExecutePool.getInstance().execute(packetDealThread);*/
+
+//        int headNum = appearNumber(socketMessageHex,"eb90");
+//        chaibao(socketMessageHex,headNum);
 
 //        lookByte(bytes);//看指令
 
@@ -178,8 +186,56 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
 
         handlingMethod(bytes,finalBody);
-
         ReferenceCountUtil.release(byteBuf);
+    }
+    public  void chaibao(String socketMessageHex,int headNum) throws Exception{
+        String onePacketString = null;
+        String shengYuString = null;
+        if(socketMessageHex.startsWith("eb90") && headNum >= 2) {
+            //内容足够
+            int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;
+            int limit = 0;
+            if(socketMessageHex.length()-limitNum==1){
+                log.info("一个完整的包，解析......");
+                String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
+                byte[] onePacket = PlatformPacketUtil.HexString2Bytes(body1);
+                StringBuilder Str2 = new StringBuilder();
+                for (byte byteItem : onePacket) {
+                    Str2.append(String.format("%02x ", byteItem));
+                }
+                log.info("准备解析的字节数组="+Str2);
+                onePacketString = PlatformPacketUtil.toStringHex(body1);
+                log.info("准备解析的xml=="+onePacketString);
+                stringToXml(onePacket,onePacketString);
+            }else{
+                log.info("大于一个完整的包");
+                socketMessageHex = socketMessageHex.substring(0,limitNum+1);
+                /*byte[] by = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
+                limit = PlatformPacketUtil.HexString2Bytes(socketMessageHex).length;*/
+//                shengYuString = onePacketString.replace(socketMessageHex,"");
+//                chaibao(shengYuString,appearNumber(shengYuString,"eb90"));
+            }
+        }else {
+            if (socketMessageHex.startsWith("eb90")){
+                String now = Constant.Packet + socketMessageHex;
+                log.info("现在的包："+ now);
+//                chaibao(now,appearNumber(now,"eb90"));
+            }else {
+                String now = socketMessageHex + Constant.Packet;
+                log.info("现在的包："+ now);
+//                chaibao(now,appearNumber(now,"eb90"));
+            }
+        }
+    }
+    //获取指定字符串出现的次数
+    public static int appearNumber(String srcText, String findText) {
+        int count = 0;
+        Pattern p = Pattern.compile(findText);
+        Matcher m = p.matcher(srcText);
+        while (m.find()) {
+            count++;
+        }
+        return count;
     }
     /*拆包工具
     *
@@ -208,7 +264,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     //      log.info("不足一个完整的包：" + Packet);
         }
     }
-    private void stringToXml(byte[] bytes,String xmlContext)throws Exception{
+     void stringToXml(byte[] bytes,String xmlContext)throws Exception{
             Document document = DocumentHelper.parseText(xmlContext);//String转XML
             XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
             log.info("解析出来的xml是：" + xmlRes);

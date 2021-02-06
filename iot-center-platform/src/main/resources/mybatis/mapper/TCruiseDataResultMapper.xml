@@ -406,6 +406,33 @@
         LIMIT 1
 
     </select>
+    <select id="selectMeteCruiseByDeviceId3" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo"  >
+        SELECT
+        b.instance_id,
+        d.cruise_result,
+        f.dict_note AS cruise_result_name,
+        b.cruise_time,
+        d.picpath,
+        d.identify_result,
+        k.dict_note AS identify_result_name,
+        b.instance_name as cruise_name
+        FROM
+        t_cruise_point_instance a
+        LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
+        JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
+        LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code AND f.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business k ON d.identify_result = k.dict_code AND k.col_name = 'identify_result'
+        LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
+        LEFT JOIN t_cruise_task_result c ON b.task_result_id = c.task_result_id
+        LEFT JOIN t_cruise_result m ON b.task_result_id = m.task_result_id
+        LEFT JOIN t_dict_business n ON m.c_state = n.dict_code AND n.col_name = 'task_state'
+        WHERE 1 = 1
+        <if test="deviceId != null">and a.device_id= #{deviceId,jdbcType=BIGINT}</if>
+        <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
+        ORDER BY
+        b.cruise_time DESC
+        LIMIT 1
+    </select>
     <select id="selectCruiseDataResultByList2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
         SELECT
             e.cruise_result_id,

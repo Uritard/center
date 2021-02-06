@@ -78,6 +78,18 @@ public class TCruiseDataResultService {
             cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
         }
 
+        /*//按巡检时间逆序排列
+        Collections.sort(cruiseResultAnalMeteInfoList, new Comparator<CruiseResultAnalyzeMeteInfo>() {
+            @Override
+            public int compare(CruiseResultAnalyzeMeteInfo o1, CruiseResultAnalyzeMeteInfo o2) {
+                Date date1 = o1.getCruiseTime();
+                Date date2 = o2.getCruiseTime();
+                int flag = date1.compareTo(date2);
+                flag = -flag;
+                return flag;
+            }
+        });*/
+
         //获取同一设备下的有巡检结果的标准测点
         List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
         for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
@@ -113,19 +125,8 @@ public class TCruiseDataResultService {
         log.info("abnormalFilters==="+abnormalFilters);
         cruiseResultAnalMeteInfoList.removeAll(abnormalFilters);
 
-        //按巡检时间逆序排列
-        Collections.sort(cruiseResultAnalMeteInfoList, new Comparator<CruiseResultAnalyzeMeteInfo>() {
-            @Override
-            public int compare(CruiseResultAnalyzeMeteInfo o1, CruiseResultAnalyzeMeteInfo o2) {
-                Date date1 = o1.getCruiseTime();
-                Date date2 = o2.getCruiseTime();
-                int flag = date1.compareTo(date2);
-                flag = -flag;
-                return flag;
-            }
-        });
-
         return cruiseResultAnalMeteInfoList;
+
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -91,8 +91,7 @@ public class TCameraPresetService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraPresetExpand> selectByPage(TCameraPreset tCameraPreset) {
-        List<TCameraPresetExpand> tCameraPresetExpandList = tCameraPresetDao.selectByPage(tCameraPreset);
-        return tCameraPresetExpandList;
+        return tCameraPresetDao.selectByPage(tCameraPreset);
     }
 
     @Transactional(rollbackFor = Exception.class)

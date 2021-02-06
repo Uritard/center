@@ -208,6 +208,7 @@
         <if test="calibrationStatus != null "> and a.calibration_status = #{calibrationStatus, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
         and a.camera_id = b.camera_id
+        ORDER BY a.preset_num asc
     </select>
 
     <insert id="batchInsert">
