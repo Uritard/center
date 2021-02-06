@@ -102,7 +102,13 @@ public class TStdDeviceController {
     public Result deleteAll(@RequestParam(value = "deviceId", required = true) Long deviceId) {
         Result result = new Result();
         try {
-            result.setData(tStdDeviceService.deleteByPrimaryIdALL(deviceId));
+            int re  = tStdDeviceService.deleteByPrimaryIdALL(deviceId);
+            if(re == -1){
+                result.setCode(209,"此设备下存在测点");
+            }else {
+                result.setData(re);
+            }
+            //result.setData(tStdDeviceService.deleteByPrimaryIdALL(deviceId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除设备及属性异常:", e);
@@ -392,7 +398,12 @@ public class TStdDeviceController {
     public Result batchDelete(@RequestParam(value="deviceIds")String deviceIds){
         Result result=new Result();
         try{
-            result.setData(tStdDeviceService.batchDelete(deviceIds));
+            int re  = tStdDeviceService.batchDelete(deviceIds);
+            if(re == -1){
+                result.setCode(209,"设备下存在巡视点");
+            }else {
+                result.setData(re);
+            }
         }catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除设备异常:", e);

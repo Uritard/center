@@ -84,7 +84,13 @@ public class TRobotInfoController {
     public Result delete(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
         try {
-            result.setData(tRobotInfoService.deleteByPrimaryId(robotId));
+            int re = tRobotInfoService.deleteByPrimaryId(robotId);
+            if(re == -1){
+                result.setCode(209,"此机器人下存在巡视点");
+            }else {
+                result.setData(re);
+            }
+            //result.setData(tRobotInfoService.deleteByPrimaryId(robotId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除机器人异常:", e);
@@ -258,7 +264,13 @@ public class TRobotInfoController {
     public Result batchDelete(@RequestParam(value = "robotIds", required = true) String robotIds) {
         Result result = new Result();
         try {
-            result.setData(tRobotInfoService.batchDelete(robotIds));
+            int re = tRobotInfoService.batchDelete(robotIds);
+            if(re == -1){
+                result.setCode(209,"此机器人下存在巡视点");
+            }else {
+                result.setData(re);
+            }
+            //result.setData(tRobotInfoService.batchDelete(robotIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);

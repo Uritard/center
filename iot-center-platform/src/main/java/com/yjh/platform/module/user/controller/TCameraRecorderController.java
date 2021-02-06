@@ -66,7 +66,12 @@ public class TCameraRecorderController {
     public Result delete(@RequestParam(value = "recordId", required = true) Long recordId) {
         Result result = new Result();
         try {
-            result.setData(tCameraRecorderService.deleteByPrimaryId(recordId));
+            int re  = tCameraRecorderService.deleteByPrimaryId(recordId);
+            if(re == -1){
+                result.setCode(209,"此录像服务器下存在摄像机");
+            }else {
+                result.setData(re);
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -83,7 +88,13 @@ public class TCameraRecorderController {
     public Result deleteSelectedRecord(@RequestParam(value = "recordIds", required = true) String recordIds) {
         Result result = new Result();
         try {
-            result.setData(tCameraRecorderService.deleteSelectedRecord(recordIds));
+            int re  = tCameraRecorderService.deleteSelectedRecord(recordIds);
+            if(re == -1){
+                result.setCode(209,"录像服务器下存在摄像机");
+            }else {
+                result.setData(re);
+            }
+            //result.setData(tCameraRecorderService.deleteSelectedRecord(recordIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);

@@ -11,6 +11,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -38,6 +39,8 @@ public class TCameraPresetController {
 
     @Autowired
     private final TCameraPresetService tCameraPresetService;
+    @Autowired
+    private  TCameraPresetDao tCameraPresetDao;
 
     private Logger log = LoggerFactory.getLogger(TCameraPresetController.class);
 
@@ -76,7 +79,7 @@ public class TCameraPresetController {
                         tCameraPresetService.update(tCameraPreset1);//存图
                         result.setData(resultNum);
                     } else {
-                        tCameraPresetService.deleteByPrimaryId(tCameraPreset1.getPresetId());
+                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset1.getPresetId());
                         resultNum = 0;
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
                         result.setData(resultNum);
@@ -98,21 +101,26 @@ public class TCameraPresetController {
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
-            //操作预置位
-            TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(presetId);
-            HashMap<String,Long> params = new HashMap<>();
+            int resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
+            if(resultNum == -1){
+                result.setCode(209,"此预置位已被配置到巡视点");
+            }else {
+                //操作预置位
+                TCameraPreset tCameraPreset = tCameraPresetService.selectByPrimaryId(presetId);
+                HashMap<String, Long> params = new HashMap<>();
 
-            params.put("cameraId",tCameraPreset.getCameraId());
-            params.put("presetId",tCameraPreset.getPresetId());
-            Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);
+                params.put("cameraId", tCameraPreset.getCameraId());
+                params.put("presetId", tCameraPreset.getPresetId());
+                Result response = sendPostRequest(Constant.CANCEL_PRESET_URL, params);
 
-            int resultNum = 0;
-            //操作数据库
-            if (response.getData().equals(true)){
-             log.info("nvr删除预置位成功");
+                //int resultNum = 0;
+                //操作数据库
+                if (response.getData().equals(true)) {
+                    log.info("nvr删除预置位成功");
+                }
+                //resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
+                result.setData(resultNum);
             }
-            resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
-            result.setData(resultNum);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -151,8 +159,12 @@ public class TCameraPresetController {
                 Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);
                 //操作数据库
                 int resultNum = 0;
-                if (response.getData().equals(true)) {
-                    resultNum = tCameraPresetService.deleteByPrimaryId(Long.valueOf(presetIdArray[i]));
+                //if (response.getData().equals(true)) {
+                resultNum = tCameraPresetService.deleteByPrimaryId(Long.valueOf(presetIdArray[i]));
+                //}
+                if(resultNum == -1){
+                    result.setCode(209,"预置位已配置到巡视点");
+                    return result;
                 }
                 result.setData(resultNum);
             }
@@ -291,7 +303,13 @@ public class TCameraPresetController {
     public Result batchInsert(@RequestBody List<TCameraPreset> list) {
         Result result = new Result();
         try {
-        result.setData(tCameraPresetService.batchInsert(list));
+            int re = tCameraPresetService.batchInsert(list);
+            if(re ==-1){
+                result.setCode(209,"预置位已配置到巡视点");
+            }else {
+                result.setData(re);
+            }
+        //result.setData(tCameraPresetService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);

@@ -71,7 +71,13 @@ public class TCameraInfoController {
     public Result delete(@RequestParam(value = "cameraId", required = true) Long cameraId) {
         Result result = new Result();
         try {
-            result.setData(tCameraInfoService.deleteByPrimaryId(cameraId));
+            int re = tCameraInfoService.deleteByPrimaryId(cameraId);
+            if(re == -1){
+                result.setCode(209,"此摄像机下存在预置位");
+            }else{
+                result.setData(re);
+            }
+            //result.setData(tCameraInfoService.deleteByPrimaryId(cameraId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除相机异常:", e);
@@ -88,7 +94,13 @@ public class TCameraInfoController {
     public Result deleteSelectedCamera(@RequestParam(value = "cameraIds", required = true) String cameraIds) {
         Result result = new Result();
         try {
-            result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
+            int re = tCameraInfoService.deleteSelectedCamera(cameraIds);
+            if(re == -1){
+                result.setCode(209,"摄像机下存在预置位");
+            }else{
+                result.setData(re);
+            }
+            //result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);

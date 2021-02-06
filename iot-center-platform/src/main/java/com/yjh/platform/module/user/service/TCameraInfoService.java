@@ -91,6 +91,13 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long cameraId) {
+        //判断相机下是否有预置位
+        {
+            List<Long> list = tCameraInfoDao.selectHavePreset(cameraId);
+            if(list != null && list.size()>0){
+                return -1;
+            }
+        }
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
         return this.intoRedis();
     }
@@ -98,6 +105,12 @@ public class TCameraInfoService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedCamera(String cameraIds) {
         List<String> list = Arrays.asList(cameraIds.split(","));
+        for(String item:list){
+            List<Long> haveList = tCameraInfoDao.selectHavePreset(Long.valueOf(item));
+            if(haveList != null && haveList.size()>0){
+                return -1;
+            }
+        }
         int i = this.tCameraInfoDao.deleteSelectedCamera(list);
         this.intoRedis();
         return i;

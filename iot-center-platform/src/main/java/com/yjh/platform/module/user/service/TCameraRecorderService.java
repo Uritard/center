@@ -52,12 +52,25 @@ public class TCameraRecorderService {
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long recordId) {
+        //判断录像机下是否有摄像机
+        {
+            List<Long> list = tCameraRecorderDao.selectHaveCamera(recordId);
+            if(list != null && list.size() > 0){
+                return  -1;
+            }
+        }
         return this.tCameraRecorderDao.deleteByPrimaryId(recordId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteSelectedRecord(String recordIds) {
         List<String> list= Arrays.asList(recordIds.split(","));
+        for(String item:list){
+            List<Long> listHave = tCameraRecorderDao.selectHaveCamera(Long.valueOf(item));
+            if(listHave != null && listHave.size() > 0){
+                return  -1;
+            }
+        }
         return this.tCameraRecorderDao.deleteSelectedRecord(list);
     }
 

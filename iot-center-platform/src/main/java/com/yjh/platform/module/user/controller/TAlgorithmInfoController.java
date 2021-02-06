@@ -69,7 +69,13 @@ public class TAlgorithmInfoController {
     public Result delete(@RequestParam(value = "algorithmId", required = true) Long algorithmId) {
         Result result = new Result();
         try {
-            result.setData(tAlgorithmInfoService.deleteByPrimaryId(algorithmId));
+            int re  = tAlgorithmInfoService.deleteByPrimaryId(algorithmId);
+            if(re == -1){
+                result.setCode(209,"此算法已配置到测点");
+            }else {
+                result.setData(re);
+            }
+            //result.setData(tAlgorithmInfoService.deleteByPrimaryId(algorithmId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除算法异常:", e);
@@ -161,7 +167,13 @@ public class TAlgorithmInfoController {
     public Result batchInsert(@RequestBody List<TAlgorithmInfo> list) {
         Result result = new Result();
         try {
-        result.setData(tAlgorithmInfoService.batchInsert(list));
+            int re  = tAlgorithmInfoService.batchInsert(list);
+            if(re == -1){
+                result.setCode(209,"算法已配置到测点");
+            }else {
+                result.setData(re);
+            }
+        //result.setData(tAlgorithmInfoService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入算法失败：" + e);

@@ -123,12 +123,12 @@ public class TVoiceDeviceService{
                 areaInfoCountryList.add(areaInfoCountry);
             }
         }
-        //获取相机的状态
-        String path = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
-        diGui(areaInfoCountryList, listTree,path);
+        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
+        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }
-    private void diGui(List<VoiceDevice> areaInfoList, List<VoiceDevice> listTree,String path) {
+    private void diGui(List<VoiceDevice> areaInfoList, List<VoiceDevice> listTree,String realPath,String absPath) {
         for(VoiceDevice areaInfo : areaInfoList){
             List<VoiceDevice> childrenList = new ArrayList<>();
             for(Iterator<VoiceDevice> it = listTree.iterator();it.hasNext();){
@@ -144,7 +144,7 @@ public class TVoiceDeviceService{
                     if("device".equals(areaInfoTem.getInfoType())){
                         boolean flag = false;
                         //File file = new File("D:/code/qhTest"+"/"+areaInfoTem.getId());
-                        File file = new File(path+"/"+areaInfoTem.getId());
+                        File file = new File(absPath+"/"+areaInfoTem.getId());
                         File[] tempList = file.listFiles();
                         if(tempList != null && tempList.length>0){
                             for (int i = 0; i < tempList.length; i++) {
@@ -153,7 +153,7 @@ public class TVoiceDeviceService{
                                     voiceDevice.setUpId(areaInfoTem.getId());
                                     voiceDevice.setUpName(areaInfoTem.getLabel());
                                     voiceDevice.setLabel(tempList[i].getName());
-                                    voiceDevice.setFilePath(path+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
+                                    voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
                                     voiceDevice.setInfoType("file");
                                     fileList.add(voiceDevice);
                                 }
@@ -167,7 +167,7 @@ public class TVoiceDeviceService{
             }
             if (childrenList.size()>0 ) {
                 areaInfo.setChildren(childrenList);
-                diGui(childrenList, listTree,path);
+                diGui(childrenList, listTree,realPath,absPath);
             }
         }
     }
