@@ -21,47 +21,8 @@ public class Demo {
     // 国密规范测试私钥
     private static final String prik = "00AFB685CF8993EF80FF9B6F8DD92486710C719AB3820B9D48A13A12ED9FD6CFE1";
     //国密规范测试公钥
-    private static final String pubk =  "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
-                                       //"048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
-
-//    public static void main(String[] arg) {
-//        String msg = "123456789";//原始数据
-//        System.out.println("原始数据：" + msg);
-//        String summaryString = summary(String.valueOf(msg));
-//        System.out.println("摘要：" + summaryString);
-//        String signString = sign(summaryString);
-//        System.out.println("摘要签名：" + signString);
-//        boolean status = verify(summaryString, signString);
-//        System.out.println("验签结果：" + status);
-//
-//        System.out.println("加密: ");
-//        byte[] cipherText = null;
-//        try {
-//            cipherText = SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), String.valueOf(msg).getBytes());
-//        } catch (IllegalArgumentException e1) {
-//            // TODO 自动生成的 catch 块
-//            e1.printStackTrace();
-//        } catch (IOException e1) {
-//            // TODO 自动生成的 catch 块
-//            e1.printStackTrace();
-//        }
-//        System.out.println(new String(Base64.encode(cipherText)));
-//        System.out.println("");
-//
-//        System.out.println("解密: ");
-//        String res = null;
-//        try {
-//            res = new String(SM2Utils.decrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(prik))).getBytes()), cipherText));
-//        } catch (IllegalArgumentException e) {
-//            // TODO 自动生成的 catch 块
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            // TODO 自动生成的 catch 块
-//            e.printStackTrace();
-//        }
-//        System.out.println(res);
-//
-//    }
+    private static final String pubk =  //"0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
+                                       "048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
 
     /**
      * 摘要
@@ -75,7 +36,7 @@ public class Demo {
         sm.update(msg.getBytes(), 0, msg.getBytes().length);
         sm.doFinal(md, 0);
         String s = new String(Hex.encode(md));
-        return s.toUpperCase();
+        return s;
     }
 
     /**
@@ -108,11 +69,6 @@ public class Demo {
      * @return
      */
     public static boolean verify(String summary, String sign) {
-//        String pubkS = new String(Base64.encode(Util.hexToByte(pubk)));
-//        System.out.println("pubkS: " + pubkS);
-//        System.out.println("");
-//
-//        System.out.println("验签 ");
         boolean vs = false; //验签结果
         try {
             vs = SM2Utils.verifySign(userId.getBytes(),  Util.hexToByte(pubk), summary.getBytes(), Base64.decode(sign));

@@ -75,7 +75,7 @@ public class Demo {
         sm.update(msg.getBytes(), 0, msg.getBytes().length);
         sm.doFinal(md, 0);
         String s = new String(Hex.encode(md));
-        return s.toUpperCase();
+        return s;
     }
 
     /**
@@ -141,18 +141,52 @@ public class Demo {
     /**
      * 加密
      */
-    public static  String encryption(String msg) throws IOException {
-      return   new String(Base64.encode(SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), msg.getBytes())));
-    }
+//    public static  String encryption(String msg) throws IOException {
+//      return   new String(Base64.encode(SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), msg.getBytes())));
+//    }
 
     /**
      * 解密
      */
-    public  static  String decrypt(String msg) throws IOException {
-        if (StringUtils.isNotBlank(msg)) {
-            return new String(SM2Utils.decrypt(org.bouncycastle.util.encoders.Base64.decode(new String(org.bouncycastle.util.encoders.Base64.encode(Util.hexToByte(prik))).getBytes()), Base64.decode(msg.getBytes())));
-        }else {
-            return  msg;
-        }
+//    public  static  String decrypt(String msg) throws IOException {
+//        if (StringUtils.isNotBlank(msg)) {
+//            return new String(SM2Utils.decrypt(org.bouncycastle.util.encoders.Base64.decode(new String(org.bouncycastle.util.encoders.Base64.encode(Util.hexToByte(prik))).getBytes()), Base64.decode(msg.getBytes())));
+//        }else {
+//            return  msg;
+//        }
+//    }
+
+
+    /**
+     * 解密前端密码
+     *
+     * @param pCode 前端密码
+     * @return 密码
+     * @throws Exception 异常
+     */
+    public static String decrypt(String pCode) throws IOException {
+        return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte("04" + pCode)));
+    }
+
+    /**
+     * 解密后端密码
+     *
+     * @param pCode 后端密码
+     * @return 密码
+     * @throws Exception 异常
+     */
+    public static String decryptDB(String pCode) throws IOException {
+        return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte(pCode)));
+    }
+
+    /**
+     * 加密
+     *
+     * @param pCode 密码
+     * @return 密码
+     * @throws Exception 异常
+     */
+    public static String encryption(String pCode) throws IOException {
+        return SM2Utils.encrypt(Util.hexStringToBytes(pubk), pCode.getBytes());
     }
 }
