@@ -101,12 +101,12 @@ public class TCameraPresetController {
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
+            TCameraPreset tCameraPreset = tCameraPresetService.selectByPrimaryId(presetId);
             int resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
             if(resultNum == -1){
                 result.setCode(209,"此预置位已被配置到巡视点");
             }else {
                 //操作预置位
-                TCameraPreset tCameraPreset = tCameraPresetService.selectByPrimaryId(presetId);
                 HashMap<String, Long> params = new HashMap<>();
 
                 params.put("cameraId", tCameraPreset.getCameraId());

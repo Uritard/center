@@ -212,6 +212,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             {//遥控信号
                 if(meteKind == 3){
                     getUrl(SEQUENCE_URL,meteId.toString());
+                    getUrl(UNION_URL,meteId.toString());
                 }else {
                     getUrl(UNION_URL,meteId.toString());
                 }
