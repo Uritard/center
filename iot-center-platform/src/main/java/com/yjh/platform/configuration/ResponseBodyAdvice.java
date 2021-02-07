@@ -89,7 +89,7 @@ public class ResponseBodyAdvice implements  org.springframework.web.servlet.mvc.
                 response.getHeaders().
                         add("isdecode", "1");
                 byte[] cipherText = null;
-                cipherText = SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), result.getBytes());
+              //  cipherText = SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), result.getBytes());
                 return new String(Base64.encode(cipherText));
             } catch (Exception e) {
                 return body;
