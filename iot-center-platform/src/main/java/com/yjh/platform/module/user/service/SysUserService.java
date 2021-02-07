@@ -104,13 +104,17 @@ public class SysUserService {
                     Demo.decrypt(userMap.get("userName"));
             String password =//userMap.get("password");
                     Demo.decrypt(userMap.get("password"));
-            String verfiCode = userMap.get("verfiCode");
+            // String verfiCode = userMap.get("verfiCode");
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
             sysUserLogin.setUserName(Demo.encryption(sysUserLogin.getUserName()));
             sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
             if (!Objects.equals(null, sysUserLogin)) {
                 SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
+                Map verMap = new LinkedHashMap<>();
+                verMap.put("userName", userName);
+                verMap.put("password", password);
+                String verfiCode=Demo.summary(verMap.toString());
                 if (!sysUserBackUp.getVerfiCode().equals(verfiCode)) {
                     Map linkedHashMap = new LinkedHashMap<>();
                     linkedHashMap.put("userName", userName);
