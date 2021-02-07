@@ -111,13 +111,13 @@ public class TCameraPresetController {
 
                 params.put("cameraId", tCameraPreset.getCameraId());
                 params.put("presetId", tCameraPreset.getPresetId());
-                Result response = sendPostRequest(Constant.CANCEL_PRESET_URL, params);
+                //Result response = sendPostRequest(Constant.CANCEL_PRESET_URL, params);
 
                 //int resultNum = 0;
                 //操作数据库
-                if (response.getData().equals(true)) {
-                    log.info("nvr删除预置位成功");
-                }
+//                if (response.getData().equals(true)) {
+//                    log.info("nvr删除预置位成功");
+//                }
                 //resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
                 result.setData(resultNum);
             }
