@@ -135,6 +135,9 @@ public class CameraConService {
     public String stopRealPlay(Long cameraId, String rtmpUrl) {
         String urlStop = null;
         String livePath;
+        redisTemplate.delete("cameraRealFlow:"+cameraId);
+//        redisTemplate.opsForHash().delete("cameraRealFlow:"+cameraId, "cameraId", "rtmpUrl", "flvUrl");
+        log.info("1111");
         try {
             if (Objects.equals(null, rtmpUrl) || rtmpUrl.equals("")) {
                 String rtmpUrlCamera = Constant.mapsForCamera.get(String.valueOf(cameraId));
@@ -158,9 +161,6 @@ public class CameraConService {
             Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
             urlStop = "kill -9 "+processNum;
             Runtime.getRuntime().exec(urlStop);
-            redisTemplate.delete("cameraRealFlow:"+cameraId);
-            redisTemplate.opsForHash().delete("cameraRealFlow:"+cameraId, "cameraId", "rtmpUrl", "flvUrl");
-            log.info("1111");
             Constant.mapsForCamera.remove(String.valueOf(cameraId));
         } catch (Exception e) {e.getMessage();}
         return "stop " + cameraId + " preview success!";
