@@ -412,4 +412,18 @@ public class TCruiseTaskController {
         }
         return result;
     }
+
+
+    @ApiOperation(value = "图片判别任务下发")
+    @RequestMapping(value = "executeDifferentiateTask",method = RequestMethod.POST)
+    public Result executeDifferentiateTask(@RequestBody List<String> images){
+        Result result=new Result();
+        try {
+            result.setData(tCruiseTaskService.executeDifferentiateTasks(images));
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("任务下发失败");
+        }
+        return  result;
+    }
 }

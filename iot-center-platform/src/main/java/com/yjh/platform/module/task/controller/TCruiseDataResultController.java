@@ -390,6 +390,7 @@ public class TCruiseDataResultController {
         }
         return result;
     }
+
     @ApiOperation(value = "测点巡检时间记录表维护")
     @PostMapping(value = "/updateCruiseAnalyze")
     @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
@@ -402,6 +403,21 @@ public class TCruiseDataResultController {
             log.error("测点巡检时间记录表维护失败：" + e);
         }
         return result;
+    }
+
+
+
+    @ApiOperation(value = "图像判别结果查询")
+    @RequestMapping(value = "/QueryDifferentiateResult",method = RequestMethod.GET)
+    public Result QueryDifferentiateResult(@RequestParam String taskId){
+        Result result=new Result();
+        try {
+           result.setData(tCruiseDataResultService.QueryDifferentiateResult(taskId));
+        }catch (Exception e){
+            log.error("查询失败"+e);
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+        }
+        return  result;
     }
 
 }

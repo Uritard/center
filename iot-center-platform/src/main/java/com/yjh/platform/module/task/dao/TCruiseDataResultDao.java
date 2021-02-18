@@ -83,9 +83,14 @@ public interface TCruiseDataResultDao {
                                           @Param(value = "endTime") String endTime,
                                           @Param(value = "meteType") String meteType,
                                           @Param(value = "meterType") Integer meterType);
+
     List<Long> selectAllDeviceMeteId();
     TStdDeviceMeteUpdate selectCruiseAnalyze(@Param(value = "cruiseResultId") String cruiseResultId);
     int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
     int insertDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
     List<String> test();
+
+
+    List<String> selectResultImg(@Param(value = "taskId")String taskId);
+
 }

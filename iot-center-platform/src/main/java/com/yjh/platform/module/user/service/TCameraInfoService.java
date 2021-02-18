@@ -81,7 +81,7 @@ public class TCameraInfoService {
             log.info("channel:"+channel);
         }catch (Exception e){
             log.error("监测点新增失败："+e);
-            return 1;
+            return 0;
         }
 
         tCameraInfo.setMonitorId(channel.getId());
@@ -134,6 +134,7 @@ public class TCameraInfoService {
             Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
         }catch (Exception e){
             log.error("监测点修改失败："+e);
+            return 0;
         }
 
 

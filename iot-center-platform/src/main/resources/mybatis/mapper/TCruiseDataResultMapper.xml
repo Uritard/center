@@ -611,6 +611,7 @@
         <if test="meteType != null and meteType != -1" >and a.mete_type=#{meteType,jdbcType=VARCHAR}</if>
         ORDER BY e.cruise_time ASC
     </select>
+
     <select id="selectCruiseAnalyze" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate">
         SELECT
             a.instance_id,
@@ -658,4 +659,16 @@
         SELECT  a.cruise_result_id
         FROM t_cruise_task_result_detail a
     </select>
+
+
+    <select id="selectResultImg" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        d.result_pic
+        FROM
+        t_cruise_task a LEFT JOIN t_cruise_task_result b ON a.task_id=b.task_id
+        LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id=c.task_result_id
+        LEFT JOIN t_cruise_data_result d ON c.cruise_result_id=d.cruise_result_id
+        WHERE a.task_id= #{taskId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

@@ -32,10 +32,10 @@ public class ChanResultService {
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(ChanResult chanResult) {
-        if(!(chanResult.getSnapshotUrl().equals("(null)"))){
+        if (!(chanResult.getSnapshotUrl().equals("(null)"))) {
             chanResult.setSnapshotUrl(chanResult.getSnapshotUrl().replaceAll("192.168.10.34:81", Constant.VQD_IMAGES_STORE_URL));
         }
-        switch (chanResult.getChannelResult()){
+        switch (chanResult.getChannelResult()) {
             case 0:
                 chanResult.setStatus("未检测");
                 chanResult.setResultContent("未检测");
@@ -112,41 +112,49 @@ public class ChanResultService {
 
     @Logs(title = "查询诊断任务或监测点信息")
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,String>> findQueryItems(Integer queryType){
-        List<Map<String,String>> queryItems=new ArrayList<>();
-        queryItems=chanResultDao.selectQueryItems(queryType);
+    public List<Map<String, String>> findQueryItems(Integer queryType) {
+        List<Map<String, String>> queryItems = new ArrayList<>();
+        queryItems = chanResultDao.selectQueryItems(queryType);
         return queryItems;
     }
 
     @Logs(title = "分页查询诊断结果详细信息", code = "chanResult")
     @Transactional(rollbackFor = Exception.class)
-    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId,String status) throws Exception {
-        List<DiagnoseResultDetail> details = chanResultDao.selectDiagnoseResultByPage(pointId, startTime, endTime, diagnosePlanId,status);
-        log.info("details:---------"+details);
+    public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId, String status) throws Exception {
+
+        List<DiagnoseResultDetail> details=new ArrayList<>();
+
+        log.info("details:---------" + details);
         log.info("result：" + details);
-        for (DiagnoseResultDetail detail : details) {
-            detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
-            checkItemsOperate(detail);
-            //获取视频地址
-            Result result=Constant.otherServer(detail.getCameraId(),Constant.START_CAMERA_URL);
-            Map<String,String> videoInfo=(Map<String, String>)result.getData();
-           detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
-           detail.setFlvUrl(videoInfo.get("flvUrl"));
-            switch (detail.getDevType()){
-                case "0":
-                    detail.setDevType("枪机");
-                    break;
-                case "1":
-                    detail.setDevType("球机");
-                    break;
+        //无任务时返回[]结果信息
+        if(Objects.isNull(diagnosePlanId) || diagnosePlanId.equals("")){
+           return details;
+        }else {
+            details = chanResultDao.selectDiagnoseResultByPage(pointId, startTime, endTime, diagnosePlanId, status);
+            for (DiagnoseResultDetail detail : details) {
+                detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
+                checkItemsOperate(detail);
+                //获取视频地址
+                Result result = Constant.otherServer(detail.getCameraId(), Constant.START_CAMERA_URL);
+                Map<String, String> videoInfo = (Map<String, String>) result.getData();
+                detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
+                detail.setFlvUrl(videoInfo.get("flvUrl"));
+                switch (detail.getDevType()) {
+                    case "0":
+                        detail.setDevType("枪机");
+                        break;
+                    case "1":
+                        detail.setDevType("球机");
+                        break;
+                }
             }
         }
         return details;
     }
 
 
-    public ChanResult checkItems(ChanResult chanResult){
-        String content="";
+    public ChanResult checkItems(ChanResult chanResult) {
+        String content = "";
 
         if (chanResult.getSignalResult().equals("2")) {
             content = "信号丢失 ";
@@ -207,8 +215,8 @@ public class ChanResultService {
             content = content + "云台失控";
         }
 
-        String temContent=content.replaceAll("\\s+",",");
-        chanResult.setResultContent(temContent.substring(0,temContent.length()-1));
+        String temContent = content.replaceAll("\\s+", ",");
+        chanResult.setResultContent(temContent.substring(0, temContent.length() - 1));
         return chanResult;
     }
 
@@ -264,55 +272,55 @@ public class ChanResultService {
 
     @Logs(title = "统计不同故障类型的诊断点数")
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Long> faultCounts(String planId,String channelId) {
+    public Map<String, Long> faultCounts(String planId, String channelId) {
         return chanResultDao.faultTypeSta(planId, channelId);
     }
 
     @Logs(title = "统计不同监测点状态")
-    public Map<String, Long> statusTypeChannel(String planId,String channelId) {
+    public Map<String, Long> statusTypeChannel(String planId, String channelId) {
         return chanResultDao.statusTypeChannel(planId, channelId);
     }
 
     @Logs(title = "故障信息树")
-    public List<Map<String, String>>  faultTree() {
-        List<Map<String,String>>faultItems=new ArrayList<>();
-        String[]keys={"signal","blur","contrast","bright","dark","chroma","mono","noise","streak","freeze","shake","flash","scene","cover","ptz","login","stream"};
-        String[]names={"视频丢失","图像模糊","对比度","图像过亮","图像过暗","图像偏色","黑白图像","噪声干扰","条纹干扰","画面冻结","视频抖动","视频剧变","场景变换","视频遮挡","云台失控","登录失败","取流异常"};
-        for(int i=0;i<keys.length;i++){
-            Map<String,String> item=new HashMap<>();
-            item.put("checked","1");
-            item.put("key",keys[i]);
-            item.put("name",names[i]);
+    public List<Map<String, String>> faultTree() {
+        List<Map<String, String>> faultItems = new ArrayList<>();
+        String[] keys = {"signal", "blur", "contrast", "bright", "dark", "chroma", "mono", "noise", "streak", "freeze", "shake", "flash", "scene", "cover", "ptz", "login", "stream"};
+        String[] names = {"信号丢失", "图像模糊", "对比度", "图像过亮", "图像过暗", "图像偏色", "黑白图像", "噪声干扰", "条纹干扰", "画面冻结", "视频抖动", "视频剧变", "场景变换", "视频遮挡", "云台失控", "登录失败", "取流异常"};
+        for (int i = 0; i < keys.length; i++) {
+            Map<String, String> item = new HashMap<>();
+            item.put("checked", "1");
+            item.put("key", keys[i]);
+            item.put("name", names[i]);
             faultItems.add(item);
         }
         return faultItems;
     }
 
     @Logs(title = "统计分析")
-    public Map<String,List<Map<String, Object>>> staticalAnalysis(String faultInfo,String startDate,String endDate) throws ParseException {
+    public Map<String, List<Map<String, Object>>> staticalAnalysis(String faultInfo, String startDate, String endDate) throws ParseException {
 
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date startTime=null;
-        Date endTime=null;
-        if(Objects.nonNull(startDate)){
-            if(!(startDate.equals(""))){
-                startTime=simpleDateFormat.parse(startDate);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date startTime = null;
+        Date endTime = null;
+        if (Objects.nonNull(startDate)) {
+            if (!(startDate.equals(""))) {
+                startTime = simpleDateFormat.parse(startDate);
             }
 
         }
-        if(Objects.nonNull(endDate)){
-            if(!(endDate.equals(""))){
-                endTime=simpleDateFormat.parse(endDate);
+        if (Objects.nonNull(endDate)) {
+            if (!(endDate.equals(""))) {
+                endTime = simpleDateFormat.parse(endDate);
             }
 
         }
-        List<Map<String,Object>> charData=new ArrayList<>();
-        List<Map<String,Object>> gridData=new ArrayList<>();
-        List<Map<String,Object>> mapList=chanResultDao.staticalAnalysis(startTime,endTime);
+        List<Map<String, Object>> charData = new ArrayList<>();
+        List<Map<String, Object>> gridData = new ArrayList<>();
+        List<Map<String, Object>> mapList = chanResultDao.staticalAnalysis(startTime, endTime);
 
-        String[] faultArr=faultInfo.split(",");
-        for(int i=0;i<faultArr.length;i++){
-            switch (faultArr[i]){
+        String[] faultArr = faultInfo.split(",");
+        for (int i = 0; i < faultArr.length; i++) {
+            switch (faultArr[i]) {
                 case "signal":
                     charData.add(mapList.get(0));
                     gridData.add(mapList.get(0));
@@ -453,9 +461,9 @@ public class ChanResultService {
 //            gridData.add(mapList.get(16));
 //        }
 
-        Map<String,List<Map<String, Object>>> map=new HashMap<>();
-        map.put("charData",charData);
-        map.put("gridData",gridData);
+        Map<String, List<Map<String, Object>>> map = new HashMap<>();
+        map.put("charData", charData);
+        map.put("gridData", gridData);
         return map;
     }
 

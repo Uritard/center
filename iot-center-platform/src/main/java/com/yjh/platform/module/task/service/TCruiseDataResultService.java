@@ -250,5 +250,11 @@ public class TCruiseDataResultService {
         }
         return updateRes+insertRes;
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> QueryDifferentiateResult(String taskId){
+      return tCruiseDataResultDao.selectResultImg(taskId);
+    }
+
 }
 

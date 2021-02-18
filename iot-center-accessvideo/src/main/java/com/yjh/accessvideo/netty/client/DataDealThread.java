@@ -70,7 +70,6 @@ public class DataDealThread implements Runnable {
     @SneakyThrows
     @Override
     public void run() {
-        //TODO 添加线程池
         String remoteAdds = ctx.channel().remoteAddress().toString();
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
         String usefulBody = analyseDataOperateService.nonUnpacking(body);//反拆包解析
@@ -88,6 +87,23 @@ public class DataDealThread implements Runnable {
                     //遍历每一个结果子集
                     JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
                     log.info("数据****：" + jsonObjectResult);//打印resultInfo
+
+                    //处理判别结果
+                    if(jsonObjectResult.get("analyseType").toString().equals("11")){
+                        //获取分析结果图片地址
+                        String taskId=jsonObjectResult.get("taskId").toString();
+                        Long instanceId=Long.valueOf(jsonObjectResult.get("instanceId").toString());
+                        String resultImage=jsonObjectResult.get("analyseResultImg").toString();
+                        if(instanceId !=0){
+                            // TODO: 2021/2/6 联调时修改完善 
+                            //插入TCTR
+                            //插入TCTRD
+                            //插入TCDR
+                        }
+                    }
+
+
+
                     //初始化TASKID和INSTANCEID
                     TASKID = jsonObjectResult.get("taskId").toString();
                     INSTANCEID = jsonObjectResult.get("instanceId").toString();
@@ -412,6 +428,8 @@ public class DataDealThread implements Runnable {
                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "缺陷异常"));
                                     tAbnormal++;
 
+                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+
                                     //生成缺陷缓存信息（单一缺陷和多元缺陷）
                                     log.info("--------____--------生成缺陷缓存");
                                     String[] resultArr = resultValue.split("\\s+");
@@ -432,9 +450,21 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
                                         defectMap.put("defectTime",simpleDateFormat.format(new Date()));
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
+
+                                        // webSocket通知显示缺陷信息(单条推送)
+                                        Map<String, Object> jasonMaps = new HashMap<>();
+                                        jasonMaps.put("type", "newAlarm");
+                                        jasonMaps.put("alarmName", resultValue);
+                                        jasonMaps.put("alarmTime", defectMap.get("defectTime"));
+                                        jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName()+"--"+resultValue);
+                                        String jsons = JSON.toJSONString(jasonMaps);
+                                        log.info("缺陷生成-前端推送：" + jsons);
+                                        WebSocketServer.sendMsg(jsons);
+
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
                                         String defectTime=simpleDateFormat.format(new Date());
+                                        String defectNames="";
                                         for (int i = 0; i < resultArr.length; i++) {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
@@ -490,7 +520,20 @@ public class DataDealThread implements Runnable {
                                                     WebSocketServer.sendMsg(json);
                                                 }
                                             }
+
+                                            defectNames=defectNames+resultArr[i]+" ";
+
                                         }
+
+                                        // webSocket通知显示缺陷信息(多条推送)
+                                        Map<String, Object> jasonMaps = new HashMap<>();
+                                        jasonMaps.put("type", "newAlarm");
+                                        jasonMaps.put("alarmName", defectNames);
+                                        jasonMaps.put("alarmTime", defectTime);
+                                        jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName()+"--"+defectNames);
+                                        String jsons = JSON.toJSONString(jasonMaps);
+                                        log.info("缺陷生成-前端推送：" + jsons);
+                                        WebSocketServer.sendMsg(jsons);
 
                                     }
 

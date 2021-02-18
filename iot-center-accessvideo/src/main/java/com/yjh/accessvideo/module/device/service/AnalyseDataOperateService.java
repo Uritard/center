@@ -185,6 +185,7 @@ public class AnalyseDataOperateService {
 //
 //    }
 
+    //反拆包
     public String nonUnpacking(String body) {
         //body清除空格
         body = body.replaceAll("\\s++", "");
@@ -380,10 +381,10 @@ public class AnalyseDataOperateService {
                     defectValue = defectValue + "鸟窝" + " ";
                     break;
                 case "yw_gkxfw":
-                    defectValue = defectValue + "飘挂物" + " ";
+                    defectValue = defectValue + "挂空悬浮物" + " ";
                     break;
-                case "jyz_bmwh":
-                    defectValue = defectValue + "绝缘子-表面污秽" + " ";
+                case "bmwh":
+                    defectValue = defectValue + "表面污秽" + " ";
                     break;
                 case "jyz_pl":
                     defectValue = defectValue + "绝缘子-破裂" + " ";
@@ -423,6 +424,30 @@ public class AnalyseDataOperateService {
                     break;
                 case "jsxs":
                     defectValue = defectValue + "金属锈蚀" + " ";
+                    break;
+                case"sly_bjbmyw":
+                    defectValue=defectValue+"部件表面油污"+ " ";
+                    break;
+                case "gbqs":
+                    defectValue=defectValue+"盖板缺失"+ " ";
+                    break;
+                case "yxcr":
+                    defectValue=defectValue+"越线闯入"+ " ";
+                    break;
+                case "hzyw":
+                    defectValue=defectValue+"烟火识别"+ " ";
+                    break;
+                case "xdwsb":
+                    defectValue=defectValue+"小动物识别"+ " ";
+                    break;
+                case "smdmjs":
+                    defectValue=defectValue+"积水检测"+ " ";
+                    break;
+                case "kgg_ybf":
+                    defectValue=defectValue+"压板分"+ " ";
+                    break;
+                case "kgg_ybh":
+                    defectValue=defectValue+"压板合"+ " ";
                     break;
                 default:
                     return "null";

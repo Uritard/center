@@ -196,14 +196,15 @@ public class HelloController {
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
 
-        Long endTime=System.currentTimeMillis();
-        List<Integer> results=new ArrayList<>();
 
-          HashMap<String,Long> map1=new HashMap<>();
-          map1.put("cameraId",Long.valueOf("40050"));
-         Result result1=sendPostRequest(Constant.START_CAMERA_URL,map1);
-         result.setData(result1.getData());
-         log.info("---------："+result1.getData());
+//        Long endTime=System.currentTimeMillis();
+//        List<Integer> results=new ArrayList<>();
+
+//          HashMap<String,Long> map1=new HashMap<>();
+//          map1.put("cameraId",Long.valueOf("40050"));
+//         Result result1=sendPostRequest(Constant.START_CAMERA_URL,map1);
+//         result.setData(result1.getData());
+//         log.info("---------："+result1.getData());
 
 //        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
 //        log.info("djkhwqedkfe:"+maps.get("remark"));
@@ -212,8 +213,8 @@ public class HelloController {
 //        log.info("class.....:"+testString.getClass());
 //        log.info("content-length:"+testString.length());
 //
-        log.info("Content表计:"+testString.matches("\\{\"msgData.*?\"2\"}"));
-        log.info("Content缺陷:"+testString.matches("\\{\"msgType.*?}}}}"));
+//        log.info("Content表计:"+testString.matches("\\{\"msgData.*?\"2\"}"));
+//        log.info("Content缺陷:"+testString.matches("\\{\"msgType.*?}}}}"));
 
 //        log.info("Content前半:"+testString.matches());
 //        log.info("Content后半:"+testString.matches());

@@ -30,7 +30,7 @@ public enum ResultCodeEnum {
     FILEDELETED(602, "您要下载的资源已被删除！！"),
     CODE0(0, "成功"),
     CODE1(1, "未知错误"),
-
+    CODE2(2,"添加失败"),
 
     CODE10001(10001, "服务暂时不可用"),
     CODE10002(10002, "请求来自未经授权的IP地址"),

@@ -55,7 +55,13 @@ public class TCameraInfoController {
 
         Result result = new Result();
         try {
-            result.setData(tCameraInfoService.insert(tCameraInfo));
+            int state=tCameraInfoService.insert(tCameraInfo);
+            if(state==0){
+                result.setMessage(ResultCodeEnum.CODE2.getCode(),ResultCodeEnum.CODE2.getName());
+            }else {
+                result.setData(state);
+            }
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -117,7 +123,13 @@ public class TCameraInfoController {
     public Result update(@RequestBody TCameraInfo tCameraInfo) {
         Result result = new Result();
         try {
-            result.setData(tCameraInfoService.update(tCameraInfo));
+            int state=tCameraInfoService.update(tCameraInfo);
+            if(state==0){
+                result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            }else {
+                result.setData(state);
+            }
+
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新相机异常:", e);

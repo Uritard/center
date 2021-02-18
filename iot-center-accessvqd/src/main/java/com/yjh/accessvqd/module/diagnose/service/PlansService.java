@@ -409,7 +409,12 @@ public class PlansService {
     @Logs(title = "查询近一次任务")
     @Transactional(rollbackFor = Exception.class)
     public PlanInfo selectTheLastPlan() {
-        return tDiagnosePlanDao.selectLastPlan();
+        PlanInfo planInfo=tDiagnosePlanDao.selectLastPlan();
+        //若无最近一次任务则返回空数据体
+        if(Objects.isNull(planInfo)){
+            planInfo=new PlanInfo();
+        }
+        return planInfo;
     }
 
 

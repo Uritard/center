@@ -17,6 +17,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +47,8 @@ public class PacketDataHandler {
             //二次拆包
             log.info("index"+chanResult.indexOf("<?"));
             //xml转实体
-            ChanResult chanResult1=ChanResultXML.unPackingXMl(chanResult.substring(139));
+            // TODO: 2021/2/7   index:报文开始处理位置--会出现波动--后期修改
+            ChanResult chanResult1=ChanResultXML.unPackingXMl(chanResult.substring(137));
             log.info("对象:"+chanResult1);
             //获取监测点ID
             Set<String>keys=redisScan("diagnosePlan");
@@ -56,7 +58,7 @@ public class PacketDataHandler {
                     chanResult1.setDiagnosePlanId( key.replaceAll("diagnosePlan:",""));
                     log.info("size:------"+redisTemplate.opsForList().size(key));
                     if(redisTemplate.opsForList().size(key)==0){
-                       log.info("updatePlan:"+tDiagnosePlanDao.updateEndTime(chanResult1.getDiagnosePlanId(),chanResult1.getCheckTime()));
+                       log.info("updatePlan:"+tDiagnosePlanDao.updateEndTime(chanResult1.getDiagnosePlanId(),new Date()));
                     }
                 }
 
