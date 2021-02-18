@@ -158,7 +158,7 @@ public class CameraConService {
             Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
             urlStop = "kill -9 "+processNum;
             Runtime.getRuntime().exec(urlStop);
-            redisTemplate.opsForHash().delete("cameraRealFlow:"+cameraId);
+            redisTemplate.delete("cameraRealFlow:"+cameraId);
             Constant.mapsForCamera.remove(String.valueOf(cameraId));
         } catch (Exception e) {e.getMessage();}
         return "stop " + cameraId + " preview success!";
