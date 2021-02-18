@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.service.TSequentialConfService;
@@ -252,6 +253,24 @@ public class TSequentialConfController {
         Result result=new Result();
         try {
             result.setData(tSequentialConfService.unionTask(cfgDeviceId,order));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取顺控处于那一步")
+    @RequestMapping(value = "/getStep",method = RequestMethod.GET)
+    public Result getStep(){
+        Result result=new Result();
+        try {
+            Integer step = Constant.sequentialState.get("state");
+            if(step == null){
+                result.setData(-1);
+            }else {
+                result.setData(step);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

@@ -106,23 +106,23 @@ public class TSequentialConfService{
     public List<AreaInfo> selectForCfgDeviceTree(String cfgDeviceName){
         List<AreaInfo> list = new LinkedList<>();
         //遥信
-//        List<AreaInfo> listItem1 = this.tSequentialConfDao.selectForTCfgMete(1,cfgDeviceName);
-//        AreaInfo areaInfoItem1 = new AreaInfo();
-//        areaInfoItem1.setId(-1L);
-//        areaInfoItem1.setUpId(null);
-//        areaInfoItem1.setLabel("遥控设备树");
-//        areaInfoItem1.setChildren(listItem1);
-//        areaInfoItem1.setInfoType("tree");
-        //list.add(areaInfoItem1);
+        List<AreaInfo> listItem1 = this.tSequentialConfDao.selectForTCfgMete(1,cfgDeviceName);
+        AreaInfo areaInfoItem1 = new AreaInfo();
+        areaInfoItem1.setId(-1L);
+        areaInfoItem1.setUpId(null);
+        areaInfoItem1.setLabel("遥信");
+        areaInfoItem1.setChildren(listItem1);
+        areaInfoItem1.setInfoType("meteKind");
+        list.add(areaInfoItem1);
         //遥测
-//        List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2,cfgDeviceName);
-//        AreaInfo areaInfoItem2 = new AreaInfo();
-//        areaInfoItem2.setId(2L);
-//        areaInfoItem2.setUpId(-2L);
-//        areaInfoItem2.setLabel("遥测");
-//        areaInfoItem2.setChildren(listItem2);
-//        areaInfoItem2.setInfoType("meteKind");
-        //list.add(areaInfoItem2);
+        List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2,cfgDeviceName);
+        AreaInfo areaInfoItem2 = new AreaInfo();
+        areaInfoItem2.setId(2L);
+        areaInfoItem2.setUpId(-2L);
+        areaInfoItem2.setLabel("遥测");
+        areaInfoItem2.setChildren(listItem2);
+        areaInfoItem2.setInfoType("meteKind");
+        list.add(areaInfoItem2);
         //遥测
         List<AreaInfo> listItem3 = this.tSequentialConfDao.selectForTCfgMete(3,cfgDeviceName);
         AreaInfo areaInfoItem3 = new AreaInfo();
@@ -133,14 +133,14 @@ public class TSequentialConfService{
         areaInfoItem3.setInfoType("meteKind");
         list.add(areaInfoItem3);
         //遥测
-//        List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4,cfgDeviceName);
-//        AreaInfo areaInfoItem4 = new AreaInfo();
-//        areaInfoItem2.setId(4L);
-//        areaInfoItem2.setUpId(-4L);
-//        areaInfoItem2.setLabel("遥调");
-//        areaInfoItem2.setChildren(listItem4);
-//        areaInfoItem2.setInfoType("meteKind");
-        //list.add(areaInfoItem4);
+        List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4,cfgDeviceName);
+        AreaInfo areaInfoItem4 = new AreaInfo();
+        areaInfoItem4.setId(4L);
+        areaInfoItem4.setUpId(-4L);
+        areaInfoItem4.setLabel("遥调");
+        areaInfoItem4.setChildren(listItem4);
+        areaInfoItem4.setInfoType("meteKind");
+        list.add(areaInfoItem4);
 
         return list;
     }
@@ -152,7 +152,8 @@ public class TSequentialConfService{
             Map<String, Object> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "newSequential");
             jasonMaps2.put("cfgDeviceId", meteId);
-            jasonMaps2.put("sort", map.get("sort"));
+            jasonMaps2.put("sort", Integer.valueOf(map.get("sort"))-1);
+            Constant.sequentialState.put("state",Integer.valueOf(map.get("sort"))-1);
             jasonMaps2.put("state", map.get("state"));
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
@@ -212,13 +213,20 @@ public class TSequentialConfService{
             Map<String, Object> jasonMapsResult = new HashMap<>();
             jasonMapsResult.put("type", "newSequentialResult");
             jasonMapsResult.put("cfgDeviceId", meteId);
-            jasonMapsResult.put("sort", map.get("sort"));
+            jasonMapsResult.put("sort", Integer.valueOf(map.get("sort"))-1);
             jasonMapsResult.put("state", map.get("state"));
             jasonMapsResult.put("identifyResult", map.get("state"));
             String jsonResult = JSON.toJSONString(jasonMapsResult);
             log.info("发送给前端的消息：" + jsonResult);
             WebSocketServer.sendMsg(jsonResult);
 
+            List<String> listSort = tSequentialConfDao.selectLastStep();
+            if(listSort.get(listSort.size()-1).equals(meteId) ){
+                //这是最后一个步骤
+                TSysParam time = tSysParamDao.selectByParamType("cleanTime");
+                Thread.sleep(Integer.valueOf(time.getContent())*1000);
+                Constant.sequentialState.put("state",-1);
+            }
             //todo 生成顺控文件
         }
        return "ok";

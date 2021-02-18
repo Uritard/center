@@ -32,4 +32,5 @@ public interface TSequentialConfDao {
     List<Map<String,String>> selectForSequenceInfo(@Param(value = "cfgDeviceId") String cfgDeviceId);
     TSequentialConf selectSort(@Param(value = "cfgDeviceId") String cfgDeviceId);
     List<Long>selectCameraId();
+    List<String> selectLastStep();
 }

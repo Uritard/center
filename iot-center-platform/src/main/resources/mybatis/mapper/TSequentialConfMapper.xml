@@ -48,7 +48,7 @@
         <if test="cameraId != null ">a.camera_id = #{cameraId},</if>
         <if test="presetId != null ">a.preset_id = #{presetId},</if>
         <if test="identifyResult != null">a.identify_result = #{identifyResult},</if>
-        CURRENT_TIMESTAMP(),
+        a.record_time = CURRENT_TIMESTAMP(),
     </set>
             where a.cfg_device_id = #{cfgDeviceId, jdbcType=VARCHAR}
     </update>
@@ -183,4 +183,9 @@
         from t_sequential_conf
     </select>
 
+    <select id="selectLastStep" resultType="java.lang.String">
+        select
+        a.cfg_device_id
+        from t_sequential_conf a
+    </select>
 </mapper>

@@ -888,7 +888,7 @@ public class TCruiseTaskService {
         item.put("plan_start_time",tCruiseTask.getStartTime());
         if(tCruiseTask.getIfRun() == 172){
             try{
-                CronExpression expression = new CronExpression(tCruiseTask.getDateType());
+                //CronExpression expression = new CronExpression(tCruiseTask.getDateType());
                 item.put("start_time",tCruiseTask.getStartTime());
             }catch (Exception e){
                 log.info("上报出错"+e.getMessage());
