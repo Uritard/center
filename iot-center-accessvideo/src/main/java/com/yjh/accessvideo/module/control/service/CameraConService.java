@@ -43,7 +43,7 @@ public class CameraConService {
 
     @Autowired
     private CameraConDao cameraConDao;
-    @Resource
+    @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
     @Value("${nvr.rtmp.video}")
     private String UrlTem;
@@ -158,7 +158,9 @@ public class CameraConService {
             Integer processNum = Integer.parseInt(dataBackForId.substring(9,15).replace(" ",""));
             urlStop = "kill -9 "+processNum;
             Runtime.getRuntime().exec(urlStop);
+            redisTemplate.delete("cameraRealFlow:"+cameraId);
             redisTemplate.opsForHash().delete("cameraRealFlow:"+cameraId, "cameraId", "rtmpUrl", "flvUrl");
+            log.info("1111");
             Constant.mapsForCamera.remove(String.valueOf(cameraId));
         } catch (Exception e) {e.getMessage();}
         return "stop " + cameraId + " preview success!";
