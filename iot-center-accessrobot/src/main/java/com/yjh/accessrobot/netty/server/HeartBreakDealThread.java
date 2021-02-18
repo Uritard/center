@@ -35,7 +35,10 @@ public class HeartBreakDealThread implements Runnable {
                 Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
 
                 long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
-                int res = processMethod(sleepTime);
+                Thread.sleep(sleepTime);
+                log.info("线程等待了"+sleepTime+"ms了");
+                Constant.heartNum.addAndGet(1);
+                int res = Constant.heartNum.intValue();
                 if (res > 3){
                     robotServerHandler.procSend(robotCode);
                     StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
@@ -49,12 +52,12 @@ public class HeartBreakDealThread implements Runnable {
             log.error(e.getMessage(), e);
         }
     }
-    public synchronized int processMethod(long sleepTime) throws InterruptedException{
+    /*public synchronized int processMethod(long sleepTime) throws InterruptedException{
         Thread.sleep(sleepTime);
         log.info("线程等待了"+sleepTime+"ms了");
         Constant.heartNum++;
         int res = Constant.heartNum;
         log.info("判断条件是==="+res);
         return res;
-    }
+    }*/
 }

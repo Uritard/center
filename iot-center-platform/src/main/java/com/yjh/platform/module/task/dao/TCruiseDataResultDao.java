@@ -54,8 +54,7 @@ public interface TCruiseDataResultDao {
 
     CruiseResultAnalMeteInfo selectMeteCruiseByDeviceId(@Param(value = "deviceId") Long deviceId,
                                                         @Param(value = "deviceMeteId") Long deviceMeteId);
-    CruiseResultAnalyzeMeteInfo selectMeteCruiseByDeviceId2(@Param(value = "deviceId") Long deviceId,
-                                                        @Param(value = "deviceMeteId") Long deviceMeteId);
+    CruiseResultAnalyzeMeteInfo selectMeteCruiseByDeviceId2(@Param(value = "instanceId") Long instanceId);
     CruiseResultAnalyzeMeteInfo selectMeteCruiseByDeviceId3(@Param(value = "deviceId") Long deviceId,
                                     @Param(value = "deviceMeteId") Long deviceMeteId);
     List<CruiseResultAnalInfo> selectCruiseDataResultByList(@Param(value = "cruiseType") Integer cruiseType,
@@ -84,4 +83,9 @@ public interface TCruiseDataResultDao {
                                           @Param(value = "endTime") String endTime,
                                           @Param(value = "meteType") String meteType,
                                           @Param(value = "meterType") Integer meterType);
+    List<Long> selectAllDeviceMeteId();
+    TStdDeviceMeteUpdate selectCruiseAnalyze(@Param(value = "cruiseResultId") String cruiseResultId);
+    int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
+    int insertDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
+    List<String> test();
 }

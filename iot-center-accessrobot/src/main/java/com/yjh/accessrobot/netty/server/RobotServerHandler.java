@@ -65,7 +65,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private String strRobotCode = "TT";
     private boolean isThreadStart = true;
     private String redisValue = "content";
-    private String code = "";
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String todayTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -158,13 +157,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         for (byte byteItem : bytes) {
             Str.append(String.format("%02x ", byteItem));
         }
-        String socketMessageHex = Str.toString().replace(" ","").toLowerCase();
-        log.info("socketMessageHex:"+socketMessageHex);
+        log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
-
-        /*PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
-        TaskExecutePool.getInstance().execute(packetDealThread);*/
-
+//       String socketMessageHex = Str.toString().replace(" ","").toLowerCase();
+//        log.info("socketMessageHex:"+socketMessageHex);
+//        PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
+//        TaskExecutePool.getInstance().execute(packetDealThread);
 //        int headNum = appearNumber(socketMessageHex,"eb90");
 //        chaibao(socketMessageHex,headNum);
 
@@ -264,7 +262,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     //      log.info("不足一个完整的包：" + Packet);
         }
     }
-     void stringToXml(byte[] bytes,String xmlContext)throws Exception{
+    private void stringToXml(byte[] bytes,String xmlContext)throws Exception{
             Document document = DocumentHelper.parseText(xmlContext);//String转XML
             XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
             log.info("解析出来的xml是：" + xmlRes);
@@ -298,6 +296,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             String value = allRobotCodeMap.get(key);
             allRobotCodeList.add(value);
         }
+        String code = "";
         if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
             log.info("我们这边存在这个机器人,连它");
              code = "200";//成功
@@ -310,7 +309,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
                 //注册指令(发送响应)
                 case "2511":
-                    log.info("巡视主机收到注册指令了");
+                    log.info("巡视主机收到注册指令了,这是第"+Constant.registerCount+"次");
+                    Constant.registerCount++;
                     List<Map<String, Object>> ItemsList = new ArrayList<>();
                     Map<String, Object> Items = new HashMap<>();
 
@@ -343,7 +343,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
                     send(ctx, heartProtocol,xmlBaseModel.getSendCode());
                     //若心跳能够正常收发，将机器人置为在线状态
-                    Constant.heartNum = 0;
                     Constant.flag = 1;
                     if (Constant.flag2 == 0){
                         robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");

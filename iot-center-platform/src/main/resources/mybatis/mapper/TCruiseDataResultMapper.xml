@@ -378,31 +378,24 @@
 
     <select id="selectMeteCruiseByDeviceId2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo" >
         SELECT
-        b.instance_id,
-        d.cruise_result,
-        f.dict_note AS cruise_result_name,
-        b.cruise_time,
-        d.picpath,
-        d.identify_result,
+        e.cruise_data_id,
+        a.device_id,
+        e.cruise_result,
+        f.dict_note as cruise_result_name,
+        e.picpath,
+        e.identify_result,
         k.dict_note AS identify_result_name,
-        b.instance_name as cruise_name
+        a.instance_name as cruise_name
         FROM
-        t_cruise_point_instance a
-        LEFT JOIN t_cruise_task_result_detail b ON a.instance_id = b.instance_id
-        JOIN t_cruise_data_result d ON b.cruise_result_id = d.cruise_result_id
-        LEFT JOIN t_dict_business f ON d.cruise_result = f.dict_code AND f.col_name = 'cruise_result'
-        LEFT JOIN t_dict_business k ON d.identify_result = k.dict_code AND k.col_name = 'identify_result'
-        LEFT JOIN t_std_devicemete e ON a.device_mete_id = e.device_mete_id
-        LEFT JOIN t_cruise_task_result c ON b.task_result_id = c.task_result_id
-        LEFT JOIN t_cruise_result m ON b.task_result_id = m.task_result_id
-        LEFT JOIN t_dict_business n ON m.c_state = n.dict_code AND n.col_name = 'task_state'
+        t_cruise_task_result_detail a
+        LEFT JOIN t_cruise_result j on j.task_result_id = j.task_result_id and j.c_state != 239 and j.c_state != 241
+        LEFT JOIN t_cruise_data_result e ON e.cruise_result_id = a.cruise_result_id
+        LEFT JOIN t_dict_business f ON e.cruise_result = f.dict_code AND f.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business k ON e.identify_result = k.dict_code AND k.col_name = 'identify_result'
         WHERE 1 = 1
-        <if test="deviceId != null">and a.device_id= #{deviceId,jdbcType=BIGINT}</if>
-        <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
-        AND m.c_state != 239
-        AND m.c_state != 241
+        <if test="instanceId != null">and a.instance_id= #{instanceId,jdbcType=BIGINT}</if>
         ORDER BY
-            b.cruise_time DESC
+            a.cruise_time DESC
         LIMIT 1
 
     </select>
@@ -617,5 +610,52 @@
         <if test="meterType != -1" >and a.meter_type=#{meterType,jdbcType=INTEGER}</if>
         <if test="meteType != null and meteType != -1" >and a.mete_type=#{meteType,jdbcType=VARCHAR}</if>
         ORDER BY e.cruise_time ASC
+    </select>
+    <select id="selectCruiseAnalyze" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate">
+        SELECT
+            a.instance_id,
+            b.device_mete_id,
+            a.cruise_time as update_time,
+            d.picpath,
+            d.cruise_result,
+            d.identify_result
+        FROM
+            t_cruise_task_result_detail a,t_cruise_point_instance b,t_cruise_data_result d
+        WHERE
+        a.instance_id = b.instance_id
+        and a.cruise_result_id = d.cruise_result_id
+        and a.cruise_result_id = #{cruiseResultId,jdbcType=VARCHAR}
+    </select>
+    <select id="selectAllDeviceMeteId" resultType="java.lang.Long">
+        SELECT  a.device_mete_id FROM t_std_devicemete_update a;
+    </select>
+    <update id="updateDeviceMeteUpdate">
+        update t_std_devicemete_update a <set>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime},</if>
+        <if test="cruiseResult != null ">a.cruise_result = #{cruiseResult},</if>
+        <if test="identifyResult != null ">a.identify_result = #{identifyResult},</if>
+        <if test="picPath != null">a.pic_path = #{picPath},</if>
+    </set>
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </update>
+    <insert id="insertDeviceMeteUpdate">
+        insert into t_std_devicemete_update(
+            device_mete_id,
+            update_time,
+            cruise_result,
+            identify_result,
+            pic_path
+        )values(
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{updateTime, jdbcType=TIMESTAMP},
+                #{cruiseResult, jdbcType=INTEGER},
+                #{identifyResult, jdbcType=INTEGER},
+                #{picPath, jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="test" resultType="java.lang.String">
+        SELECT  a.cruise_result_id
+        FROM t_cruise_task_result_detail a
     </select>
 </mapper>
