@@ -154,6 +154,7 @@ public class TSequentialConfService{
             jasonMaps2.put("cfgDeviceId", meteId);
             jasonMaps2.put("sort", Integer.valueOf(map.get("sort"))-1);
             Constant.sequentialState.put("state",Integer.valueOf(map.get("sort"))-1);
+            Constant.sequentialState.put("cfgDeviceId",meteId);
             jasonMaps2.put("state", map.get("state"));
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
@@ -226,6 +227,7 @@ public class TSequentialConfService{
                 TSysParam time = tSysParamDao.selectByParamType("cleanTime");
                 Thread.sleep(Integer.valueOf(time.getContent())*1000);
                 Constant.sequentialState.put("state",-1);
+                Constant.sequentialState.put("cfgDeviceId","");
             }
             //todo 生成顺控文件
         }

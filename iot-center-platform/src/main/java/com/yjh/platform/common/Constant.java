@@ -83,5 +83,5 @@ public class Constant {
         return re;
     }
 
-    public static Map<String,Integer> sequentialState = new HashMap<>();
+    public static Map<String,Object> sequentialState = new HashMap<>();
 }

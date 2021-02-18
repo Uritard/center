@@ -265,11 +265,13 @@ public class TSequentialConfController {
     public Result getStep(){
         Result result=new Result();
         try {
-            Integer step = Constant.sequentialState.get("state");
+            Integer step = (Integer) Constant.sequentialState.get("state");
             if(step == null){
-                result.setData(-1);
+                Constant.sequentialState.put("state",-1);
+                Constant.sequentialState.put("cfgDeviceId","");
+                result.setData(Constant.sequentialState);
             }else {
-                result.setData(step);
+                result.setData(Constant.sequentialState);
             }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
