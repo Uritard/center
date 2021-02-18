@@ -1083,7 +1083,7 @@ public class RobotService {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.ALGORITHM_URL, analysisMap, String.class);
+                serviceRestTemplate.postForObject(Constant.algorithmUrl, analysisMap, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1094,7 +1094,7 @@ public class RobotService {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.DEFECT_URL, analysisMap, String.class);
+                serviceRestTemplate.postForObject(Constant.defectUrl, analysisMap, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

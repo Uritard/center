@@ -50,7 +50,7 @@ public class PacketDealThread implements Runnable {
                 log.info("准备解析的字节数组="+Str2);
                 onePacketString = PlatformPacketUtil.toStringHex(body1);
                 log.info("准备解析的xml=="+onePacketString);
-                robotServerHandler.stringToXml(onePacket,onePacketString);
+//                robotServerHandler.stringToXml(onePacket,onePacketString);
             }else{
                 log.info("大于一个完整的包");
                 socketMessageHex = socketMessageHex.substring(0,limitNum+1);

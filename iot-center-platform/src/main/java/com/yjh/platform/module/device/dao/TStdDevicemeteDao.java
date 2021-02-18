@@ -74,6 +74,7 @@ public interface TStdDevicemeteDao {
                                                                 @Param(value ="deviceType")Integer deviceType,
                                                                 @Param(value ="meteType")String meteType,
                                                                 @Param(value ="meterType")Integer meterType);
+//    List<Long> selectInstanceIdList(@Param(value ="list")List<Long> list);
    //通过巡检点Id查询标准测点
     Long getdeviceMeteByPointinstance(@Param(value = "instanceId")Long instanceId);
     List<Long> selectByDevId(@Param(value = "deviceId")Long deviceId);

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Constant {
 
@@ -21,10 +22,12 @@ public class Constant {
     public static final byte HEARTBEAT = 0x03;
 
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
-    public static int heartNum = 0;
+    public static AtomicInteger heartNum = new AtomicInteger(0);
     public static int flag = 0;
     public static int flag2 = 0;
     public static String Packet = "";
+    public static int registerCount = 1;
+
 
     public static long sendSessionId = 0L;//发送会话序列号
 
@@ -51,8 +54,8 @@ public class Constant {
     public static Map<String,String> robotResultMap =  new HashMap<>();
 
     //算法接口
-    public static  String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
+    public static final String algorithmUrl = "http://iot-center-accessvideo/analysis/v1/algorithm";
     //缺陷接口
-    public static  String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+    public static final String defectUrl = "http://iot-center-accessvideo/analysis/v1/defect";
 
 }
