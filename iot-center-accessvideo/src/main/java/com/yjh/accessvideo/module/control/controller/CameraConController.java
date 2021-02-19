@@ -411,12 +411,57 @@ public class CameraConController {
             log.info("service返回值："+url);
             if(null!=url) {
                 result.setData(url);
-            } else { result.setData(ResultCodeEnum.CODE1); }
+            } else { result.setData("文件不存在"); }
         } catch (Exception e) {
-            result.setData(ResultCodeEnum.CODE1);
+            result.setData(ResultCodeEnum.SYSTEMERROR);
             log.error("视频上传服务器失败",e);
         }
         return result;
+    }
+    @ApiOperation(value = "获取到视频文件列表")
+    @RequestMapping(value = "/getFileList", method = RequestMethod.GET)
+    public Result getFileList(@RequestParam(value = "cameraId") Long cameraId,
+                              @RequestParam(value = "startTime") String startTime,
+                              @RequestParam(value = "endTime") String endTime){
+        Result result = new Result();
+        try {
+                List<HCNetSDK.NET_DVR_FIND_DATA> list= cameraConService.geifile(cameraId,startTime,endTime);
+                Map<String,String> map =new HashMap<String,String>();
+                String[] s = new String[2];
+                int iTemp;
+                String MyString;
+                if (list.size()>0)
+                {
+                    for (HCNetSDK.NET_DVR_FIND_DATA po :list)
+                    {
+                        s = new String(po.sFileName).split("\0", 2);
+                        map.put("FileName",new String(s[0]));
+                        map.put("startTime",po.struStartTime.toStringTime());
+                        map.put("endTime",po.struStopTime.toStringTime());
+                        if (po.dwFileSize < 1024 * 1024)
+                        {
+                            iTemp = (po.dwFileSize) / (1024);
+                            MyString = iTemp + "K ";
+                        }
+                        else
+                        {
+                            iTemp = (po.dwFileSize) / (1024 * 1024);
+                            MyString = iTemp + "M";
+                            iTemp = ((po.dwFileSize) % (1024 * 1024)) / (1204);
+                            MyString = MyString + iTemp + "K";
+                        }
+                        map.put("fileSize",MyString);
+                    }
+                    result.setData(map);
+                   // result.setData(list);
+                }else {result.setData("文件不存在");}
+        }catch (Exception e)
+        {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.info(e.getMessage());
+        }
+        return result;
+
     }
 
 }
