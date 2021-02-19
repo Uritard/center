@@ -639,12 +639,12 @@ public class CameraConService {
                 hardFreeTotal = hardFreeTotal+hardFree;
                 log.info(s+"， hardNo: "+hardNo+", hardCapacity: "+hardCapacity+", hardFree"+hardFree);
             }
-            channleStatusMap.put("recordId", String.valueOf(recordId));
+            channleStatusMap.put("recorderId", String.valueOf(recordId));
             channleStatusMap.put("capacityTotal", String.valueOf(hardCapacityTotal));
             channleStatusMap.put("freeTotal", String.valueOf(hardFreeTotal));
             return channleStatusMap;
         }
-        channleStatusMap.put("errorMessage: " ,"recordId is null");
+        channleStatusMap.put("errorMessage" ,"录像机不在线");
         return channleStatusMap;
     }
 
