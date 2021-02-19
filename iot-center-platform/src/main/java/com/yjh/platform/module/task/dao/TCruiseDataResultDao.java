@@ -84,6 +84,7 @@ public interface TCruiseDataResultDao {
                                           @Param(value = "meteType") String meteType,
                                           @Param(value = "meterType") Integer meterType);
 
+
     List<Long> selectAllDeviceMeteId();
     TStdDeviceMeteUpdate selectCruiseAnalyze(@Param(value = "cruiseResultId") String cruiseResultId);
     int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
@@ -92,5 +93,4 @@ public interface TCruiseDataResultDao {
 
 
     List<String> selectResultImg(@Param(value = "taskId")String taskId);
-
 }
