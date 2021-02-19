@@ -56,10 +56,10 @@ public class zuulFilter extends ZuulFilter {
                     paramBodyMap = JSONObject.parseObject(body, LinkedHashMap.class);
                 }
                 for (Map.Entry<String, Object> param : paramBodyMap.entrySet()) {
-                    if (!"webcode".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                    if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
                         jsonModel.put(param.getKey(), param.getValue());
                     }
-                    if ("webcode".equals(param.getKey())) {
+                    if ("summary".equals(param.getKey())) {
                         webcode = String.valueOf(param.getValue());
                     }
                     if ("signStr".equals(param.getKey())) {
@@ -77,21 +77,21 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                     return false;
                 }
-                if (!Demo.verify(plainText, signStr)) {
-                    log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    return false;
-                }
+//                if (!Demo.verify(plainText, signStr)) {
+//                    log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
+//                    ctx.setSendZuulResponse(false);
+//                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+//                    return false;
+//                }
                 ctx.setRequest(requestWrapper);
             } else {
-                String tokenStr = request.getParameter("webcode");
-                String signStr = request.getParameter("signStr");
-                String plainText = request.getParameter("plainText");
+                String tokenStr = request.getParameter("summary");
+//                String signStr = request.getParameter("signStr");
+//                String plainText = request.getParameter("plainText");
                 JSONObject jsonModel = new JSONObject(true);
                 Map<String, String[]> params = new TreeMap<>(request.getParameterMap());
                 for (Map.Entry<String, String[]> param : params.entrySet()) {
-                    if (!"webcode".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                    if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
                         jsonModel.put(param.getKey(), ((String[]) param.getValue())[0]);
                     }
                 }
@@ -103,12 +103,12 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                     return false;
                 }
-                if (!Demo.verify(plainText, signStr)) {
-                    log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    return false;
-                }
+//                if (!Demo.verify(plainText, signStr)) {
+//                    log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
+//                    ctx.setSendZuulResponse(false);
+//                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+//                    return false;
+//                }
             }
         }
 //        String contentType = request.getContentType();
