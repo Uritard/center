@@ -109,10 +109,10 @@
         <if test="state != null">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="userTitle != null ">a.user_title = #{userTitle},</if>
         <if test="creatorId != null ">a.creator_id = #{creatorId},</if>
-        <if test="appkey != null and ">a.appkey = #{appkey},</if>
+        <if test="appkey != null  ">a.appkey = #{appkey},</if>
         <if test="imageUrl != null ">a.image_url = #{imageUrl},</if>
         <if test="roleId != null ">a.role_id = #{roleId},</if>
-        <if test="orgId != null and">a.org_id = #{orgId},</if>
+        <if test="orgId != null">a.org_id = #{orgId},</if>
         <if test="userStatus != null">a.user_status = #{userStatus, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
