@@ -221,6 +221,12 @@ public class TRobotInspectionService{
         Map<String,Object> reMap = new HashMap<>();
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
+        if(mapForRobotInstance == null || mapForRobotInstance.size() == 0){
+            reMap.put("taskProgress",0);
+            reMap.put("taskName","");
+            reMap.put("startTime","");
+            return reMap;
+        }
         String taskId = (String)mapForRobotInstance.get("taskId");
         String instanceList = (String)mapForRobotInstance.get("instanceIdList");
         instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");

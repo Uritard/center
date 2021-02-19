@@ -361,6 +361,8 @@ public class RunAtNowTask implements Runnable{
                         tCruiseDataResult.setCruiseResult(247);
                         tCruiseDataResult.setCruiseAbnormal(410);
                         tCruiseDataResult.setResultNum("设备检修中");
+                        tCruiseDataResult.setEvaluationState(257);
+                        tCruiseDataResult.setIsWarn(0);
                         tCruiseDataResultDao.insert(tCruiseDataResult);
                         tCruiseTaskResultDetail.setCruiseStatus(255);
                         tCruiseTaskResultDetail.setEndTime(new Date());
@@ -433,6 +435,8 @@ public class RunAtNowTask implements Runnable{
                         tCruiseDataResult.setCruiseResult(247);
                         tCruiseDataResult.setCruiseAbnormal(248);
                         tCruiseDataResult.setResultNum("抓图失败");
+                        tCruiseDataResult.setEvaluationState(257);
+                        tCruiseDataResult.setIsWarn(0);
                         tCruiseDataResultDao.insert(tCruiseDataResult);
                         tCruiseTaskResultDetail.setCruiseStatus(254);
                         tCruiseTaskResultDetail.setEndTime(new Date());

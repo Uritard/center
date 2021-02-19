@@ -117,16 +117,16 @@ public class TUnionTaskController {
                          @RequestParam(value = "ruleDelay", required = false) Integer ruleDelay,
                          @RequestParam(value = "isFinish", required = false) Integer isFinish,
                          @RequestParam(value = "robotId", required = false) Long robotId,
-                         @RequestParam(value = "remark1", required = false) Integer remark1,
-                         @RequestParam(value = "remark2", required = false) Integer remark2,
+                         @RequestParam(value = "meteId", required = false) Long meteId,
+                         @RequestParam(value = "triggeringTime", required = false) Date triggeringTime,
                          @RequestParam(value = "remark3", required = false) String remark3,
                          @RequestParam(value = "paramValues", required = false) String paramValues,
                          @RequestParam(value = "startTime", required = false) Date startTime,
                          @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TUnionTask> list = tUnionTaskService.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, remark1,
-                    remark2, remark3, paramValues, startTime, createTime);
+            List<TUnionTask> list = tUnionTaskService.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, meteId,
+                    triggeringTime, remark3, paramValues, startTime, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

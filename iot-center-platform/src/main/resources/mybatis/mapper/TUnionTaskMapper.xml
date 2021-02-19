@@ -10,7 +10,7 @@
         <result column="rule_delay" jdbcType="INTEGER" property="ruleDelay" />
         <result column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
-        <result column="remark2" jdbcType="INTEGER" property="remark2" />
+        <result column="triggering_time" jdbcType="TIMESTAMP" property="triggeringTime" />
         <result column="remark3" jdbcType="VARCHAR" property="remark3" />
         <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -20,12 +20,12 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        union_id, rule_id, union_name, robot_id, rule_delay, remark1, remark2, remark3, is_finish, start_time, create_time,param_values
+        union_id, rule_id, union_name, robot_id, rule_delay, mete_id, triggering_time, remark3, is_finish, start_time, create_time,param_values
     </sql>
 
     <sql id="General">
         a.union_id,a.rule_id,a.union_name,a.rule_delay,a.robot_id,a.mete_id,
-        a.remark2,a.remark3,a.is_finish,a.start_time,a.create_time,a.param_values,
+        a.triggering_time,a.remark3,a.is_finish,a.start_time,a.create_time,a.param_values,
         b.plan_id,b.rule_name,b.rule_type,b.rule_content,b.description,b.update_time,
         d.plan_name
     </sql>
@@ -38,7 +38,7 @@
             robot_id,
             rule_delay,
             mete_id ,
-            remark2,
+            triggering_time,
             remark3,
             is_finish,
             start_time,
@@ -51,7 +51,7 @@
                 #{robotId, jdbcType=BIGINT},
                 #{ruleDelay, jdbcType=INTEGER},
                 #{meteId, jdbcType=BIGINT},
-                #{remark2, jdbcType=INTEGER},
+                #{triggeringTime, jdbcType=TIMESTAMP},
                 #{remark3, jdbcType=VARCHAR},
                 #{isFinish, jdbcType=INTEGER},
                 #{startTime, jdbcType=TIMESTAMP},
@@ -73,7 +73,7 @@
         <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="ruleDelay != null ">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
         <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="remark2 != null ">a.remark2 = #{remark2, jdbcType=INTEGER},</if>
+        <if test="triggeringTime != null ">a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP},</if>
         <if test="remark3 != null ">a.remark3 = #{remark3},</if>
         <if test="isFinish != null ">a.is_finish = #{isFinish, jdbcType=INTEGER},</if>
         <if test="startTime != null">a.start_time = #{startTime},</if>
@@ -91,7 +91,7 @@
         a.robot_id,
         a.rule_delay,
         a.mete_id,
-        a.remark2,
+        a.triggering_time,
         a.remark3,
         a.is_finish,
         a.start_time,
@@ -111,7 +111,7 @@
         a.rule_delay,
         a.robot_id,
         a.mete_id,
-        a.remark2,
+        a.triggering_time,
         a.remark3,
         a.is_finish,
         a.start_time,
@@ -125,7 +125,7 @@
         <if test="ruleDelay != null "> and a.rule_delay = #{ruleDelay, ruleDelay=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="meteId != null "> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
-        <if test="remark2 != null "> and a.remark2 = #{remark2, jdbcType=INTEGER}</if>
+        <if test="triggeringTime != null "> and a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP}</if>
         <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
         <if test="isFinish != null "> and a.is_finish = #{isFinish, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
@@ -141,7 +141,7 @@
         a.rule_delay,
         a.robot_id,
         a.mete_id,
-        a.remark2,
+        a.triggering_time,
         a.remark3,
         a.is_finish,
         a.start_time,
@@ -154,8 +154,8 @@
         <if test="unionName != null and unionName != ''"> and a.union_name = #{unionName, jdbcType=VARCHAR}</if>
         <if test="ruleDelay != null "> and a.rule_delay = #{ruleDelay, ruleDelay=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        <if test="mete_id != null "> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
-        <if test="remark2 != null "> and a.remark2 = #{remark2, jdbcType=INTEGER}</if>
+        <if test="meteId != null "> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
+        <if test="triggeringTime != null "> and a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP}</if>
         <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
         <if test="isFinish != null "> and a.is_finish = #{isFinish, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
@@ -171,7 +171,7 @@
         rule_delay,
         robot_id,
         mete_id,
-        remark2,
+        triggering_time,
         remark3,
         is_finish,
         start_time,
@@ -186,7 +186,7 @@
             #{TUnionTask.ruleDelay, jdbcType=INTEGER},
             #{TUnionTask.robotId, jdbcType=BIGINT},
             #{TUnionTask.meteId, jdbcType=BIGINT},
-            #{TUnionTask.remark2, jdbcType=INTEGER},
+            #{TUnionTask.triggeringTime, jdbcType=TIMESTAMP},
             #{TUnionTask.remark3, jdbcType=VARCHAR},
             #{TUnionTask.isFinish, jdbcType=INTEGER},
             #{TUnionTask.startTime, jdbcType=TIMESTAMP},

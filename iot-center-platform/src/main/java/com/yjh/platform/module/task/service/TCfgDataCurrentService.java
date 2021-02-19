@@ -295,7 +295,8 @@ public class TCfgDataCurrentService {
             String taskId=result.getData().toString();//联动任务ID
             cLogger.info("联动开始执行");
             //联动记录插库
-            tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0));
+            TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));
+            tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0),unionForGetTime.getRecordTime());
             // TODO: 2020/12/12 待优化WB
             // webSocket通知前端产生联动信息
             Map<String, Object> jasonMap = new HashMap<>();

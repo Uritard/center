@@ -56,8 +56,8 @@ public class TUnionTaskService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TUnionTask> select(String unionId, Long ruleId, String unionName, Integer ruleDelay, Integer isFinish,  Long robotId,  Integer remark1, Integer remark2, String remark3, String paramValues, Date startTime, Date createTime) {
-        return tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, remark1, remark2, remark3, paramValues, startTime, createTime);
+    public List<TUnionTask> select(String unionId, Long ruleId, String unionName, Integer ruleDelay, Integer isFinish,  Long robotId,  Long meteId, Date triggeringTime, String remark3, String paramValues, Date startTime, Date createTime) {
+        return tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, meteId, triggeringTime, remark3, paramValues, startTime, createTime);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -96,7 +96,7 @@ public class TUnionTaskService{
         return tUnionTaskDao.getHistoryByMonth();
     }
     @Transactional(rollbackFor = Exception.class)
-    public int insertRecord(Long meteId,String unionId,Long ruleId,Long robotId,Date createTime,String paramValues) {
+    public int insertRecord(Long meteId,String unionId,Long ruleId,Long robotId,Date createTime,String paramValues,Date triggeringTime) {
         TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
         TUnionTask tUnionTask = new TUnionTask();
         tUnionTask.setUnionId(unionId);
@@ -113,6 +113,7 @@ public class TUnionTaskService{
         startTime.setSeconds(createTime.getSeconds() + tCfgUnionRule.getRuleDelay());
         tUnionTask.setStartTime(startTime);
         tUnionTask.setParamValues(paramValues);
+        tUnionTask.setTriggeringTime(triggeringTime);
 
         int result01 = tUnionTaskDao.insert(tUnionTask);
 

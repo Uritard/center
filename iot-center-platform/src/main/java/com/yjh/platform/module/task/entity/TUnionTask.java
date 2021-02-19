@@ -47,7 +47,6 @@ public class TUnionTask implements Serializable {
 
     @Max(value=999999999)
     @ApiModelProperty(value = "延迟时间")
-
     private Integer ruleDelay;
 
     @Max(value=999999999999999999l)
@@ -57,11 +56,14 @@ public class TUnionTask implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "备注1")
+    @TableField(value = "mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long meteId;
 
     @Max(value=999999999)
-    @ApiModelProperty(value = "备注2")
-    private Integer remark2;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "联动出发时间")
+    private Date triggeringTime;
 
     @Length(max = 256,message = "remark3长度必须小于等于256")
     @ApiModelProperty(value = "备注3")

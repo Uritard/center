@@ -187,6 +187,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseDataResult.setCruiseName(mapForCruise.get("cruiseName"));
                         tCruiseDataResult.setCreatetime(new Date());
                         tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
+                        tCruiseDataResult.setEvaluationState(257);
                         tCruiseDataResult.setIsWarn(0);
                         TCDRList.add(tCruiseDataResult);
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + item.getInstanceId(), mapForCruise);
