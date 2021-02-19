@@ -11,7 +11,7 @@
         <result column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
         <result column="triggering_time" jdbcType="TIMESTAMP" property="triggeringTime" />
-        <result column="remark3" jdbcType="VARCHAR" property="remark3" />
+        <result column="ruleName" jdbcType="VARCHAR" property="ruleName" />
         <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="param_values" jdbcType="VARCHAR" property="paramValues" />
@@ -20,12 +20,12 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        union_id, rule_id, union_name, robot_id, rule_delay, mete_id, triggering_time, remark3, is_finish, start_time, create_time,param_values
+        union_id, rule_id, union_name, robot_id, rule_delay, remark1, triggering_time, rule_name, is_finish, start_time, create_time,param_values
     </sql>
 
     <sql id="General">
         a.union_id,a.rule_id,a.union_name,a.rule_delay,a.robot_id,a.mete_id,
-        a.triggering_time,a.remark3,a.is_finish,a.start_time,a.create_time,a.param_values,
+        a.triggering_time,a.rule_name,a.is_finish,a.start_time,a.create_time,a.param_values,
         b.plan_id,b.rule_name,b.rule_type,b.rule_content,b.description,b.update_time,
         d.plan_name
     </sql>
@@ -39,11 +39,13 @@
             rule_delay,
             mete_id ,
             triggering_time,
-            remark3,
+            rule_name,
             is_finish,
             start_time,
             create_time,
-            param_values
+            param_values,
+            plan_name,
+            rule_content
         )values(
                 #{unionId, jdbcType=VARCHAR},
                 #{ruleId, jdbcType=BIGINT},
@@ -52,11 +54,13 @@
                 #{ruleDelay, jdbcType=INTEGER},
                 #{meteId, jdbcType=BIGINT},
                 #{triggeringTime, jdbcType=TIMESTAMP},
-                #{remark3, jdbcType=VARCHAR},
+                #{ruleName, jdbcType=VARCHAR},
                 #{isFinish, jdbcType=INTEGER},
                 #{startTime, jdbcType=TIMESTAMP},
                 #{createTime, jdbcType=TIMESTAMP},
-                #{paramValues, jdbcType=VARCHAR}
+                #{paramValues, jdbcType=VARCHAR},
+                #{planName, jdbcType=VARCHAR},
+                #{ruleContent, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -74,11 +78,13 @@
         <if test="ruleDelay != null ">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
         <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="triggeringTime != null ">a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP},</if>
-        <if test="remark3 != null ">a.remark3 = #{remark3},</if>
+        <if test="ruleName != null ">a.rule_name = #{ruleName},</if>
         <if test="isFinish != null ">a.is_finish = #{isFinish, jdbcType=INTEGER},</if>
         <if test="startTime != null">a.start_time = #{startTime},</if>
         <if test="createTime != null ">a.create_time = #{createTime},</if>
         <if test="paramValues != null">a.param_values = #{paramValues},</if>
+        <if test="planName != null">a.param_values = #{planName},</if>
+        <if test="ruleContent != null">a.param_values = #{ruleContent},</if>
     </set>
         where a.union_id = #{unionId, jdbcType=VARCHAR}
     </update>
@@ -92,11 +98,13 @@
         a.rule_delay,
         a.mete_id,
         a.triggering_time,
-        a.remark3,
+        a.rule_name,
         a.is_finish,
         a.start_time,
         a.create_time,
-        a.param_values
+        a.param_values,
+        a.plan_name,
+        a.rule_content
         from t_union_task a
         where 1 = 1
             and a.union_id = #{unionId, jdbcType=VARCHAR}
@@ -112,11 +120,13 @@
         a.robot_id,
         a.mete_id,
         a.triggering_time,
-        a.remark3,
+        a.rule_name,
         a.is_finish,
         a.start_time,
         a.create_time,
-        a.param_values
+        a.param_values,
+        a.plan_name,
+        a.rule_content
         from t_union_task a
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
@@ -126,11 +136,13 @@
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="meteId != null "> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="triggeringTime != null "> and a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP}</if>
-        <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
+        <if test="ruleName != null and ruleName != ''"> and a.rule_name = #{ruleName, jdbcType=VARCHAR}</if>
         <if test="isFinish != null "> and a.is_finish = #{isFinish, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=VARCHAR}</if>
         <if test="paramValues != null and paramValues != ''"> and a.param_values = #{paramValues, jdbcType=TIMESTAMP}</if>
+        <if test="planName != null and planName != ''"> and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
+        <if test="ruleContent != null and ruleContent != ''"> and a.rule_content = #{ruleContent, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTask">
@@ -142,11 +154,13 @@
         a.robot_id,
         a.mete_id,
         a.triggering_time,
-        a.remark3,
+        a.rule_name,
         a.is_finish,
         a.start_time,
         a.create_time,
-        a.param_values
+        a.param_values,
+        a.plan_name,
+        a.rule_content
         from t_union_task a
         where 1 = 1
         <if test="unionId != null and unionId != ''"> and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
@@ -156,11 +170,14 @@
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="meteId != null "> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="triggeringTime != null "> and a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP}</if>
-        <if test="remark3 != null and remark3 != ''"> and a.remark3 = #{remark3, jdbcType=VARCHAR}</if>
+        <if test="mete_id != null "> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
+        <if test="ruleName != null and ruleName != ''"> and a.rule_name = #{ruleName, jdbcType=VARCHAR}</if>
         <if test="isFinish != null "> and a.is_finish = #{isFinish, jdbcType=INTEGER}</if>
         <if test="startTime != null and startTime != ''"> and a.start_time = #{startTime, jdbcType=TIMESTAMP}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=VARCHAR}</if>
         <if test="paramValues != null and paramValues != ''"> and a.param_values = #{paramValues, jdbcType=TIMESTAMP}</if>
+        <if test="planName != null and planName != ''"> and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
+        <if test="ruleContent != null and ruleContent != ''"> and a.rule_content = #{ruleContent, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
@@ -172,11 +189,13 @@
         robot_id,
         mete_id,
         triggering_time,
-        remark3,
+        rule_name,
         is_finish,
         start_time,
         create_time,
-        param_values
+        param_values,
+        plan_name,
+        rule_content
         )values
         <foreach collection="list" item="TUnionTask" separator=",">
             (
@@ -187,23 +206,28 @@
             #{TUnionTask.robotId, jdbcType=BIGINT},
             #{TUnionTask.meteId, jdbcType=BIGINT},
             #{TUnionTask.triggeringTime, jdbcType=TIMESTAMP},
-            #{TUnionTask.remark3, jdbcType=VARCHAR},
+            #{TUnionTask.ruleName, jdbcType=VARCHAR},
             #{TUnionTask.isFinish, jdbcType=INTEGER},
             #{TUnionTask.startTime, jdbcType=TIMESTAMP},
             #{TUnionTask.createTime, jdbcType=TIMESTAMP},
-            #{TUnionTask.paramValues, jdbcType=VARCHAR}
+            #{TUnionTask.paramValues, jdbcType=VARCHAR},
+            #{TUnionTask.planName, jdbcType=VARCHAR},
+            #{TUnionTask.ruleContent, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
 
     <select id="selectHistory" parameterType="com.yjh.platform.module.task.entity.TUnionTask" resultType="com.yjh.platform.module.task.entity.TUnionTaskExpand">
-        select <include refid="General"></include>
-        from t_cfg_union_rule b,t_union_task a,t_cruise_plan d
+        select
+        a.union_id,
+        a.rule_name,
+        a.is_finish,
+        a.create_time,
+        a.param_values,
+        a.plan_name,
+        a.rule_content
+        from t_union_task a
         where 1 = 1
-        <if test="ruleName != null and ruleName != ''"> and b.rule_name like concat('%',#{ruleName, jdbcType=VARCHAR},'%') </if>
-        <if test="startDateTemp != null " ><if test="endDateTemp != null">and a.create_time between #{startDateTemp,jdbcType=TIMESTAMP} and #{endDateTemp,jdbcType=TIMESTAMP}</if></if>
-        and a.rule_id = b.rule_id
-        and b.plan_id = d.plan_id
         order by create_time DESC
     </select>
 

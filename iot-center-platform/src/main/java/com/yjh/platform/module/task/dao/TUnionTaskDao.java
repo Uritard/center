@@ -26,10 +26,12 @@ public interface TUnionTaskDao {
                             @Param(value = "robotId") Long robotId,
                             @Param(value = "meteId") Long meteId,
                             @Param(value = "triggeringTime") Date triggeringTime,
-                            @Param(value = "remark3") String remark3,
+                            @Param(value = "ruleName") String ruleName,
                             @Param(value = "paramValues") String paramValues,
                             @Param(value = "startTime") Date startTime,
-                            @Param(value = "createTime") Date createTime);
+                            @Param(value = "createTime") Date createTime,
+                            @Param(value = "planName") String planName,
+                            @Param(value = "ruleContent") String ruleContent);
     List<TUnionTask> selectByPage(TUnionTask tUnionTask);
     int batchInsert(List<TUnionTask> list);
 

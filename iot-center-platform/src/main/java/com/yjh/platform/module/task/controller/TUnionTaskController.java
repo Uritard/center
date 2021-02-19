@@ -119,14 +119,16 @@ public class TUnionTaskController {
                          @RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "meteId", required = false) Long meteId,
                          @RequestParam(value = "triggeringTime", required = false) Date triggeringTime,
-                         @RequestParam(value = "remark3", required = false) String remark3,
+                         @RequestParam(value = "ruleName", required = false) String ruleName,
                          @RequestParam(value = "paramValues", required = false) String paramValues,
                          @RequestParam(value = "startTime", required = false) Date startTime,
-                         @RequestParam(value = "createTime", required = false) Date createTime) {
+                         @RequestParam(value = "createTime", required = false) Date createTime,
+                         @RequestParam(value = "planName", required = false) String planName,
+                         @RequestParam(value = "ruleContent", required = false) String ruleContent) {
         Result result = new Result();
         try {
             List<TUnionTask> list = tUnionTaskService.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, meteId,
-                    triggeringTime, remark3, paramValues, startTime, createTime);
+                    triggeringTime, ruleName, paramValues, startTime, createTime,planName,ruleContent);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -215,7 +217,6 @@ public class TUnionTaskController {
             }else if (dateMarked.equals("recentMonth")){
                 result.setData(tUnionTaskService.historyStatisticalByMonth());
             }
-//            result.setData(tUnionTaskService.historyStatistical());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("统计失败：" + e);

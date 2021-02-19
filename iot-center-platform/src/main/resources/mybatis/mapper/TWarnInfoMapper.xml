@@ -681,7 +681,7 @@
     </select>
 
     <!--统计近一月内的告警数-->
-    <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+    <select id="countAllWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT
         a.timeNode,
         ifnull( b.count, 0 ) AS count
@@ -705,6 +705,33 @@
         order by a.timeNode
     </select>
 
+    <!--统计近一月机器人本体告警-->
+    <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT
+            a.timeNode,
+            ifnull( b.count, 0 ) AS count
+        FROM
+            (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac-1 DAY), '%Y-%m-%d') as timeNode
+            FROM (
+                SELECT @ai:=@ai+1 as ac from
+                (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
+                (SELECT @ai:=0) xc0
+            ) c )a
+        LEFT JOIN (
+            SELECT
+                DATE(alarm_time) date,
+                alarm_time,
+                count( 1 ) AS count
+            FROM
+                t_robot_alarm
+            WHERE
+                DATEDIFF( now( ), alarm_time ) &lt;= 31
+                GROUP BY
+                date
+            ) b ON a.timeNode = b.date
+        order by a.timeNode
+    </select>
     <!--根据告警处理状态统计告警个数-->
     <select id="countWarnConfMode" resultType="java.util.Map">
         SELECT

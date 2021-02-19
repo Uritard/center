@@ -296,8 +296,22 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "统计近一月的所有告警个数-折线图")
-    @GetMapping(value = "/countWarnOnMonth")
+    @GetMapping(value = "/countAllWarnOnMonth")
     @Logs(title = "根据设备类型统计告警个数",content = "统计近一个月的所有告警",logType = 1)
+    public Result countAllWarnOnMonth(){
+        Result result = new Result();
+        try {
+            List<WarnStatistical> list = tWarnInfoService.countAllWarnOnMonth();
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "统计近一月的机器人本体告警个数-折线图")
+    @GetMapping(value = "/countWarnOnMonth")
+    @Logs(title = "根据时间统计告警个数",content = "统计近一个月的机器人本体告警",logType = 1)
     public Result countWarnOnMonth(){
         Result result = new Result();
         try {

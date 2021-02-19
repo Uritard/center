@@ -66,9 +66,9 @@ public class TUnionTask implements Serializable {
     private Date triggeringTime;
 
     @Length(max = 256,message = "remark3长度必须小于等于256")
-    @ApiModelProperty(value = "备注3")
-    @TableField(value = "remark3",updateStrategy = FieldStrategy.IGNORED)
-    private String remark3;
+    @ApiModelProperty(value = "规则名称")
+    @TableField(value = "ruleName",updateStrategy = FieldStrategy.IGNORED)
+    private String ruleName;
 
     @Past
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -93,5 +93,9 @@ public class TUnionTask implements Serializable {
     @ApiModelProperty(value = "联动结果 0-失败 1-成功")
     private Integer isFinish;
 
+    @ApiModelProperty(value = "预案名称")
+    private String planName;
+    @ApiModelProperty(value = "具体治理规则")
+    private String ruleContent;
 
 }

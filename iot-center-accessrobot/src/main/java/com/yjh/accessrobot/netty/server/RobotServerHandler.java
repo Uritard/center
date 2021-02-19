@@ -66,7 +66,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private boolean isThreadStart = true;
     private String redisValue = "content";
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    String todayTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
     public boolean getIsThreadStart() {
         return isThreadStart;
@@ -344,10 +344,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, heartProtocol,xmlBaseModel.getSendCode());
                     //若心跳能够正常收发，将机器人置为在线状态
                     Constant.flag = 1;
+                    log.info("修改前Constant.flag2的值==="+Constant.flag2);
                     if (Constant.flag2 == 0){
                         robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
                         Constant.flag2 = 1;
                     }
+                    log.info("修改后Constant.flag2的值==="+Constant.flag2);
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -634,7 +636,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     //开发环境图片绝对路径文件目录
                     String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-                    //开发环境图片相对路径文件目
+                    //开发环境图片相对路径文件目录
                     String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
 
                     if (xmlBaseModel.getItems().get(0).get("file_type").toString().equals("1")){//红外图谱文件

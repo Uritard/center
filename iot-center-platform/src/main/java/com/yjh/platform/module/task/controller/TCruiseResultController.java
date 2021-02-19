@@ -6,6 +6,8 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import com.yjh.platform.module.task.service.TCruiseResultService;
@@ -34,6 +36,10 @@ public class TCruiseResultController {
 
     @Autowired
     private ReportManageService reportManageService;
+    @Autowired
+    private TStdDeviceService tStdDeviceService;
+    @Autowired
+    private TStdRegionService tStdRegionService;
 
     private Logger log = LoggerFactory.getLogger(TCruiseResultController.class);
 
@@ -237,7 +243,22 @@ public class TCruiseResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            resultMap = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,regionId,pageNum,pageSize);
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -40,8 +40,7 @@ public class CruiseResultDealThread implements Runnable{
     @Override
     public void run(){
         try {
-            log.info("处理巡视结果的线程进来了！！！！！！！！！！！！！！");
-            log.info("传进来的cruiseResultMap是==="+cruiseResultMap);
+            log.info("Process CruiseResult Starting.....cruiseResultMap==="+cruiseResultMap);
 
             List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
             List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
@@ -72,9 +71,7 @@ public class CruiseResultDealThread implements Runnable{
             TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
             log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
 
-             //读缓存
             Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+cruiseResultMap.get("robotCode"));
-
             Map<String,String> tCruiseTaskResultMap = new HashMap<>();
 
             String str = null;
@@ -86,7 +83,6 @@ public class CruiseResultDealThread implements Runnable{
                         &&cruiseResultMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
                     String instanceId = redisInfoMap.get("instanceId");
                     String cruiseTime = redisInfoMap.get("cruiseTime");
-                    log.info("该deviceId对应的instanceId是===" + instanceId);
 
                     str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + ":" + instanceId;//redis缓存名称
 
@@ -96,7 +92,6 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("taskName",tCruiseResult.getTaskName());
                     tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("cruiseStatus","252");
-
                     if (!"".equals(cruiseResultMap.get("value"))){
                         tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
                         tCruiseTaskResultMap.put("cruiseResult","246");//正常
@@ -113,8 +108,6 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
                     tCruiseTaskResultMap.put("is_warn","0");
-
-                    log.info("tCruiseTaskResultMap是==="+tCruiseTaskResultMap);
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
 
                     //做完一个点给前端推一次webSocket
@@ -162,7 +155,7 @@ public class CruiseResultDealThread implements Runnable{
 
 
             if(instanceIdList.size() == resultList.size() ) {
-                log.info("完成！！！");
+                log.info("Task Finished......");
 
                 List<Long> instanceIDList = Constant.flagMap.get(taskId);
                 log.info("做过的点instanceIDList====" + instanceIDList);

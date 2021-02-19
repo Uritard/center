@@ -2,8 +2,6 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -11,8 +9,6 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
@@ -42,10 +38,6 @@ public class TCruiseResultService{
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TStdDeviceAttrDao tStdDeviceAttrDao;
-    @Autowired
-    private TStdRegionDao tStdRegionDao;
-    @Autowired
-    private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
 
@@ -79,50 +71,30 @@ public class TCruiseResultService{
         return tCruiseResultDao.selectTaskByPage(taskName,cState,cType);
     }
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,Long regionId,int pageNum,int pageSize) {
-
-        List<Long> regionIdList = tStdRegionDao.selectDownId(regionId);//查询该regionId子节点
-        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
-
-        Map<String, Object> resultMap = new HashMap<>();
-
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+    public List<CruiseResultDetail>  selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList) {
         List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
             cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList);
         }
-
-        resultMap.put("count",page.getTotal());
-        resultMap.put("list", cruiseResultDetailList);
-        return resultMap;
+        return cruiseResultDetailList;
     }
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview,String userId){
-        //获取审核人
-        Integer userID = Integer.valueOf(userId);
-        String userName = tCruiseResultDao.selectUserName(userID);
+        //checkUser && checkDate
+        String userName = tCruiseResultDao.selectUserName(Integer.valueOf(userId));
         cruiseManualReview.setCheckUser(userName);
-        //获取审核时间
-        Date cruiseCheckDate = new Date();
-        cruiseManualReview.setCheckDate(cruiseCheckDate);
-        //审核
+        cruiseManualReview.setCheckDate(new Date());
+        //manualReview
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
-        log.info("cruiseDataId是==="+cruiseManualReview.getCruiseDataId());
-        Map<String,Object> judgeCondition = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
-        String personCheck = judgeCondition.get("person_check").toString();
-        int isWarn =  Integer.parseInt(judgeCondition.get("is_warn").toString());
-        String taskId = judgeCondition.get("task_id").toString();
-        String picPath = judgeCondition.get("picpath").toString();
-        Long instanceId = Long.valueOf(judgeCondition.get("instance_id").toString());
-        Integer identifyResult = Integer.valueOf(judgeCondition.get("identify_result").toString());
-        log.info("人工审核的实际结果是==="+identifyResult);
+        //查询该巡检点审核后的相关信息
+        AfterManualReviewInfo afterManualReviewInfo = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         //查询该巡检点对应测点配置的告警阈值相关信息
-        TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(instanceId);
+        TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(afterManualReviewInfo.getInstanceId());
         log.info("tStdDeviceMete==="+tStdDevicemete);
 
         Map<String,Object> params = new HashMap<>();
-        params.put("value",personCheck);
+        params.put("value",afterManualReviewInfo.getPersonCheck());
         params.put("stdDeviceMeteName",tStdDevicemete.getMeteName());
         params.put("meteKind",tStdDevicemete.getMeteKind());
         params.put("alarmState",tStdDevicemete.getAlarmState());
@@ -154,30 +126,30 @@ public class TCruiseResultService{
         warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
         warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
         warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-        warnInfo.setInstanceId(instanceId);
+        warnInfo.setInstanceId(afterManualReviewInfo.getInstanceId());
         warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
         warnInfo.setConfMode(275);//已核查
         warnInfo.setDealType(286);//属实
         warnInfo.setDefectModel(405);//其他
         warnInfo.setAlarmSource(282);//主辅设备
-        warnInfo.setImagePath(picPath);
-        warnInfo.setValue(personCheck);
-        warnInfo.setTaskId(taskId);
+        warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
+        warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
+        warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
         log.info("warnInfo=="+warnInfo);
 
         //判断该点是否已在告警表
-            if (isWarn == 1) {
+            if (afterManualReviewInfo.getIsWarn() == 1) {
                 //存在
                 //判断该点是否产生告警以及告警信息
                 if (Boolean.TRUE.equals(isWarN)){//触发告警
                     // 修改告警信息表
-                    tCruiseResultDao.updateWarnInfo(taskId, instanceId,
+                    tCruiseResultDao.updateWarnInfo(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId(),
                             map.get("warnName").toString(),
                             Integer.valueOf(map.get("warnLevel").toString()),
                             map.get("warnContent").toString(),
-                            outRange,userName,cruiseCheckDate);
+                            outRange,userName,new Date());
                 }else {
-                    tCruiseResultDao.updateWarnInfo2(taskId, instanceId,userName,cruiseCheckDate);
+                    tCruiseResultDao.updateWarnInfo2(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId(),userName,new Date());
                 }
             }else {
                 //不存在
@@ -187,17 +159,17 @@ public class TCruiseResultService{
                     warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
                     warnInfo.setWarnContent(map.get("warnContent").toString());
                     warnInfo.setOutRange(outRange);
-                    warnInfo.setDealTime(cruiseCheckDate);
+                    warnInfo.setDealTime(new Date());
                     warnInfo.setDealPersonId(userName);
                     log.info("要插库的告警数据是==="+warnInfo);
                     tWarnInfoDao.insert(warnInfo);
                 }
             }
-        /*if ( isWarn == 1){
-            tCruiseResultDao.updateWarnInfo(taskId,instanceId);//更新告警表信息
+        /*if ( afterManualReviewInfo.getIsWarn == 1){
+            tCruiseResultDao.updateWarnInfo(afterManualReviewInfo.getTaskId,afterManualReviewInfo.getInstanceId);//更新告警表信息
             if (identifyResult == 261){//结果正确
-                tCruiseResultDao.updateWarnInfo2(taskId,instanceId);//更新告警表信息
-                Long warnId = tCruiseResultDao.selectWarnId(taskId,instanceId);//根据任务和巡检点id查询告警id
+                tCruiseResultDao.updateWarnInfo2(afterManualReviewInfo.getTaskId,afterManualReviewInfo.getInstanceId);//更新告警表信息
+                Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId,afterManualReviewInfo.getInstanceId);//根据任务和巡检点id查询告警id
                 //给前端推webSocket
                 Map<String,Object> jasonMap=new HashMap<>();
                 jasonMap.put("type","finishedOneAlarm");
@@ -208,9 +180,8 @@ public class TCruiseResultService{
             }
         }*/
 
-        //获取审核后的信息
-        String taskResultId1  = cruiseManualReview.getTaskResultId();
-        List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(taskResultId1);
+        //获取审核后该任务下的巡检点信息
+        List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(cruiseManualReview.getTaskResultId());
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
         HashSet<String> haS1 = new HashSet<>();
         for (CruiseManualReview cMR:cruiseManualReviewList){
@@ -300,11 +271,6 @@ public class TCruiseResultService{
         String weekEnd = tCruiseResultDao.selectOnSunday() + " 23:59:59";//本周日的日期
         String lastWeekStart = tCruiseResultDao.selectLastMonday() + " 00:00:00";//上周一的日期
         String lastWeekend = tCruiseResultDao.selectLastSunday()+ " 23:59:59";//上周日的日期
-        log.info("这周一=="+weekStart);
-        log.info("这周日=="+weekEnd);
-        log.info("上周一=="+lastWeekStart);
-        log.info("上周日=="+lastWeekend);
-
 
         String colName1 = "plan_type";
 

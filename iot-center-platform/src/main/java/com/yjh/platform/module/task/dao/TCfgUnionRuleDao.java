@@ -39,5 +39,6 @@ public interface TCfgUnionRuleDao {
 
     List<TCfgUnionRule> selectUnionRuleByMeteId(@Param(value ="inputParam" )String inputParam);
     List<AreaInfo> selectForTCfgMete(Integer meteKind);
+    String getPlanName(@Param(value = "planId") Long planId);
 
 }

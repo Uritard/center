@@ -56,8 +56,8 @@ public class TUnionTaskService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TUnionTask> select(String unionId, Long ruleId, String unionName, Integer ruleDelay, Integer isFinish,  Long robotId,  Long meteId, Date triggeringTime, String remark3, String paramValues, Date startTime, Date createTime) {
-        return tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, meteId, triggeringTime, remark3, paramValues, startTime, createTime);
+    public List<TUnionTask> select(String unionId, Long ruleId, String unionName, Integer ruleDelay, Integer isFinish,  Long robotId,  Long meteId, Date triggeringTime, String ruleName, String paramValues, Date startTime, Date createTime,String planName,String ruleContent) {
+        return tUnionTaskDao.select(unionId, ruleId, unionName, ruleDelay, isFinish, robotId, meteId, triggeringTime, ruleName, paramValues, startTime, createTime,planName,ruleContent);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -107,6 +107,9 @@ public class TUnionTaskService{
         tUnionTask.setIsFinish(1);
         tUnionTask.setMeteId(meteId);
         tUnionTask.setCreateTime(createTime);
+        tUnionTask.setRuleName(tCfgUnionRule.getRuleName());
+        tUnionTask.setPlanName(tCfgUnionRuleDao.getPlanName(tCfgUnionRule.getPlanId()));
+        tUnionTask.setRuleContent(tCfgUnionRule.getRuleContent());
 
         //计算巡视时间
         Date startTime = new Date();

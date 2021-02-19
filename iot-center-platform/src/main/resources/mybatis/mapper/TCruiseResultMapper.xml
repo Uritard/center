@@ -100,7 +100,7 @@
         where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
     </update>
 
-    <select id="selectJudgeCondition" parameterType="java.lang.Long" resultType="java.util.Map">
+    <select id="selectJudgeCondition" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.AfterManualReviewInfo">
         select
             a.is_warn,
             b.instance_id,

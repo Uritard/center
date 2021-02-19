@@ -63,7 +63,9 @@ public interface TWarnInfoDao {
     Map<String, Integer> countWarnDefectConfMode(@Param(value = "startTime")String startTime,
                                            @Param(value = "endTime")String endTime);
     List<TWarnInfoDetail> selectAlarmProcess(@Param(value = "warnId")Long warnId);
+    List<WarnStatistical> countAllWarnOnMonth();
     List<WarnStatistical> countWarnOnMonth();
+
     List<WarnStatistical> countWarnAndDefectOnMonth1();//近一月告警
     List<WarnStatistical> countWarnAndDefectOnMonth2();//近一月缺陷
 

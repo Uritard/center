@@ -168,6 +168,10 @@ public class TWarnInfoService{
         return finalLst;
     }
     @Transactional(rollbackFor = Exception.class)
+    public List<WarnStatistical> countAllWarnOnMonth() {
+        return tWarnInfoDao.countAllWarnOnMonth();
+    }
+    @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnOnMonth() {
         return tWarnInfoDao.countWarnOnMonth();
     }
