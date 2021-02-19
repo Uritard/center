@@ -93,7 +93,7 @@ public class ChanResultService {
 //    @Transactional(rollbackFor = Exception.class)
 //    public List<ChanResult> select(Long diagnoseResultId, String channelId, String ip, String chanIndex, Date checkTime, Integer channelResult, Integer signalResult, Integer blurResult, Integer contrastResult, Integer brightResult, Integer darkResult, Integer chromaResult, Integer monoResult, Integer noiseResult, Integer streakResult, Integer freezeResult, Integer shakeResult, Integer flashResult, Integer sceneResult, Integer coverResult, Integer ptzResult, String snapshotUlt, String resultContent) {
 //        List<ChanResult> tDiagnoseResultList = chanResultDao.select(diagnoseResultId, channelId, ip, chanIndex, checkTime, channelResult, signalResult, blurResult, contrastResult, brightResult, darkResult, chromaResult, monoResult, noiseResult, streakResult, freezeResult, shakeResult, flashResult, sceneResult, coverResult, ptzResult, snapshotUlt, resultContent);
-//        return ltList;
+//        return tDiagnoseResultList;
 //    }
 
     @Logs(title = "分页查询", code = "module")

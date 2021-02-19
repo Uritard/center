@@ -26,6 +26,7 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.sql.ClientInfoStatus;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -845,6 +846,12 @@ public class CameraConService {
 //
 //        return judge;
 //    }
+    /**
+     *下载nvr文件
+     * @param cameraId 摄像头id
+     * @param startTime 开始时间
+     * @param stopTime 结束时间
+     */
 
     public String getDVRToPlace(long cameraId, String startTime, String stopTime) throws ParseException {
         //返回结果
@@ -873,12 +880,11 @@ public class CameraConService {
                     //开始时间
                     HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
                     HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
-                    Date startTimes = format.parse(startTime);//
+                    Date startTimes = format.parse(startTime);
                     c.setTime(startTimes);
                     log.info("startTime获取到：" + startTime);
                     log.info("stopTime时间转：" + stopTime);
                     struStartTime.dwYear = c.get(Calendar.YEAR);
-                    ;
                     struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
                     struStartTime.dwDay = c.get(Calendar.DATE);
                     struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
@@ -886,7 +892,7 @@ public class CameraConService {
                     struStartTime.dwSecond = c.get(Calendar.SECOND);
                     // log.info("struStartTime 开始时间结束："+struStartTime.toString());
                     //结束时间
-                    Date endTimes = format.parse(stopTime);//
+                    Date endTimes = format.parse(stopTime);
                     c.setTime(endTimes);
                     struStopTim.dwYear = c.get(Calendar.YEAR);
                     struStopTim.dwMonth = c.get(Calendar.MONTH) + 1;
@@ -895,7 +901,7 @@ public class CameraConService {
                     struStopTim.dwMinute = c.get(Calendar.MINUTE);
                     struStopTim.dwSecond = c.get(Calendar.SECOND);
                     log.info("时间赋值成功");
-                    NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
+                    NativeLong lChannel = new NativeLong(3);
                     log.info("lChannel赋值成功:" + lChannel);
                     //查找文件存在不存在
                     NativeLong findFile= hCNetSDK.NET_DVR_FindFile(lUserIDLong,lChannel,0,struStartTime,struStopTim);
@@ -912,8 +918,8 @@ public class CameraConService {
                             if (fileByTime.longValue() < 100) {
                                 //  hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/sdklog",false);
                                 //使用NET_DVR_GetFileByTime_V40接口必须使用一下播放接口才能下载视频到本地
-                                boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileByTime, hCNetSDK.NET_DVR_PLAYSTART, 0, null);
-                                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + hCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + hCNetSDK.NET_DVR_GETTOTALTIME);
+                                boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileByTime, HCNetSDK.NET_DVR_PLAYSTART, 0, null);
+                                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + HCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + HCNetSDK.NET_DVR_GETTOTALTIME);
                                 if (PlayBackControl) {
                                     log.info("NET_DVR_PlayBackControl成功调用");
                                     iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -985,6 +991,129 @@ public class CameraConService {
         }
         return judge;
     }
+
+    /**
+     * 获取摄像头文件列表
+     * @param cameraId 摄像头id
+     * @param startTime 开始时间
+     * @param stopTime 结束时间
+     */
+    public    List<HCNetSDK.NET_DVR_FIND_DATA> geifile(long cameraId, String startTime, String stopTime)
+    {
+        List<HCNetSDK.NET_DVR_FIND_DATA> list =new ArrayList<HCNetSDK.NET_DVR_FIND_DATA>();
+    try {
+
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+        if (hCNetSDK.NET_DVR_Init()) {
+            log.info("初始化成功开始注册登录：");
+            String login = registerNVR(cameraConInfo.getRecordId());
+            if (!login.isEmpty()) {
+                log.info("登录成功：" + login);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+                log.info("lUserIDLong获取到：" + lUserIDLong);
+                Calendar c = Calendar.getInstance();
+                //开始时间
+                HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
+                HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
+                Date startTimes = format.parse(startTime);
+                c.setTime(startTimes);
+                log.info("startTime获取到：" + startTime);
+                log.info("stopTime时间转：" + stopTime);
+                struStartTime.dwYear = c.get(Calendar.YEAR);
+                struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
+                struStartTime.dwDay = c.get(Calendar.DATE);
+                struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
+                struStartTime.dwMinute = c.get(Calendar.MINUTE);
+                struStartTime.dwSecond = c.get(Calendar.SECOND);
+                // log.info("struStartTime 开始时间结束："+struStartTime.toString());
+                //结束时间
+                Date endTimes = format.parse(stopTime);
+                c.setTime(endTimes);
+                struStopTim.dwYear = c.get(Calendar.YEAR);
+                struStopTim.dwMonth = c.get(Calendar.MONTH) + 1;
+                struStopTim.dwDay = c.get(Calendar.DATE);
+                struStopTim.dwHour = c.get(Calendar.HOUR_OF_DAY);
+                struStopTim.dwMinute = c.get(Calendar.MINUTE);
+                struStopTim.dwSecond = c.get(Calendar.SECOND);
+                log.info("时间赋值成功");
+                NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
+                log.info("lChannel赋值成功:" + lChannel);
+                //查找文件存在不存在
+                NativeLong findFile = hCNetSDK.NET_DVR_FindFile(lUserIDLong, lChannel, 0, struStartTime, struStopTim);
+                log.info("findFile查找文件接口:" +"findFile-->>>："+findFile.longValue());
+                log.info("findFile查找文件接口:" +"findFile-->>>："+findFile.longValue()+"<<<<lUserIDLong:"+lUserIDLong+"lChannel:"+lChannel);
+                HCNetSDK.NET_DVR_FIND_DATA FindData=new  HCNetSDK.NET_DVR_FIND_DATA();
+                if (findFile.longValue()>-1)
+                {
+                    log.info("NET_DVR_FindFile接口请求成功findFile:" + findFile.longValue());
+                    FindData = new HCNetSDK.NET_DVR_FIND_DATA();
+                            // 文件列表接口
+                    NativeLong findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
+                    log.info("findNextFile>>:"+findNextFile.longValue());
+                    if(findNextFile.longValue()>-1)
+                    {
+                        log.info("NET_DVR_FindNextFile接口请求成功findFile:" + findNextFile.longValue());
+                        //当找到录像文件时接口将返回1000，当没有查找到文件或查找结束将返回1003或者1004，返回1002表示当前正在查找
+                        while (findNextFile.longValue() != HCNetSDK.NET_DVR_NOMOREFILE &&findNextFile.longValue() != HCNetSDK.NET_DVR_FILE_NOFIND)
+                        {
+                            switch ((int) findNextFile.longValue()) {
+                                case HCNetSDK.NET_DVR_FILE_SUCCESS:
+                                    log.info("NET_DVR_FindNextFile接口请求成功:"+findNextFile.longValue());
+                                    HCNetSDK.NET_DVR_FIND_DATA savedate = new HCNetSDK.NET_DVR_FIND_DATA();
+                                    savedate.sFileName = FindData.sFileName;
+                                    savedate.dwFileSize = FindData.dwFileSize;
+                                    savedate.struStartTime = FindData.struStartTime;
+                                    savedate.struStopTime = FindData.struStopTime;
+                                    list.add(savedate);
+                                    findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile,FindData);
+                                    break;
+                                case  HCNetSDK.NET_DVR_FILE_NOFIND:
+                                    list=null;
+                                    log.info("没有文件！");
+                                    break;
+
+                                case  HCNetSDK.NET_DVR_ISFINDING:
+                                    findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile,FindData);
+                                    break;
+                                case HCNetSDK.NET_DVR_NOMOREFILE:
+                                    log.info("查找完毕！");
+                                    break;
+                                default:
+                                    list=null;
+                                     log.info("查找文件时异常");
+                                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                                    log.info("查找文件时候异常iErr:"+iErr);
+                                    break;
+                            }
+                        }
+                        //释放资源
+                        hCNetSDK.NET_DVR_Logout(lUserIDLong);
+                        hCNetSDK.NET_DVR_Cleanup();
+                    }else
+                    {
+                        list=null;
+                        int iErr = hCNetSDK.NET_DVR_GetLastError();
+                        log.info("查找下一个文件是失败iErr:"+iErr);
+                    }
+
+                }else
+                    {
+                        list=null;
+                        int iErr = hCNetSDK.NET_DVR_GetLastError();
+                        log.info("文件不存在:"+iErr);
+                    }
+            }
+        }
+        }catch (Exception e)
+        {
+            list=null;
+            log.error( e.getMessage());
+        }
+    return  list;
+    }
+
 
 }
 

@@ -72,7 +72,7 @@
         update robot_alarm a <set>
         <if test="robotAlarmId != null ">a.robot_alarm_id = #{robotAlarmId},</if>
         <if test="stationId != null">a.station_id = #{stationId},</if>
-        <if test="alarmType != null">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmType != null">a.al arm_type = #{alarmType, jdbcType=INTEGER},</if>
         <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmInfo != null">a.alarm_info = #{alarmInfo},</if>
         a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
