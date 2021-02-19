@@ -109,6 +109,7 @@
         <if test="meteKind != null ">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
         <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
         <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR},</if>
+        order by a.record_time,
     </select>
 
     <insert id="batchInsert">
@@ -167,7 +168,7 @@
         <if test="meteKind != null ">and b.mete_kind = #{meteKind, jdbcType=INTEGER}</if>
         <if test="meteName != null and meteName != ''"> and b.mete_id in (select mete_id from t_cfg_mete where mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%'))</if>
         <if test="deviceName != null and deviceName != ''"> and b.device_id in (select device_id from t_cfg_device where device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%'))</if>
-        )  order by mete_name,record_time desc
+        )  order by record_time,mete_name desc
     </select>
 
     <select id="selectUnionTask"  resultType="com.yjh.platform.module.task.entity.UnionTaskInfo">
@@ -187,7 +188,7 @@
         c.instance_name
         FROM
         t_union_task a
-        LEFT JOIN t_cruise_task_result b ON a.union_id = b.task_id
+        LEFT JOIN t_cruise_result b ON a.union_id = b.task_id
         LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
         LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
         left join t_cfg_mete g on a.mete_id = g.mete_id

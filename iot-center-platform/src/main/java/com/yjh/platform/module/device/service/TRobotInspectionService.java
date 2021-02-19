@@ -8,6 +8,10 @@ import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.task.dao.TCruiseResultDao;
+import com.yjh.platform.module.task.dao.TCruiseTaskDao;
+import com.yjh.platform.module.task.entity.TCruiseResult;
+import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +41,8 @@ public class TRobotInspectionService{
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private TCruiseResultDao tCruiseResultDao;
 
     private Logger log = LoggerFactory.getLogger(TRobotInspectionService.class);
 
@@ -211,8 +217,8 @@ public class TRobotInspectionService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public Integer selectRobotTaskProgress(Long robotId){
-
+    public Map<String,Object> selectRobotTaskProgress(Long robotId){
+        Map<String,Object> reMap = new HashMap<>();
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
         String taskId = (String)mapForRobotInstance.get("taskId");
@@ -230,7 +236,23 @@ public class TRobotInspectionService{
             }
         }
         Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue())*100);
-        return re;
+        TCruiseResult tc = tCruiseResultDao.selectForTaskId(taskId);
+        if(tc == null){
+            reMap.put("taskProgress",0);
+            reMap.put("taskName","");
+            reMap.put("startTime","");
+        }else{
+            if(tc.getCState() == 239 || tc.getCState() == 241){
+                reMap.put("taskProgress",re);
+                reMap.put("taskName",tc.getTaskName());
+                reMap.put("startTime",mapForRobotInstance.get("startTime"));
+            }else {
+                reMap.put("taskProgress",0);
+                reMap.put("taskName","");
+                reMap.put("startTime","");
+            }
+        }
+        return reMap;
     }
 
 }
