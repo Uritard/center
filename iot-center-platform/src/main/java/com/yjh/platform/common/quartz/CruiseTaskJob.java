@@ -485,10 +485,21 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     }else {
                                         defect(analysisMap);
                                     }
-
-                                    if("on".equals(tStdDevicemete.getIsAi())){
-                                        defect(analysisMap);
-                                    }
+                                }
+                                if("on".equals(tStdDevicemete.getIsAi())){
+                                    Analysis analysis = new Analysis();
+                                    analysis.setTaskId(tCruiseTask.getTaskId());
+                                    analysis.setInstanceId(item.getInstanceId());
+                                    analysis.setPicPath(absPath);
+                                    analysis.setAnalyseType("398");
+                                    analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
+                                    analysis.setIsAi(0);
+                                    List<Analysis> analysisList = new ArrayList<>();
+                                    analysisList.add(analysis);
+                                    Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                                    analysisMap.put("list",analysisList);
+                                    log.info("算法信息：    "+analysisMap);
+                                    defect(analysisMap);
                                 }
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);

@@ -180,8 +180,8 @@ public class TSequentialConfService{
 
             //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
             TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-            //String devicePath = tSysParam.getContent()+"/"+"sequential.txt";
-            String devicePath = "D:/code/qhTest/sequential.txt";
+            String devicePath = tSysParam.getContent()+"/"+"sequential.txt";
+            //String devicePath = "D:/code/qhTest/sequential.txt";
             try{
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 //File txt=new File("D:/code/qhTest/sequential.txt");
