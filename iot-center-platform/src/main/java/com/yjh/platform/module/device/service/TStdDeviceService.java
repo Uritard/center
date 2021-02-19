@@ -396,6 +396,26 @@ public class TStdDeviceService{
         return upRegionIds;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfo> selectDevTaskTree(String taskId) {
+
+        List<AreaInfo> listTree = this.tStdDeviceDao.selectDevTaskTree(taskId);
+
+        List<AreaInfo> areaInfoCountryList = new ArrayList<>();
+        for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
+            AreaInfo areaInfoMap = it.next();
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+                AreaInfo areaInfoCountry = new AreaInfo();
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountryList.add(areaInfoCountry);
+            }
+        }
+        diGui(areaInfoCountryList, listTree);
+        return areaInfoCountryList;
+    }
+
     private void Recursion(List<Long> upRegionIds, List<AreaInfo> upRegionList, List<AreaInfo> upRegionTree) {
         for(AreaInfo areaInfo : upRegionList){
             List<AreaInfo> childrenList = new ArrayList<>();
