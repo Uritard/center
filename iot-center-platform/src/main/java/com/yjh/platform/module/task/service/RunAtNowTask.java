@@ -13,10 +13,7 @@ import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.device.entity.TAlgorithmConfBak;
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
@@ -527,7 +524,7 @@ public class RunAtNowTask implements Runnable{
                                 redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                             }
                             List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
-                            TStdDevicemete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
+                            TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
                             for (TAlgorithmInfo tAlgorithmInfo:tAlgorithmInfoList) {
                                 Analysis analysis = new Analysis();
                                 analysis.setTaskId(tCruiseTask.getTaskId());
