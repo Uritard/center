@@ -52,6 +52,10 @@ public class TStdDevicemete implements Serializable {
     @ApiModelProperty(value = "点号位置，inside-内部设备，outside-外部设备")
     private String positionType;
 
+    private Integer analyseType;
+
+    private String isAi;
+
     @ApiModelProperty(value = "单位")
     private String unit;
 

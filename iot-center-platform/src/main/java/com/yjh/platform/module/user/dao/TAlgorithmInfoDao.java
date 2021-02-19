@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.dao;
 
 import java.util.List;
 
+import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,5 @@ public interface TAlgorithmInfoDao {
     TAlgorithmInfo selectByAnalyseType(@Param(value = "analyseType") String analyseType);
     List<TAlgorithmInfo> selectByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<Long> selectHaveDevice(@Param(value = "algorithmId") Long algorithmId);
+    TStdDevicemete selectDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
 }

@@ -78,15 +78,15 @@ public class TStdDevicemeteService{
                 tAlgorithmConfBakDao.add(tAlgorithmConfBak);
             }
         }
-        if("on".equals(tStdDeviceMeteDetail.getIsAi())){
-            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType("398");
-            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
-            if(tAlgorithmInfo != null){
-                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
-                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
-            }
-        }
+//        if("on".equals(tStdDeviceMeteDetail.getIsAi())){
+//            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType("398");
+//            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
+//            if(tAlgorithmInfo != null){
+//                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+//                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+//                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+//            }
+//        }
         return  1;
     }
 
@@ -141,15 +141,15 @@ public class TStdDevicemeteService{
         }else {
             tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
         }
-        if("on".equals(tStdDeviceMeteDetail.getIsAi())){
-            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType("398");
-            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
-            if(tAlgorithmInfo != null){
-                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
-                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
-                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
-            }
-        }
+//        if("on".equals(tStdDeviceMeteDetail.getIsAi())){
+//            TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType("398");
+//            TAlgorithmConfBak tAlgorithmConfBak = new TAlgorithmConfBak();
+//            if(tAlgorithmInfo != null){
+//                tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
+//                tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
+//                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
+//            }
+//        }
         TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在
         if(Objects.isNull(tStdDevice)){
             //新增没有的 修改的部位 的设备

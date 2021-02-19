@@ -273,25 +273,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseDataResult.setCruiseType(item.getCruiseType());
                     tCruiseDataResult.setCruiseName(item.getCruiseName());
 
-                    Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                    String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
-                    Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
-                    tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
-                    tCruiseTaskResultDetailMap.put("taskId",taskId);
-                    tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
-                    tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
-                    tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
-                    tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
-                    //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
-                    //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
-
-                    tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
-                    tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
-
                     Date now = new Date();
                     List<Long>  overhaul= tCruisePointInstanceDao.selectTimeIsIn(now);
                     if(overhaul != null && overhaul.size()>0){//判断是否检修
-                        if(overhaul.contains(item)){
+                        if(overhaul.contains(item.getDeviceId())){
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
                                 tCruiseResult.setCState(240);
@@ -313,6 +298,20 @@ public class CruiseTaskJob extends QuartzJobBean {
                         }
 
                     }
+                    Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                    String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
+                    Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                    tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
+                    tCruiseTaskResultDetailMap.put("taskId",taskId);
+                    tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
+                    tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
+                    tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
+                    tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
+                    //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
+                    //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+
+                    tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
+                    tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
 
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                     //一次循环 一个巡检点
@@ -470,6 +469,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                                 }
                                 List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
+                                TStdDevicemete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
                                 for (TAlgorithmInfo tAlgorithmInfo:tAlgorithmInfoList) {
                                     Analysis analysis = new Analysis();
                                     analysis.setTaskId(tCruiseTask.getTaskId());
@@ -486,6 +486,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
                                         analysis(analysisMap);
                                     }else {
+                                        defect(analysisMap);
+                                    }
+
+                                    if("on".equals(tStdDevicemete.getIsAi())){
                                         defect(analysisMap);
                                     }
                                 }

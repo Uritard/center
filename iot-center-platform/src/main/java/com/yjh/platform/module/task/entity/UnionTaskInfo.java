@@ -28,6 +28,9 @@ public class UnionTaskInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cruiseTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date triggeringTime;
+
     private String resultNum;
 
     private String origpic;

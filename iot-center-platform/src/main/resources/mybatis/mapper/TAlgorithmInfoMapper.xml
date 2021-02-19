@@ -168,4 +168,9 @@
             t_algorithm_conf_bak a
         where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </select>
+    <select id="selectDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+        select *
+        from t_std_devicemete
+        where device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+    </select>
 </mapper>
