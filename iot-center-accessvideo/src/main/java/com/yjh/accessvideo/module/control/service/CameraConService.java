@@ -727,7 +727,7 @@ public class CameraConService {
             Integer state = Integer.parseInt(String.valueOf(camreaStatusMap.get("state")));
             if (Objects.equals(state,1)){
                 log.info("unable");
-                throw new BusinessException("this camera is unable to control.");
+                throw new BusinessException("相机不可控！");
             }
         }
         return result;
