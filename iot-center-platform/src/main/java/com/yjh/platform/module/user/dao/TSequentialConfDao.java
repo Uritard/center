@@ -29,7 +29,7 @@ public interface TSequentialConfDao {
     int batchDelete(List<String> list);
     List<AreaInfo> selectForTCfgMete(@Param(value = "meteKind") Integer meteKind,
                                      @Param(value = "cfgDeviceName") String cfgDeviceName);
-    List<Map<String,String>> selectForSequenceInfo(@Param(value = "cfgDeviceId") String cfgDeviceId);
+    List<Map<String,Object>> selectForSequenceInfo(@Param(value = "cfgDeviceId") String cfgDeviceId);
     TSequentialConf selectSort(@Param(value = "cfgDeviceId") String cfgDeviceId);
     List<Long>selectCameraId();
     List<String> selectLastStep();

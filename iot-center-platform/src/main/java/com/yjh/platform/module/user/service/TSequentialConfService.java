@@ -148,12 +148,12 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public String sequential(String meteId) throws Exception{
         {
-            Map<String,String> map = this.sequentialInfo(meteId).get(0);
+            Map<String,Object> map = this.sequentialInfo(meteId).get(0);
             Map<String, Object> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "newSequential");
             jasonMaps2.put("cfgDeviceId", meteId);
-            jasonMaps2.put("sort", Integer.valueOf(map.get("sort"))-1);
-            Constant.sequentialState.put("state",Integer.valueOf(map.get("sort"))-1);
+            jasonMaps2.put("sort", ((Double)map.get("sort")).intValue());
+            Constant.sequentialState.put("state",((Double)map.get("sort")).intValue());
             Constant.sequentialState.put("cfgDeviceId",meteId);
             jasonMaps2.put("state", map.get("state"));
             String json = JSON.toJSONString(jasonMaps2);
@@ -214,7 +214,7 @@ public class TSequentialConfService{
             Map<String, Object> jasonMapsResult = new HashMap<>();
             jasonMapsResult.put("type", "newSequentialResult");
             jasonMapsResult.put("cfgDeviceId", meteId);
-            jasonMapsResult.put("sort", Integer.valueOf(map.get("sort"))-1);
+            jasonMapsResult.put("sort", ((Double)map.get("sort")).intValue());
             jasonMapsResult.put("state", map.get("state"));
             jasonMapsResult.put("identifyResult", map.get("state"));
             String jsonResult = JSON.toJSONString(jasonMapsResult);
@@ -235,7 +235,7 @@ public class TSequentialConfService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,String>> sequentialInfo(String cfgDeviceId){
+    public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
         //todo 写入识别结果
          return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }

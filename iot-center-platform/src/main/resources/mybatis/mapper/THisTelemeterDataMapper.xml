@@ -176,11 +176,11 @@
         g.mete_name,
         i.mete_value,
         a.triggering_time,
-        a.start_time as cruiseTime,
         d.result_num,
         d.origpic,
         d.person_check,
         b.task_name,
+        b.create_time as cruiseTime,
         j.device_id,
         j.device_name,
         g.mete_kind,
@@ -193,42 +193,12 @@
         LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
         left join t_cfg_mete g on a.mete_id = g.mete_id
         left join t_cruise_task h on a.union_id = h.task_id
-        left join t_his_signal_data i on a.mete_id = i.mete_id and a.triggering_time = i.record_time
+        left join (select mete_id,mete_value,record_time from t_his_signal_data union all (select mete_id,mete_value,record_time from t_his_telemeter_data)) i on a.mete_id = i.mete_id and a.triggering_time = i.record_time
         left join t_cfg_device j on i.mete_id = j.device_id
         left join t_dict_business k on g.mete_kind  = k.dict_code and k.col_name="mete_kind"
-        WHERE 1 =1
+        WHERE 1 = 1
         <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
         <if test="deviceName != null and deviceName != ''"> and a.mete_id in (SELECT mete_id from t_cfg_data_current where device_id in (select device_id from t_cfg_device WHERE device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') ))</if>
-        union all (
-        SELECT
-        a.union_id,
-        g.mete_name,
-        z.mete_value,
-        a.triggering_time,
-        a.start_time as cruiseTime,
-        d.result_num,
-        d.origpic,
-        d.person_check,
-        b.task_name,
-        j.device_id,
-        j.device_name,
-        g.mete_kind,
-        k.dict_note as meteKindName,
-        c.instance_name
-        FROM
-        t_union_task a
-        LEFT JOIN t_cruise_result b ON a.union_id = b.task_id
-        LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
-        LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
-        left join t_cfg_mete g on a.mete_id = g.mete_id
-        left join t_cruise_task h on a.union_id = h.task_id
-        left join t_his_telemeter_data z on a.mete_id = z.mete_id and a.triggering_time = z.record_time
-        left join t_cfg_device j on z.mete_id = j.device_id
-        left join t_dict_business k on g.mete_kind  = k.dict_code and k.col_name="mete_kind"
-        WHERE 1 =1
-        <if test="startTime != null and endTime != null"> and a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceName != null and deviceName != ''"> and a.mete_id in (SELECT mete_id from t_cfg_data_current where device_id in (select device_id from t_cfg_device WHERE device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') ))</if>
-        )
-        order by mete_name,cruiseTime desc
+        order by mete_name,cruiseTime,triggering_time desc
     </select>
 </mapper>

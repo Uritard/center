@@ -96,7 +96,7 @@
         from t_device_maintenance a
         where 1 = 1
         <if test="maintenanceName != null and maintenanceName != ''"> and a.maintenance_name LIKE CONCAT('%',#{maintenanceName, jdbcType=VARCHAR},'%') </if>
-        group by a.maintenance_id
+        group by a.maintenance_id desc
     </select>
 
     <insert id="batchAdd">
