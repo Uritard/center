@@ -419,5 +419,4 @@ public class TCruiseDataResultController {
         }
         return  result;
     }
-
 }
