@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.server;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
@@ -36,6 +37,7 @@ import static com.yjh.accessrobot.common.Constant.maps;
 public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     public RobotServerHandler() {
+        Integer heartNum;
     }
 
     private SysLogsService sysLogsService;
@@ -65,6 +67,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private String strRobotCode = "TT";
     private boolean isThreadStart = true;
     private String redisValue = "content";
+    private Integer heartNum = 0;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
@@ -329,11 +332,15 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
                     sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
+                    if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
+                        robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
+                    }
                     //启动线程
                     HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart);
                     Thread thread = new Thread(dataDealThread);
                     thread.setDaemon(true);
                     thread.start();
+
                     robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     break;  
                 //心跳指令(发送响应)
@@ -350,6 +357,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         Constant.flag2 = 1;
                     }
                     log.info("修改后Constant.flag2的值==="+Constant.flag2);
+                    heartNum.intValue();
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -728,17 +736,25 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return PlatformXMLUtil.readStringXmlOut(document);
     }
 
-    void procSend(String robotCode) {
-        log.info("没有收到心跳报文......");
-        robotServerHandlerMap.remove(robotCode);//断开链接
-        try {
-            ctx.close().sync();
-            ctx.flush();
-            super.channelInactive(ctx);
-        } catch (Exception e) {
+    void procSend(String robotCode, Map<String, String> robotStatusMap) {
+        heartNum ++;
+        int res = heartNum;
+        if (res > 3){
+            StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
+            robotStatusMap.put("value","1");//异常
+            redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//更新缓存机器人的网络状态
             isThreadStart = false;
-            log.error("clientDisconnect: " + e.getMessage());
+            try {
+                robotServerHandlerMap.remove(robotCode);//断开链接
+                ctx.close().sync();
+                ctx.flush();
+                super.channelInactive(ctx);
+            } catch (Exception e) {
+                isThreadStart = false;
+                log.error("clientDisconnect: " + e.getMessage());
+            }
         }
+
     }
 
     private void send(ChannelHandlerContext ctx, byte[] bytes,String strRobotCode) {

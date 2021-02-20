@@ -18,6 +18,8 @@ public class HeartBreakDealThread implements Runnable {
     private String robotCode;
     private RedisTemplate redisTemplate;
     private volatile boolean isThreadStart;
+    private Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
+    private long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
 
 
     public HeartBreakDealThread(RobotServerHandler robotServerHandler, String robotCode,RedisTemplate redisTemplate,boolean isThreadStart) {
@@ -31,22 +33,11 @@ public class HeartBreakDealThread implements Runnable {
     public void run() {
         try {
             while (isThreadStart){
-                Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
-                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
 
-                long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
+                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
                 Thread.sleep(sleepTime);
                 log.info("线程等待了"+sleepTime+"ms了");
-                Constant.heartNum.addAndGet(1);
-                int res = Constant.heartNum.intValue();
-                if (res > 3){
-                    robotServerHandler.procSend(robotCode);
-                    StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
-                    robotStatusMap.put("value","1");//异常
-                    redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//更新缓存机器人的网络状态
-                    isThreadStart = false;
-                    break;
-                }
+                robotServerHandler.procSend(robotCode, robotStatusMap);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
