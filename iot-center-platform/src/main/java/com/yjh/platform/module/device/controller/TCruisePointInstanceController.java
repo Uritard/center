@@ -144,13 +144,14 @@ public class TCruisePointInstanceController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询巡检点数据",content = "根据用户传递的参数查询巡检点数据",logType = 1)
-    public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TCruisePointInstance tCruisePointInstance
+//                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+//                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
+    ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tCruisePointInstance.getPageNum()!=null?tCruisePointInstance.getPageNum():1, tCruisePointInstance.getPageSize()!=null?tCruisePointInstance.getPageSize():0,true,null,true);
             List<TCruisePointInstance> list = tCruisePointInstanceService.selectByPage(tCruisePointInstance);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
