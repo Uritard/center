@@ -78,5 +78,8 @@ public class RobotAlarm implements Serializable {
 
     private Date endTime;
 
+    private Integer pageNum;
+
+    private Integer pageSize;
 
 }
