@@ -52,12 +52,6 @@
         where route_id = #{routeId,jdbcType=BIGINT}
     </update>
 
-    "updateStatus" parameterType="com.yjh.gateway.module.gateway.entity.Route">
-        update sys_route
-        set enabled = #{enabled,jdbcType=INTEGER}
-        where route_id = #{routeId,jdbcType=BIGINT}
-    </update>
-
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select route_id, service_id, url, strip_prefix, retry_able, api_name, enabled, path,remark
         from sys_route
