@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
@@ -63,10 +64,12 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统用户数据",content = "根据用户传递的参数新增系统用户数据",logType = 2)
-    public Result insert(@RequestBody SysUser sysUser) {
+    public Result insert(@Validated @RequestBody SysUser sysUser) {
 
         Result result = new Result();
         try {
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+            sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             result.setData(sysUserService.insert(sysUser));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -101,6 +104,8 @@ public class SysUserController {
     public Result update(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+            sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             result.setData(sysUserService.update(sysUser));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -119,6 +124,8 @@ public class SysUserController {
         Result result = new Result();
         try {
             SysUser sysUser = sysUserService.selectByPrimaryId(userId);
+            sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
+            sysUser.setUserName(Demo.encryption(sysUser.getUserName()));
             result.setData(sysUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -133,8 +140,14 @@ public class SysUserController {
     public Result selectByUserState(@RequestParam(value = "state", required = true) Integer state) {
         Result result = new Result();
         try {
+            List<SysUser> enUser=new ArrayList<>();
             List<SysUser> sysUser = sysUserService.selectByUserState(state);
-            result.setData(sysUser);
+            for(SysUser list:sysUser){
+                  list.setUserName(Demo.encryption(list.getUserName()));
+                  list.setPassword(Demo.encryption(list.getPassword()));
+                  enUser.add(list);
+            }
+            result.setData(enUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -148,8 +161,15 @@ public class SysUserController {
     public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
         Result result = new Result();
         try {
+            List<SysUser> enUser=new ArrayList<>();
+            userName=Demo.decrypt(userName);
             List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
-            result.setData(sysUsers);
+            for(SysUser list:sysUsers){
+                list.setUserName(Demo.encryption(list.getUserName()));
+                list.setPassword(Demo.encryption(list.getPassword()));
+                enUser.add(list);
+            }
+            result.setData(enUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -187,8 +207,16 @@ public class SysUserController {
                          @RequestParam(value = "lastLogin", required = false) Date lastLogin) {
         Result result = new Result();
         try {
+            List<SysUser> enUser=new ArrayList<>();
+            userName=Demo.decrypt(userName);
+            password=Demo.decrypt(password);
             List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
-            result.setData(list);
+            for(SysUser lists:list){
+                lists.setUserName(Demo.encryption(lists.getUserName()));
+                lists.setPassword(Demo.encryption(lists.getPassword()));
+                enUser.add(lists);
+            }
+            result.setData(enUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -209,7 +237,18 @@ public class SysUserController {
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+            sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
+            List<Map<String, String>> enUser=new ArrayList<>();
             List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
+            for(Map<String,String> map:list){
+                for (Map.Entry<String, String> m : map.entrySet()) {
+                    if(m.getKey().equals("userName")||m.getKey().equals("password")){
+                        m.setValue(Demo.encryption(m.getValue()));
+                    }
+                }
+                enUser.add(map);
+            }
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -297,13 +336,14 @@ public class SysUserController {
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
     @Logs(title = "新增用户",content = "根据用户传递的参数新增数据",logType = 2)
-    public Result insertUser( @RequestBody SysUser sysUser) {
+    public Result insertUser(@Validated @RequestBody SysUser sysUser) {
 
         Result result = new Result();
         try {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
             sysUser.setPassword("Yjh@123!");
+            sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
             sysUserService.insert(sysUser);
             sysUserService.insertIntoRedis();
             result.setData(sysUser);
@@ -364,10 +404,14 @@ public class SysUserController {
         try {
             Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
-            String oldPassword = map.get("oldPassword");
+            String oldPassword =Demo.decrypt(map.get("oldPassword"));
+                    //map.get("oldPassword");
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (sysUserCurrent.getPassword().equals(oldPassword)) {
-                if (sysUserCurrent.getPassword().equals(map.get("newPassword"))) {
+                if (sysUserCurrent.getPassword().equals(
+                        //map.get("newPassword")
+                        Demo.decrypt(map.get("newPassword"))
+                )) {
                     result.setMessage("新密码不能和旧密码重复");
                     return result;
                 } else if (map.get("newPassword").contains(sysUserCurrent.getUserName())) {
@@ -377,7 +421,7 @@ public class SysUserController {
                     result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
                     return result;
                 } else {
-                    result.setData(sysUserService.changePassword(userId, map));
+                    result.setData(sysUserService.changePassword(userId, map,sysUserCurrent.getUserName()));
                 }
             } else {
                 Map<String, Object> mapResult = new HashMap<>();

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -47,7 +48,7 @@ public class TStdMetemodelDetailController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统测点模版详细数据",content = "根据用户传递的参数新增系统测点模版详细数据",logType = 2)
-    public Result add(@RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
+    public Result add(@Validated  @RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
@@ -194,7 +195,7 @@ public class TStdMetemodelDetailController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchadd", method = RequestMethod.POST)
     @Logs(title = "批量插入系统测点模版详细数据",content = "根据用户传递的参数批量插入系统测点模版详细信息",logType = 2)
-    public Result batchAdd(@RequestBody List<TStdMeteModelDetail> list, HttpServletRequest request) {
+    public Result batchAdd(@Validated @RequestBody List<TStdMeteModelDetail> list, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

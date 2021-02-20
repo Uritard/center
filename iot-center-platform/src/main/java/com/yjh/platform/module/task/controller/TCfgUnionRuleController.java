@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -49,7 +50,7 @@ public class TCfgUnionRuleController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增联动规则数据",content = "根据用户传递的参数新增联动规则数据",logType = 2)
-    public Result add(@RequestBody TCfgUnionRule tCfgUnionRule) {
+    public Result add(@Validated @RequestBody TCfgUnionRule tCfgUnionRule) {
         Result result = new Result();
         try {
             result.setData(tCfgUnionRuleService.add(tCfgUnionRule));
@@ -161,7 +162,7 @@ public class TCfgUnionRuleController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入联动规则数据",content = "根据用户传递的参数批量插入数据联动规则信息",logType = 2)
-    public Result batchAdd(@RequestBody List<TCfgUnionRule> list) {
+    public Result batchAdd(@Validated @RequestBody List<TCfgUnionRule> list) {
         Result result = new Result();
         try {
         result.setData(tCfgUnionRuleService.batchAdd(list));

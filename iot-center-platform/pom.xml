@@ -130,6 +130,11 @@
             <version>2.3.27-incubating</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.46</version>
+        </dependency>
         <!--swagger增强工具依赖包，方便生成接口文档。非必须导入-->
         <!--<dependency>-->
             <!--<groupId>com.github.xiaoymin</groupId>-->

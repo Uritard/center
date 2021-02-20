@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -41,7 +42,7 @@ public class TCfgTelecontrolController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增遥控数据",content = "根据用户传递的参数插入遥控数据",logType = 2)
-    public Result add(@RequestBody TCfgTelecontrol tCfgTelecontrol) {
+    public Result add(@Validated  @RequestBody TCfgTelecontrol tCfgTelecontrol) {
         Result result = new Result();
         try {
             result.setData(tCfgTelecontrolService.insert(tCfgTelecontrol));
@@ -155,7 +156,7 @@ public class TCfgTelecontrolController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入遥控数据",content = "根据用户传递的参数批量插入遥控数据",logType =2)
-    public Result batchAdd(@RequestBody List<TCfgTelecontrol> list) {
+    public Result batchAdd(@Validated @RequestBody List<TCfgTelecontrol> list) {
         Result result = new Result();
         try {
         result.setData(tCfgTelecontrolService.batchInsert(list));

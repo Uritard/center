@@ -43,7 +43,7 @@ public class TAlgorithmConfController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增算法配置数据",content = "根据用户传递的参数新增算法配置数据",logType = 2)
-    public Result add(@RequestBody TAlgorithmConf tAlgorithmConf) {
+    public Result add(@Validated @RequestBody TAlgorithmConf tAlgorithmConf) {
 
         Result result = new Result();
         try {
@@ -154,7 +154,7 @@ public class TAlgorithmConfController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入算法配置数据",content = "根据用户传递的参数批量插入算法配置信息",logType = 2)
-    public Result batchAdd(@RequestBody List<TAlgorithmConf> list) {
+    public Result batchAdd(@Validated @RequestBody List<TAlgorithmConf> list) {
         Result result = new Result();
         try {
         result.setData(tAlgorithmConfService.batchAdd(list));

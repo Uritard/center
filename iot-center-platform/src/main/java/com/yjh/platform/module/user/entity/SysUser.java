@@ -37,11 +37,11 @@ public class SysUser implements Serializable {
     @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
-    @Length(max = 20,message = "userName长度必须小于等于20")
+  //  @Length(max = 20,message = "userName长度必须小于等于20")
     @ApiModelProperty(value = "用户名")
     private String userName;
 
-    @Length(max = 256,message = "password长度必须小于等于256")
+   // @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "密码")
     private String password;
 

@@ -42,7 +42,7 @@ public class SysRoleMenuController {
     @ApiOperation(value = "角色菜单表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增角色菜单数据",content = "根据用户传递的参数新增角色菜单数据",logType = 2)
-    public Result insert(@RequestBody  SysRoleMenu sysRoleMenu) {
+    public Result insert(@Validated @RequestBody  SysRoleMenu sysRoleMenu) {
 
         Result result = new Result();
         try {
@@ -165,7 +165,7 @@ public class SysRoleMenuController {
     @ApiOperation(value = "角色菜单表批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入角色菜单数据",content = "根据用户传递的参数批量插入角色菜单信息",logType = 2)
-    public Result batchInsert(@RequestBody List<SysRoleMenu> list) {
+    public Result batchInsert(@Validated @RequestBody List<SysRoleMenu> list) {
         Result result = new Result();
         try {
             result.setData(sysRoleMenuService.batchInsert(list));

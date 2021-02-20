@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -48,7 +49,7 @@ public class TStdRegionController {
     @ApiOperation(value = "新增区域")
     @RequestMapping(value = "/addRegion", method = RequestMethod.POST)
     @Logs(title = "新增区域",content = "根据用户传递的参数新增标准区域数据",logType = 2)
-    public Result insert(@RequestBody TStdRegion tStdRegion) {
+    public Result insert(@Validated  @RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
             result.setData(tStdRegionService.insert(tStdRegion));

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -41,7 +42,7 @@ public class TCfgAlarmCurrentController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增活动告警数据",content = "根据用户传递的参数新增活动告警数据",logType = 2)
-    public Result insert(@RequestBody TCfgAlarmCurrent tCfgAlarmCurrent) {
+    public Result insert(@Validated  @RequestBody TCfgAlarmCurrent tCfgAlarmCurrent) {
         Result result = new Result();
         try {
             result.setData(tCfgAlarmCurrentService.insert(tCfgAlarmCurrent));
@@ -159,7 +160,7 @@ public class TCfgAlarmCurrentController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量新增活动告警数据",content = "根据用户传递的参数批量新增活动告警数据",logType = 2)
-    public Result batchInsert(@RequestBody List<TCfgAlarmCurrent> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCfgAlarmCurrent> list) {
         Result result = new Result();
         try {
         result.setData(tCfgAlarmCurrentService.batchInsert(list));
