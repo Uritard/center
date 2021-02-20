@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +52,7 @@ public class TRobotInfoController {
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
     @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2)
-    public Result insert(HttpServletRequest request, @RequestBody  TRobotInfo tRobotInfo) {
+    public Result insert(HttpServletRequest request,@Validated @RequestBody  TRobotInfo tRobotInfo) {
 
         Result result = new Result();
         try {

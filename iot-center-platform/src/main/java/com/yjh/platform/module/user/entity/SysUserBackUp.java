@@ -36,12 +36,12 @@ public class SysUserBackUp implements Serializable {
     @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
-    @Length(max = 20,message = "userName长度必须小于等于20")
+   // @Length(max = 20,message = "userName长度必须小于等于20")
     @ApiModelProperty(value = "用户名")
     @TableField(value = "user_name",updateStrategy = FieldStrategy.IGNORED)
     private String userName;
 
-    @Length(max = 256,message = "password长度必须小于等于256")
+   // @Length(max = 256,message = "password长度必须小于等于256")
     @ApiModelProperty(value = "密码")
      @TableField(value = "PASSWORD",updateStrategy = FieldStrategy.IGNORED)
     private String password;
@@ -148,5 +148,5 @@ public class SysUserBackUp implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastLogin;
 
-
+    private String verfiCode;
 }

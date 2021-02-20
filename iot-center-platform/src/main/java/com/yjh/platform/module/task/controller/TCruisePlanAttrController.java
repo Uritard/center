@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -42,7 +43,7 @@ public class TCruisePlanAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检预案属性数据",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2)
-    public Result insert(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
+    public Result insert(@Validated  @RequestBody TCruisePlanAttr tCruisePlanAttr) {
         Result result = new Result();
         try {
             result.setData(tCruisePlanAttrService.insert(tCruisePlanAttr));
@@ -156,7 +157,7 @@ public class TCruisePlanAttrController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入巡检预案属性数据",content = "根据用户传递的参数批量插入巡检预案属性数据",logType = 2)
-    public Result batchInsert(@RequestBody List<TCruisePlanAttr> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCruisePlanAttr> list) {
         Result result = new Result();
         try {
         result.setData(tCruisePlanAttrService.batchInsert(list));

@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -46,7 +47,7 @@ public class TUnionTaskController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检任务数据",content = "根据用户传递的参数新增巡检任务数据",logType = 2)
-    public Result insert(@RequestBody TUnionTask tUnionTask) {
+    public Result insert(@Validated  @RequestBody TUnionTask tUnionTask) {
         Result result = new Result();
         try {
             result.setData(tUnionTaskService.insert(tUnionTask));
@@ -161,7 +162,7 @@ public class TUnionTaskController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入巡检任务数据",content = "根据用户传递的参数批量插入巡检任务数据",logType = 2)
-    public Result batchInsert(@RequestBody List<TUnionTask> list) {
+    public Result batchInsert(@Validated @RequestBody List<TUnionTask> list) {
         Result result = new Result();
         try {
             result.setData(tUnionTaskService.batchInsert(list));

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -41,7 +42,7 @@ public class TCruisePointAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检点数据",content = "根据用户传递的参数插入巡检点数据",logType = 2)
-    public Result add(@RequestBody TCruisePointAttr tCruisePointAttr) {
+    public Result add(@Validated  @RequestBody TCruisePointAttr tCruisePointAttr) {
         Result result = new Result();
         try {
             result.setData(tCruisePointAttrService.add(tCruisePointAttr));
@@ -146,7 +147,7 @@ public class TCruisePointAttrController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入巡检点数据",content = "根据用户传递的参批量插入巡检点数据",logType = 2)
-    public Result batchAdd(@RequestBody List<TCruisePointAttr> list) {
+    public Result batchAdd(@Validated @RequestBody List<TCruisePointAttr> list) {
         Result result = new Result();
         try {
         result.setData(tCruisePointAttrService.batchAdd(list));

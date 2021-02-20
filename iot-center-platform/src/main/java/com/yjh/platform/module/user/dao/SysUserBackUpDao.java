@@ -21,4 +21,6 @@ public interface SysUserBackUpDao {
 
         int update(SysUserBackUp sysUserBackUp);
 
+        SysUserBackUp selectByVerfiCode(@Param(value = "userId") Long userId);
+
 }

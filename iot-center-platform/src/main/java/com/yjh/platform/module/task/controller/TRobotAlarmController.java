@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.yjh.platform.module.task.service.TRobotAlarmService;
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -45,7 +46,7 @@ public class TRobotAlarmController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增机器人本体告警表",content = "根据用户传递的参数新增机器人本体告警数据",logType = 2)
-    public Result insert(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
+    public Result insert(@Validated  @RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
@@ -175,7 +176,7 @@ public class TRobotAlarmController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入机器人本体告警表",content = "根据用户传递的参数批量插入机器人本体告警数据",logType = 2)
-    public Result batchInsert(@RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
+    public Result batchInsert(@Validated @RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

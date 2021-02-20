@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class TCameraRecorderController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增录像服务器信息",content = "根据用户传递的参数新增录像服务器信息",logType = 2)
-    public Result insert(@RequestBody TCameraRecorder tCameraRecorder) {
+    public Result insert(@Validated  @RequestBody TCameraRecorder tCameraRecorder) {
 
         Result result = new Result();
         try {
@@ -212,7 +213,7 @@ public class TCameraRecorderController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入录像服务器信息",content = "根据用户传递的参数批量插入录像服务器信息",logType = 2)
-    public Result batchInsert(@RequestBody List<TCameraRecorder> list) {
+    public Result batchInsert(@Validated @RequestBody List<TCameraRecorder> list) {
         Result result = new Result();
         try {
         result.setData(tCameraRecorderService.batchInsert(list));
