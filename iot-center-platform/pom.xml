@@ -54,10 +54,10 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <!-- spring admin 监控 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-actuator</artifactId>-->
+        <!--</dependency>-->
         <!--admin监控客户端-->
         <!--<dependency>-->
             <!--<groupId>de.codecentric</groupId>-->
