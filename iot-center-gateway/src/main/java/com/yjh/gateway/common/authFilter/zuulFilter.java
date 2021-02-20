@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +26,10 @@ import java.util.TreeMap;
 
 @Component
 public class zuulFilter extends ZuulFilter {
+
     private static Logger log = LoggerFactory.getLogger(zuulFilter.class);
 
+    private SecurityProperties securityProperties;
     @Override
     public String filterType() {
         return "pre";
@@ -40,75 +43,79 @@ public class zuulFilter extends ZuulFilter {
     @SneakyThrows
     @Override
     public boolean shouldFilter() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-        MyRequestWrapper requestWrapper = null;
-        if (request instanceof HttpServletRequest) {
-            requestWrapper = new MyRequestWrapper(request);
-            if ("POST".equals(request.getMethod().toUpperCase())) {
-                String webcode = null;
-                String signStr = null;
-                String plainText = null;
-                String body = requestWrapper.getBody();
-                Map<String, Object> paramBodyMap = new LinkedHashMap<>();
-                JSONObject jsonModel = new JSONObject(true);
-                if (!StringUtils.isEmpty(body)) {
-                    paramBodyMap = JSONObject.parseObject(body, LinkedHashMap.class);
-                }
-                for (Map.Entry<String, Object> param : paramBodyMap.entrySet()) {
-                    if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
-                        jsonModel.put(param.getKey(), param.getValue());
+        if("true".equals(securityProperties.getIsDecode())) {
+            RequestContext ctx = RequestContext.getCurrentContext();
+            HttpServletRequest request = ctx.getRequest();
+            MyRequestWrapper requestWrapper = null;
+            if (request instanceof HttpServletRequest) {
+                requestWrapper = new MyRequestWrapper(request);
+                if ("POST".equals(request.getMethod().toUpperCase())) {
+                    String webcode = null;
+                    String signStr = null;
+                    String plainText = null;
+                    String body = requestWrapper.getBody();
+                    Map<String, Object> paramBodyMap = new LinkedHashMap<>();
+                    JSONObject jsonModel = new JSONObject(true);
+                    if (!StringUtils.isEmpty(body)) {
+                        paramBodyMap = JSONObject.parseObject(body, LinkedHashMap.class);
                     }
-                    if ("summary".equals(param.getKey())) {
-                        webcode = String.valueOf(param.getValue());
+                    for (Map.Entry<String, Object> param : paramBodyMap.entrySet()) {
+                        if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                            jsonModel.put(param.getKey(), param.getValue());
+                        }
+                        if ("summary".equals(param.getKey())) {
+                            webcode = String.valueOf(param.getValue());
+                        }
+                        if ("signStr".equals(param.getKey())) {
+                            signStr = String.valueOf(param.getValue());
+                        }
+                        if ("plainText".equals(param.getKey())) {
+                            plainText = String.valueOf(param.getValue());
+                        }
                     }
-                    if ("signStr".equals(param.getKey())) {
-                        signStr = String.valueOf(param.getValue());
+                    String token = Demo.summary(jsonModel.toJSONString());
+                    if (!token.equals(webcode)) {
+                        log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的token: " + token);
+                        //throw new RuntimeException("参数篡改");
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        return false;
                     }
-                    if ("plainText".equals(param.getKey())) {
-                        plainText = String.valueOf(param.getValue());
-                    }
-                }
-                String token = Demo.summary(jsonModel.toJSONString());
-                if (!token.equals(webcode)) {
-                    log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的token: " + token);
-                    //throw new RuntimeException("参数篡改");
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    return false;
-                }
 //                if (!Demo.verify(plainText, signStr)) {
 //                    log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
 //                    ctx.setSendZuulResponse(false);
 //                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
 //                    return false;
 //                }
-                ctx.setRequest(requestWrapper);
-            } else {
-                String tokenStr = request.getParameter("summary");
+                    ctx.setRequest(requestWrapper);
+                } else {
+                    String tokenStr = request.getParameter("summary");
 //                String signStr = request.getParameter("signStr");
 //                String plainText = request.getParameter("plainText");
-                JSONObject jsonModel = new JSONObject(true);
-                Map<String, String[]> params = new TreeMap<>(request.getParameterMap());
-                for (Map.Entry<String, String[]> param : params.entrySet()) {
-                    if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
-                        jsonModel.put(param.getKey(), ((String[]) param.getValue())[0]);
+                    JSONObject jsonModel = new JSONObject(true);
+                    Map<String, String[]> params = new TreeMap<>(request.getParameterMap());
+                    for (Map.Entry<String, String[]> param : params.entrySet()) {
+                        if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                            jsonModel.put(param.getKey(), ((String[]) param.getValue())[0]);
+                        }
                     }
-                }
-                String token = Demo.summary(jsonModel.toJSONString());
-                if (!token.equals(tokenStr)) {
-                    log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的token: " + token);
-                    //throw new RuntimeException("参数篡改");
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    return false;
-                }
+                    if (params.size() != 0) {
+                        String token = Demo.summary(jsonModel.toJSONString());
+                        if (!token.equals(tokenStr)) {
+                            log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的token: " + token);
+                            //throw new RuntimeException("参数篡改");
+                            ctx.setSendZuulResponse(false);
+                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                            return false;
+                        }
+                    }
 //                if (!Demo.verify(plainText, signStr)) {
 //                    log.error("签名验证结果 - " + Demo.verify(plainText, signStr));
 //                    ctx.setSendZuulResponse(false);
 //                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
 //                    return false;
 //                }
+                }
             }
         }
 //        String contentType = request.getContentType();
@@ -178,6 +185,7 @@ public class zuulFilter extends ZuulFilter {
 //            ctx.setResponseBody(buliderString);
 //        }
         return true;
+
     }
 
     @Override
