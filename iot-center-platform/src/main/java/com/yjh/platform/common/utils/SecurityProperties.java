@@ -1,4 +1,4 @@
-package com.yjh.gateway.common.authFilter;
+package com.yjh.platform.common.utils;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

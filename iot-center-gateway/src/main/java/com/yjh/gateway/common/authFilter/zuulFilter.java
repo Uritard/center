@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,9 +28,12 @@ import java.util.TreeMap;
 @Component
 public class zuulFilter extends ZuulFilter {
 
+    @Resource
+    private SecurityProperties securityProperties;
+
     private static Logger log = LoggerFactory.getLogger(zuulFilter.class);
 
-    private SecurityProperties securityProperties;
+
     @Override
     public String filterType() {
         return "pre";

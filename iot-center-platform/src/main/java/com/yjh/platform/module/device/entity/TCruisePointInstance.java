@@ -125,5 +125,8 @@ public class TCruisePointInstance implements Serializable {
     @TableField(value = "sort",updateStrategy = FieldStrategy.IGNORED)
     private String sort;
 
+    private Integer pageNum;
+
+    private Integer pageSize;
 
 }

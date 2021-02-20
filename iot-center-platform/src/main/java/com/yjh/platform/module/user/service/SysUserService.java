@@ -5,6 +5,7 @@ import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.SecurityProperties;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.common.utils.smUtil.SM2Utils;
 import com.yjh.platform.common.utils.smUtil.Util;
@@ -62,8 +63,10 @@ public class SysUserService {
 
     @Resource
     private RedisAndYxsjUtil redisAndYxsjUtil;
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    @Resource
+    private SecurityProperties securityProperties;
 
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysUser sysUser) {
@@ -97,17 +100,24 @@ public class SysUserService {
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
         Map<String, Object> mapResult = new HashMap<>();
         if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
-            String userName =//userMap.get("userName");
-                    Demo.decrypt(userMap.get("userName"));
-            String password =//userMap.get("password");
-                    Demo.decrypt(userMap.get("password"));
-            // String verfiCode = userMap.get("verfiCode");
+            String userName=null;
+            String password=null;
+            if("true".equals(securityProperties.getIsDecode())) {
+                 userName =//userMap.get("userName");
+                        Demo.decrypt(userMap.get("userName"));
+                 password =//userMap.get("password");
+                        Demo.decrypt(userMap.get("password"));
+                // String verfiCode = userMap.get("verfiCode");
+            }else{
+                 userName =userMap.get("userName");
+                 password =userMap.get("password");
+            }
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
-            if (!Objects.equals(null, sysUserLogin) && userName.equals(sysUserLogin.getUserName()) && password.equals(sysUserLogin.getPassword())) {
-                String userAvoid=Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
-            sysUserLogin.setUserName(Demo.encryption(sysUserLogin.getUserName()));
-            sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
+            if("true".equals(securityProperties.getIsDecode())) {
+                sysUserLogin.setUserName(Demo.encryption(sysUserLogin.getUserName()));
+                sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
+            }
             if (!Objects.equals(null, sysUserLogin)) {
                 SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
                 Map verMap = new LinkedHashMap<>();
@@ -380,13 +390,19 @@ public class SysUserService {
     public int changePassword(Long userId, Map<String, String> map, String userName) throws IOException {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
-        linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
         SysUser sysUser = new SysUser();
+        if("true".equals(securityProperties.getIsDecode())) {
+            linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
+            sysUser.setPassword(
+                    // map.get("newPassword")
+                    Demo.decrypt(map.get("newPassword"))
+            );
+        }else{
+            linkedHashMap.put("password", map.get("newPassword"));
+            sysUser.setPassword(
+                    map.get("newPassword"));
+        }
         sysUser.setUserId(userId);
-        sysUser.setPassword(
-                // map.get("newPassword")
-                Demo.decrypt(map.get("newPassword"))
-        );
         Date date = new Date();
         sysUser.setUpdateTime(date);
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
