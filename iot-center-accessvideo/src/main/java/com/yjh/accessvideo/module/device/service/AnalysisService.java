@@ -99,7 +99,10 @@ public class AnalysisService {
                 i++;
             }
             analysisObject.put("msgData", msgDataObject);
+            log.info("msgData",msgDataObject);
+            log.info("msgMap-----"+analysisObject);
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+            log.info("算法数据初始化-----完成");
         }catch (Exception e){
             log.error("缺陷算法识别异常："+e);
         }
