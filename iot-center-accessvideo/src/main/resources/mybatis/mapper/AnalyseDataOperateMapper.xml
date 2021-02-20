@@ -876,4 +876,13 @@
             WHERE a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
 
+
+    <select id="selectAlgorithmDefectInfo" parameterType="java.lang.Long" resultType="java.lang.Long">
+                SELECT
+        defect_level
+        FROM
+        t_algorithm_info
+        WHERE is_ai=0
+        AND  defect_type= #{defectType,jdbcType=INTEGER}
+    </select>
 </mapper>

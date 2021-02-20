@@ -437,8 +437,9 @@ public class DataDealThread implements Runnable {
                                         log.info("--------____--------单一缺陷");
                                         Map<String, String> defectMap = new HashMap<>();
                                         String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                        defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
+                                        // TODO: 2021/2/19 判别并获取对应缺陷的缺陷算法等级
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
+                                        defectMap.put("defectLevel",analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                         defectMap.put("defectContent", resultValue);
                                         defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                         defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
@@ -469,8 +470,8 @@ public class DataDealThread implements Runnable {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
                                             String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
+                                            defectMap.put("defectLevel",analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                             defectMap.put("defectContent", resultArr[i]);
                                             defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                             defectMap.put("instanceId", cruiseResult.get("instanceId").toString());

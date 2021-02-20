@@ -151,6 +151,12 @@ public class AnalyseDataOperateService {
         return this.analyseDataOperateDao.batchInsertDefectInfo(list);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String selectAlgorithmDefectInfo(String defectType){
+        Integer defectLevel=analyseDataOperateDao.selectAlgorithmDefectInfo(Long.valueOf(defectType));
+        return defectLevel.toString();
+    }
+
 
 //    public String nonUnpacking(String body) {
 //        log.info("body:"+body);
