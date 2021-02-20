@@ -3,6 +3,7 @@ package com.yjh.accessvideo.module.device.service;
 
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.*;
+import io.swagger.models.auth.In;
 import net.bytebuddy.asm.Advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +154,7 @@ public class AnalyseDataOperateService {
 
     @Transactional(rollbackFor = Exception.class)
     public String selectAlgorithmDefectInfo(String defectType){
-        Integer defectLevel=analyseDataOperateDao.selectAlgorithmDefectInfo(Long.valueOf(defectType));
+        Integer defectLevel=analyseDataOperateDao.selectAlgorithmDefectInfo(Integer.valueOf(defectType));
         return defectLevel.toString();
     }
 

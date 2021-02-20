@@ -42,6 +42,6 @@ public interface AnalyseDataOperateDao {
     Map<String,Object> selectWarnInfo(@Param(value = "deviceMeteId")Long deviceMeteId);
 
     //根据缺陷类型查询缺陷等级
-    int selectAlgorithmDefectInfo(@Param(value = "defectType")Long defectType);
+    int selectAlgorithmDefectInfo(@Param(value = "defectType")Integer defectType);
 
 }

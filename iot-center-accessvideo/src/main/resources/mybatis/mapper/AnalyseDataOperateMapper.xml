@@ -877,7 +877,7 @@
     </select>
 
 
-    <select id="selectAlgorithmDefectInfo" parameterType="java.lang.Long" resultType="java.lang.Long">
+    <select id="selectAlgorithmDefectInfo" parameterType="java.lang.Integer" resultType="java.lang.Integer">
                 SELECT
         defect_level
         FROM
