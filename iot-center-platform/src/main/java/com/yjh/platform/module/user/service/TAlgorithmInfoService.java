@@ -72,5 +72,7 @@ public class TAlgorithmInfoService{
         return this.tAlgorithmInfoDao.batchInsert(list);
     }
 
+
+
 }
 

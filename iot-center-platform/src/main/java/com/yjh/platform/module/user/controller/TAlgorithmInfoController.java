@@ -167,6 +167,7 @@ public class TAlgorithmInfoController {
     public Result batchInsert( @Validated @RequestBody List<TAlgorithmInfo> list) {
         Result result = new Result();
         try {
+            
             int re  = tAlgorithmInfoService.batchInsert(list);
             if(re == -1){
                 result.setCode(209,"算法已配置到测点");

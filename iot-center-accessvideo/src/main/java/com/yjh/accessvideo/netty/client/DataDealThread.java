@@ -174,7 +174,7 @@ public class DataDealThread implements Runnable {
                                             //初始化告警信息redis表
                                             String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             Map<String, String> warnMap = new HashMap<>();
-                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
+//                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
                                             warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
                                             warnMap.put("customId", tCruisePointInstance.getCustomId());
                                             warnMap.put("instanceId", jsonObjectResult.get("instanceId").toString());
@@ -310,7 +310,7 @@ public class DataDealThread implements Runnable {
                                                 if (warningMsg.size() != 0) {
                                                     TWarnInfo tWarnInfo = new TWarnInfo();
                                                     tWarnInfo.setWarnLevel(Integer.valueOf(warningMsg.get("warnLevel").toString()));
-                                                    tWarnInfo.setWarnType(Integer.valueOf(warningMsg.get("warnType").toString()));
+//                                                    tWarnInfo.setWarnType(Integer.valueOf(warningMsg.get("warnType").toString()));
                                                     tWarnInfo.setDeviceId(Long.valueOf(warningMsg.get("deviceId").toString()));
                                                     tWarnInfo.setCunstomId(warningMsg.get("customId").toString());
                                                     tWarnInfo.setInstanceId(Long.valueOf(warningMsg.get("instanceId").toString()));

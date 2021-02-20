@@ -11,11 +11,13 @@
         <result column="algorithm_code" jdbcType="VARCHAR" property="algorithmCode" />
         <result column="analyse_type" jdbcType="VARCHAR" property="analyseType" />
         <result column="is_ai" jdbcType="INTEGER" property="isAi" />
+        <result column="defect_type" jdbcType="INTEGER" property="defectType"/>
+        <result column="defect_level" jdbcType="INTEGER" property="defectLevel"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        algorithm_id, algorithm_name, alias_name, describel, algorithm_code, analyse_type,is_ai
+        algorithm_id, algorithm_name, alias_name, describel, algorithm_code, analyse_type,is_ai,defect_type,defect_level
     </sql>
 
 
@@ -26,14 +28,18 @@
             describel,
             algorithm_code,
             analyse_type,
-            is_ai
+            is_ai,
+            defect_type,
+            defect_level
         )values(
                 #{algorithmName, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
                 #{describel, jdbcType=VARCHAR},
                 #{algorithmCode, jdbcType=VARCHAR},
                 #{analyseType, jdbcType=VARCHAR},
-                #{isAi, jdbcType=INTEGER}
+                #{isAi, jdbcType=INTEGER},
+                #{defectType,jdbcType=INTEGER},
+                #{defectLevel,jdbcType=INTEGER}
         )
     </insert>
 
@@ -51,6 +57,8 @@
         <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR},</if>
         <if test="analyseType != null">a.analyse_type = #{analyseType},</if>
         <if test="isAi != null ">a.is_ai = #{isAi, jdbcType=INTEGER},</if>
+        <if test="defectType != null ">a.defect_type = #{defectType, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null ">a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
     </set>
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </update>
@@ -63,7 +71,9 @@
         a.describel,
         a.algorithm_code,
         a.analyse_type,
-        a.is_ai
+        a.is_ai,
+        a.defect_type,
+        a.defect_level
         from t_algorithm_info a
         where 1 = 1
             and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
@@ -99,6 +109,9 @@
         <result property="analyseType" column="analyse_type"/>
         <result property="isAi" column="is_ai"/>
         <result property="analyseTypeName" column="dict_note"/>
+        <result property="defectType" column="defect_type"/>
+        <result property="defectLevel" column="defect_level"/>
+        <result property="defectLevelName" column="defect_level_name"/>
     </resultMap>
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultMap="algorithmInfoMap">
         select
@@ -109,9 +122,13 @@
         a.algorithm_code,
         a.analyse_type,
         a.is_ai,
-        b.dict_note
+        b.dict_note,
+        a.defect_type,
+        a.defect_level,
+        c.dict_note as 'defect_level_name'
         from t_algorithm_info a
         LEFT JOIN t_dict_business b ON b.dict_code = a.analyse_type and (b.col_name = "analyse_type" or b.col_name ="defect_type")
+        LEFT JOIN t_dict_business c ON c.dict_code = a.defect_level and (c.col_name= "alarm_level")
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
         <if test="algorithmName != null and algorithmName != ''"> and a.algorithm_name like concat('%',#{algorithmName,jdbcType=VARCHAR},'%')</if>
@@ -120,6 +137,7 @@
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
         <if test="isAi != null"> and a.is_ai = #{isAi, jdbcType=INTEGER}</if>
+        <if test="defectLevel != null"> and a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
          order by a.algorithm_id desc
     </select>
 
@@ -173,4 +191,5 @@
         from t_std_devicemete
         where device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
+
 </mapper>

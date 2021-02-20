@@ -54,5 +54,11 @@ public class TAlgorithmInfo implements Serializable {
     @Max(value=9)
     private Integer isAi;
 
+    private Integer defectType;
+
+    private Integer defectLevel;
+
+    private String defectLevelName;
+
 
 }

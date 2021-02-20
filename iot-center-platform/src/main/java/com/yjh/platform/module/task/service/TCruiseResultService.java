@@ -123,7 +123,7 @@ public class TCruiseResultService{
         //组装告警基本信息
         TWarnInfo warnInfo = new TWarnInfo();
         warnInfo.setWarnTime(new Date());
-        warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
+//        warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
         warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
         warnInfo.setCunstomId(tStdDevicemete.getCustomId());
         warnInfo.setInstanceId(afterManualReviewInfo.getInstanceId());
