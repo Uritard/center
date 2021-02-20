@@ -41,24 +41,28 @@ public class AnalysisService {
             analysisObject.put("msgType", "1");
             msgDataObject.put("desNode", "serverSocket");
             msgDataObject.put("srcNode", "clientSocket001");
-            int i=1;
-            for (Analysis analysis: analysisList) {
-                log.info("表计IsAI："+analysis.getIsAi());
-                if (analysis.getIsAi()==1) {
-                    JSONObject pictureInfoObject = new JSONObject();
-                    JSONObject pictureDataObject = new JSONObject();
-                    pictureDataObject.put("analyseType", analysis.getAnalyseType());
-                    pictureDataObject.put("imagePath", analysis.getPicPath());
-                    pictureDataObject.put("modelPath", analysis.getPicModelPath());
-                    pictureDataObject.put("taskId", analysis.getTaskId());
-                    pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                    pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-                    msgDataObject.put("data", pictureInfoObject);
+            try {
+                int i=1;
+                for (Analysis analysis: analysisList) {
+                    log.info("表计IsAI："+analysis.getIsAi());
+                    if (analysis.getIsAi()==1) {
+                        JSONObject pictureInfoObject = new JSONObject();
+                        JSONObject pictureDataObject = new JSONObject();
+                        pictureDataObject.put("analyseType", analysis.getAnalyseType());
+                        pictureDataObject.put("imagePath", analysis.getPicPath());
+                        pictureDataObject.put("modelPath", analysis.getPicModelPath());
+                        pictureDataObject.put("taskId", analysis.getTaskId());
+                        pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                        pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
+                        msgDataObject.put("data", pictureInfoObject);
+                    }
+                    i++;
                 }
-                i++;
+                analysisObject.put("msgData", msgDataObject);
+                AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
+            }catch (Exception e){
+                log.error("表计识别算法异常："+e);
             }
-            analysisObject.put("msgData", msgDataObject);
-            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
         }
         log.info("analysisList.get(0).getInstanceId():"+analysisList.get(0).getInstanceId());
         return "success";
@@ -76,25 +80,30 @@ public class AnalysisService {
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
         log.info("进入算法方法----------");
-        int i=1;
-        for (Analysis analysis: analysisList) {
-            log.info("缺陷IsAI："+analysis.getIsAi());
-            if (analysis.getIsAi()==0) {
-                JSONObject pictureDataObject = new JSONObject();
-                JSONObject pictureInfoObject = new JSONObject();
-                pictureDataObject.put("analyseType", analysis.getAnalyseType());
-                pictureDataObject.put("imagePath", analysis.getPicPath());
-                pictureDataObject.put("modelPath", analysis.getPicModelPath());
-                pictureDataObject.put("taskId", analysis.getTaskId());
-                pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-                pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                msgDataObject.put("data", pictureInfoObject);
-                log.info("DATA内容:"+pictureInfoObject);
+        try{
+            int i=1;
+            for (Analysis analysis: analysisList) {
+                log.info("缺陷IsAI："+analysis.getIsAi());
+                if (analysis.getIsAi()==0) {
+                    JSONObject pictureDataObject = new JSONObject();
+                    JSONObject pictureInfoObject = new JSONObject();
+                    pictureDataObject.put("analyseType", analysis.getAnalyseType());
+                    pictureDataObject.put("imagePath", analysis.getPicPath());
+                    pictureDataObject.put("modelPath", analysis.getPicModelPath());
+                    pictureDataObject.put("taskId", analysis.getTaskId());
+                    pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
+                    pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                    msgDataObject.put("data", pictureInfoObject);
+                    log.info("DATA内容:"+pictureInfoObject);
+                }
+                i++;
             }
-            i++;
+            analysisObject.put("msgData", msgDataObject);
+            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+        }catch (Exception e){
+            log.error("缺陷算法识别异常："+e);
         }
-        analysisObject.put("msgData", msgDataObject);
-        AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+
         log.info("缺陷算法结束------------"+msgDataObject);
         return "success";
     }
