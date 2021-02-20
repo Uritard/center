@@ -462,6 +462,24 @@ public class DataDealThread implements Runnable {
                                         log.info("缺陷生成-前端推送：" + jsons);
                                         WebSocketServer.sendMsg(jsons);
 
+                                        //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
+                                        String alarmNote = tStdDevicemete.getAlarmNote();
+                                        log.info("该测点是否配置了告警提示是===" + alarmNote);
+                                        Integer defectLevel = Integer.valueOf(defectMap.get("defectLevel"));
+                                        log.info("产生的该条缺陷的等级是===" + defectLevel);
+                                        if (alarmNote != null && "1".equals(alarmNote)) {
+                                            if (defectLevel == 133 ) {//危急
+                                                //webSocket通知前端调用查询告警弹框的接口
+                                                Map<String, Object> jasonMaps2 = new HashMap<>();
+                                                jasonMaps2.put("type", "alarmPopUp");
+                                                jasonMaps2.put("warnId", defectMap.get("redisFlag"));
+                                                jasonMaps2.put("defectModel", defectMap.get("defectType"));
+                                                String json = JSON.toJSONString(jasonMaps2);
+                                                log.info("发送给前端的消息：" + json);
+                                                WebSocketServer.sendMsg(json);
+                                            }
+                                        }
+
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
                                         String defectTime=simpleDateFormat.format(new Date());
