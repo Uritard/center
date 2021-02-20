@@ -74,4 +74,9 @@ public interface TWarnInfoDao {
     Integer warnCountsNonIdentify();
 
     TWarnInfoDetail selectWarnPopUp(@Param(value = "warnId")Long warnId);
+    String selectDictNoteByCode(@Param(value = "dictCode")String dictCode,
+                                @Param(value = "colName")String colName);
+    Map<String,String> selectName(@Param(value = "stdMeteId")Long stdMeteId);
+    Long selectPresetId(@Param(value = "instanceId")Long instanceId);
+    Long selectCameraId(@Param(value = "instanceId")Long instanceId);
 }

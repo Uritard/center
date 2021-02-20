@@ -433,7 +433,7 @@ public class TWarnInfoController {
     @ApiOperation(value = "告警弹框")
     @GetMapping(value = "/warnPopUp")
     @Logs(title = "告警弹框",content = "告警弹窗",logType = 5)
-    public Result warnPopUp(@RequestParam(value = "warnId", required = true) Long warnId,
+    public Result warnPopUp(@RequestParam(value = "warnId", required = true) String warnId,
                             @RequestParam(value = "defectModel", required = true) Integer defectModel) {
         Result result = new Result();
         try {

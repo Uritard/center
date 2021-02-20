@@ -828,5 +828,46 @@
         <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
 
     </select>
+    <select id="selectDictNoteByCode" resultType="java.lang.String">
+        SELECT
+            a.dict_note
+        FROM
+            t_dict_business a
+        WHERE 1 = 1
+        <if test="dictCode != null "> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
+        <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectName" resultType="java.util.Map">
+        SELECT
+        a.mete_name,
+        b.device_name,
+        d.real_code
+    FROM
+        t_std_devicemete a,
+        t_std_device b,
+        t_std_device_attr d
+    WHERE 1 = 1
+        <if test="stdMeteId != null "> and a.device_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+    and a.device_id = b.device_id
+    and a.custom_id = b.custom_id
+    and a.device_id = d.device_id
+    </select>
+    <select id="selectPresetId" resultType="java.lang.Long">
+        SELECT
+            a.cruise_id as presetId
+        FROM
+            t_cruise_point_instance a
+        WHERE 1 = 1
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+    </select>
+    <select id="selectCameraId" resultType="java.lang.Long">
+    SELECT
+        k.camera_id
+    FROM
+        t_cruise_point_instance a
+    LEFT JOIN t_camera_preset k on k.preset_id = a.cruise_id
+    WHERE 1 = 1
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+    </select>
 
 </mapper>

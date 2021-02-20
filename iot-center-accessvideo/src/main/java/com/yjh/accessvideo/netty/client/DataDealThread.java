@@ -469,7 +469,9 @@ public class DataDealThread implements Runnable {
                                         for (int i = 0; i < resultArr.length; i++) {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
-                                            String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                            String redisFlag =  jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                            String defectRedisName = "defectInfo:" + redisFlag ;
+                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectLevel",analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                             defectMap.put("defectContent", resultArr[i]);
@@ -484,33 +486,18 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("defectTime",defectTime);
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
-                                            TDefectInfo tDefectInfo = new TDefectInfo();
-                                            tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel")));
-                                            tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime")));//缺陷识别时间
-                                            tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType")));
-                                            tDefectInfo.setDefectContent(defectMap.get("defectContent"));
-                                            tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId")));
-                                            tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId")));
-                                            tDefectInfo.setCunstomId(defectMap.get("customId"));
-                                            tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId")));
-                                            tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode")));
-                                            tDefectInfo.setImagePath(defectMap.get("imagePath"));
-                                            tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource")));
-
-                                            TStdDevicemete tStdDeviceMeteMM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(defectMap.get("instanceId")));
-
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
-                                            String alarmNote = tStdDeviceMeteMM.getAlarmNote();
+                                            String alarmNote = tStdDevicemete.getAlarmNote();
                                             log.info("该测点是否配置了告警提示是===" + alarmNote);
-                                            Integer defectLevel = tDefectInfo.getDefectLevel();
+                                            Integer defectLevel = Integer.valueOf(defectMap.get("defectLevel"));
                                             log.info("产生的该条缺陷的等级是===" + defectLevel);
                                             if (alarmNote != null && "1".equals(alarmNote)) {
                                                 if (defectLevel == 133 ) {//危急
                                                     //webSocket通知前端调用查询告警弹框的接口
                                                     Map<String, Object> jasonMaps2 = new HashMap<>();
                                                     jasonMaps2.put("type", "alarmPopUp");
-                                                    jasonMaps2.put("warnId", tDefectInfo.getDefectId());
-                                                    jasonMaps2.put("defectModel", tDefectInfo.getDefectType());
+                                                    jasonMaps2.put("warnId", defectMap.get("redisFlag"));
+                                                    jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                     String json = JSON.toJSONString(jasonMaps2);
                                                     log.info("发送给前端的消息：" + json);
                                                     WebSocketServer.sendMsg(json);
