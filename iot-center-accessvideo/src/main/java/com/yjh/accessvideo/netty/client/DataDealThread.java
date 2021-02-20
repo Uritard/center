@@ -436,7 +436,8 @@ public class DataDealThread implements Runnable {
                                     if (resultArr.length == 1) {
                                         log.info("--------____--------单一缺陷");
                                         Map<String, String> defectMap = new HashMap<>();
-                                        String defectRedisName = "defectInfo:" + jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        String redisFlag =  jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        String defectRedisName = "defectInfo:" + redisFlag ;
                                         // TODO: 2021/2/19 判别并获取对应缺陷的缺陷算法等级
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
                                         defectMap.put("defectLevel",analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
@@ -472,7 +473,7 @@ public class DataDealThread implements Runnable {
                                                 //webSocket通知前端调用查询告警弹框的接口
                                                 Map<String, Object> jasonMaps2 = new HashMap<>();
                                                 jasonMaps2.put("type", "alarmPopUp");
-                                                jasonMaps2.put("warnId", defectMap.get("redisFlag"));
+                                                jasonMaps2.put("warnId", redisFlag);
                                                 jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                 String json = JSON.toJSONString(jasonMaps2);
                                                 log.info("发送给前端的消息：" + json);
@@ -514,7 +515,7 @@ public class DataDealThread implements Runnable {
                                                     //webSocket通知前端调用查询告警弹框的接口
                                                     Map<String, Object> jasonMaps2 = new HashMap<>();
                                                     jasonMaps2.put("type", "alarmPopUp");
-                                                    jasonMaps2.put("warnId", defectMap.get("redisFlag"));
+                                                    jasonMaps2.put("warnId", redisFlag);
                                                     jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                     String json = JSON.toJSONString(jasonMaps2);
                                                     log.info("发送给前端的消息：" + json);
