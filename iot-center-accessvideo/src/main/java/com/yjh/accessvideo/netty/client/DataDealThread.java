@@ -500,16 +500,11 @@ public class DataDealThread implements Runnable {
 
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                             String alarmNote = tStdDeviceMeteMM.getAlarmNote();
-                                            Integer alarmLevel = tStdDeviceMeteMM.getAlarmLevel();
-                                            Integer warnLevel = tDefectInfo.getDefectLevel();
                                             log.info("该测点是否配置了告警提示是===" + alarmNote);
-                                            log.info("该测点告警推送配置的告警等级是===" + alarmLevel);
-                                            log.info("产生的该条告警等级是===" + warnLevel);
-                                            log.info("一层判断" + (alarmNote != null && "1".equals(alarmNote)));
-                                            log.info("二层判断" + (warnLevel == alarmLevel || warnLevel > alarmLevel));
-
+                                            Integer defectLevel = tDefectInfo.getDefectLevel();
+                                            log.info("产生的该条缺陷的等级是===" + defectLevel);
                                             if (alarmNote != null && "1".equals(alarmNote)) {
-                                                if (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel) {
+                                                if (defectLevel == 133 ) {//危急
                                                     //webSocket通知前端调用查询告警弹框的接口
                                                     Map<String, Object> jasonMaps2 = new HashMap<>();
                                                     jasonMaps2.put("type", "alarmPopUp");
