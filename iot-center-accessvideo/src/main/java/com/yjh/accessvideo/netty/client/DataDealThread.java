@@ -733,6 +733,9 @@ public class DataDealThread implements Runnable {
                     log.info("两表开始插入");
                     analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
                     analyseDataOperateService.batchInsertCruiseDataResult(dataList);
+                    log.info("------------点结果插入后调用updateCruiseResultIds----------------------");
+                    Constant.otherServerList(cruiseResultIds,Constant.TASK_FINISH);
+                    log.info("----------------------------------");
                     redisTemplate.delete("cruiseKeys:" + TASKID);
                     log.info("Loading........清空本任务至此的巡视点");
 //                if (warnList.size() > 0) {
@@ -797,9 +800,6 @@ public class DataDealThread implements Runnable {
                         log.info("发送给前端的消息：" + json);
                         WebSocketServer.sendMsg(json);
 
-                        log.info("------------任务结束调用cruiseResult----------------------");
-                        Constant.otherServerList(cruiseResultIds,Constant.TASK_FINISH);
-                        log.info("----------------------------------");
 
                         //任务执行完成 删除当前任务的缓存
                         redisTemplate.delete("taskConstant:" + TASKID);
