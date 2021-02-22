@@ -395,10 +395,10 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "测点巡检时间记录表维护")
     @PostMapping(value = "/updateCruiseAnalyze")
     @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
-    public Result updateCruiseAnalyze() {
+    public Result updateCruiseAnalyze(@RequestBody List<String> cruiseResultIdList) {
         Result result = new Result();
         try {
-            result.setData(tCruiseDataResultService.updateCruiseAnalyze());
+            result.setData(tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("测点巡检时间记录表维护失败：" + e);

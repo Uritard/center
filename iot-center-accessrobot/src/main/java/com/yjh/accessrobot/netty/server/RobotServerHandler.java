@@ -301,11 +301,17 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         String code = "";
         if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
-            log.info("我们这边存在这个机器人,连它");
+            log.info("缓存有这个机器人,连它");
              code = "200";//成功
         }else {
-            log.info("对不起,不存在这个机器人");
-             code = "400";//拒绝
+            List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
+            if (robotCodeList.contains(xmlBaseModel.getSendCode())){
+                code = "200";//成功
+                log.info("缓存无，表中有，连它");
+            }else {
+                code = "400";//拒绝
+                log.info("缓存无，表中无，不给它");
+            }
         }
 
         if ("251".equals(xmlBaseModel.getType())){

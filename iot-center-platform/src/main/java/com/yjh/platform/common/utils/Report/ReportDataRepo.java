@@ -37,7 +37,7 @@ public class ReportDataRepo {
 //    };
     //明细
     private static final String[] TASK_PORT_INFO = {
-            "序号", "实物编码", "巡视设备", "巡视点", "图片","巡视值", "识别状态", "审核状态","审核值","审核结果","巡视时间"
+            "序号", "实物ID", "巡视设备", "巡视点", "图片","巡视值", "识别状态", "审核状态","审核值","审核结果","巡视时间"
     };
 
     public static  ContentData getData(ReportData param) {

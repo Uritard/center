@@ -208,9 +208,9 @@ public class TCruiseDataResultService {
         return tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
     }
     @Transactional(rollbackFor = Exception.class)
-    public int updateCruiseAnalyze(){
+    public int updateCruiseAnalyze(List<String> cruiseResultIdList){
         List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-        List<String> cruiseResultIdList = tCruiseDataResultDao.test();
+//        List<String> cruiseResultIdList = tCruiseDataResultDao.test();
         int updateRes = 0;
         int insertRes = 0;
         for (String cruiseResultId: cruiseResultIdList){

@@ -196,7 +196,10 @@ public class RobotService {
         WebSocketServer.sendMsg(json);*/
         return res;
     }
-
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> selectAllRobotCode() {
+        return tRobotInfoDao.selectAllRobotCode();
+    }
     //@Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
