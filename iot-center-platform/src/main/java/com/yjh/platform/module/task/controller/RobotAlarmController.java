@@ -136,14 +136,15 @@ public class RobotAlarmController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询机器人本体告警数据",content = "根据用户传递的参数分页查询机器人本体告警",logType = 1)
-    public Result selectByPage(@RequestBody RobotAlarm robotAlarm
-                              //  @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                //@RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
+    public Result selectByPage(@RequestBody RobotAlarm robotAlarm,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
                                ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(robotAlarm.getPageNum()!=null?robotAlarm.getPageNum():1, robotAlarm.getPageSize()!=null?robotAlarm.getPageSize():0,true,null,true);
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+          //  Page page = PageHelper.startPage(robotAlarm.getPageNum()!=null?robotAlarm.getPageNum():1, robotAlarm.getPageSize()!=null?robotAlarm.getPageSize():0,true,null,true);
             List<RobotAlarm> list = robotAlarmService.selectByPage(robotAlarm);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

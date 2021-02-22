@@ -138,14 +138,15 @@ public class TCfgTeleadjustController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询遥调数据",content = "根据用户传递的参数查询遥调信息",logType = 1)
-    public Result selectByPage(@RequestBody TCfgTeleadjust tCfgTeleadjust
-//                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-//                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
+    public Result selectByPage(@RequestBody TCfgTeleadjust tCfgTeleadjust,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
     ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(tCfgTeleadjust.getPageNum()!=null?tCfgTeleadjust.getPageNum():1, tCfgTeleadjust.getPageSize()!=null?tCfgTeleadjust.getPageSize():0,true,null,true);
+              Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+          //  Page page = PageHelper.startPage(tCfgTeleadjust.getPageNum()!=null?tCfgTeleadjust.getPageNum():1, tCfgTeleadjust.getPageSize()!=null?tCfgTeleadjust.getPageSize():0,true,null,true);
             List<TCfgTeleadjust> list = tCfgTeleadjustService.selectByPage(tCfgTeleadjust);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
