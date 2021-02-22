@@ -230,10 +230,10 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("tCDRList的内容是===" + tCDRList);
                 //批量插入TCTRD库
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
-                StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
                 log.info("res1的内容是===" + res1);
                 //批量插入TCDR库
                 int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
+                StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
                 log.info("res2的内容是===" + res2);
 
                 //将公共类的instanceIdList清空
