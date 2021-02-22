@@ -213,14 +213,14 @@ public class CheckTaskAreJob extends QuartzJobBean {
         redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForGet);
         //查库
         log.info("开始入库");
+            if(TCDRList.size()>0){
+                tCruiseDataResultDao.batchInsert(TCDRList);
+            }
         if(TCTRDList.size()>0){
             tCruiseTaskResultDetailDao.batchInsert(TCTRDList);
             tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
         }
 
-        if(TCDRList.size()>0){
-            tCruiseDataResultDao.batchInsert(TCDRList);
-        }
 
 
 
