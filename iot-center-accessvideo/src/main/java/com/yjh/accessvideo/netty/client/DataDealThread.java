@@ -395,9 +395,9 @@ public class DataDealThread implements Runnable {
                                                             WebSocketServer.sendMsg(json);
                                                         }
                                                     }
-
-                                                    //删除告警redis
-                                                    redisTemplate.delete(warnName);
+//
+//                                                    //删除告警redis
+//                                                    redisTemplate.delete(warnName);
                                                 }
                                             } catch (Exception e) {
                                                 log.error("告警入库失败" + e);
