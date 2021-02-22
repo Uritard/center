@@ -163,13 +163,13 @@ public class SystemInfoService {
                 Integer all = Integer.valueOf(map.get("capacityTotal"));
                 Integer other = all - use;
                 map.put("use",other.toString());
-                map.put("recoderName",item.getRecordName());
+                map.put("recorderName",item.getRecordName());
             }else {
                 map.put("recordId",item.getRecordId().toString());
-                map.put("recordName",item.getRecordName());
-                map.put("freeTotal","-");
-                map.put("capacityTotal","-");
-                map.put("use","-");
+                map.put("recorderName",item.getRecordName());
+                map.put("freeTotal","0");
+                map.put("capacityTotal","0");
+                map.put("use","0");
             }
 
             reList.add(map);
