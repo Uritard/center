@@ -9,6 +9,7 @@ import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -186,6 +187,8 @@ public class RunAtNowTask implements Runnable{
             WebSocketServer.sendMsg(json);
             log.info(taskDate+"需要执行的任务");
 
+            TCruiseDataResultService tCruiseDataResultService  = StaticContextAccessor.getBean(TCruiseDataResultService.class);
+
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
@@ -313,7 +316,7 @@ public class RunAtNowTask implements Runnable{
 
             log.info("开始巡检"+new Date());
 
-
+            List<String> cruiseResultIdList = new ArrayList<>();
             for (TCruisePointInstanceNameDetail item : instancesList) {
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                 tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
@@ -353,6 +356,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetail.setEndTime(new Date());
                         tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                         tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                        cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                         Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                         String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
@@ -455,6 +459,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetail.setEndTime(new Date());
                         tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                         tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                        cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                          tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                          str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
@@ -606,6 +611,7 @@ public class RunAtNowTask implements Runnable{
                             tCruiseTaskResultDetail.setEndTime(new Date());
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                              tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                              str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
@@ -770,6 +776,8 @@ public class RunAtNowTask implements Runnable{
                 mapForAbnormal.put("normal",normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
             }
+
+            tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
             //任务结束生成结果，
             Analysis analysis = new Analysis();
             analysis.setTaskId(taskId);

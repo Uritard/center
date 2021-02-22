@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -55,6 +56,9 @@ public class TaskShutDownJob extends QuartzJobBean {
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TCruiseDataResultService tCruiseDataResultService;
+
 
     //表记分析
     private void analysis(Map<String, List<Analysis>> analysisMap) {
@@ -131,6 +135,7 @@ public class TaskShutDownJob extends QuartzJobBean {
             List<TCruiseTaskResultDetail> TCTRDList = new ArrayList();
             List<TCruiseDataResult> TCDRList = new ArrayList();
             int taskWait = 0;
+            List<String> cruiseResultIdList = new ArrayList<>();
             if(instanceIdList.size() != 0) {
                 List<TCruisePointInstanceNameDetail> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
                 for (TCruisePointInstanceNameDetail item : instancesList) {
@@ -172,6 +177,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseTaskResultDetail.setCruiseStatus(253);
                         tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
                         TCTRDList.add(tCruiseTaskResultDetail);
+                        cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
 
                         //TCDR
@@ -241,6 +247,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         String cruiseTime = simpleDateFormat.format(new Date());
                         tCruiseTaskResultDetail.setCruiseStatus(253);
                         TCTRDList.add(tCruiseTaskResultDetail);
+                        cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                         tCruiseDataResult.setCruiseResultId(tCruiseResult.getTaskResultId() + item.getInstanceId().toString());
@@ -306,6 +313,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                 log.info("开始入库");
                 if (TCTRDList.size() > 0) {
                     tCruiseTaskResultDetailDao.batchInsert(TCTRDList);
+                    tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
                 }
 
                 if (TCDRList.size() > 0) {
@@ -328,6 +336,7 @@ public class TaskShutDownJob extends QuartzJobBean {
             tCruiseTaskResult.setTaskStatus(242);
             tCruiseTaskResult.setCruiseResult(247);
             tCruiseTaskResultDao.insert(tCruiseTaskResult);
+
 
             Map<String,Object> jasonMapOnFinished=new HashMap<>();
             jasonMapOnFinished.put("type","newTask");

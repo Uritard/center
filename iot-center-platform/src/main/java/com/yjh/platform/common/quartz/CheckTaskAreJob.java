@@ -11,6 +11,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
@@ -54,6 +55,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
     private TCruiseDataResultDao tCruiseDataResultDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private TCruiseDataResultService tCruiseDataResultService;
 
     //算法接口
     private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
@@ -99,6 +102,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         //检查每个点的状态
         List<TCruiseTaskResultDetail> TCTRDList = new ArrayList();
             List<TCruiseDataResult> TCDRList = new ArrayList();
+            List<String> cruiseResultIdList = new ArrayList<>();
         for(Long item:instanceIdList){
             Map<String,String> mapForCruise  = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
             if(mapForCruise.size()>0){
@@ -137,6 +141,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(mapForCruise.get("cruiseStatus").toString()));
                 tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
                 TCTRDList.add(tCruiseTaskResultDetail);
+                cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
 
                 //TCDR
@@ -210,6 +215,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         log.info("开始入库");
         if(TCTRDList.size()>0){
             tCruiseTaskResultDetailDao.batchInsert(TCTRDList);
+            tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
         }
 
         if(TCDRList.size()>0){

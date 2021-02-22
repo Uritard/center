@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -14,6 +15,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
@@ -122,6 +124,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                 //任务超期时间
                 Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                 tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
+
+                TCruiseDataResultService tCruiseDataResultService  = StaticContextAccessor.getBean(TCruiseDataResultService.class);
 
                 Date taskStart = new Date();
                 log.info("开始进行任务" +taskStart);
@@ -250,7 +254,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                 log.info("开始巡检"+new Date());
 
-
+                List<String> cruiseResultIdList = new ArrayList<>();
                 for (TCruisePointInstanceNameDetail item : instancesList) {
 
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -291,6 +295,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetail.setEndTime(new Date());
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
+                            //tCruiseDataResultService.updateCruiseAnalyze();
 
                             Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                             String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
@@ -396,6 +402,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                              tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                              str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
@@ -548,6 +555,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseTaskResultDetail.setEndTime(new Date());
                                 tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                                 tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                                cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                                  tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                                  str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
@@ -714,6 +722,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                     mapForAbnormal.put("normal",normal.toString());
                     redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
                 }
+                tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
+
                 //任务结束生成结果，
                 Analysis analysis = new Analysis();
                 analysis.setTaskId(tCruiseTask.getTaskId());
