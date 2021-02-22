@@ -178,7 +178,7 @@ public class HomePageService {
                 item.setMileage("");//里程
             }
             Map<String,Object> mapForControlModel  = redisTemplate.opsForHash().entries("RobotStatus:"+item.getRobotCode()+":61");
-            if(mapForMileage.size() != 0){
+            if(mapForControlModel.size() != 0){
                 String model = mapForControlModel.get("value").toString();
                 if("1".equals(model)){
                     model = "任务模式";
