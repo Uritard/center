@@ -44,6 +44,8 @@ public class CruiseResultDealThread implements Runnable{
 
             List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
             List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
+            List<String> cruiseResultIdList = new ArrayList<>();
+
 
             String taskId = cruiseResultMap.get("taskCode");
 
@@ -181,6 +183,7 @@ public class CruiseResultDealThread implements Runnable{
                                 .setDeviceName(redisInfoMap.get("deviceName"))
                                 .setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
                         tCTRDList.add(tCruiseTaskResultDetail);
+                        cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
 
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
                                 .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
@@ -227,6 +230,7 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("tCDRList的内容是===" + tCDRList);
                 //批量插入TCTRD库
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
+                StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
                 log.info("res1的内容是===" + res1);
                 //批量插入TCDR库
                 int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);//批量插tCDRList

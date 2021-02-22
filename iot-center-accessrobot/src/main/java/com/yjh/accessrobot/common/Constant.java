@@ -58,4 +58,10 @@ public class Constant {
     //缺陷接口
     public static final String defectUrl = "http://iot-center-accessvideo/analysis/v1/defect";
 
+    public static<T> Result otherServerList( List<T> list, String url){
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
+    }
+    public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
+
+
 }
