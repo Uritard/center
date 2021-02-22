@@ -312,6 +312,8 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                             tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                             tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
+                            tCruiseTaskResultDetailMap.put("cameraId",tCameraPreset.getCameraId().toString());
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             continue;
                         }

@@ -372,6 +372,9 @@ public class RunAtNowTask implements Runnable{
 
                         tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                         tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                        tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                        TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
+                        tCruiseTaskResultDetailMap.put("cameraId",tCameraPreset.getCameraId().toString());
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         continue;
                     }
