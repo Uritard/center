@@ -310,8 +310,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
                             tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
 
-                            //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
-                            //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                            tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
+                            tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             continue;
                         }
