@@ -151,7 +151,7 @@ public class SystemInfoService {
         List<Map<String,String>> reList = new ArrayList<>();
         for (TCameraRecorderDetail item:list) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",item.getRecordId() );
+            recordIdMap.put("recorderId",item.getRecordId() );
             Result re = getNVRInfo(recordIdMap);
 
             if(re == null){
@@ -165,7 +165,7 @@ public class SystemInfoService {
                 map.put("use",other.toString());
                 map.put("recorderName",item.getRecordName());
             }else {
-                map.put("recordId",item.getRecordId().toString());
+                map.put("recorderId",item.getRecordId().toString());
                 map.put("recorderName",item.getRecordName());
                 map.put("freeTotal","0");
                 map.put("capacityTotal","0");
