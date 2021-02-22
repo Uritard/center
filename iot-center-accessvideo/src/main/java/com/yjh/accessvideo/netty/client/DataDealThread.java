@@ -798,9 +798,7 @@ public class DataDealThread implements Runnable {
                         WebSocketServer.sendMsg(json);
 
                         log.info("------------任务结束调用cruiseResult----------------------");
-                        Map<String,List<String>> taskFinishFun=new HashMap<>();
-                        taskFinishFun.put("cruiseResultIdList",cruiseResultIds);
-                        Constant.otherServer(taskFinishFun,Constant.TASK_FINISH);
+                        Constant.otherServerList(cruiseResultIds,Constant.TASK_FINISH);
                         log.info("----------------------------------");
 
                         //任务执行完成 删除当前任务的缓存
