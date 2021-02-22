@@ -353,6 +353,22 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetail.setEndTime(new Date());
                         tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                         tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+
+                        Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                        String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
+                        Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                        tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
+                        tCruiseTaskResultDetailMap.put("taskId",taskId);
+                        tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
+                        tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
+                        tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
+                        tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
+                        tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
+                        tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
+
+                        //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
+                        //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                        redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         continue;
                     }
 
