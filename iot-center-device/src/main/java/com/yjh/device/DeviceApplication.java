@@ -2,6 +2,7 @@ package com.yjh.device;
 
 import com.yjh.device.commons.restTemplate.ServiceRestTemplate;
 import org.apache.catalina.connector.Connector;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
@@ -25,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableDiscoveryClient
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
 @EnableFeignClients
-public class DeviceApplication {
+public class DeviceApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         SpringApplication.run(DeviceApplication.class, args);
@@ -46,6 +47,11 @@ public class DeviceApplication {
             }
         });
         return factory;
+    }
+
+    @Override
+    public void run(String... strings) throws Exception {
+        //
     }
 
     @LoadBalanced

@@ -186,7 +186,7 @@ public class SystemInfoService {
 //            }
             re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.NVR_URL, map, Result.class);
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return re;
     }
