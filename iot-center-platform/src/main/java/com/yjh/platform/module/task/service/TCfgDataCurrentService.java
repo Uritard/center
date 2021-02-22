@@ -304,7 +304,7 @@ public class TCfgDataCurrentService {
             log.info("cfgDevice:"+currents.get(0).getDeviceId().toString());
             jasonMap.put("deviceName", tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName());
             jasonMap.put("time",simpleDateFormat.format(new Date()));
-            jasonMap.put("warnContent", "触发联动");
+            jasonMap.put("warnContent",  tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName()+"触发联动");
             String jsonT = JSON.toJSONString(jasonMap);
             log.info("发送给前端的消息：" + jsonT);
             WebSocketServer.sendMsg(jsonT);

@@ -224,7 +224,7 @@ public class TCruiseTaskResultService {
                 }
                 cruiseInspectResult.setVideoInfo(videoInfo);
 
-            } else {
+            } else if(Objects.nonNull(resultMap.get("robotId"))){
                 HashMap<String, Long> robot = new HashMap<>();
                 robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
                 Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
@@ -232,6 +232,9 @@ public class TCruiseTaskResultService {
                 videoInfo.putAll((Map<String, String>) result.getData());
                 videoInfo.put("cameraId", null);
                 cruiseInspectResult.setVideoInfo(videoInfo);
+            }
+            else {
+
             }
             inspectResult = cruiseInspectResult;
 //                }

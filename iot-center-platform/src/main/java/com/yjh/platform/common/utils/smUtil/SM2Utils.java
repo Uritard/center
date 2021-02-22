@@ -225,6 +225,7 @@ public class SM2Utils {
 	    SM2Result sm2Result = new SM2Result();
 	    sm2Result.r = r;
 	    sm2Result.s = s;
+
 //	    System.out.println("r: " + sm2Result.r.toString(16));
 //	    System.out.println("s: " + sm2Result.s.toString(16));
 //	    System.out.println("");
