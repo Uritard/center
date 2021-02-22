@@ -211,25 +211,32 @@ public class TCruiseDataResultService {
     public int updateCruiseAnalyze(List<String> cruiseResultIdList){
         List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
         log.info("deviceMeteIdList==="+deviceMeteIdList);
+        log.info("cruiseResultIdList==="+cruiseResultIdList);
         int updateRes = 0;
         int insertRes = 0;
         for (String cruiseResultId: cruiseResultIdList){
             TStdDeviceMeteUpdate tStdDeviceMeteUpdateTemp = tCruiseDataResultDao.selectCruiseAnalyze(cruiseResultId);
             TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
                     .setDeviceMeteId(tStdDeviceMeteUpdateTemp.getDeviceMeteId())
-                    .setUpdateTime(tStdDeviceMeteUpdateTemp.getUpdateTime())
-                    .setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult())
-                    .setIdentifyResult(tStdDeviceMeteUpdateTemp.getIdentifyResult())
-                    .setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
+                    .setIdentifyResult(tStdDeviceMeteUpdateTemp.getIdentifyResult());
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getUpdateTime())){
+                tStdDeviceMeteUpdate.setUpdateTime(tStdDeviceMeteUpdateTemp.getUpdateTime());
+            }
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getCruiseResult())){
+                tStdDeviceMeteUpdate.setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult());
+            }
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){
+                tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
+            }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
             if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
-                log.info("存在,更新值");
                 //更新
                 updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值");
             }else {
                 //插入
-                log.info("不存在,插入值");
                 insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值");
             }
         }
         return updateRes+insertRes;
