@@ -71,6 +71,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
+
     public boolean getIsThreadStart() {
         return isThreadStart;
     }
@@ -155,6 +156,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
+        log.info("Onlinesizett: " + maps.size());
 
         StringBuilder Str = new StringBuilder();
         for (byte byteItem : bytes) {
@@ -283,15 +285,15 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     }
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception  {
         log.info("robotServerHandlerMap==="+robotServerHandlerMap);
-        Map<String, String> platformServerMap = redisTemplate.opsForHash().entries("t_sys_param:PlatformServer");
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-        Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
-        Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
-        Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
+         Map<String, String> platformServerMap = redisTemplate.opsForHash().entries("t_sys_param:PlatformServer");
+         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+         Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
+         Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
+         Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
+         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
 
-        Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
         Iterator<String> iterator = allRobotCodeMap.keySet().iterator();
         List<String> allRobotCodeList = new ArrayList<>();
         while(iterator.hasNext()){
@@ -304,14 +306,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             log.info("缓存有这个机器人,连它");
              code = "200";//成功
         }else {
-            List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
-            if (robotCodeList.contains(xmlBaseModel.getSendCode())){
+            /*List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
+            if (robotCodeList.contains(xmlBaseModel.getSendCode())){*/
                 code = "200";//成功
-                log.info("缓存无，表中有，连它");
-            }else {
-                code = "400";//拒绝
-                log.info("缓存无，表中无，不给它");
-            }
+//                log.info("缓存无，表中有，连它");
+//            }else {
+//                code = "400";//拒绝
+//                log.info("缓存无，表中无，不给它");
+//            }
         }
 
         if ("251".equals(xmlBaseModel.getType())){
@@ -341,13 +343,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
                         robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
                     }
+                    robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     //启动线程
                     HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart);
                     Thread thread = new Thread(dataDealThread);
                     thread.setDaemon(true);
                     thread.start();
-
-                    robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     break;  
                 //心跳指令(发送响应)
                 case "2512":
@@ -745,6 +746,26 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     void procSend(String robotCode, Map<String, String> robotStatusMap) {
         heartNum ++;
         int res = heartNum;
+
+        /*Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("t_sys_param:AllRobotCode");
+        Iterator<String> iterator = allRobotCodeMap.keySet().iterator();
+        List<String> allRobotCodeList = new ArrayList<>();
+        while(iterator.hasNext()){
+            String key=iterator.next();
+            String value = allRobotCodeMap.get(key);
+            allRobotCodeList.add(value);
+        }
+        if (allRobotCodeList.contains(robotCode)){
+            log.info("缓存有这个机器人,发送心跳相应");
+        }else {
+            List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
+            if (robotCodeList.contains(robotCode)){
+                log.info("缓存无，表中有这个机器人,发送心跳相应");
+            }else {
+                log.info("缓存无，表中无这个机器人,断开相应");
+            }
+        }*/
+
         if (res > 3){
             StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
             robotStatusMap.put("value","1");//异常
