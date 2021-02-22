@@ -210,7 +210,7 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public int updateCruiseAnalyze(List<String> cruiseResultIdList){
         List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-//        List<String> cruiseResultIdList = tCruiseDataResultDao.test();
+        log.info("deviceMeteIdList==="+deviceMeteIdList);
         int updateRes = 0;
         int insertRes = 0;
         for (String cruiseResultId: cruiseResultIdList){
@@ -223,13 +223,13 @@ public class TCruiseDataResultService {
                     .setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
             if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
+                log.info("存在,更新值");
                 //更新
                 updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info("更新");
             }else {
                 //插入
+                log.info("不存在,插入值");
                 insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info("插入");
             }
         }
         return updateRes+insertRes;
