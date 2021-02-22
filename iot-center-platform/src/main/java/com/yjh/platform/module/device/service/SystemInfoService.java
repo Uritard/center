@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.SystemInfoUtil;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
@@ -179,10 +180,11 @@ public class SystemInfoService {
     private static Result getNVRInfo(HashMap map) {
         Result re = null;
         try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,map);
-            }
+//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+//            if (null != serviceRestTemplate) {
+//                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,map);
+//            }
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.NVR_URL, map, Result.class);
         } catch (Exception e) {
 
         }
