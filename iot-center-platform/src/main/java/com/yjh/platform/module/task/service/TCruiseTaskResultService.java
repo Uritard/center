@@ -172,71 +172,73 @@ public class TCruiseTaskResultService {
 
 //            for (String key : cruiseKeys) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
-            //log.info("---___---:" + resultMap);
+            log.info("------------------MAP-----------------" + resultsMap.size());
+
+            if (resultMap.size() != 0) {
+                //log.info("---___---:" + resultMap);
 //                if (resultMap.get("instanceId").toString().equals(cruiseInspectResult.getInstanceId().toString())) {
-            cruiseInspectResult.setCruiseStatus(tDictBusinessDao.selectDictNoteByDictCode(resultMap.get("cruiseStatus").toString()));
-            if (resultMap.get("resultNum").toString().equals("") || resultMap.get("resultNum").toString().equals("null")) {
-                cruiseInspectResult.setCruiseResultName("--");
-            } else {
-                cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
-            }
-            if (resultMap.get("endTime").equals("null")) {
-                cruiseInspectResult.setEndTime(null);
-            } else {
-                cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));
-            }
-            if (Objects.nonNull(resultMap.get("isWarn"))) {
-                if (resultMap.get("isWarn").toString().equals("1")) {
-                    cruiseInspectResult.setIsWarn("有");
+                cruiseInspectResult.setCruiseStatus(tDictBusinessDao.selectDictNoteByDictCode(resultMap.get("cruiseStatus").toString()));
+                if (resultMap.get("resultNum").toString().equals("") || resultMap.get("resultNum").toString().equals("null")) {
+                    cruiseInspectResult.setCruiseResultName("--");
                 } else {
-                    cruiseInspectResult.setIsWarn("无");
+                    cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
                 }
-            }
-            if (Objects.nonNull(resultMap.get("picpath"))) {
-                cruiseInspectResult.setImagePath(resultMap.get("picpath").toString());
-            } else {
-                cruiseInspectResult.setImagePath("");
-            }
-
-            Map<String, String> videoInfo = new HashMap<>();
-            if (Objects.nonNull(resultMap.get("cameraId"))) {
-                if(redisTemplate.opsForHash().entries("cruiseVideo:"+taskId+(cruiseInspectResult.getInstanceId()).toString()).size()==0){
-                    HashMap<String, Long> camera = new HashMap<>();
-                    camera.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
-                    try{
-                        Result result = sendGetRequest(Constant.START_CAMERA_URL, camera);
-                        videoInfo.putAll((Map<String, String>) result.getData());
-                        log.info("result："+result);
-                    }catch (Exception e){
-                        log.error("播放失败："+e);
-                        videoInfo.put("flvUrl","null");
-                        videoInfo.put("rtmpUrl","null");
-                    }finally {
-                        videoInfo.put("cameraId", resultMap.get("cameraId").toString());
-                        redisTemplate.opsForHash().putAll("cruiseVideo:"+taskId+(cruiseInspectResult.getInstanceId()).toString(),videoInfo);
+                if (resultMap.get("endTime").equals("null")) {
+                    cruiseInspectResult.setEndTime(null);
+                } else {
+                    cruiseInspectResult.setEndTime(simpleDateFormat.parse(resultMap.get("endTime").toString()));
+                }
+                if (Objects.nonNull(resultMap.get("isWarn"))) {
+                    if (resultMap.get("isWarn").toString().equals("1")) {
+                        cruiseInspectResult.setIsWarn("有");
+                    } else {
+                        cruiseInspectResult.setIsWarn("无");
                     }
-                }else {
-                    Map<String,Object>cruiseVideoInfo=redisTemplate.opsForHash().entries("cruiseVideo:"+taskId+(cruiseInspectResult.getInstanceId()).toString());
-                    videoInfo.put("cameraId",cruiseVideoInfo.get("cameraId").toString());
-                    videoInfo.put("flvUrl",cruiseVideoInfo.get("flvUrl").toString());
-                    videoInfo.put("rtmpUrl",cruiseVideoInfo.get("rtmpUrl").toString());
+                }
+                if (Objects.nonNull(resultMap.get("picpath"))) {
+                    cruiseInspectResult.setImagePath(resultMap.get("picpath").toString());
+                } else {
+                    cruiseInspectResult.setImagePath("");
+                }
+
+                Map<String, String> videoInfo = new HashMap<>();
+                if (Objects.nonNull(resultMap.get("cameraId"))) {
+                    if (redisTemplate.opsForHash().entries("cruiseVideo:" + taskId + (cruiseInspectResult.getInstanceId()).toString()).size() == 0) {
+                        HashMap<String, Long> camera = new HashMap<>();
+                        camera.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
+                        try {
+                            Result result = sendGetRequest(Constant.START_CAMERA_URL, camera);
+                            videoInfo.putAll((Map<String, String>) result.getData());
+                            log.info("result：" + result);
+                        } catch (Exception e) {
+                            log.error("播放失败：" + e);
+                            videoInfo.put("flvUrl", "null");
+                            videoInfo.put("rtmpUrl", "null");
+                        } finally {
+                            videoInfo.put("cameraId", resultMap.get("cameraId").toString());
+                            redisTemplate.opsForHash().putAll("cruiseVideo:" + taskId + (cruiseInspectResult.getInstanceId()).toString(), videoInfo);
+                        }
+                    } else {
+                        Map<String, Object> cruiseVideoInfo = redisTemplate.opsForHash().entries("cruiseVideo:" + taskId + (cruiseInspectResult.getInstanceId()).toString());
+                        videoInfo.put("cameraId", cruiseVideoInfo.get("cameraId").toString());
+                        videoInfo.put("flvUrl", cruiseVideoInfo.get("flvUrl").toString());
+                        videoInfo.put("rtmpUrl", cruiseVideoInfo.get("rtmpUrl").toString());
+
+                    }
+                    cruiseInspectResult.setVideoInfo(videoInfo);
+
+                } else if (Objects.nonNull(resultMap.get("robotId"))) {
+                    HashMap<String, Long> robot = new HashMap<>();
+                    robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
+                    Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+
+                    videoInfo.putAll((Map<String, String>) result.getData());
+                    videoInfo.put("cameraId", null);
+                    cruiseInspectResult.setVideoInfo(videoInfo);
+                } else {
 
                 }
-                cruiseInspectResult.setVideoInfo(videoInfo);
-
-            } else if(Objects.nonNull(resultMap.get("robotId"))){
-                HashMap<String, Long> robot = new HashMap<>();
-                robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
-                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-
-                videoInfo.putAll((Map<String, String>) result.getData());
-                videoInfo.put("cameraId", null);
-                cruiseInspectResult.setVideoInfo(videoInfo);
-            }
-            else {
-
-            }
-            inspectResult = cruiseInspectResult;
+                inspectResult = cruiseInspectResult;
 //                }
 //            }
 
@@ -261,6 +263,7 @@ public class TCruiseTaskResultService {
 //                resultsMap.put("imageArray",imageArray);
 //            }
 
+            }
         }
 
 
