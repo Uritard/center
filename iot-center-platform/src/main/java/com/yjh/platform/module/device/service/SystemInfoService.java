@@ -153,7 +153,7 @@ public class SystemInfoService {
         for (TCameraRecorderDetail item:list) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recorderId",item.getRecordId() );
-            Result re = getNVRInfo(recordIdMap);
+            Result re = getNVRInfo(item.getRecordId());
 
             if(re == null){
                 continue;
@@ -177,14 +177,14 @@ public class SystemInfoService {
         }
         return reList;
     }
-    private static Result getNVRInfo(HashMap map) {
+    private static Result getNVRInfo(Long recordId) {
         Result re = null;
         try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,map);
-//            }
-            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.NVR_URL, map, Result.class);
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,recordId);
+            }
+//            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.NVR_URL, map, Result.class);
         } catch (Exception e) {
             e.getMessage();
         }
