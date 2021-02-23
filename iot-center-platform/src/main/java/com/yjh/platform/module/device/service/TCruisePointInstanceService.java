@@ -118,21 +118,21 @@ public class TCruisePointInstanceService{
 //            listAll.get(length).getInfraredType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
 //        }
         //在线监控  内容未作
-        if("231".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
-            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
-            Map<Object,Object> map3 = new HashMap<>();
-            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-            listAll.get(length).getVoiceType().getList().add(map3);
-            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
-        }
-        //scada 内容未作
-        if("233".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
-            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
-            Map<Object,Object> map3 = new HashMap<>();
-            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-            listAll.get(length).getVoiceType().getList().add(map3);
-            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
-        }
+//        if("231".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
+//            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+//            Map<Object,Object> map3 = new HashMap<>();
+//            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+//            listAll.get(length).getVoiceType().getList().add(map3);
+//            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+//        }
+//        //scada 内容未作
+//        if("233".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
+//            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+//            Map<Object,Object> map3 = new HashMap<>();
+//            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+//            listAll.get(length).getVoiceType().getList().add(map3);
+//            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+//        }
     }
     private int isIn(List<TStdDeviceMeteForPointDetail> listAll,Long deviceMeteId){
         int i = -1;

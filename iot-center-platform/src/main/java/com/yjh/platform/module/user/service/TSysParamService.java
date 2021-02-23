@@ -4,6 +4,7 @@ import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.user.entity.TSysParam;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +82,16 @@ public class TSysParamService{
             redisTemplate.opsForHash().putAll(str, map);
         }
         return 1;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectQuery(List<String> params) {
+        List<TSysParam> list = this.tSysParamDao.selectQuery(params);
+        Map<String,Object> mapFOrRe = new HashMap<>();
+        for (TSysParam item: list){
+            mapFOrRe.put(item.getParamCode(),item.getContent());
+        }
+        return mapFOrRe;
     }
 
 

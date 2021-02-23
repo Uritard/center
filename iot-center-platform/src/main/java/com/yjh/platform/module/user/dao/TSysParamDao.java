@@ -33,5 +33,5 @@ public interface TSysParamDao {
 
     List<TSysParam>selectAll();
     TSysParam selectByParamType(@Param(value = "paramType") String paramType);
-
+    List<TSysParam> selectQuery(@Param("params") List<String> params);
 }

@@ -256,6 +256,8 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseDataResult.setCruiseName(item.getCruiseName());
                         tCruiseDataResult.setResultNum("任务终止");
                         tCruiseDataResult.setCruiseResult(247);
+                        tCruiseDataResult.setEvaluationState(257);
+                        tCruiseDataResult.setIsWarn(0);
 
                         Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail, true));
                         String str = "t_cruise_task_result:" + taskId + ":" + item.getInstanceId();
