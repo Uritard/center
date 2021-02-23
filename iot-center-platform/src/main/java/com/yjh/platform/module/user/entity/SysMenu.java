@@ -98,5 +98,7 @@ public class SysMenu implements Serializable {
     @ApiModelProperty(value = "系统状态（0系统，1 非系统）")
     private Integer sysState;
 
+    private Integer pageNum=1;
 
+    private Integer pageSize=0;
 }

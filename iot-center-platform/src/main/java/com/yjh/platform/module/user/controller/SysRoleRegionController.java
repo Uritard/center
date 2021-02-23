@@ -125,13 +125,11 @@ public class SysRoleRegionController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询角色和机器人关联数据",content = "根据用户传递的参数分页查询角色和机器人关联信息",logType = 1)
-    public Result selectByPage(@RequestBody SysRoleRegion sysRoleRegion,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody SysRoleRegion sysRoleRegion ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(sysRoleRegion.getPageNum()!=null?sysRoleRegion.getPageNum():1, sysRoleRegion.getPageSize()!=null?sysRoleRegion.getPageSize():0,true,null,true);
             List<SysRoleRegion> list = sysRoleRegionService.selectByPage(sysRoleRegion);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

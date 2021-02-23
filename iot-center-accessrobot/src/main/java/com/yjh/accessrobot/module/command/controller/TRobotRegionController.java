@@ -124,13 +124,12 @@ public class TRobotRegionController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    public Result selectByPage(@RequestBody TRobotRegion tRobotRegion,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+    public Result selectByPage(@RequestBody TRobotRegion tRobotRegion
+        ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize);
+            Page page = PageHelper.startPage(tRobotRegion.getPageNum()!=null?tRobotRegion.getPageNum():1, tRobotRegion.getPageSize()!=null?tRobotRegion.getPageSize():100 );
             List<TRobotRegion> list = tRobotRegionService.selectByPage(tRobotRegion);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

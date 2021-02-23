@@ -62,7 +62,7 @@ public class TRobotAlarm implements Serializable {
     @TableField(value = "alarm_info",updateStrategy = FieldStrategy.IGNORED)
     private String alarmInfo;
 
-    @Past
+
     @ApiModelProperty(value = "告警时间")
     @TableField(value = "alarm_time",updateStrategy = FieldStrategy.IGNORED)
     private Date alarmTime;
@@ -81,7 +81,7 @@ public class TRobotAlarm implements Serializable {
     @TableField(value = "deal_person_id",updateStrategy = FieldStrategy.IGNORED)
     private String dealPersonId;
 
-    @Past
+
     @ApiModelProperty(value = "处理时间")
     private Date dealTime;
 
@@ -99,13 +99,15 @@ public class TRobotAlarm implements Serializable {
     @ApiModelProperty(value = "0 未处理  1 处理")
     private Integer alarmState;
 
-    @Past
+
     @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private Date createTime;
 
-    @Past
+
     @TableField(value = "end_time",updateStrategy = FieldStrategy.IGNORED)
     private Date endTime;
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 
 }

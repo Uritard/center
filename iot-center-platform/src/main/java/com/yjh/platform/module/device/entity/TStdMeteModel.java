@@ -55,5 +55,7 @@ public class TStdMeteModel implements Serializable {
     @ApiModelProperty(value = "层级标志")
     private int level = 2;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

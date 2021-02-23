@@ -78,7 +78,7 @@ public class SysOrg implements Serializable {
     @TableField(value = "dept_name",updateStrategy = FieldStrategy.IGNORED)
     private String deptName;
 
-//    private Integer pageNum;
-//
-//    private Integer pageSize;
+    private Integer pageNum=1;
+
+    private Integer pageSize=0;
 }

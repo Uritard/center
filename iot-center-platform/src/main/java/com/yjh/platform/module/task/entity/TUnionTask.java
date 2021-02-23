@@ -70,14 +70,14 @@ public class TUnionTask implements Serializable {
     @TableField(value = "ruleName",updateStrategy = FieldStrategy.IGNORED)
     private String ruleName;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "巡视时间")
     @TableField(value = "start_time",updateStrategy = FieldStrategy.IGNORED)
     private Date startTime;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
@@ -98,4 +98,7 @@ public class TUnionTask implements Serializable {
     @ApiModelProperty(value = "具体治理规则")
     private String ruleContent;
 
+    private Integer pageNum = 1;
+
+    private Integer pageSize = 0;
 }

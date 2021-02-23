@@ -165,7 +165,11 @@ public class Demo {
      * @throws Exception 异常
      */
     public static String decrypt(String pCode) throws IOException {
-        return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte("04" + pCode)));
+        if(StringUtils.isNoneBlank(pCode)){
+            return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte("04" + pCode)));
+        }else {
+            return  "";
+        }
     }
 
     /**
@@ -176,7 +180,11 @@ public class Demo {
      * @throws Exception 异常
      */
     public static String decryptDB(String pCode) throws IOException {
-        return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte(pCode)));
+        if(StringUtils.isNoneBlank(pCode)) {
+            return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte(pCode)));
+        }else {
+            return  "";
+        }
     }
 
     /**

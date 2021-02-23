@@ -142,13 +142,12 @@ public class TStdDeviceAttrController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询标准化设备参数",content = "根据用户传递的参数查询标准化设备参数",logType = 1)
-    public Result selectByPage(@RequestBody TStdDeviceAttr tStdDeviceAttr,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TStdDeviceAttr tStdDeviceAttr
+                             ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tStdDeviceAttr.getPageNum()!=null?tStdDeviceAttr.getPageNum():1, tStdDeviceAttr.getPageSize()!=null?tStdDeviceAttr.getPageSize():0,true,null,true);
             List<TStdDeviceAttr> list = tStdDeviceAttrService.selectByPage(tStdDeviceAttr);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

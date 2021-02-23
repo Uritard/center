@@ -140,13 +140,11 @@ public class SysMenuController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询菜单数据",content = "根据用户传递的参数分页查询菜单信息",logType = 1)
-    public Result selectByPage(@RequestBody SysMenu sysMenu,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody SysMenu sysMenu) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            Page page = PageHelper.startPage(sysMenu.getPageNum()!=null?sysMenu.getPageNum():1, sysMenu.getPageSize()!=null?sysMenu.getPageSize():0, true, null, true);
             List<SysMenu> list = sysMenuService.selectByPage(sysMenu);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

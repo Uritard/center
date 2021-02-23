@@ -139,13 +139,12 @@ public class TVideoAlgoResultController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询视频轮训任务结果",content = "根据用户传递的参数分页查询视频轮训任务结果信息",logType = 1)
-    public Result selectByPage(@RequestBody TVideoAlgoResult tVideoAlgoResult,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TVideoAlgoResult tVideoAlgoResult
+                                ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tVideoAlgoResult.getPageNum()!=null?tVideoAlgoResult.getPageNum():1, tVideoAlgoResult.getPageSize()!=null?tVideoAlgoResult.getPageSize():0,true,null,true);
             List<TVideoAlgoResult> list = tVideoAlgoResultService.selectByPage(tVideoAlgoResult);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

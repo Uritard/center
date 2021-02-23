@@ -280,13 +280,12 @@ public class TCameraPresetController {
     @ApiOperation(value = "分页查询")
     @PostMapping(value = "/selectByPage")
     @Logs(title = "查询预置位信息",content = "根据用户传递的参数分页查询预置位信息",logType = 1)
-    public Result selectByPage(@RequestBody TCameraPreset tCameraPreset,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TCameraPreset tCameraPreset
+                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tCameraPreset.getPageNum()!=null?tCameraPreset.getPageNum():1, tCameraPreset.getPageSize()!=null?tCameraPreset.getPageSize():0,true,null,true);
             List<TCameraPresetExpand> list = tCameraPresetService.selectByPage(tCameraPreset);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

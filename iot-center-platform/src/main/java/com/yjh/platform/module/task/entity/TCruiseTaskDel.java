@@ -31,17 +31,19 @@ public class TCruiseTaskDel implements Serializable {
     @TableField(value = "task_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskId;
 
-    @Past
+
     @ApiModelProperty(value = "巡视时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @TableField(value = "del_time",updateStrategy = FieldStrategy.IGNORED)
     private Date delTime;
 
-    @Past
+
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private Date createTime;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

@@ -70,6 +70,8 @@ public class TCruiseTaskAttr implements Serializable {
     @Max(value=999999999)
     @ApiModelProperty(value = "是否支持人工巡视")
     private Integer ifArtificial;
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 
 }

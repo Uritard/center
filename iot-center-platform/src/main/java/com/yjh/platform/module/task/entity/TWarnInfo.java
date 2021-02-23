@@ -38,7 +38,7 @@ public class TWarnInfo implements Serializable {
     @ApiModelProperty(value = "告警等级")
     private Integer warnLevel;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "告警时间")
     private Date warnTime;
@@ -96,7 +96,7 @@ public class TWarnInfo implements Serializable {
     @TableField(value = "deal_person_id",updateStrategy = FieldStrategy.IGNORED)
     private String dealPersonId;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "确认时间")
     private Date dealTime;
@@ -141,5 +141,7 @@ public class TWarnInfo implements Serializable {
     @TableField(value = "task_id",updateStrategy = FieldStrategy.IGNORED)
     private String taskId;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

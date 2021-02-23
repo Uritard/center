@@ -144,13 +144,12 @@ public class TRobotInspectionController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询机器人巡检点信息",content = "根据用户传递的参数分页查询机器人巡检点信息",logType = 1)
-    public Result selectByPage(@RequestBody TRobotInspection tRobotInspection,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TRobotInspection tRobotInspection
+        ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tRobotInspection.getPageNum()!=null?tRobotInspection.getPageNum():1, tRobotInspection.getPageSize()!=null?tRobotInspection.getPageSize():0,true,null,true);
             List<TRobotInspection> list = tRobotInspectionService.selectByPage(tRobotInspection);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

@@ -136,13 +136,12 @@ public class TCruiseTypeController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询巡视类型关联实例点数据",content = "根据用户传递的参数分页查询巡视类型关联实例点信息",logType = 1)
-    public Result selectByPage(@RequestBody TCruiseType tCruiseType,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TCruiseType tCruiseType
+                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tCruiseType.getPageNum()!=null?tCruiseType.getPageNum():1, tCruiseType.getPageSize()!=null?tCruiseType.getPageSize():0,true,null,true);
             List<TCruiseTypeDetail> list = tCruiseTypeService.selectByPage(tCruiseType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

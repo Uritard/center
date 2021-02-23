@@ -78,19 +78,21 @@ public class TCruiseTask implements Serializable {
     @ApiModelProperty(value = "任务等级(从高到低):4级,3级,2级,1级")
     private Integer taskLevel;
 
-    @Past
+
     @ApiModelProperty(value = "巡视时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
      @TableField(value = "start_time",updateStrategy = FieldStrategy.IGNORED)
     private Date startTime;
 
-    @Past
+
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private Date createTime;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 
 
 }

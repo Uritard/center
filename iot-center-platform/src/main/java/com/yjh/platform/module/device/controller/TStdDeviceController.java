@@ -269,13 +269,12 @@ public class TStdDeviceController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1)
-    public Result selectByPage(@RequestBody TStdDevice tStdDevice,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TStdDevice tStdDevice
+                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tStdDevice.getPageNum()!=null?tStdDevice.getPageNum():1, tStdDevice.getPageSize()!=null?tStdDevice.getPageSize():0,true,null,true);
             List<TStdDevice> list = tStdDeviceService.selectByPage(tStdDevice);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -290,16 +289,15 @@ public class TStdDeviceController {
     @ApiOperation(value = "分页查询设备及属性")
     @RequestMapping(value = "/selectByPageAll", method = RequestMethod.POST)
     @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1)
-    public Result selectByPageAll(@RequestBody TStdDeviceDetail tStdDeviceDetail,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPageAll(@RequestBody TStdDeviceDetail tStdDeviceDetail
+                              ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
 //            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceDetail.getUpRegionId());
             List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tStdDeviceDetail.getUpRegionId());
             log.info("upRegionIds:"+upRegionIds);
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tStdDeviceDetail.getPageNum()!=null?tStdDeviceDetail.getPageNum():1, tStdDeviceDetail.getPageSize()!=null?tStdDeviceDetail.getPageSize():0,true,null,true);
             List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail, upRegionIds);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

@@ -51,5 +51,9 @@ public class TRobotRegion implements Serializable {
 
     private Date createTime;
 
+    private Integer pageNum = 1;
+
+    private Integer pageSize = 100;
+
 
 }

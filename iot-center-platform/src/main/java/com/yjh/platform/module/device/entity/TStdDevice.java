@@ -95,15 +95,17 @@ public class TStdDevice implements Serializable {
     @ApiModelProperty(value = "设备状态(0：新建，1：在线，2：离线)")
     private Integer status;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

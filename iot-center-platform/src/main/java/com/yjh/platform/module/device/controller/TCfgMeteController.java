@@ -150,13 +150,12 @@ public class TCfgMeteController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询系统测点数据",content = "根据用户传递的参数查询系统测点信息",logType = 1)
-    public Result selectByPage(@RequestBody TCfgMete tCfgMete,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TCfgMete tCfgMete
+                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tCfgMete.getPageNum()!=null?tCfgMete.getPageNum():1, tCfgMete.getPageSize()!=null?tCfgMete.getPageSize():0,true,null,true);
             List<TCfgMete> list = tCfgMeteService.selectByPage(tCfgMete);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

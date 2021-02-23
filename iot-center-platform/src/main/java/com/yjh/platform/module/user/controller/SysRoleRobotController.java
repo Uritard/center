@@ -125,13 +125,12 @@ public class SysRoleRobotController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询角色和机器人关联数据",content = "根据用户传递的参数分页查询角色和机器人关联信息",logType = 1)
-    public Result selectByPage(@RequestBody SysRoleRobot sysRoleRobot,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody SysRoleRobot sysRoleRobot
+                                ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(sysRoleRobot.getPageNum()!=null?sysRoleRobot.getPageNum():1, sysRoleRobot.getPageSize()!=null?sysRoleRobot.getPageSize():0,true,null,true);
             List<SysRoleRobot> list = sysRoleRobotService.selectByPage(sysRoleRobot);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
