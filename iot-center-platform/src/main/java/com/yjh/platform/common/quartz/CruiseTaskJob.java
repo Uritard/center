@@ -480,6 +480,22 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
                                 //log.info("tCruiseTaskResultDetailMap" +tCruiseTaskResultDetailMap);
                                 //log.info("tCruiseDataResultMap" +tCruiseDataResultMap);
+
+                                List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
+                                TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
+                                Integer recognitionMode = 0;
+                                if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
+                                    recognitionMode = 1;
+                                }
+                                if("on".equals(tStdDevicemete.getIsAi())){
+                                    if(recognitionMode == 1){
+                                        recognitionMode = 0;
+                                    }else {
+                                        recognitionMode = 2;
+                                    }
+                                }
+                                tCruiseTaskResultDetailMap.put("recognitionMode",recognitionMode.toString());
+
                                 redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                                 //抓图成功 算法分析
                                 if(redisTemplate.hasKey("analysisList:"+taskId)) {
@@ -491,8 +507,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     analysisInstanceList.add(item.getInstanceId().toString());
                                     redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                                 }
-                                List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
-                                TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
+
                                 for (TAlgorithmInfo tAlgorithmInfo:tAlgorithmInfoList) {
                                     Analysis analysis = new Analysis();
                                     analysis.setTaskId(tCruiseTask.getTaskId());
