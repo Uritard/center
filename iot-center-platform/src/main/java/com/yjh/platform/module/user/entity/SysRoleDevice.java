@@ -40,5 +40,7 @@ public class SysRoleDevice implements Serializable {
     @TableField(value = "is_checked",updateStrategy = FieldStrategy.IGNORED)
     private String isChecked;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

@@ -42,7 +42,7 @@ public class THisSignalData implements Serializable {
     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
-    @Past
+
     @ApiModelProperty(value = "数值时间")
     private Date recordTime;
 
@@ -61,5 +61,7 @@ public class THisSignalData implements Serializable {
     @TableField(value = "last_mete_value",updateStrategy = FieldStrategy.IGNORED)
     private String lastMeteValue;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

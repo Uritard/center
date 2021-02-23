@@ -54,7 +54,9 @@ public class TStdMeteModelDetail extends TStdDeviceMeteDetail implements Seriali
     private String modelName;
 
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 
 
 

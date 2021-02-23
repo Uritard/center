@@ -47,10 +47,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Service
 public class SysUserService {
-    //国密规范测试公钥
-    private static final String prik = "055C74CFB227BD9CDFF242D233096BC6FDBAFB59D001D5EE7F857ADFC6BF1501";
-    //国密规范测试公钥
-    private static final String pubk = "04673FC4F3D41C9470E32AABCB5A958E2CE528959F373D0F7AB2B82E65BF4DE8FB67716A269993585451888C8450E92A75A6C34EDFF748097BEAD8E41C2976E8AA";
     @Autowired
     private SysUserDao sysUserDao;
     @Resource
@@ -103,10 +99,8 @@ public class SysUserService {
             String userName=null;
             String password=null;
             if("true".equals(securityProperties.getIsDecode())) {
-                 userName =//userMap.get("userName");
-                        Demo.decrypt(userMap.get("userName"));
-                 password =//userMap.get("password");
-                        Demo.decrypt(userMap.get("password"));
+                 userName =Demo.decrypt(userMap.get("userName"));
+                 password =Demo.decrypt(userMap.get("password"));
                 // String verfiCode = userMap.get("verfiCode");
             }else{
                  userName =userMap.get("userName");
@@ -114,10 +108,9 @@ public class SysUserService {
             }
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
-            if("true".equals(securityProperties.getIsDecode())) {
-                sysUserLogin.setUserName(Demo.encryption(sysUserLogin.getUserName()));
-                sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
-            }
+//            if("true".equals(securityProperties.getIsDecode())) {
+//                sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
+//            }
             if (!Objects.equals(null, sysUserLogin)) {
                 SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
                 Map verMap = new LinkedHashMap<>();

@@ -131,15 +131,15 @@ public class TAlgorithmConfBakController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "分页查询算法配置信息",content = "根据用户传递的参数分页查询算法配置信息",logType = 1)
-    public Result selectByPage(@RequestBody TAlgorithmConfBak tAlgorithmConfBak,//)
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize)
+    public Result selectByPage(@RequestBody TAlgorithmConfBak tAlgorithmConfBak)
+//                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+//                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize)
                                  {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-          //  Page page = PageHelper.startPage(tAlgorithmConfBak.getPageNum()!=null?tAlgorithmConfBak.getPageNum():1, tAlgorithmConfBak.getPageSize()!=null?tAlgorithmConfBak.getPageSize():0,true,null,true);
+            //Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tAlgorithmConfBak.getPageNum()!=null?tAlgorithmConfBak.getPageNum():1, tAlgorithmConfBak.getPageSize()!=null?tAlgorithmConfBak.getPageSize():0,true,null,true);
             List<TAlgorithmConfBak> list = tAlgorithmConfBakService.selectByPage(tAlgorithmConfBak);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

@@ -128,13 +128,12 @@ public class THisSignalDataController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询遥信历史数据",content = "根据用户传递的参数分页查询遥信历史数据",logType = 1)
-    public Result selectByPage(@RequestBody THisSignalData tHisSignalData,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody THisSignalData tHisSignalData
+                                ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tHisSignalData.getPageNum()!=null?tHisSignalData.getPageNum():1, tHisSignalData.getPageSize()!=null?tHisSignalData.getPageSize():0,true,null,true);
             List<THisSignalData> list = tHisSignalDataService.selectByPage(tHisSignalData);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

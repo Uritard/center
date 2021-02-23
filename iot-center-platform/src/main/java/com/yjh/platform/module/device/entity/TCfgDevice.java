@@ -56,12 +56,12 @@ public class TCfgDevice implements Serializable {
     @TableField(value = "relationCode",updateStrategy = FieldStrategy.IGNORED)
     private String relationCode;
 
-    @Past
+
     @ApiModelProperty(value = "创建时间")
      @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private Date createTime;
 
-    @Past
+
     @ApiModelProperty(value = "更新时间")
     @TableField(value = "update_time",updateStrategy = FieldStrategy.IGNORED)
     private Date updateTime;
@@ -71,5 +71,7 @@ public class TCfgDevice implements Serializable {
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

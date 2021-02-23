@@ -61,5 +61,7 @@ public class TDictBusiness implements Serializable {
     @TableField(value = "sort",updateStrategy = FieldStrategy.IGNORED)
     private Long sort;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

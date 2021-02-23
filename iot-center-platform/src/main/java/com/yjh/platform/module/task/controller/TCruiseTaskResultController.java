@@ -136,13 +136,12 @@ public class TCruiseTaskResultController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询任务点状态数据",content = "根据用户传递的参数分页查询任务点状态信息",logType = 1)
-    public Result selectByPage(@RequestBody TCruiseTaskResult tCruiseTaskResult,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TCruiseTaskResult tCruiseTaskResult
+                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tCruiseTaskResult.getPageNum()!=null?tCruiseTaskResult.getPageNum():1, tCruiseTaskResult.getPageSize()!=null?tCruiseTaskResult.getPageSize():0,true,null,true);
             List<TCruiseTaskResult> list = tCruiseTaskResultService.selectByPage(tCruiseTaskResult);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

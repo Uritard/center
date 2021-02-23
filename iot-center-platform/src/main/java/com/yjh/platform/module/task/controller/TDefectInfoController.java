@@ -148,13 +148,12 @@ public class TDefectInfoController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询陷信息数据",content = "根据用户传递的参数分页查询缺陷信息",logType = 1)
-    public Result selectByPage(@RequestBody TDefectInfo tDefectInfo,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TDefectInfo tDefectInfo
+                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tDefectInfo.getPageNum()!=null?tDefectInfo.getPageNum():1, tDefectInfo.getPageSize()!=null?tDefectInfo.getPageSize():0,true,null,true);
             List<TDefectInfo> list = tDefectInfoService.selectByPage(tDefectInfo);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

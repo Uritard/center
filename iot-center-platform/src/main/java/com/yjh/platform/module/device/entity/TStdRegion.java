@@ -64,11 +64,13 @@ public class TStdRegion implements Serializable {
     @ApiModelProperty(value = "0:非当前变电站 1：当前变电站")
     private Integer state;
 
-    @Past
+
     private Date createTime;
 
     @Length(max = 32,message = "stationName长度必须小于等于32")
     private  String stationName;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

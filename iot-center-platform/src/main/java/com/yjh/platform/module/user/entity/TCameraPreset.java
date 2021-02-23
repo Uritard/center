@@ -81,4 +81,8 @@ public class TCameraPreset implements Serializable {
     @Length(max = 255,message = "remark长度必须小于等于255")
     @ApiModelProperty(value = "备注")
     private String remark ;
+
+    private Integer pageNum = 1;
+
+    private Integer pageSize = 0;
 }

@@ -65,17 +65,18 @@ public class TAlgorithmConf implements Serializable {
     @TableField(value = "apply_module",updateStrategy = FieldStrategy.IGNORED)
     private Integer applyModule;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @Past
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
 
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 
 }

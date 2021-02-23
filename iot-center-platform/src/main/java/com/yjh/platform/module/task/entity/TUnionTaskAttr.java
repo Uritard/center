@@ -60,5 +60,7 @@ public class TUnionTaskAttr implements Serializable {
     private Integer ifInferad;
 
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

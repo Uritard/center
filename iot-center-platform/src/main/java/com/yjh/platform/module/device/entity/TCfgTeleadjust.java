@@ -108,7 +108,7 @@ public class TCfgTeleadjust implements Serializable {
     @ApiModelProperty(value = "是否可控")
     private Integer controlenable;
 
-//    private Integer pageNum;
-//
-//    private Integer pageSize;
+    private Integer pageNum=1;
+
+    private Integer pageSize=0;
 }

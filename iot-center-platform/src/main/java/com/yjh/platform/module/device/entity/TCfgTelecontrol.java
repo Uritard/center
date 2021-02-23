@@ -90,6 +90,8 @@ public class TCfgTelecontrol implements Serializable {
     @ApiModelProperty(value = "态值描述")
     @TableField(value = "describer",updateStrategy = FieldStrategy.IGNORED)
     private String describer;
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 
 }

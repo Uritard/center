@@ -38,5 +38,7 @@ public class TCruiseType implements Serializable {
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

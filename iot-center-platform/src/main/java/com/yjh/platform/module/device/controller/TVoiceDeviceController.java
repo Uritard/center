@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
 import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -49,8 +50,8 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增声纹设备数据",content = "根据用户传递的参数新增声纹设备数据",logType = 2)
-    public Result add(@Validated  @RequestBody TVoiceDevice tVoiceDevice) {
+    @Logs(title = "新增声纹设备数据", content = "根据用户传递的参数新增声纹设备数据", logType = 2)
+    public Result add(@Validated @RequestBody TVoiceDevice tVoiceDevice) {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.add(tVoiceDevice));
@@ -65,7 +66,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除声纹设备数据",content = "根据用户传递的参数删除声纹设备数据",logType = 4)
+    @Logs(title = "删除声纹设备数据", content = "根据用户传递的参数删除声纹设备数据", logType = 4)
     public Result delete(@RequestParam(value = "voiceDeviceId", required = true) String voiceDeviceId) {
         Result result = new Result();
         try {
@@ -82,7 +83,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改声纹设备数据",content = "根据用户传递的参数修改声纹设备数据",logType = 3)
+    @Logs(title = "修改声纹设备数据", content = "根据用户传递的参数修改声纹设备数据", logType = 3)
     public Result update(@RequestBody TVoiceDevice tVoiceDevice) {
         Result result = new Result();
         try {
@@ -99,7 +100,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询声纹设备数据",content = "根据用户传递的参数查询声纹设备",logType = 1)
+    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数查询声纹设备", logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "voiceDeviceId", required = true) String voiceDeviceId) {
         Result result = new Result();
         try {
@@ -114,13 +115,13 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询声纹设备数据",content = "根据用户传递的参数查询声纹设备",logType = 1)
+    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数查询声纹设备", logType = 1)
     public Result select(@RequestParam(value = "voiceDeviceId", required = false) String voiceDeviceId,
-                            @RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
-                            @RequestParam(value = "stdDeviceId", required = false) Long stdDeviceId,
-                            @RequestParam(value = "deviceType", required = false) String deviceType,
-                            @RequestParam(value = "configId", required = false) String configId,
-                         @RequestParam(value = "upRegionId", required = false)Long upRegionId) {
+                         @RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
+                         @RequestParam(value = "stdDeviceId", required = false) Long stdDeviceId,
+                         @RequestParam(value = "deviceType", required = false) String deviceType,
+                         @RequestParam(value = "configId", required = false) String configId,
+                         @RequestParam(value = "upRegionId", required = false) Long upRegionId) {
         Result result = new Result();
         try {
             List<TVoiceDevice> list = tVoiceDeviceService.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId, upRegionId);
@@ -134,14 +135,13 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询声纹设备数据",content = "根据用户传递的参数分页查询声纹设备",logType = 1)
-    public Result selectByPage(@RequestBody TVoiceDevice tVoiceDevice,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数分页查询声纹设备", logType = 1)
+    public Result selectByPage(@RequestBody TVoiceDevice tVoiceDevice
+                             ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tVoiceDevice.getPageNum()!=null?tVoiceDevice.getPageNum():1, tVoiceDevice.getPageSize()!=null?tVoiceDevice.getPageSize():0,  true, null, true);
             List<TVoiceDevice> list = tVoiceDeviceService.selectByPage(tVoiceDevice);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
@@ -155,40 +155,40 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
-    @Logs(title = "批量插入声纹设备数据",content = "根据用户传递的参数批量插入声纹设备数据",logType = 2)
+    @Logs(title = "批量插入声纹设备数据", content = "根据用户传递的参数批量插入声纹设备数据", logType = 2)
     public Result batchAdd(@Validated @RequestBody List<TVoiceDevice> list) {
         Result result = new Result();
         try {
-        result.setData(tVoiceDeviceService.batchAdd(list));
+            result.setData(tVoiceDeviceService.batchAdd(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
         }
         return result;
     }
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
-    @Logs(title = "删除声纹设备数据",content = "根据用户传递的参数批量删除声纹设备",logType = 4)
+    @Logs(title = "删除声纹设备数据", content = "根据用户传递的参数批量删除声纹设备", logType = 4)
     public Result batchDelete(@RequestParam(value = "voiceDeviceIds") String voiceDeviceIds) {
-    Result result = new Result();
-    try {
-        result.setData(tVoiceDeviceService.batchDelete(voiceDeviceIds));
-    } catch (BusinessException e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量删除失败：" + e);
-    }catch (Exception e) {
-        result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量删除错误:", e);
-    }
-    return result;
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.batchDelete(voiceDeviceIds));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量删除失败：" + e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量删除错误:", e);
+        }
+        return result;
     }
 
 
     @ApiOperation(value = "查询音频设备树")
     @RequestMapping(value = "/selectVoiceDeviceTree", method = RequestMethod.GET)
-    @Logs(title = "查询音频设备树",content = "音频设备树查询",logType = 1)
-    public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName",required = false)String voiceDeviceName) {
+    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1)
+    public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName) {
         Result result = new Result();
         try {
             List<VoiceDevice> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName);

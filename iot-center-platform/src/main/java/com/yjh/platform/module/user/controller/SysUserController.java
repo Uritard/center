@@ -153,7 +153,6 @@ public class SysUserController {
             if("true".equals(securityProperties.getIsDecode())) {
                 List<SysUser> enUser=new ArrayList<>();
                 for(SysUser list:sysUser){
-                    list.setUserName(Demo.encryption(list.getUserName()));
                     list.setPassword(Demo.encryption(list.getPassword()));
                     enUser.add(list);
                 }
@@ -179,7 +178,6 @@ public class SysUserController {
                 userName = Demo.decrypt(userName);
                 List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
                 for (SysUser list : sysUsers) {
-                    list.setUserName(Demo.encryption(list.getUserName()));
                     list.setPassword(Demo.encryption(list.getPassword()));
                     enUser.add(list);
                 }
@@ -231,7 +229,6 @@ public class SysUserController {
                 password = Demo.decrypt(password);
                 List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
                 for (SysUser lists : list) {
-                    lists.setUserName(Demo.encryption(lists.getUserName()));
                     lists.setPassword(Demo.encryption(lists.getPassword()));
                     enUser.add(lists);
                 }
@@ -250,13 +247,15 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询系统用户数据",content = "根据用户传递的参数分页查询系统用户信息",logType = 1)
-    public Result selectByPage(@RequestBody SysUser sysUser,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody SysUser sysUser
+//                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+//                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
+    ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+          //  Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            Page page = PageHelper.startPage(sysUser.getPageNum()!=null?sysUser.getPageNum():1, sysUser.getPageSize()!=null?sysUser.getPageSize():0, true, null, true);
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
@@ -267,7 +266,7 @@ public class SysUserController {
                 List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
                 for (Map<String, String> map : list) {
                     for (Map.Entry<String, String> m : map.entrySet()) {
-                        if (m.getKey().equals("userName") || m.getKey().equals("password")) {
+                        if (m.getKey().equals("password")) {
                             m.setValue(Demo.encryption(m.getValue()));
                         }
                     }
@@ -451,10 +450,10 @@ public class SysUserController {
                 {
                     result.setMessage("新密码不能和旧密码重复");
                     return result;
-                } else if (map.get("newPassword").contains(sysUserCurrent.getUserName())) {
+                } else if (newPassword.contains(sysUserCurrent.getUserName())) {
                     result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
                     return result;
-                } else if (!map.get("newPassword").matches(PW_PATTERN)) {
+                } else if (!newPassword.matches(PW_PATTERN)) {
                     result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
                     return result;
                 } else {

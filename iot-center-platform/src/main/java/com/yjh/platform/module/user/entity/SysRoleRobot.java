@@ -35,5 +35,7 @@ public class SysRoleRobot implements Serializable {
     @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }

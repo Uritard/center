@@ -128,22 +128,22 @@ public class SysUserBackUp implements Serializable {
     @ApiModelProperty(value = "员工状态")
     private Integer userStatus;
 
-    @Past
+
     @ApiModelProperty(value = "创建日期",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
-    @Past
+
     @ApiModelProperty(value = "修改日期",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    @Past
+
     @ApiModelProperty(value = "失效时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date invalidTime;
 
-    @Past
+
     @ApiModelProperty(value = "最后登录时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastLogin;

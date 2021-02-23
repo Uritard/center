@@ -184,9 +184,8 @@ public class TStdDevicemeteController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1)
-    public Result selectByPage(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail
+                              ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -194,7 +193,7 @@ public class TStdDevicemeteController {
             if (upRegionIds.size() == 0) {
                 upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
             }
-            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            Page page = PageHelper.startPage(tStdDeviceMeteDetail.getPageNum()!=null?tStdDeviceMeteDetail.getPageNum():1, tStdDeviceMeteDetail.getPageSize()!=null?tStdDeviceMeteDetail.getPageSize():0, true, null, true);
             List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

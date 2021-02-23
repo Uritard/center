@@ -56,6 +56,8 @@ public class SysRole implements Serializable {
     @Max(value=9)
     @ApiModelProperty(value = "1系统权限，0非系统权限")
     private Integer sysState;
+    private Integer pageNum=1;
 
+    private Integer pageSize=0;
 
 }

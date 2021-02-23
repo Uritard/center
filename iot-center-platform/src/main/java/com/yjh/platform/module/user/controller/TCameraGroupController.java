@@ -136,13 +136,12 @@ public class TCameraGroupController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询相机分组信息",content = "根据用户传递的参数分页查询相机分组信息",logType = 1)
-    public Result selectByPage(@RequestBody TCameraGroup tCameraGroup,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    public Result selectByPage(@RequestBody TCameraGroup tCameraGroup
+                                ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            Page page = PageHelper.startPage(tCameraGroup.getPageNum()!=null?tCameraGroup.getPageNum():1, tCameraGroup.getPageSize()!=null?tCameraGroup.getPageSize():0,true,null,true);
             List<TCameraGroup> list = tCameraGroupService.selectByPage(tCameraGroup);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

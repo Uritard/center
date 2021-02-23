@@ -70,8 +70,8 @@ public class TAlgorithmConfBak implements Serializable {
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
 
-//    private Integer pageNum;
-//
-//    private Integer pageSize;
+    private Integer pageNum=1;
+
+    private Integer pageSize=0;
 
 }

@@ -40,10 +40,11 @@ public class TCameraScreen implements Serializable {
     @TableField(value = "camera_ids",updateStrategy = FieldStrategy.IGNORED)
     private String cameraIds;
 
-    @Past
     @ApiModelProperty(value = "创建日期")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    private Integer pageNum = 1;
 
+    private Integer pageSize = 0;
 }
