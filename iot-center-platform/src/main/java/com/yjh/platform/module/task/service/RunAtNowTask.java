@@ -417,9 +417,10 @@ public class RunAtNowTask implements Runnable{
                         Integer cameraState = Integer.valueOf(mapForCameraState.get("state"));
                         if(cameraState == 1){//摄像头在任务中
                             while (cameraState == 1){
-                                Thread.sleep(waitTime+10000);
+                                Thread.sleep(waitTime+1000);
                                 log.info("任务："+tCruiseTask.getTaskName()+"在"+simpleDateFormat.format(new Date())+"时已经等待了"+(waitTime+1000)/1000+"秒");
-                                cameraState = Integer.valueOf(mapForCameraState.get("state"));
+                                Map<String,String> mapForCameraStateForGet = redisTemplate.opsForHash().entries("camera_info:"+tCameraPreset.getCameraId());
+                                cameraState = Integer.valueOf(mapForCameraStateForGet.get("state"));
                             }
                         }
                         mapForCameraState.put("state","1");
