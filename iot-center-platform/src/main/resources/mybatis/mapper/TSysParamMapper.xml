@@ -138,4 +138,10 @@
         where param_code = #{paramType,jdbcType=VARCHAR}
     </select>
 
+
+    <select id="selectByPrimaryCode" resultType="com.yjh.platform.module.user.entity.TSysParam">
+        select *
+        from t_sys_param
+        where param_code = 'isEncryption'
+    </select>
 </mapper>

@@ -5,11 +5,9 @@ import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
-import com.yjh.platform.common.utils.SecurityProperties;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.common.utils.smUtil.SM2Utils;
-import com.yjh.platform.common.utils.smUtil.Util;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
+import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.dao.SysUserBackUpDao;
@@ -26,14 +24,12 @@ import java.util.*;
 
 import com.yjh.platform.module.user.entity.SysUserBackUp;
 import com.yjh.platform.module.user.entity.SysUserLogin;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -59,20 +55,20 @@ public class SysUserService {
 
     @Resource
     private RedisAndYxsjUtil redisAndYxsjUtil;
-    @Resource
-    private SecurityProperties securityProperties;
+
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Transactional(rollbackFor = Exception.class)
-    public int insert(SysUser sysUser) {
+    public int insert(SysUser sysUser) throws IOException {
         Map map = new LinkedHashMap<>();
         Date date = new Date();
         sysUser.setCreateTime(date);
         sysUser.setUpdateTime(date);
-        int total = sysUserDao.insert(sysUser);
         map.put("userName", sysUser.getUserName());
         map.put("password", sysUser.getPassword());
+        sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
+        int total = sysUserDao.insert(sysUser);
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
         sysUserBackUp.setVerfiCode(Demo.summary(map.toString()));
@@ -86,8 +82,9 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int update(SysUser sysUser) {
+    public int update(SysUser sysUser) throws IOException {
         Date date = new Date();
+        sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
         sysUser.setUpdateTime(date);
         return this.sysUserDao.update(sysUser);
     }
@@ -98,7 +95,7 @@ public class SysUserService {
         if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
             String userName=null;
             String password=null;
-            if("true".equals(securityProperties.getIsDecode())) {
+            if("true".equals(Constant.isDecode)) {
                  userName =Demo.decrypt(userMap.get("userName"));
                  password =Demo.decrypt(userMap.get("password"));
                 // String verfiCode = userMap.get("verfiCode");
@@ -107,11 +104,8 @@ public class SysUserService {
                  password =userMap.get("password");
             }
             String replayAvoid = userMap.get("replayAvoid");
-            SysUserLogin sysUserLogin = sysUserDao.selectByUserNameL(userName, password);
-//            if("true".equals(securityProperties.getIsDecode())) {
-//                sysUserLogin.setPassword(Demo.encryption(sysUserLogin.getPassword()));
-//            }
-            if (!Objects.equals(null, sysUserLogin)) {
+            SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
+            if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserLogin.getPassword()).equals(password)) {
                 SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
                 Map verMap = new LinkedHashMap<>();
                 verMap.put("userName", userName);
@@ -384,16 +378,12 @@ public class SysUserService {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
-        if("true".equals(securityProperties.getIsDecode())) {
+        if("true".equals(Constant.isDecode)) {
             linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
-            sysUser.setPassword(
-                    // map.get("newPassword")
-                    Demo.decrypt(map.get("newPassword"))
-            );
+            sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPassword")) ));
         }else{
             linkedHashMap.put("password", map.get("newPassword"));
-            sysUser.setPassword(
-                    map.get("newPassword"));
+            sysUser.setPassword(Demo.encryption(map.get("newPassword")));
         }
         sysUser.setUserId(userId);
         Date date = new Date();

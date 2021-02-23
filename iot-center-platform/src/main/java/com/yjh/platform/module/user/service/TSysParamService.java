@@ -83,6 +83,10 @@ public class TSysParamService{
         return 1;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public TSysParam selectByPrimaryCode() {
+        return this.tSysParamDao.selectByPrimaryCode();
+    }
 
 }
 

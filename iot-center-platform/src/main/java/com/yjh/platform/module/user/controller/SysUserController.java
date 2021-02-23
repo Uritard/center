@@ -3,23 +3,18 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.utils.SecurityProperties;
 import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.entity.*;
-import com.yjh.platform.module.user.service.SysUserBackUpService;
 import com.yjh.platform.module.user.service.SysUserService;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import io.swagger.annotations.*;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +29,6 @@ import com.mysql.jdbc.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 
 /**
@@ -53,8 +47,6 @@ public class SysUserController {
     @Autowired
     private SysRoleMenuDao sysRoleMenuDao;
 
-    @Resource
-    private SecurityProperties securityProperties;
 
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
     @Autowired
@@ -71,7 +63,7 @@ public class SysUserController {
 
         Result result = new Result();
         try {
-            if("true".equals(securityProperties.getIsDecode())) {
+            if("true".equals(Constant.isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
@@ -109,7 +101,7 @@ public class SysUserController {
     public Result update(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
-            if("true".equals(securityProperties.getIsDecode())) {
+            if("true".equals(Constant.isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
@@ -131,10 +123,6 @@ public class SysUserController {
         Result result = new Result();
         try {
             SysUser sysUser = sysUserService.selectByPrimaryId(userId);
-            if("true".equals(securityProperties.getIsDecode())) {
-                sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
-                sysUser.setUserName(Demo.encryption(sysUser.getUserName()));
-            }
             result.setData(sysUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -150,16 +138,7 @@ public class SysUserController {
         Result result = new Result();
         try {
             List<SysUser> sysUser = sysUserService.selectByUserState(state);
-            if("true".equals(securityProperties.getIsDecode())) {
-                List<SysUser> enUser=new ArrayList<>();
-                for(SysUser list:sysUser){
-                    list.setPassword(Demo.encryption(list.getPassword()));
-                    enUser.add(list);
-                }
-                result.setData(enUser);
-            }else{
-                result.setData(sysUser);
-            }
+            result.setData(sysUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -173,15 +152,10 @@ public class SysUserController {
     public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
         Result result = new Result();
         try {
-            if("true".equals(securityProperties.getIsDecode())) {
-                List<SysUser> enUser = new ArrayList<>();
+            if("true".equals(Constant.isDecode)) {
                 userName = Demo.decrypt(userName);
                 List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
-                for (SysUser list : sysUsers) {
-                    list.setPassword(Demo.encryption(list.getPassword()));
-                    enUser.add(list);
-                }
-                result.setData(enUser);
+                result.setData(sysUsers);
             }else{
                 List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
                 result.setData(sysUsers);
@@ -223,16 +197,11 @@ public class SysUserController {
                          @RequestParam(value = "lastLogin", required = false) Date lastLogin) {
         Result result = new Result();
         try {
-            if("true".equals(securityProperties.getIsDecode())) {
-                List<SysUser> enUser = new ArrayList<>();
+            if("true".equals(Constant.isDecode)) {
                 userName = Demo.decrypt(userName);
                 password = Demo.decrypt(password);
                 List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
-                for (SysUser lists : list) {
-                    lists.setPassword(Demo.encryption(lists.getPassword()));
-                    enUser.add(lists);
-                }
-                result.setData(enUser);
+                result.setData(list);
             }else{
                 List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
                 result.setData(list);
@@ -248,32 +217,20 @@ public class SysUserController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询系统用户数据",content = "根据用户传递的参数分页查询系统用户信息",logType = 1)
     public Result selectByPage(@RequestBody SysUser sysUser
-//                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-//                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize
     ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-          //  Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             Page page = PageHelper.startPage(sysUser.getPageNum()!=null?sysUser.getPageNum():1, sysUser.getPageSize()!=null?sysUser.getPageSize():0, true, null, true);
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
-            if("true".equals(securityProperties.getIsDecode())) {
+            if("true".equals(Constant.isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
-                List<Map<String, String>> enUser = new ArrayList<>();
                 List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
-                for (Map<String, String> map : list) {
-                    for (Map.Entry<String, String> m : map.entrySet()) {
-                        if (m.getKey().equals("password")) {
-                            m.setValue(Demo.encryption(m.getValue()));
-                        }
-                    }
-                    enUser.add(map);
-                }
                 resultMap.put("count", page.getTotal());
-                resultMap.put("list", enUser);
+                resultMap.put("list", list );
                 result.setData(resultMap);
             }else{
                 List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
@@ -372,7 +329,7 @@ public class SysUserController {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
             sysUser.setPassword("Yjh@123!");
-            if("true".equals(securityProperties.getIsDecode())) {
+            if("true".equals(Constant.isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
             }
             sysUserService.insert(sysUser);
@@ -437,7 +394,7 @@ public class SysUserController {
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             String oldPassword=null;
             String newPassword=null;
-            if("true".equals(securityProperties.getIsDecode())) {
+            if("true".equals(Constant.isDecode)) {
                  oldPassword = Demo.decrypt(map.get("oldPassword"));
                  newPassword=Demo.decrypt(map.get("newPassword"));
             }else{
@@ -446,7 +403,7 @@ public class SysUserController {
             }
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (sysUserCurrent.getPassword().equals(oldPassword)) {
-                if (sysUserCurrent.getPassword().equals(newPassword))
+                if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword))
                 {
                     result.setMessage("新密码不能和旧密码重复");
                     return result;

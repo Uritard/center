@@ -3,24 +3,16 @@ package com.yjh.gateway.common.authFilter;
 import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.yjh.gateway.commons.utils.NumConstant;
+import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
-import com.yjh.gateway.commons.utils.smUtil.SM2Utils;
-import com.yjh.gateway.commons.utils.smUtil.Util;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,8 +20,6 @@ import java.util.TreeMap;
 @Component
 public class zuulFilter extends ZuulFilter {
 
-    @Resource
-    private SecurityProperties securityProperties;
 
     private static Logger log = LoggerFactory.getLogger(zuulFilter.class);
 
@@ -47,7 +37,7 @@ public class zuulFilter extends ZuulFilter {
     @SneakyThrows
     @Override
     public boolean shouldFilter() {
-        if("true".equals(securityProperties.getIsDecode())) {
+        if("true".equals(Constant.isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;

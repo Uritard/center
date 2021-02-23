@@ -61,4 +61,6 @@ public interface SysUserDao {
     SysOrg selectRelationOrg(@Param(value = "userId") Long userId);
     List<String> selectRelationMenu(@Param(value = "userId") Long userId);
     List<Map<String, String>> selectRelationAuthor(@Param(value = "userId") Long userId);
+
+    SysUserLogin selectByUserNameAndL(@Param(value = "userName") String userName);
 }

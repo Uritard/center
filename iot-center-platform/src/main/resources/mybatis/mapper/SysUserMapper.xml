@@ -398,5 +398,14 @@
        select * from sys_user
    </select>
 
+    <select id="selectByUserNameAndL" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUserLogin">
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,
+          a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,b.role_name,a.org_id,c.org_name,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login
+        from sys_user a
+        LEFT JOIN sys_role b ON a.role_id = b.role_id
+        LEFT JOIN sys_org c ON c.org_id = a.org_id
+        where 1 = 1
+        and a.user_name = #{userName, jdbcType=VARCHAR}
+    </select>
 
 </mapper>
