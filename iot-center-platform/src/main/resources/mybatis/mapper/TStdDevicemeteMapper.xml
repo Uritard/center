@@ -677,6 +677,7 @@
         h.update_time as cruise_time,
         h.pic_Path,
         h.cruise_result,
+        IFNULL(h.identify_result, h.cruise_result) as FinalState,
         k.dict_note as cruise_result_name,
         h.identify_result
         FROM
@@ -689,11 +690,50 @@
         <if test="deviceType != -1">and a.device_type = #{deviceType,jdbcType = INTEGER} </if>
         <if test="meterType != -1">and b.meter_type = #{meterType,jdbcType = INTEGER} </if>
         <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
-        <if test="list != null and list.size() > 0">and b.device_id IN
+
+        <if test="list!= null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
+        where 1 = 1
+        <if test="cruiseRes != -1 ">and IFNULL(h.identify_result, h.cruise_result) IN (246,261)</if>
+        GROUP BY f.device_mete_id
+        ORDER BY cruise_time desc
+    </select>
+    <select id="selectCruiseResultAnalyze2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo">
+        SELECT
+        b.instance_id,
+        f.device_mete_id,
+        f.device_id,
+        f.mete_type,
+        f.meter_type,
+        g.device_type,
+        f.mete_name,
+        h.update_time as cruise_time,
+        h.pic_Path,
+        h.cruise_result,
+        IFNULL(h.identify_result, h.cruise_result) as FinalState,
+        k.dict_note as cruise_result_name,
+        h.identify_result
+        FROM
+        t_cruise_task_result_detail b
+        LEFT JOIN t_cruise_point_instance e on e.instance_id = b.instance_id
+        JOIN t_std_devicemete f on f.device_mete_id = e.device_mete_id
+        LEFT JOIN t_std_device g on g.device_id = f.device_id
+        LEFT JOIN t_std_devicemete_update h on  h.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business k on k.dict_code = h.cruise_result and k.col_name = 'cruise_result'
+        <if test="deviceType != -1">and a.device_type = #{deviceType,jdbcType = INTEGER} </if>
+        <if test="meterType != -1">and b.meter_type = #{meterType,jdbcType = INTEGER} </if>
+        <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
+
+        <if test="list!= null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        where 1 = 1
+        <if test="cruiseRes != -1 ">and IFNULL(h.identify_result, h.cruise_result) IN (247,262,263,264)</if>
         GROUP BY f.device_mete_id
         ORDER BY cruise_time desc
     </select>

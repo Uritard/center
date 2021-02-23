@@ -244,7 +244,7 @@ public class TCruiseDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,pageNum,pageSize);
+            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes);
             resultMap.put("count",page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);
