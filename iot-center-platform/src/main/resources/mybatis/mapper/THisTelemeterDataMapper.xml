@@ -180,7 +180,7 @@
         d.origpic,
         d.person_check,
         b.task_name,
-        b.create_time as cruiseTime,
+        c.cruise_time as cruiseTime,
         j.device_id,
         j.device_name,
         g.mete_kind,
@@ -192,7 +192,6 @@
         LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
         LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
         left join t_cfg_mete g on a.mete_id = g.mete_id
-        left join t_cruise_task h on a.union_id = h.task_id
         left join (select mete_id,mete_value,record_time from t_his_signal_data union all (select mete_id,mete_value,record_time from t_his_telemeter_data)) i on a.mete_id = i.mete_id and a.triggering_time = i.record_time
         left join t_cfg_device j on i.mete_id = j.device_id
         left join t_dict_business k on g.mete_kind  = k.dict_code and k.col_name="mete_kind"
