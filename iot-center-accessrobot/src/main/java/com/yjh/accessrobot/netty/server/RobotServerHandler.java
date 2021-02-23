@@ -24,6 +24,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +69,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private boolean isThreadStart = true;
     private String redisValue = "content";
     private Integer heartNum = 0;
+    private Integer flag2 = 0;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
@@ -306,14 +308,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             log.info("缓存有这个机器人,连它");
              code = "200";//成功
         }else {
-            /*List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
-            if (robotCodeList.contains(xmlBaseModel.getSendCode())){*/
+            List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
+            if (robotCodeList.contains(xmlBaseModel.getSendCode())){
                 code = "200";//成功
-//                log.info("缓存无，表中有，连它");
-//            }else {
-//                code = "400";//拒绝
-//                log.info("缓存无，表中无，不给它");
-//            }
+                log.info("缓存无，表中有，连它");
+            }else {
+                code = "400";//拒绝
+                log.info("缓存无，表中无，不给它");
+            }
         }
 
         if ("251".equals(xmlBaseModel.getType())){
@@ -349,22 +351,21 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     Thread thread = new Thread(dataDealThread);
                     thread.setDaemon(true);
                     thread.start();
-                    break;  
+                    break;
                 //心跳指令(发送响应)
                 case "2512":
                     log.info("巡视主机收到心跳指令了");
+                    heartNum = 0;
                     String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
                     send(ctx, heartProtocol,xmlBaseModel.getSendCode());
                     //若心跳能够正常收发，将机器人置为在线状态
                     Constant.flag = 1;
-                    log.info("修改前Constant.flag2的值==="+Constant.flag2);
-                    if (Constant.flag2 == 0){
+                    log.info("flag2的值==="+flag2);
+                    if (flag2 == 0){
                         robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
-                        Constant.flag2 = 1;
+                        flag2 = 1;
                     }
-                    log.info("修改后Constant.flag2的值==="+Constant.flag2);
-                    heartNum.intValue();
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -745,8 +746,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
     void procSend(String robotCode, Map<String, String> robotStatusMap) {
         heartNum ++;
-        int res = heartNum;
-
+        log.info("heartNum==="+heartNum);
         /*Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("t_sys_param:AllRobotCode");
         Iterator<String> iterator = allRobotCodeMap.keySet().iterator();
         List<String> allRobotCodeList = new ArrayList<>();
@@ -766,7 +766,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             }
         }*/
 
-        if (res > 3){
+        if (heartNum > 3){
             StaticContextAccessor.getBean(RobotService.class).updateRobotInfo(robotCode,"离线");//更新机器人表信息
             robotStatusMap.put("value","1");//异常
             redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//更新缓存机器人的网络状态

@@ -188,6 +188,7 @@ public class RobotService {
         log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus());
 
         int res = tRobotInfoDao.update(tRobotInfo);
+        log.info("修改结果==="+res);
         //机器人状态改变给前端推送webSocket
         /*Map<String,Object> jasonMap=new HashMap<>();
         jasonMap.put("type","robotStatus");

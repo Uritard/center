@@ -225,11 +225,11 @@ public class TCruiseDataResultService {
             if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getCruiseResult())){
                 tStdDeviceMeteUpdate.setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult());
             }
-            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
+
                 tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
             }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
                 //更新
                 updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
                 log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值");

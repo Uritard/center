@@ -24,7 +24,6 @@ public class Constant {
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
     public static AtomicInteger heartNum = new AtomicInteger(0);
     public static int flag = 0;
-    public static int flag2 = 0;
     public static String Packet = "";
     public static int registerCount = 1;
 
