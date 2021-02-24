@@ -39,11 +39,7 @@ public class AlarmResultDealThread implements Runnable{
                     .setAlarmLevel(133)
                     .setAlarmInfo(robotAlarmMap.get("content"))
                     .setAlarmTime(sdf.parse(robotAlarmMap.get("time")))
-//                            .setPositionOffset()
-//                            .setPositionStationNum()
                     .setAlarmState(276);
-//                            .setCreateTime()
-//                            .setEndTime()
             log.info("tRobotAlarm的内容==="+tRobotAlarm);
             //插表入库
             int res = StaticContextAccessor.getBean(RobotService.class).insertRobotAlarm(tRobotAlarm);
