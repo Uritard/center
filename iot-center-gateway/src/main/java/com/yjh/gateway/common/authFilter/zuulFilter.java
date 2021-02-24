@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -68,7 +69,7 @@ public class zuulFilter extends ZuulFilter {
                             webcode = String.valueOf(param.getValue());
                         }
                     }
-                    String token = Demo.summary(jsonModel.toJSONString());
+                    String token = Demo.summary(URLEncoder.encode(jsonModel.toJSONString()));
                     if (!token.equals(webcode)) {
                         log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token+",前端summary"+webcode);
                         ctx.setSendZuulResponse(false);
@@ -86,7 +87,7 @@ public class zuulFilter extends ZuulFilter {
                         }
                     }
                     if (jsonModel.size() != 0) {
-                        String token = Demo.summary(jsonModel.toJSONString());
+                        String token = Demo.summary(URLEncoder.encode(jsonModel.toJSONString()));
                         if (!token.equals(tokenStr)) {
                             log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token+",前端summary"+tokenStr);
                             ctx.setSendZuulResponse(false);
