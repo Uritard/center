@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.netty.server;
 
-import com.sun.tools.javac.jvm.Items;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -15,14 +14,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import javax.swing.plaf.SliderUI;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
