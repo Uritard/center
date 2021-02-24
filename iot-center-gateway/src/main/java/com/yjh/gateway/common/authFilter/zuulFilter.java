@@ -41,6 +41,7 @@ public class zuulFilter extends ZuulFilter {
     @SneakyThrows
     @Override
     public boolean shouldFilter() {
+
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isDecode");
         String isDecode =map.get("content");
         Map<String,String> uKeymap= redisTemplate.opsForHash().entries("t_sys_param:isUkey");

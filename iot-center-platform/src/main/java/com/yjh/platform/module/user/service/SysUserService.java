@@ -109,6 +109,7 @@ public class SysUserService {
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
             if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserLogin.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
+
                 SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
                 Map verMap = new LinkedHashMap<>();
                 verMap.put("userName", userName);
