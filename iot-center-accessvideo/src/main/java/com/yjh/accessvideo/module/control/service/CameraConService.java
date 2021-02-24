@@ -83,7 +83,7 @@ public class CameraConService {
     private NativeLong m_lPort =  new NativeLong(-1);
     FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
-    private int lUserID;//用户句柄
+    private int lUserID = -1;//用户句柄
     //设备登录信息
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
     //设备信息
@@ -657,7 +657,7 @@ public class CameraConService {
     public String registerNVR(Long recordId) {
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        lUserID = Constant.maps.get(String.valueOf(recordId));
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) lUserID = Constant.maps.get(String.valueOf(recordId));
         log.info("lUserID: "+lUserID);
 
         if (lUserID > -1) {
