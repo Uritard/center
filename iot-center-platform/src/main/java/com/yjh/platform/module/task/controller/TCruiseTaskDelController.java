@@ -43,7 +43,7 @@ public class TCruiseTaskDelController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增周期任务删除记录",content = "根据用户传递的参数新增周期任务删除记录数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TCruiseTaskDel tCruiseTaskDel) {
+    public Result insert(@RequestBody TCruiseTaskDel tCruiseTaskDel) {
         Result result = new Result();
         try {
             result.setData(tCruiseTaskDelService.insert(tCruiseTaskDel));
@@ -145,7 +145,7 @@ public class TCruiseTaskDelController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入周期任务删除记录",content = "根据用户传递的参数批量插入周期任务删除记录数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TCruiseTaskDel> list) {
+    public Result batchInsert(@RequestBody List<TCruiseTaskDel> list) {
         Result result = new Result();
         try {
         result.setData(tCruiseTaskDelService.batchInsert(list));

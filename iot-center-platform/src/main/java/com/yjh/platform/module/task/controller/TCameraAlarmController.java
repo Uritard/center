@@ -48,7 +48,7 @@ public class TCameraAlarmController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增可视设备本体告警数据",content = "根据用户传递的参数新增可视设备本体告警数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
+    public Result insert(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
@@ -176,7 +176,7 @@ public class TCameraAlarmController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量新增可视设备本体告警数据",content = "根据用户传递的参数批量新增可视设备本体告警数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
+    public Result batchInsert(@RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

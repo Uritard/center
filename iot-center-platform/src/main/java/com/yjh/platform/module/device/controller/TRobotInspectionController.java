@@ -52,7 +52,7 @@ public class TRobotInspectionController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "插入机器人巡检点信息",content = "根据用户传递的参数新增机器人巡检点信息",logType = 2)
-    public Result add(@Validated  @RequestBody TRobotInspection tRobotInspection) {
+    public Result add(@RequestBody TRobotInspection tRobotInspection) {
         Result result = new Result();
         try {
             result.setData(tRobotInspectionService.insert(tRobotInspection));
@@ -164,7 +164,7 @@ public class TRobotInspectionController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入机器人巡检点信息",content = "根据用户传递的参数批量插入机器人巡检点信息",logType = 2)
-    public Result batchAdd(@Validated @RequestBody List<TRobotInspection> list) {
+    public Result batchAdd(@RequestBody List<TRobotInspection> list) {
         Result result = new Result();
         try {
             result.setData(tRobotInspectionService.batchInsert(list));

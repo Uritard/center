@@ -45,7 +45,7 @@ public class SysMenuController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增菜单数据",content = "根据用户传递的参数新增菜单数据",logType = 2)
-    public Result insert(@Validated @RequestBody SysMenu sysMenu) {
+    public Result insert(@RequestBody SysMenu sysMenu) {
 
         Result result = new Result();
         try {

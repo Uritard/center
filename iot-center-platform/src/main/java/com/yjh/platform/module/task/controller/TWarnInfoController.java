@@ -45,7 +45,7 @@ public class TWarnInfoController {
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
     @Logs(title = "新增告警信息数据",content = "根据用户传递的参数新增告警信息数据",logType =2)
-    public Result insert(@Validated  @RequestBody TWarnInfo tWarnInfo) {
+    public Result insert(@RequestBody TWarnInfo tWarnInfo) {
         Result result = new Result();
         try {
             result.setData(tWarnInfoService.insert(tWarnInfo));

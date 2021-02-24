@@ -42,7 +42,7 @@ public class TVideoAnalyseResultController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增算法结果",content = "根据用户传递的参数新增算法结果数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TVideoAnalyseResult tVideoAnalyseResult) {
+    public Result insert(@RequestBody TVideoAnalyseResult tVideoAnalyseResult) {
         Result result = new Result();
         try {
             result.setData(tVideoAnalyseResultService.insert(tVideoAnalyseResult));
@@ -150,7 +150,7 @@ public class TVideoAnalyseResultController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入算法结果",content = "根据用户传递的参数批量插入算法结果数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TVideoAnalyseResult> list) {
+    public Result batchInsert(@RequestBody List<TVideoAnalyseResult> list) {
         Result result = new Result();
         try {
         result.setData(tVideoAnalyseResultService.batchInsert(list));

@@ -59,7 +59,7 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统用户数据",content = "根据用户传递的参数新增系统用户数据",logType = 2)
-    public Result insert(@Validated @RequestBody SysUser sysUser) {
+    public Result insert(@RequestBody SysUser sysUser) {
 
         Result result = new Result();
         try {
@@ -333,7 +333,7 @@ public class SysUserController {
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
     @Logs(title = "新增用户",content = "根据用户传递的参数新增数据",logType = 2)
-    public Result insertUser(@Validated @RequestBody SysUser sysUser) {
+    public Result insertUser( @RequestBody SysUser sysUser) {
 
         Result result = new Result();
         try {

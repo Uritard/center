@@ -48,7 +48,7 @@ public class TDictBusinessController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增业务字典信息",content = "根据用户传递的参数新增业务字典信息",logType = 2)
-    public Result insert(@Validated @RequestBody TDictBusiness tDictBusiness) {
+    public Result insert( @RequestBody TDictBusiness tDictBusiness) {
 
         Result result = new Result();
         try {
@@ -163,7 +163,7 @@ public class TDictBusinessController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入业务字典信息",content = "根据用户传递的参数批量插入业务字典信息",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TDictBusiness> list) {
+    public Result batchInsert( @RequestBody List<TDictBusiness> list) {
         Result result = new Result();
         try {
         result.setData(tDictBusinessService.batchInsert(list));
