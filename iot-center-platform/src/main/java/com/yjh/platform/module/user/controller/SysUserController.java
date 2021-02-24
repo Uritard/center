@@ -63,7 +63,9 @@ public class SysUserController {
 
         Result result = new Result();
         try {
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
@@ -102,7 +104,9 @@ public class SysUserController {
     public Result update(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
@@ -153,7 +157,9 @@ public class SysUserController {
     public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
         Result result = new Result();
         try {
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
                 List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
                 result.setData(sysUsers);
@@ -198,7 +204,9 @@ public class SysUserController {
                          @RequestParam(value = "lastLogin", required = false) Date lastLogin) {
         Result result = new Result();
         try {
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
                 password = Demo.decrypt(password);
                 List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
@@ -226,7 +234,9 @@ public class SysUserController {
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
                 List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
@@ -330,7 +340,9 @@ public class SysUserController {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
             sysUser.setPassword("Yjh@123!");
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
             }
             sysUserService.insert(sysUser);
@@ -395,7 +407,9 @@ public class SysUserController {
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             String oldPassword=null;
             String newPassword=null;
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =enmap.get("content");
+            if("true".equals(isDecode)) {
                  oldPassword = Demo.decrypt(map.get("oldPassword"));
                  newPassword=Demo.decrypt(map.get("newPassword"));
             }else{

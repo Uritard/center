@@ -96,7 +96,9 @@ public class SysUserService {
         if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
             String userName=null;
             String password=null;
-            if("true".equals(Constant.isDecode)) {
+            Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =enmap.get("content");
+            if("true".equals(isDecode)) {
                  userName =Demo.decrypt(userMap.get("userName"));
                  password =Demo.decrypt(userMap.get("password"));
                 // String verfiCode = userMap.get("verfiCode");

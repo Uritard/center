@@ -24,8 +24,8 @@ public class SecurityPropertie implements ApplicationRunner {
     private RedisTemplate redisTemplate;
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        this.getIsCode();
-        this.getIsUkey();
+//        this.getIsCode();
+//        this.getIsUkey();
     }
 
     /**

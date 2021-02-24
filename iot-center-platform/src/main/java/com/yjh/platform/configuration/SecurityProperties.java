@@ -24,7 +24,7 @@ public class SecurityProperties implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        this.getIsCode();
+//        this.getIsCode();
     }
 
     /**

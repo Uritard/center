@@ -10,8 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,6 +25,8 @@ public class zuulFilter extends ZuulFilter {
 
     private static Logger log = LoggerFactory.getLogger(zuulFilter.class);
 
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Override
     public String filterType() {
@@ -37,7 +41,11 @@ public class zuulFilter extends ZuulFilter {
     @SneakyThrows
     @Override
     public boolean shouldFilter() {
-        if("true".equals(Constant.isDecode)) {
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isDecode");
+        String isDecode =map.get("content");
+        Map<String,String> uKeymap= redisTemplate.opsForHash().entries("t_sys_param:isUkey");
+        String isUkey =uKeymap.get("content");
+        if("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;
@@ -88,7 +96,7 @@ public class zuulFilter extends ZuulFilter {
                 }
             }
         }
-        if("true".equals(Constant.isUkey)){
+        if("true".equals(isUkey)){
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;

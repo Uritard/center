@@ -3,6 +3,7 @@ package com.yjh.logs.module.log.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.logs.common.smUtil.Demo;
 import com.yjh.logs.commons.result.BusinessException;
 import com.yjh.logs.commons.result.Result;
 import com.yjh.logs.commons.result.ResultCodeEnum;
@@ -15,9 +16,11 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,7 +36,8 @@ public class SysLogController {
 
     @Autowired
     private final SysLogService sysLogService;
-
+    @Resource
+    private RedisTemplate redisTemplate;
     private Logger log = LoggerFactory.getLogger(SysLogController.class);
 
     public SysLogController(SysLogService sysOperateLogService) {
@@ -177,6 +181,11 @@ public class SysLogController {
                          @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
+            Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =enmap.get("content");
+            if("true".equals(isDecode)) {
+                userName= Demo.decrypt(userName);
+            }
             List<SysLog> list = sysLogService.select(logId, logType, ip, title, state, content, userId, userName, requestOrigin, requestPath, requestMethod, createTime);
             result.setData(list);
         } catch (Exception e) {
@@ -197,6 +206,11 @@ public class SysLogController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =enmap.get("content");
+            if("true".equals(isDecode)) {
+                userName= Demo.decrypt(userName);
+            }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<SysLogDetail> list = sysLogService.selectByPage(userName,title,startTime,endTime);
             resultMap.put("count", page.getTotal());
