@@ -26,9 +26,9 @@
     </select>
 
 
-    <select id="selectByPrimaryCode" resultType="com.yjh.gateway.module.gateway.entity.TSysParam">
+    <select id="selectByPrimaryUkey" resultType="com.yjh.gateway.module.gateway.entity.TSysParam">
         select *
         from t_sys_param
-        where param_code = 'isDecode'
+        where param_code = 'isUkey'
     </select>
 </mapper>
