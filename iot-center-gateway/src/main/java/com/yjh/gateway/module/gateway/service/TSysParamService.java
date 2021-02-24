@@ -15,10 +15,16 @@ public class TSysParamService {
     private TSysParamDao tSysParamDao;
 
 
+
     @Transactional(rollbackFor = Exception.class)
     public TSysParam selectByPrimaryCode() {
         return this.tSysParamDao.selectByPrimaryCode();
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    public TSysParam selectByPrimaryUkey() {
+        return this.tSysParamDao.selectByPrimaryUkey();
+    }
 }
 

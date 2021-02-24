@@ -22,8 +22,6 @@ public class SecurityProperties implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         this.getIsCode();
     }
-//    @Value("${spring.security.isDecode}")
-//    private String isDecode;
 
     /**
      * 获取是否加解密

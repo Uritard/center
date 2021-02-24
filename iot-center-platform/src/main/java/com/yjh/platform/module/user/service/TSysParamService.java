@@ -94,6 +94,7 @@ public class TSysParamService{
         return mapFOrRe;
     }
 
+
     @Transactional(rollbackFor = Exception.class)
     public TSysParam selectByPrimaryCode() {
         return this.tSysParamDao.selectByPrimaryCode();

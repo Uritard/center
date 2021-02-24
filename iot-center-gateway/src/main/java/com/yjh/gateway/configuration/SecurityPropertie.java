@@ -22,11 +22,20 @@ public class SecurityPropertie implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         this.getIsCode();
     }
+
     /**
      * 获取是否验证参数篡改
      */
     private void getIsCode() {
         TSysParam tSysParam=tSysParamService.selectByPrimaryCode();
         Constant.isDecode=tSysParam.getContent();
+    }
+
+    /**
+     * 获取是否开启Ukey
+     */
+    private void getIsUkey() {
+        TSysParam tSysParam=tSysParamService.selectByPrimaryUkey();
+        Constant.isUkey=tSysParam.getContent();
     }
 }

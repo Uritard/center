@@ -89,6 +89,7 @@ public class SysUserService {
         return this.sysUserDao.update(sysUser);
     }
 
+
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
         Map<String, Object> mapResult = new HashMap<>();

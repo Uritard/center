@@ -17,7 +17,6 @@ public class Demo {
 
     // 国密规范测试用户ID
     private static final String userId ="1234567812345678";
-            //"rzx";
     // 国密规范测试私钥
     private static final String prik = "00AFB685CF8993EF80FF9B6F8DD92486710C719AB3820B9D48A13A12ED9FD6CFE1";
     //国密规范测试公钥

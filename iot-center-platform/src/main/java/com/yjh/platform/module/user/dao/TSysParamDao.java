@@ -13,15 +13,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TSysParamDao {
     int insert(TSysParam tSysParam);
+
     int deleteByPrimaryId(@Param(value = "paramId") Integer paramId);
+
     int update(TSysParam tSysParam);
+
     TSysParam selectByPrimaryId(@Param(value = "paramId") Integer paramId);
+
     List<TSysParam> select(@Param(value = "paramId") Integer paramId,
                            @Param(value = "paramCode") String paramCode,
-                                @Param(value = "paramType") String paramType,
-                                @Param(value = "paramName") String paramName,
-                                @Param(value = "content") String content,
-                                @Param(value = "remark") String remark);
+                           @Param(value = "paramType") String paramType,
+                           @Param(value = "paramName") String paramName,
+                           @Param(value = "content") String content,
+                           @Param(value = "remark") String remark);
+
     List<TSysParam> selectByPage(@Param(value = "paramId") Integer paramId,
                                  @Param(value = "paramCode") String paramCode,
                                  @Param(value = "paramType") String paramType,
@@ -31,10 +36,13 @@ public interface TSysParamDao {
 
     int batchInsert(List<TSysParam> list);
 
-    List<TSysParam>selectAll();
+    List<TSysParam> selectAll();
+
     TSysParam selectByParamType(@Param(value = "paramType") String paramType);
 
+
     TSysParam selectByPrimaryCode();
+
 
     List<TSysParam> selectQuery(@Param("params") List<String> params);
 }

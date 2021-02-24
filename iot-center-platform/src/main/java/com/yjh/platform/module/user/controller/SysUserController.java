@@ -95,6 +95,7 @@ public class SysUserController {
         return result;
     }
 
+
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改系统用户数据",content = "根据用户传递的参数修改系统用户数据",logType = 3)

@@ -8,6 +8,7 @@ import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.entity.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.validation.constraints.Max;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,6 @@ public class Constant {
     public static Map<String,Object> weatherInfo = new HashMap<>();
 
     public static final String account_lock_time = "account_lock_time:userAccountID";
-
 
     public static final String WARN_JUDGE = "http://iot-center-accessvideo/AnalysisDataOperate/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 

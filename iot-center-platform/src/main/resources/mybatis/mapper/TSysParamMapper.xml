@@ -144,6 +144,7 @@
         from t_sys_param
         where param_code = 'isEncryption'
     </select>
+
     <select id="selectQuery" parameterType="HashMap" resultType="com.yjh.platform.module.user.entity.TSysParam">
         select
         a.param_id,

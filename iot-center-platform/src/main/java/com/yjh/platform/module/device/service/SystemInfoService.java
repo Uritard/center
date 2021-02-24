@@ -48,12 +48,20 @@ public class SystemInfoService {
         Map<String,String> menUsage=systemInfoUtil.getMemUsage();
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:MemoryFreeMin");
         Double cpuFreeMin=Double.parseDouble(map.get("content"));
+<<<<<<< Updated upstream
         if(Double.parseDouble(menUsage.get("free"))/Double.parseDouble(menUsage.get("total"))*100<cpuFreeMin){
+=======
+        if(Double.parseDouble(map.get("free"))/Double.parseDouble(map.get("total"))*100<cpuFreeMin){
+>>>>>>> Stashed changes
             menUsage.put("code","01");
         }else{
             menUsage.put("code","02");
         }
+<<<<<<< Updated upstream
         return menUsage;
+=======
+        return systemInfoUtil.getMemUsage();
+>>>>>>> Stashed changes
     }
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getCPU() throws Exception {
@@ -101,7 +109,11 @@ public class SystemInfoService {
         Map<String,Object> deskOnUse=systemInfoUtil.getDeskOnUse();
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:DiskFreeMin");
         Double diskFreeMin=Double.parseDouble(map.get("content"));
+<<<<<<< Updated upstream
         if(Double.parseDouble(deskOnUse.get("use").toString())/Double.parseDouble(deskOnUse.get("all").toString())*100>(100-diskFreeMin)){
+=======
+        if(Double.parseDouble(map.get("use").toString())/Double.parseDouble(map.get("all").toString())*100>(100-diskFreeMin)){
+>>>>>>> Stashed changes
             deskOnUse.put("code","01");
         }else{
             deskOnUse.put("code","02");
