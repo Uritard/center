@@ -36,4 +36,5 @@ public interface TSysParamDao {
 
     TSysParam selectByPrimaryCode();
 
+    List<TSysParam> selectQuery(@Param("params") List<String> params);
 }

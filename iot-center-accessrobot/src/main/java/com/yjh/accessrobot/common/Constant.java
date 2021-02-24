@@ -24,7 +24,6 @@ public class Constant {
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
     public static AtomicInteger heartNum = new AtomicInteger(0);
     public static int flag = 0;
-    public static int flag2 = 0;
     public static String Packet = "";
     public static int registerCount = 1;
 
@@ -57,5 +56,11 @@ public class Constant {
     public static final String algorithmUrl = "http://iot-center-accessvideo/analysis/v1/algorithm";
     //缺陷接口
     public static final String defectUrl = "http://iot-center-accessvideo/analysis/v1/defect";
+
+    public static<T> Result otherServerList( List<T> list, String url){
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
+    }
+    public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
+
 
 }

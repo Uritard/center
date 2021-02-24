@@ -65,38 +65,24 @@ public class TCruiseDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeMeteInfo>  selectCruiseResultAnalyze(List<Long> deviceIdList,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes,int pageNum,int pageSize) {
+    public List<CruiseResultAnalyzeMeteInfo>  selectCruiseResultAnalyze(List<Long> deviceIdList,Integer deviceType,String meteType,Integer meterType,Integer cruiseRes) {
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
-            cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType);
-        }
-
-        //获取同一设备下的有巡检结果的标准测点
-        List<CruiseResultAnalyzeMeteInfo> abnormalFilters=new ArrayList<>();
-        for (CruiseResultAnalyzeMeteInfo deviceInfo : cruiseResultAnalMeteInfoList) {
-            //根据巡视点的-算法数据结果状态和最终审核结果判断最终的展示状态结果
-            if (Objects.isNull(deviceInfo.getIdentifyResult())) {
-                if (deviceInfo.getCruiseResult() == 246) {
-                    deviceInfo.setFinalState(1);
-                } else {
-                    deviceInfo.setFinalState(0);
-                }
-            } else {
-                if (deviceInfo.getIdentifyResult() == 261) {
-                    deviceInfo.setFinalState(1);
-                } else {
-                    deviceInfo.setFinalState(0);
-                }
-            }
             //cruiseRes:-1全部,1正常,0异常
-            if (cruiseRes != -1 && cruiseRes != deviceInfo.getFinalState()){
-                abnormalFilters.add(deviceInfo);
+            if (cruiseRes == 1){
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes);
+            }else {
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList,deviceType,meteType,meterType,cruiseRes);
+            }
+            for (CruiseResultAnalyzeMeteInfo item : cruiseResultAnalMeteInfoList){
+                if (item.getFinalState() == 246 || item.getFinalState() == 261){
+                    item.setFinalState(1);
+                }else {
+                    item.setFinalState(0);
+                }
             }
         }
-        log.info("abnormalFilters==="+abnormalFilters);
-        cruiseResultAnalMeteInfoList.removeAll(abnormalFilters);
         return cruiseResultAnalMeteInfoList;
-
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -208,28 +194,35 @@ public class TCruiseDataResultService {
         return tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
     }
     @Transactional(rollbackFor = Exception.class)
-    public int updateCruiseAnalyze(){
+    public int updateCruiseAnalyze(List<String> cruiseResultIdList){
         List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-        List<String> cruiseResultIdList = tCruiseDataResultDao.test();
+        log.info("deviceMeteIdList==="+deviceMeteIdList);
+        log.info("cruiseResultIdList==="+cruiseResultIdList);
         int updateRes = 0;
         int insertRes = 0;
         for (String cruiseResultId: cruiseResultIdList){
             TStdDeviceMeteUpdate tStdDeviceMeteUpdateTemp = tCruiseDataResultDao.selectCruiseAnalyze(cruiseResultId);
             TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
                     .setDeviceMeteId(tStdDeviceMeteUpdateTemp.getDeviceMeteId())
-                    .setUpdateTime(tStdDeviceMeteUpdateTemp.getUpdateTime())
-                    .setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult())
-                    .setIdentifyResult(tStdDeviceMeteUpdateTemp.getIdentifyResult())
-                    .setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
+                    .setIdentifyResult(tStdDeviceMeteUpdateTemp.getIdentifyResult());
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getUpdateTime())){
+                tStdDeviceMeteUpdate.setUpdateTime(tStdDeviceMeteUpdateTemp.getUpdateTime());
+            }
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getCruiseResult())){
+                tStdDeviceMeteUpdate.setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult());
+            }
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
+
+                tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
+            }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
                 //更新
                 updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info("更新");
+                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值");
             }else {
                 //插入
                 insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info("插入");
+                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值");
             }
         }
         return updateRes+insertRes;

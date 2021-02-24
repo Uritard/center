@@ -244,7 +244,7 @@ public class TCruiseDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,pageNum,pageSize);
+            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes);
             resultMap.put("count",page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);
@@ -394,10 +394,10 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "测点巡检时间记录表维护")
     @PostMapping(value = "/updateCruiseAnalyze")
     @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
-    public Result updateCruiseAnalyze() {
+    public Result updateCruiseAnalyze(@RequestBody List<String> cruiseResultIdList) {
         Result result = new Result();
         try {
-            result.setData(tCruiseDataResultService.updateCruiseAnalyze());
+            result.setData(tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("测点巡检时间记录表维护失败：" + e);

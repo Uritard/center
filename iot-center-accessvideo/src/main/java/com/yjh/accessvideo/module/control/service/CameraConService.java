@@ -94,7 +94,10 @@ public class CameraConService {
         Map<String, Object> returnMap = new HashMap<>();
         try {
             Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:"+cameraId);
-            if (Objects.nonNull(cameraFlowMap.get("rtmpUrl"))) { return cameraFlowMap; }
+            if (Objects.nonNull(cameraFlowMap.get("rtmpUrl"))) {
+                cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+                return cameraFlowMap;
+            }
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
             String userName = cameraConInfo.getUserName();
             String password = cameraConInfo.getPwd();
@@ -181,6 +184,7 @@ public class CameraConService {
             for (Long cameraId: list) {
                 Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:"+cameraId);
                 if (Objects.nonNull(cameraFlowMap.get("rtmpUrl"))) {
+                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
                     returnMapList.add(cameraFlowMap);
                 } else {
                     CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);

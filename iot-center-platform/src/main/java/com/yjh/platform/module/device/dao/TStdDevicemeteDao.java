@@ -70,10 +70,16 @@ public interface TStdDevicemeteDao {
     List<CruiseResultAnalMeteInfo> selectDeviceMeteByDeviceId(List<Long> deviceIds);
     List<CruiseResultAnalMeteInfo> selectDeviceMete();
 
-    List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(@Param(value ="list")List<Long> list,
+    List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(@Param(value ="list") List<Long> deviceIdList,
                                                                 @Param(value ="deviceType")Integer deviceType,
                                                                 @Param(value ="meteType")String meteType,
-                                                                @Param(value ="meterType")Integer meterType);
+                                                                @Param(value ="meterType")Integer meterType,
+                                                                @Param(value ="cruiseRes")Integer cruiseRes);
+    List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze2(@Param(value ="list") List<Long> deviceIdList,
+                                                                @Param(value ="deviceType")Integer deviceType,
+                                                                @Param(value ="meteType")String meteType,
+                                                                @Param(value ="meterType")Integer meterType,
+                                                                @Param(value ="cruiseRes")Integer cruiseRes);
 //    List<Long> selectInstanceIdList(@Param(value ="list")List<Long> list);
    //通过巡检点Id查询标准测点
     Long getdeviceMeteByPointinstance(@Param(value = "instanceId")Long instanceId);

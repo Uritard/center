@@ -4,6 +4,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.user.service.TSysParamService;
 import com.yjh.platform.module.user.entity.TSysParam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -181,4 +182,22 @@ public class TSysParamController {
         return result;
     }
 
+    @ApiOperation(value = "查询系统参数")
+    @RequestMapping(value = "/selectQuery", method = RequestMethod.GET)
+    @Logs(title = "查询系统参数",content = "根据用户传递的参数分页查询系统参数",logType = 1)
+    public Result selectQuery(@RequestParam(value = "params") String params) {
+        Result result = new Result();
+        try {
+            String [] splitColNames=params.split("'|,");
+            List<String> list = new ArrayList<>();
+            for(String ColName : splitColNames) {
+                list.add(ColName);
+            }
+            result.setData(tSysParamService.selectQuery(list));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("系统参数分页查询失败描述：", e);
+        }
+        return result;
+    }
 }

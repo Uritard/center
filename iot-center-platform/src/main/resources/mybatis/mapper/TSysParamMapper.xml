@@ -144,4 +144,18 @@
         from t_sys_param
         where param_code = 'isEncryption'
     </select>
+    <select id="selectQuery" parameterType="HashMap" resultType="com.yjh.platform.module.user.entity.TSysParam">
+        select
+        a.param_id,
+        a.param_code,
+        a.param_type,
+        a.param_name,
+        a.content,
+        a.remark
+        from t_sys_param a
+        where a.param_code in
+        <foreach item="item" index="index" collection="params" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

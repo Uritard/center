@@ -33,6 +33,7 @@ public class DataDealThread implements Runnable {
     private String TASKID;
     private String INSTANCEID;
 
+
     public DataDealThread(String body, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, ChannelHandlerContext ctx) {
         this.analyseDataOperateService = analyseDataOperateService;
         this.redisTemplate = redisTemplate;
@@ -394,9 +395,9 @@ public class DataDealThread implements Runnable {
                                                             WebSocketServer.sendMsg(json);
                                                         }
                                                     }
-
-                                                    //删除告警redis
-                                                    redisTemplate.delete(warnName);
+//
+//                                                    //删除告警redis
+//                                                    redisTemplate.delete(warnName);
                                                 }
                                             } catch (Exception e) {
                                                 log.error("告警入库失败" + e);
@@ -650,11 +651,13 @@ public class DataDealThread implements Runnable {
                 Integer tNormal = Integer.valueOf(taskConstant.get("tNormal").toString());
                 log.info("正常点数：" + tNormal);
                 log.info("异常点数：" + tAbnormal);
+                List<String> cruiseResultIds=new ArrayList<>();//cruiseResultIds
                 try {
                     //满足条件先插巡视点数据
                     List<TCruiseTaskResultDetail> detailList = new ArrayList<>();//TCTRD List对象
                     List<TCruiseDataResult> dataList = new ArrayList<>();//TCDR List对象
                     List<TDefectInfo> defectList = new ArrayList<>();//TDI List对象
+
                     //从redisList中取出目前为止本任务中执行算法的所有巡视点
                     List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, redisTemplate.opsForList().size("cruiseKeys:" + TASKID) - 1);
                     log.info("cruisekeys:" + cruiseKeys);
@@ -676,9 +679,10 @@ public class DataDealThread implements Runnable {
                         tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
                         log.info("TCDRD内容：" + tCruiseTaskResultDetail);
                         detailList.add(tCruiseTaskResultDetail);
+                        cruiseResultIds.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                         //TCDR
-                        log.info("TCRDR开始");
+                        log.info("TCDR开始");
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                         tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
                         tCruiseDataResult.setCruiseName(cruiseWorkedMap.get("cruiseName").toString());
@@ -729,6 +733,9 @@ public class DataDealThread implements Runnable {
                     log.info("两表开始插入");
                     analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
                     analyseDataOperateService.batchInsertCruiseDataResult(dataList);
+                    log.info("------------点结果插入后调用updateCruiseResultIds----------------------");
+                    Constant.otherServerList(cruiseResultIds,Constant.TASK_FINISH);
+                    log.info("----------------------------------");
                     redisTemplate.delete("cruiseKeys:" + TASKID);
                     log.info("Loading........清空本任务至此的巡视点");
 //                if (warnList.size() > 0) {
@@ -784,6 +791,7 @@ public class DataDealThread implements Runnable {
                         tCruiseResult.setTaskWait(0);
                         analyseDataOperateService.updateCruiseResult(tCruiseResult);
 
+
                         // webSocket通知前端调用巡视监控的接口（任务完成）
                         Map<String, Object> jasonMap = new HashMap<>();
                         jasonMap.put("type", "lastOneInstance");
@@ -791,6 +799,7 @@ public class DataDealThread implements Runnable {
                         String json = JSON.toJSONString(jasonMap);
                         log.info("发送给前端的消息：" + json);
                         WebSocketServer.sendMsg(json);
+
 
                         //任务执行完成 删除当前任务的缓存
                         redisTemplate.delete("taskConstant:" + TASKID);

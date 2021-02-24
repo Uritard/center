@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.SystemInfoUtil;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
@@ -151,8 +152,8 @@ public class SystemInfoService {
         List<Map<String,String>> reList = new ArrayList<>();
         for (TCameraRecorderDetail item:list) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",item.getRecordId() );
-            Result re = getNVRInfo(recordIdMap);
+            recordIdMap.put("recorderId",item.getRecordId() );
+            Result re = getNVRInfo(item.getRecordId());
 
             if(re == null){
                 continue;
@@ -163,28 +164,29 @@ public class SystemInfoService {
                 Integer all = Integer.valueOf(map.get("capacityTotal"));
                 Integer other = all - use;
                 map.put("use",other.toString());
-                map.put("recoderName",item.getRecordName());
+                map.put("recorderName",item.getRecordName());
             }else {
-                map.put("recordId",item.getRecordId().toString());
-                map.put("recordName",item.getRecordName());
-                map.put("freeTotal","-");
-                map.put("capacityTotal","-");
-                map.put("use","-");
+                map.put("recorderId",item.getRecordId().toString());
+                map.put("recorderName",item.getRecordName());
+                map.put("freeTotal","0");
+                map.put("capacityTotal","0");
+                map.put("use","0");
             }
 
             reList.add(map);
         }
         return reList;
     }
-    private static Result getNVRInfo(HashMap map) {
+    private static Result getNVRInfo(Long recordId) {
         Result re = null;
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,map);
+                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,recordId);
             }
+//            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.NVR_URL, map, Result.class);
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return re;
     }

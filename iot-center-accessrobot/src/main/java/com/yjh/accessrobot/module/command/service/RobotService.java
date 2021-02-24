@@ -188,6 +188,7 @@ public class RobotService {
         log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus());
 
         int res = tRobotInfoDao.update(tRobotInfo);
+        log.info("修改结果==="+res);
         //机器人状态改变给前端推送webSocket
         /*Map<String,Object> jasonMap=new HashMap<>();
         jasonMap.put("type","robotStatus");
@@ -196,7 +197,10 @@ public class RobotService {
         WebSocketServer.sendMsg(json);*/
         return res;
     }
-
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> selectAllRobotCode() {
+        return tRobotInfoDao.selectAllRobotCode();
+    }
     //@Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
@@ -640,6 +644,7 @@ public class RobotService {
         log.info("准备遍历的点是===" + instanceIdList);
         List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
         List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
+        List<String> cruiseResultIdList = new ArrayList<>();
         List<Long> instancedList = new ArrayList<>();//插过库的点
 
         //读异常点缓存表巡检点
@@ -676,6 +681,7 @@ public class RobotService {
                         .setDeviceName(redisInfoMap.get("deviceName"))
                         .setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
                 tCTRDList.add(tCruiseTaskResultDetail);
+                cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
                 instancedList.add(Long.valueOf(redisInfoMap.get("instanceId")));
 
                 TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
@@ -740,6 +746,7 @@ public class RobotService {
         log.info("res1的内容是===" + res1);
         //批量插入TCDR库
         int res2 = batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
+        otherServer(cruiseResultIdList);
         log.info("res2的内容是===" + res2);
 
 
@@ -770,6 +777,10 @@ public class RobotService {
         return 1;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public Result otherServer(List<String > cruiseResultIdList) {
+        return Constant.otherServerList(cruiseResultIdList,Constant.TASK_FINISH);
+    }
     //@Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectTaskResultId(String taskId) {

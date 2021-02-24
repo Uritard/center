@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -14,6 +15,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
@@ -122,6 +124,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                 //任务超期时间
                 Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                 tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
+
+                TCruiseDataResultService tCruiseDataResultService  = StaticContextAccessor.getBean(TCruiseDataResultService.class);
 
                 Date taskStart = new Date();
                 log.info("开始进行任务" +taskStart);
@@ -250,7 +254,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                 log.info("开始巡检"+new Date());
 
-
+                List<String> cruiseResultIdList = new ArrayList<>();
                 for (TCruisePointInstanceNameDetail item : instancesList) {
 
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -291,6 +295,26 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetail.setEndTime(new Date());
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
+                            //tCruiseDataResultService.updateCruiseAnalyze();
+
+                            Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                            String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
+                            Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                            tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
+                            tCruiseTaskResultDetailMap.put("taskId",taskId);
+                            tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
+                            tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
+                            tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
+                            tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
+                            tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
+                            tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
+
+                            tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
+                            tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
+                            tCruiseTaskResultDetailMap.put("cameraId",tCameraPreset.getCameraId().toString());
+                            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             continue;
                         }
 
@@ -332,9 +356,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                             Integer cameraState = Integer.valueOf(mapForCameraState.get("state"));
                             if(cameraState == 1){//摄像头在任务中
                                 while (cameraState == 1){
-                                    Thread.sleep(waitTime+10000);
+                                    Thread.sleep(waitTime+1000);
                                     log.info("任务："+tCruiseTask.getTaskName()+"在"+simpleDateFormat.format(new Date())+"时已经等待了"+(waitTime+1000)/1000+"秒");
-                                    cameraState = Integer.valueOf(mapForCameraState.get("state"));
+                                    Map<String,String> mapForCameraStateForGet = redisTemplate.opsForHash().entries("camera_info:"+tCameraPreset.getCameraId());
+                                    cameraState = Integer.valueOf(mapForCameraStateForGet.get("state"));
                                 }
                             }
 //                            mapForCameraState.put("taskId",tCruiseTask.getTaskId());
@@ -380,6 +405,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                             tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                              tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                              str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
@@ -454,6 +480,22 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
                                 //log.info("tCruiseTaskResultDetailMap" +tCruiseTaskResultDetailMap);
                                 //log.info("tCruiseDataResultMap" +tCruiseDataResultMap);
+
+                                List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
+                                TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
+                                Integer recognitionMode = 0;
+                                if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
+                                    recognitionMode = 1;
+                                }
+                                if("on".equals(tStdDevicemete.getIsAi())){
+                                    if(recognitionMode == 1){
+                                        recognitionMode = 0;
+                                    }else {
+                                        recognitionMode = 2;
+                                    }
+                                }
+                                tCruiseTaskResultDetailMap.put("recognitionMode",recognitionMode.toString());
+
                                 redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                                 //抓图成功 算法分析
                                 if(redisTemplate.hasKey("analysisList:"+taskId)) {
@@ -465,8 +507,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     analysisInstanceList.add(item.getInstanceId().toString());
                                     redisTemplate.opsForList().leftPushAll("analysisList:"+taskId,analysisInstanceList);
                                 }
-                                List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
-                                TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
+
                                 for (TAlgorithmInfo tAlgorithmInfo:tAlgorithmInfoList) {
                                     Analysis analysis = new Analysis();
                                     analysis.setTaskId(tCruiseTask.getTaskId());
@@ -532,6 +573,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseTaskResultDetail.setEndTime(new Date());
                                 tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
                                 tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                                cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                                  tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
                                  str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
@@ -698,6 +740,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                     mapForAbnormal.put("normal",normal.toString());
                     redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
                 }
+                tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
+
                 //任务结束生成结果，
                 Analysis analysis = new Analysis();
                 analysis.setTaskId(tCruiseTask.getTaskId());
