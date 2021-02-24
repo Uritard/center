@@ -207,7 +207,7 @@ public class SysLogController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-            
+
             String isDecode =enmap.get("content");
             if("true".equals(isDecode)) {
                 userName= Demo.decrypt(userName);
