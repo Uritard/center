@@ -43,7 +43,7 @@ public class TCfgMeteController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统测点数据",content = "根据用户传递的参数新增系统测点数据",logType = 2)
-    public Result add(@Validated  @RequestBody TCfgMete tCfgMete) {
+    public Result add(@RequestBody TCfgMete tCfgMete) {
         Result result = new Result();
         try {
             result.setData(tCfgMeteService.insert(tCfgMete));
@@ -170,7 +170,7 @@ public class TCfgMeteController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入系统测点数据",content = "根据用户传递的参数批量插入系统测点信息",logType = 2)
-    public Result batchAdd(@Validated @RequestBody List<TCfgMete> list) {
+    public Result batchAdd(@RequestBody List<TCfgMete> list) {
         Result result = new Result();
         try {
         result.setData(tCfgMeteService.batchInsert(list));

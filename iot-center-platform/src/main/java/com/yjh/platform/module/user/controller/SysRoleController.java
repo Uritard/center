@@ -45,7 +45,7 @@ public class SysRoleController {
     @ApiOperation(value = "插入用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
     @Logs(title = "新增角色数据",content = "根据用户传递的参数新增角色数据",logType = 2)
-    public Result insert(@Validated @RequestBody  SysRole sysRole) {
+    public Result insert(@RequestBody  SysRole sysRole) {
 
         Result result = new Result();
         try {

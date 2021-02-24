@@ -43,7 +43,7 @@ public class TCruisePointInstanceController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检点数据",content = "根据用户传递的参数新增巡检点数据",logType = 2)
-    public Result add(@Validated  @RequestBody TCruisePointInstance tCruisePointInstance) {
+    public Result add(@RequestBody TCruisePointInstance tCruisePointInstance) {
         Result result = new Result();
         try {
             result.setData(tCruisePointInstanceService.insert(tCruisePointInstance));
@@ -179,7 +179,7 @@ public class TCruisePointInstanceController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入巡检点数据",content = "根据用户传递的参数批量插入巡检点数据",logType = 2)
-    public Result batchAdd(@Validated @RequestBody List<TCruisePointInstance> list) {
+    public Result batchAdd( @RequestBody List<TCruisePointInstance> list) {
         Result result = new Result();
         try {
             result.setData(tCruisePointInstanceService.batchInsert(list));

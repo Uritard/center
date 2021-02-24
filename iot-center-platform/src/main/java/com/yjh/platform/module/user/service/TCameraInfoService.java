@@ -311,10 +311,15 @@ public class TCameraInfoService {
     public int intoRedis() {
         List<Long> list =tCameraInfoDao.selectCameraAll();
         for (Long item:list) {
-            Map<String,String> map = new HashMap<>();
+            String str = "camera_info:"+item;
+            Map<String,String> map = redisTemplate.opsForHash().entries(str);
+            if(map != null && map.size()>0){
+                continue;
+            }else {
+                map = new HashMap<>();
+            }
             map.put("cameraId",item.toString());
             map.put("state","0");
-            String str = "camera_info:"+item;
             redisTemplate.opsForHash().putAll(str, map);
         }
        return 1;
