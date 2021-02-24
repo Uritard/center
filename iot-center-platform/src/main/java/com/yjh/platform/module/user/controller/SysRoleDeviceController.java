@@ -45,7 +45,7 @@ public class SysRoleDeviceController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增角色和设备关联数据",content = "根据用户传递的参数新增角色和设备关联数据",logType = 2)
-    public Result insert(@Validated @RequestBody   SysRoleDevice sysRoleDevice) {
+    public Result insert(@RequestBody   SysRoleDevice sysRoleDevice) {
 
         Result result = new Result();
         try {
@@ -146,7 +146,7 @@ public class SysRoleDeviceController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入角色和设备关联数据",content = "根据用户传递的参数批量插入角色和设备关联数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<SysRoleDevice> list) {
+    public Result batchInsert( @RequestBody List<SysRoleDevice> list) {
         Result result = new Result();
         try {
             result.setData(sysRoleDeviceService.batchInsert(list));

@@ -47,7 +47,7 @@ public class TDeviceMaintenanceController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "插入设备检修区域",content = "根据用户传递的参数新增设备检修区域",logType = 2)
-    public Result add(@Validated  @RequestBody TDeviceMaintenance tDeviceMaintenance) {
+    public Result add( @RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
             result.setData(tDeviceMaintenanceService.add(tDeviceMaintenance));
@@ -155,7 +155,7 @@ public class TDeviceMaintenanceController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入设备检修区域",content = "根据用户传递的参数批量插入设备检修区域",logType = 2)
-    public Result batchAdd(@Validated @RequestBody List<TDeviceMaintenance> list) {
+    public Result batchAdd(@RequestBody List<TDeviceMaintenance> list) {
         Result result = new Result();
         try {
         result.setData(tDeviceMaintenanceService.batchAdd(list));

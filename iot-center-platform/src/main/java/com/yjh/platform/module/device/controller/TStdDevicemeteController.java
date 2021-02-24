@@ -57,7 +57,7 @@ public class TStdDevicemeteController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增标准设备测点",content = "根据用户传递的参数新增标准设备测点",logType = 2)
-    public Result add(@Validated  @RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request)  {
+    public Result add(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request)  {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
@@ -208,7 +208,7 @@ public class TStdDevicemeteController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入标准设备测点",content = "根据用户传递的参数批量插入标准设备测点",logType = 2)
-    public Result batchAdd(@Validated @RequestBody List<TStdDeviceMete> list, HttpServletRequest request) {
+    public Result batchAdd(@RequestBody List<TStdDeviceMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

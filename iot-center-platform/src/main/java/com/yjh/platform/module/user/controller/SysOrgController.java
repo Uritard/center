@@ -43,7 +43,7 @@ public class SysOrgController {
     @ApiOperation(value = "新增组织机构")
     @RequestMapping(value = "/addOrg", method = RequestMethod.POST)
     @Logs(title = "新增组织机构",content = "根据用户传递的参数新增组织机构数据",logType = 2)
-    public Result insert(@Validated @RequestBody   SysOrg sysOrg) {
+    public Result insert(@RequestBody   SysOrg sysOrg) {
 
         Result result = new Result();
         try {

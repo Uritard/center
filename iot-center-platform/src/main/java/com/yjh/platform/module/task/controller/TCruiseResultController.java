@@ -51,7 +51,7 @@ public class TCruiseResultController {
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
     @Logs(title = "新增巡检任务结果数据",content = "根据用户传递的参数新增巡检任务结果数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TCruiseResult tCruiseResult) {
+    public Result insert(@RequestBody TCruiseResult tCruiseResult) {
         Result result = new Result();
         try {
             result.setData(tCruiseResultService.insert(tCruiseResult));
@@ -290,7 +290,7 @@ public class TCruiseResultController {
     @ApiOperation(value = "批量插入")
     @PostMapping(value = "/batchInsert")
     @Logs(title = "批量插入数据",content = "根据用户传递的参数批量插入数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TCruiseResult> list) {
+    public Result batchInsert(@RequestBody List<TCruiseResult> list) {
         Result result = new Result();
         try {
             result.setData(tCruiseResultService.batchInsert(list));

@@ -42,7 +42,7 @@ public class TCruiseTaskAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增任务关联数据",content = "根据用户传递的参数新增任务关联数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TCruiseTaskAttr tCruiseTaskAttr) {
+    public Result insert(@RequestBody TCruiseTaskAttr tCruiseTaskAttr) {
         Result result = new Result();
         try {
             result.setData(tCruiseTaskAttrService.insert(tCruiseTaskAttr));
@@ -151,7 +151,7 @@ public class TCruiseTaskAttrController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入关联数据",content = "根据用户传递的参数批量插入任务关联数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TCruiseTaskAttr> list) {
+    public Result batchInsert(@RequestBody List<TCruiseTaskAttr> list) {
         Result result = new Result();
         try {
         result.setData(tCruiseTaskAttrService.batchInsert(list));

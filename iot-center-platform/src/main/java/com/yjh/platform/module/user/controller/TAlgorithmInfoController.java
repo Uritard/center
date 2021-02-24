@@ -44,7 +44,7 @@ public class TAlgorithmInfoController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增算法信息",content = "根据用户传递的参数新增算法信息",logType = 2)
-    public Result insert(@Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
+    public Result insert( @RequestBody TAlgorithmInfo tAlgorithmInfo) {
 
         Result result = new Result();
         try {
@@ -163,7 +163,7 @@ public class TAlgorithmInfoController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入算法信息",content = "根据用户传递的参数批量插入算法信息",logType = 2)
-    public Result batchInsert( @Validated @RequestBody List<TAlgorithmInfo> list) {
+    public Result batchInsert(  @RequestBody List<TAlgorithmInfo> list) {
         Result result = new Result();
         try {
             

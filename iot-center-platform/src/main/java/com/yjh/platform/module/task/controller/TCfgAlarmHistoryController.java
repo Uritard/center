@@ -45,7 +45,7 @@ public class TCfgAlarmHistoryController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增历史告警数据",content = "根据用户传递的参数新增历史告警数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
+    public Result insert(@RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
         Result result = new Result();
         try {
             result.setData(tCfgAlarmHistoryService.insert(tCfgAlarmHistory));
@@ -190,7 +190,7 @@ public class TCfgAlarmHistoryController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入历史告警数据",content = "根据用户传递的参数批量插入历史告警数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TCfgAlarmHistory> list) {
+    public Result batchInsert(@RequestBody List<TCfgAlarmHistory> list) {
         Result result = new Result();
         try {
         result.setData(tCfgAlarmHistoryService.batchInsert(list));

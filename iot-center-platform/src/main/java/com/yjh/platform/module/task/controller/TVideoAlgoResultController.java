@@ -42,7 +42,7 @@ public class TVideoAlgoResultController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增视频轮训任务结果",content = "根据用户传递的参数新增视频轮训任务结果数据",logType = 2)
-    public Result insert(@Validated  @RequestBody TVideoAlgoResult tVideoAlgoResult) {
+    public Result insert(  @RequestBody TVideoAlgoResult tVideoAlgoResult) {
         Result result = new Result();
         try {
             result.setData(tVideoAlgoResultService.insert(tVideoAlgoResult));
@@ -159,7 +159,7 @@ public class TVideoAlgoResultController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入视频轮训任务结果",content = "根据用户传递的参数批量插入数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<TVideoAlgoResult> list) {
+    public Result batchInsert(@RequestBody List<TVideoAlgoResult> list) {
         Result result = new Result();
         try {
         result.setData(tVideoAlgoResultService.batchInsert(list));

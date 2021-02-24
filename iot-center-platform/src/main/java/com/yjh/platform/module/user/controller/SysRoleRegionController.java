@@ -43,7 +43,7 @@ public class SysRoleRegionController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增角色和机器人关联数据",content = "根据用户传递的参数新增角色和机器人关联数据",logType = 2)
-    public Result insert(@Validated @RequestBody  SysRoleRegion sysRoleRegion) {
+    public Result insert(@RequestBody  SysRoleRegion sysRoleRegion) {
 
         Result result = new Result();
         try {
@@ -144,7 +144,7 @@ public class SysRoleRegionController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
     @Logs(title = "批量插入角色和机器人关联数据",content = "根据用户传递的参数批量插入角色和机器人关联数据",logType = 2)
-    public Result batchInsert(@Validated @RequestBody List<SysRoleRegion> list) {
+    public Result batchInsert(@RequestBody List<SysRoleRegion> list) {
         Result result = new Result();
         try {
             result.setData(sysRoleRegionService.batchInsert(list));

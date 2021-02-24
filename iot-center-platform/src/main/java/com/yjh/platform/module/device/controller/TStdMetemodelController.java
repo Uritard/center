@@ -46,7 +46,7 @@ public class TStdMetemodelController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统测点模版",content = "根据用户传递的参数新增系统测点模版",logType = 2)
-    public Result add(@Validated  @RequestBody TStdMeteModel tStdMeteModel) {
+    public Result add(@RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
         try {
             result.setData(tStdMetemodelService.add(tStdMeteModel));
@@ -149,7 +149,7 @@ public class TStdMetemodelController {
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入系统测点模版",content = "根据用户传递的参数批量插入系统测点模版",logType = 2)
-    public Result batchAdd(@Validated @RequestBody List<TStdMeteModel> list) {
+    public Result batchAdd(@RequestBody List<TStdMeteModel> list) {
         Result result = new Result();
         try {
         result.setData(tStdMetemodelService.batchAdd(list));
