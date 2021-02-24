@@ -463,5 +463,20 @@ public class CameraConController {
         return result;
 
     }
+    @ApiOperation(value = "获取到视频文件列表")
+    @RequestMapping(value = "/getTemperature", method = RequestMethod.GET)
+    public Result getTemperature(@RequestParam(value = "cameraId",required = false) Long cameraId)
+    {
+        Result result = new Result();
+        List<String> list=cameraConService.getTemperature(cameraId);
+        if (list.size()>0)
+        {
+            result.setData(list);
+        }else {
+            result.setData("获取温度失败");
+        }
+
+        return result;
+    }
 
 }

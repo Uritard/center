@@ -26,7 +26,9 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.sql.ClientInfoStatus;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1116,6 +1118,89 @@ public class CameraConService {
             log.error( e.getMessage());
         }
     return  list;
+    }
+
+    /**
+     * 获取全画面最高温度
+     * @param cameraId 摄像头id
+     * @return
+     */
+    public List<String> getTemperature(long cameraId)
+    {
+        List<String> list=new ArrayList<String>();
+       try {
+           CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+           cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
+           log.info("通道号："+cameraConInfo.getChannelNum());
+           log.info("getRecordId:"+cameraConInfo.getRecordId());
+               lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+               log.info("lUserIDLong"+lUserIDLong);
+                   HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA   m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+                   m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
+                   m_strJpegWithAppenData.dwChannel =1;
+                   HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 *1024);
+                   HCNetSDK.BYTE_ARRAY ptrP2PDataByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 *1024);
+                   m_strJpegWithAppenData.pJpegPicBuff =ptrJpegByte.getPointer();
+                   m_strJpegWithAppenData.pP2PDataBuff = ptrP2PDataByte.getPointer();
+                   log.info("m_strJpegWithAppenData的值:"+m_strJpegWithAppenData.toString());
+                   boolean bRet =hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong,2, m_strJpegWithAppenData);
+                   log.info("bRet返回值："+bRet);
+                   if (bRet)
+                   {
+                       if (m_strJpegWithAppenData.dwP2PDataLen>0)
+                       {
+                           list.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                           byte [] byTempData = new byte[4];
+                           float[] arr =new float[m_strJpegWithAppenData.dwP2PDataLen];
+                           for (int i = 1 ;i<= m_strJpegWithAppenData.dwJpegPicWidth;i++)
+                           {
+                               for (int j = 1 ;j<= m_strJpegWithAppenData.dwJpegPicHeight;j++)
+                               {
+                                   ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i-1)*(j-1)*4, 4);
+                                   TempDatabuffers.get(byTempData);
+                                   int l;
+                                   l = byTempData[0];
+                                   l &= 0xff;
+                                   l |= ((long) byTempData[1] << 8);
+                                   l &= 0xffff;
+                                   l |= ((long) byTempData[ 2] << 16);
+                                   l &= 0xffffff;
+                                   l |= ((long) byTempData[3] << 24);
+                                   arr[i]=Float.intBitsToFloat(l);
+                                  log.info("行数：" + i +"列数：" + j + "温度数据：" +   Float.intBitsToFloat(l) );
+                               }
+                           }
+                           //获取最大温度值
+                           float max=arr[0];
+                           for (int i=0;i<arr.length;i++){
+                               //4.把获取到的数据一次和temp进行比较，并将最大的值赋值给temp
+                               if(arr[i]>max){
+                                   max=arr[i];
+                               }
+                           }
+                           //转换保留后两位小数
+                           list.add( new  DecimalFormat("##0.00").format(max)+"℃");
+
+                       }else
+                           {
+                               list=null;
+                               int iErr = hCNetSDK.NET_DVR_GetLastError();
+                               log.info("温度不存在"+iErr);
+                           }
+
+                   }else{
+                       int iErr = hCNetSDK.NET_DVR_GetLastError();
+                       log.info("温度获取失败错误码"+iErr);
+                   }
+
+       }catch (Exception e){
+           int iErr = hCNetSDK.NET_DVR_GetLastError();
+           log.info("系统异常"+iErr);
+       }finally {
+           hCNetSDK.NET_DVR_Logout(lUserIDLong);
+           hCNetSDK.NET_DVR_Cleanup();
+       }
+        return list;
     }
 
 

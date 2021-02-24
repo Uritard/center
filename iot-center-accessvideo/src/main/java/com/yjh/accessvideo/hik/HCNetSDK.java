@@ -4078,6 +4078,20 @@ EMAIL参数结构
             return Arrays.asList("byValue");
         }
     }
+    //设备抓图附加全屏测温数据结构体
+    public static class NET_DVR_JPEGPICTURE_WITH_APPENDDATA extends Structure
+    {
+        public int     dwSize;
+        public int     dwChannel;//通道号
+        public int     dwJpegPicLen;//Jpeg图片长度
+        public Pointer pJpegPicBuff;//Jpeg图片指针
+        public int     dwJpegPicWidth;  // 图像宽度
+        public int      dwJpegPicHeight;  //图像高度
+        public int      dwP2PDataLen;//全屏测温数据长度
+        public Pointer  pP2PDataBuff; //全屏测温数据指针
+        public byte     byIsFreezedata;//是否数据冻结 0-否 1-是
+        public byte[]   byRes = new byte[255];
+    }
 
     /***API函数声明,详细说明见API手册***/
     public static interface FRealDataCallBack_V30 extends Callback {
@@ -4086,7 +4100,7 @@ EMAIL参数结构
     }
 
     public static interface FMSGCallBack extends Callback {
-        public void invoke(NativeLong lCommand, NET_DVR_ALARMER pAlarmer, HCNetSDK.RECV_ALARM pAlarmInfo, int dwBufLen, Pointer pUser);
+        public void invoke(NativeLong lCommand, NET_DVR_ALARMER pAlarmer, RECV_ALARM pAlarmInfo, int dwBufLen, Pointer pUser);
     }
 
     public static interface FMessCallBack extends Callback {
@@ -4523,6 +4537,8 @@ EMAIL参数结构
     //获取所有IP，用于支持多网卡接口
     boolean NET_DVR_GetLocalIP(byte sIP[], IntByReference pValidNum, ByteByReference pEnableBind);
     boolean NET_DVR_SetValidIP(int dwIPIndex, boolean bEnableBind);
+
+    boolean NET_DVR_CaptureJPEGPicture_WithAppendData(NativeLong lUserID, int lChannel, NET_DVR_JPEGPICTURE_WITH_APPENDDATA lpJpegWithAppend);
 
 }
 
