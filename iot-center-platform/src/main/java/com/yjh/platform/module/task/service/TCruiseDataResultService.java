@@ -211,18 +211,18 @@ public class TCruiseDataResultService {
             if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getCruiseResult())){
                 tStdDeviceMeteUpdate.setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult());
             }
-            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
-
+            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){
                 tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
             }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
+            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
                 //更新
-                updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
                 log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值");
+                updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
             }else {
                 //插入
-                insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
                 log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值");
+                insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
             }
         }
         return updateRes+insertRes;

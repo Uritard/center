@@ -15,13 +15,17 @@ public class HeartBreakDealThread implements Runnable {
     private String robotCode;
     private RedisTemplate redisTemplate;
     private volatile boolean isThreadStart;
+    private long sendSessionId;
+    private long receiveSessionId;
 
 
-    public HeartBreakDealThread(RobotServerHandler robotServerHandler, String robotCode,RedisTemplate redisTemplate,boolean isThreadStart) {
+    public HeartBreakDealThread(RobotServerHandler robotServerHandler, String robotCode,RedisTemplate redisTemplate,boolean isThreadStart,long sendSessionId,long receiveSessionId) {
         this.robotServerHandler = robotServerHandler;
         this.robotCode = robotCode;
         this.redisTemplate = redisTemplate;
         this.isThreadStart = isThreadStart;
+        this.sendSessionId = sendSessionId;
+        this.receiveSessionId = receiveSessionId;
     }
 
     @Override
@@ -33,8 +37,8 @@ public class HeartBreakDealThread implements Runnable {
                 long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
                 Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
                 Thread.sleep(sleepTime);
-                log.info("线程等待了"+sleepTime+"ms了");
-                robotServerHandler.procSend(robotCode, robotStatusMap);
+                log.info("Thread Wait"+sleepTime+"ms......");
+                robotServerHandler.procSend(robotCode, robotStatusMap,sendSessionId,receiveSessionId);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
