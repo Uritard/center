@@ -13,6 +13,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -911,9 +912,22 @@ public class TCruiseTaskService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskConfirmation(String userId, String password) {
+    public int taskConfirmation(String userId, String password) throws Exception {
         //todo 密码的解密
         SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
+        //判断开关
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+        Boolean flag =Boolean.valueOf(map.get("content")) ;
+        if(!flag){
+            //需要自己解密password
+            sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
+        }else {
+            //
+            password = Demo.decrypt(password);
+            sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
+        }
+        //password = Demo.decrypt(password);
+        //sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
         if (sysUser.getPassword().equals(password)) {
             return 1;
         }
