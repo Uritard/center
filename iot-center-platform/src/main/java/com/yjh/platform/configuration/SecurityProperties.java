@@ -8,15 +8,19 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 @Data
 @Configuration
 @Order
 public class SecurityProperties implements ApplicationRunner {
+    //    @Resource
+//    private TSysParamService tSysParamService;
     @Resource
-    private TSysParamService tSysParamService;
+    private RedisTemplate redisTemplate;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -27,7 +31,8 @@ public class SecurityProperties implements ApplicationRunner {
      * 获取是否加解密
      */
     private void getIsCode() {
-        TSysParam tSysParam=tSysParamService.selectByPrimaryCode();
-        Constant.isDecode=tSysParam.getContent();
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+        Constant.isDecode =map.get("content");
+      //  Constant.isDecode = tSysParam.getContent();
     }
 }
