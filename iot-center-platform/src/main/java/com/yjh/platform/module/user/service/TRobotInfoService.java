@@ -1,5 +1,9 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -34,10 +38,10 @@ public class TRobotInfoService{
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    private String ROBOT_REMOVE_LINK =  "http://iot-center-accessrobot/robot/v1/removeLink?robotCode={robotCode}&robotId={robotId}";
 
     private Logger log = LoggerFactory.getLogger(TRobotInfoService.class);
     private SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TRobotInfo tRobotInfo,Long userId) {
@@ -63,6 +67,16 @@ public class TRobotInfoService{
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
         int res =  this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
         redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
+
+        //判断删除前的robotCode是否存在管道连接(在线),若存在，则断开连接
+        if (tRobotInfo.getRobotStatus().equals("在线")){
+            HashMap<String,String> map = new HashMap<>();
+            map.put("robotCode",tRobotInfo.getRobotCode());
+            map.put("robotId",tRobotInfo.getRobotId().toString());
+            log.info("删除前的robotCode==="+map);
+            sendPostRequest(ROBOT_REMOVE_LINK,map);
+        }
+
         return res;
     }
 
@@ -71,8 +85,24 @@ public class TRobotInfoService{
         String userName = tRobotInfoDao.selectUserName(userId);
         tRobotInfo.setUpdateBy(userName);
         tRobotInfo.setUpdateDate(new Date());
+        TRobotInfo tRobotInfoPri = tRobotInfoDao.selectByPrimaryId(tRobotInfo.getRobotId());
+
         int res = this.tRobotInfoDao.update(tRobotInfo);
         redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+
+        //判断修改前的robotCode是否存在管道连接(在线),若存在，则断开连接
+        if (!tRobotInfoPri.getRobotCode().equals(tRobotInfo.getRobotCode()) && tRobotInfoPri.getRobotStatus().equals("在线")){
+            HashMap<String,String> map = new HashMap<>();
+            map.put("robotCode",tRobotInfoPri.getRobotCode());
+            map.put("robotId",tRobotInfoPri.getRobotId().toString());
+            log.info("修改前的robotCode==="+map);
+            Result result = sendPostRequest(ROBOT_REMOVE_LINK,map);
+            TRobotInfo tRobotInfoTemp = new TRobotInfo()
+                    .setRobotStatus(result.getData().toString())
+                    .setRobotId(tRobotInfoPri.getRobotId());
+            tRobotInfoDao.update(tRobotInfoTemp);
+        }
+
         return res;
     }
     @Transactional(rollbackFor = Exception.class)
@@ -355,5 +385,17 @@ public class TRobotInfoService{
             }
         }
         return xmlPath;
+    }
+    public Result sendPostRequest(String url,HashMap<String,String> params) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.getForObject(url, Result.class,params);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
     }
 }

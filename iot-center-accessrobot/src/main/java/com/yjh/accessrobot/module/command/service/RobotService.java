@@ -51,7 +51,6 @@ public class RobotService {
     @Resource
     private SysUserDao sysUserDao;
 
-    //@Logs(title = "巡视主机向机器人下发控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) throws Exception{
         Map scmap = new HashMap();
@@ -127,7 +126,6 @@ public class RobotService {
 
     }
 
-    //@Logs(title = "巡视主机向机器人下发模型同步指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public boolean feignRobotTransfer(String robotCode) throws Exception {
         boolean res = false;
@@ -156,7 +154,9 @@ public class RobotService {
         return res;
     }
 
-    //生成发送byte指令，附带测试
+    /*
+    * 生成发送byte指令，附带测试
+    * */
     public byte[] generateByteOrder(String xmlString, String robotCode) {
         long sendSessionId = Constant.sendSessionId;
         RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
@@ -178,7 +178,6 @@ public class RobotService {
         return requestProtocol;
     }
 
-    //@Logs(title = "机器人在线状态更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int updateRobotInfo(String robotCode, String robotStatus) {
         Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
@@ -189,22 +188,14 @@ public class RobotService {
 
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("修改结果==="+res);
-        //机器人状态改变给前端推送webSocket
-        /*Map<String,Object> jasonMap=new HashMap<>();
-        jasonMap.put("type","robotStatus");
-        jasonMap.put("status",tRobotInfo.getRobotStatus());
-        String json= JSON.toJSONString(jasonMap);
-        WebSocketServer.sendMsg(json);*/
         return res;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectAllRobotCode() {
         return tRobotInfoDao.selectAllRobotCode();
     }
-    //@Logs(title = "机器人模型同步到数据库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
-        //从缓存中获取系统参数
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         //机器人模型文件
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
@@ -233,24 +224,11 @@ public class RobotService {
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
 
-        log.info("机器人code是:" + xmlBaseModel.getSendCode());
         Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
-        log.info("机器人的id是：" + robotId);
 
-        /*String robotFactory = tRobotInfoDao.selectDictCode("robot_factory",robotMap.get(0).get("manufacturer").toString());
-        Integer robotType = null;
-        if ("1".equals(robotMap.get(0).get("manufacturer").toString())){
-            robotType = 156;
-        }else if ("2".equals(robotMap.get(0).get("manufacturer").toString())){
-            robotType = 155;
-        }else if ("3".equals(robotMap.get(0).get("manufacturer").toString())){
-            robotType = 399;
-        }*/
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
-                /*.setRobotFactory(robotFactory)
-                .setRobotType(robotType);*/
         log.info("获得的tRobotInfo是：" + tRobotInfo);
 
         //更新机器人地图信息
@@ -389,7 +367,6 @@ public class RobotService {
         return 1;
     }
 
-    //@Logs(title = "机器人收到下发任务指令/控制指令后，巡视主机接收响应处理", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> receivingResponse(XMLBaseModel xmlBaseModel) {
         Constant.robotResultMap.put("Type",xmlBaseModel.getType());
@@ -398,7 +375,6 @@ public class RobotService {
         return Constant.robotResultMap;
     }
 
-    //@Logs(title = "巡视主机向机器人下发检修区域指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public String deviceMaintenanceIssued(Map<String,Object> resMap) {
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
@@ -439,7 +415,6 @@ public class RobotService {
         }*/
         return "success";
     }
-    //@Logs(title = "巡视主机向机器人下发任务指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
         log.info("传来的ItemMap是==" + ItemMap);
@@ -580,7 +555,6 @@ public class RobotService {
                 .sendHeartBeat(generateByteOrder(xmlString,resMap.get("receiveCode").toString()), resMap.get("receiveCode").toString());
         return 1;
     }
-    //@Logs(title = "巡视主机向机器人下发任务控制指令接口", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap) throws Exception {
         log.info("robotTaskControlMap===" + robotTaskControlMap);
@@ -781,49 +755,41 @@ public class RobotService {
     public Result otherServer(List<String > cruiseResultIdList) {
         return Constant.otherServerList(cruiseResultIdList,Constant.TASK_FINISH);
     }
-    //@Logs(title = "根据taskId查询相关内容", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseResult selectTaskResultId(String taskId) {
         return tRobotInfoDao.selectTaskResultId(taskId);
     }
 
-    //@Logs(title = "根据taskId查询相关内容2", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
 
-    //@Logs(title = "根据robotCode查询robotId", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public Long selectRobotIdByCode(String robotCode) {
         return tRobotInfoDao.selectRobotIdByCode(robotCode);
     }
 
-    //@Logs(title = "机器人本体告警信息入库", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {
         return this.tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
     }
 
-    //@Logs(title = "TCDR信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseDataResult(List<TCruiseDataResult> tCruiseDataResultList) {
         return this.tRobotInfoDao.batchInsertCruiseDataResult(tCruiseDataResultList);
     }
 
-    //@Logs(title = "TCTRD信息入库--批量插", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList) {
         return this.tRobotInfoDao.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetailList);
     }
 
-    //@Logs(title = "TCR信息更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int updateTCruiseResult(TCruiseResult tCruiseResult) {
         return this.tRobotInfoDao.updateTCruiseResult(tCruiseResult);
     }
 
-    //@Logs(title = "TCTR信息更新", code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
@@ -860,7 +826,6 @@ public class RobotService {
     }
 
 
-    //@Logs(title ="站端控制机器人",code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel){
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
@@ -876,7 +841,6 @@ public class RobotService {
         return "success";
     }
 
-    //@Logs(title ="机器人数据上报巡视主机",code = "Robot")
     @Transactional(rollbackFor = Exception.class)
     public String upToCruise(XMLBaseModel xmlBaseModel){
         Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
@@ -940,6 +904,8 @@ public class RobotService {
                 case "12":
                     dictNote = "沉降监测点";
                     break;
+                default:
+                    break;
             }
         }else if (valueName.equals("meterType")){
             switch (value){
@@ -966,6 +932,8 @@ public class RobotService {
                     break;
                 case "9":
                     dictNote = "气压表";
+                    break;
+                default:
                     break;
             }
         }else if (valueName.equals("deviceType")){
@@ -1054,14 +1022,16 @@ public class RobotService {
                 case "28":
                     dictNote = "避雷器动作次数表";
                     break;
+                default:
+                    break;
             }
         }
-
         Integer dictCode = Integer.valueOf(tRobotInfoDao.selectDictCode(colName,dictNote));
         return dictCode;
     }
-
-    //机器人巡视结果交给算法再分析
+    /*
+    * 机器人巡视结果交给算法,分析后再处理
+    * */
     public List<AlgorithmDeviceMete> AnalyzeAfterRobot(Analysis analysisItem,String inspectionCode){
         List<AlgorithmDeviceMete> algorithmDeviceMeteList = tRobotInfoDao.selectAlgorithm(inspectionCode);
 
@@ -1110,6 +1080,18 @@ public class RobotService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+    /*
+    * 若修改机器人编码或删除机器人断开在线的机器人连接
+    * */
+    public String removeLink(String robotCode,Long robotId){
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).removeLink(robotCode);
+        /*TRobotInfo tRobotInfo = new TRobotInfo()
+                .setRobotId(robotId)
+                .setRobotStatus("离线");
+        int res = tRobotInfoDao.update(tRobotInfo);
+        log.info("修改成功==="+res);*/
+        return "离线";
     }
 }
 

@@ -72,9 +72,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
-
     public boolean getIsThreadStart() {
         return isThreadStart;
+    }
+
+    public ChannelHandlerContext getCtx() {
+        return ctx;
     }
 
     private ChannelHandlerContext ctx;
@@ -95,7 +98,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         //TO DO: channel 和 ChannelPipeline 是否需要关闭？？
         ctx.close().sync();
         ctx.flush();
-        log.info("Connection is Removed.");
+        log.info("Connection is Removed."+ctx.channel().id());
     }
 
     @Override
@@ -166,13 +169,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
        /*String socketMessageHex = Str.toString().replace(" ","").toLowerCase();
-    log.info("socketMessageHex:"+socketMessageHex);
-    PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
-    TaskExecutePool.getInstance().execute(packetDealThread);
-    int headNum = appearNumber(socketMessageHex,"eb90");
-    chaibao(socketMessageHex,headNum);*/
-
-//        lookByte(bytes);//看指令
+        log.info("socketMessageHex:"+socketMessageHex);
+        PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
+        TaskExecutePool.getInstance().execute(packetDealThread);
+        int headNum = appearNumber(socketMessageHex,"eb90");
+        chaibao(socketMessageHex,headNum);
+        lookByte(bytes);//看指令*/
 
         String body = new String(bytes, StandardCharsets.UTF_8);
         log.info("机器人发来的内容="+body);
@@ -246,7 +248,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
          Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
          Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
 
-        String code = "";
+        /*String code = "";
         List<String> allRobotCodeList = nowRobotCode();
         if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
              code = "200";//success
@@ -260,7 +262,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 code = "400";//拒绝
                 log.info("缓存无，表中无，不可以注册");
             }
-        }
+        }*/
 
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
@@ -270,11 +272,26 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     Constant.registerCount++;
                     List<Map<String, Object>> itemsList = new ArrayList<>();
                     Map<String, Object> items = new HashMap<>();
-
+                    String code = "";
+                    List<String> allRobotCodeList = nowRobotCode();
+                    if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
+                        code = "200";//success
+                        log.info("缓存有,可以注册");
+                    }else {
+                        List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
+                        if (robotCodeList.contains(xmlBaseModel.getSendCode())){
+                            code = "200";
+                            log.info("缓存无，表中有，可以注册");
+                        }else {
+                            code = "400";//refuse
+                            log.info("缓存无，表中无，不可以注册");
+                        }
+                    }
                     items.put("heart_beat_interval", heartbeatIntervalMap.get(redisValue));//心跳间隔
                     items.put("robot_run_interval", runDataIntervalMap.get(redisValue));//机器人运行数据间隔
                     items.put("weather_interval", weatherDataIntervalMap.get(redisValue));//微气象数据间隔
                     itemsList.add(items);
+
                     XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
                             .setSendCode(platformServerMap.get(redisValue))
                             .setReceiveCode(xmlBaseModel.getSendCode())
@@ -286,9 +303,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
                     sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
+
                     if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
                         robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
                     }
+
                     robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     //Start heatBreakDealThread
                     HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart,sendSessionId,receiveSessionId);
@@ -305,11 +324,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, heartProtocol,xmlBaseModel.getSendCode());*/
                     //若心跳能够正常收发，将机器人置为在线状态
                     Constant.flag = 1;
-                    log.info("flag2的值==="+flag2);
+                    /*log.info("flag2的值==="+flag2);
                     if (flag2 == 0){
                         robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
                         flag2 = 1;
-                    }
+                    }*/
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -513,7 +532,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 //微气象数据(接收并发送响应)
                 case "21":
                     log.info("巡视主机收到微气象数据了");
-                    //Deal with robot microclimate data
+                    //Deal with robot micro climate data
                     List<Map<String,String>> weatherList = new ArrayList<>();
                     xmlBaseModel.getItems().forEach(res-> {
                         Map<String, String> weatherMap = new HashMap<>();
@@ -698,7 +717,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * */
     void procSend(String robotCode, Map<String, String> robotStatusMap,long sendSessionId,long receiveSessionId ) {
         heartNum ++;
-        log.info("heartNum==="+heartNum);
+        log.info("heartNum==="+heartNum+"      "+ctx.channel().id());
         if (heartNum > 3){
             heartBeatFailAfter(robotCode,robotStatusMap);
         }
@@ -735,16 +754,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * 没有收到心跳指令,removeLink && updateRobotStatus
     * */
     void heartBeatFailAfter(String robotCode,Map<String, String> robotStatusMap){
-        isThreadStart = false;
-        try {
-            robotServerHandlerMap.remove(robotCode);
-            ctx.close().sync();
-            ctx.flush();
-            super.channelInactive(ctx);
-        } catch (Exception e) {
-            isThreadStart = false;
-            log.error("clientDisconnect: " + e.getMessage());
-        }
+        removeLink(robotCode);
 
         robotService.updateRobotInfo(robotCode,"离线");
         robotStatusMap.put("value","1");//异常
@@ -891,5 +901,23 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             endStr.append(String.format("%02x ", byteItem));
         }
         log.info("结束标志符号指令是<start>" + endStr + "<end>");
+    }
+    /*
+    * 和客户端断开连接
+    * */
+    public void removeLink(String robotCode){
+        try {
+            log.info("准备断连的是=="+ctx.channel().id());
+            robotServerHandlerMap.remove(robotCode);
+            ctx.close().sync();
+            ctx.flush();
+            super.channelInactive(ctx);
+            log.info("成功断开连接......");
+        } catch (Exception e) {
+            isThreadStart = false;
+            log.error("clientDisconnect: " + e.getMessage());
+        }
+
+
     }
 }

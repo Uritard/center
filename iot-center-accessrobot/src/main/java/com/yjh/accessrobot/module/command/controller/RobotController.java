@@ -37,8 +37,6 @@ public class RobotController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-
-
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
     public RobotController(RobotService robotService) { this.robotService = robotService; }
@@ -68,6 +66,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送模型同步指令接口")
     @RequestMapping(value = "/fileTransfer", method = RequestMethod.GET)
+    @Logs(title = "模型同步",content = "根据用户传递的参数给机器人发送模型同步指令",logType = 5)
     public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
@@ -82,6 +81,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务指令接口")
     @RequestMapping(value = "/taskIssued", method = RequestMethod.POST)
+    @Logs(title = "机器人下发任务",content = "根据用户传递的参数给机器人下发任务",logType = 5)
     public Result feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         Result result = new Result();
         try {
@@ -96,6 +96,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务控制指令接口")
     @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
+    @Logs(title = "机器人任务控制",content = "根据用户传递的参数给机器人发送任务控制指令",logType = 5)
     public Result feignRobotTaskControl(@RequestBody Map<String, Object> robotTaskControlMap) {
         Result result = new Result();
         try {
@@ -105,6 +106,70 @@ public class RobotController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("发送任务控制接口调用错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "站端命令下发")
+    @RequestMapping(value = "/upSystemCommand", method = RequestMethod.POST)
+    @Logs(title = "站端命令下发",content = "根据用户传递的参数控制机器人",logType = 5)
+    public Result upSystemCommand(@RequestBody Map<String,List<XMLBaseModel>> map){
+        Result result = new Result();
+        try {
+            XMLBaseModel xmlBaseModel = map.get("list").get(0);
+            log.info("--站端控制数据--"+xmlBaseModel);
+            result.setData(robotService.upSystemCommand(xmlBaseModel));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站端命令下发错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视主机向机器人下发检修区域指令接口")
+    @RequestMapping(value = "/deviceMaintenanceIssued", method = RequestMethod.POST)
+    @Logs(title = "下发检修区域",content = "根据用户传递的参数给机器人下发检修区域指令",logType = 5)
+    public Result deviceMaintenanceIssued(@RequestBody Map<String,Object> resMap){
+        Result result = new Result();
+        try {
+            result.setData(robotService.deviceMaintenanceIssued(resMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("巡视主机向机器人下发检修区域指令接口发生错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "巡视主机联动任务下给机器人的指令接口")
+    @RequestMapping(value = "/taskIssued2", method = RequestMethod.POST)
+    @Logs(title = "给机器人下发联动任务",content = "根据用户传递的参数给机器人下发联动任务指令",logType = 5)
+    public Result feignRobotTaskIssued2(@RequestBody Map<String,Object> resMap){
+        Result result = new Result();
+        try {
+            result.setData(robotService.feignRobotTaskIssued2(resMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("巡视主机联动任务下给机器人的指令接口发生错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "断开连接接口")
+    @GetMapping(value = "/removeLink")
+    @Logs(title = "断开连接",content = "根据用户传递的参数断开该机器人的连接",logType = 5)
+    public Result removeLink(@RequestParam(value = "robotCode")  String robotCode,
+                             @RequestParam(value = "robotId")  Long robotId){
+        Result result = new Result();
+        try {
+            log.info("RemoveLink coming......");
+            result.setData(robotService.removeLink(robotCode,robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("断开连接接口发生错误:", e);
         }
         return result;
     }
@@ -125,48 +190,4 @@ public class RobotController {
         return result;
     }
 
-    @ApiOperation(value = "站端命令下发")
-    @RequestMapping(value = "/upSystemCommand", method = RequestMethod.POST)
-    public Result upSystemCommand(@RequestBody Map<String,List<XMLBaseModel>> map){
-        Result result = new Result();
-        try {
-            XMLBaseModel xmlBaseModel = map.get("list").get(0);
-            log.info("--站端控制数据--"+xmlBaseModel);
-            result.setData(robotService.upSystemCommand(xmlBaseModel));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("站端命令下发错误:", e);
-        }
-        return result;
-    }
-    @ApiOperation(value = "巡视主机向机器人下发检修区域指令接口")
-    @RequestMapping(value = "/deviceMaintenanceIssued", method = RequestMethod.POST)
-    public Result deviceMaintenanceIssued(@RequestBody Map<String,Object> resMap){
-        Result result = new Result();
-        try {
-            result.setData(robotService.deviceMaintenanceIssued(resMap));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡视主机向机器人下发检修区域指令接口发生错误:", e);
-        }
-        return result;
-    }
-    @ApiOperation(value = "巡视主机联动任务下给机器人的指令接口")
-    @RequestMapping(value = "/taskIssued2", method = RequestMethod.POST)
-    public Result feignRobotTaskIssued2(@RequestBody Map<String,Object> resMap){
-        Result result = new Result();
-        try {
-            result.setData(robotService.feignRobotTaskIssued2(resMap));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡视主机联动任务下给机器人的指令接口发生错误:", e);
-        }
-        return result;
-    }
 }

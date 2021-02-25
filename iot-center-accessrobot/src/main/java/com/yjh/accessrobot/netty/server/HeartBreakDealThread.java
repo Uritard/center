@@ -37,8 +37,10 @@ public class HeartBreakDealThread implements Runnable {
                 long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
                 Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
                 Thread.sleep(sleepTime);
-                log.info("Thread Wait"+sleepTime+"ms......");
+                log.info("Thread wait "+sleepTime+" ms......");
                 robotServerHandler.procSend(robotCode, robotStatusMap,sendSessionId,receiveSessionId);
+                if (!robotServerHandler.getIsThreadStart()) isThreadStart = false;
+                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId()+",id: "+robotServerHandler.getCtx().channel().id());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
