@@ -628,6 +628,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void SendHeartBeat(Analysis analysis) throws InterruptedException {
+        log.info("analysis-INFO-----:"+analysis);
         String instanceId = analysis.getInstanceId().toString();
         String taskId = analysis.getTaskId();
         Thread.sleep(3000);

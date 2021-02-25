@@ -90,19 +90,18 @@ public class DataDealThread implements Runnable {
                     log.info("数据****：" + jsonObjectResult);//打印resultInfo
 
                     //处理判别结果
-                    if(jsonObjectResult.get("analyseType").toString().equals("11")){
+                    if (jsonObjectResult.get("analyseType").toString().equals("11")) {
                         //获取分析结果图片地址
-                        String taskId=jsonObjectResult.get("taskId").toString();
-                        Long instanceId=Long.valueOf(jsonObjectResult.get("instanceId").toString());
-                        String resultImage=jsonObjectResult.get("analyseResultImg").toString();
-                        if(instanceId !=0){
-                            // TODO: 2021/2/6 联调时修改完善 
+                        String taskId = jsonObjectResult.get("taskId").toString();
+                        Long instanceId = Long.valueOf(jsonObjectResult.get("instanceId").toString());
+                        String resultImage = jsonObjectResult.get("analyseResultImg").toString();
+                        if (instanceId != 0) {
+                            // TODO: 2021/2/6 联调时修改完善
                             //插入TCTR
                             //插入TCTRD
                             //插入TCDR
                         }
                     }
-
 
 
                     //初始化TASKID和INSTANCEID
@@ -128,11 +127,15 @@ public class DataDealThread implements Runnable {
                     String redisName = jsonObjectResult.get("taskId").toString() + ":" + jsonObjectResult.get("instanceId").toString();
                     log.info("template:" + redisTemplate);
                     log.info("redisName:" + redisName);
+                    //巡视点信息存储Redis KeyName
+                    String cruiseRedisName = "t_cruise_task_result:" + redisName;
                     Map<String, Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:" + redisName);//读redis
                     log.info("读取到的redis：" + cruiseResult);
+                    String recognitionMode = cruiseResult.get("recognitionMode").toString();
+                    log.info("recognitionMode----识别模式 ：-------" + recognitionMode);
                     Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
 
-                    SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
                     log.info("端口号：" + remotePort);
@@ -140,16 +143,21 @@ public class DataDealThread implements Runnable {
                     try {
                         switch (remotePort) {
                             case 13668:
+                                if (recognitionMode.equals(0)) {
+                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-2");
+                                }
                                 if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
                                     cruiseResultMap.put("resultNum", "缺少标定文件");
                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                                    tAbnormal++;
+                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else if (jsonObjectResult.get("resultValue").equals("识别失败")) {
                                     cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                                    tAbnormal++;
+                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else {
                                     if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
                                         cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
@@ -183,9 +191,9 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("taskId", jsonObjectResult.get("taskId").toString());
                                             warnMap.put("value", jsonObjectResult.get("resultValue").toString());
                                             warnMap.put("imagePath", cruiseResult.get("picpath").toString());
-                                            warnMap.put("confMode","276");
+                                            warnMap.put("confMode", "276");
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
-                                            warnMap.put("defectModel",analyseDataOperateService.selectDictCode("defect_model","其他"));
+                                            warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
                                             log.info("开始告警判断");
                                             log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
                                             switch (tStdDevicemeteM.getMeteKind()) {
@@ -203,9 +211,9 @@ public class DataDealThread implements Runnable {
                                                         warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "状态异常");
                                                         warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                         if (tStdDevicemeteM.getAlarmState() == 0) {
-                                                            warnMap.put("warnContent",  tStdDevicemeteM.getMeteName() +":"+ tStdDevicemeteM.getStateZero() + "--"+analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(),"alarm_level"));
+                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + tStdDevicemeteM.getStateZero() + "--" + analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(), "alarm_level"));
                                                         } else {
-                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() +":"+ tStdDevicemeteM.getStateOne() + "--"+analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(),"alarm_level"));
+                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + tStdDevicemeteM.getStateOne() + "--" + analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(), "alarm_level"));
                                                         }
                                                         warnMap.put("outRange", "--");
 
@@ -219,13 +227,17 @@ public class DataDealThread implements Runnable {
 
                                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                                         cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
-                                                        tAbnormal++;
+//                                                        tAbnormal++;
+                                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
 
                                                     } else {
                                                         //未达到告警值(遥信)
                                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                                         cruiseResultMap.put("cruiseAbnormal", "--");
-                                                        tNormal++;
+//                                                        tNormal++;
+                                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                                     }
                                                     break;
                                                 case "2":
@@ -246,7 +258,7 @@ public class DataDealThread implements Runnable {
                                                         switch (warnRuleMeter) {
                                                             case 1:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
-                                                                warnMap.put("warnContent",  tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--"+"预警");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "预警");
                                                                 alarm_level = "1";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit1()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit1()));
@@ -256,7 +268,7 @@ public class DataDealThread implements Runnable {
                                                                 break;
                                                             case 2:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--" + "一般");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "一般");
                                                                 alarm_level = "2";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit2()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
@@ -266,7 +278,7 @@ public class DataDealThread implements Runnable {
                                                                 break;
                                                             case 3:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
-                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--" + "严重");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "严重");
                                                                 alarm_level = "3";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit3()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit3()));
@@ -277,7 +289,7 @@ public class DataDealThread implements Runnable {
 
                                                             case 4:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
-                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":"+cruiseResultMap.get("resultNum")+"--"+ "危急");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "危急");
                                                                 alarm_level = "4";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit4()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit4()));
@@ -293,12 +305,16 @@ public class DataDealThread implements Runnable {
 
                                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                                         cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
-                                                        tAbnormal++;
+//                                                        tAbnormal++;
+                                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                                     } else {
                                                         //未达到告警值（遥测）
                                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                                         cruiseResultMap.put("cruiseAbnormal", "--");
-                                                        tNormal++;
+//                                                        tNormal++;
+                                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                                     }
                                                     break;
                                                 default:
@@ -307,7 +323,7 @@ public class DataDealThread implements Runnable {
                                             try {
                                                 // TODO: 2020/12/15 告警信息插库 并推送
                                                 Map<String, Object> warningMsg = redisTemplate.opsForHash().entries(warnName);
-                                                log.info("warnMsg:"+warningMsg);
+                                                log.info("warnMsg:" + warningMsg);
                                                 if (warningMsg.size() != 0) {
                                                     TWarnInfo tWarnInfo = new TWarnInfo();
                                                     tWarnInfo.setWarnLevel(Integer.valueOf(warningMsg.get("warnLevel").toString()));
@@ -332,35 +348,35 @@ public class DataDealThread implements Runnable {
                                                     {
                                                         //告警上报站端
                                                         XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                                                        List<Map<String,Object>> xmlItems = new ArrayList<>();
-                                                        Map<String,Object> xmlItem = new HashMap<>();
+                                                        List<Map<String, Object>> xmlItems = new ArrayList<>();
+                                                        Map<String, Object> xmlItem = new HashMap<>();
                                                         xmlBaseModel.setType("62");
-                                                        xmlItem.put("patroldevice_code",cruiseResult.get("instanceId"));
-                                                        xmlItem.put("task_name",cruiseResult.get("taskName"));
-                                                        xmlItem.put("task_code",cruiseResult.get("taskCode"));
-                                                        xmlItem.put("device_name",cruiseResult.get("instanceName"));
-                                                        xmlItem.put("device_id",cruiseResult.get("instanceId"));
-                                                        xmlItem.put("alarm_level",alarm_level);
+                                                        xmlItem.put("patroldevice_code", cruiseResult.get("instanceId"));
+                                                        xmlItem.put("task_name", cruiseResult.get("taskName"));
+                                                        xmlItem.put("task_code", cruiseResult.get("taskCode"));
+                                                        xmlItem.put("device_name", cruiseResult.get("instanceName"));
+                                                        xmlItem.put("device_id", cruiseResult.get("instanceId"));
+                                                        xmlItem.put("alarm_level", alarm_level);
                                                         String deviceMeteId = cruiseResult.get("device_mete_id").toString();
-                                                        Map<String,Object> info = analyseDataOperateService.selectWarnInfo(Long.valueOf(deviceMeteId));
-                                                        xmlItem.put("alarm_type",(null== info.get("alarm_type") ? "": info.get("alarm_type")));
-                                                        xmlItem.put("recognition_type",(null== info.get("recognition_type") ? "": info.get("recognition_type")));
-                                                        xmlItem.put("value",tWarnInfo.getValue());
-                                                        xmlItem.put("unit",(null== info.get("unit") ? "": info.get("unit")));
-                                                        xmlItem.put("value_unit",tWarnInfo.getValue()+xmlItem.get("unit"));
-                                                        xmlItem.put("time",simpleDateFormat.format(new Date()));
-                                                        xmlItem.put("task_patrolled_id",cruiseResult.get("taskId"));
-                                                        xmlItem.put("content",tWarnInfo.getWarnContent());
+                                                        Map<String, Object> info = analyseDataOperateService.selectWarnInfo(Long.valueOf(deviceMeteId));
+                                                        xmlItem.put("alarm_type", (null == info.get("alarm_type") ? "" : info.get("alarm_type")));
+                                                        xmlItem.put("recognition_type", (null == info.get("recognition_type") ? "" : info.get("recognition_type")));
+                                                        xmlItem.put("value", tWarnInfo.getValue());
+                                                        xmlItem.put("unit", (null == info.get("unit") ? "" : info.get("unit")));
+                                                        xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
+                                                        xmlItem.put("time", simpleDateFormat.format(new Date()));
+                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId"));
+                                                        xmlItem.put("content", tWarnInfo.getWarnContent());
 
 
                                                         xmlItems.add(xmlItem);
                                                         xmlBaseModel.setItems(xmlItems);
                                                         List<XMLBaseModel> list = new ArrayList<>();
                                                         list.add(xmlBaseModel);
-                                                        Map<String,List<XMLBaseModel>> map = new HashMap<>();
-                                                        map.put("list",list);
-                                                        log.info("告警上报：-"+map);
-                                                        Constant.otherServer(map,Constant.TCP_URL);
+                                                        Map<String, List<XMLBaseModel>> map = new HashMap<>();
+                                                        map.put("list", list);
+                                                        log.info("告警上报：-" + map);
+                                                        Constant.otherServer(map, Constant.TCP_URL);
                                                     }
 
                                                     // webSocket通知前端刷新告警统计数量
@@ -406,28 +422,40 @@ public class DataDealThread implements Runnable {
                                         } else {
                                             cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                             cruiseResultMap.put("cruiseAbnormal", "--");
-                                            tNormal++;
+//                                            tNormal++;
+                                            tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                            tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                         }
                                     } else {
                                         cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
                                         cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                         cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
-                                        tAbnormal++;
+//                                        tAbnormal++;
+                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                     }
                                 }
 
                                 break;
                             case 13669:
+                                if (recognitionMode.equals(0)) {
+                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-1");
+                                }
+
                                 String originResult = jsonObjectResult.get("resultValue").toString();
                                 String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
-                                log.info("解析的缺陷数据："+resultValue);
-                                // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形 
+                                log.info("解析的缺陷数据：" + resultValue);
+                                String analyseResultImg = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content").toString());
+                                redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultImg);
+                                // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
                                 if (resultValue != "null") {
-                                   //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
+                                    //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
                                     cruiseResultMap.put("resultNum", resultValue);
                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
                                     cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "缺陷异常"));
-                                    tAbnormal++;
+//                                    tAbnormal++;
+                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
 
                                     TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
 
@@ -437,11 +465,11 @@ public class DataDealThread implements Runnable {
                                     if (resultArr.length == 1) {
                                         log.info("--------____--------单一缺陷");
                                         Map<String, String> defectMap = new HashMap<>();
-                                        String redisFlag =  jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                        String defectRedisName = "defectInfo:" + redisFlag ;
+                                        String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        String defectRedisName = "defectInfo:" + redisFlag;
                                         // TODO: 2021/2/19 判别并获取对应缺陷的缺陷算法等级
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
-                                        defectMap.put("defectLevel",analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
+                                        defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                         defectMap.put("defectContent", resultValue);
                                         defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                         defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
@@ -450,8 +478,8 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
                                         defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
                                         defectMap.put("imagePath", cruiseResult.get("picpath").toString());
-                                        defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
-                                        defectMap.put("defectTime",simpleDateFormat.format(new Date()));
+                                        defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                        defectMap.put("defectTime", simpleDateFormat.format(new Date()));
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
                                         // webSocket通知显示缺陷信息(单条推送)
@@ -459,7 +487,7 @@ public class DataDealThread implements Runnable {
                                         jasonMaps.put("type", "newAlarm");
                                         jasonMaps.put("alarmName", resultValue);
                                         jasonMaps.put("alarmTime", defectMap.get("defectTime"));
-                                        jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName()+"--"+resultValue);
+                                        jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName() + "--" + resultValue);
                                         String jsons = JSON.toJSONString(jasonMaps);
                                         log.info("缺陷生成-前端推送：" + jsons);
                                         WebSocketServer.sendMsg(jsons);
@@ -470,7 +498,7 @@ public class DataDealThread implements Runnable {
                                         Integer defectLevel = Integer.valueOf(defectMap.get("defectLevel"));
                                         log.info("产生的该条缺陷的等级是===" + defectLevel);
                                         if (alarmNote != null && "1".equals(alarmNote)) {
-                                            if (defectLevel == 133 ) {//危急
+                                            if (defectLevel == 133) {//危急
                                                 //webSocket通知前端调用查询告警弹框的接口
                                                 Map<String, Object> jasonMaps2 = new HashMap<>();
                                                 jasonMaps2.put("type", "alarmPopUp");
@@ -484,16 +512,16 @@ public class DataDealThread implements Runnable {
 
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
-                                        String defectTime=simpleDateFormat.format(new Date());
-                                        String defectNames="";
+                                        String defectTime = simpleDateFormat.format(new Date());
+                                        String defectNames = "";
                                         for (int i = 0; i < resultArr.length; i++) {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
-                                            String redisFlag =  jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                            String defectRedisName = "defectInfo:" + redisFlag ;
+                                            String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                            String defectRedisName = "defectInfo:" + redisFlag;
                                             defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
-                                            defectMap.put("defectLevel",analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
+                                            defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                             defectMap.put("defectContent", resultArr[i]);
                                             defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
                                             defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
@@ -502,8 +530,8 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
                                             defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
                                             defectMap.put("imagePath", cruiseResult.get("picpath").toString());
-                                            defectMap.put("alarmSource",analyseDataOperateService.selectDictCode("alarm_source","主辅设备"));
-                                            defectMap.put("defectTime",defectTime);
+                                            defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                            defectMap.put("defectTime", defectTime);
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
@@ -512,7 +540,7 @@ public class DataDealThread implements Runnable {
                                             Integer defectLevel = Integer.valueOf(defectMap.get("defectLevel"));
                                             log.info("产生的该条缺陷的等级是===" + defectLevel);
                                             if (alarmNote != null && "1".equals(alarmNote)) {
-                                                if (defectLevel == 133 ) {//危急
+                                                if (defectLevel == 133) {//危急
                                                     //webSocket通知前端调用查询告警弹框的接口
                                                     Map<String, Object> jasonMaps2 = new HashMap<>();
                                                     jasonMaps2.put("type", "alarmPopUp");
@@ -524,7 +552,7 @@ public class DataDealThread implements Runnable {
                                                 }
                                             }
 
-                                            defectNames=defectNames+resultArr[i]+" ";
+                                            defectNames = defectNames + resultArr[i] + " ";
 
                                         }
 
@@ -533,7 +561,7 @@ public class DataDealThread implements Runnable {
                                         jasonMaps.put("type", "newAlarm");
                                         jasonMaps.put("alarmName", defectNames);
                                         jasonMaps.put("alarmTime", defectTime);
-                                        jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName()+"--"+defectNames);
+                                        jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName() + "--" + defectNames);
                                         String jsons = JSON.toJSONString(jasonMaps);
                                         log.info("缺陷生成-前端推送：" + jsons);
                                         WebSocketServer.sendMsg(jsons);
@@ -541,7 +569,9 @@ public class DataDealThread implements Runnable {
                                     }
 
                                 } else {  //未产生缺陷
-                                    tNormal++;
+                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
+//                                    tNormal++;
                                     cruiseResultMap.put("resultNum", "--");
                                     cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
                                     cruiseResultMap.put("cruiseAbnormal", "--");
@@ -553,82 +583,87 @@ public class DataDealThread implements Runnable {
                         log.error("告警/缺陷处理失败：" + e);
                     }
 
-                    cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
-                    if (Objects.isNull(cruiseResultMap.get("isWarn"))) {
-                        cruiseResultMap.put("isWarn", "0");
-                    }
-                    cruiseResultMap.put("evaluationState", analyseDataOperateService.selectDictCode("evaluation_state", "未审核"));
-                    // TODO: 2020/11/4 对算法识别结果进行判断并决定再redis中插入哪个值：identifyState- 识别正常&识别异常
-                    // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
+                    //仅单算法点可执行以下操作
+                    if(!recognitionMode.equals("0")) {
 
-                    redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
-
-                    {
-                        //巡视点结果上报站端
-                        XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                        List<Map<String,Object>> xmlItems = new ArrayList<>();
-                        Map<String,Object> xmlItem = new HashMap<>();
-                        xmlBaseModel.setType("61");
-                        xmlItem.put("patroldevice_code",cruiseResult.get("instanceId"));
-                        xmlItem.put("task_name",cruiseResult.get("taskName"));
-                        xmlItem.put("task_code",cruiseResult.get("taskCode"));
-                        xmlItem.put("device_name",cruiseResult.get("instanceName"));
-                        xmlItem.put("device_id",cruiseResult.get("instanceId"));
-                        xmlItem.put("material_id",cruiseResult.get("realCode"));
-                        xmlItem.put("value","");
-                        xmlItem.put("value_unit",cruiseResultMap.get("resultNum"));
-                        xmlItem.put("unit","");
-                        xmlItem.put("time",simpleDateFormat.format(new Date()));
-                        //todo
-                        xmlItem.put("recognition_type","");
-                        xmlItem.put("file_type","2");
-                        xmlItem.put("file_path",cruiseResult.get("picpath"));
-                        xmlItem.put("rectangle","");
-                        xmlItem.put("task_patrolled_id",cruiseResult.get("taskId"));
-                        xmlItem.put("data_type","0x01");
-                        String valid = "";
-                        if("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))){
-                            valid = "0";
-                        }else {
-                            valid = "1";
+                        cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
+                        if (Objects.isNull(cruiseResultMap.get("isWarn"))) {
+                            cruiseResultMap.put("isWarn", "0");
                         }
-                        xmlItem.put("valid",valid);
+                        cruiseResultMap.put("evaluationState", analyseDataOperateService.selectDictCode("evaluation_state", "未审核"));
+                        // TODO: 2020/11/4 对算法识别结果进行判断并决定再redis中插入哪个值：identifyState- 识别正常&识别异常
+                        // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
 
-                        xmlItems.add(xmlItem);
-                        xmlBaseModel.setItems(xmlItems);
-                        List<XMLBaseModel> list = new ArrayList<>();
-                        list.add(xmlBaseModel);
-                        Map<String,List<XMLBaseModel>> map = new HashMap<>();
-                        map.put("list",list);
-                        log.info("结果信息上报：-"+map);
-                        Constant.otherServer(map,Constant.TCP_URL);
-                    }
+                        redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
 
-                    log.info("Border_______---------______________________________________________________________________________________________");
-                    //若本任务上一次有巡视数据，则正常或异常点数要进行加和
-                    if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
-                        tNormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal").toString()) + tNormal;
-                        tAbnormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tAbnormal").toString()) + tAbnormal;
-                    }
-                    taskConstant.put("tNormal", tNormal.toString());
-                    taskConstant.put("tAbnormal", tAbnormal.toString());
-                    redisTemplate.opsForHash().putAll("taskConstant:" + TASKID, taskConstant);//插入任务常量Map
-                    log.info("任务常量配置完成");
+                        {
+                            //巡视点结果上报站端
+                            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                            List<Map<String, Object>> xmlItems = new ArrayList<>();
+                            Map<String, Object> xmlItem = new HashMap<>();
+                            xmlBaseModel.setType("61");
+                            xmlItem.put("patroldevice_code", cruiseResult.get("instanceId"));
+                            xmlItem.put("task_name", cruiseResult.get("taskName"));
+                            xmlItem.put("task_code", cruiseResult.get("taskCode"));
+                            xmlItem.put("device_name", cruiseResult.get("instanceName"));
+                            xmlItem.put("device_id", cruiseResult.get("instanceId"));
+                            xmlItem.put("material_id", cruiseResult.get("realCode"));
+                            xmlItem.put("value", "");
+                            xmlItem.put("value_unit", cruiseResultMap.get("resultNum"));
+                            xmlItem.put("unit", "");
+                            xmlItem.put("time", simpleDateFormat.format(new Date()));
+                            //todo
+                            xmlItem.put("recognition_type", "");
+                            xmlItem.put("file_type", "2");
+                            xmlItem.put("file_path", cruiseResult.get("picpath"));
+                            xmlItem.put("rectangle", "");
+                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId"));
+                            xmlItem.put("data_type", "0x01");
+                            String valid = "";
+                            if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
+                                valid = "0";
+                            } else {
+                                valid = "1";
+                            }
+                            xmlItem.put("valid", valid);
+
+                            xmlItems.add(xmlItem);
+                            xmlBaseModel.setItems(xmlItems);
+                            List<XMLBaseModel> list = new ArrayList<>();
+                            list.add(xmlBaseModel);
+                            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+                            map.put("list", list);
+                            log.info("结果信息上报：-" + map);
+                            Constant.otherServer(map, Constant.TCP_URL);
+                        }
+
+                        log.info("Border_______---------______________________________________________________________________________________________");
+                        //若本任务上一次有巡视数据，则正常或异常点数要进行加和
+                        if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
+                            tNormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal").toString()) + tNormal;
+                            tAbnormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tAbnormal").toString()) + tAbnormal;
+                        }
+                        taskConstant.put("tNormal", tNormal.toString());
+                        taskConstant.put("tAbnormal", tAbnormal.toString());
+                        redisTemplate.opsForHash().putAll("taskConstant:" + TASKID, taskConstant);//插入任务常量Map
+                        log.info("任务常量配置完成");
 
 //                NORMAL = NORMAL + 1;
-                    // webSocket通知前端调用巡视监控的接口
-                    Map<String, Object> jasonMap = new HashMap<>();
-                    jasonMap.put("type", "finishedOneInstance");
-                    jasonMap.put("taskId", cruiseResult.get("taskId").toString());
-                    String json = JSON.toJSONString(jasonMap);
-                    log.info("发送给前端的消息：" + json);
-                    WebSocketServer.sendMsg(json);
 
-                    //修改缓存中任务算法巡视点List
-                    redisTemplate.opsForList().remove("analysisList:" + cruiseResult.get("taskId").toString(), 0, cruiseResult.get("instanceId").toString());
-                    redisTemplate.opsForList().leftPush("analysisList:" + cruiseResult.get("taskId").toString(), "0");
+                        // webSocket通知前端调用巡视监控的接口
+                        Map<String, Object> jasonMap = new HashMap<>();
+                        jasonMap.put("type", "finishedOneInstance");
+                        jasonMap.put("taskId", cruiseResult.get("taskId").toString());
+                        String json = JSON.toJSONString(jasonMap);
+                        log.info("发送给前端的消息：" + json);
+                        WebSocketServer.sendMsg(json);
 
-                    log.info("RedisList修改成功");
+                        //修改缓存中任务算法巡视点List
+                        redisTemplate.opsForList().remove("analysisList:" + cruiseResult.get("taskId").toString(), 0, cruiseResult.get("instanceId").toString());
+                        redisTemplate.opsForList().leftPush("analysisList:" + cruiseResult.get("taskId").toString(), "0");
+
+                        log.info("RedisList修改成功");
+                    }
 
                 }
 
@@ -642,7 +677,7 @@ public class DataDealThread implements Runnable {
             }
 
             if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1")) {  //满足插库条件
-                SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String finalCruiseKey = "instanceId";//最后修改任务表信息所需的redis KEY名
                 log.info("任务结束-开始数据存储");
                 //插库时从redis中取出正常、异常点数
@@ -651,7 +686,7 @@ public class DataDealThread implements Runnable {
                 Integer tNormal = Integer.valueOf(taskConstant.get("tNormal").toString());
                 log.info("正常点数：" + tNormal);
                 log.info("异常点数：" + tAbnormal);
-                List<String> cruiseResultIds=new ArrayList<>();//cruiseResultIds
+                List<String> cruiseResultIds = new ArrayList<>();//cruiseResultIds
                 try {
                     //满足条件先插巡视点数据
                     List<TCruiseTaskResultDetail> detailList = new ArrayList<>();//TCTRD List对象
@@ -734,7 +769,7 @@ public class DataDealThread implements Runnable {
                     analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
                     analyseDataOperateService.batchInsertCruiseDataResult(dataList);
                     log.info("------------点结果插入后调用updateCruiseResultIds----------------------");
-                    Constant.otherServerList(cruiseResultIds,Constant.TASK_FINISH);
+                    Constant.otherServerList(cruiseResultIds, Constant.TASK_FINISH);
                     log.info("----------------------------------");
                     redisTemplate.delete("cruiseKeys:" + TASKID);
                     log.info("Loading........清空本任务至此的巡视点");
@@ -769,7 +804,7 @@ public class DataDealThread implements Runnable {
                 if (tAbnormal + tNormal == total) {
                     //TCTR开始
 
-                    Thread.sleep(15000);
+                    Thread.sleep(10000);
 
                     try {
                         log.info("TCTR开始");
@@ -781,7 +816,11 @@ public class DataDealThread implements Runnable {
                         tCruiseTaskResult.setTaskAlarm(0);
                         tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
 //                                tCruiseTaskResult.setCruiseTaskTime();
-                        analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+                        if (analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()).equals(tCruiseTaskResult.getTaskResultId())) {
+                            log.info("TCTR已存在");
+                        } else {
+                            analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);
+                        }
 
 
                         //TCR开始

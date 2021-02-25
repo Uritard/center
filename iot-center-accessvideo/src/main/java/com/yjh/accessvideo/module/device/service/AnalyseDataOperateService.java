@@ -158,6 +158,61 @@ public class AnalyseDataOperateService {
         return defectLevel.toString();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String selectLaterTaskCruiseResult(String taskId){
+        return analyseDataOperateDao.selectLaterTaskCruiseResult(taskId);
+    }
+
+    /**
+     *Fun 算法综合 状态点判断
+     * @param mode 识别模式: 1,2:表计、缺陷 ———— -1，-2：逆表计、逆缺陷 ———— 0：双识别
+     * @param flag 1：正常点 0:异常点
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public List<Integer> mutiAlgoCount(String mode,Integer flag,String cruiseRedisKey){
+
+        Integer normal=0;
+        Integer abnormal=0;
+
+        switch (mode){
+            case "1":
+            case "2":
+                if(flag==1){
+                  normal++;
+                }else {
+                  abnormal++;
+                }
+                break;
+            case "-1":
+            case "-2":
+                String temResult=redisTemplate.opsForHash().get(cruiseRedisKey,"temResult").toString();
+                if(flag==1){
+                   if(temResult.equals("1")){
+                       normal++;
+                   }else {
+                       abnormal++;
+                   }
+                }else {
+                   abnormal++;
+                }
+                break;
+            case "0":
+                if(flag==1){
+                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","1");//临时值为正常点
+                }else {
+                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","0");//临时值为异常点
+                }
+                break;
+        }
+
+        List<Integer> result=new ArrayList<>();
+        result.add(normal);
+        result.add(abnormal);
+        return result;
+
+    }
+
 
 //    public String nonUnpacking(String body) {
 //        log.info("body:"+body);
@@ -192,6 +247,11 @@ public class AnalyseDataOperateService {
 //
 //    }
 
+    /**
+     * -------算法服务报文反拆包-------
+     * @param body 算法服务返回的报文消息体
+     * @return  完整的合并拆包信息的结果报文
+     */
     //反拆包
     public String nonUnpacking(String body) {
         //body清除空格
@@ -222,6 +282,21 @@ public class AnalyseDataOperateService {
     }
 
 
+    /**
+     * ------巡视点告警配置判断（综合告警预判断）-------
+     * @param meteKind 测点类型
+     * @param stateZero 遥信状态0
+     * @param alarmState 遥信预告警状态
+     * @param highLimit1 遥测 上1 阈值
+     * @param lowLimit1 遥测 下1 阈值
+     * @param highLimit2 遥测 上2 阈值
+     * @param lowLimit2 遥测 下2 阈值
+     * @param highLimit3 遥测 上3 阈值
+     * @param lowLimit3 遥测 下3 阈值
+     * @param highLimit4 遥测 上4 阈值
+     * @param lowLimit4 遥测 下4 阈值
+     * @return  是否产生告警  0/1
+     */
     //@Logs(title = "告警配置判断")
     @Transactional(rollbackFor = Exception.class)
     public int warnSettings(String meteKind,
@@ -267,6 +342,19 @@ public class AnalyseDataOperateService {
     }
 
 
+    /**
+     * -------表计识别 数据告警判断 --------
+     * @param value 算法识别结果
+     * @param highLimit1
+     * @param lowLimit1
+     * @param highLimit2
+     * @param lowLimit2
+     * @param highLimit3
+     * @param lowLimit3
+     * @param highLimit4
+     * @param lowLimit4
+     * @return 返回遥测告警等级或未告警
+     */
     //@Logs(title = "表计识别-告警判断-数值结果判断", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgement(Float value,
@@ -359,6 +447,11 @@ public class AnalyseDataOperateService {
     // TODO: 2020/11/21 表计识别结果告警判断--文字结果判断
 
 
+    /**
+     * -----缺陷识别结果解析（标签数据转化文字描述）------
+     * @param resultValue 缺陷算法识别结果
+     * @return
+     */
     //@Logs(title = "缺陷识别结果解析", code = "")
     @Transactional(rollbackFor = Exception.class)
     public String resolveDefectResult(String resultValue) {

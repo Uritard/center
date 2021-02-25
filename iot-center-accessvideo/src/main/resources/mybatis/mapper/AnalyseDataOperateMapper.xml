@@ -718,7 +718,7 @@
         WHERE a.instance_id=#{instanceId,jdbcType=BIGINT}
 
     </select>
-    
+
     <select id="selectDictCode"  resultType="java.lang.String">
        SELECT
 	    dict_code
@@ -884,5 +884,15 @@
         t_algorithm_info
         WHERE is_ai=0
         AND  defect_type= #{defectType,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="selectLaterTaskCruiseResult" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        task_result_id
+    FROM
+        t_cruise_task_result
+    WHERE
+        task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 </mapper>
