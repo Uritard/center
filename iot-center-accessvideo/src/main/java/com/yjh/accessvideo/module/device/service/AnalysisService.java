@@ -31,8 +31,8 @@ public class AnalysisService {
         log.info("analysisList____-----____:"+analysisList);
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
-        log.info("任务结束心跳发送");
         if (analysisList.get(0).getInstanceId() == -1) {
+            log.info("任务结束心跳发送");
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0));
         } else {
             algorithmMsgId = algorithmMsgId+1;
