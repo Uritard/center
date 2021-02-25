@@ -41,6 +41,7 @@ public class HeartBreakDealThread implements Runnable {
                 robotServerHandler.procSend(robotCode, robotStatusMap,sendSessionId,receiveSessionId);
                 if (!robotServerHandler.getIsThreadStart()) isThreadStart = false;
 //                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId()+",id: "+robotServerHandler.getCtx().channel().id());
+                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -190,9 +190,9 @@ public class TVoiceDeviceService{
             }
         }
         String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
-//        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
         //String realPath = "D:/code/qhTest";
-        String absPath  = "D:/code/qhTest";
+        //String absPath  = "D:/code/qhTest";
         diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }
@@ -265,8 +265,8 @@ public class TVoiceDeviceService{
 //        if(Constant.voiceAnalyseResult.get(voiceDeviceId+":"+voicePath) != null){
 //            //此文件已经分析过了
 //        }
-        String path = "D:/code/qhTest";
-        //String path = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        //String path = "D:/code/qhTest";
+        String path = tSysParamDao.selectByParamType("absVoicePath").getContent();
         MultimediaObject multimediaObject = new MultimediaObject(new File(path+"/"+voiceDeviceId+"/"+voicePath));
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
