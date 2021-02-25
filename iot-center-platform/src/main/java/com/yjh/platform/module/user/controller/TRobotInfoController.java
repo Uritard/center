@@ -148,8 +148,8 @@ public class TRobotInfoController {
                          @RequestParam(value = "upRegionName", required = false) String upRegionName,
                          @RequestParam(value = "lightIp", required = false) String lightIp,
                          @RequestParam(value = "lightPort", required = false) String lightPort,
-                         @RequestParam(value = "lightUsername", required = false) String lightUsername,
-                         @RequestParam(value = "lightPassword", required = false) String lightPassword,
+                         @RequestParam(value = "identityManager", required = false) String identityManager,
+                         @RequestParam(value = "identityCode", required = false) String identityCode,
                          @RequestParam(value = "lnferadIp", required = false) String lnferadIp,
                          @RequestParam(value = "inferadPort", required = false) Integer inferadPort,
                          @RequestParam(value = "inferadUsername", required = false) String inferadUsername,
@@ -175,7 +175,7 @@ public class TRobotInfoController {
         Result result = new Result();
         try {
             List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType,
-                    robotIp, robotPort, upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp,
+                    robotIp, robotPort, upRegionName, lightIp, lightPort, identityManager, identityCode, lnferadIp,
                     inferadPort, inferadUsername, inferadPassword, photePath, createBy, createDate, updateBy,
                     updateDate, robotFactory, isUse, commissionDate, upRegionId, robotPosition,robotSource,
                     address,buildingUser,appearanceNumber,defectRecord,repairRecord,exitPutIntoRecord,remarks);

@@ -59,8 +59,8 @@ public class TCameraInfoService {
             channel.setId(RandomStringUtils.randomAlphanumeric(12));
             channel.setIp(recorder.getRecordIp());
             channel.setPort(recorder.getHttpPort().toString());
-            channel.setUserName(recorder.getUserName());
-            channel.setUserPwd(recorder.getPwd());
+            channel.setUserName(recorder.getIdentityManager());
+            channel.setUserPwd(recorder.getIdentityCode());
             Integer realChannelNum=tCameraInfo.getChannelNum()+32;
             channel.setChanIndex(realChannelNum.toString());
             channel.setProtocol("0");
@@ -126,8 +126,8 @@ public class TCameraInfoService {
 
             channel.setIp(recorder.getRecordIp());
             channel.setPort(recorder.getHttpPort().toString());
-            channel.setUserName(recorder.getUserName());
-            channel.setUserPwd(recorder.getPwd());
+            channel.setUserName(recorder.getIdentityManager());
+            channel.setUserPwd(recorder.getIdentityCode());
             Integer realChannelNum=tCameraInfo.getChannelNum()+32;
             channel.setChanIndex(realChannelNum.toString());
 

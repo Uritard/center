@@ -43,8 +43,8 @@
 		a.http_port,
 		a.trans_port,
 		a.rtsp_port,
-		a.user_name,
-        a.pwd,
+		a.identity_manager,
+        a.identity_code,
         a.protocol_url,
         a.max_channel,
         a.hdd_size,
@@ -67,8 +67,8 @@
             http_port,
             trans_port,
             rtsp_port,
-            user_name,
-            pwd,
+            identity_manager,
+            identity_code,
             protocol_url,
             max_channel,
             hdd_size,
@@ -88,8 +88,8 @@
                 #{httpPort, jdbcType=INTEGER},
                 #{transPort, jdbcType=INTEGER},
                 #{rtspPort, jdbcType=INTEGER},
-                #{userName, jdbcType=VARCHAR},
-                #{pwd, jdbcType=VARCHAR},
+                #{identityManager, jdbcType=VARCHAR},
+                #{identityCode, jdbcType=VARCHAR},
                 #{protocolUrl, jdbcType=VARCHAR},
                 #{maxChannel, jdbcType=INTEGER},
                 #{hddSize, jdbcType=INTEGER},
@@ -144,8 +144,8 @@
         <if test="httpPort != null ">a.http_port = #{httpPort, jdbcType=INTEGER},</if>
         <if test="transPort != null ">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
-        <if test="userName != null ">a.user_name = #{userName},</if>
-        <if test="pwd != null ">a.pwd = #{pwd},</if>
+        <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
+        <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
         <if test="maxChannel != null ">a.max_channel = #{maxChannel, jdbcType=INTEGER},</if>
         <if test="hddSize != null ">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>
@@ -170,8 +170,8 @@
             http_port,
             trans_port,
             rtsp_port,
-            user_name,
-            pwd,
+            identity_manager,
+            identity_code,
             protocol_url,
             max_channel,
             hdd_size,
@@ -198,8 +198,8 @@
             a.http_port,
             a.trans_port,
             a.rtsp_port,
-            a.user_name,
-            a.pwd,
+            a.identity_manager,
+            a.identity_code,
             a.protocol_url,
             a.max_channel,
             a.hdd_size,
@@ -220,8 +220,8 @@
         <if test="httpPort != null "> and a.http_port = #{httpPort, jdbcType=INTEGER}</if>
         <if test="transPort != null "> and a.trans_port = #{transPort, jdbcType=INTEGER}</if>
         <if test="rtspPort != null "> and a.rtsp_port = #{rtspPort, jdbcType=INTEGER}</if>
-        <if test="userName != null and userName != ''"> and a.user_name = #{userName, jdbcType=VARCHAR}</if>
-        <if test="pwd != null and pwd != ''"> and a.pwd = #{pwd, jdbcType=VARCHAR}</if>
+        <if test="identityManager != null and identityManager != ''"> and a.identity_manager = #{identityManager, jdbcType=VARCHAR}</if>
+        <if test="identityCode != null and identityCode != ''"> and a.identity_code = #{identityCode, jdbcType=VARCHAR}</if>
         <if test="protocolUrl != null and protocolUrl != ''"> and a.protocol_url = #{protocolUrl, jdbcType=VARCHAR}</if>
         <if test="maxChannel != null "> and a.max_channel = #{maxChannel, jdbcType=INTEGER}</if>
         <if test="hddSize != null "> and a.hdd_size = #{hddSize, jdbcType=INTEGER}</if>
@@ -259,8 +259,8 @@
             http_port,
             trans_port,
             rtsp_port,
-            user_name,
-            pwd,
+        identity_manager,
+        identity_code,
             protocol_url,
             max_channel,
             hdd_size,
@@ -282,8 +282,8 @@
                 #{TCameraRecorder.httpPort, jdbcType=INTEGER},
                 #{TCameraRecorder.transPort, jdbcType=INTEGER},
                 #{TCameraRecorder.rtspPort, jdbcType=INTEGER},
-                #{TCameraRecorder.userName, jdbcType=VARCHAR},
-                #{TCameraRecorder.pwd, jdbcType=VARCHAR},
+                #{TCameraRecorder.identityManager, jdbcType=VARCHAR},
+                #{TCameraRecorder.identityCode, jdbcType=VARCHAR},
                 #{TCameraRecorder.protocolUrl, jdbcType=VARCHAR},
                 #{TCameraRecorder.maxChannel, jdbcType=INTEGER},
                 #{TCameraRecorder.hddSize, jdbcType=INTEGER},

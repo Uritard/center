@@ -112,14 +112,14 @@ public class TRobotInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TRobotInfo> select(Long robotId, String robotCode, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
-                                    String upRegionName, String lightIp, String lightPort, String lightUsername, String lightPassword,
+                                    String upRegionName, String lightIp, String lightPort, String identityManager, String identityCode,
                                    String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
                                    String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
                                    Date commissionDateString, Long upRegionId, String robotPosition, String robotSource,
                                    String address,String buildingUser,String appearanceNumber,String defectRecord,String repairRecord,
                                    String exitPutIntoRecord,String remarks) {
         return tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
-                upRegionName, lightIp, lightPort, lightUsername, lightPassword, lnferadIp, inferadPort, inferadUsername, inferadPassword,
+                upRegionName, lightIp, lightPort, identityManager, identityCode, lnferadIp, inferadPort, inferadUsername, inferadPassword,
                 photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition,
                 robotSource,address,buildingUser,appearanceNumber,defectRecord,repairRecord,exitPutIntoRecord,remarks);
     }
@@ -184,8 +184,8 @@ public class TRobotInfoService{
                             .setRobotPort(Integer.valueOf(map.get("robotPort").toString()))
                             .setLightIp(map.get("lightIp").toString())
                             .setLightPort(map.get("lightPort").toString())
-                            .setLightUsername(map.get("lightUsername").toString())
-                            .setLightPassword(map.get("lightPassword").toString())
+                            .setIdentityManager(map.get("lightUsername").toString())
+                            .setIdentityCode(map.get("lightPassword").toString())
                             .setLnferadIp(map.get("lnferadIP").toString())
                             .setInferadPort(Integer.valueOf(map.get("InferadPort").toString()))
                             .setInferadUsername(map.get("InferadUsername").toString())

@@ -13,8 +13,8 @@
         <result column="robot_port" jdbcType="INTEGER" property="robotPort" />
         <result column="light_ip" jdbcType="VARCHAR" property="lightIp" />
         <result column="light_port" jdbcType="VARCHAR" property="lightPort" />
-        <result column="light_username" jdbcType="VARCHAR" property="lightUsername" />
-        <result column="light_password" jdbcType="VARCHAR" property="lightPassword" />
+        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager" />
+        <result column="identity_code" jdbcType="VARCHAR" property="identityCode" />
         <result column="lnferad_IP" jdbcType="VARCHAR" property="lnferadIp" />
         <result column="Inferad_Port" jdbcType="INTEGER" property="inferadPort" />
         <result column="Inferad_username" jdbcType="VARCHAR" property="inferadUsername" />
@@ -38,7 +38,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_code, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password,
+        robot_id, robot_code, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
         lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date,
         robot_factory, is_use, commission_date, up_region_id, robot_position, remarks
     </sql>
@@ -54,8 +54,8 @@
             robot_port,
             light_ip,
             light_port,
-            light_username,
-            light_password,
+            identity_manager,
+            identity_code,
             lnferad_IP,
             Inferad_Port,
             Inferad_username,
@@ -87,8 +87,8 @@
                 #{robotPort, jdbcType=INTEGER},
                 #{lightIp, jdbcType=VARCHAR},
                 #{lightPort, jdbcType=VARCHAR},
-                #{lightUsername, jdbcType=VARCHAR},
-                #{lightPassword, jdbcType=VARCHAR},
+                #{identityManager, jdbcType=VARCHAR},
+                #{identityCode, jdbcType=VARCHAR},
                 #{lnferadIp, jdbcType=VARCHAR},
                 #{inferadPort, jdbcType=INTEGER},
                 #{inferadUsername, jdbcType=VARCHAR},
@@ -140,8 +140,8 @@
         <if test="robotPort != null ">a.robot_port = #{robotPort, jdbcType=INTEGER},</if>
         <if test="lightIp != null ">a.light_ip = #{lightIp},</if>
         <if test="lightPort != null ">a.light_port = #{lightPort},</if>
-        <if test="lightUsername != null ">a.light_username = #{lightUsername},</if>
-        <if test="lightPassword != null ">a.light_password = #{lightPassword},</if>
+        <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
+        <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
         <if test="lnferadIp != null ">a.lnferad_IP = #{lnferadIp},</if>
         <if test="inferadPort != null">a.Inferad_Port = #{inferadPort, jdbcType=INTEGER},</if>
         <if test="inferadUsername != null">a.Inferad_username = #{inferadUsername},</if>
@@ -179,8 +179,8 @@
         a.robot_port,
         a.light_ip,
         a.light_port,
-        a.light_username,
-        a.light_password,
+        a.identity_manager,
+        a.identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
@@ -220,8 +220,8 @@
         a.robot_port,
         a.light_ip,
         a.light_port,
-        a.light_username,
-        a.light_password,
+        a.identity_manager,
+        a.identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
@@ -255,8 +255,8 @@
         <if test="robotPort != null "> and a.robot_port = #{robotPort, jdbcType=INTEGER}</if>
         <if test="lightIp != null and lightIp != ''"> and a.light_ip = #{lightIp, jdbcType=VARCHAR}</if>
         <if test="lightPort != null and lightPort != ''"> and a.light_port = #{lightPort, jdbcType=VARCHAR}</if>
-        <if test="lightUsername != null and lightUsername != ''"> and a.light_username = #{lightUsername, jdbcType=VARCHAR}</if>
-        <if test="lightPassword != null and lightPassword != ''"> and a.light_password = #{lightPassword, jdbcType=VARCHAR}</if>
+        <if test="identityManager != null and identityManager != ''"> and a.identity_manager = #{identityManager, jdbcType=VARCHAR}</if>
+        <if test="identityCode != null and identityCode != ''"> and a.identity_code = #{identityCode, jdbcType=VARCHAR}</if>
         <if test="lnferadIp != null and lnferadIp != ''"> and a.lnferad_IP = #{lnferadIp, jdbcType=VARCHAR}</if>
         <if test="inferadPort != null "> and a.Inferad_Port = #{inferadPort, jdbcType=INTEGER}</if>
         <if test="inferadUsername != null and inferadUsername != ''"> and a.Inferad_username = #{inferadUsername, jdbcType=VARCHAR}</if>
@@ -293,8 +293,8 @@
         a.robot_port,
         a.light_ip,
         a.light_port,
-        a.light_username,
-        a.light_password,
+        a.identity_manager,
+        a.identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
@@ -353,8 +353,8 @@
             robot_port,
             light_ip,
             light_port,
-            light_username,
-            light_password,
+            identity_manager,
+            identity_code,
             lnferad_IP,
             Inferad_Port,
             Inferad_username,
@@ -388,8 +388,8 @@
                 #{TRobotInfo.robotPort, jdbcType=INTEGER},
                 #{TRobotInfo.lightIp, jdbcType=VARCHAR},
                 #{TRobotInfo.lightPort, jdbcType=VARCHAR},
-                #{TRobotInfo.lightUsername, jdbcType=VARCHAR},
-                #{TRobotInfo.lightPassword, jdbcType=VARCHAR},
+                #{TRobotInfo.identityManager, jdbcType=VARCHAR},
+                #{TRobotInfo.identityCode, jdbcType=VARCHAR},
                 #{TRobotInfo.lnferadIp, jdbcType=VARCHAR},
                 #{TRobotInfo.inferadPort, jdbcType=INTEGER},
                 #{TRobotInfo.inferadUsername, jdbcType=VARCHAR},

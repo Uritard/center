@@ -154,8 +154,8 @@ public class TCameraRecorderController {
                             @RequestParam(value = "httpPort", required = false) Integer httpPort,
                             @RequestParam(value = "transPort", required = false) Integer transPort,
                             @RequestParam(value = "rtspPort", required = false) Integer rtspPort,
-                            @RequestParam(value = "userName", required = false) String userName,
-                            @RequestParam(value = "pwd", required = false) String pwd,
+                            @RequestParam(value = "identityManager", required = false) String identityManager,
+                            @RequestParam(value = "identityCode", required = false) String identityCode,
                             @RequestParam(value = "protocolUrl", required = false) String protocolUrl,
                             @RequestParam(value = "maxChannel", required = false) Integer maxChannel,
                             @RequestParam(value = "hddSize", required = false) Integer hddSize,
@@ -164,7 +164,7 @@ public class TCameraRecorderController {
                             @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, vendorId,pmsId,aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.select(recordId, recordName, recorderModel,recorderType, vendorId,pmsId,aliasName, recordIp, protocol, httpPort, transPort, rtspPort, identityManager, identityCode, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

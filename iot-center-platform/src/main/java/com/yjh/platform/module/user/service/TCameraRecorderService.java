@@ -85,8 +85,8 @@ public class TCameraRecorderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraRecorderByDict> select(Long recordId, String recordName,Integer recorderModel, String recorderType,Integer vendorId,String pmsId,String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String userName, String pwd, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong,String unit) {
-        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName,recorderModel, recorderType,vendorId,pmsId, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, userName, pwd, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
+    public List<TCameraRecorderByDict> select(Long recordId, String recordName,Integer recorderModel, String recorderType,Integer vendorId,String pmsId,String aliasName, String recordIp, String protocol, Integer httpPort, Integer transPort, Integer rtspPort, String identityManager, String identityCode, String protocolUrl, Integer maxChannel, Integer hddSize, Integer bufferDay, Integer timeLong,String unit) {
+        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.select(recordId, recordName,recorderModel, recorderType,vendorId,pmsId, aliasName, recordIp, protocol, httpPort, transPort, rtspPort, identityManager, identityCode, protocolUrl, maxChannel, hddSize, bufferDay, timeLong,unit);
         return tCameraRecorderByDictList;
     }
 
@@ -171,8 +171,8 @@ public class TCameraRecorderService {
                             .setHttpPort(Integer.valueOf(map.get("httpPort").toString()))
                             .setTransPort(Integer.valueOf(map.get("transPort").toString()))
                             .setRtspPort(Integer.valueOf(map.get("rtspPort").toString()))
-                            .setUserName(map.get("userName").toString())
-                            .setPwd(map.get("pwd").toString())
+                            .setIdentityManager(map.get("userName").toString())
+                            .setIdentityCode(map.get("pwd").toString())
                             .setProtocolUrl(map.get("protocolUrl").toString())
                             .setMaxChannel(Integer.valueOf(map.get("maxChannel").toString()))
                             .setHddSize(Integer.valueOf(map.get("hddSize").toString()))

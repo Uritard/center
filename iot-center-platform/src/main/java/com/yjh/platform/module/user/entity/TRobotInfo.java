@@ -76,13 +76,13 @@ public class TRobotInfo implements Serializable {
 
     @Length(max = 32, message = "lightUsername长度必须小于等于32")
     @ApiModelProperty(value = "可见光用户名")
-    @TableField(value = "light_username",updateStrategy = FieldStrategy.IGNORED)
-    private String lightUsername;
+    @TableField(value = "identity_manager",updateStrategy = FieldStrategy.IGNORED)
+    private String identityManager;
 
     @Length(max = 15, message = "lightPassword长度必须小于等于15")
     @ApiModelProperty(value = "可见光密码")
-    @TableField(value = "light_password",updateStrategy = FieldStrategy.IGNORED)
-    private String lightPassword;
+    @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
+    private String identityCode;
 
     @Length(max = 32, message = "lnferadIp长度必须小于等于32")
     @ApiModelProperty(value = "红外IP")

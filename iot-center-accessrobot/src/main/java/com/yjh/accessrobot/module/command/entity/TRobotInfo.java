@@ -47,10 +47,10 @@ public class TRobotInfo implements Serializable {
     private String lightIp;
     @TableField(value = "light_port",updateStrategy = FieldStrategy.IGNORED)
     private String lightPort;
-    @TableField(value = "light_username",updateStrategy = FieldStrategy.IGNORED)
-    private String lightUsername;
-    @TableField(value = "light_password",updateStrategy = FieldStrategy.IGNORED)
-    private String lightPassword;
+    @TableField(value = "identity_manager",updateStrategy = FieldStrategy.IGNORED)
+    private String identityManager;
+    @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
+    private String identityCode;
 
     @ApiModelProperty(value = "红外IP")
     @TableField(value = "lnferad_IP",updateStrategy = FieldStrategy.IGNORED)

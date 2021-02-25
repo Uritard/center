@@ -71,13 +71,13 @@ public class TCameraRecorder implements Serializable {
 
     @Length(max = 128,message = "userName长度必须小于等于128")
     @ApiModelProperty(value = "用户名")
-     @TableField(value = "user_name",updateStrategy = FieldStrategy.IGNORED)
-    private String userName;
+     @TableField(value = "identity_manager",updateStrategy = FieldStrategy.IGNORED)
+    private String identityManager;
 
     @Length(max = 50,message = "pwd长度必须小于等于50")
     @ApiModelProperty(value = "密码")
-    @TableField(value = "pwd",updateStrategy = FieldStrategy.IGNORED)
-    private String pwd;
+    @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
+    private String identityCode;
 
     @Length(max = 255,message = "protocolUrl长度必须小于等于255")
     @ApiModelProperty(value = "协议路径")
