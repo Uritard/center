@@ -25,21 +25,29 @@ public class TCruiseTypeService{
     private TCruiseTypeDao tCruiseTypeDao;
 
     @Transactional(rollbackFor = Exception.class)
-    public int add(Integer cruiseType,String instanceList,String remark) {
+    public int add(Integer cruiseType,String instanceList) {
         if("".equals(instanceList)){
            return this.deleteByPrimaryId(cruiseType);
         }
-        List<String> list1= Arrays.asList(instanceList.split(","));
+        List<String> list1= Arrays.asList(instanceList.split(","));//修改或者新增的
+        List<Long> listNew = new ArrayList<>();
+        for(String item:list1){
+            listNew.add(Long.valueOf(item));
+        }
         List<TCruiseTypeDetail> list = new ArrayList<>();
+        if(list1 != null && list1.size()>0){
+            tCruiseTypeDao.batchDeleteByInstance(listNew);//先把库里有listNew的点删除掉
+        }
+        List<Long> listHave= tCruiseTypeDao.selectIdList(cruiseType);//此时查出来的是要标记删除的
+        //此时listHave中剩下的都是此次新增中所不需要的点 需要标记删除
+        tCruiseTypeDao.tagsDeleted(listHave);//将库里的标记删除了
         for (String item:list1) {
             TCruiseTypeDetail tCruiseType= new TCruiseTypeDetail();
             tCruiseType.setSubType(cruiseType);
             tCruiseType.setInstanceId(Long.valueOf(item));
-            tCruiseType.setRemark(remark);
             list.add(tCruiseType);
         }
-        this.deleteByPrimaryId(cruiseType);
-        return this.tCruiseTypeDao.batchAdd(list);
+        return this.tCruiseTypeDao.batchAdd(list);//将此次的点新增
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -48,96 +56,159 @@ public class TCruiseTypeService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int update(TCruiseType tCruiseType) {
-        return this.tCruiseTypeDao.update(tCruiseType);
+    public int update(Integer subType) {
+        List<TCruiseTypeDetail> tCruiseTypeList = new ArrayList<>();
+        if(subType == 213 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectAll();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        if(subType == 322 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectByAnalyse();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        if(subType == 323 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectByMeterTypeByOil();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        if(subType == 324 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectByMeterTypeByArrester();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        if(subType == 325 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectByMeterTypeBySF6();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        if(subType == 326 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectByMeterTypeByYY();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        if(subType == 327 ){
+            //库里有的  包括标记删除的
+            List<Long> listHave = tCruiseTypeDao.selectIdListByAll(subType);
+            //巡视表里有的
+            List<TCruiseTypeDetail> listNew = tCruiseTypeDao.selectByAnalyseByWg();
+            List<TCruiseTypeDetail> listForAdd = new ArrayList<>();
+            if(listHave != null && listHave.size()>0 ){
+                for(int i = 0;i < listNew.size();i++){
+                    if( !listHave.contains(listNew.get(i).getInstanceId())){
+                        listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
+                    }
+                }
+            }
+            //将删除已存在的listNew插库
+            if(listForAdd != null && listForAdd.size()>0){
+                return tCruiseTypeDao.batchAdd(listForAdd);
+            }else {
+                return 1;
+            }
+        }
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TCruiseType selectByPrimaryId(Integer subType) {
+    public List<TCruiseTypeDetail> selectByPrimaryId(Integer subType) {
         return this.tCruiseTypeDao.selectByPrimaryId(subType);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTypeDetail> select(Integer subType) {
-        List<TCruiseTypeDetail> tCruiseTypeList = new ArrayList<>();
-        if(subType == 213 ){
-            //全面巡视
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectAll();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        if(subType == 322 ){
-            //红外测温
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectByAnalyse();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        if(subType == 323 ){
-            //油温有位
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByOil();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        if(subType == 324 ){
-            //避雷器
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByArrester();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        if(subType == 325 ){
-            //SF6
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeBySF6();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        if(subType == 326 ){
-            //液压表
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectByMeterTypeByYY();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        if(subType == 327 ){
-            //位置状态识别
-            tCruiseTypeList = tCruiseTypeDao.select(subType);
-            if(tCruiseTypeList == null || tCruiseTypeList.size()==0){
-                //库里没有
-                tCruiseTypeList = tCruiseTypeDao.selectByAnalyseByWg();
-                if(tCruiseTypeList != null && tCruiseTypeList.size()>0){
-                    this.batchAdd(tCruiseTypeList);
-                }
-            }
-        }
-        return tCruiseTypeList;
+        return tCruiseTypeDao.select(subType);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -154,13 +225,19 @@ public class TCruiseTypeService{
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String subType) {
     List<String> list1= Arrays.asList(subType.split(","));
-    return this.tCruiseTypeDao.batchDelete(list1);
+    List<Long> list = new ArrayList<>();
+    for(String item:list1){
+        list.add(Long.valueOf(item));
+    }
+    return this.tCruiseTypeDao.batchDelete(list);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<Long> selectIdList(Integer subType) {
         return this.tCruiseTypeDao.selectIdList(subType);
     }
+
+
 
 }
 

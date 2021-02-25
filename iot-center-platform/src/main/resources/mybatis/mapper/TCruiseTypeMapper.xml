@@ -18,12 +18,10 @@
     <insert id="add" useGeneratedKeys="true" keyProperty="subType" parameterType="com.yjh.platform.module.task.entity.TCruiseType">
         insert into t_cruise_type(
             sub_type,
-            instance_id,
-            remark
+            instance_id
         )values(
                 #{subType, jdbcType=INTEGER},
-                #{instanceId, jdbcType=BIGINT},
-                #{remark, jdbcType=VARCHAR}
+                #{instanceId, jdbcType=BIGINT}
         )
     </insert>
 
@@ -41,22 +39,19 @@
             where a.sub_type = #{subType, jdbcType=INTEGER}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.task.entity.TCruiseType">
+    <select id="selectByPrimaryId" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
         a.sub_type,
-        a.instance_id,
-        a.remark
+        a.instance_id
         from t_cruise_type a
-        where 1 = 1
+        where 1 = 1 and a.remark = 1
             and a.sub_type = #{subType, jdbcType=INTEGER}
-        limit 1
     </select>
 
     <select id="select"  resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
         a.sub_type,
         a.instance_id,
-        a.remark,
         (CASE
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
@@ -79,7 +74,7 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
-        where 1 = 1
+        where 1 = 1 and a.remark = 1
         <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
         ORDER BY b.device_id, b.custom_id
     </select>
@@ -88,7 +83,6 @@
         select
         a.sub_type,
         a.instance_id,
-        a.remark,
         (CASE
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
@@ -111,7 +105,7 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
-        where 1 = 1
+        where 1 = 1 and a.remark = 1
         <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
         ORDER BY b.device_id, b.custom_id
     </select>
@@ -119,14 +113,12 @@
     <insert id="batchAdd">
         insert into t_cruise_type(
             sub_type,
-            instance_id,
-            remark
+            instance_id
         )values
         <foreach collection="list" item="TCruiseTypeDetail" separator=",">
             (
                 #{TCruiseTypeDetail.subType, jdbcType=INTEGER},
-                #{TCruiseTypeDetail.instanceId, jdbcType=BIGINT},
-                #{TCruiseTypeDetail.remark, jdbcType=VARCHAR}
+                #{TCruiseTypeDetail.instanceId, jdbcType=BIGINT}
             )
         </foreach>
     </insert>
@@ -143,7 +135,7 @@
     <select id="selectIdList" resultType="java.lang.Long">
         select  instance_id
         from t_cruise_type
-        where 1=1
+        where 1=1 and remark = 1
         <if test="subType != null"> and sub_type = #{subType, jdbcType=INTEGER}</if>
     </select>
 
@@ -368,5 +360,41 @@
         where a.algorithm_id in (select algorithm_id from t_algorithm_info where analyse_type in(8,7,6,5) )
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
         ORDER BY b.device_id, b.custom_id
+    </select>
+    <update id="tagsDeleted" >
+        update t_cruise_type a <set>
+        a.remark = 0,
+    </set>
+        where a.instance_id in (
+        <foreach collection="list" item="instanceId" separator=",">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </update>
+
+    <update id="tagsAdd" >
+        update t_cruise_type a <set>
+        a.remark = 1,
+    </set>
+        where a.instance_id in (
+        <foreach collection="list" item="instanceId" separator=",">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </update>
+    <delete id="batchDeleteByInstance">
+        delete from t_cruise_type
+        where instance_id in (
+        <foreach collection="list" item="instanceId" separator=",">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+        )
+    </delete>
+
+    <select id="selectIdListByAll" resultType="java.lang.Long">
+        select  instance_id
+        from t_cruise_type
+        where 1=1
+        <if test="subType != null"> and sub_type = #{subType, jdbcType=INTEGER}</if>
     </select>
 </mapper>

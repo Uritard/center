@@ -43,11 +43,10 @@ public class TCruiseTypeController {
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     @Logs(title = "新增巡视类型关联实例点数据",content = "根据用户传递的参数新增巡视类型关联实例点数据",logType = 2)
     public Result add(@RequestParam(value = "cruiseType") Integer cruiseType,
-                      @RequestParam(value = "instanceList") String instanceList,
-                      @RequestParam(value = "subType",required = false) String remake) {
+                      @RequestParam(value = "instanceList") String instanceList) {
         Result result = new Result();
         try {
-            result.setData(tCruiseTypeService.add(cruiseType,instanceList,remake));
+            result.setData(tCruiseTypeService.add(cruiseType,instanceList));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -74,13 +73,13 @@ public class TCruiseTypeController {
         return result;
     }
 
-    @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改巡视类型关联实例点数据",content = "根据用户传递的参数修改巡视类型关联实例点数据",logType = 3)
-    public Result update(@RequestBody TCruiseType tCruiseType) {
+    @ApiOperation(value = "同步")
+    @RequestMapping(value = "/update", method = RequestMethod.GET)
+    @Logs(title = "同步巡视类型关联实例点数据",content = "根据用户传递的参数同步巡视类型关联实例点数据",logType = 3)
+    public Result update(@RequestParam(value = "subType", required = true) Integer subType) {
         Result result = new Result();
         try {
-            result.setData(tCruiseTypeService.update(tCruiseType));
+            result.setData(tCruiseTypeService.update(subType));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);
@@ -97,8 +96,8 @@ public class TCruiseTypeController {
     public Result selectByPrimaryId(@RequestParam(value = "subType", required = true) Integer subType) {
         Result result = new Result();
         try {
-            TCruiseType tCruiseType = tCruiseTypeService.selectByPrimaryId(subType);
-            result.setData(tCruiseType);
+            List<TCruiseTypeDetail> tCruiseTypeList = tCruiseTypeService.selectByPrimaryId(subType);
+            result.setData(tCruiseTypeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
