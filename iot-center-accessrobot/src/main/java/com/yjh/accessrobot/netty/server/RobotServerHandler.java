@@ -76,10 +76,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return isThreadStart;
     }
 
-    public ChannelHandlerContext getCtx() {
-        return ctx;
-    }
-
     private ChannelHandlerContext ctx;
     //遥调遥控
     private static Map<Object, RobotServerHandler> robotServerHandlerMap = new HashMap<>();
@@ -247,22 +243,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
          Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
          Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
          Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
-
-        /*String code = "";
-        List<String> allRobotCodeList = nowRobotCode();
-        if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
-             code = "200";//success
-            log.info("缓存有,可以注册");
-        }else {
-            List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
-            if (robotCodeList.contains(xmlBaseModel.getSendCode())){
-                code = "200";
-                log.info("缓存无，表中有，可以注册");
-            }else {
-                code = "400";//拒绝
-                log.info("缓存无，表中无，不可以注册");
-            }
-        }*/
 
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
