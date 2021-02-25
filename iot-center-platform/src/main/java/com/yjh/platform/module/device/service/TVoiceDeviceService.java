@@ -79,7 +79,8 @@ public class TVoiceDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public String voiceFileGenerate(Long voiceDeviceId) {
-        String voicePath = "F:\\workspace\\";
+        String voicePath = "/home/yjh/iot-files/";
+        String voiceName = "voice"+ new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 
         if (sdk_.NET_TRADIO_Init() == 0) {
             System.out.println("SDK初始化成功");
@@ -110,14 +111,13 @@ public class TVoiceDeviceService{
                     System.arraycopy(byteOne, 0, bytesArrayTem, i, 1);
                     StrArrayTem.append(String.format("%02x ", data.getByte(i)));
                 }
-
                 log.info("receiveOriginalDataArray:" + StrArrayTem);
 
                 if (channel==0) {
                     try {
                         File file = new File(voicePath);
                         if (!file.exists()) { file.mkdirs(); }
-                        File tempWav = new File(file, "voice"+ new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) +".aac");
+                        File tempWav = new File(file, voiceName +".aac");
                         if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
                         FileOutputStream fos = new FileOutputStream(tempWav, true);
                         fos.write(bytesArrayTem, 0, bytesArrayTem.length);
@@ -131,29 +131,16 @@ public class TVoiceDeviceService{
         log.info("byteArrayLength: "+byteArratTemLength[0]);
 
         NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
-        if (sdk_.NET_TRADIO_Login(hdForData, "192.168.10.127", 38000, "admin", "123456", dev) == 0) {
-            System.out.println("注册成功");
-        }else {
-            System.out.println("注册失败");
-        }
-
-        try {
-            Thread.sleep(30000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        if (sdk_.NET_TRADIO_Login(hdForData, "192.168.10.127", 38000, "admin", "123456", dev) == 0) { System.out.println("注册成功"); }else { System.out.println("注册失败"); }
+        try { Thread.sleep(30000); } catch (InterruptedException e) { e.getMessage(); }
 
         int id = 0;
-        if (sdk_.NET_TRADIO_Logout(id) != 0) {
-            System.out.println("设备注销成功");
-        } else {
-            System.out.println("设备注销失败");
-        }
-
+        if (sdk_.NET_TRADIO_Logout(id) != 0) { System.out.println("设备注销成功"); } else { System.out.println("设备注销失败"); }
         sdk_.NET_TRADIO_Clear();
+        String urlAACToWAV = "/usr/bin/ffmpeg -y -i "+voiceName+".aac -acodec pcm_s16le -ac 2 -ar 32000 " + voiceName + ".wav";
+        try { Runtime.getRuntime().exec(urlAACToWAV); } catch (IOException e) { e.getMessage(); }
 
-
-        return voicePath;
+        return voicePath+voiceName+".wav";
     }
 
     @Transactional(rollbackFor = Exception.class)
