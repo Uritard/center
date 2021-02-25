@@ -153,6 +153,20 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "声纹文件生成")
+    @RequestMapping(value = "/voiceFileGenerate", method = RequestMethod.GET)
+    @Logs(title = "生成声纹文件", content = "生成声纹文件到指定目录下", logType = 1)
+    public Result voiceFileGenerate(@RequestParam(value = "voiceDeviceId") Long voiceDeviceId) {
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.voiceFileGenerate(voiceDeviceId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
     @Logs(title = "批量插入声纹设备数据", content = "根据用户传递的参数批量插入声纹设备数据", logType = 2)

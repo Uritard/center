@@ -1,15 +1,16 @@
 package com.yjh.platform.module.device.service;
 
-import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.Result;
+import com.sun.jna.Pointer;
+import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
+import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
-import com.yjh.platform.module.device.controller.TVoiceDeviceController;
-import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.LongBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,14 +18,11 @@ import java.util.*;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail;
 import com.yjh.platform.module.user.dao.TSysParamDao;
-import com.yjh.platform.module.user.entity.AreaInfoDetail;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
@@ -44,6 +42,8 @@ public class TVoiceDeviceService{
     private TSysParamDao tSysParamDao;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
+
+    private static TradioLibrary sdk_= TradioLibrary.INSTANCE;;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TVoiceDevice tVoiceDevice) {
@@ -75,6 +75,85 @@ public class TVoiceDeviceService{
     public List<TVoiceDevice> selectByPage(TVoiceDevice tVoiceDevice) {
         List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(tVoiceDevice);
         return tVoiceDeviceList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String voiceFileGenerate(Long voiceDeviceId) {
+        String voicePath = "F:\\workspace\\";
+
+        if (sdk_.NET_TRADIO_Init() == 0) {
+            System.out.println("SDK初始化成功");
+        } else {
+            System.out.println("SDK初始化失败");
+        }
+
+        LongBuffer hd = LongBuffer.allocate(1);
+        if(sdk_.NET_TRADIO_CreateDevice(hd) == 0){
+            System.out.println("创建设备成功");
+        }else{
+            System.out.println("创建设备失败");
+        }
+
+        final int[] byteArratTemLength = {0};
+        long hdForData = hd.get();
+        sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
+            @Override
+            public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
+                log.info("收到数据：charPtr1=" + data + "，int1=" + len + "，int2=" + channel + "，int3=" + db
+                        + "，long1=" + dev + "，sample_rate=" + sample_rate);
+
+                byte[] bytesArrayTem = new byte[len];
+                StringBuilder StrArrayTem = new StringBuilder();
+                for (int i = 0; i < len; i++) {
+                    byte[] byteOne = new byte[1];
+                    byteOne[0] = data.getByte(i);
+                    System.arraycopy(byteOne, 0, bytesArrayTem, i, 1);
+                    StrArrayTem.append(String.format("%02x ", data.getByte(i)));
+                }
+
+                log.info("receiveOriginalDataArray:" + StrArrayTem);
+
+                if (channel==0) {
+                    try {
+                        File file = new File(voicePath);
+                        if (!file.exists()) { file.mkdirs(); }
+                        File tempWav = new File(file, "voice"+ new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) +".aac");
+                        if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+                        FileOutputStream fos = new FileOutputStream(tempWav, true);
+                        fos.write(bytesArrayTem, 0, bytesArrayTem.length);
+                        fos.flush();
+                        fos.close();
+                        byteArratTemLength[0] = byteArratTemLength[0]+len;
+                    } catch (IOException e) { e.getMessage(); }
+                }
+            }
+        }, 0);
+        log.info("byteArrayLength: "+byteArratTemLength[0]);
+
+        NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
+        if (sdk_.NET_TRADIO_Login(hdForData, "192.168.10.127", 38000, "admin", "123456", dev) == 0) {
+            System.out.println("注册成功");
+        }else {
+            System.out.println("注册失败");
+        }
+
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int id = 0;
+        if (sdk_.NET_TRADIO_Logout(id) != 0) {
+            System.out.println("设备注销成功");
+        } else {
+            System.out.println("设备注销失败");
+        }
+
+        sdk_.NET_TRADIO_Clear();
+
+
+        return voicePath;
     }
 
     @Transactional(rollbackFor = Exception.class)
