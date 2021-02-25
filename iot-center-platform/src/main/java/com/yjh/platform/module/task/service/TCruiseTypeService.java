@@ -198,7 +198,7 @@ public class TCruiseTypeService{
                 return 1;
             }
         }
-        return 1;
+        return 0;
     }
 
     @Transactional(rollbackFor = Exception.class)

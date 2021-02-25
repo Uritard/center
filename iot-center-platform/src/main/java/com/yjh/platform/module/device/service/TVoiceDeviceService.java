@@ -190,7 +190,9 @@ public class TVoiceDeviceService{
             }
         }
         String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
-        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
+//        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        //String realPath = "D:/code/qhTest";
+        String absPath  = "D:/code/qhTest";
         diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }
@@ -206,28 +208,48 @@ public class TVoiceDeviceService{
                     areaInfoTem.setLabel(areaInfoMap.getLabel());
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
-                    List<VoiceDevice> fileList = new ArrayList<>();
+                    List<VoiceDevice> dateList = new ArrayList<>();
                     if("device".equals(areaInfoTem.getInfoType())){
+                        //todo 记得加上日期这一层级日期
                         boolean flag = false;
                         //File file = new File("D:/code/qhTest"+"/"+areaInfoTem.getId());
                         File file = new File(absPath+"/"+areaInfoTem.getId());
                         File[] tempList = file.listFiles();
                         if(tempList != null && tempList.length>0){
                             for (int i = 0; i < tempList.length; i++) {
-                                if (tempList[i].isFile()) {
-                                    VoiceDevice voiceDevice = new VoiceDevice();
-                                    voiceDevice.setUpId(areaInfoTem.getId());
-                                    voiceDevice.setUpName(areaInfoTem.getLabel());
-                                    voiceDevice.setLabel(tempList[i].getName());
-                                    voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
-                                    voiceDevice.setInfoType("file");
-                                    fileList.add(voiceDevice);
+                                if (tempList[i].isDirectory()) {//时间日期文件夹
+                                    VoiceDevice date = new VoiceDevice();
+                                    date.setUpId(areaInfoTem.getId());
+                                    date.setUpName(areaInfoTem.getLabel());
+                                    date.setLabel(tempList[i].getName());
+                                    date.setId(areaInfoTem.getId());
+                                    //voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
+                                    date.setInfoType("date");
+                                    //查询此文件夹下的所有文件
+                                    List<VoiceDevice> fileList = new ArrayList<>();
+                                    File fileForFile = new File(absPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
+                                    File[] voiceFileList = fileForFile.listFiles();
+                                    if(voiceFileList != null && voiceFileList.length>0) {
+                                        for (int j = 0; j < voiceFileList.length; j++) {
+                                            if (voiceFileList[j].isFile()) {//音频文件
+                                                VoiceDevice voiceDevice = new VoiceDevice();
+                                                voiceDevice.setUpId(date.getId());
+                                                voiceDevice.setUpName(date.getLabel());
+                                                voiceDevice.setLabel(voiceFileList[i].getName());
+                                                voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName()+"/"+voiceFileList[i].getName());
+                                                voiceDevice.setInfoType("file");
+                                                fileList.add(voiceDevice);
+                                            }
+                                        }
+                                    }
+                                    date.setChildren(fileList);
+                                    dateList.add(date);
                                 }
                             }
                         }
 
                     }
-                    areaInfoTem.setChildren(fileList);
+                    areaInfoTem.setChildren(dateList);
                     childrenList.add(areaInfoTem);
                 }
             }
@@ -243,8 +265,8 @@ public class TVoiceDeviceService{
 //        if(Constant.voiceAnalyseResult.get(voiceDeviceId+":"+voicePath) != null){
 //            //此文件已经分析过了
 //        }
-        //String path = "D:/code/qhTest";
-        String path = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        String path = "D:/code/qhTest";
+        //String path = tSysParamDao.selectByParamType("absVoicePath").getContent();
         MultimediaObject multimediaObject = new MultimediaObject(new File(path+"/"+voiceDeviceId+"/"+voicePath));
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
@@ -277,19 +299,19 @@ public class TVoiceDeviceService{
             try{
                 if(DBList.get(i-1)<warnDb && DBList.get(i) >= warnDb){
                     //记录开始时间
-                    log.info("开始时间："+simpleDateFormat.format(i*hm- TimeZone.getDefault().getRawOffset()));
+                    //log.info("开始时间："+simpleDateFormat.format(i*hm- TimeZone.getDefault().getRawOffset()));
                     timeList.add(i);
                 }
                 if(DBList.get(i-1)>=warnDb && DBList.get(i) < warnDb){
                     //记录结束时间
-                    log.info("结束时间："+simpleDateFormat.format(i*hm- TimeZone.getDefault().getRawOffset()));
+                    //log.info("结束时间："+simpleDateFormat.format(i*hm- TimeZone.getDefault().getRawOffset()));
                     timeList.add(i);
                 }
             }catch (Exception e){
                 log.info("时间转化错误："+e);
             }
         }
-        if(timeList.size() == 1){
+        if(timeList.size()%2 == 1){
             //只有开始没有结束
             timeList.add(DBList.size()-1);
             log.info("结束时间："+simpleDateFormat.format((DBList.size()-1)*hm- TimeZone.getDefault().getRawOffset()));
