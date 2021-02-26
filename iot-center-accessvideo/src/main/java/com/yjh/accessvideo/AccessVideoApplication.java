@@ -87,8 +87,8 @@ public class AccessVideoApplication implements CommandLineRunner {
             for (RecorderConInfo recorderConInfo:recorderConInfoList) {
                 long recordId = recorderConInfo.getRecordId();
                 String m_sDeviceIP = recorderConInfo.getRecordIp();
-                String m_sUsername = recorderConInfo.getUserName();
-                String m_sPassword = recorderConInfo.getPwd();
+                String m_sUsername = recorderConInfo.getIdentityManager();
+                String m_sPassword = recorderConInfo.getIdentityCode();
                 Short m_port = recorderConInfo.getHttpPort().shortValue();
                 log.info("register nvr"+recorderConInfo.getRecordName()+", ip is "+m_sDeviceIP+", port is "+m_port);
                 //注册

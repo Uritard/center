@@ -39,6 +39,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -446,5 +447,12 @@ public class HelloController {
 
             return keys;
         });
+    }
+    @ApiOperation(value = "判断系统是哪个操作系统")
+    @RequestMapping(value = "/testIsWhatOS", method = RequestMethod.GET)
+    public Result testIsWhatOS() throws Exception{
+        Result result = new Result();
+        result.setData("此系统是： "+System.getProperty("os.name")+"ip是"+ InetAddress.getLocalHost().getHostAddress());
+        return result;
     }
 }
