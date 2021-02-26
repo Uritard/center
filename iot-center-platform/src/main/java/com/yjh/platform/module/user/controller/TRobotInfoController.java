@@ -71,7 +71,7 @@ public class TRobotInfoController {
             }
             List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
             if (allRobotCodeList.contains(tRobotInfo.getRobotCode())){
-                result.setMessage(209, "机器人PMS编码已存在，不可重复");
+                result.setMessage(209, "机器人编码已存在，不可重复");
             }else {
                 result.setData(tRobotInfoService.insert(tRobotInfo,userId));
             }
@@ -116,7 +116,7 @@ public class TRobotInfoController {
             String robotCode = tRobotInfoService.selectRobotCodeById(tRobotInfo.getRobotId());
             List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
             if (!tRobotInfo.getRobotCode().equals(robotCode) && allRobotCodeList.contains(tRobotInfo.getRobotCode())){
-                    result.setMessage(209, "机器人PMS编码已存在，不可重复");
+                    result.setMessage(209, "机器人编码已存在，不可重复");
             }else {
                 Long userId = Long.valueOf(request.getHeader("userId"));
                 result.setData(tRobotInfoService.update(tRobotInfo,userId));

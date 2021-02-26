@@ -63,16 +63,19 @@ public class ReportManageService {
         recordData.setTCDRDList(tCDRDList);
 
 //        String fileName = sdf.format(new Date())+"-"+reportType+".xlsx";
-//        String fileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
+        String fileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
         //生成随机的文件名称
-        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+//        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+
 //        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-        String finalFileName = null;
+        /*String finalFileName = null;
         try {
             finalFileName = new String(fileName.getBytes(StandardCharsets.UTF_8),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        String finalFileName = toUTF8(fileName);
 
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
@@ -326,7 +329,32 @@ public class ReportManageService {
         String fileRelativePath = map.get("content") + "/" + finalFileName;
         log.info("该文件相对路径是==="+fileRelativePath);
         return fileRelativePath;
-
-
+    }
+    /*
+    *转UTF-8
+    * */
+    public String toUTF8(String s) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= 0 && c <= 255) {
+                sb.append(c);
+            } else {
+                byte[] b;
+                try {
+                    b = Character.toString(c).getBytes(StandardCharsets.UTF_8);
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                    b = new byte[0];
+                }
+                for (int j = 0; j < b.length; j++) {
+                    int k = b[j];
+                    if (k < 0)
+                        k += 256;
+                    sb.append("%" + Integer.toHexString(k).toUpperCase());
+                }
+            }
+        }
+        return sb.toString();
     }
 }

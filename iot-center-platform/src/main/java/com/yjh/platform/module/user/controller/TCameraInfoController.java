@@ -59,7 +59,7 @@ public class TCameraInfoController {
         try {
             List<String> selectAllPMSIdList = tCameraInfoService.selectAllPMSId();
             if (selectAllPMSIdList.contains(tCameraInfo.getPmsId())) {
-                result.setMessage(209, "摄像机PMS编码已存在，不可重复");
+                result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
                 int state = tCameraInfoService.insert(tCameraInfo);
                 if (state == 0) {
@@ -132,7 +132,7 @@ public class TCameraInfoController {
             String pmsId = tCameraInfoService.selectPmsIdById(tCameraInfo.getCameraId());
             List<String> allPmsIdList = tCameraInfoService.selectAllPMSId();
             if (!tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
-                result.setMessage(209, "摄像机PMS编码已存在，不可重复");
+                result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
                 int state = tCameraInfoService.update(tCameraInfo);
                 if (state == 0) {
