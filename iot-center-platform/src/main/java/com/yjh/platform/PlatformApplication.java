@@ -1,6 +1,9 @@
 package com.yjh.platform;
 
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.tradio.RecordVoiceFileThread;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
+import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
@@ -19,11 +22,14 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 
 
 
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
@@ -37,6 +43,10 @@ public class PlatformApplication  implements CommandLineRunner {
     private TCameraInfoService tCameraInfoService;
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private TVoiceDeviceService tVoiceDeviceService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -51,6 +61,16 @@ public class PlatformApplication  implements CommandLineRunner {
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();
+        //Start RecordVoiceFileThread
+//        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
+//        for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
+//            RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
+//                    voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
+//                    voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true);
+//            Thread thread = new Thread(recordVoiceFileThread);
+//            thread.setDaemon(true);
+//            thread.start();
+//        }
     }
 
     @Bean
