@@ -70,12 +70,14 @@ public class ReportManageService {
 //        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
         String finalFileName = null;
         try {
-            finalFileName = new String(fileName.getBytes("GBK"),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
+            finalFileName = new String(fileName.getBytes(),"UTF-8");
+//            finalFileName = java.net.URLEncoder.encode(fileName, "UTF-8");
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
 //        String finalFileName = toUTF8(fileName);
+
 
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
