@@ -182,11 +182,10 @@ public class RobotController {
     /*用完就删*/
     @ApiOperation(value = "方法测试")
     @PostMapping(value = "/methodTest")
-    public Result methodTest(@RequestParam(value = "inspectionCode",required = false) String inspectionCode,
-                             @RequestBody Analysis analysis){
+    public Result methodTest(@RequestParam(value = "name",required = false) String name){
         Result result = new Result();
         try {
-            result.setData(robotService.AnalyzeAfterRobot(analysis,inspectionCode));
+//            result.setData(robotService.methodTest(name));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
