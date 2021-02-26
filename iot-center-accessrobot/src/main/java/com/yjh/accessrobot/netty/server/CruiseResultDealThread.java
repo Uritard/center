@@ -194,7 +194,7 @@ public class CruiseResultDealThread implements Runnable{
                                 .setOrigpic(redisInfoMap.get("origpic"))
                                 .setIsWarn(0)
                                 .setEvaluationState(257)
-                                .setCreatetime(new Date())
+                                .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
                                 .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                         if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                             tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));

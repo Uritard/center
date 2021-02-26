@@ -68,14 +68,14 @@ public class ReportManageService {
 //        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
 
 //        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-        /*String finalFileName = null;
+        String finalFileName = null;
         try {
-            finalFileName = new String(fileName.getBytes(StandardCharsets.UTF_8),"UTF-8");
+            finalFileName = new String(fileName.getBytes("GBK"),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }*/
+        }
 
-        String finalFileName = toUTF8(fileName);
+//        String finalFileName = toUTF8(fileName);
 
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
