@@ -1,32 +1,24 @@
 package com.yjh.platform.module.device.service;
 
-import com.sun.jna.Pointer;
-import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
-import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
-import com.yjh.platform.module.device.entity.TVoiceDevice;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.LongBuffer;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
+import com.yjh.platform.module.device.entity.TVoiceDevice;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
 import com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
+
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
 * @author lqh
@@ -38,13 +30,9 @@ public class TVoiceDeviceService{
     @Autowired
     private TVoiceDeviceDao tVoiceDeviceDao;
     @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
     private TSysParamDao tSysParamDao;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
-
-    private static TradioLibrary sdk_= TradioLibrary.INSTANCE;;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TVoiceDevice tVoiceDevice) {

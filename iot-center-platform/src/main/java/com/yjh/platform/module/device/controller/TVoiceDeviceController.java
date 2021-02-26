@@ -1,33 +1,24 @@
 package com.yjh.platform.module.device.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.utils.mp3.SpectrumMp3;
-import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.entity.TVoiceDevice;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
-import com.yjh.platform.module.device.entity.TVoiceDevice;
-
-import java.beans.Encoder;
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-
-import io.swagger.annotations.*;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ws.schild.jave.MultimediaInfo;
-import ws.schild.jave.MultimediaObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
