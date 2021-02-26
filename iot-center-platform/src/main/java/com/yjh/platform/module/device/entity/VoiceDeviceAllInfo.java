@@ -79,5 +79,5 @@ public class VoiceDeviceAllInfo {
     @TableField("filePath")
     private String filePath;
 
-    private Integer channelNum;
+    private String channelNum;
 }
