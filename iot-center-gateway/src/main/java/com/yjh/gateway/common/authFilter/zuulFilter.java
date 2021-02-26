@@ -45,12 +45,11 @@ public class zuulFilter extends ZuulFilter {
     @SneakyThrows
     @Override
     public boolean shouldFilter() {
-
-        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isDecode");
-        String isDecode =map.get("content");
-        Map<String,String> uKeymap= redisTemplate.opsForHash().entries("t_sys_param:isUkey");
-        String isUkey =uKeymap.get("content");
-        if("true".equals(isDecode)) {
+        Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isDecode");
+        String isDecode = map.get("content");
+        Map<String, String> uKeymap = redisTemplate.opsForHash().entries("t_sys_param:isUkey");
+        String isUkey = uKeymap.get("content");
+        if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;
@@ -65,7 +64,7 @@ public class zuulFilter extends ZuulFilter {
                         paramBodyMap = JSONObject.parseObject(body, LinkedHashMap.class);
                     }
                     for (Map.Entry<String, Object> param : paramBodyMap.entrySet()) {
-                        if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                        if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey())) {
                             jsonModel.put(param.getKey(), param.getValue());
                         }
                         if ("summary".equals(param.getKey())) {
@@ -98,7 +97,7 @@ public class zuulFilter extends ZuulFilter {
                         Map<String, Object> params = JSON.parseObject(jsonObject.toString(), LinkedHashMap.class);
                         JSONObject jsonModel = new JSONObject(true);
                         for (Map.Entry<String, Object> param : params.entrySet()) {
-                            if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                            if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey())) {
                                 jsonModel.put(param.getKey(), param.getValue());
                             }
                         }
@@ -121,15 +120,16 @@ public class zuulFilter extends ZuulFilter {
                 }
             }
         }
-        if("true".equals(isUkey)){
+        if ("true".equals(isUkey)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;
             if (request instanceof HttpServletRequest) {
                 requestWrapper = new MyRequestWrapper(request);
-                if ("POST".equals(request.getMethod().toUpperCase())||"PUT".equals(request.getMethod().toUpperCase())) {
+                if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
                     String signStr = null;
-                    String plainText = null;
+                    String webcode = null;
+
                     String body = requestWrapper.getBody();
                     Map<String, Object> paramBodyMap = new LinkedHashMap<>();
                     if (!StringUtils.isEmpty(body)) {
@@ -139,26 +139,26 @@ public class zuulFilter extends ZuulFilter {
                         if ("signStr".equals(param.getKey())) {
                             signStr = String.valueOf(param.getValue());
                         }
-                        if ("plainText".equals(param.getKey())) {
-                            plainText = String.valueOf(param.getValue());
+                        if ("summary".equals(param.getKey())) {
+                            webcode = String.valueOf(param.getValue());
                         }
                     }
-                    boolean status=Demo.verify(plainText, signStr);
+                    boolean status = Demo.verify(webcode, signStr);
                     if (!status) {
                         log.error("签名验证结果 - " + status);
                         ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
                         return false;
                     }
                     ctx.setRequest(requestWrapper);
                 } else {
                     String signStr = request.getParameter("signStr");
-                    String plainText = request.getParameter("plainText");
+                    String plainText = request.getParameter("summary");
                     boolean status = Demo.verify(plainText, signStr);
                     if (!status) {
                         log.error("签名验证结果 - " + status);
                         ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
                         return false;
                     }
                 }
