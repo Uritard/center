@@ -113,8 +113,8 @@ public class RecordVoiceFileThread implements Runnable {
                 NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
                 if (sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev) == 0) { log.info("注册成功"); }else { log.info("注册失败"); }
                 try { Thread.sleep(6000); } catch (InterruptedException e) { e.getMessage(); }
-//                if (sdk_.NET_TRADIO_Logout(0) != 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
-//                sdk_.NET_TRADIO_Clear();
+                if (sdk_.NET_TRADIO_Logout(0) != 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
+                sdk_.NET_TRADIO_Clear();
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
