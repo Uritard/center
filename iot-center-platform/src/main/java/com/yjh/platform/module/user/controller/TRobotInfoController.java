@@ -69,7 +69,12 @@ public class TRobotInfoController {
                     result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
                 }
             }
-            result.setData(tRobotInfoService.insert(tRobotInfo,userId));
+            List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
+            if (allRobotCodeList.contains(tRobotInfo.getRobotCode())){
+                result.setMessage(209, "机器人PMS编码已存在，不可重复");
+            }else {
+                result.setData(tRobotInfoService.insert(tRobotInfo,userId));
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -108,8 +113,14 @@ public class TRobotInfoController {
     public Result update(HttpServletRequest request, @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(tRobotInfoService.update(tRobotInfo,userId));
+            String robotCode = tRobotInfoService.selectRobotCodeById(tRobotInfo.getRobotId());
+            List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
+            if (!tRobotInfo.getRobotCode().equals(robotCode) && allRobotCodeList.contains(tRobotInfo.getRobotCode())){
+                    result.setMessage(209, "机器人PMS编码已存在，不可重复");
+            }else {
+                Long userId = Long.valueOf(request.getHeader("userId"));
+                result.setData(tRobotInfoService.update(tRobotInfo,userId));
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新机器人异常:", e);

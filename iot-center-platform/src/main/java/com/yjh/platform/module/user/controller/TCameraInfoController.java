@@ -10,6 +10,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,13 +57,17 @@ public class TCameraInfoController {
 
         Result result = new Result();
         try {
-            int state=tCameraInfoService.insert(tCameraInfo);
-            if(state==0){
-                result.setMessage(ResultCodeEnum.CODE2.getCode(),ResultCodeEnum.CODE2.getName());
-            }else {
-                result.setData(state);
+            List<String> selectAllPMSIdList = tCameraInfoService.selectAllPMSId();
+            if (selectAllPMSIdList.contains(tCameraInfo.getPmsId())) {
+                result.setMessage(209, "摄像机PMS编码已存在，不可重复");
+            } else {
+                int state = tCameraInfoService.insert(tCameraInfo);
+                if (state == 0) {
+                    result.setMessage(ResultCodeEnum.CODE2.getCode(), ResultCodeEnum.CODE2.getName());
+                } else {
+                    result.setData(state);
+                }
             }
-
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -124,13 +129,18 @@ public class TCameraInfoController {
     public Result update(@RequestBody TCameraInfo tCameraInfo) {
         Result result = new Result();
         try {
-            int state=tCameraInfoService.update(tCameraInfo);
-            if(state==0){
-                result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-            }else {
-                result.setData(state);
+            String pmsId = tCameraInfoService.selectPmsIdById(tCameraInfo.getCameraId());
+            List<String> allPmsIdList = tCameraInfoService.selectAllPMSId();
+            if (!tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
+                result.setMessage(209, "摄像机PMS编码已存在，不可重复");
+            } else {
+                int state = tCameraInfoService.update(tCameraInfo);
+                if (state == 0) {
+                    result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+                } else {
+                    result.setData(state);
+                }
             }
-
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新相机异常:", e);

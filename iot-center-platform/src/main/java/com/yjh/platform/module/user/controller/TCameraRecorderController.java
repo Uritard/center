@@ -11,6 +11,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TCameraRecorderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,8 +51,13 @@ public class TCameraRecorderController {
 
         Result result = new Result();
         try {
-            result.setData(tCameraRecorderService.insert(tCameraRecorder));
-            sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
+            List<String> selectAllPMSIdList = tCameraRecorderService.selectAllPMSId();
+            if (selectAllPMSIdList.contains(tCameraRecorder.getPmsId())) {
+                result.setMessage(209, "录像机PMS编码已存在，不可重复");
+            } else {
+                result.setData(tCameraRecorderService.insert(tCameraRecorder));
+                sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -112,8 +118,14 @@ public class TCameraRecorderController {
     public Result update(@RequestBody TCameraRecorder tCameraRecorder) {
         Result result = new Result();
         try {
-            result.setData(tCameraRecorderService.update(tCameraRecorder));
-            sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
+            String pmsId = tCameraRecorderService.selectPmsIdById(tCameraRecorder.getRecordId());
+            List<String> allPmsIdList = tCameraRecorderService.selectAllPMSId();
+            if (!tCameraRecorder.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraRecorder.getPmsId())) {
+                result.setMessage(209, "录像机PMS编码已存在，不可重复");
+            } else {
+                result.setData(tCameraRecorderService.update(tCameraRecorder));
+                sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新异常:", e);

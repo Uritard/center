@@ -84,5 +84,7 @@ public interface TRobotInfoDao {
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     String selectUserName(@Param(value = "userID")Long  userID);
     List<TRobotInfo> selectAllRobotCode();
+    List<String> selectAllRobotCode2();
+    String selectRobotCodeById(@Param(value = "robotId")Long robotId);
     List<Long>selectHaveIns(@Param(value = "robotId") Long robotId);
 }

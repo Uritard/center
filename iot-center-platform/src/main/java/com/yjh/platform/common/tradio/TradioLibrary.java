@@ -13,8 +13,10 @@ import java.nio.LongBuffer;
  * For help, please visit <a href="http://nativelibs4java.googlecode.com/">NativeLibs4Java</a> , <a href="http://rococoa.dev.java.net/">Rococoa</a>, or <a href="http://jna.dev.java.net/">JNA</a>.
  */
 public interface TradioLibrary extends Library {
+    
     public static final String JNA_LIBRARY_NAME = "/usr/lib64/libtradio.so";
     //public static final String JNA_LIBRARY_NAME = "D:\\code\\zhihui\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
+
     public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(TradioLibrary.JNA_LIBRARY_NAME);
     public static final TradioLibrary INSTANCE = (TradioLibrary)Native.loadLibrary(TradioLibrary.JNA_LIBRARY_NAME, TradioLibrary.class);
     /**

@@ -332,4 +332,10 @@
             t_camera_preset a
             where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </select>
+    <select id="selectAllPMSId" resultType="java.lang.String">
+        SELECT a.pms_id FROM t_camera_info a
+    </select>
+    <select id="selectPmsIdById" resultType="java.lang.String">
+        SELECT a.pms_id FROM t_camera_info a where a.camera_id = #{cameraId, jdbcType=BIGINT}
+    </select>
 </mapper>

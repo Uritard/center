@@ -398,4 +398,12 @@ public class TRobotInfoService{
         }
         return response;
     }
+    @Transactional(rollbackFor = Exception.class)
+    public String selectRobotCodeById(Long robotId) {
+        return tRobotInfoDao.selectRobotCodeById(robotId);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> selectAllRobotCode2() {
+        return tRobotInfoDao.selectAllRobotCode2();
+    }
 }

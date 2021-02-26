@@ -49,4 +49,6 @@ public interface TCameraRecorderDao {
     List<TCameraRecorderDetail> selectIdAndName();
     Long selectRecorderIdByPmsId(@Param(value = "pmsId")String pmsId);
     List<Long>selectHaveCamera(@Param(value = "recordId") Long recordId);
+    List<String> selectAllPMSId();
+    String selectPmsIdById(@Param(value = "recordId")Long recordId);
 }
