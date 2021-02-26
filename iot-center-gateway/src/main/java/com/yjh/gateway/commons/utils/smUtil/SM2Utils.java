@@ -152,8 +152,8 @@ public class SM2Utils {
 		sm3.update(sourceData, 0, sourceData.length);
 	    byte[] md = new byte[32];
 	    sm3.doFinal(md, 0);
-	    System.out.println("SM3摘要值:" + Util.getHexString(md));
-	    System.out.println("");
+//	    System.out.println("SM3摘要值:" + Util.getHexString(md));
+//	    System.out.println("");
 		
 	    ByteArrayInputStream bis = new ByteArrayInputStream(signData);
 	    ASN1InputStream dis = new ASN1InputStream(bis);
@@ -164,9 +164,9 @@ public class SM2Utils {
 	    SM2Result sm2Result = new SM2Result();
 	    sm2Result.r = r;
 	    sm2Result.s = s;
-	    System.out.println("r: " + sm2Result.r.toString(16));
-	    System.out.println("s: " + sm2Result.s.toString(16));
-	    System.out.println("");
+//	    System.out.println("r: " + sm2Result.r.toString(16));
+//	    System.out.println("s: " + sm2Result.s.toString(16));
+//	    System.out.println("");
 	    
 	    
 	    sm2.sm2Verify(md, userKey, sm2Result.r, sm2Result.s, sm2Result);
