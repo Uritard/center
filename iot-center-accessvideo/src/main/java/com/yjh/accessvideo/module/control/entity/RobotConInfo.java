@@ -54,10 +54,10 @@ public class RobotConInfo implements Serializable {
     private String lightPort;
 
     @ApiModelProperty(value = "可见光用户名")
-    private String lightUsername;
+    private String identityManager;
 
     @ApiModelProperty(value = "可见光密码")
-    private String lightPassword;
+    private String identityCode;
 
     @TableField("lnferad_IP")
     @ApiModelProperty(value = "红外IP")

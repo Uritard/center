@@ -101,8 +101,8 @@ public class CameraConService {
                 return cameraFlowMap;
             }
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
-            String userName = cameraConInfo.getUserName();
-            String password = cameraConInfo.getPwd();
+            String userName = cameraConInfo.getIdentityManager();
+            String password = cameraConInfo.getIdentityCode();
             String cameraIp = cameraConInfo.getRecordIp();
             int cameraPort = cameraConInfo.getRtspPort();
             int iChanNum = cameraConInfo.getChannelNum();
@@ -190,8 +190,8 @@ public class CameraConService {
                     returnMapList.add(cameraFlowMap);
                 } else {
                     CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
-                    String userName = cameraConInfo.getUserName();
-                    String password = cameraConInfo.getPwd();
+                    String userName = cameraConInfo.getIdentityManager();
+                    String password = cameraConInfo.getIdentityCode();
                     String cameraIp = cameraConInfo.getRecordIp();
                     int cameraPort = cameraConInfo.getRtspPort();
                     int iChanNum = cameraConInfo.getChannelNum();
@@ -238,8 +238,8 @@ public class CameraConService {
 
         String lightIp = robotConInfo.getLightIp();
         String lightPort = robotConInfo.getLightPort();
-        String lightUsername = robotConInfo.getLightUsername();
-        String lightPassword = robotConInfo.getLightPassword();
+        String lightUsername = robotConInfo.getIdentityManager();
+        String lightPassword = robotConInfo.getIdentityCode();
         int livePath =110;
         if (Objects.isNull(Constant.maps.get("livePath"))) {
             livePath = 123;
@@ -344,9 +344,9 @@ public class CameraConService {
         Map<String, Object> returnMap = new HashMap<>();
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
-            String userName = cameraConInfo.getUserName();
+            String userName = cameraConInfo.getIdentityManager();
             String cameraIp = cameraConInfo.getRecordIp();
-            String password = cameraConInfo.getPwd();
+            String password = cameraConInfo.getIdentityCode();
             int cameraPort = cameraConInfo.getRtspPort();
             int iChanNum = cameraConInfo.getChannelNum();
             int historyPath;
@@ -668,8 +668,8 @@ public class CameraConService {
             lUserID = -1;
         }
         String m_sDeviceIP = recorderConInfo.getRecordIp();
-        String m_sUsername = recorderConInfo.getUserName();
-        String m_sPassword = recorderConInfo.getPwd();
+        String m_sUsername = recorderConInfo.getIdentityManager();
+        String m_sPassword = recorderConInfo.getIdentityCode();
         Short m_port = recorderConInfo.getHttpPort().shortValue();
         log.info("register nvr"+recorderConInfo.getRecordName()+", ip is "+m_sDeviceIP+", port is "+m_port);
         //注册

@@ -10,14 +10,14 @@
         <result column="preset_num" jdbcType="INTEGER" property="presetNum" />
         <result column="record_id" jdbcType="BIGINT" property="recordId" />
         <result column="record_ip" jdbcType="VARCHAR" property="recordIp" />
-        <result column="user_name" jdbcType="VARCHAR" property="userName" />
-        <result column="pwd" jdbcType="VARCHAR" property="pwd" />
+        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager" />
+        <result column="identity_code" jdbcType="VARCHAR" property="identityCode" />
         <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        camera_id, channel_num, preset_id, preset_num, record_id, record_ip, user_name, pwd, rtsp_port
+        camera_id, channel_num, preset_id, preset_num, record_id, record_ip, identity_manager, identity_code, rtsp_port
     </sql>
 
     <select id="selectConInfo" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraConInfo">
@@ -29,8 +29,8 @@
         b.preset_num,
         c.record_id,
         c.record_ip,
-        c.user_name,
-        c.pwd,
+        c.identity_manager,
+        c.identity_code,
         c.rtsp_port
         FROM t_camera_info a
         LEFT JOIN t_camera_preset b ON a.camera_id = b.camera_id
@@ -48,8 +48,8 @@
         a.camera_type,
         c.record_id,
         c.record_ip,
-        c.user_name,
-        c.pwd,
+        c.identity_manager,
+        c.identity_code,
         c.rtsp_port
         FROM t_camera_info a
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
@@ -68,8 +68,8 @@
         a.http_port,
         a.trans_port,
         a.rtsp_port,
-        a.user_name,
-        a.pwd,
+        a.identity_manager,
+        a.identity_code,
         a.max_channel
         FROM t_camera_recorder a
     </select>
@@ -114,8 +114,8 @@
         a.robot_port,
         a.light_ip,
         a.light_port,
-        a.light_username,
-        a.light_password,
+        a.identity_manager,
+        a.identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
@@ -138,7 +138,8 @@
     </select>
 
     <select id="selectByRecordId" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.RecorderConInfo">
-        select a.record_id, a.record_name, a.record_ip, a.protocol, a.http_port, a.trans_port, a.rtsp_port, a.user_name, a.pwd, a.max_channel
+        select a.record_id, a.record_name, a.record_ip, a.protocol, a.http_port, a.trans_port, a.rtsp_port, a.identity_manager,
+        a.identity_code, a.max_channel
         from t_camera_recorder a
         where 1 = 1
         and a.record_id = #{recordId, jdbcType=BIGINT}

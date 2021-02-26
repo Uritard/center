@@ -44,10 +44,10 @@ public class CameraConInfo implements Serializable {
     private String recordIp;
 
     @ApiModelProperty(value = "用户名")
-    private String userName;
+    private String identityManager;
 
     @ApiModelProperty(value = "密码")
-    private String pwd;
+    private String identityCode;
 
     @ApiModelProperty(value = "控制端口")
     private Integer rtspPort;

@@ -46,10 +46,10 @@ public class RecorderConInfo implements Serializable {
     private Integer rtspPort;
 
     @ApiModelProperty(value = "用户名")
-    private String userName;
+    private String identityManager;
 
     @ApiModelProperty(value = "密码")
-    private String pwd;
+    private String identityCode;
 
     @ApiModelProperty(value = "最大通道数")
     private Integer maxChannel;
