@@ -78,4 +78,6 @@ public class VoiceDeviceAllInfo {
     @ApiModelProperty(value = "算法配置文件路径")
     @TableField("filePath")
     private String filePath;
+
+    private Integer channelNum;
 }

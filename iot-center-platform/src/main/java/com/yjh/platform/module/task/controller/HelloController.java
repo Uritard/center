@@ -452,7 +452,7 @@ public class HelloController {
     @RequestMapping(value = "/testIsWhatOS", method = RequestMethod.GET)
     public Result testIsWhatOS() throws Exception{
         Result result = new Result();
-        result.setData("此系统是： "+System.getProperty("os.name")+"ip是"+ InetAddress.getLocalHost().getHostAddress());
+        result.setData("此系统是： "+System.getProperty("os.name")+"; ip是:"+ InetAddress.getLocalHost().getHostAddress());
         return result;
     }
 }
