@@ -77,7 +77,6 @@ public class RecordVoiceFileThread implements Runnable {
                 }else{ log.info("创建设备失败"); }
 
                 long hdForData = hd.get();
-                final int[] i= {1};
                 sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
                     @Override
                     public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
@@ -93,7 +92,6 @@ public class RecordVoiceFileThread implements Runnable {
                             StrArrayTem.append(String.format("%02x ", data.getByte(i)));
                         }
                         log.debug("receiveOriginalDataArray:" + StrArrayTem);
-                        i[0]=i[0]+1;
                         for (String channelNumTem:channelNumList) {
                             Integer channelNumTerm = Integer.parseInt(channelNumTem)-1;
                             if (channel == channelNumTerm) {
@@ -113,12 +111,10 @@ public class RecordVoiceFileThread implements Runnable {
                 }, 0);
 
                 NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
-                log.info("i[0]/40*1000: "+i[0]/40*1000);
                 if (sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev) == 0) { log.info("注册成功"); }else { log.info("注册失败"); }
-                try { Thread.sleep(16000); } catch (InterruptedException e) { e.getMessage(); }
-                log.info("222i[0]/40*1000: "+i[0]/40*1000);
-                if (sdk_.NET_TRADIO_Logout(0) != 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
-                sdk_.NET_TRADIO_Clear();
+                try { Thread.sleep(6000); } catch (InterruptedException e) { e.getMessage(); }
+//                if (sdk_.NET_TRADIO_Logout(0) != 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
+//                sdk_.NET_TRADIO_Clear();
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
