@@ -913,27 +913,27 @@ public class TCruiseTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public int taskConfirmation(String userId, String password) throws Exception {
-        return 1;
+        //return 1;
         //todo 密码的解密
-//        SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
-//        //判断开关
-//        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-//        Boolean flag =Boolean.valueOf(map.get("content")) ;
-//        if(!flag) {
-//            //需要自己解密数据库password
-//            sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
-//        //}
-//        }else {
-//            //全要解密
-//            password = Demo.decrypt(password);
-//            sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
-//        }
-//        //password = Demo.decrypt(password);
-//        sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
-//        if (sysUser.getPassword().equals(password)) {
-//            return 1;
-//        }
-//        return -1;
+        SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
+        //判断开关
+        Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+        Boolean flag =Boolean.valueOf(map.get("content")) ;
+        if(!flag) {
+            //需要自己解密数据库password
+            sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
+        //}
+        }else {
+            //全要解密
+            password = Demo.decrypt(password);
+            sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
+        }
+        //password = Demo.decrypt(password);
+        //sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
+        if (sysUser.getPassword().equals(password)) {
+            return 1;
+        }
+        return -1;
     }
 
     private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state) {

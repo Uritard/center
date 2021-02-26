@@ -229,5 +229,18 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "查询音频设备全部信息")
+    @RequestMapping(value = "/selectVoiceDeviceInfo", method = RequestMethod.GET)
+    //@Logs(title = "音频分析",content = "",logType = 5)
+    public Result selectVoiceDeviceInfo() {
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.selectVoiceDeviceInfo());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 
 }

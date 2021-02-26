@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.device.entity.VoiceDevice;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
 import com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import org.slf4j.Logger;
@@ -349,6 +350,12 @@ public class TVoiceDeviceService{
             }
         }
         return big;
+    }
+
+    //查询音频设备的所有信息
+    @Transactional(rollbackFor = Exception.class)
+    public List<VoiceDeviceAllInfo> selectVoiceDeviceInfo(){
+        return this.tVoiceDeviceDao.selectVoiceDeviceInfo();
     }
 }
 
