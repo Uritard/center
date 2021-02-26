@@ -348,8 +348,14 @@ public class TCameraInfoService {
         channel.setStreamType("0");
         return channel;
     }
-
-
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> selectAllPMSId() {
+        return tCameraInfoDao.selectAllPMSId();
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public String selectPmsIdById(Long cameraId) {
+        return tCameraInfoDao.selectPmsIdById(cameraId);
+    }
 }
 
 

@@ -13,8 +13,8 @@
         <result column="http_port" jdbcType="INTEGER" property="httpPort" />
         <result column="trans_port" jdbcType="INTEGER" property="transPort" />
         <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort" />
-        <result column="user_name" jdbcType="VARCHAR" property="userName" />
-        <result column="pwd" jdbcType="VARCHAR" property="pwd" />
+        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager" />
+        <result column="identity_code" jdbcType="VARCHAR" property="identityCode" />
         <result column="protocolUrl" jdbcType="VARCHAR" property="protocolUrl" />
         <result column="max_channel" jdbcType="INTEGER" property="maxChannel" />
         <result column="hdd_size" jdbcType="INTEGER" property="hddSize" />
@@ -314,5 +314,11 @@
         FROM
             t_camera_info a
             where a.record_id = #{recordId, jdbcType=BIGINT}
+    </select>
+    <select id="selectAllPMSId" resultType="java.lang.String">
+        SELECT a.pms_id FROM t_camera_recorder a
+    </select>
+    <select id="selectPmsIdById" resultType="java.lang.String">
+        SELECT a.pms_id FROM t_camera_recorder a where a.record_id = #{recordId, jdbcType=BIGINT}
     </select>
 </mapper>

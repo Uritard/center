@@ -196,6 +196,13 @@ public class TCameraRecorderService {
     public int batchInsert(List<TCameraRecorder> list) {
         return this.tCameraRecorderDao.batchInsert(list);
     }
-
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> selectAllPMSId() {
+        return tCameraRecorderDao.selectAllPMSId();
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public String selectPmsIdById(Long recordId) {
+        return tCameraRecorderDao.selectPmsIdById(recordId);
+    }
 }
 

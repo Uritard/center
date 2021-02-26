@@ -472,6 +472,18 @@
             a.robot_code
         FROM t_robot_info a
     </select>
+    <select id="selectAllRobotCode2" resultType="java.lang.String">
+       select
+            a.robot_code
+        FROM t_robot_info a
+    </select>
+    <select id="selectRobotCodeById" resultType="java.lang.String">
+       select
+            a.robot_code
+        FROM t_robot_info a
+        where a.robot_id = #{robotId,jdbcType = BIGINT}
+
+    </select>
     <select id="selectHaveIns" resultType="java.lang.Long">
         SELECT
             a.instance_id
