@@ -1,9 +1,12 @@
 package com.yjh.gateway.common.authFilter;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.yjh.gateway.common.Constant;
+import com.yjh.gateway.common.utils.Decode;
+import com.yjh.gateway.common.utils.MultisMap;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +56,7 @@ public class zuulFilter extends ZuulFilter {
             MyRequestWrapper requestWrapper = null;
             if (request instanceof HttpServletRequest) {
                 requestWrapper = new MyRequestWrapper(request);
-                if ("POST".equals(request.getMethod().toUpperCase())||"PUT".equals(request.getMethod().toUpperCase())) {
+                if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
                     String webcode = null;
                     String body = requestWrapper.getBody();
                     Map<String, Object> paramBodyMap = new LinkedHashMap<>();
@@ -69,43 +72,50 @@ public class zuulFilter extends ZuulFilter {
                             webcode = String.valueOf(param.getValue());
                         }
                     }
+                    if (jsonModel.size() != 0) {
                         StringBuilder sb = new StringBuilder();
-                        if(null != jsonModel.toJSONString()){
-                            for(char c : jsonModel.toJSONString().toCharArray()){
-                                sb.append(String.valueOf((int)c));
+                        if (null != jsonModel.toJSONString()) {
+                            for (char c : jsonModel.toJSONString().toCharArray()) {
+                                sb.append(String.valueOf((int) c));
                             }
                         }
-                     String  token = Demo.summary(sb.toString());
-                    if (!token.equals(webcode)) {
-                        log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token+",前端summary"+webcode);
-                        ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                        return false;
+                        String token = Demo.summary(sb.toString());
+                        if (!token.equals(webcode)) {
+                            log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token + ",前端summary: " + webcode);
+                            ctx.setSendZuulResponse(false);
+                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                            return false;
+                        }
                     }
                     ctx.setRequest(requestWrapper);
                 } else {
                     String tokenStr = request.getParameter("summary");
-                    JSONObject jsonModel = new JSONObject(true);
-                    Map<String, String[]> params = new TreeMap<>(request.getParameterMap());
-                    for (Map.Entry<String, String[]> param : params.entrySet()) {
-                        if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
-                            jsonModel.put(param.getKey(), ((String[]) param.getValue())[0]);
-                        }
-                    }
-                    if (jsonModel.size() != 0) {
-                        StringBuilder sb = new StringBuilder();
-                        if(null != jsonModel.toJSONString()){
-                            for(char c : jsonModel.toJSONString().toCharArray()){
-                                sb.append(String.valueOf((int)c));
+                    String str = request.getQueryString();
+                    if (str != null) {
+                        MultisMap multiMap = new MultisMap();
+                        Decode.decodeTo(str, multiMap, "UTF-8");
+                        JSONObject jsonObject = new JSONObject(multiMap);
+                        Map<String, Object> params = JSON.parseObject(jsonObject.toString(), LinkedHashMap.class);
+                        JSONObject jsonModel = new JSONObject(true);
+                        for (Map.Entry<String, Object> param : params.entrySet()) {
+                            if (!"summary".equals(param.getKey()) && !"signStr".equals(param.getKey()) && !"plainText".equals(param.getKey())) {
+                                jsonModel.put(param.getKey(), param.getValue());
                             }
                         }
-                        String  token = Demo.summary(sb.toString());
-//                        String token = Demo.summary(jsonModel.toJSONString());
-                        if (!token.equals(tokenStr)) {
-                            log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token+",前端summary"+tokenStr);
-                            ctx.setSendZuulResponse(false);
-                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                            return false;
+                        if (jsonModel.size() != 0) {
+                            StringBuilder sb = new StringBuilder();
+                            if (null != jsonModel.toJSONString()) {
+                                for (char c : jsonModel.toJSONString().toCharArray()) {
+                                    sb.append(String.valueOf((int) c));
+                                }
+                            }
+                            String token = Demo.summary(sb.toString());
+                            if (!token.equals(tokenStr)) {
+                                log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token + ",前端summary: " + tokenStr);
+                                ctx.setSendZuulResponse(false);
+                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                return false;
+                            }
                         }
                     }
                 }

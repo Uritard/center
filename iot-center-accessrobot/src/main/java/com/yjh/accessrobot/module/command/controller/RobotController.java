@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.controller;
 
+import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
@@ -55,6 +56,11 @@ public class RobotController {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
+            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =map.get("content");
+            if("true".equals(isDecode)) {
+                password= Demo.decrypt(password);
+            }
             result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

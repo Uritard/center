@@ -4,6 +4,7 @@ package com.yjh.accessrobot.module.command.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
@@ -795,7 +796,7 @@ public class RobotService {
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
     }
 
-    public Map<String, Object> booleanZcz(String key, Long userId, String password) {
+    public Map<String, Object> booleanZcz(String key, Long userId, String password) throws  Exception{
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
         Map map = new HashMap();
         String keys = Constant.map.get(String.valueOf(userId));
@@ -817,7 +818,7 @@ public class RobotService {
             map.put("code", 2);
             map.put("result", "密钥不正确,请重新输入");
             return map;
-        } else if (!sysUserCurrent.getPassword().equals(password)) {
+        } else if (!Demo.decryptDB(sysUserCurrent.getPassword()).equals(password)) {
             map.put("code", 2);
             map.put("result", "用户密码错误，请重新输入");
             return map;

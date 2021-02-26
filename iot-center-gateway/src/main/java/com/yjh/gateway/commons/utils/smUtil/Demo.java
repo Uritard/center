@@ -67,7 +67,7 @@ public class Demo {
      *
      * @return
      */
-    public static boolean verify(String summary, String sign) {
+    public static boolean   verify(String summary, String sign) {
         boolean vs = false; //验签结果
         try {
             vs = SM2Utils.verifySign(userId.getBytes(),  Util.hexToByte(pubk), summary.getBytes(), Base64.decode(sign));

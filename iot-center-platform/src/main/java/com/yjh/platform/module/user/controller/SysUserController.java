@@ -417,7 +417,7 @@ public class SysUserController {
                 newPassword=map.get("newPassword");
             }
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
-            if (sysUserCurrent.getPassword().equals(oldPassword)) {
+            if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(oldPassword)) {
                 if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword))
                 {
                     result.setMessage("新密码不能和旧密码重复");

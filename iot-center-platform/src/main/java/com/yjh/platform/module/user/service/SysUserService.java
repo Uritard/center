@@ -382,7 +382,9 @@ public class SysUserService {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
-        if("true".equals(Constant.isDecode)) {
+        Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+        String isDecode =enmap.get("content");
+        if("true".equals(isDecode)) {
             linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
             sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPassword")) ));
         }else{
