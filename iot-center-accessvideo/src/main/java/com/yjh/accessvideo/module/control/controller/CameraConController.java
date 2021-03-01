@@ -411,7 +411,7 @@ public class CameraConController {
             log.info("service返回值："+url);
             if(null!=url) {
                 result.setData(url);
-            } else { result.setData("文件不存在"); }
+            } else { result.setData("下载失败请重新下载"); }
         } catch (Exception e) {
             result.setData(ResultCodeEnum.SYSTEMERROR);
             log.error("视频上传服务器失败",e);

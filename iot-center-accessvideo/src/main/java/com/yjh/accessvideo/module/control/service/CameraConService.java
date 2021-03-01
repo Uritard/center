@@ -919,7 +919,7 @@ public class CameraConService {
                     struStopTim.dwMinute = c.get(Calendar.MINUTE);
                     struStopTim.dwSecond = c.get(Calendar.SECOND);
                     log.info("时间赋值成功");
-                    NativeLong lChannel = new NativeLong(3);
+                    NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
                     log.info("lChannel赋值成功:" + lChannel);
                     //查找文件存在不存在
                     NativeLong findFile= hCNetSDK.NET_DVR_FindFile(lUserIDLong,lChannel,0,struStartTime,struStopTim);
@@ -947,7 +947,7 @@ public class CameraConService {
                                     {
                                         NativeLong m_lLoadHandle = fileByTime;
                                         hCNetSDK.NET_DVR_PlayBackControl(m_lLoadHandle, HCNetSDK.NET_DVR_PLAYGETPOS, 0, nPos);
-                                        log.info("NET_DVR_PlayBackControl循环内接口参数"+"m_lLoadHandle"+m_lLoadHandle+"nPos"+nPos);
+                                        //log.info("NET_DVR_PlayBackControl循环内接口参数"+"m_lLoadHandle"+m_lLoadHandle+"nPos"+nPos);
                                         if (nPos.getValue() > 100) {
                                             hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
                                             m_lLoadHandle.setValue(-1);
