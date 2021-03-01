@@ -55,15 +55,17 @@ public class RecordVoiceFileThread implements Runnable {
                 if (System.currentTimeMillis() >dateTimeAfter) {
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
-                    String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " + voicePath +voiceName + "01.wav";
-                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " + voicePath +voiceName + "02.wav";
+                    String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+                            voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime)) +voiceName + "01.wav";
+                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+                            voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime)) +voiceName + "02.wav";
                     log.info("urlAACToWAV: "+urlAACToWAV1);
                     try {
                         Runtime.getRuntime().exec(urlAACToWAV1);
                         Runtime.getRuntime().exec(urlAACToWAV2);
                         Thread.sleep(2000);
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceName+"01.aac");
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceName+"02.aac");
+                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"01.aac");
+                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"02.aac");
                     } catch (IOException e) { e.getMessage(); }
                     voiceName = voiceDeviceId +"T"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(dateTime))+"T"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(dateTimeAfter))+"T";
                 }
@@ -96,8 +98,7 @@ public class RecordVoiceFileThread implements Runnable {
                             Integer channelNumTerm = Integer.parseInt(channelNumTem)-1;
                             if (channel == channelNumTerm) {
                                 try {
-                                    voicePath = voicePath+voiceDeviceId+"/"+channelNumTem+"/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
-                                    File file = new File(voicePath);
+                                    File file = new File(voicePath+voiceDeviceId+"/"+channelNumTem+"/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime)));
                                     if (!file.exists()) { file.mkdirs(); }
                                     File tempWav = new File(file, voiceName + "0" + Integer.parseInt(channelNumTem) +".aac");
                                     if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }

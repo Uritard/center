@@ -63,13 +63,15 @@ public class PlatformApplication  implements CommandLineRunner {
         sysUserService.insertIntoRedis();
         //Start RecordVoiceFileThread
         List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
-        for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
-            RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
-                    voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-                    voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true);
-            Thread thread = new Thread(recordVoiceFileThread);
-            thread.setDaemon(true);
-            thread.start();
+        if (voiceDeviceAllInfoList.size()>0) {
+            for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
+                RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
+                        voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
+                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true);
+                Thread thread = new Thread(recordVoiceFileThread);
+                thread.setDaemon(true);
+                thread.start();
+            }
         }
     }
 
