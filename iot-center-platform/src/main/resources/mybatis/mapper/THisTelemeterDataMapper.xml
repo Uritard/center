@@ -177,7 +177,7 @@
         i.mete_value,
         a.triggering_time,
         d.result_num,
-        d.origpic,
+        d.picpath as origpic,
         d.person_check,
         b.task_name,
         c.cruise_time as cruiseTime,
