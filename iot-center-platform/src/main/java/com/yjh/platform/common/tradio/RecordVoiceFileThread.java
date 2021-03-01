@@ -96,7 +96,7 @@ public class RecordVoiceFileThread implements Runnable {
                             Integer channelNumTerm = Integer.parseInt(channelNumTem)-1;
                             if (channel == channelNumTerm) {
                                 try {
-                                    File file = new File(voicePath);
+                                    File file = new File(voicePath+voiceDeviceId+"/"+channelNumTem+"/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime)));
                                     if (!file.exists()) { file.mkdirs(); }
                                     File tempWav = new File(file, voiceName + "0" + Integer.parseInt(channelNumTem) +".aac");
                                     if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
