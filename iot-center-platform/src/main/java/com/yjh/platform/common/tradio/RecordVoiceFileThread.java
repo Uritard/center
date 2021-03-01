@@ -53,17 +53,17 @@ public class RecordVoiceFileThread implements Runnable {
         try {
             while (isThreadStart){
                 if (System.currentTimeMillis() >dateTimeAfter) {
-                    String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
-                            voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime)) +voiceName + "01.wav";
-                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
-                            voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime)) +voiceName + "02.wav";
+                    String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+"/"+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+                            voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+"/"+voiceName + "01.wav";
+                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+"/"+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+                            voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+"/"+voiceName + "02.wav";
                     log.info("urlAACToWAV: "+urlAACToWAV1);
                     try {
                         Runtime.getRuntime().exec(urlAACToWAV1);
                         Runtime.getRuntime().exec(urlAACToWAV2);
                         Thread.sleep(2000);
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"01.aac");
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+voiceName+"02.aac");
+                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceDeviceId+"/1/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+"/"+voiceName+"01.aac");
+                        Runtime.getRuntime().exec("rm -rf "+voicePath+voiceDeviceId+"/2/"+new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime))+"/"+voiceName+"02.aac");
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
