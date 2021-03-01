@@ -23,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.imageio.stream.FileImageOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.sql.ClientInfoStatus;
 import java.text.DecimalFormat;
@@ -68,6 +66,20 @@ public class CameraConService {
 
     @Value("${nvr.capture.video}")
     private String videoPath;//视频保存位置
+
+    @Value("${nvr.capture.hotPic}")
+    private String hotPic;//红外图片路径
+
+    @Value("${nvr.capture.hotPicshow}")
+    private String hotPicshow;//红外图片路径对外
+
+
+    @Value("${nvr.capture.hotFir}")
+    private String hotFir;//红外csv和fir文件路径
+
+
+    @Value("${nvr.capture.hotFirShow}")
+    private String hotFirShow;//红外csv和fir文件路径对外
 
     @Value("${nvr.capture.savePath}")
     private String savePath;//下载视频地址
@@ -1006,7 +1018,8 @@ public class CameraConService {
      */
     public    List<HCNetSDK.NET_DVR_FIND_DATA> geifile(long cameraId, String startTime, String stopTime)
     {
-        List<HCNetSDK.NET_DVR_FIND_DATA> list =new ArrayList<HCNetSDK.NET_DVR_FIND_DATA>();
+        List< HCNetSDK.NET_DVR_FIND_DATA> list =new ArrayList< HCNetSDK.NET_DVR_FIND_DATA>();
+       // List<Vector<String>> list =new ArrayList<Vector<String>>();
     try {
 
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
@@ -1127,6 +1140,7 @@ public class CameraConService {
      */
     public List<String> getTemperature(long cameraId)
     {
+
         List<String> list=new ArrayList<String>();
        try {
            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
@@ -1201,6 +1215,142 @@ public class CameraConService {
            hCNetSDK.NET_DVR_Cleanup();
        }
         return list;
+    }
+
+    /**
+     * 获取测温数据和图片
+     * @param cameraId 摄像头id
+     *  @param presetId 预置位id
+     * @return
+     */
+    public Map<String,String> givePicFir(long cameraId,Long presetId)
+    {
+        Map<String,String> map=new HashMap<String,String>();
+
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
+            log.info("通道号："+cameraConInfo.getChannelNum());
+            log.info("getRecordId:"+cameraConInfo.getRecordId());
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            log.info("lUserIDLong"+lUserIDLong);
+            //转到预置点
+            boolean Preset=  hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET, cameraConInfo.getPresetNum());
+            if (Preset){
+                log.info("转到预置点成功：Preset->"+Preset);
+            }else
+                {
+                    log.info("转到预置点信息Preset->"+Preset);
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("转到预置点失败错误码"+iErr);
+                }
+
+            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA   m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+            m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
+            m_strJpegWithAppenData.dwChannel =1;
+            HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 *1024);
+            HCNetSDK.BYTE_ARRAY ptrP2PDataByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 *1024);
+            m_strJpegWithAppenData.pJpegPicBuff =ptrJpegByte.getPointer();
+            m_strJpegWithAppenData.pP2PDataBuff = ptrP2PDataByte.getPointer();
+           // log.info("m_strJpegWithAppenData的值:"+m_strJpegWithAppenData.toString());
+            boolean bRet =hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong,2, m_strJpegWithAppenData);
+            log.info("bRet返回值："+bRet);
+            if (bRet)
+            {
+                FileOutputStream fout;
+                String newName   = new SimpleDateFormat("yyyyMMddhhmmssSSS").format(new Date());
+                //测温图片
+                if(m_strJpegWithAppenData.dwJpegPicLen>0)
+                {
+                    String path= hotPic+newName+".jpg";
+                    log.info("hotPic地址："+path);
+                    fout= new FileOutputStream(path);
+                        //将字节写入文件
+                        long offset = 0;
+                        ByteBuffer buffers = m_strJpegWithAppenData.pJpegPicBuff.getByteBuffer(offset, m_strJpegWithAppenData.dwJpegPicLen);
+                        byte [] bytes = new byte[m_strJpegWithAppenData.dwJpegPicLen];
+                        buffers.rewind();
+                        buffers.get(bytes);
+                        fout.write(bytes);
+                        fout.close();
+                        map.put("picPath",hotPicshow+newName+".jpg");
+                    log.info("hotPicshow地址："+hotPicshow+newName+".jpg");
+                }else
+                    {
+                        map=null;
+                        int iErr = hCNetSDK.NET_DVR_GetLastError();
+                        log.info("图片获取失败错误码"+iErr);
+                    }
+                //测温数据data
+                if(m_strJpegWithAppenData.dwP2PDataLen>0)
+                {
+                    String path= hotFir+newName+".data";
+                    log.info("hotFirdata地址："+path);
+                    fout= new FileOutputStream(path);
+                    //将字节写入文件
+                    long offset = 0;
+                    ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer(offset, m_strJpegWithAppenData.dwP2PDataLen);
+                    byte [] bytes = new byte[m_strJpegWithAppenData.dwP2PDataLen];
+                    buffers.rewind();
+                    buffers.get(bytes);
+                    fout.write(bytes);
+                    fout.close();
+                    map.put("dataPath",hotFirShow+newName+".data");
+                    log.info("hotFirShowdata地址："+hotFirShow+newName+".data");
+                }else
+                    {
+                        int iErr = hCNetSDK.NET_DVR_GetLastError();
+                        log.info("data获取失败错误码"+iErr);
+                    }
+                //测温数据cvs
+                if(m_strJpegWithAppenData.dwP2PDataLen>0)
+                {
+                    String path= hotFir+newName+".csv";
+                    log.info("hotFircsv地址："+path);
+                    byte [] byTempData = new byte[4];
+                    FileWriter fos=new FileWriter (path);
+                    for (int i = 1 ;i<= m_strJpegWithAppenData.dwJpegPicWidth;i++)
+                    {
+                        for (int j = 1 ;j<= m_strJpegWithAppenData.dwJpegPicHeight;j++)
+                        {
+                            ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i-1)*(j-1)*4, 4);
+                            buffers.get(byTempData);
+                            int l;
+                            l = byTempData[0];
+                            l &= 0xff;
+                            l |= ((long) byTempData[1] << 8);
+                            l &= 0xffff;
+                            l |= ((long) byTempData[ 2] << 16);
+                            l &= 0xffffff;
+                            l |= ((long) byTempData[3] << 24);
+                            fos.write(String.valueOf(Float.intBitsToFloat(l)));
+                            fos.write(",");
+                        }
+                        fos.append('\n');
+                    }
+                    fos.flush();
+                    fos.close();
+                    map.put("cvsPath",hotFirShow+newName+".csv");
+                    log.info("hotFirShowcsv地址："+hotFirShow+newName+".csv");
+
+                }else
+                {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("csv获取失败错误码"+iErr);
+                }
+
+            }else
+                {
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("红外温感文件获取接口调用失败"+iErr);
+                }
+
+        }catch (Exception e)
+        {
+            int iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("系统异常"+iErr);
+        }
+        return map;
     }
 
 

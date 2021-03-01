@@ -4092,6 +4092,25 @@ EMAIL参数结构
         public byte     byIsFreezedata;//是否数据冻结 0-否 1-是
         public byte[]   byRes = new byte[255];
     }
+    public static class NET_DVR_XML_CONFIG_INPUT extends Structure {
+        public int dwSize;
+        public Pointer lpRequestUrl;
+        public int dwRequestUrlLen;
+        public Pointer lpInBuffer;
+        public int dwInBufferSize;
+        public int dwRecvTimeOut;
+        public byte[] byRes = new byte[32];
+    }
+
+    public static class NET_DVR_XML_CONFIG_OUTPUT extends Structure {
+        public int dwSize;
+        public Pointer lpOutBuffer;
+        public int dwOutBufferSize;
+        public int dwReturnedXMLSize;
+        public Pointer lpStatusBuffer;
+        public int dwStatusSize;
+        public byte[] byRes = new byte[32];
+    }
 
     /***API函数声明,详细说明见API手册***/
     public static interface FRealDataCallBack_V30 extends Callback {
@@ -4537,8 +4556,9 @@ EMAIL参数结构
     //获取所有IP，用于支持多网卡接口
     boolean NET_DVR_GetLocalIP(byte sIP[], IntByReference pValidNum, ByteByReference pEnableBind);
     boolean NET_DVR_SetValidIP(int dwIPIndex, boolean bEnableBind);
-
+    //获取温度
     boolean NET_DVR_CaptureJPEGPicture_WithAppendData(NativeLong lUserID, int lChannel, NET_DVR_JPEGPICTURE_WITH_APPENDDATA lpJpegWithAppend);
+    boolean NET_DVR_STDXMLConfig(int lUserID, NET_DVR_XML_CONFIG_INPUT lpInputParam, NET_DVR_XML_CONFIG_OUTPUT lpOutputParam);
 
 }
 

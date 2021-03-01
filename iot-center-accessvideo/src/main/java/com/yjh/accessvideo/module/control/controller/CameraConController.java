@@ -463,7 +463,7 @@ public class CameraConController {
         return result;
 
     }
-    @ApiOperation(value = "获取到视频文件列表")
+    @ApiOperation(value = "获取全屏最大温度值")
     @RequestMapping(value = "/getTemperature", method = RequestMethod.GET)
     public Result getTemperature(@RequestParam(value = "cameraId",required = false) Long cameraId)
     {
@@ -479,4 +479,20 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "获取文件")
+    @RequestMapping(value = "/givePicFir", method = RequestMethod.GET)
+    public Result givePicFir(@RequestParam(value = "presetId",required = false) Long presetId,
+                               @RequestParam(value = "cameraId",required = false) Long cameraId) {
+        Result result = new Result();
+        Map<String,String> map=cameraConService.givePicFir(cameraId,presetId);
+        if (map.size()>0)
+        {
+            result.setData(map);
+        }else
+            {
+                result.setData("获取文件失败");
+            }
+
+        return result;
+    }
 }
