@@ -11,6 +11,7 @@ import com.yjh.accessvqd.module.diagnose.entity.DiagnoseResultDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +28,16 @@ public class ChanResultService {
     @Autowired
     private ChanResultDao chanResultDao;
 
+    @Value("${diagnose.picStore}")
+    private String VQD_IMAGES_STORE_URL;
+
     Logger log = LoggerFactory.getLogger(ChanResultService.class);
 
     @Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int insert(ChanResult chanResult) {
         if (!(chanResult.getSnapshotUrl().equals("(null)"))) {
-            chanResult.setSnapshotUrl(chanResult.getSnapshotUrl().replaceAll("192.168.10.34:81", Constant.VQD_IMAGES_STORE_URL));
+            chanResult.setSnapshotUrl(chanResult.getSnapshotUrl().replaceAll("192.168.10.34:81",VQD_IMAGES_STORE_URL));
         }
         switch (chanResult.getChannelResult()) {
             case 0:
@@ -212,7 +216,7 @@ public class ChanResultService {
         }
 
         if (chanResult.getPtzResult().equals("2")) {
-            content = content + "云台失控";
+            content = content + "云台失控 ";
         }
 
         String temContent = content.replaceAll("\\s+", ",");

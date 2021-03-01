@@ -816,7 +816,8 @@ public class DataDealThread implements Runnable {
                         tCruiseTaskResult.setTaskAlarm(0);
                         tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
 //                                tCruiseTaskResult.setCruiseTaskTime();
-                        if (analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()).equals(tCruiseTaskResult.getTaskResultId())) {
+
+                        if (Objects.nonNull(analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()))) {
                             log.info("TCTR已存在");
                         } else {
                             analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);

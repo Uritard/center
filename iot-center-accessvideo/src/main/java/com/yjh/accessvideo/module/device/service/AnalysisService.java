@@ -33,6 +33,7 @@ public class AnalysisService {
         JSONObject msgDataObject = new JSONObject();
         if (analysisList.get(0).getInstanceId() == -1) {
             log.info("任务结束心跳发送");
+            log.info("----------任务结束报文-----------"+analysisList.get(0));
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0));
         } else {
             algorithmMsgId = algorithmMsgId+1;
