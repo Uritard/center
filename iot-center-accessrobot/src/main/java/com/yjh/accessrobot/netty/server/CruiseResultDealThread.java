@@ -201,11 +201,12 @@ public class CruiseResultDealThread implements Runnable{
                         } else {
                             tCruiseDataResult.setCruiseAbnormal(null);
                         }
-                        if (!"--".equals(redisInfoMap.get("resultNum"))) {
+                        /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                             tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                         } else {
                             tCruiseDataResult.setResultNum(null);
-                        }
+                        }*/
+                        tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                         tCDRList.add(tCruiseDataResult);
                     }
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
