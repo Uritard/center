@@ -34,7 +34,7 @@ import java.util.List;
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
-@EnableFeignClients 
+@EnableFeignClients
 public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired

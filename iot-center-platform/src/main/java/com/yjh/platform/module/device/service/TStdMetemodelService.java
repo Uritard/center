@@ -476,9 +476,9 @@ public class TStdMetemodelService {
 
     private String excelDataImport(MultipartFile file) {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String path = (String) mapForPicModelPath.get("content");
-        //String path = "D:/code/qhTest/66666";
-        String fileName = "copy-meteModel.xlsx";
+        //String path = (String) mapForPicModelPath.get("content");
+        String path = "D:/code/qhTest/66666";
+        String fileName = "copy-meteModel.xls";
         // 将上传文件写入
         try {
             deleteDir(new File(path +"/"+ fileName));
@@ -932,18 +932,19 @@ public class TStdMetemodelService {
                 }
                 tStdMeteList.add(tStdMete);
             }
+            int isInsert = 0;
             if (tStdMeteList.size() > 0) {
-                tStdMeteDao.batchAdd(tStdMeteList);
+                isInsert = tStdMeteDao.batchAdd(tStdMeteList);
             }
 
-            if ("".equals(isRepetition)) {
+            if ("".equals(isRepetition) && isInsert > 0) {
+                result.setCode(200);
                 result.setData("ok");
             } else {
                 isRepetition = "第" + isRepetition.replaceFirst(",", "") + "行与数据库数据重复，其他数据已导入";
                 result.setData(isRepetition);
             }
             deleteDir(new File(pathName));
-            result.setCode(200);
             return result;
         }catch (Exception e){
             e.getMessage();
