@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,9 @@ import java.util.Map;
 @RequestMapping("/tCameraPreset/v1")
 @Api(value = "/tCameraPreset")
 public class TCameraPresetController {
+
+    @Value("${nvr.capture.Preset}")
+    private String capturePresetPath;//预置位路径
 
     @Autowired
     private final TCameraPresetService tCameraPresetService;
@@ -158,6 +162,8 @@ public class TCameraPresetController {
                 params.put("cameraId",tCameraPreset.getCameraId());
                 params.put("presetId",Long.valueOf(presetIdArray[i]));
                 Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);
+                String delPresetPic = "rm -rf "+capturePresetPath + "/"+Long.valueOf(presetIdArray[i]);
+                try { Runtime.getRuntime().exec(delPresetPic); } catch (Exception e) { e.getMessage(); }
                 //操作数据库
                 int resultNum = 0;
                 //if (response.getData().equals(true)) {
