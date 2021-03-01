@@ -947,6 +947,7 @@ public class TStdMetemodelService {
             deleteDir(new File(pathName));
             return result;
         }catch (Exception e){
+            result.setCode(209,"文件错误，导入文件失败");
             e.getMessage();
         }finally {
             try {
