@@ -330,11 +330,11 @@
         where 1 = 1
         <if test="robotName != null and robotName != '' ">and a.robot_name  LIKE CONCAT('%',#{robotName, jdbcType=VARCHAR},'%')</if>
         <if test="robotType != -1"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
-        <if test="buildingUser != null and buildingUser != '' ">and a.buildingUser = #{buildingUser,jdbcType=VARCHAR}</if>
+        <if test="buildingUser != null and buildingUser != '' ">and a.building_user LIKE CONCAT('%',#{buildingUser, jdbcType=VARCHAR},'%')</if>
         <if test="robotFactory != -1 ">and a.robot_factory = #{robotFactory,jdbcType=INTEGER}</if>
-        <if test="robotSource != null and robotSource != '' ">and a.robot_source = #{robotSource,jdbcType=VARCHAR}</if>
+        <if test="robotSource != null and robotSource != '' ">and a.robot_source LIKE CONCAT('%',#{robotSource, jdbcType=VARCHAR},'%')</if>
         <if test="isUse != -1 ">and a.is_use = #{isUse,jdbcType=INTEGER}</if>
-        <if test="address != null and address != '' ">and a.address = #{address,jdbcType=VARCHAR}</if>
+        <if test="address != null and address != '' ">and a.address LIKE CONCAT('%',#{address, jdbcType=VARCHAR},'%')</if>
 
         <if test="regionIdList != null and regionIdList.size() > 0">and a.up_region_id in
             <foreach collection="regionIdList" item="upRegionIds"  separator="," open="(" close=")"  >

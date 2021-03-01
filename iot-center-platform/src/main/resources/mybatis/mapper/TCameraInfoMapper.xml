@@ -242,8 +242,8 @@
             </foreach>
         </if>
         <if test="cameraVendor != -1 "> and a.vendor_id = #{cameraVendor, jdbcType=VARCHAR}</if>
-        <if test="address != null and address != '' ">and a.address = #{address, jdbcType=VARCHAR}</if>
-        <if test="unit != null and unit != ''">and a.unit = #{unit, jdbcType=VARCHAR}</if>
+        <if test="address != null and address != '' ">and a.address like concat('%',#{address, jdbcType=VARCHAR},'%')</if>
+        <if test="unit != null and unit != ''">and a.unit like concat('%',#{unit, jdbcType=VARCHAR},'%')</if>
         order by a.camera_id
     </select>
 

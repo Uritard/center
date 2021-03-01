@@ -76,6 +76,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return isThreadStart;
     }
 
+    public ChannelHandlerContext getCtx() {
+        return ctx;
+    }
+
     private ChannelHandlerContext ctx;
     //遥调遥控
     private static Map<Object, RobotServerHandler> robotServerHandlerMap = new HashMap<>();
@@ -253,8 +257,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     List<Map<String, Object>> itemsList = new ArrayList<>();
                     Map<String, Object> items = new HashMap<>();
                     String code = "";
-                    List<String> allRobotCodeList = nowRobotCode();
-                    if (allRobotCodeList.contains(xmlBaseModel.getSendCode())){
+                    Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+                    if (allRobotCodeMap.containsValue(xmlBaseModel.getSendCode())){
                         code = "200";//success
                         log.info("缓存有,可以注册");
                     }else {
@@ -496,7 +500,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get(redisValue).toString());
 
                     //Start alarmResultDealThread
-                    AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap);
+                    AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap,isThreadStart,this);
                     TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
                     String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
@@ -701,8 +705,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         if (heartNum > 3){
             heartBeatFailAfter(robotCode,robotStatusMap);
         }
-        List<String> allRobotCodeList = nowRobotCode();
-        if (allRobotCodeList.contains(robotCode)){
+        Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+
+        if (allRobotCodeMap.containsValue(robotCode)){
             log.info("缓存有,发送心跳响应");
             heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
         }else {
@@ -735,10 +740,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * */
     void heartBeatFailAfter(String robotCode,Map<String, String> robotStatusMap){
         removeLink(robotCode);
-
-        robotService.updateRobotInfo(robotCode,"离线");
-        robotStatusMap.put("value","1");//异常
-        redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
+        log.info("flag2的值==="+flag2);
+        if (flag2 == 1){
+            robotService.updateRobotInfo(robotCode,"离线");
+            robotStatusMap.put("value","1");//异常
+            redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
+            flag2 = 0;
+        }
     }
     /*
     * 3、2、1走你

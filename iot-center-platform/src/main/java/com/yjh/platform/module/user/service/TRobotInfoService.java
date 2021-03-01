@@ -97,6 +97,7 @@ public class TRobotInfoService{
             map.put("robotId",tRobotInfoPri.getRobotId().toString());
             log.info("修改前的robotCode==="+map);
             Result result = sendPostRequest(ROBOT_REMOVE_LINK,map);
+            log.info("result==="+result);
             TRobotInfo tRobotInfoTemp = new TRobotInfo()
                     .setRobotStatus(result.getData().toString())
                     .setRobotId(tRobotInfoPri.getRobotId());
