@@ -50,18 +50,18 @@ public class zuulFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isDecode");
-        String isDecode =map.get("content");
+        String isDecode = map.get("content");
         Map<String, String> uKeymap = redisTemplate.opsForHash().entries("t_sys_param:isUkey");
         String isUkey = uKeymap.get("content");
         if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;
-            String webcode = request.getHeader("summary")!= null ? request.getHeader("summary") : "";
+            String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (request instanceof HttpServletRequest) {
                 if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
                     String contentType = request.getContentType();
-                        if (contentType != null && contentType.contains("multipart/form-data")) {
+                    if (contentType != null && contentType.contains("multipart/form-data")) {
 //                            MultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
 //                            MultipartHttpServletRequest multipartHttpServletRequest=resolver.resolveMultipart(request);
 //                            System.out.println("type:  " + multipartHttpServletRequest.getContentType());
@@ -79,34 +79,24 @@ public class zuulFilter extends ZuulFilter {
 //                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
 //                                return false;
 //                            }
-                        }else {
-                            requestWrapper = new MyRequestWrapper(request);
-                            String body = requestWrapper.getBody();
-                            Map<String, Object> paramBodyMap = new LinkedHashMap<>();
-                            JSONObject jsonModel = new JSONObject(true);
-                            if (!StringUtils.isEmpty(body)) {
-                                paramBodyMap = JSONObject.parseObject(body, LinkedHashMap.class);
+                    } else {
+                        requestWrapper = new MyRequestWrapper(request);
+                        String body = requestWrapper.getBody();
+                        StringBuilder sb = new StringBuilder();
+                        if (null != body) {
+                            for (char c : body.toCharArray()) {
+                                sb.append(String.valueOf((int) c));
                             }
-                            for (Map.Entry<String, Object> param : paramBodyMap.entrySet()) {
-                                jsonModel.put(param.getKey(), param.getValue());
+                            String token = Demo.summary(sb.toString());
+                            if (!token.equals(webcode)) {
+                                log.error("参数篡改" + body + " ,之后的summary: " + token + ",前端summary: " + webcode);
+                                ctx.setSendZuulResponse(false);
+                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                return false;
                             }
-                            if (jsonModel.size() != 0) {
-                                StringBuilder sb = new StringBuilder();
-                                if (null != jsonModel.toJSONString()) {
-                                    for (char c : jsonModel.toJSONString().toCharArray()) {
-                                        sb.append(String.valueOf((int) c));
-                                    }
-                                }
-                                String token = Demo.summary(sb.toString());
-                                if (!token.equals(webcode)) {
-                                    log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token + ",前端summary: " + webcode);
-                                    ctx.setSendZuulResponse(false);
-                                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                    return false;
-                                }
-                            }
-                            ctx.setRequest(requestWrapper);
                         }
+                        ctx.setRequest(requestWrapper);
+                    }
                 } else {
                     String str = request.getQueryString();
                     if (str != null) {
@@ -116,7 +106,7 @@ public class zuulFilter extends ZuulFilter {
                         Map<String, Object> params = JSON.parseObject(jsonObject.toString(), LinkedHashMap.class);
                         JSONObject jsonModel = new JSONObject(true);
                         for (Map.Entry<String, Object> param : params.entrySet()) {
-                                jsonModel.put(param.getKey(), param.getValue());
+                            jsonModel.put(param.getKey(), param.getValue());
                         }
                         if (jsonModel.size() != 0) {
                             StringBuilder sb = new StringBuilder();
