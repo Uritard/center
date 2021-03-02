@@ -198,14 +198,15 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
         //机器人模型文件
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
         log.info("图片路径为：" + picPath);
         /*
          * 将ftp图copy到开发环境
          * */
-        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-
         String splitArray[] = picPath.split("/");
         String fileName = splitArray[splitArray.length - 1];
         String developMap = absoluteImgMap.get("content") + "/Map";
@@ -214,7 +215,6 @@ public class RobotService {
             f.setWritable(true, false);
             f.mkdirs();
         }
-
         try {
             String url = "cp " + picPath + " " + developMap;
             log.info("url是===" + url);
@@ -222,18 +222,15 @@ public class RobotService {
         } catch (Exception e) {
             e.getMessage();
         }
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
 
         Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
-
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
         log.info("获得的tRobotInfo是：" + tRobotInfo);
-
-        //更新机器人地图信息
         tRobotInfoDao.update(tRobotInfo);
+
         //设备模型文件
         List<TRobotInspection> deviceList = new ArrayList<>();
         List<TRobotRegion> tRobotRegionList = new ArrayList<>();
@@ -419,11 +416,10 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
         log.info("传来的ItemMap是==" + ItemMap);
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
 
         if (null != ItemMap) {
             List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
-            List<Map<String, String>> redisInfoList = new ArrayList<>();//缓存信息List
+            List<Map<String, String>> redisInfoList = new ArrayList<>();
             log.info("rTIIList是===" + rTIIList);
             for (RobotTaskInstanceInfo rTII : rTIIList) {
                 //巡视类型
@@ -486,13 +482,13 @@ public class RobotService {
                 //组装任务下发的item
                 List<Map<String, Object>> mapList = new ArrayList<>();
                 Map<String, Object> map = new HashMap<>();
-                map.put("type", planType);//巡视类型
-                map.put("task_code", rTII.getTaskId());//任务编码
-                map.put("task_name", rTII.getTaskName());//任务名称
-                map.put("priority", rTII.getPriority());//优先级
-                map.put("device_level", rTII.getDeviceLevel());//设备层级
-                map.put("device_list", deviceIdList);//设备列表
-                map.put("fixed_start_time", sdf.format(new Date()));//定期开始时间
+                map.put("type", planType);
+                map.put("task_code", rTII.getTaskId());
+                map.put("task_name", rTII.getTaskName());
+                map.put("priority", rTII.getPriority());
+                map.put("device_level", rTII.getDeviceLevel());
+                map.put("device_list", deviceIdList);
+                map.put("fixed_start_time", sdf.format(new Date()));
 //                map.put("cycle_month", "周期（月）");
 //                map.put("cycle_week", "周期（周）");
 //                map.put("cycle_execute_time", "周期（执行时间） ");
@@ -522,11 +518,8 @@ public class RobotService {
                         .setItems(mapList);
                 String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
                 log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
-
-                //根据不同的机器人对应不同的管道发送指令
                 RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
             }
-
         }
         return 1;
     }
@@ -617,8 +610,8 @@ public class RobotService {
             }
         }
         log.info("准备遍历的点是===" + instanceIdList);
-        List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
-        List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
+        List<TCruiseDataResult> tCDRList = new ArrayList<>();
+        List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
         List<Long> instancedList = new ArrayList<>();//插过库的点
 
@@ -626,19 +619,15 @@ public class RobotService {
         String strForCountAbnormal = "countForAbnormal:" + taskId;
         Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
 
-        //缓存中的总检测点
         Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
         log.info("总检测点数是===" + totalCheckPoint);
-        //缓存中的异常点
         Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString());
         log.info("异常点数是===" + abnormalCheckPoint);
-        //缓存中的正常点
         Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString());
         log.info("正常点数是===" + normalCheckPoint);
 
-
-        Integer abnormal = abnormalCheckPoint;//异常
-        Integer normal = normalCheckPoint;//正常
+        Integer abnormal = abnormalCheckPoint;
+        Integer normal = normalCheckPoint;
 
         for (String instanceId : instanceIdList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
@@ -654,7 +643,7 @@ public class RobotService {
                         .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
                         .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
                         .setDeviceName(redisInfoMap.get("deviceName"))
-                        .setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
+                        .setCruiseStatus(252);
                 tCTRDList.add(tCruiseTaskResultDetail);
                 cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
                 instancedList.add(Long.valueOf(redisInfoMap.get("instanceId")));
@@ -663,7 +652,7 @@ public class RobotService {
                         .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                         .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
                         .setCruiseName(redisInfoMap.get("cruiseName"))
-                        .setCruiseType(228)//机器人
+                        .setCruiseType(228)
 //                        .setPicPathAnl(redisInfoMap.get(""))
                         .setPicpath(redisInfoMap.get("picpath"))
 //                        .setOrigPicAnl(redisInfoMap.get(""))
@@ -677,11 +666,12 @@ public class RobotService {
                 } else {
                     tCruiseDataResult.setCruiseAbnormal(null);
                 }
-                if (!"--".equals(redisInfoMap.get("resultNum"))) {
+                /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                     tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 } else {
                     tCruiseDataResult.setResultNum(null);
-                }
+                }*/
+                tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 tCDRList.add(tCruiseDataResult);
 
                 if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
@@ -693,8 +683,7 @@ public class RobotService {
                 }
             }
         }
-        log.info("准备更新的abnormal是===" + abnormal);
-        log.info("准备更新的normal是===" + normal);
+        log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
 
         Map<String, String> mapForAbnormal = new HashMap<>();
         mapForAbnormal.put("abnormal", abnormal.toString());
@@ -716,20 +705,17 @@ public class RobotService {
             Constant.flagMap.put(taskId, instancedList);
         }
 
-        //批量插入TCTRD库
-        int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
+        int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);
         log.info("res1的内容是===" + res1);
-        //批量插入TCDR库
-        int res2 = batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
+        int res2 = batchInsertCruiseDataResult(tCDRList);
         otherServer(cruiseResultIdList);
         log.info("res2的内容是===" + res2);
 
-
         Integer cState = null;
         if (taskStatus == 2) {
-            cState = 241;//任务暂停
+            cState = 241;
         } else if (taskStatus == 4) {
-            cState = 242;//任务终止
+            cState = 242;
             //将公共类的instanceIdList清空
             for (Long instancedId : Constant.flagMap.get(taskId)) {
                 instanceIdList.remove(instancedId.toString());
@@ -737,10 +723,8 @@ public class RobotService {
         }
 
         TCruiseResult tCruiseResult = selectTaskResultId(taskId);
-        log.info("taskResultId是===" + tCruiseResult.getTaskResultId());
-
         Integer taskWait = totalCheckPoint - normal - abnormal;
-        log.info("taskWait的值是==" + taskWait);
+        log.info("taskResultId是: " + tCruiseResult.getTaskResultId()+"的taskWait值是==" + taskWait);
         tCruiseResult.setTaskWait(taskWait);
         tCruiseResult.setCState(cState);
         tCruiseResult.setTaskCode(taskId);

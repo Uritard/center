@@ -42,10 +42,9 @@ public class CruiseResultDealThread implements Runnable{
         try {
             log.info("Process CruiseResult Starting.....cruiseResultMap==="+cruiseResultMap);
 
-            List<TCruiseDataResult> tCDRList = new ArrayList<>();//巡检点数据表tCDRList
-            List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();//巡检点状态详细表tCTRDList
+            List<TCruiseDataResult> tCDRList = new ArrayList<>();
+            List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
             List<String> cruiseResultIdList = new ArrayList<>();
-
 
             String taskId = cruiseResultMap.get("taskCode");
 
@@ -53,23 +52,19 @@ public class CruiseResultDealThread implements Runnable{
             String strForCountAbnormal = "countForAbnormal:" + taskId;
             Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
 
-            //缓存中的总检测点
             Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
             log.info("总检测点数是==="+totalCheckPoint);
-            //缓存中的异常点
             Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
             log.info("异常点数是===" + abnormalCheckPoint);
-            //缓存中的正常点
             Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
             log.info("正常点数是===" + normalCheckPoint);
 
-            Integer abnormal = abnormalCheckPoint;//异常
-            Integer normal = normalCheckPoint;//正常
+            Integer abnormal = abnormalCheckPoint;
+            Integer normal = normalCheckPoint;
 
             //根据taskId查询相关内容
-            log.info("taskId是==="+taskId);
             TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(taskId);//获取任务
-            log.info("tCruiseTask是==="+tCruiseTask);
+            log.info("taskId是: "+taskId+"的任务数据tCruiseTask是: "+tCruiseTask);
             TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
             log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
 
@@ -96,11 +91,11 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("cruiseStatus","252");
                     if (!"".equals(cruiseResultMap.get("value"))){
                         tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
-                        tCruiseTaskResultMap.put("cruiseResult","246");//正常
+                        tCruiseTaskResultMap.put("cruiseResult","246");
                         tCruiseTaskResultMap.put("cruiseAbnormal","null");
                     }else {
                         tCruiseTaskResultMap.put("resultNum","--");
-                        tCruiseTaskResultMap.put("cruiseResult","247");//异常
+                        tCruiseTaskResultMap.put("cruiseResult","247");
                         tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                     }
                     if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
@@ -110,7 +105,7 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
                     tCruiseTaskResultMap.put("is_warn","0");
-                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);//塞进缓存
+                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
                     //做完一个点给前端推一次webSocket
                     Map<String, Object> jasonMap = new HashMap<>();
@@ -131,7 +126,7 @@ public class CruiseResultDealThread implements Runnable{
                     resultList.add(redisInfoMap.get("instanceId"));
                 }
             }
-            log.info("resultList的大小===="+resultList.size());
+            log.info("机器人返回任务结果的大小===="+resultList.size());
 
             //统计巡视主机下发给机器人的巡检点大小
             Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode"));
@@ -142,7 +137,7 @@ public class CruiseResultDealThread implements Runnable{
             for (String i : instanceIdArray){
                 instanceIdList.add(i);
             }
-            log.info("instanceIdList的大小===="+instanceIdList.size());
+            log.info("巡视主机下发给机器人的巡检点大小===="+instanceIdList.size());
 
             //比较任务相关时间(开始时间，超期时间)
             /*Map<String, String> redisInfoMap3 = redisTemplate.opsForHash().entries("countForAbnormal:"+cruiseResultMap.get("taskCode"));
@@ -181,7 +176,7 @@ public class CruiseResultDealThread implements Runnable{
                                 .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
                                 .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
                                 .setDeviceName(redisInfoMap.get("deviceName"))
-                                .setCruiseStatus(252);//252.已执行253.未执行254.执行失败255.未知
+                                .setCruiseStatus(252);
                         tCTRDList.add(tCruiseTaskResultDetail);
                         cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
 
@@ -189,7 +184,7 @@ public class CruiseResultDealThread implements Runnable{
                                 .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                                 .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
                                 .setCruiseName(redisInfoMap.get("cruiseName"))
-                                .setCruiseType(228)//机器人
+                                .setCruiseType(228)
                                 .setPicpath(redisInfoMap.get("picpath"))
                                 .setOrigpic(redisInfoMap.get("origpic"))
                                 .setIsWarn(0)
@@ -217,9 +212,7 @@ public class CruiseResultDealThread implements Runnable{
                         log.info("这次变化的abnormal是==="+abnormal);
                     }
                 }
-
-                log.info("准备更新的abnormal是===" + abnormal);
-                log.info("准备更新的normal是===" + normal);
+                log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
 
                 Map<String, String> mapForAbnormal = new HashMap<>();
                 mapForAbnormal.put("abnormal", abnormal.toString());
@@ -229,11 +222,10 @@ public class CruiseResultDealThread implements Runnable{
 
                 log.info("tCTRDList的内容是===" + tCTRDList);
                 log.info("tCDRList的内容是===" + tCDRList);
-                //批量插入TCTRD库
-                int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);//批量插tCTRDList
+
+                int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
                 log.info("res1的内容是===" + res1);
-                //批量插入TCDR库
-                int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);//批量插tCDRList
+                int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
                 StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
                 log.info("res2的内容是===" + res2);
 
@@ -260,7 +252,6 @@ public class CruiseResultDealThread implements Runnable{
                             .setCruiseTaskTime(sdf.parse(tCruiseTaskResultMap.get("cruiseTaskTime")))
                             .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"));
                     log.info("tCruiseTaskResult的内容是==="+tCruiseTaskResult);
-                    //插TCTR表
                     StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
 
                     Integer taskWait = totalCheckPoint - normal - abnormal;
@@ -269,7 +260,6 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseResult.setCState(240);
                     tCruiseResult.setTaskCode(taskId);
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
-                    //更新TCR表
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 
                     // webSocket通知前端调用巡视监控的接口（任务完成）
@@ -288,11 +278,9 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseResult.setCState(239);
                     tCruiseResult.setTaskCode(taskId);
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
-                    //更新TCR表
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
                 }
             }
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

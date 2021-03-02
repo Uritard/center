@@ -341,6 +341,7 @@
                 #{upRegionIds,jdbcType=BIGINT}
             </foreach>
         </if>
+        ORDER BY robot_id
     </select>
 
     <insert id="batchInsert">

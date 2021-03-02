@@ -50,9 +50,10 @@ public class TRobotInfoService{
         tRobotInfo.setCreateDate(new Date());
         tRobotInfo.setRobotStatus("离线");
         int res = this.tRobotInfoDao.insert(tRobotInfo);
-        Long robotId = tRobotInfoDao.selectRobotIdByCode(tRobotInfo.getRobotCode());
-        redisTemplate.opsForHash().put("AllRobotCode",robotId.toString(),tRobotInfo.getRobotCode());
-
+        if (res > 0){
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(tRobotInfo.getRobotCode());
+            redisTemplate.opsForHash().put("AllRobotCode",robotId.toString(),tRobotInfo.getRobotCode());
+        }
         return res;
     }
 
@@ -66,8 +67,9 @@ public class TRobotInfoService{
         }
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
         int res =  this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
-        redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
-
+        if (res > 0){
+            redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
+        }
         //判断删除前的robotCode是否存在管道连接(在线),若存在，则断开连接
         if (tRobotInfo.getRobotStatus().equals("在线")){
             HashMap<String,String> map = new HashMap<>();
@@ -88,8 +90,9 @@ public class TRobotInfoService{
         TRobotInfo tRobotInfoPri = tRobotInfoDao.selectByPrimaryId(tRobotInfo.getRobotId());
 
         int res = this.tRobotInfoDao.update(tRobotInfo);
-        redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
-
+        if (res > 0){
+            redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+        }
         //判断修改前的robotCode是否存在管道连接(在线),若存在，则断开连接
         if (!tRobotInfoPri.getRobotCode().equals(tRobotInfo.getRobotCode()) && tRobotInfoPri.getRobotStatus().equals("在线")){
             HashMap<String,String> map = new HashMap<>();

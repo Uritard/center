@@ -729,7 +729,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
         send(ctx, heartProtocol,robotCode);
 
-        log.info("flag2的值==="+flag2);
+        log.info("成功收到心跳flag2的值==="+flag2);
         if (flag2 == 0){
             robotService.updateRobotInfo(robotCode,"在线");
             flag2 = 1;
@@ -740,7 +740,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * */
     void heartBeatFailAfter(String robotCode,Map<String, String> robotStatusMap){
         removeLink(robotCode);
-        log.info("flag2的值==="+flag2);
+        log.info("没有收到心跳flag2的值==="+flag2);
         if (flag2 == 1){
             robotService.updateRobotInfo(robotCode,"离线");
             robotStatusMap.put("value","1");//异常

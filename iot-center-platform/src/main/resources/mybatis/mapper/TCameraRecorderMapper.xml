@@ -243,6 +243,7 @@
         <if test="vendorId != -1 "> and a.vendor_id = #{vendorId, jdbcType=INTEGER}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="unit != null and unit != ''">and a.unit like concat('%',#{unit, jdbcType=VARCHAR},'%')</if>
+        ORDER BY record_id
     </select>
 
     <insert id="batchInsert">
