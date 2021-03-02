@@ -213,7 +213,7 @@ public class TCameraInfoService {
 
         Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String filePathAndName = resMap.get("content") +  "/PMS/CameraPMS.xml";
-//        String filePathAndName = "D:/testform/PMS/摄像机PMS系统.xml";
+//        String filePathAndName = "D:/testform/PMS/CameraPMS.xml";
         log.info("路径是==="+filePathAndName);
 
         SAXReader reader = new SAXReader();
@@ -234,24 +234,74 @@ public class TCameraInfoService {
                         Element stuChild = (Element) iterator1.next();
                         map.put(stuChild.getName(), stuChild.getStringValue());
                     }
-                    log.info("map的结果是===" + map);
-
-                    Integer cameraModel = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_model",map.get("cameraModel").toString()));
-                    Integer vendorId = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_vendor",map.get("vendorId").toString()));
-                    Integer cameraType = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_type",map.get("cameraType").toString()));
-
                     TCameraInfo tCameraInfo = new TCameraInfo()
-                            .setCameraId(cameraId)
-                            .setCameraModel(cameraModel)
-                            .setAliasName(map.get("aliasName").toString())
-                            .setChannelNum(Integer.valueOf(map.get("channelNum").toString()))
-                            .setVendorId(vendorId)
-                            .setCameraIp(map.get("cameraIp").toString())
-                            .setPort(Integer.valueOf(map.get("port").toString()))
-                            .setCameraType(cameraType)
-                            .setIsControl(Integer.valueOf(map.get("isControl").toString()))
-                            .setAddress(map.get("address").toString())
-                            .setUnit(map.get("unit").toString());
+                            .setCameraId(cameraId);
+                    if (map.containsKey("cameraName")) {
+                        tCameraInfo.setCameraName(map.get("cameraName").toString());
+                    }
+                    if (map.containsKey("cameraModel")) {
+                        Integer cameraModel = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_model",map.get("cameraModel").toString()));
+                        tCameraInfo.setCameraModel(cameraModel);
+                    }
+                    if (map.containsKey("aliasName")) {
+                        tCameraInfo.setAliasName(map.get("aliasName").toString());
+                    }
+                    if (map.containsKey("recordId")){
+                        tCameraInfo.setRecordId(Long.valueOf(map.get("recordId").toString()));
+                    }
+                    if (map.containsKey("upRegionId")){
+                        tCameraInfo.setUpRegionId(Long.valueOf(map.get("upRegionId").toString()));
+                    }
+                    if (map.containsKey("channelNum")) {
+                        tCameraInfo.setChannelNum(Integer.valueOf(map.get("channelNum").toString()));
+                    }
+                    if (map.containsKey("smsId")) {
+                        tCameraInfo.setSmsId(Integer.valueOf(map.get("smsId").toString()));
+                    }
+                    if (map.containsKey("rmsId")) {
+                        tCameraInfo.setRmsId(Integer.valueOf(map.get("rmsId").toString()));
+                    }
+                    if (map.containsKey("monitorId")) {
+                        tCameraInfo.setMonitorId(map.get("monitorId").toString());
+                    }
+                    if (map.containsKey("vendorId")) {
+                        Integer vendorId = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_vendor",map.get("vendorId").toString()));
+                        tCameraInfo.setVendorId(vendorId);
+                    }
+                    if (map.containsKey("streamType")) {
+                        tCameraInfo.setStreamType(Integer.valueOf(map.get("streamType").toString()));
+                    }
+                    if (map.containsKey("protocolType")) {
+                        tCameraInfo.setProtocolType(Integer.valueOf(map.get("protocolType").toString()));
+                    }
+                    if (map.containsKey("url")) {
+                        tCameraInfo.setUrl(map.get("url").toString());
+                    }
+                    if (map.containsKey("cameraIp")) {
+                        tCameraInfo.setCameraIp(map.get("cameraIp").toString());
+                    }
+                    if (map.containsKey("port")) {
+                        tCameraInfo.setPort(Integer.valueOf(map.get("port").toString()));
+                    }
+                    if (map.containsKey("cameraType")) {
+                        Integer cameraType = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_type",map.get("cameraType").toString()));
+                        tCameraInfo.setCameraType(cameraType);
+                    }
+                    if (map.containsKey("isControl")) {
+                        tCameraInfo.setIsControl(Integer.valueOf(map.get("isControl").toString()));
+                    }
+                    if (map.containsKey("latitude")) {
+                        tCameraInfo.setLatitude(map.get("latitude").toString());
+                    }
+                    if (map.containsKey("longitude")) {
+                        tCameraInfo.setLongitude(map.get("longitude").toString());
+                    }
+                    if (map.containsKey("address")) {
+                        tCameraInfo.setAddress(map.get("address").toString());
+                    }
+                    if (map.containsKey("unit")){
+                            tCameraInfo.setUnit(map.get("unit").toString());
+                    }
                     log.info("tCameraInfo==="+tCameraInfo);
                     tCameraInfoDao.update(tCameraInfo);
                     return true;

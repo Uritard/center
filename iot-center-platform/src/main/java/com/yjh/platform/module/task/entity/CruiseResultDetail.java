@@ -56,8 +56,12 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     @ApiModelProperty(value = "巡视异常原因")
     private Integer cruiseAbnormal;
-    @ApiModelProperty(value = "巡视异常原因-字典表")
+    @ApiModelProperty(value = "巡视异常原因-字典表总")
     private String abnormalType;
+    @ApiModelProperty(value = "巡视异常原因-字典表1")
+    private String abnormalType1;
+    @ApiModelProperty(value = "巡视异常原因-字典表2")
+    private String abnormalType2;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")

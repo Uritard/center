@@ -233,7 +233,8 @@ public class TRobotInfoController {
     public Result synchronizeFromPMS(@RequestParam(value = "robotCode") String robotCode,HttpServletRequest request) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
+//            Long userId = Long.valueOf(request.getHeader("userId"));
+            Long userId = 10l;
             result.setData(tRobotInfoService.synchronizeFromPMS(robotCode,userId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

@@ -275,7 +275,10 @@
         j.dict_note as cruise_result_name,
         b.cruise_time,
         g.cruise_abnormal,
-        p.dict_note as abnormal_type,
+        p.dict_note as abnormal_type1,
+        IF(ISNULL(g.remark),p.dict_note,CONCAT(p.dict_note,',',x.dict_note)) as abnormal_type,
+        g.remark,
+        x.dict_note as abnormal_type2,
         g.evaluation_state,
         i.dict_note as evaluation_state_name,
         g.check_user,
@@ -325,6 +328,7 @@
         LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
         LEFT JOIN t_dict_business w on w.dict_code = g.identify_result and w.col_name ='identify_result'
         LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
+        LEFT JOIN t_dict_business x ON x.dict_code = g.remark and x.col_name = 'abnormal_type'
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
@@ -504,12 +508,17 @@
     </select>
     <select id="cruiseStatisticalByAbnormal" resultType="com.yjh.platform.module.task.entity.CruiseStatistical">
         select
-                dict_code as cruise_abnormal,
-                dict_note as abnormal_type,
+            dict_code as cruise_abnormal,
+            dict_note as abnormal_type,
+            (
                 (select COUNT(*)
                     from t_cruise_data_result
-                    WHERE  cruise_abnormal = dict_code
-                ) AS "count"
+                    WHERE  cruise_abnormal = dict_code)
+                    +
+				(select COUNT(*)
+                    from t_cruise_data_result
+                    WHERE  remark = dict_code)
+            ) AS "count"
             from t_dict_business
             where dict_code IN
                 (
@@ -518,7 +527,6 @@
                     where col_name = 'abnormal_type'
                 )
             ORDER BY dict_code;
-
     </select>
 
     <select id="selectByIdentifyResult" parameterType="java.lang.Integer" resultType="java.lang.String">
