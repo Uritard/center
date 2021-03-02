@@ -19,7 +19,7 @@ import java.util.Map;
 public class RecordVoiceFileThread implements Runnable {
 
     private Integer port;
-    private String voiceDeviceId;
+    private Long voiceDeviceId;
     private String ftpUrl;
     private String owner;
     private String ownerCode;
@@ -32,7 +32,7 @@ public class RecordVoiceFileThread implements Runnable {
     private String voiceName;
     private static TradioLibrary sdk_= TradioLibrary.INSTANCE;
 
-    public RecordVoiceFileThread(RedisTemplate redisTemplate, Integer port, String voiceDeviceId, String channelNum,
+    public RecordVoiceFileThread(RedisTemplate redisTemplate, Integer port, Long voiceDeviceId, String channelNum,
                                  String ftpUrl, String owner, String ownerCode, boolean isThreadStart) {
         this.port = port;
         this.voiceDeviceId = voiceDeviceId;

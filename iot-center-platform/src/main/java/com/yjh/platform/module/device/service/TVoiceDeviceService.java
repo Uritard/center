@@ -1,11 +1,10 @@
 package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
-import com.yjh.platform.module.device.entity.TVoiceDevice;
-import com.yjh.platform.module.device.entity.VoiceDevice;
-import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
-import com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,50 +30,76 @@ public class TVoiceDeviceService{
     private TVoiceDeviceDao tVoiceDeviceDao;
     @Autowired
     private TSysParamDao tSysParamDao;
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public int add(TVoiceDevice tVoiceDevice) {
+    public int add(VoiceDeviceAllInfoDetail tVoiceDevice) {
+        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
+        if(tStdDevice != null){
+            tVoiceDevice.setDeviceType(tStdDevice.getDeviceType().toString());
+            //tVoiceDevice.setStationId(tStdDevice.getS)
+        }else {
+            return -1;
+        }
+        this.tVoiceDeviceDao.addConf(tVoiceDevice);
         return this.tVoiceDeviceDao.add(tVoiceDevice);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(String voiceDeviceId) {
+    public int deleteByPrimaryId(Long voiceDeviceId) {
+        VoiceDeviceAllInfoDetail voiceDeviceInfoDetail = this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
+        this.tVoiceDeviceDao.deleteConf(voiceDeviceInfoDetail.getConfigId());
         return this.tVoiceDeviceDao.deleteByPrimaryId(voiceDeviceId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int update(TVoiceDevice tVoiceDevice) {
+    public int update(VoiceDeviceAllInfoDetail tVoiceDevice) {
+        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
+        if(tStdDevice != null){
+            tVoiceDevice.setDeviceType(tStdDevice.getDeviceType().toString());
+            //tVoiceDevice.setStationId(tStdDevice.getS)
+        }else {
+            return -1;
+        }
+        this.tVoiceDeviceDao.updateConf(tVoiceDevice);
         return this.tVoiceDeviceDao.update(tVoiceDevice);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TVoiceDevice selectByPrimaryId(String voiceDeviceId) {
+    public VoiceDeviceAllInfoDetail selectByPrimaryId(Long voiceDeviceId) {
         return this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TVoiceDevice> select(String voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, String configId,Long upRegionId) {
+    public List<TVoiceDevice> select(Long voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, Long configId,Long upRegionId) {
         List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId, upRegionId);
         return tVoiceDeviceList;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TVoiceDevice> selectByPage(TVoiceDevice tVoiceDevice) {
-        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(tVoiceDevice);
+    public List<VoiceDeviceAllInfoDetail> selectByPage(String voiceDeviceName,String deviceType,Long upRegionId) {
+        List<Long> list = tStdRegionDao.selectDownId(upRegionId);
+        List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list);
         return tVoiceDeviceList;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int batchAdd(List<TVoiceDevice> list) {
+    public int batchAdd(List<VoiceDeviceAllInfoDetail> list) {
         return this.tVoiceDeviceDao.batchAdd(list);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String voiceDeviceId) {
     List<String> list1= Arrays.asList(voiceDeviceId.split(","));
-    return this.tVoiceDeviceDao.batchDelete(list1);
+    for(String item:list1){
+        this.deleteByPrimaryId(Long.valueOf(item));
+    }
+    return 1;
     }
 
 
@@ -184,7 +209,7 @@ public class TVoiceDeviceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,String>> voiceAnalyse(String voicePath,String voiceDeviceId) throws Exception{
+    public List<Map<String,String>> voiceAnalyse(String voicePath,Long voiceDeviceId) throws Exception{
 //        if(Constant.voiceAnalyseResult.get(voiceDeviceId+":"+voicePath) != null){
 //            //此文件已经分析过了
 //        }

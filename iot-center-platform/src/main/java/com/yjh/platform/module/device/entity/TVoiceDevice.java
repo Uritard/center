@@ -25,7 +25,7 @@ public class TVoiceDevice implements Serializable {
 
     @Length(max = 64, message = "voiceDeviceId长度必须小于等于64")
     @ApiModelProperty(value = "声纹监控设备Id（默认为Ip地址）")
-    private String voiceDeviceId;
+    private Long voiceDeviceId;
 
     @Length(max = 255, message = "voiceDeviceName长度必须小于等于255")
     @ApiModelProperty(value = "声纹监控设备名称（）")
@@ -40,7 +40,7 @@ public class TVoiceDevice implements Serializable {
     private String deviceType;
 
     @Length(max = 32, message = "configId长度必须小于等于32")
-    private String configId;
+    private Long configId;
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "上级区域id")

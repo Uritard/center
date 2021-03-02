@@ -148,7 +148,6 @@ public class TaskShutDownJob extends QuartzJobBean {
                             //mapForCruise.put("cruiseAbnormal","251");
                             mapForCruise.put("cruiseStatus", "253");
                             mapForCruise.put("resultNum", "任务终止");
-
                         }
                         if ("247".equals(mapForCruise.get("cruiseResult"))) {
                             abnormal = abnormal + 1;
@@ -189,6 +188,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         //tCruiseDataResult.setResultDesc(mapForCruise.get("resultDesc").toString());
                         tCruiseDataResult.setCruiseType(Integer.valueOf(mapForCruise.get("cruiseType").toString()));
                         //tCruiseDataResult.setModifyNum(mapForCruise.get("modifyNum").toString());
+                        tCruiseDataResult.setCruiseResult(Integer.valueOf(mapForCruise.get("cruiseResult")));
                         tCruiseDataResult.setOrigpic(mapForCruise.get("origpic").toString());
                         tCruiseDataResult.setCruiseName(mapForCruise.get("cruiseName"));
                         tCruiseDataResult.setCreatetime(new Date());
