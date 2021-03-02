@@ -619,7 +619,8 @@
             a.cruise_time as update_time,
             d.picpath,
             d.cruise_result,
-            d.identify_result
+            d.identify_result,
+            a.cruise_status
         FROM
             t_cruise_task_result_detail a,t_cruise_point_instance b,t_cruise_data_result d
         WHERE

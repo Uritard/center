@@ -63,9 +63,10 @@ public class ReportManageService {
         recordData.setTCDRDList(tCDRDList);
 
 //        String fileName = sdf.format(new Date())+"-"+reportType+".xlsx";
-        String finalFileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
+//        String finalFileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
         //生成随机的文件名称
         String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+//        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
 
 //        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
 /*        String finalFileName = null;
@@ -88,7 +89,7 @@ public class ReportManageService {
 
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                 contentData.getElements(), file);
-        log.info("start rename.... ");
+        /*log.info("start rename.... ");
         try {
             Thread.sleep(1000);
             String url2 = "mv "+ reportPath +" "+map.get("content")+"/"+finalFileName;
@@ -97,7 +98,7 @@ public class ReportManageService {
         } catch (Exception e) {
             e.getMessage();
         }
-        log.info("rename success.... ");
+        log.info("rename success.... ");*/
 //        DownloadUtil.downloadFile(reportPath, file.getName(), response, request);
 //        String url = "ls "+reportPath+" | wc -w";
 //        long count = 0;

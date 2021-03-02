@@ -33,4 +33,7 @@ public class TStdDeviceMeteUpdate implements Serializable {
     private Integer identifyResult;
     @ApiModelProperty(value = "巡检图片")
     private String picPath;
+    @ApiModelProperty(value = "状态")
+    private Integer cruiseStatus;
+
 }

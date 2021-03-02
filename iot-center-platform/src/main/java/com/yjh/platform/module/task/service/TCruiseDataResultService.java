@@ -198,8 +198,6 @@ public class TCruiseDataResultService {
         List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
         log.info("deviceMeteIdList==="+deviceMeteIdList);
         log.info("cruiseResultIdList==="+cruiseResultIdList);
-        int updateRes = 0;
-        int insertRes = 0;
         for (String cruiseResultId: cruiseResultIdList){
             TStdDeviceMeteUpdate tStdDeviceMeteUpdateTemp = tCruiseDataResultDao.selectCruiseAnalyze(cruiseResultId);
             TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
@@ -215,17 +213,19 @@ public class TCruiseDataResultService {
                 tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
             }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId())){
-                //更新
-                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值");
-                updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-            }else {
-                //插入
-                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值");
-                insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-            }
+//            if (tStdDeviceMeteUpdateTemp.getCruiseStatus() != 253){//即非终止情况
+                if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId()) ){
+                    //更新
+                    int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                    log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值: "+updateRes);
+                }else {
+                    //插入
+                    int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                    log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值: "+insertRes);
+                }
+//            }
         }
-        return updateRes+insertRes;
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)
