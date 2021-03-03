@@ -148,6 +148,9 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 log.info("TCDR开始构建");
                 TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                 tCruiseDataResult.setCruiseId(Long.valueOf(mapForCruise.get("instanceId").toString()));
+                if(mapForCruise.get("picpath") == null){
+                    mapForCruise.put("picpath","null");
+                }
                 tCruiseDataResult.setPicpath(mapForCruise.get("picpath").toString());
                 tCruiseDataResult.setResultNum(mapForCruise.get("resultNum").toString());
                 //tCruiseDataResult.setResultDesc(mapForCruise.get("resultDesc").toString());
@@ -163,7 +166,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                     tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(mapForCruise.get("cruiseAbnormal").toString()));
                 }
                 tCruiseDataResult.setEvaluationState(257);
-                tCruiseDataResult.setCreatetime(new Date());
+                tCruiseDataResult.setCreatetime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
                 tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
                 tCruiseDataResult.setIsWarn(0);
                 TCDRList.add(tCruiseDataResult);

@@ -164,12 +164,12 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseTaskResultDetail.setInstanceId(Long.valueOf(mapForCruise.get("instanceId").toString()));
                         tCruiseTaskResultDetail.setInstanceName(mapForCruise.get("instanceName"));
                         tCruiseTaskResultDetail.setDeviceName(mapForCruise.get("deviceName"));
-//                    if(mapForCruise.get("cruiseTime").equals("null")){
-//                        tCruiseTaskResultDetail.setCruiseTime(new Date());
-//                        mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
-//                    }else {
-//                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
-//                    }
+                    if(mapForCruise.get("cruiseTime").equals("null")){
+                        tCruiseTaskResultDetail.setCruiseTime(new Date());
+                        mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
+                    }else {
+                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
+                    }
 
                         //tCruiseTaskResultDetail.setEndTime(new Date());
                         //mapForCruise.put("endTime",simpleDateFormat.format(new Date()));
@@ -183,7 +183,10 @@ public class TaskShutDownJob extends QuartzJobBean {
                         log.info("TCDR开始构建");
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                         tCruiseDataResult.setCruiseId(Long.valueOf(mapForCruise.get("instanceId").toString()));
-                        //tCruiseDataResult.setPicpath(mapForCruise.get("picpath").toString());
+                        if(mapForCruise.get("picpath") == null){
+                            mapForCruise.put("picpath","null");
+                        }
+                        tCruiseDataResult.setPicpath(mapForCruise.get("picpath").toString());
                         tCruiseDataResult.setResultNum(mapForCruise.get("resultNum").toString());
                         //tCruiseDataResult.setResultDesc(mapForCruise.get("resultDesc").toString());
                         tCruiseDataResult.setCruiseType(Integer.valueOf(mapForCruise.get("cruiseType").toString()));
@@ -191,7 +194,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseDataResult.setCruiseResult(Integer.valueOf(mapForCruise.get("cruiseResult")));
                         tCruiseDataResult.setOrigpic(mapForCruise.get("origpic").toString());
                         tCruiseDataResult.setCruiseName(mapForCruise.get("cruiseName"));
-                        tCruiseDataResult.setCreatetime(new Date());
+                        tCruiseDataResult.setCreatetime(simpleDateFormat.parse(mapForCruise.get("cruiseTime")));
                         tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
                         tCruiseDataResult.setEvaluationState(257);
                         tCruiseDataResult.setIsWarn(0);
@@ -243,7 +246,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseTaskResultDetail.setInstanceId(item.getInstanceId());
                         tCruiseTaskResultDetail.setDeviceName(item.getDeviceName());
                         tCruiseTaskResultDetail.setInstanceName(item.getInstanceName());
-                        //tCruiseTaskResultDetail.setCruiseTime(new Date());
+                        tCruiseTaskResultDetail.setCruiseTime(new Date());
                         String cruiseTime = simpleDateFormat.format(new Date());
                         tCruiseTaskResultDetail.setCruiseStatus(253);
                         TCTRDList.add(tCruiseTaskResultDetail);
@@ -251,11 +254,14 @@ public class TaskShutDownJob extends QuartzJobBean {
 
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
                         tCruiseDataResult.setCruiseResultId(tCruiseResult.getTaskResultId() + item.getInstanceId().toString());
+                        tCruiseDataResult.setPicpath("null");
                         tCruiseDataResult.setCruiseId(item.getInstanceId());
                         tCruiseDataResult.setCruiseType(item.getCruiseType());
                         tCruiseDataResult.setCruiseName(item.getCruiseName());
                         tCruiseDataResult.setResultNum("任务终止");
                         tCruiseDataResult.setCruiseResult(247);
+                        tCruiseDataResult.setCruiseAbnormal(250);
+                        tCruiseDataResult.setCreatetime(new Date());
                         tCruiseDataResult.setEvaluationState(257);
                         tCruiseDataResult.setIsWarn(0);
 
