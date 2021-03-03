@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,35 +59,46 @@ public class zuulFilter extends ZuulFilter {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             MyRequestWrapper requestWrapper = null;
+            MultipartHttpServletRequest multipartHttpServletRequest = null;
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (request instanceof HttpServletRequest) {
                 if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
                     String contentType = request.getContentType();
                     if (contentType != null && contentType.contains("multipart/form-data")) {
-//                            MultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
-//                            MultipartHttpServletRequest multipartHttpServletRequest=resolver.resolveMultipart(request);
-//                            System.out.println("type:  " + multipartHttpServletRequest.getContentType());
-//                            MultipartFile multipartFile = multipartHttpServletRequest.getFile("file");
-//                            StringBuilder sb = new StringBuilder();
-//                            if (null != multipartFile) {
-//                                for (char c :  multipartFile.getInputStream().toString().toCharArray()) {
-//                                    sb.append(String.valueOf((int) c));
-//                                }
-//                            }
-//                            String token = Demo.summary(sb.toString());
-//                            if (!token.equals(webcode)) {
-//                                log.error("参数篡改" +multipartFile + " ,之后的summary: " + token + ",前端summary: " + webcode);
-//                                ctx.setSendZuulResponse(false);
-//                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-//                                return false;
-//                            }
+                        String filePath = "";
+                        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+                        multipartHttpServletRequest = resolver.resolveMultipart(request);
+                        Map<String, MultipartFile> fileMap = multipartHttpServletRequest.getFileMap();
+                        Iterator<Map.Entry<String, MultipartFile>> it = fileMap.entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry<String, MultipartFile> entry = it.next();
+                            MultipartFile mFile = entry.getValue();
+                            if (mFile.getSize() != 0 && !"".equals(mFile.getName())) {
+                                filePath+='"'+mFile.getOriginalFilename()+'"' + ";";
+                            }
+                        }
+                        String filePaths = filePath.substring(0, filePath.length() - 1);
+                        StringBuilder sb = new StringBuilder();
+                        if (null != filePaths) {
+                            for (char c : filePaths.toCharArray()) {
+                                sb.append(Integer.toUnsignedString(c, 10));
+                            }
+                        }
+                        String token = Demo.summary(sb.toString());
+                        if (!token.equals(webcode)) {
+                            log.error("参数篡改" + filePaths + " ,之后的summary: " + token + ",前端summary: " + webcode);
+                            ctx.setSendZuulResponse(false);
+                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                            return false;
+                        }
+                        ctx.setRequest(multipartHttpServletRequest);
                     } else {
                         requestWrapper = new MyRequestWrapper(request);
                         String body = requestWrapper.getBody();
                         StringBuilder sb = new StringBuilder();
                         if (null != body) {
                             for (char c : body.toCharArray()) {
-                                sb.append(String.valueOf((int) c));
+                                sb.append(Integer.toUnsignedString(c, 10));
                             }
                             String token = Demo.summary(sb.toString());
                             if (!token.equals(webcode)) {
@@ -112,7 +125,7 @@ public class zuulFilter extends ZuulFilter {
                             StringBuilder sb = new StringBuilder();
                             if (null != jsonModel.toJSONString()) {
                                 for (char c : jsonModel.toJSONString().toCharArray()) {
-                                    sb.append(String.valueOf((int) c));
+                                    sb.append(Integer.toUnsignedString(c, 10));
                                 }
                             }
                             String token = Demo.summary(sb.toString());
