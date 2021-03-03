@@ -188,6 +188,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("处理过的Packet="+Packet);
         String temporaryBody = Packet + body ;//临时
+        log.info("准备解析的xml是==="+temporaryBody);
         String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
         String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
 
