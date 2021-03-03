@@ -40,7 +40,9 @@ public class TCruiseTypeService{
         }
         List<Long> listHave= tCruiseTypeDao.selectIdList(cruiseType);//此时查出来的是要标记删除的
         //此时listHave中剩下的都是此次新增中所不需要的点 需要标记删除
-        tCruiseTypeDao.tagsDeleted(listHave);//将库里的标记删除了
+        if(listHave != null && listHave.size()>0){
+            tCruiseTypeDao.tagsDeleted(listHave);//将库里的标记删除了
+        }
         for (String item:list1) {
             TCruiseTypeDetail tCruiseType= new TCruiseTypeDetail();
             tCruiseType.setSubType(cruiseType);
@@ -71,6 +73,12 @@ public class TCruiseTypeService{
                     }
                 }
             }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
+                }
+            }
             //将删除已存在的listNew插库
             if(listForAdd != null && listForAdd.size()>0){
                 return tCruiseTypeDao.batchAdd(listForAdd);
@@ -89,6 +97,12 @@ public class TCruiseTypeService{
                     if( !listHave.contains(listNew.get(i).getInstanceId())){
                         listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
                     }
+                }
+            }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
                 }
             }
             //将删除已存在的listNew插库
@@ -111,6 +125,12 @@ public class TCruiseTypeService{
                     }
                 }
             }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
+                }
+            }
             //将删除已存在的listNew插库
             if(listForAdd != null && listForAdd.size()>0){
                 return tCruiseTypeDao.batchAdd(listForAdd);
@@ -129,6 +149,12 @@ public class TCruiseTypeService{
                     if( !listHave.contains(listNew.get(i).getInstanceId())){
                         listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
                     }
+                }
+            }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
                 }
             }
             //将删除已存在的listNew插库
@@ -151,6 +177,12 @@ public class TCruiseTypeService{
                     }
                 }
             }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
+                }
+            }
             //将删除已存在的listNew插库
             if(listForAdd != null && listForAdd.size()>0){
                 return tCruiseTypeDao.batchAdd(listForAdd);
@@ -171,6 +203,12 @@ public class TCruiseTypeService{
                     }
                 }
             }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
+                }
+            }
             //将删除已存在的listNew插库
             if(listForAdd != null && listForAdd.size()>0){
                 return tCruiseTypeDao.batchAdd(listForAdd);
@@ -189,6 +227,12 @@ public class TCruiseTypeService{
                     if( !listHave.contains(listNew.get(i).getInstanceId())){
                         listForAdd.add(listNew.get(i));//找出listNew中不存在于listHave中的点
                     }
+                }
+            }
+            if(listHave!= null && listHave.size() ==0){
+                //库里什么都没有
+                if(listNew != null && listNew.size()>0){
+                    return tCruiseTypeDao.batchAdd(listNew);
                 }
             }
             //将删除已存在的listNew插库
