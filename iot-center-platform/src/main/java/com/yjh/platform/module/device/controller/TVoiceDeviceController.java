@@ -241,4 +241,19 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "从PMS系统同步音频设备信息")
+    @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
+    @Logs(title = "从PMS系统同步音频设备信息",content = "从pms系统同步音频设备信息",logType = 5)
+    public Result synchronizeFromPMS(@RequestParam(value = "pmsId",required = false) String pmsId,
+                                     @RequestParam(value = "voiceDeviceId",required = false) Long voiceDeviceId) {
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.synchronizeFromPMS(pmsId,voiceDeviceId));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("从PMS系统同步摄像机信息失败描述：" + e);
+        }
+        return result;
+    }
+
 }

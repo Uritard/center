@@ -6,9 +6,15 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.user.dao.TSysParamDao;
+import com.yjh.platform.module.user.entity.TCameraInfo;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
@@ -34,6 +40,8 @@ public class TVoiceDeviceService{
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
 
@@ -84,7 +92,10 @@ public class TVoiceDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public List<VoiceDeviceAllInfoDetail> selectByPage(String voiceDeviceName,String deviceType,Long upRegionId) {
         List<Long> list = tStdRegionDao.selectDownId(upRegionId);
-        List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list);
+        if(upRegionId != null){
+            list.add(upRegionId);
+        }
+        List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId);
         return tVoiceDeviceList;
     }
 
@@ -303,6 +314,87 @@ public class TVoiceDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public List<VoiceDeviceAllInfo> selectVoiceDeviceInfo(){
         return this.tVoiceDeviceDao.selectVoiceDeviceInfo();
+    }
+
+    //从pms同步设备信息
+    @Transactional(rollbackFor = Exception.class)
+    public int synchronizeFromPMS(String pmsId,Long voiceDeviceId) throws Exception{
+        //在那时理解为从无到有
+        VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail;
+        if(voiceDeviceId == null){
+            voiceDeviceAllInfoDetail=new VoiceDeviceAllInfoDetail();
+        }else {
+            voiceDeviceAllInfoDetail= tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
+        }
+        //找到对应的pms文件
+        Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String filePathAndName = resMap.get("content") +  "/PMS/CameraPMS.xml";
+//        String filePathAndName = "D:/testform/PMS/CameraPMS.xml";
+        log.info("路径是==="+filePathAndName);
+
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new File(filePathAndName));
+        //解析xml
+        Element rootElement = document.getRootElement();
+
+        Iterator iterator = rootElement.elementIterator();
+        Map<String,String> map = new HashMap<>();
+        while (iterator.hasNext()) {
+            Element stu = (Element) iterator.next();
+            List<Attribute> attributes = stu.attributes();
+
+            for (Attribute attribute : attributes) {
+                    Iterator iterator1 = stu.elementIterator();
+                    while (iterator1.hasNext()) {
+                        Element stuChild = (Element) iterator1.next();
+                        map.put(stuChild.getName(), stuChild.getStringValue());
+                    }
+                    if (map.containsKey("voiceDeviceName")) {
+                        voiceDeviceAllInfoDetail.setVoiceDeviceName(map.get("voiceDeviceName"));
+                    }
+                if (map.containsKey("stdDeviceId")) {
+                    voiceDeviceAllInfoDetail.setStdDeviceId(Long.valueOf(map.get("stdDeviceId")));
+                }
+                if (map.containsKey("upRegionId")) {
+                    voiceDeviceAllInfoDetail.setUpRegionId(Long.valueOf(map.get("upRegionId")));
+                }
+                if (map.containsKey("ftpUrl")) {
+                    voiceDeviceAllInfoDetail.setFtpUrl(map.get("ftpUrl"));
+                }
+                if (map.containsKey("owner")) {
+                    voiceDeviceAllInfoDetail.setOwner(map.get("owner"));
+                }
+                if (map.containsKey("ownerCode")) {
+                    voiceDeviceAllInfoDetail.setOwnerCode(map.get("ownerCode"));
+                }
+                if (map.containsKey("port")) {
+                    voiceDeviceAllInfoDetail.setPort(Integer.valueOf(map.get("port")));
+                }
+                if (map.containsKey("absoluPath")) {
+                    voiceDeviceAllInfoDetail.setAbsoluPath(map.get("absoluPath"));
+                }
+                if (map.containsKey("dbValue")) {
+                    voiceDeviceAllInfoDetail.setDbValue(map.get("dbValue"));
+                }
+                if (map.containsKey("fValue")) {
+                    voiceDeviceAllInfoDetail.setfValue(map.get("fValue"));
+                }
+                if (map.containsKey("channelNum")) {
+                    voiceDeviceAllInfoDetail.setChannelNum(map.get("channelNum"));
+                }
+                if (map.containsKey("pmsId")) {
+                    voiceDeviceAllInfoDetail.setPmsId(map.get("pmsId"));
+                }
+
+                log.info("voiceDeviceAllInfoDetail==="+voiceDeviceAllInfoDetail);
+                if(pmsId != null && pmsId.equals(map.get("pmsId"))){
+                    this.update(voiceDeviceAllInfoDetail);
+                }else {
+                    this.add(voiceDeviceAllInfoDetail);
+                }
+            }
+        }
+        return 1;
     }
 }
 

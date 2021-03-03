@@ -120,7 +120,7 @@
         where 1=1
         <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
-        <if test="list != null"> and a.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        <if test="upRegionId != null"> and a.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
             #{upRegionId, jdbcType=BIGINT}</foreach></if>
     </select>
 

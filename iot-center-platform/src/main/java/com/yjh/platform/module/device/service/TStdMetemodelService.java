@@ -483,6 +483,8 @@ public class TStdMetemodelService {
         try {
             deleteDir(new File(path +"/"+ fileName));
             file.transferTo(new File(path +"/"+ fileName));
+        }catch (NullPointerException e) {
+            e.getMessage();
         } catch (IOException e) {
             e.getMessage();
         }
@@ -495,6 +497,10 @@ public class TStdMetemodelService {
         Result result = new Result();
         try {
             result.setCode(209);
+            if(file == null){
+                result.setCode(209,"文件错误，文件为null");
+                return result;
+            }
             String pathName = excelDataImport(file);
             //获取字典表的值pathName
             ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();

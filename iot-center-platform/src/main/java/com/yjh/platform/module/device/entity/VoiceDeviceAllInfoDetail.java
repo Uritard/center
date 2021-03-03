@@ -81,6 +81,17 @@ public class VoiceDeviceAllInfoDetail{
 
     private String deviceTypeName;
 
+    private String pmsId;
+
+    public String getPmsId() {
+        return pmsId;
+    }
+
+    public void setPmsId(String pmsId) {
+        this.pmsId = pmsId;
+    }
+
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
