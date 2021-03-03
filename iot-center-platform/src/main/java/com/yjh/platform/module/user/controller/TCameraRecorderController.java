@@ -123,6 +123,7 @@ public class TCameraRecorderController {
             if (!tCameraRecorder.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
+                log.info("tCameraRecorderName: "+tCameraRecorder.getRecordName());
                 result.setData(tCameraRecorderService.update(tCameraRecorder));
                 sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
             }
