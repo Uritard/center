@@ -483,7 +483,7 @@ public class TStdMetemodelService {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForPicModelPath.get("content");
         //String path = "D:/code/qhTest/66666";
-        String fileName = "copy-meteModel.xls";
+        String fileName = "copy-meteModel.xlsx";
         // 将上传文件写入
         try {
             deleteDir(new File(path +"/"+ fileName));
