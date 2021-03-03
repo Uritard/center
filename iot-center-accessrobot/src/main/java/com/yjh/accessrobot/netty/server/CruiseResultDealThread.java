@@ -103,7 +103,7 @@ public class CruiseResultDealThread implements Runnable{
                     }
                     tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
                     tCruiseTaskResultMap.put("evaluationState","257");
-                    tCruiseTaskResultMap.put("createtime",sdf.format(new Date()));
+                    tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("is_warn","0");
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
@@ -176,7 +176,8 @@ public class CruiseResultDealThread implements Runnable{
                                 .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
                                 .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
                                 .setDeviceName(redisInfoMap.get("deviceName"))
-                                .setCruiseStatus(252);
+                                .setCruiseStatus(252)
+                                .setRemark(redisInfoMap.get("remark"));
                         tCTRDList.add(tCruiseTaskResultDetail);
                         cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
 
@@ -185,25 +186,31 @@ public class CruiseResultDealThread implements Runnable{
                                 .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
                                 .setCruiseName(redisInfoMap.get("cruiseName"))
                                 .setCruiseType(228)
+                                .setResultNum(redisInfoMap.get("resultNum"))
+                                .setModifyNum(redisInfoMap.get("modifyNum"))
                                 .setPicpath(redisInfoMap.get("picpath"))
+                                .setPicPathAnl(redisInfoMap.get("picPathAnl"))
                                 .setOrigpic(redisInfoMap.get("origpic"))
-                                .setIsWarn(0)
+                                .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                                .setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")))
                                 .setEvaluationState(257)
                                 .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
+                                .setRemark(redisInfoMap.get("remark"))
+                                .setIsWarn(0)
                                 .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
-                        if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                        /*if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                             tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                         } else {
-                            tCruiseDataResult.setCruiseAbnormal(null);
-                        }
+                            tCruiseDataResult.setCruiseAbnormal(250);
+                        }*/
                         /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                             tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                         } else {
                             tCruiseDataResult.setResultNum(null);
                         }*/
-                        tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                         tCDRList.add(tCruiseDataResult);
                     }
+
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
                         normal = normal + 1;
                         log.info("这次变化的normal是==="+normal);

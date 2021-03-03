@@ -91,7 +91,7 @@ public class RobotController {
     public Result feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTaskIssued(robotTaskInfoMap));
+            robotService.feignRobotTaskIssued(robotTaskInfoMap);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

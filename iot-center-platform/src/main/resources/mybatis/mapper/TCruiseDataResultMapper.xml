@@ -659,7 +659,7 @@
     <select id="test" resultType="java.lang.String">
         SELECT  a.cruise_result_id
         FROM t_cruise_task_result_detail a
-        limit 180,50
+        limit 57,10
     </select>
 
 
