@@ -60,5 +60,9 @@ public interface AnalyseDataOperateDao {
 
     //查询任务结束后TCTR中是否已被插入数据
     String selectLaterTaskCruiseResult(@Param(value = "taskId") String taskId);
+
+    //根据任务ID与巡视点ID查询相机ID与预置位ID
+    Map<String,Long> selectTaskCruiseCameraInfo(@Param(value = "taskId")String taskId,
+                                                @Param(value = "instanceId")Long instanceId);
 }
 

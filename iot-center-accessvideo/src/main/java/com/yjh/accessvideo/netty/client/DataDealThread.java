@@ -110,8 +110,14 @@ public class DataDealThread implements Runnable {
                     String name = "t_cruise_task_result:" + TASKID + ":" + INSTANCEID;
                     //将每个任务下所需的正常点数、异常点数放入"任务常量Map"中
                     Map<String, String> taskConstant = new HashMap<>();
-                    //把巡视点redis名称放入任务算法巡视点List中
-                    redisTemplate.opsForList().leftPush("cruiseKeys:" + TASKID, name);
+                    //把巡视点redis名称放入任务算法巡视点List中--单点双算法需要判重
+                    if (redisTemplate.opsForList().size("cruiseKeys:" + TASKID) != 0) {
+                        redisTemplate.opsForList().remove("cruiseKeys:" + TASKID, 0, name);
+                        redisTemplate.opsForList().leftPush("cruiseKeys:" + TASKID, name);
+                    } else {
+                        redisTemplate.opsForList().leftPush("cruiseKeys:" + TASKID, name);
+                    }
+
                     Integer tAbnormal = 0;
                     Integer tNormal = 0;
                     taskConstant.put("taskId", TASKID);
@@ -143,24 +149,27 @@ public class DataDealThread implements Runnable {
                     try {
                         switch (remotePort) {
                             case 13668:
-                                if (recognitionMode.equals(0)) {
+                                if (recognitionMode.equals("0")) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-2");
                                 }
                                 if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
-                                    cruiseResultMap.put("resultNum", "缺少标定文件");
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
+                                    Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", "缺少标定文件");
+                                    cruiseResultMap.put("resultNum", doubleHandelMap.get("resultNum"));
+                                    cruiseResultMap.put("cruiseResult", doubleHandelMap.get("cruiseResult"));
+                                    cruiseResultMap.put("cruiseAbnormal", doubleHandelMap.get("cruiseAbnormal"));
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else if (jsonObjectResult.get("resultValue").equals("识别失败")) {
-                                    cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
+                                    Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.get("resultValue").toString());
+                                    cruiseResultMap.put("resultNum", doubleHandelMap.get("resultNum"));
+                                    cruiseResultMap.put("cruiseResult", doubleHandelMap.get("cruiseResult"));
+                                    cruiseResultMap.put("cruiseAbnormal", doubleHandelMap.get("cruiseAbnormal"));
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else {
                                     if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
-                                        cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
+
+                                        String alarmValue = jsonObjectResult.get("resultValue").toString();
 
                                         log.info("开始告警预处理");
                                         TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
@@ -225,16 +234,20 @@ public class DataDealThread implements Runnable {
                                                             log.info("生成错误", e);
                                                         }
 
-                                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                                        cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "异常告警", alarmValue);
+                                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                                        tAbnormal++;
                                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
 
                                                     } else {
                                                         //未达到告警值(遥信)
-                                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
-                                                        cruiseResultMap.put("cruiseAbnormal", "--");
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", alarmValue);
+                                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                                        tNormal++;
                                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
                                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
@@ -303,15 +316,19 @@ public class DataDealThread implements Runnable {
                                                         cruiseResultMap.put("isWarn", "1");
                                                         log.info("告警Map:" + warnMap);
 
-                                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                                        cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "异常告警"));
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "异常告警", alarmValue);
+                                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                                        tAbnormal++;
                                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                                     } else {
                                                         //未达到告警值（遥测）
-                                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
-                                                        cruiseResultMap.put("cruiseAbnormal", "--");
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", alarmValue);
+                                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                                        tNormal++;
                                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
                                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
@@ -420,16 +437,19 @@ public class DataDealThread implements Runnable {
                                             }
 
                                         } else {
-                                            cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
-                                            cruiseResultMap.put("cruiseAbnormal", "--");
+                                            Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", alarmValue);
+                                            cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                            cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                            cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                            tNormal++;
                                             tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
                                             tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                         }
                                     } else {
-                                        cruiseResultMap.put("resultNum", jsonObjectResult.get("resultValue").toString());
-                                        cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                        cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "数据异常"));
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.get("resultValue").toString());
+                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                        tAbnormal++;
                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
@@ -438,7 +458,7 @@ public class DataDealThread implements Runnable {
 
                                 break;
                             case 13669:
-                                if (recognitionMode.equals(0)) {
+                                if (recognitionMode.equals("0")) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-1");
                                 }
 
@@ -450,9 +470,10 @@ public class DataDealThread implements Runnable {
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
                                 if (resultValue != "null") {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
-                                    cruiseResultMap.put("resultNum", resultValue);
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "异常"));
-                                    cruiseResultMap.put("cruiseAbnormal", analyseDataOperateService.selectDictCode("abnormal_type", "缺陷异常"));
+                                    Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
+                                    cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                    cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                    cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                    tAbnormal++;
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
@@ -572,9 +593,10 @@ public class DataDealThread implements Runnable {
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
 //                                    tNormal++;
-                                    cruiseResultMap.put("resultNum", "--");
-                                    cruiseResultMap.put("cruiseResult", analyseDataOperateService.selectDictCode("cruise_result", "正常"));
-                                    cruiseResultMap.put("cruiseAbnormal", "--");
+                                    Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
+                                    cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                    cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                    cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
                                 }
 
                                 break;
@@ -583,9 +605,14 @@ public class DataDealThread implements Runnable {
                         log.error("告警/缺陷处理失败：" + e);
                     }
 
-                    //仅单算法点可执行以下操作
-                    if(!recognitionMode.equals("0")) {
 
+                    if (recognitionMode.equals("0")) {
+                        //双算法-第一算法处理
+                        log.info("DoubleAlgorithmDealing......................");
+                        redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);
+                        log.info("--------------------End-----------------------");
+                    } else {
+                        //单算法处理/双算法-第二算法处理--（完整巡视点结束）
                         cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
                         if (Objects.isNull(cruiseResultMap.get("isWarn"))) {
                             cruiseResultMap.put("isWarn", "0");
@@ -732,7 +759,14 @@ public class DataDealThread implements Runnable {
                         if (cruiseWorkedMap.get("cruiseAbnormal").toString().equals("--")) {
                             tCruiseDataResult.setCruiseAbnormal(null);
                         } else {
-                            tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
+                            if (cruiseWorkedMap.get("cruiseAbnormal").toString().contains(",")) {
+                                String[] abnormalArr = cruiseWorkedMap.get("cruiseAbnormal").toString().split(",");
+                                tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(abnormalArr[0]));
+                                tCruiseDataResult.setRemark(abnormalArr[1]);
+                            } else {
+                                tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
+                            }
+
                         }
                         tCruiseDataResult.setEvaluationState(Integer.valueOf(cruiseWorkedMap.get("evaluationState").toString()));
                         tCruiseDataResult.setCreatetime(new Date());
@@ -817,6 +851,7 @@ public class DataDealThread implements Runnable {
                         tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
 //                                tCruiseTaskResult.setCruiseTaskTime();
 
+                        log.info("taskId-----------:" + tCruiseTaskResult.getTaskId());
                         if (Objects.nonNull(analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()))) {
                             log.info("TCTR已存在");
                         } else {

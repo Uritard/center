@@ -3,14 +3,19 @@ package com.yjh.accessvideo.module.device.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.accessvideo.module.control.service.CameraConService;
+import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.netty.client.AnalysisClientHandler;
+import org.apache.xml.serializer.utils.MsgKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -20,6 +25,11 @@ import java.util.Random;
 @Service
 public class AnalysisService {
 
+    @Autowired
+    private AnalyseDataOperateDao analyseDataOperateDao;
+
+    @Autowired
+    private CameraConService cameraConService;
     private Logger log = LoggerFactory.getLogger(AnalysisService.class);
 
     private static long algorithmMsgId = 100000001;
@@ -33,7 +43,8 @@ public class AnalysisService {
         JSONObject msgDataObject = new JSONObject();
         if (analysisList.get(0).getInstanceId() == -1) {
             log.info("任务结束心跳发送");
-            log.info("----------任务结束报文-----------"+analysisList.get(0));
+            log.info("----------任务结束报文-----------");
+            log.info("----------------"+analysisList.get(0));
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0));
         } else {
             algorithmMsgId = algorithmMsgId+1;
@@ -47,6 +58,10 @@ public class AnalysisService {
                 for (Analysis analysis: analysisList) {
                     log.info("表计IsAI："+analysis.getIsAi());
                     if (analysis.getIsAi()==1) {
+                        Map<String,Long>cameraInfo=analyseDataOperateDao.selectTaskCruiseCameraInfo(analysis.getTaskId(),analysis.getInstanceId());
+                        Map<String,String> firHandelMap=cameraConService.givePicFir(cameraInfo.get("cameraId"),cameraInfo.get("presetId"));
+                        log.info("cameraInfo-----"+cameraInfo);
+                        log.info("firData-------"+firHandelMap);
                         JSONObject pictureInfoObject = new JSONObject();
                         JSONObject pictureDataObject = new JSONObject();
                         pictureDataObject.put("analyseType", analysis.getAnalyseType());
@@ -54,6 +69,8 @@ public class AnalysisService {
                         pictureDataObject.put("modelPath", analysis.getPicModelPath());
                         pictureDataObject.put("taskId", analysis.getTaskId());
                         pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                        pictureDataObject.put("csvPath",firHandelMap.get("csvPath"));
+                        pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
                         pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                         msgDataObject.put("data", pictureInfoObject);
                     }

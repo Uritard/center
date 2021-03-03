@@ -1330,7 +1330,7 @@ public class CameraConService {
                     }
                     fos.flush();
                     fos.close();
-                    map.put("cvsPath",hotFirShow+newName+".csv");
+                    map.put("csvPath",hotFirShow+newName+".csv");
                     log.info("hotFirShowcsv地址："+hotFirShow+newName+".csv");
 
                 }else

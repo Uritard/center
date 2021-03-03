@@ -209,9 +209,86 @@ public class AnalyseDataOperateService {
         List<Integer> result=new ArrayList<>();
         result.add(normal);
         result.add(abnormal);
+        log.info("-------------异常点判断-----------");
         return result;
 
     }
+
+    /**
+     *双算法 综合巡视结果解析与获取
+     * @param mode 识别模式
+     * @param cruiseRedisKey redis Key名
+     * @param cruiseResult  巡视结果
+     * @param abnormalType  异常类型
+     * @param resultValue   巡视值
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,String> doubleResultHandle(String mode,String cruiseRedisKey,String cruiseResult,String abnormalType,String resultValue){
+        Map<String,String> handleResultMap=new HashMap<>();
+        String resultNum="--";
+        String cruiseResultFinal="null";
+        String abnormalTypeFinal="null";
+        String abnormalTypeTem="null";
+        String cruiseResultTem=selectDictCode("cruise_result",cruiseResult);
+
+        if(abnormalType.equals("--")){
+            abnormalTypeTem=abnormalType;
+        }else {
+             abnormalTypeTem=selectDictCode("abnormal_type",abnormalType);
+        }
+        switch (mode){
+            case "0":
+            case "1":
+            case "2":
+                resultNum=resultValue;
+                cruiseResultFinal=cruiseResultTem;
+                abnormalTypeFinal=abnormalTypeTem;
+                break;
+            case "-1":
+            case "-2":
+                if(redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString().contains("--")){
+                    resultNum=resultValue;
+                }else {
+                   if(resultValue.contains("--")){
+                       resultNum=redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString();
+                   }else {
+                       resultNum=(redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString())+","+resultValue;
+                   }
+                }
+                if((redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseResult").toString()).equals(selectDictCode("cruise_result","正常"))){
+                    cruiseResultFinal=cruiseResultTem;
+                }else {
+                    cruiseResultFinal=redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseResult").toString();
+                }
+                // TODO: 2021/3/1 巡视监控页面需对该变量进行字符串解析
+
+                if(redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString().contains("--")){
+                    abnormalTypeFinal=abnormalTypeTem;
+                }else {
+                   if(abnormalTypeTem.contains("--")){
+                       abnormalTypeFinal=redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString();
+                   }else {
+                       abnormalTypeFinal=(redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString())+","+abnormalTypeTem;
+                   }
+                }
+                break;
+//            case "1":
+//            case "2":
+//                resultNum=resultValue;
+//                cruiseResultFinal=cruiseResultTem;
+//                abnormalTypeFinal=abnormalTypeTem;
+//                break;
+        }
+
+        handleResultMap.put("resultNum",resultNum);
+        handleResultMap.put("cruiseResult",cruiseResultFinal);
+        handleResultMap.put("cruiseAbnormal",abnormalTypeFinal);
+        log.info("----------巡视结果集产生---------");
+        log.info("doubleResultMap----------:"+handleResultMap);
+        return handleResultMap;
+    }
+
 
 
 //    public String nonUnpacking(String body) {

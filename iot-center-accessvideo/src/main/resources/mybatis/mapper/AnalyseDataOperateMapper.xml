@@ -895,4 +895,18 @@
     WHERE
         task_id = #{taskId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectTaskCruiseCameraInfo" resultType="java.util.Map">
+            SELECT
+        d.camera_id as 'cameraId',
+        d.preset_id as 'presetId'
+    FROM
+        t_cruise_task a
+    LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
+    LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+    LEFT JOIN t_camera_preset d ON c.cruise_id = d.preset_id
+    WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+    AND b.instance_id = #{instanceId,jdbcType=BIGINT}
+    </select>
 </mapper>
