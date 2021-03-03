@@ -414,14 +414,17 @@ public class RobotService {
         return "success";
     }
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
+    public void feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {
         log.info("传来的ItemMap是==" + ItemMap);
 
-        if (null != ItemMap) {
-            List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
-            List<Map<String, String>> redisInfoList = new ArrayList<>();
-            log.info("rTIIList是===" + rTIIList);
-            for (RobotTaskInstanceInfo rTII : rTIIList) {
+        List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
+        List<Map<String, String>> redisInfoList = new ArrayList<>();
+        log.info("rTIIList是===" + rTIIList);
+        for (RobotTaskInstanceInfo rTII : rTIIList) {
+            String robotStatus = tRobotInfoDao.selectStatusByRobotCode(rTII.getRobotCode());
+            if (robotStatus.equals("离线")){
+                log.info("该机器人处于离线状态,没有成功将任务下发到机器人......");
+            }else{
                 //巡视类型
                 Integer planType = null;
                 switch (rTII.getCruiseType()) {
@@ -520,8 +523,7 @@ public class RobotService {
                 log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
                 RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
             }
-        }
-        return 1;
+                    }
     }
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskIssued2(Map<String,Object> resMap){
@@ -643,7 +645,8 @@ public class RobotService {
                         .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
                         .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
                         .setDeviceName(redisInfoMap.get("deviceName"))
-                        .setCruiseStatus(252);
+                        .setCruiseStatus(252)
+                        .setRemark(redisInfoMap.get("remark"));
                 tCTRDList.add(tCruiseTaskResultDetail);
                 cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
                 instancedList.add(Long.valueOf(redisInfoMap.get("instanceId")));
@@ -653,25 +656,28 @@ public class RobotService {
                         .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
                         .setCruiseName(redisInfoMap.get("cruiseName"))
                         .setCruiseType(228)
-//                        .setPicPathAnl(redisInfoMap.get(""))
+                        .setResultNum(redisInfoMap.get("resultNum"))
+                        .setModifyNum(redisInfoMap.get("modifyNum"))
                         .setPicpath(redisInfoMap.get("picpath"))
-//                        .setOrigPicAnl(redisInfoMap.get(""))
+                        .setPicPathAnl(redisInfoMap.get("picPathAnl"))
                         .setOrigpic(redisInfoMap.get("origpic"))
-                        .setIsWarn(0)
+                        .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                        .setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")))
                         .setEvaluationState(257)
-                        .setCreatetime(new Date())
+                        .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
+                        .setRemark(redisInfoMap.get("remark"))
+                        .setIsWarn(0)
                         .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
-                if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                /*if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                     tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                 } else {
-                    tCruiseDataResult.setCruiseAbnormal(null);
-                }
+                    tCruiseDataResult.setCruiseAbnormal(250);
+                }*/
                 /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                     tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 } else {
                     tCruiseDataResult.setResultNum(null);
                 }*/
-                tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 tCDRList.add(tCruiseDataResult);
 
                 if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {

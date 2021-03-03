@@ -213,7 +213,6 @@ public class TCruiseDataResultService {
                 tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
             }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-//            if (tStdDeviceMeteUpdateTemp.getCruiseStatus() != 253){//即非终止情况
                 if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId()) ){
                     //更新
                     int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
@@ -223,7 +222,6 @@ public class TCruiseDataResultService {
                     int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
                     log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值: "+insertRes);
                 }
-//            }
         }
         return 1;
     }
