@@ -74,10 +74,10 @@ public class zuulFilter extends ZuulFilter {
                             Map.Entry<String, MultipartFile> entry = it.next();
                             MultipartFile mFile = entry.getValue();
                             if (mFile.getSize() != 0 && !"".equals(mFile.getName())) {
-                                filePath+='"'+mFile.getOriginalFilename()+'"' + ";";
+                                filePath+=mFile.getOriginalFilename() + ";";
                             }
                         }
-                        String filePaths = filePath.substring(0, filePath.length() - 1);
+                        String filePaths ='"'+ filePath.substring(0, filePath.length() - 1)+'"';
                         StringBuilder sb = new StringBuilder();
                         if (null != filePaths) {
                             for (char c : filePaths.toCharArray()) {
