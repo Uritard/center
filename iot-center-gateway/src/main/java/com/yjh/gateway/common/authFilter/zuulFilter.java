@@ -96,7 +96,7 @@ public class zuulFilter extends ZuulFilter {
                         requestWrapper = new MyRequestWrapper(request);
                         String body = requestWrapper.getBody();
                         StringBuilder sb = new StringBuilder();
-                        if (null != body) {
+                        if (StringUtils.isNoneBlank(body)) {
                             for (char c : body.toCharArray()) {
                                 sb.append(Integer.toUnsignedString(c, 10));
                             }
