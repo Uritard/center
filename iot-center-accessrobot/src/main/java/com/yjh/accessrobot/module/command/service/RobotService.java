@@ -39,8 +39,8 @@ public class RobotService {
 
     private Logger log = LoggerFactory.getLogger(RobotService.class);
 
-    private static final String TIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
-    SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+    private static final String DATE_TIME_FORMAT_TPL = "yyyy-MM-dd HH:mm:ss";
+    SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT_TPL);
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -86,7 +86,7 @@ public class RobotService {
                 return zcz;
             }
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+
         List<Map<String, Object>> Item = new LinkedList<>();
         Map<String, Object> map = new HashMap<>();
         if (!"".equals(value) || null != value) {
@@ -132,7 +132,6 @@ public class RobotService {
         boolean res = false;
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
@@ -555,7 +554,6 @@ public class RobotService {
     public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap) throws Exception {
         log.info("robotTaskControlMap===" + robotTaskControlMap);
 
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         String taskId = robotTaskControlMap.get("taskId").toString();
         //1.任务启动2.任务暂停3.任务继续4.任务停止
         String commandValue = robotTaskControlMap.get("commandValue").toString();
@@ -626,11 +624,9 @@ public class RobotService {
         Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
 
         Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
-        log.info("总检测点数是===" + totalCheckPoint);
         Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString());
-        log.info("异常点数是===" + abnormalCheckPoint);
         Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString());
-        log.info("正常点数是===" + normalCheckPoint);
+        log.info("总检测点数是==="+totalCheckPoint+",异常点数是==="+abnormalCheckPoint+",正常点数是===" + normalCheckPoint);
 
         Integer abnormal = abnormalCheckPoint;
         Integer normal = normalCheckPoint;
@@ -638,8 +634,8 @@ public class RobotService {
         for (String instanceId : instanceIdList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
             log.info("cruiseResult 是 ===" + redisInfoMap.get("cruiseResult"));
-            if (redisInfoMap.get("cruiseResult").equals("246") ||
-                    redisInfoMap.get("cruiseResult").equals("247")) {//缓存中该巡检点有结果
+            //缓存中该巡检点有结果
+            if (redisInfoMap.get("cruiseResult").equals("246") || redisInfoMap.get("cruiseResult").equals("247")) {
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
                         .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                         .setTaskResultId(redisInfoMap.get("taskResultId"))
@@ -822,7 +818,6 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel){
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
 
         xmlBaseModel
                 .setSendCode("Server01")

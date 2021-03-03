@@ -7,6 +7,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -82,8 +83,9 @@ public class TCruiseResultService{
     public int manualReview(CruiseManualReview cruiseManualReview,String userId){
         //checkUser && checkDate
         String userName = tCruiseResultDao.selectUserName(Integer.valueOf(userId));
+        Date date = new Date();
         cruiseManualReview.setCheckUser(userName);
-        cruiseManualReview.setCheckDate(new Date());
+        cruiseManualReview.setCheckDate(date);
         //manualReview
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
@@ -122,7 +124,7 @@ public class TCruiseResultService{
 
         //组装告警基本信息
         TWarnInfo warnInfo = new TWarnInfo();
-        warnInfo.setWarnTime(new Date());
+        warnInfo.setWarnTime(date);
 //        warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
         warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
         warnInfo.setCunstomId(tStdDevicemete.getCustomId());
@@ -130,6 +132,7 @@ public class TCruiseResultService{
         warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
         warnInfo.setConfMode(275);//已核查
         warnInfo.setDealType(286);//属实
+        warnInfo.setDealInfo("程序正常，告警属实");
         warnInfo.setDefectModel(405);//其他
         warnInfo.setAlarmSource(282);//主辅设备
         warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
@@ -139,6 +142,7 @@ public class TCruiseResultService{
 
         //判断该点是否已在告警表
             if (afterManualReviewInfo.getIsWarn() == 1) {
+                Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(),afterManualReviewInfo.getInstanceId());
                 //存在
                 //判断该点是否产生告警以及告警信息
                 if (Boolean.TRUE.equals(isWarN)){//触发告警
@@ -147,9 +151,12 @@ public class TCruiseResultService{
                             map.get("warnName").toString(),
                             Integer.valueOf(map.get("warnLevel").toString()),
                             map.get("warnContent").toString(),
-                            outRange,userName,new Date());
+                            outRange,userId,date);
+                    sendWebSocket(warnId);
                 }else {
-                    tCruiseResultDao.updateWarnInfo2(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId(),userName,new Date());
+                    tCruiseResultDao.updateWarnInfo2(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId(),
+                            userId,date);
+                    sendWebSocket(warnId);
                 }
             }else {
                 //不存在
@@ -159,27 +166,14 @@ public class TCruiseResultService{
                     warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
                     warnInfo.setWarnContent(map.get("warnContent").toString());
                     warnInfo.setOutRange(outRange);
-                    warnInfo.setDealTime(new Date());
-                    warnInfo.setDealPersonId(userName);
+                    warnInfo.setDealTime(date);
+                    warnInfo.setDealPersonId(userId);
                     log.info("要插库的告警数据是==="+warnInfo);
                     tWarnInfoDao.insert(warnInfo);
+                    sendWebSocket(warnInfo.getWarnId());
+                    tCruiseResultDao.updateIsWarn(cruiseManualReview.getCruiseDataId());
                 }
             }
-        /*if ( afterManualReviewInfo.getIsWarn == 1){
-            tCruiseResultDao.updateWarnInfo(afterManualReviewInfo.getTaskId,afterManualReviewInfo.getInstanceId);//更新告警表信息
-            if (identifyResult == 261){//结果正确
-                tCruiseResultDao.updateWarnInfo2(afterManualReviewInfo.getTaskId,afterManualReviewInfo.getInstanceId);//更新告警表信息
-                Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId,afterManualReviewInfo.getInstanceId);//根据任务和巡检点id查询告警id
-                //给前端推webSocket
-                Map<String,Object> jasonMap=new HashMap<>();
-                jasonMap.put("type","finishedOneAlarm");
-                jasonMap.put("alarmId",warnId);
-                String json= JSON.toJSONString(jasonMap);
-                System.out.println(("发送给前端的消息==="+json));
-                WebSocketServer.sendMsg(json);
-            }
-        }*/
-
         //获取审核后该任务下的巡检点信息
         List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(cruiseManualReview.getTaskResultId());
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
@@ -263,6 +257,15 @@ public class TCruiseResultService{
             }
         }
         return cruiseManualReview.getCheckDate();
+    }
+    public void sendWebSocket(Long warnId){
+        //给前端推webSocket
+        Map<String,Object> jasonMap=new HashMap<>();
+        jasonMap.put("type","finishedOneAlarm");
+        jasonMap.put("alarmId",warnId);
+        String json= JSON.toJSONString(jasonMap);
+        System.out.println(("发送给前端的消息==="+json));
+        WebSocketServer.sendMsg(json);
     }
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalResult> taskStatistical(){

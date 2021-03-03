@@ -25,8 +25,8 @@ import java.util.*;
 @lombok.extern.slf4j.Slf4j
 public class CruiseResultDealThread implements Runnable{
 
-    private static final String DATETIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
-    SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
+    private static final String DATE_TIME_FORMAT_TPL = "yyyy-MM-dd HH:mm:ss";
+    SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT_TPL);
 
     private RedisTemplate redisTemplate;
 
@@ -53,11 +53,9 @@ public class CruiseResultDealThread implements Runnable{
             Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
 
             Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
-            log.info("总检测点数是==="+totalCheckPoint);
             Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
-            log.info("异常点数是===" + abnormalCheckPoint);
             Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
-            log.info("正常点数是===" + normalCheckPoint);
+            log.info("总检测点数是==="+totalCheckPoint+",异常点数是==="+abnormalCheckPoint+",正常点数是===" + normalCheckPoint);
 
             Integer abnormal = abnormalCheckPoint;
             Integer normal = normalCheckPoint;
@@ -163,10 +161,11 @@ public class CruiseResultDealThread implements Runnable{
                     }
                 }
                 log.info("准备遍历的点是==="+instanceIdList);
+
                 for (String instanceId : instanceIdList) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
-                    if (redisInfoMap.get("cruiseResult").equals("246") ||
-                            redisInfoMap.get("cruiseResult").equals("247")) {//缓存中该巡检点有结果
+                    //缓存中该巡检点有结果
+                    if (redisInfoMap.get("cruiseResult").equals("246") ||redisInfoMap.get("cruiseResult").equals("247")) {
                         TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
                                 .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                                 .setTaskResultId(redisInfoMap.get("taskResultId"))
@@ -265,6 +264,7 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseResult.setTaskWait(taskWait);
                     tCruiseResult.setCState(240);
                     tCruiseResult.setTaskCode(taskId);
+                    tCruiseResult.setCreateTime(sdf.parse(tCruiseTaskResultMap.get("cruiseTaskTime")));
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 

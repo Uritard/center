@@ -62,6 +62,7 @@ public interface TCruiseResultDao {
                        @Param(value = "instanceId")Long instanceId,
                         @Param(value = "dealPersonId")String dealPersonId,
                         @Param(value = "dealTime")Date dealTime);
+    int updateIsWarn(@Param(value = "cruiseDataId")Long cruiseDataId);
     Long selectWarnId(@Param(value = "taskId")String taskId,
                       @Param(value = "instanceId")Long instanceId);
     int batchInsert(List<TCruiseResult> list);

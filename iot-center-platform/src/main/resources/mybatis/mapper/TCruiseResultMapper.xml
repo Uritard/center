@@ -567,6 +567,7 @@
         <if test="warnContent != null ">a.warn_content = #{warnContent},</if>
          a.conf_mode = 275,
          a.deal_type = 286,
+        a.deal_info = "程序正常，告警属实",
         <if test="outRange != null ">a.out_range = #{outRange},</if>
         <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
@@ -587,6 +588,13 @@
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
+    </update>
+    <update id="updateIsWarn" parameterType="java.lang.Long">
+        UPDATE t_cruise_data_result a <set>
+        a.is_warn = 1
+        </set>
+        WHERE
+        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
     </update>
     <select id="selectWarnId" resultType="java.lang.Long">
         SELECT a.warn_id
