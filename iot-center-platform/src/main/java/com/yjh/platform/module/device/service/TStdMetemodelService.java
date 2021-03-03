@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.ResultHandleUtils;
+import com.yjh.platform.module.device.controller.TStdMetemodelController;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdMeteDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
@@ -27,6 +28,8 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,8 @@ public class TStdMetemodelService {
     private TStdMeteDao tStdMeteDao;
     @Autowired
     RedisTemplate redisTemplate;
+
+    private Logger log = LoggerFactory.getLogger(TStdMetemodelService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdMeteModel tStdMeteModel) {
@@ -954,7 +959,7 @@ public class TStdMetemodelService {
             return result;
         }catch (Exception e){
             result.setCode(209,"导入文件失败");
-            e.getMessage();
+            log.error(e.getMessage());
         }finally {
             try {
                 if (in != null) {
