@@ -476,8 +476,8 @@ public class TStdMetemodelService {
 
     private String excelDataImport(MultipartFile file) {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String path = (String) mapForPicModelPath.get("content");
-        //String path = "D:/code/qhTest/66666";
+        //String path = (String) mapForPicModelPath.get("content");
+        String path = "D:/code/qhTest/66666";
         String fileName = "copy-meteModel.xls";
         // 将上传文件写入
         try {

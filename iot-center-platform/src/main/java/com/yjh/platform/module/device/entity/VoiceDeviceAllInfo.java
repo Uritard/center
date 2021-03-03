@@ -16,14 +16,13 @@ import javax.validation.constraints.Max;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
 @ApiModel(value = "TVoiceDevice对象全量信息", description = "声纹设备表全部信息")
 public class VoiceDeviceAllInfo {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "声纹监控设备Id（默认为Ip地址）")
-    private String voiceDeviceId;
+    private Long voiceDeviceId;
 
     @ApiModelProperty(value = "声纹监控设备名称（）")
     private String voiceDeviceName;
@@ -35,7 +34,7 @@ public class VoiceDeviceAllInfo {
     private String deviceType;
 
     @Length(max = 32, message = "configId长度必须小于等于32")
-    private String configId;
+    private Long configId;
 
     @ApiModelProperty(value = "上级区域id")
     private Long upRegionId;
@@ -68,11 +67,8 @@ public class VoiceDeviceAllInfo {
     private String dbValue;
 
     @ApiModelProperty(value = "频率限值")
-    @TableField("fValue")
     private String fValue;
 
-    @ApiModelProperty(value = "幅值限值")
-    @TableField("mpValue")
     private String mpValue;
 
     @ApiModelProperty(value = "算法配置文件路径")
@@ -80,4 +76,6 @@ public class VoiceDeviceAllInfo {
     private String filePath;
 
     private String channelNum;
+
+
 }

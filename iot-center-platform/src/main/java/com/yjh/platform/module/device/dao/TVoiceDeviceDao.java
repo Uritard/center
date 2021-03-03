@@ -13,21 +13,26 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TVoiceDeviceDao {
 
-    int add(TVoiceDevice tVoiceDevice);
-    int deleteByPrimaryId(@Param(value = "voiceDeviceId") String voiceDeviceId);
-    int update(TVoiceDevice tVoiceDevice);
-    TVoiceDevice selectByPrimaryId(@Param(value = "voiceDeviceId") String voiceDeviceId);
-    List<TVoiceDevice> select(@Param(value = "voiceDeviceId") String voiceDeviceId,
+    int add(VoiceDeviceAllInfoDetail tVoiceDevice);
+    int deleteByPrimaryId(@Param(value = "voiceDeviceId") Long voiceDeviceId);
+    int update(VoiceDeviceAllInfoDetail tVoiceDevice);
+    VoiceDeviceAllInfoDetail selectByPrimaryId(@Param(value = "voiceDeviceId") Long voiceDeviceId);
+    List<TVoiceDevice> select(@Param(value = "voiceDeviceId") Long voiceDeviceId,
                                 @Param(value = "voiceDeviceName") String voiceDeviceName,
                                 @Param(value = "stdDeviceId") Long stdDeviceId,
                                 @Param(value = "deviceType") String deviceType,
-                                @Param(value = "configId") String configId,
+                                @Param(value = "configId") Long configId,
                               @Param(value = "upRegionId")Long upRegionId);
-    List<TVoiceDevice> selectByPage(TVoiceDevice tVoiceDevice);
+    List<VoiceDeviceAllInfoDetail> selectByPage(@Param(value = "voiceDeviceName") String voiceDeviceName,
+                                    @Param(value = "deviceType") String deviceType,
+                                    @Param(value = "list") List<Long> list);
 
-    int batchAdd(List<TVoiceDevice> list);
+    int batchAdd(List<VoiceDeviceAllInfoDetail> list);
     int batchDelete(List<String> list);
     List<VoiceDevice> selectAll(@Param(value = "voiceDeviceName") String voiceDeviceName);
-    VoiceDeviceInfoDetail selectVoiceInfo(@Param(value = "voiceDeviceId") String voiceDeviceId);
+    VoiceDeviceInfoDetail selectVoiceInfo(@Param(value = "voiceDeviceId") Long voiceDeviceId);
     List<VoiceDeviceAllInfo>selectVoiceDeviceInfo();
+    int addConf(VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail);
+    int updateConf(VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail);
+    int deleteConf(@Param(value = "configId") Long configId);
 }
