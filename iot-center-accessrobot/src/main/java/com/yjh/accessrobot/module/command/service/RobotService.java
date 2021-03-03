@@ -568,21 +568,25 @@ public class RobotService {
             String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
             for (String robotCode : robotCodeList) {
-                XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                        .setType("41")
-                        .setSendCode(sendCode)
-                        .setReceiveCode(robotCode)
-                        .setCode(taskId)
-                        .setCommand(commandValue)
-                        .setTime(sdf.format(new Date()));
-                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-                log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
+                String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+                if (robotStatus.equals("离线")){
+                    log.info("该机器人处于离线状态,没有成功将任务控制下发到机器人......");
+                }else {
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                            .setType("41")
+                            .setSendCode(sendCode)
+                            .setReceiveCode(robotCode)
+                            .setCode(taskId)
+                            .setCommand(commandValue)
+                            .setTime(sdf.format(new Date()));
+                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+                    log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
 
-                //根据不同的机器人对应不同的管道发送指令
-                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+                    RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
 
-                if (commandValue.equals("2") || commandValue.equals("4")) {
-                    insertForPause(robotCode, taskId, Integer.valueOf(commandValue));
+                    if (commandValue.equals("2") || commandValue.equals("4")) {
+                        insertForPause(robotCode, taskId, Integer.valueOf(commandValue));
+                    }
                 }
             }
         }
@@ -662,17 +666,16 @@ public class RobotService {
                         .setPicPathAnl(redisInfoMap.get("picPathAnl"))
                         .setOrigpic(redisInfoMap.get("origpic"))
                         .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
-                        .setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")))
                         .setEvaluationState(257)
                         .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
                         .setRemark(redisInfoMap.get("remark"))
                         .setIsWarn(0)
                         .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
-                /*if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                     tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                 } else {
                     tCruiseDataResult.setCruiseAbnormal(250);
-                }*/
+                }
                 /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                     tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 } else {

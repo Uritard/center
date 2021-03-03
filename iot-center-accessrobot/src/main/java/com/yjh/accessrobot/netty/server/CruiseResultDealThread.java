@@ -104,7 +104,7 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
-                    tCruiseTaskResultMap.put("is_warn","0");
+                    tCruiseTaskResultMap.put("isWarn","0");
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
                     //做完一个点给前端推一次webSocket
@@ -192,17 +192,16 @@ public class CruiseResultDealThread implements Runnable{
                                 .setPicPathAnl(redisInfoMap.get("picPathAnl"))
                                 .setOrigpic(redisInfoMap.get("origpic"))
                                 .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
-                                .setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")))
                                 .setEvaluationState(257)
                                 .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
                                 .setRemark(redisInfoMap.get("remark"))
                                 .setIsWarn(0)
                                 .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
-                        /*if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                        if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                             tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                         } else {
                             tCruiseDataResult.setCruiseAbnormal(250);
-                        }*/
+                        }
                         /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                             tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
                         } else {
