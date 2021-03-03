@@ -464,7 +464,7 @@
             IFNULL(c.count,0) count
         FROM
             t_dict_business a
-        left join (select count(1) as count,defect_level from t_defect_info GROUP BY defect_level ) c on a.dict_code = c.defect_level
+        left join (select count(1) as count,defect_level from t_defect_info GROUP BY defect_level ) c on a.up_dict = c.defect_level
         WHERE a.col_name='defect_level'
     </select>
 

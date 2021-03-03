@@ -520,6 +520,10 @@ public class TStdMetemodelService {
             StringBuffer errMsg = new StringBuffer();
             String item = null;
             String isRepetition = "";
+            if(sheet.getRow(1) == null){
+                result.setCode(209,"文件无有效数据");
+                return result;
+            }
             for (int i = 1; i <= total; i++) {
                 Row row = sheet.getRow(i);
                 TStdMete tStdMete = new TStdMete();
@@ -938,7 +942,7 @@ public class TStdMetemodelService {
                     tStdMete.setRemark(item);
                 }
                 if (isIn(meteList, tStdMete)) {
-                    isRepetition = isRepetition + "," + (i + 1);
+                    //isRepetition = isRepetition + "," + (i + 1);
                     continue;
                 }
                 tStdMeteList.add(tStdMete);
@@ -948,12 +952,10 @@ public class TStdMetemodelService {
                 isInsert = tStdMeteDao.batchAdd(tStdMeteList);
             }
 
-            if ("".equals(isRepetition) && isInsert > 0) {
+            if (isInsert >= 0) {
                 result.setCode(200);
                 result.setData("ok");
-            } else {
-                isRepetition = "第" + isRepetition.replaceFirst(",", "") + "行与数据库数据重复，其他数据已导入";
-                result.setData(isRepetition);
+                result.setMessage("ok");
             }
             deleteDir(new File(pathName));
             return result;
