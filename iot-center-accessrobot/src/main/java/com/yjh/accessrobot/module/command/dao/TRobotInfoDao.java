@@ -66,4 +66,7 @@ public interface TRobotInfoDao {
     int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult);
 
     List<AlgorithmDeviceMete> selectAlgorithm(@Param(value = "inspectionCode") String inspectionCode);
+
+    List<TCruiseTaskResultDetail> selectRepairTCTRDList(@Param(value = "taskId")String taskId);
+    List<TCruiseDataResult> selectRepairTCDRList(@Param(value = "taskId")String taskId);
 }

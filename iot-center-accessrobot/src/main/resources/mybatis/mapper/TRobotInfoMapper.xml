@@ -621,4 +621,53 @@
         and e.algorithm_id = f.algorithm_id
 
     </select>
+    <select id="selectRepairTCTRDList" resultType="com.yjh.accessrobot.module.command.entity.TCruiseTaskResultDetail">
+       select
+        a.cruise_result_id,
+        a.task_result_id,
+        a.device_id,
+        a.device_name,
+        a.instance_id,
+        a.instance_name,
+        a.cruise_time,
+        a.end_time,
+        a.cruise_status,
+        a.remark
+        from t_cruise_task_result_detail a,t_cruise_result b
+        where 1 = 1
+        and a.task_result_id = b.task_result_id
+        <if test="taskId != null and taskId != ''">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectRepairTCDRList" resultType="com.yjh.accessrobot.module.command.entity.TCruiseDataResult">
+        select
+        a.cruise_data_id,
+        a.cruise_result_id,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.pic_path_anl,
+        a.picpath,
+        a.person_check,
+        a.orig_pic_anl,
+        a.origpic,
+        a.cruise_abnormal,
+        a.cruise_result,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark,
+        a.check_user,
+        a.check_date,
+        a.is_warn,
+        a.cruise_result
+        from t_cruise_data_result a,t_cruise_task_result_detail d,t_cruise_result b
+        where 1 = 1
+        and b.task_result_id = d.task_result_id
+        and d.cruise_result_id = a.cruise_result_id
+        <if test="taskId != null and taskId != ''">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
+    </select>
 </mapper>

@@ -128,7 +128,6 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean feignRobotTransfer(String robotCode) throws Exception {
-        boolean res = false;
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
         if (robotStatus.equals("离线")){
             log.info("该机器人处于离线状态,没有成功将模型文件同步指令下发到机器人......");
@@ -145,12 +144,13 @@ public class RobotService {
                 .setCommand("1");
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
+        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString,robotCode),robotCode);
         /*Constant.flag = 0;
-        *//*RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
+        RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
         log.info("sendId是<start>" + sendId + "<end>");
         if (sendId != null) {
             sendId.sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        }*//*
+        }
         Thread.sleep(500);
         if (Constant.flag == 1) {
             res = true;
@@ -670,7 +670,7 @@ public class RobotService {
                 if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                     tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                 } else {
-                    tCruiseDataResult.setCruiseAbnormal(250);
+                    tCruiseDataResult.setCruiseAbnormal(null);
                 }
                 if (!"null".equals(redisInfoMap.get("remark"))){
                     tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
@@ -714,6 +714,11 @@ public class RobotService {
             log.info("不用放");
             Constant.flagMap.put(taskId, instancedList);
         }
+
+        List<TCruiseTaskResultDetail> repairTCTRDList = selectRepairTCTRDList(taskId);
+        tCTRDList.removeAll(repairTCTRDList);
+        List<TCruiseDataResult> repairTCDRList = selectRepairTCDRList(taskId);
+        tCDRList.remove(repairTCDRList);
 
         int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);
         log.info("res1的内容是===" + res1);
@@ -1086,6 +1091,13 @@ public class RobotService {
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("修改成功==="+res);*/
         return "离线";
+    }
+
+    public List<TCruiseTaskResultDetail> selectRepairTCTRDList(String taskId){
+        return this.tRobotInfoDao.selectRepairTCTRDList(taskId);
+    }
+    public List<TCruiseDataResult> selectRepairTCDRList(String taskId){
+        return this.tRobotInfoDao.selectRepairTCDRList(taskId);
     }
 }
 

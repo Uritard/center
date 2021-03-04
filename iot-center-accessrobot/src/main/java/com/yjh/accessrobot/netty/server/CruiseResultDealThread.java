@@ -198,7 +198,7 @@ public class CruiseResultDealThread implements Runnable{
                         if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                             tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                         } else {
-                            tCruiseDataResult.setCruiseAbnormal(250);
+                            tCruiseDataResult.setCruiseAbnormal(null);
                         }
                         if (!"null".equals(redisInfoMap.get("remark"))){
                             tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
@@ -226,6 +226,11 @@ public class CruiseResultDealThread implements Runnable{
 
                 log.info("tCTRDList的内容是===" + tCTRDList);
                 log.info("tCDRList的内容是===" + tCDRList);
+
+                List<TCruiseTaskResultDetail> repairTCTRDList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCTRDList(taskId);
+                tCTRDList.removeAll(repairTCTRDList);
+                List<TCruiseDataResult> repairTCDRList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCDRList(taskId);
+                tCDRList.remove(repairTCDRList);
 
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
                 log.info("res1的内容是===" + res1);

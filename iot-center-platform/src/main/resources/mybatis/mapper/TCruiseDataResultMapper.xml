@@ -138,9 +138,9 @@
         a.identify_result,
         a.createtime,
         a.remark,
-        check_user,
-        check_date,
-        is_warn
+        a.check_user,
+        a.check_date,
+        a.is_warn
         from t_cruise_data_result a
         where 1 = 1
             and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
@@ -169,10 +169,10 @@
         a.identify_result,
         a.createtime,
         a.remark,
-        check_user,
-        check_date,
-        is_warn,
-        cruise_result
+        a.check_user,
+        a.check_date,
+        a.is_warn,
+        a.cruise_result
         from t_cruise_data_result a
         where 1 = 1
         <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
@@ -224,10 +224,10 @@
         a.identify_result,
         a.createtime,
         a.remark,
-        check_user,
-        check_date,
-        is_warn,
-        cruise_result
+        a.check_user,
+        a.check_date,
+        a.is_warn,
+        a.cruise_result
         from t_cruise_data_result a
         where 1 = 1
         <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
