@@ -23,6 +23,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -58,6 +59,10 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
+
+            HttpServletResponse response = ctx.getResponse();
+            response.setHeader("Server", "unKnow");
+
             MyRequestWrapper requestWrapper = null;
             MultipartHttpServletRequest multipartHttpServletRequest = null;
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
