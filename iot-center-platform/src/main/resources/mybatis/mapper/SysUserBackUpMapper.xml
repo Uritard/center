@@ -26,7 +26,7 @@
         <result column="user_status" jdbcType="INTEGER" property="userStatus" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
+        <result column="invalid_time" jdbcType="INTEGER" property="invalidTime" />
         <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
         <result column="verfi_code" jdbcType="VARCHAR" property="verfiCode" />
     </resultMap>
@@ -85,7 +85,7 @@
                 #{userStatus, jdbcType=INTEGER},
                 #{createTime, jdbcType=TIMESTAMP},
                 #{updateTime, jdbcType=TIMESTAMP},
-                #{invalidTime, jdbcType=TIMESTAMP},
+                #{invalidTime, jdbcType=INTEGER},
                 #{lastLogin, jdbcType=TIMESTAMP},
                 #{verfiCode, jdbcType=VARCHAR}
         )
@@ -119,7 +119,7 @@
         <if test="userStatus != null">a.user_status = #{userStatus, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP},</if>
+        <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=INTEGER},</if>
         <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
         <if test="verfiCode != null and verfiCode != ''">a.verfi_code = #{verfiCode, jdbcType=VARCHAR},</if>
     </set>

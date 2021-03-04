@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.Mapper;
-import com.yjh.platform.module.user.entity.SysOrg;
-import com.yjh.platform.module.user.entity.SysUser;
-import com.yjh.platform.module.user.entity.SysUserLogin;
-import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -23,16 +20,21 @@ public interface SysUserDao {
     int update(SysUser sysUser);
     SysUser selectByPrimaryId(@Param(value = "userId") Long userId);
 
-    List<SysUser> selectByUserState(@Param(value= "state") Integer state);
+    SysUserSelect selectByPrimaryIds(@Param(value = "userId") Long userId);
+
+    List<SysUserSelect> selectByUserState(@Param(value= "state") Integer state);
+
     List<SysUser> selectUser();
 
-    List<SysUser> selectByUserName(@Param(value = "userName")String userName);
+    List<SysUserSelect> selectUsers();
+
+    List<SysUserSelect> selectByUserName(@Param(value = "userName")String userName);
 
     List<SysUser> selectByUserNameTotal(@Param(value = "userName")String userName);
 
     SysUserLogin selectByUserNameL(@Param(value = "userName") String userName, @Param(value = "password") String password);
 
-    List<SysUser> select(@Param(value = "userId") Long userId,
+    List<SysUserSelect> select(@Param(value = "userId") Long userId,
                          @Param(value = "userName") String userName,
                          @Param(value = "password") String password,
                          @Param(value = "trueName") String trueName,
@@ -54,7 +56,7 @@ public interface SysUserDao {
                          @Param(value = "userStatus") Integer userStatus,
                          @Param(value = "createTime") Date createTime,
                          @Param(value = "updateTime") Date updateTime,
-                         @Param(value = "invalidTime") Date invalidTime,
+                         @Param(value = "invalidTime") Integer invalidTime,
                          @Param(value = "lastLogin") Date lastLogin);
     List<Map<String, String>> selectByPage(SysUser sysUser);
 

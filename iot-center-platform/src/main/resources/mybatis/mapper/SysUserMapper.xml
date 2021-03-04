@@ -26,7 +26,7 @@
         <result column="user_status" jdbcType="INTEGER" property="userStatus" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
+        <result column="invalid_time" jdbcType="INTEGER" property="invalidTime" />
         <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
     </resultMap>
 
@@ -86,7 +86,7 @@
                 #{userStatus, jdbcType=INTEGER},
                 #{createTime, jdbcType=TIMESTAMP},
                 #{updateTime, jdbcType=TIMESTAMP},
-                #{invalidTime, jdbcType=TIMESTAMP},
+                #{invalidTime, jdbcType=INTEGER},
                 #{lastLogin, jdbcType=TIMESTAMP}
         )
         <selectKey resultType="long" keyProperty="userId" order="AFTER">
@@ -127,7 +127,7 @@
         <if test="userStatus != null">a.user_status = #{userStatus, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP},</if>
+        <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=INTEGER},</if>
         <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
     </set>
         where a.user_id = #{userId, jdbcType=BIGINT}
@@ -165,11 +165,45 @@
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.user.entity.SysUser" resultType="com.yjh.platform.module.user.entity.SysUser">
+
+    <select id="selectByPrimaryIds" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
         select
         a.user_id,
         a.user_name,
-        a.PASSWORD,
+        a.true_name,
+        a.user_type,
+        a.sex,
+        a.e_mail,
+        a.mobile_phone,
+        a.work_no,
+        a.face_id,
+        a.finger_id,
+        a.voice_id,
+        a.state,
+        a.user_title,
+        a.creator_id,
+        a.appkey,
+        a.image_url,
+        a.role_id,
+        a.org_id,
+        a.user_status,
+        a.create_time,
+        a.update_time,
+        a.invalid_time,
+        a.last_login
+        from sys_user a
+        where 1 = 1
+            and a.user_id = #{userId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+
+
+
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.SysUser" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
+        select
+        a.user_id,
+        a.user_name,
         a.true_name,
         a.user_type,
         a.sex,
@@ -215,7 +249,7 @@
         <if test="userStatus != null"> and a.user_status = #{userStatus, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
-        <if test="invalidTime != null"> and a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP}</if>
+        <if test="invalidTime != null"> and a.invalid_time = #{invalidTime, jdbcType=INTEGER}</if>
         <if test="lastLogin != null"> and a.last_login = #{lastLogin, jdbcType=TIMESTAMP}</if>
     </select>
 
@@ -274,7 +308,7 @@
         a.user_status,
         DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time,
         DATE_FORMAT(a.update_time ,'%Y-%m-%d %H:%i:%s') AS update_time,
-        DATE_FORMAT(a.invalid_time ,'%Y-%m-%d %H:%i:%s') AS invalid_time,
+        a.invalid_time,
         DATE_FORMAT(a.last_login ,'%Y-%m-%d %H:%i:%s') AS last_login
         from sys_user a
         LEFT JOIN sys_org b ON a.org_id = b.org_id
@@ -302,7 +336,7 @@
         <if test="userStatus != null"> and a.user_status = #{userStatus, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
-        <if test="invalidTime != null"> and a.invalid_time = #{invalidTime, jdbcType=TIMESTAMP}</if>
+        <if test="invalidTime != null"> and a.invalid_time = #{invalidTime, jdbcType=INTEGER}</if>
         <if test="lastLogin != null"> and a.last_login = #{lastLogin, jdbcType=TIMESTAMP}</if>
     </select>
 
@@ -375,7 +409,7 @@
         and a.PASSWORD = #{password, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectByUserState" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.SysUser">
+    <select id="selectByUserState" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
          select * from sys_user a
          where 1=1
          and a.state = #{state, jdbcType=INTEGER}
@@ -388,7 +422,7 @@
         and a.user_name = #{userName, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectByUserName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUser">
+    <select id="selectByUserName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
         select * from sys_user a
         WHERE 1=1
         and a.user_name LIKE concat('%',#{userName, jdbcType=VARCHAR},'%')
@@ -398,6 +432,9 @@
        select * from sys_user
    </select>
 
+    <select id="selectUsers" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
+       select * from sys_user
+   </select>
 
     <select id="selectByUserNameAndL" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUserLogin">
         select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,

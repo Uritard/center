@@ -117,7 +117,7 @@ public class zuulFilter extends ZuulFilter {
                     }
                 } else {
                     String str = request.getQueryString();
-                    if (str != null) {
+                    if (StringUtils.isNoneBlank(str)) {
                         MultisMap multiMap = new MultisMap();
                         Decode.decodeTo(str, multiMap, "UTF-8");
                         JSONObject jsonObject = new JSONObject(multiMap);

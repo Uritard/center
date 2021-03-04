@@ -60,7 +60,6 @@ public class SysUserController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统用户数据",content = "根据用户传递的参数新增系统用户数据",logType = 2)
     public Result insert(@RequestBody SysUser sysUser) {
-
         Result result = new Result();
         try {
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
@@ -127,7 +126,7 @@ public class SysUserController {
     public Result selectByPrimaryId(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
-            SysUser sysUser = sysUserService.selectByPrimaryId(userId);
+            SysUserSelect sysUser = sysUserService.selectByPrimaryIds(userId);
             result.setData(sysUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -142,7 +141,7 @@ public class SysUserController {
     public Result selectByUserState(@RequestParam(value = "state", required = true) Integer state) {
         Result result = new Result();
         try {
-            List<SysUser> sysUser = sysUserService.selectByUserState(state);
+            List<SysUserSelect> sysUser = sysUserService.selectByUserState(state);
             result.setData(sysUser);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -161,10 +160,10 @@ public class SysUserController {
             String isDecode =map.get("content");
             if("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
-                List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
+                List<SysUserSelect> sysUsers = sysUserService.selectByUserName(userName);
                 result.setData(sysUsers);
             }else{
-                List<SysUser> sysUsers = sysUserService.selectByUserName(userName);
+                List<SysUserSelect> sysUsers = sysUserService.selectByUserName(userName);
                 result.setData(sysUsers);
             }
         } catch (Exception e) {
@@ -200,7 +199,7 @@ public class SysUserController {
                          @RequestParam(value = "userStatus", required = false) Integer userStatus,
                          @RequestParam(value = "createTime", required = false) Date createTime,
                          @RequestParam(value = "updateTime", required = false) Date updateTime,
-                         @RequestParam(value = "invalidTime", required = false) Date invalidTime,
+                         @RequestParam(value = "invalidTime", required = false) Integer invalidTime,
                          @RequestParam(value = "lastLogin", required = false) Date lastLogin) {
         Result result = new Result();
         try {
@@ -209,10 +208,10 @@ public class SysUserController {
             if("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
                 password = Demo.decrypt(password);
-                List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
                 result.setData(list);
             }else{
-                List<SysUser> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
                 result.setData(list);
             }
         } catch (Exception e) {
@@ -339,15 +338,25 @@ public class SysUserController {
         try {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
-            sysUser.setPassword("Yjh@123!");
+           // sysUser.setPassword("Yjh@123!");
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
+            String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+                sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
-            sysUserService.insert(sysUser);
-            sysUserService.insertIntoRedis();
-            result.setData(sysUser);
+            if(sysUser.getUserName().contains("admin")||sysUser.getUserName().contains("administrator")){
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名不能包含admin,administrator");
+            }else if(sysUser.getPassword().contains(sysUser.getUserName())){
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+            }else if(!sysUser.getPassword().matches(PW_PATTERN)){
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+            }else {
+                sysUserService.insert(sysUser);
+                sysUserService.insertIntoRedis();
+                result.setData(sysUser);
+            }
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_username") != -1) {
                 result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名重复");

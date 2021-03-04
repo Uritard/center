@@ -11,8 +11,7 @@ import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.dao.SysUserBackUpDao;
-import com.yjh.platform.module.user.entity.SysOrg;
-import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
 
 import java.io.IOException;
@@ -22,8 +21,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.yjh.platform.module.user.entity.SysUserBackUp;
-import com.yjh.platform.module.user.entity.SysUserLogin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -83,9 +80,10 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) throws IOException {
-        Date date = new Date();
+      //  Date date = new Date();
+        sysUser.setUserName(null);
         sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
-        sysUser.setUpdateTime(date);
+       // sysUser.setUpdateTime(date);
         return this.sysUserDao.update(sysUser);
     }
 
@@ -148,7 +146,7 @@ public class SysUserService {
                     String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date date = sdf.parse(timeStr1);
-                    int yxTime = DateTimeUtil.daysBetween(sysUserLogin.getInvalidTime(), date);
+                    int yxTime = DateTimeUtil.daysBetween(sysUserLogin.getUpdateTime(), date);
                     if (redisTemplate.hasKey(keys)) {//如果key存在
                         redisTemplate.delete(keys);
                     }
@@ -165,7 +163,7 @@ public class SysUserService {
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
                             return mapResult;
                         } else {
-                            if (yxTime > redisAndYxsjUtil.getYxsjTime()) {
+                            if (yxTime>sysUserLogin.getInvalidTime()) {
                                 mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -197,7 +195,7 @@ public class SysUserService {
                         return mapResult;
                     }
                     if (sysUserLogin.getState() == 1) {
-                        if (yxTime > redisAndYxsjUtil.getLoginTime()) {
+                        if (yxTime>sysUserLogin.getInvalidTime()) {
                             mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -286,7 +284,10 @@ public class SysUserService {
 
         return mapResult;
     }
-
+    @Transactional(rollbackFor = Exception.class)
+    public SysUserSelect selectByPrimaryIds(Long userId) {
+        return this.sysUserDao.selectByPrimaryIds(userId);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public SysUser selectByPrimaryId(Long userId) {
@@ -294,15 +295,15 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysUser> selectByUserState(Integer state) {
+    public List<SysUserSelect> selectByUserState(Integer state) {
         if (state.equals(-1)) {
-            return this.sysUserDao.selectUser();
+            return this.sysUserDao.selectUsers();
         }
         return this.sysUserDao.selectByUserState(state);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysUser> selectByUserName(String userName) {
+    public List<SysUserSelect> selectByUserName(String userName) {
         return this.sysUserDao.selectByUserName(userName);
     }
 
@@ -312,7 +313,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysUser> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Date invalidTime, Date lastLogin) {
+    public List<SysUserSelect> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Integer invalidTime, Date lastLogin) {
         return sysUserDao.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
     }
 
