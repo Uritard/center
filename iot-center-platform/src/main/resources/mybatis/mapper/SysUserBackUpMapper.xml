@@ -29,6 +29,7 @@
         <result column="invalid_time" jdbcType="INTEGER" property="invalidTime" />
         <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
         <result column="verfi_code" jdbcType="VARCHAR" property="verfiCode" />
+        <result column="lock_time" jdbcType="TIMESTAMP" property="lockTime" />
     </resultMap>
 
 
@@ -36,7 +37,7 @@
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId" parameterType="com.yjh.platform.module.user.entity.SysUserBackUp">
-        insert into sys_user_backup(
+        insert into sys_info_backup(
             user_id,
             user_name,
             PASSWORD,
@@ -61,6 +62,7 @@
             update_time,
             invalid_time,
             last_login,
+            lock_time,
             verfi_code
         )values(
                 #{userId, jdbcType=BIGINT},
@@ -87,6 +89,7 @@
                 #{updateTime, jdbcType=TIMESTAMP},
                 #{invalidTime, jdbcType=INTEGER},
                 #{lastLogin, jdbcType=TIMESTAMP},
+                 #{lockTime, jdbcType=TIMESTAMP},
                 #{verfiCode, jdbcType=VARCHAR}
         )
     </insert>
@@ -97,7 +100,7 @@
 
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysUserBackUp">
-        update sys_user_backup a <set>
+        update sys_info_backup a <set>
         <if test="userName != null">a.user_name = #{userName},</if>
         <if test="password != null">a.PASSWORD = #{password},</if>
         <if test="trueName != null ">a.true_name = #{trueName},</if>
@@ -121,6 +124,7 @@
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
         <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=INTEGER},</if>
         <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
+        <if test="lockTime != null">a.lock_time = #{lockTime, jdbcType=TIMESTAMP},</if>
         <if test="verfiCode != null and verfiCode != ''">a.verfi_code = #{verfiCode, jdbcType=VARCHAR},</if>
     </set>
         where a.user_id = #{userId, jdbcType=BIGINT}
@@ -129,9 +133,9 @@
 
 
     <select id="selectByVerfiCode" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysUserBackUp">
-        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,a.verfi_code,
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,a.verfi_code,a.lock_time
           a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,a.org_id,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login
-        from sys_user_backup a
+        from sys_info_backup a
          WHERE user_id = #{userId, jdbcType=BIGINT}
     </select>
 </mapper>

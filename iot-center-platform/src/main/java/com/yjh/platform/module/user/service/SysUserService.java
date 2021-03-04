@@ -96,6 +96,7 @@ public class SysUserService {
             String password=null;
             Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =enmap.get("content");
+                    //enmap.get("content");
             if("true".equals(isDecode)) {
                  userName =Demo.decrypt(userMap.get("userName"));
                  password =Demo.decrypt(userMap.get("password"));
@@ -114,12 +115,12 @@ public class SysUserService {
                 verMap.put("password", password);
                 String verfiCode=Demo.summary(verMap.toString());
                 if (!sysUserBackUp.getVerfiCode().equals(verfiCode)) {
-                    Map linkedHashMap = new LinkedHashMap<>();
-                    linkedHashMap.put("userName", userName);
-                    linkedHashMap.put("password", password);
+//                    Map linkedHashMap = new LinkedHashMap<>();
+//                    linkedHashMap.put("userName", userName);
+//                    linkedHashMap.put("password", password);
                     SysUserBackUp sysUserBackUps = new SysUserBackUp();
                     BeanUtils.copyProperties(sysUserLogin, sysUserBackUps);
-                    sysUserBackUps.setVerfiCode(Demo.summary(linkedHashMap.toString()));
+                  //  sysUserBackUps.setVerfiCode(Demo.summary(linkedHashMap.toString()));
                     SysUserBackUpDao.update(sysUserBackUps);
                 }
                 String userAvoid = Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
@@ -155,7 +156,7 @@ public class SysUserService {
                         calendar.setTime(date);
                         //锁定时间
                         Calendar calendarOne = Calendar.getInstance();
-                        calendarOne.setTime(sysUserLogin.getUpdateTime());
+                        calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
                         if (lockTime < redisAndYxsjUtil.getLoginTime()) { //如果锁定时间小于1200S
                             mapResult.put("errorCount", "账户已被锁定！");
@@ -259,10 +260,12 @@ public class SysUserService {
                     num = 1;
                 } else if (num >= redisAndYxsjUtil.getLoginNum()) {//超过10次账户锁定
                     if (!userId.equals("10001")) { //admin用户不可锁定
-                        sysUser.setState(2);
+                        SysUser user=new SysUser();
+                        user.setState(2);
                         Date date = new Date();
-                        sysUser.setUpdateTime(date);
-                        sysUserDao.update(sysUser);
+                        user.setLockTime(date);
+                        user.setUserId(sysUserList.get(0).getUserId());
+                        sysUserDao.update(user);
                     }
                     redisTemplate.opsForValue().increment(key, 1);
                     num = num + 1;
