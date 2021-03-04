@@ -115,6 +115,7 @@ public class zuulFilter extends ZuulFilter {
                                 return false;
                             }
                         }
+                        log.info("参数" + body);
                         ctx.setRequest(requestWrapper);
                     }
                 } else {
