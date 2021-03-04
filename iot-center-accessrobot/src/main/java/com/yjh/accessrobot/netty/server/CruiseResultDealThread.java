@@ -230,7 +230,9 @@ public class CruiseResultDealThread implements Runnable{
                 List<TCruiseTaskResultDetail> repairTCTRDList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCTRDList(taskId);
                 tCTRDList.removeAll(repairTCTRDList);
                 List<TCruiseDataResult> repairTCDRList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCDRList(taskId);
-                tCDRList.remove(repairTCDRList);
+                tCDRList.removeAll(repairTCDRList);
+                log.info("处理后的tCTRDList的内容是==="+tCTRDList);
+                log.info("处理后的tCDRList的内容是==="+tCDRList);
 
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
                 log.info("res1的内容是===" + res1);
