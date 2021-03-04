@@ -376,8 +376,16 @@ public class SysUserController {
         try {
             Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
-            String password = map.get("password");
-            if (sysUserCurrent.getRoleId() == 1234 && password.equals(sysUserCurrent.getPassword())) {
+            Map<String,String> maps= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode =maps.get("content");
+            String password =null;
+            if("true".equals(isDecode)) {
+                password = Demo.decrypt(maps.get("password"));
+            }else{
+                password = maps.get("password");
+            }
+
+            if (sysUserCurrent.getRoleId() == 1234 && password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
                 result.setData(this.sysUserService.unlockUserAccount(map));
                 Map<String, Object> mapCache = new HashMap<>();
                 mapCache.put("userId", map.get("lockedUserId"));

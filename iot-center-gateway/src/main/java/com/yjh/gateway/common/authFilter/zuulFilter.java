@@ -59,7 +59,6 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
-
             HttpServletResponse response = ctx.getResponse();
             response.setHeader("Server", "unKnow");
 //            String url=request.getRequestURI();
