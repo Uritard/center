@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.logs.common.smUtil.Demo;
+import com.yjh.logs.common.utils.NumToStringUtil;
 import com.yjh.logs.commons.result.BusinessException;
 import com.yjh.logs.commons.result.Result;
 import com.yjh.logs.commons.result.ResultCodeEnum;
@@ -132,7 +133,7 @@ public class SysLogController {
                         if(typeList.length>0){
                             for (String item:typeList) {
                                 //todo 日志类型
-                                item = findType(item);
+                                item = NumToStringUtil.findType(item);
                                 if(item != null && item.equals(logType)){
                                     result.setData("此条日志无需入库，原因：日志类型");
                                     return result;
@@ -218,36 +219,7 @@ public class SysLogController {
         return result;
     }
 
-    private String findType(String str){
-        if("查询".equals(str)){
-            return "1";
-        }
-        if("新增".equals(str)){
-            return "2";
-        }
-        if("修改".equals(str)){
-            return "3";
-        }
-        if("删除".equals(str)){
-            return "4";
-        }
-        if("执行".equals(str)){
-            return "5";
-        }
-//        if("查询".equals(str)){
-//            return "6";
-//        }
-//        if("查询".equals(str)){
-//            return "7";
-//        }
-//        if("查询".equals(str)){
-//            return "8";
-//        }
-//        if("查询".equals(str)){
-//            return "9";
-//        }
-        return null;
-    }
+
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public Result delete(@RequestParam(value = "logId", required = true) Long logId) {
@@ -328,6 +300,7 @@ public class SysLogController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "userName", required = false) String userName,
                                @RequestParam(value = "title", required = false) String title,
+                               @RequestParam(value = "logType", required = false) String logType,
                                @RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startTime,
                                @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date endTime,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
@@ -341,8 +314,11 @@ public class SysLogController {
             if("true".equals(isDecode)) {
                 userName= Demo.decrypt(userName);
             }
+            if("14".equals(logType)){
+                logType ="";
+            }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<SysLogDetail> list = sysLogService.selectByPage(userName,title,startTime,endTime);
+            List<SysLogDetail> list = sysLogService.selectByPage(userName,title,startTime,endTime,logType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -366,4 +342,16 @@ public class SysLogController {
         return result;
     }
 
+    @ApiOperation(value = "日志统计")
+    @RequestMapping(value = "/logAnalyze", method = RequestMethod.GET)
+    public Result logAnalyze(){
+        Result result = new Result();
+        try {
+            result.setData(sysLogService.logAnalyze());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("日志统计失败：" + e);
+        }
+        return result;
+    }
 }

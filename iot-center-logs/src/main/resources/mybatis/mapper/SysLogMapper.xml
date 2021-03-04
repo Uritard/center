@@ -141,6 +141,7 @@
         where 1 = 1
         <if test="title != null and title != ''"> and a.title like concat('%',#{title, jdbcType=VARCHAR},'%') </if>
         <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
         <if test="startTime != null and endTime != null"> and  a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
          order by a.create_time desc
     </select>
@@ -178,6 +179,14 @@
         </foreach>
     </insert>
 
+    <select id="logAnalyze" resultType="com.yjh.logs.module.log.entity.LongAnalyseDetail">
+        SELECT
+        count(*) as count,
+                log_type
+        FROM
+            sys_logs
+            GROUP BY log_type
+    </select>
 
 
 </mapper>
