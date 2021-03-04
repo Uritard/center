@@ -200,4 +200,19 @@ public class TSysParamController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询系统参数")
+    @RequestMapping(value = "/updateByCode", method = RequestMethod.GET)
+    @Logs(title = "查询系统参数",content = "根据用户传递的参数分页查询系统参数",logType = 1)
+    public Result updateByCode(@RequestParam(value = "paramCode") String paramCode,
+                               @RequestParam(value = "content") String content) {
+        Result result = new Result();
+        try {
+            result.setData(tSysParamService.updateByCode(paramCode,content));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("系统参数分页查询失败描述：", e);
+        }
+        return result;
+    }
 }

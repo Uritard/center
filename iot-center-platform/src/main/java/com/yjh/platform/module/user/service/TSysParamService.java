@@ -100,5 +100,11 @@ public class TSysParamService{
         return this.tSysParamDao.selectByPrimaryCode();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public int updateByCode(String paramCode,String content){
+         this.tSysParamDao.updateByCode(paramCode,content);
+        return this.insertIntoRedis();
+    }
+
 }
 

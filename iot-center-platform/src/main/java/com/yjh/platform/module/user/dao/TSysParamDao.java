@@ -45,4 +45,6 @@ public interface TSysParamDao {
 
 
     List<TSysParam> selectQuery(@Param("params") List<String> params);
+    int updateByCode(@Param(value = "paramCode") String paramCode,
+                     @Param(value = "content") String content);
 }

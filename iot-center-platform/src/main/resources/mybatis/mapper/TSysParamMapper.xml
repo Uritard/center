@@ -159,4 +159,11 @@
             #{item}
         </foreach>
     </select>
+
+    <update id="updateByCode" >
+        update t_sys_param a <set>
+        <if test="content != null ">a.content = #{content},</if>
+    </set>
+        where a.param_code = #{paramCode}
+    </update>
 </mapper>
