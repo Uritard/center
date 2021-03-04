@@ -129,7 +129,7 @@
 
 
     <select id="selectByVerfiCode" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysUserBackUp">
-        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.work_no,a.face_id,a.finger_id,a.voice_id,a.verfi_code,a.lock_time
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.work_no,a.face_id,a.finger_id,a.voice_id,a.verfi_code,a.lock_time,
           a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,a.org_id,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login
         from sys_info_backup a
          WHERE user_id = #{userId, jdbcType=BIGINT}

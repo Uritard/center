@@ -62,7 +62,10 @@ public class zuulFilter extends ZuulFilter {
 
             HttpServletResponse response = ctx.getResponse();
             response.setHeader("Server", "unKnow");
-
+//            String url=request.getRequestURI();
+//             if(url.contains("/sysUser/v1/login")){
+//
+//            }
             MyRequestWrapper requestWrapper = null;
             MultipartHttpServletRequest multipartHttpServletRequest = null;
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
