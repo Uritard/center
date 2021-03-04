@@ -50,8 +50,8 @@ public class SysUserService {
     @Resource
     private SysUserBackUpDao SysUserBackUpDao;
 
-    @Resource
-    private RedisAndYxsjUtil redisAndYxsjUtil;
+//    @Resource
+//    private RedisAndYxsjUtil redisAndYxsjUtil;
 
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -95,8 +95,9 @@ public class SysUserService {
             String userName=null;
             String password=null;
             Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            Map<String,String> lockTimes= redisTemplate.opsForHash().entries("t_sys_param:lockTime");
+            Map<String,String> loginNum= redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
             String isDecode =enmap.get("content");
-                    //enmap.get("content");
             if("true".equals(isDecode)) {
                  userName =Demo.decrypt(userMap.get("userName"));
                  password =Demo.decrypt(userMap.get("password"));
@@ -115,13 +116,14 @@ public class SysUserService {
                 verMap.put("password", password);
                 String verfiCode=Demo.summary(verMap.toString());
                 if (!sysUserBackUp.getVerfiCode().equals(verfiCode)) {
-//                    Map linkedHashMap = new LinkedHashMap<>();
-//                    linkedHashMap.put("userName", userName);
-//                    linkedHashMap.put("password", password);
-                    SysUserBackUp sysUserBackUps = new SysUserBackUp();
-                    BeanUtils.copyProperties(sysUserLogin, sysUserBackUps);
-                  //  sysUserBackUps.setVerfiCode(Demo.summary(linkedHashMap.toString()));
-                    SysUserBackUpDao.update(sysUserBackUps);
+                    SysUser sysUsers=new SysUser();
+                    sysUsers.setPassword(sysUserBackUp.getPassword());
+                    sysUsers.setUserId(sysUserLogin.getUserId());
+                    sysUserDao.update(sysUsers);
+                    mapResult.put("errorCount", "密码被篡改，请重新登陆！");
+                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                    return mapResult;
                 }
                 String userAvoid = Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
                 if (!replayAvoid.equals(userAvoid)) {
@@ -158,7 +160,7 @@ public class SysUserService {
                         Calendar calendarOne = Calendar.getInstance();
                         calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
-                        if (lockTime < redisAndYxsjUtil.getLoginTime()) { //如果锁定时间小于1200S
+                        if (lockTime < Integer.valueOf(lockTimes.get("content"))) { //如果锁定时间小于1200S
                             mapResult.put("errorCount", "账户已被锁定！");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
@@ -258,7 +260,7 @@ public class SysUserService {
                 if (num == null) { //第一次访问错误
                     redisTemplate.opsForValue().set(key, 1);
                     num = 1;
-                } else if (num >= redisAndYxsjUtil.getLoginNum()) {//超过10次账户锁定
+                } else if (num >= Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
                     if (!userId.equals("10001")) { //admin用户不可锁定
                         SysUser user=new SysUser();
                         user.setState(2);
