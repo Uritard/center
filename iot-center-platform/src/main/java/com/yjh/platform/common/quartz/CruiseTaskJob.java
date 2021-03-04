@@ -137,6 +137,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     List<TCruiseTaskAttr> attrList = tCruiseTaskAttrDao.selectByTaskId(tCruiseTask.getTaskId());
                     String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
                     tCruiseTask.setTaskId(newTaskId);
+                    tCruiseTask.setTaskCode(taskId);
                     tCruiseTask.setDateType(null);
                     tCruiseTask.setStartTime(new Date());
                     tCruiseTask.setCreateTime(new Date());
@@ -197,10 +198,11 @@ public class CruiseTaskJob extends QuartzJobBean {
                 List<String> analysisInstanceList = new ArrayList<>();
 
                 try {
-                    QuartzTask quartzTaskForAre = new QuartzTask();
-                    quartzTaskForAre.setJobName("检查"+tCruiseTask.getTaskName());
-                    quartzTaskForAre.setJobGroup("jiancha");
                     SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    QuartzTask quartzTaskForAre = new QuartzTask();
+                    quartzTaskForAre.setJobName("检查"+tCruiseTask.getTaskName()+"-"+sd.format(new Date()));
+                    quartzTaskForAre.setJobGroup("jiancha");
+                    //SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     //String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
                     Map<String,String> mapForGetTaskAreTime  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                     Date taskStartTime = sd.parse(mapForGetTaskAreTime.get("taskStart"));
