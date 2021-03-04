@@ -139,6 +139,7 @@ public class RobotController {
         Result result = new Result();
         try {
             result.setData(robotService.deviceMaintenanceIssued(resMap));
+            log.info("下发检修区域返回结果: "+result.getData());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

@@ -113,14 +113,13 @@ public class RobotService {
         Thread.sleep(500);
         String code = Constant.robotResultMap.get("Code");
         if ("200".equals(code)){
-            log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
             scmap.put("code", 3);
             scmap.put("result", "success");
         }else{
-            log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
             scmap.put("code", 3);
             scmap.put("result", "fail");
         }
+        log.info("下发控制指令返回结果: "+scmap);
         /*scmap.put("code", 3);
         scmap.put("result", "success");*/
         return scmap;
@@ -130,6 +129,11 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public boolean feignRobotTransfer(String robotCode) throws Exception {
         boolean res = false;
+        String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+        if (robotStatus.equals("离线")){
+            log.info("该机器人处于离线状态,没有成功将模型文件同步指令下发到机器人......");
+            return false;
+        }
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -141,17 +145,17 @@ public class RobotService {
                 .setCommand("1");
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
-        Constant.flag = 0;
-        RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
+        /*Constant.flag = 0;
+        *//*RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
         log.info("sendId是<start>" + sendId + "<end>");
         if (sendId != null) {
             sendId.sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        }
+        }*//*
         Thread.sleep(500);
         if (Constant.flag == 1) {
             res = true;
-        }
-        return res;
+        }*/
+        return true;
     }
 
     /*
@@ -170,11 +174,11 @@ public class RobotService {
         log.info("发送会话序列号<start>" + sendSessionId + "<end>");
         byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);//生成发送的报文
 
-        StringBuilder Str = new StringBuilder();
+        /*StringBuilder Str = new StringBuilder();
         for (byte byteitem : requestProtocol) {
             Str.append(String.format("%02x ", byteitem));
         }
-        log.info("发送给机器人的指令是<start>" + Str + "<end>");
+        log.info("发送给机器人的指令是<start>" + Str + "<end>");*/
         return requestProtocol;
     }
 
@@ -374,8 +378,8 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public String deviceMaintenanceIssued(Map<String,Object> resMap) {
+        log.info("其他服务传来的map是==="+resMap);
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
-        log.info("传来的map是==="+resMap);
         List<Map<String, Object>> ItemList = new ArrayList<>();
         Map<String,Object> itemMap = new HashMap<>();
         itemMap.put("enable",Integer.valueOf(resMap.get("enable").toString()));
@@ -393,24 +397,20 @@ public class RobotService {
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(sendCode)
                     .setReceiveCode(robotCode)
-                    .setCode("变电站编码")
+                    .setCode("省检018")
                     .setType("81")
                     .setCommand("4")
                     .setItems(ItemList);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的机器人下发检修区域指令xml是<start>" + xmlString + "<end>");
-//            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).SendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+//            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         }
 
-        /*String code = Constant.robotResultMap.get("Code");
+        String code = Constant.robotResultMap.get("Code");
         if ("200".equals(code)){
-            log.info("给机器人成功发送指令,且成功响应给巡视主机的状态码是"+code);
             return "true";
-        }else{
-            log.info("给机器人成功发送指令,但是响应给巡视主机的状态码是"+code);
-            return "false";
-        }*/
-        return "success";
+        }
+        return "false";
     }
     @Transactional(rollbackFor = Exception.class)
     public void feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) {

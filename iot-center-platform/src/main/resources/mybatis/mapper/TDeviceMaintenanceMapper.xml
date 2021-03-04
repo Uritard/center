@@ -205,13 +205,18 @@
     </foreach>
     </delete>
     <select id="selectRobotDeviceId" resultType="java.lang.String">
-       SELECT
-        e.region_id
-        FROM t_cruise_point_instance a
-        LEFT JOIN t_robot_inspection b on a.cruise_id = b.inspection_id
-        LEFT JOIN t_robot_region d on b.component_id = d.region_id
-        LEFT JOIN t_robot_region e on e.region_id = d.up_region_id
-        <if test="list != null and list.size() > 0">and a.device_id IN
+      SELECT DISTINCT
+            d.region_id
+        FROM
+            t_cruise_point_instance f,
+            t_robot_inspection a,
+            t_robot_region b,
+            t_robot_region d
+        WHERE 1 = 1
+        and a.inspection_id = f.cruise_id
+        and a.component_id = b.region_id
+        and d.region_id = b.up_region_id
+        <if test="list != null and list.size() > 0">and f.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
