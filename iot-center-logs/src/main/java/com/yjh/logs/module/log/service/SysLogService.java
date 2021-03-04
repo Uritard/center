@@ -1,6 +1,8 @@
 package com.yjh.logs.module.log.service;
 
+import com.yjh.logs.common.utils.NumToStringUtil;
 import com.yjh.logs.module.log.dao.SysLogDao;
+import com.yjh.logs.module.log.entity.LongAnalyseDetail;
 import com.yjh.logs.module.log.entity.SysLog;
 import com.yjh.logs.module.log.entity.SysLogDetail;
 import org.slf4j.Logger;
@@ -9,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
 * @author tt
@@ -57,27 +57,15 @@ public class SysLogService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLogDetail> selectByPage(String userName, String title, Date startTime, Date endTime) {
-        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPage(userName,title,startTime,endTime);
+    public List<SysLogDetail> selectByPage(String userName, String title, Date startTime, Date endTime,String logType) {
+        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPage(userName,title,startTime,endTime,logType);
         for (SysLogDetail item:sysOperateLogList) {
             String type = item.getLogType();
             if(type != null && !"".equals(type)){
-                if("1".equals(type)){
-                    type = "查询";
+                type = NumToStringUtil.findType(type);
+                if(type != null){
+                    item.setLogType(type);
                 }
-                if("2".equals(type)){
-                    type = "新增";
-                }
-                if("3".equals(type)){
-                    type = "修改";
-                }
-                if("4".equals(type)){
-                    type = "删除";
-                }
-                if("5".equals(type)){
-                    type = "执行";
-                }
-                item.setLogType(type);
             }
             String state = item.getState();
             if(state != null && !"".equals(state)){
@@ -101,5 +89,24 @@ public class SysLogService {
         return this.sysLogDao.batchInsert(list);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,String>> logAnalyze(){
+        List<LongAnalyseDetail> listForAna = this.sysLogDao.logAnalyze();
+        List<Map<String,String>> listForRe = new ArrayList<>();
+        for(int i = 0; i < 14;i++){
+            Map<String,String> map = new HashMap<>();
+            String count = "0";
+            for(LongAnalyseDetail item:listForAna){
+                if(String.valueOf(i).equals(item.getLogType())){
+                    count = item.getCount();
+                }
+            }
+            map.put("logType",NumToStringUtil.findType(String.valueOf(i)));
+            map.put("count",count);
+            listForRe.add(map);
+        }
+        //List<Map<String,Integer>> listForAna = this.sysLogDao.logAnalyze(list);
+        return listForRe;
+    }
 }
 

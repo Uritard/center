@@ -1,5 +1,6 @@
 package com.yjh.logs.module.log.dao;
 
+import com.yjh.logs.module.log.entity.LongAnalyseDetail;
 import com.yjh.logs.module.log.entity.SysLog;
 import com.yjh.logs.module.log.entity.SysLogDetail;
 import org.apache.ibatis.annotations.Param;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -34,7 +36,9 @@ public interface SysLogDao {
     List<SysLogDetail> selectByPage(@Param(value = "userName") String userName,
                                     @Param(value = "title") String title,
                                     @Param(value = "startTime") Date startTime,
-                                    @Param(value = "endTime") Date endTime);
+                                    @Param(value = "endTime") Date endTime,
+                                    @Param(value = "logType") String logType);
 
     int batchInsert(List<SysLog> list);
+    List<LongAnalyseDetail> logAnalyze();
 }
