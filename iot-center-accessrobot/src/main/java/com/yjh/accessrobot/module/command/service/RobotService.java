@@ -665,13 +665,17 @@ public class RobotService {
                         .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                         .setEvaluationState(257)
                         .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                        .setRemark(redisInfoMap.get("remark"))
                         .setIsWarn(0)
                         .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                 if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                     tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                 } else {
                     tCruiseDataResult.setCruiseAbnormal(250);
+                }
+                if (!"null".equals(redisInfoMap.get("remark"))){
+                    tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
+                }else {
+                    tCruiseDataResult.setRemark(null);
                 }
                 /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
                     tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));

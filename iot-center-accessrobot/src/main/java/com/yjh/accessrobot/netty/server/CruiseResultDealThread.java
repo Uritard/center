@@ -193,7 +193,6 @@ public class CruiseResultDealThread implements Runnable{
                                 .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                                 .setEvaluationState(257)
                                 .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                                .setRemark(redisInfoMap.get("remark"))
                                 .setIsWarn(0)
                                 .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                         if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
@@ -201,11 +200,11 @@ public class CruiseResultDealThread implements Runnable{
                         } else {
                             tCruiseDataResult.setCruiseAbnormal(250);
                         }
-                        /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
-                            tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
-                        } else {
-                            tCruiseDataResult.setResultNum(null);
-                        }*/
+                        if (!"null".equals(redisInfoMap.get("remark"))){
+                            tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
+                        }else {
+                            tCruiseDataResult.setRemark(null);
+                        }
                         tCDRList.add(tCruiseDataResult);
                     }
 
