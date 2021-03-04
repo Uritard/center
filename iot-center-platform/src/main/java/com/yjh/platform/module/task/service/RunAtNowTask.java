@@ -246,10 +246,11 @@ public class RunAtNowTask implements Runnable{
             List<String> analysisInstanceList = new ArrayList<>();
 
             try {
-                QuartzTask quartzTaskForAre = new QuartzTask();
-                quartzTaskForAre.setJobName("检查"+tCruiseTask.getTaskName());
-                quartzTaskForAre.setJobGroup("jiancha");
                 SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                QuartzTask quartzTaskForAre = new QuartzTask();
+                quartzTaskForAre.setJobName("检查"+tCruiseTask.getTaskName()+"-"+sd.format(new Date()));
+                quartzTaskForAre.setJobGroup("jiancha");
+                //SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 //String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
                 Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                 Date taskStartTime = sd.parse(mapForGet.get("taskStart"));
