@@ -21,6 +21,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,6 +60,103 @@ public class SysLogController {
                          @RequestParam(value = "requestMethod", required = false) String requestMethod) {
         Result result = new Result();
         try {
+            {
+                //判断是否需要写入日志
+                Map<String,String> mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogTime");
+                if(mapForParam != null && mapForParam.size()>0){
+                    String noLogTime = mapForParam.get("content");//日志时间 2021-03-04 00:00:00~2021-03-05 00:00:00
+                    if(noLogTime != null){
+                        String[] timeList = noLogTime.split("~");
+                        if(timeList.length<2){
+                            //时间格式不对
+                            log.info("时间格式不对"+noLogTime);
+                        }else {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            try {
+                                Date start = simpleDateFormat.parse(timeList[0]);
+                                Date end = simpleDateFormat.parse(timeList[1]);
+                                Date now = new Date();
+                                if(start.getTime()<=now.getTime() && end.getTime()>=now.getTime()){
+                                    //满足日期格式
+                                    result.setData("此条日志无需入库，原因：日志时间");
+                                    return result;
+                                }
+                            } catch (ParseException e) {
+                                log.error("日期格式错误"+e);
+                            }
+
+                        }
+                    }
+
+                }
+                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogResult");
+                if(mapForParam != null && mapForParam.size()>0) {
+                    String noLogResult = mapForParam.get("content");//日志结果  成功
+                    if(noLogResult != null){
+                        //1：成功 2：失败
+                        if("成功".equals(noLogResult)){
+                            if(state == 1){
+                                result.setData("此条日志无需入库，原因：日志结果");
+                                return result;
+                            }
+                        }
+                        if("失败".equals(noLogResult)){
+                            if(state == 2){
+                                result.setData("此条日志无需入库，原因：日志结果");
+                                return result;
+                            }
+                        }
+                    }
+                }
+                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogTitle");
+                if(mapForParam != null && mapForParam.size()>0) {
+                    String noLogTitle = mapForParam.get("content");//日志标题  多个标题以，隔开  用户登录，用户登出
+                    if(noLogTitle != null){
+                        //精确匹配
+                        String[] resultList = noLogTitle.split("-");
+                        if(resultList.length>0){
+                            for(String item: resultList){
+                                if(item.equals(title)){
+                                    result.setData("此条日志无需入库，原因：日志标题");
+                                    return result;
+                                }
+                            }
+                        }
+                    }
+                }
+                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogType");
+                if(mapForParam != null && mapForParam.size()>0) {
+                    String noLogType = mapForParam.get("content");//日志类型
+                    if(noLogType != null){
+                        String[] typeList = noLogType.split("-");
+                        if(typeList.length>0){
+                            for (String item:typeList) {
+                                //todo 日志类型
+                                item = findType(item);
+                                if(item != null && item.equals(logType)){
+                                    result.setData("此条日志无需入库，原因：日志类型");
+                                    return result;
+                                }
+                            }
+                        }
+                    }
+                }
+                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogUserIdentity");
+                if(mapForParam != null && mapForParam.size()>0) {
+                    String noLogUserIdentity = mapForParam.get("content");//用户身份
+                    if(noLogUserIdentity != null){
+                        String[] userList = noLogUserIdentity.split("-");
+                        if(userList.length>0){
+                            for(String item:userList){
+                                if(item.equals(userName)){
+                                    result.setData("此条日志无需入库，原因：用户身份");
+                                    return result;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             SysLog sysLog = new SysLog();
             sysLog.setLogType(logType);
             sysLog.setIp(ip);
@@ -119,6 +218,36 @@ public class SysLogController {
         return result;
     }
 
+    private String findType(String str){
+        if("查询".equals(str)){
+            return "1";
+        }
+        if("新增".equals(str)){
+            return "2";
+        }
+        if("修改".equals(str)){
+            return "3";
+        }
+        if("删除".equals(str)){
+            return "4";
+        }
+        if("执行".equals(str)){
+            return "5";
+        }
+//        if("查询".equals(str)){
+//            return "6";
+//        }
+//        if("查询".equals(str)){
+//            return "7";
+//        }
+//        if("查询".equals(str)){
+//            return "8";
+//        }
+//        if("查询".equals(str)){
+//            return "9";
+//        }
+        return null;
+    }
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public Result delete(@RequestParam(value = "logId", required = true) Long logId) {
