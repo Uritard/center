@@ -11,7 +11,6 @@
         <result column="user_type" jdbcType="INTEGER" property="userType" />
         <result column="sex" jdbcType="INTEGER" property="sex" />
         <result column="e_mail" jdbcType="VARCHAR" property="eMail" />
-        <result column="mobile_phone" jdbcType="VARCHAR" property="mobilePhone" />
         <result column="work_no" jdbcType="VARCHAR" property="workNo" />
         <result column="face_id" jdbcType="VARCHAR" property="faceId" />
         <result column="finger_id" jdbcType="VARCHAR" property="fingerId" />
@@ -33,7 +32,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        user_id, user_name, PASSWORD, true_name, user_type, sex, e_mail, mobile_phone, work_no, face_id, finger_id, voice_id, state, user_title, creator_id, appkey, image_url, role_id, org_id, user_status, create_time, update_time, invalid_time, last_login,lock_time
+        user_id, user_name, PASSWORD, true_name, user_type, sex, e_mail, work_no, face_id, finger_id, voice_id, state, user_title, creator_id, appkey, image_url, role_id, org_id, user_status, create_time, update_time, invalid_time, last_login,lock_time
     </sql>
 
 
@@ -47,7 +46,6 @@
             user_type,
             sex,
             e_mail,
-            mobile_phone,
             work_no,
             face_id,
             finger_id,
@@ -73,7 +71,6 @@
                 #{userType, jdbcType=INTEGER},
                 #{sex, jdbcType=INTEGER},
                 #{eMail, jdbcType=VARCHAR},
-                #{mobilePhone, jdbcType=VARCHAR},
                 #{workNo, jdbcType=VARCHAR},
                 #{faceId, jdbcType=VARCHAR},
                 #{fingerId, jdbcType=VARCHAR},
@@ -115,7 +112,6 @@
         <if test="userType != null">a.user_type = #{userType, jdbcType=INTEGER},</if>
         <if test="sex != null">a.sex = #{sex, jdbcType=INTEGER},</if>
         <if test="eMail != null">a.e_mail = #{eMail},</if>
-        <if test="mobilePhone != null">a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR},</if>
         <if test="workNo != null">a.work_no = #{workNo},</if>
         <if test="faceId != null">a.face_id = #{faceId},</if>
         <if test="fingerId != null ">a.finger_id = #{fingerId},</if>
@@ -146,7 +142,6 @@
         a.user_type,
         a.sex,
         a.e_mail,
-        a.mobile_phone,
         a.work_no,
         a.face_id,
         a.finger_id,
@@ -179,7 +174,6 @@
         a.user_type,
         a.sex,
         a.e_mail,
-        a.mobile_phone,
         a.work_no,
         a.face_id,
         a.finger_id,
@@ -214,7 +208,6 @@
         a.user_type,
         a.sex,
         a.e_mail,
-        a.mobile_phone,
         a.work_no,
         a.face_id,
         a.finger_id,
@@ -241,7 +234,6 @@
         <if test="userType != null"> and a.user_type = #{userType, jdbcType=INTEGER}</if>
         <if test="sex != null"> and a.sex = #{sex, jdbcType=INTEGER}</if>
         <if test="eMail != null and eMail != ''"> and a.e_mail = #{eMail, jdbcType=VARCHAR}</if>
-        <if test="mobilePhone != null and mobilePhone != ''"> and a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR}</if>
         <if test="workNo != null and workNo != ''"> and a.work_no = #{workNo, jdbcType=VARCHAR}</if>
         <if test="faceId != null and faceId != ''"> and a.face_id = #{faceId, jdbcType=VARCHAR}</if>
         <if test="fingerId != null and fingerId != ''"> and a.finger_id = #{fingerId, jdbcType=VARCHAR}</if>
@@ -269,7 +261,6 @@
         <result property="userType" column="user_type"/>
         <result property="sex" column="sex"/>
         <result property="eMail" column="e_mail"/>
-        <result property="mobilePhone" column="mobile_phone"/>
         <result property="workNo" column="work_no"/>
         <result property="faceId" column="face_id"/>
         <result property="fingerId" column="finger_id"/>
@@ -299,7 +290,6 @@
         a.user_type,
         a.sex,
         a.e_mail,
-        a.mobile_phone,
         a.work_no,
         a.face_id,
         a.finger_id,
@@ -330,7 +320,6 @@
         <if test="userType != null"> and a.user_type = #{userType, jdbcType=INTEGER}</if>
         <if test="sex != null"> and a.sex = #{sex, jdbcType=INTEGER}</if>
         <if test="eMail != null and eMail != ''"> and a.e_mail = #{eMail, jdbcType=VARCHAR}</if>
-        <if test="mobilePhone != null and mobilePhone != ''"> and a.mobile_phone = #{mobilePhone, jdbcType=VARCHAR}</if>
         <if test="workNo != null and workNo != ''"> and a.work_no = #{workNo, jdbcType=VARCHAR}</if>
         <if test="faceId != null and faceId != ''"> and a.face_id = #{faceId, jdbcType=VARCHAR}</if>
         <if test="fingerId != null and fingerId != ''"> and a.finger_id = #{fingerId, jdbcType=VARCHAR}</if>
@@ -409,7 +398,7 @@
     </select>
 
     <select id="selectByUserNameL" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUserLogin">
-        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.work_no,a.face_id,a.finger_id,a.voice_id,
           a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,b.role_name,a.org_id,c.org_name,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login,a.lock_time
         from sys_user a
         LEFT JOIN sys_role b ON a.role_id = b.role_id
@@ -447,7 +436,7 @@
    </select>
 
     <select id="selectByUserNameAndL" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysUserLogin">
-        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.mobile_phone,a.work_no,a.face_id,a.finger_id,a.voice_id,
+        select a.user_id,a.user_name,a.PASSWORD,a.true_name,a.user_type,a.sex,a.e_mail,a.work_no,a.face_id,a.finger_id,a.voice_id,
           a.state,a.user_title,a.creator_id,a.appkey,a.image_url,a.role_id,b.role_name,a.org_id,c.org_name,a.user_status,a.create_time,a.update_time,a.invalid_time,a.last_login,a.lock_time
         from sys_user a
         LEFT JOIN sys_role b ON a.role_id = b.role_id

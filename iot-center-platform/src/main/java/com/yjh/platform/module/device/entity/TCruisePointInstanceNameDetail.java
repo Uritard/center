@@ -20,6 +20,6 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String analyseType;
     private String realCode;
     private String isAi;
-
+    private Long robotId;
 
 }

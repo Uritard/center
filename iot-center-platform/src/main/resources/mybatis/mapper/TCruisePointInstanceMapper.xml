@@ -510,6 +510,7 @@
         b.is_ai,
         f.device_name,
         g.real_code,
+        c.robot_id,
         IFNULL(c.inspection_name,d.preset_name) as cruiseName
         FROM
         t_cruise_point_instance a

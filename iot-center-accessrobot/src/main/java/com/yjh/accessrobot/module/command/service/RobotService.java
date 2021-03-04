@@ -403,7 +403,8 @@ public class RobotService {
                     .setItems(ItemList);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的机器人下发检修区域指令xml是<start>" + xmlString + "<end>");
-//            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+
         }
 
         String code = Constant.robotResultMap.get("Code");

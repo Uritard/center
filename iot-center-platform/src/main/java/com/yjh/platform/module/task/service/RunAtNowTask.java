@@ -374,7 +374,13 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                         tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
                         TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
-                        tCruiseTaskResultDetailMap.put("cameraId",tCameraPreset.getCameraId().toString());
+                        if(item.getCruiseType() != 228){
+                            tCruiseTaskResultDetailMap.put("cameraId",item.getCruiseId().toString());
+                            tCruiseTaskResultDetailMap.put("robotId","");
+                        }else {
+                            tCruiseTaskResultDetailMap.put("cameraId","");
+                            tCruiseTaskResultDetailMap.put("robotId",item.getRobotId().toString());
+                        }
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         continue;
                     }
@@ -395,6 +401,13 @@ public class RunAtNowTask implements Runnable{
 
                 //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                 //tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
+                if(item.getCruiseType() != 228){
+                    tCruiseTaskResultDetailMap.put("cameraId",item.getCruiseId().toString());
+                    tCruiseTaskResultDetailMap.put("robotId","");
+                }else {
+                    tCruiseTaskResultDetailMap.put("cameraId","");
+                    tCruiseTaskResultDetailMap.put("robotId",item.getRobotId().toString());
+                }
                 redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                 //一次循环 一个巡检点
                 if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外

@@ -11,7 +11,6 @@
         <result column="user_type" jdbcType="INTEGER" property="userType" />
         <result column="sex" jdbcType="INTEGER" property="sex" />
         <result column="e_mail" jdbcType="VARCHAR" property="eMail" />
-        <result column="mobile_phone" jdbcType="VARCHAR" property="mobilePhone" />
         <result column="work_no" jdbcType="VARCHAR" property="workNo" />
         <result column="face_id" jdbcType="VARCHAR" property="faceId" />
         <result column="finger_id" jdbcType="VARCHAR" property="fingerId" />
@@ -32,7 +31,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        user_id, user_name, PASSWORD, true_name, user_type, sex, e_mail, mobile_phone, work_no, face_id, finger_id, voice_id, state, user_title, creator_id, appkey, image_url, role_id, org_id, user_status, create_time, update_time, invalid_time, last_login
+        user_id, user_name, PASSWORD, true_name, user_type, sex, e_mail, work_no, face_id, finger_id, voice_id, state, user_title, creator_id, appkey, image_url, role_id, org_id, user_status, create_time, update_time, invalid_time, last_login
     </sql>
 
 
@@ -50,7 +49,6 @@
         a.user_type,
         a.sex,
         a.e_mail,
-        a.mobile_phone,
         a.work_no,
         a.face_id,
         a.finger_id,

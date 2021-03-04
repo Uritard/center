@@ -41,7 +41,6 @@ public interface SysUserDao {
                          @Param(value = "userType") Integer userType,
                          @Param(value = "sex") Integer sex,
                          @Param(value = "eMail") String eMail,
-                         @Param(value = "mobilePhone") String mobilePhone,
                          @Param(value = "workNo") String workNo,
                          @Param(value = "faceId") String faceId,
                          @Param(value = "fingerId") String fingerId,

@@ -184,7 +184,6 @@ public class SysUserController {
                          @RequestParam(value = "userType", required = false) Integer userType,
                          @RequestParam(value = "sex", required = false) Integer sex,
                          @RequestParam(value = "eMail", required = false) String eMail,
-                         @RequestParam(value = "mobilePhone", required = false) String mobilePhone,
                          @RequestParam(value = "workNo", required = false) String workNo,
                          @RequestParam(value = "faceId", required = false) String faceId,
                          @RequestParam(value = "fingerId", required = false) String fingerId,
@@ -208,10 +207,11 @@ public class SysUserController {
             if("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
                 password = Demo.decrypt(password);
-                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
                 result.setData(list);
             }else{
-                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+
                 result.setData(list);
             }
         } catch (Exception e) {

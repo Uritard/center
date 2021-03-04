@@ -318,8 +318,8 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysUserSelect> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String mobilePhone, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Integer invalidTime, Date lastLogin) {
-        return sysUserDao.select(userId, userName, password, trueName, userType, sex, eMail, mobilePhone, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+    public List<SysUserSelect> select(Long userId, String userName, String password, String trueName, Integer userType, Integer sex, String eMail, String workNo, String faceId, String fingerId, String voiceId, Integer state, String userTitle, Long creatorId, String appkey, String imageUrl, Long roleId, Long orgId, Integer userStatus, Date createTime, Date updateTime, Integer invalidTime, Date lastLogin) {
+        return sysUserDao.select(userId, userName, password, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
     }
 
     @Transactional(rollbackFor = Exception.class)

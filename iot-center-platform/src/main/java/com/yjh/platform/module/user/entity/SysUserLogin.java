@@ -48,8 +48,7 @@ public class SysUserLogin implements Serializable {
     @ApiModelProperty(value = "email")
     private String eMail;
 
-    @ApiModelProperty(value = "手机号")
-    private String mobilePhone;
+
 
     @ApiModelProperty(value = "工号")
     private String workNo;

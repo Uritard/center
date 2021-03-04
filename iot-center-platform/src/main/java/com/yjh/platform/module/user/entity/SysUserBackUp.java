@@ -65,10 +65,6 @@ public class SysUserBackUp implements Serializable {
     @TableField(value = "e_mail", updateStrategy = FieldStrategy.IGNORED)
     private String eMail;
 
-    @Length(max = 20, message = "mobilePhone长度必须小于等于20")
-    @ApiModelProperty(value = "手机号")
-    @TableField(value = "mobile_phone", updateStrategy = FieldStrategy.IGNORED)
-    private String mobilePhone;
 
     @Length(max = 30, message = "workNo长度必须小于等于30")
     @ApiModelProperty(value = "工号")
