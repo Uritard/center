@@ -132,6 +132,7 @@
         a.log_id as logId,
         a.user_name as userName,
         a.title,
+        a.ip,
         a.state,
         a.log_type as logType,
         a.content,

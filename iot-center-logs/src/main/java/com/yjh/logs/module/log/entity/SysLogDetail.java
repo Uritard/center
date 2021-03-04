@@ -20,6 +20,7 @@ public class SysLogDetail {
     private Long logId;
     private String userName;
     private String title;
+    private String ip;
     private String logType;
     private String content;
     private String state;
