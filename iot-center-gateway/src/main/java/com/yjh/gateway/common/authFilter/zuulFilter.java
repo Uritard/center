@@ -61,10 +61,55 @@ public class zuulFilter extends ZuulFilter {
             HttpServletRequest request = ctx.getRequest();
             HttpServletResponse response = ctx.getResponse();
             response.setHeader("Server", "unKnow");
-//            String url=request.getRequestURI();
-//             if(url.contains("/sysUser/v1/login")){
-//
-//            }
+            String url = request.getRequestURI();
+            if (!url.contains("/sysUser/v1/login")) {
+                String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+                String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
+                if (StringUtils.isNoneBlank(userId)) {
+                    StringBuilder sb = new StringBuilder();
+                    for (char c : userId.toCharArray()) {
+                        sb.append(Integer.toUnsignedString(c, 10));
+                    }
+                    String token = Demo.summary(sb.toString());
+                    if (!token.equals(absCode)) {
+                        log.error("参数篡改userId" + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        return false;
+                    }
+                } else {
+                    log.error("无userId====================================================================================");
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                    return false;
+                }
+                String token = request.getHeader("token") != null ? request.getHeader("token") : "";
+                if (StringUtils.isNoneBlank(token)) {
+                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + token);
+                    if (appKeymap.size() == 0) {
+                        log.error("用户未登陆===================================================================================");
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                        return false;
+                    } else {
+                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + token, "expireTime")));
+                        if (System.currentTimeMillis() - expireTime > 1800000) {
+                            log.error("token已失效===========================================================================");
+                            ctx.setSendZuulResponse(false);
+                            ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                            return false;
+                        } else {
+                            redisTemplate.opsForHash().put("appKey:" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                        }
+                    }
+                } else {
+                    log.error("无token========================================================================================");
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                    return false;
+                }
+
+            }
             MyRequestWrapper requestWrapper = null;
             MultipartHttpServletRequest multipartHttpServletRequest = null;
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
@@ -81,10 +126,10 @@ public class zuulFilter extends ZuulFilter {
                             Map.Entry<String, MultipartFile> entry = it.next();
                             MultipartFile mFile = entry.getValue();
                             if (mFile.getSize() != 0 && !"".equals(mFile.getName())) {
-                                filePath+=mFile.getOriginalFilename() + ";";
+                                filePath += mFile.getOriginalFilename() + ";";
                             }
                         }
-                        String filePaths ='"'+ filePath.substring(0, filePath.length() - 1)+'"';
+                        String filePaths = '"' + filePath.substring(0, filePath.length() - 1) + '"';
                         StringBuilder sb = new StringBuilder();
                         if (null != filePaths) {
                             for (char c : filePaths.toCharArray()) {

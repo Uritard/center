@@ -365,11 +365,12 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int userLogout(String userId) {
+    public int userLogout(String userId,String token) {
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
         sysUserParams.setUserId(userIdLong);
+        redisTemplate.delete("appKey:"+token);
         return this.sysUserDao.update(sysUserParams);
     }
 

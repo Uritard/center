@@ -321,7 +321,8 @@ public class SysUserController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
-            result.setData(this.sysUserService.userLogout(userId));
+            String token = request.getHeader("token");
+            result.setData(this.sysUserService.userLogout(userId,token));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("登出失败:", e);
@@ -347,11 +348,11 @@ public class SysUserController {
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
             if(sysUser.getUserName().contains("admin")||sysUser.getUserName().contains("administrator")){
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名不能包含admin,administrator");
+                result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
             }else if(sysUser.getPassword().contains(sysUser.getUserName())){
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
             }else if(!sysUser.getPassword().matches(PW_PATTERN)){
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
             }else {
                 sysUserService.insert(sysUser);
                 sysUserService.insertIntoRedis();
@@ -437,13 +438,13 @@ public class SysUserController {
             if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(oldPassword)) {
                 if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword))
                 {
-                    result.setMessage("新密码不能和旧密码重复");
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (newPassword.contains(sysUserCurrent.getUserName())) {
-                    result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (!newPassword.matches(PW_PATTERN)) {
-                    result.setMessage("口令不得小于8位,且为字母、数字或特殊符号的混合组合,口令不允许包含用户名");
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else {
                     result.setData(sysUserService.changePassword(userId, map,sysUserCurrent.getUserName()));
