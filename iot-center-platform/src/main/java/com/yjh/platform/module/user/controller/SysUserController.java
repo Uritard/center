@@ -369,8 +369,7 @@ public class SysUserController {
     public Result unlockUserAccount(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
-            Long userId =Long.valueOf(10001);
-                    //Long.valueOf(httpServletRequest.getHeader("userId"));
+            Long userId =Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             Map<String, String> maps = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = maps.get("content");
