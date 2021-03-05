@@ -577,8 +577,8 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
-                                tCruiseDataResult.setCruiseResult(247);
-                                tCruiseDataResult.setCruiseAbnormal(248);
+                                tCruiseDataResult.setCruiseResult(246);
+                                //tCruiseDataResult.setCruiseAbnormal(248);
                                 tCruiseDataResult.setResultNum("已拍照");
                                 tCruiseDataResult.setEvaluationState(257);
                                 tCruiseDataResult.setIsWarn(0);
