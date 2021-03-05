@@ -82,7 +82,7 @@ public class SysUserService {
     public int update(SysUser sysUser) throws IOException {
       //  Date date = new Date();
         sysUser.setUserName(null);
-        sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
+        sysUser.setPassword(null);
        // sysUser.setUpdateTime(date);
         return this.sysUserDao.update(sysUser);
     }
