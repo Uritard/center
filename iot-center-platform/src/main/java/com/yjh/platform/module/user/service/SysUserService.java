@@ -108,7 +108,13 @@ public class SysUserService {
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
             SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
             if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
-                if (!Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)) {
+                String passwords="";
+               try {
+                    passwords=Demo.decryptDB(sysUserLogin.getPassword());
+               }catch (Exception e){
+                   e.printStackTrace();
+               }
+                if (!passwords.equals(password)) {
                     SysUser sysUsers=new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
                     sysUsers.setUserId(sysUserLogin.getUserId());
