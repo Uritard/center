@@ -165,47 +165,49 @@ public class CruiseResultDealThread implements Runnable{
                 for (String instanceId : instanceIdList) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
                     //缓存中该巡检点有结果
-                    if (redisInfoMap.get("cruiseResult").equals("246") ||redisInfoMap.get("cruiseResult").equals("247")) {
-                        TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
-                                .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                                .setTaskResultId(redisInfoMap.get("taskResultId"))
-                                .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
-                                .setInstanceName(redisInfoMap.get("instanceName"))
-                                .setCruiseTime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                                .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
-                                .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
-                                .setDeviceName(redisInfoMap.get("deviceName"))
-                                .setCruiseStatus(252)
-                                .setRemark(redisInfoMap.get("remark"));
-                        tCTRDList.add(tCruiseTaskResultDetail);
-                        cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
+                    if (!redisInfoMap.get("resultNum").equals("设备检修中")){
+                        if (redisInfoMap.get("cruiseResult").equals("246") || redisInfoMap.get("cruiseResult").equals("247")) {
+                            TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
+                                    .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
+                                    .setTaskResultId(redisInfoMap.get("taskResultId"))
+                                    .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
+                                    .setInstanceName(redisInfoMap.get("instanceName"))
+                                    .setCruiseTime(sdf.parse(redisInfoMap.get("cruiseTime")))
+                                    .setEndTime(sdf.parse(redisInfoMap.get("endTime")))
+                                    .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
+                                    .setDeviceName(redisInfoMap.get("deviceName"))
+                                    .setCruiseStatus(252)
+                                    .setRemark(redisInfoMap.get("remark"));
+                            tCTRDList.add(tCruiseTaskResultDetail);
+                            cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
 
-                        TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
-                                .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                                .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
-                                .setCruiseName(redisInfoMap.get("cruiseName"))
-                                .setCruiseType(228)
-                                .setResultNum(redisInfoMap.get("resultNum"))
-                                .setModifyNum(redisInfoMap.get("modifyNum"))
-                                .setPicpath(redisInfoMap.get("picpath"))
-                                .setPicPathAnl(redisInfoMap.get("picPathAnl"))
-                                .setOrigpic(redisInfoMap.get("origpic"))
-                                .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
-                                .setEvaluationState(257)
-                                .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                                .setIsWarn(0)
-                                .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
-                        if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
-                            tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
-                        } else {
-                            tCruiseDataResult.setCruiseAbnormal(null);
+                            TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
+                                    .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
+                                    .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
+                                    .setCruiseName(redisInfoMap.get("cruiseName"))
+                                    .setCruiseType(228)
+                                    .setResultNum(redisInfoMap.get("resultNum"))
+                                    .setModifyNum(redisInfoMap.get("modifyNum"))
+                                    .setPicpath(redisInfoMap.get("picpath"))
+                                    .setPicPathAnl(redisInfoMap.get("picPathAnl"))
+                                    .setOrigpic(redisInfoMap.get("origpic"))
+                                    .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                                    .setEvaluationState(257)
+                                    .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
+                                    .setIsWarn(0)
+                                    .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                            if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                                tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                            } else {
+                                tCruiseDataResult.setCruiseAbnormal(null);
+                            }
+                            if (!"null".equals(redisInfoMap.get("remark"))){
+                                tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
+                            }else {
+                                tCruiseDataResult.setRemark(null);
+                            }
+                            tCDRList.add(tCruiseDataResult);
                         }
-                        if (!"null".equals(redisInfoMap.get("remark"))){
-                            tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
-                        }else {
-                            tCruiseDataResult.setRemark(null);
-                        }
-                        tCDRList.add(tCruiseDataResult);
                     }
 
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
@@ -224,21 +226,19 @@ public class CruiseResultDealThread implements Runnable{
                 //更新异常点缓存的数据
                 redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
 
-                log.info("tCTRDList的内容是===" + tCTRDList);
-                log.info("tCDRList的内容是===" + tCDRList);
+                log.info("tCTRDList的内容是===" + tCTRDList+",大小size是: "+tCTRDList.size());
+                log.info("tCDRList的内容是===" + tCDRList+",大小size是: "+tCDRList.size());
 
-                List<TCruiseTaskResultDetail> repairTCTRDList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCTRDList(taskId);
+                /*List<TCruiseTaskResultDetail> repairTCTRDList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCTRDList(taskId);
                 tCTRDList.removeAll(repairTCTRDList);
                 List<TCruiseDataResult> repairTCDRList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCDRList(taskId);
                 tCDRList.removeAll(repairTCDRList);
-                log.info("处理后的tCTRDList的内容是==="+tCTRDList);
-                log.info("处理后的tCDRList的内容是==="+tCDRList);
+                log.info("处理后的tCTRDList大小是==="+tCTRDList.size()+",处理后的tCDRList的大小是: "+tCDRList.size());*/
 
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
-                log.info("res1的内容是===" + res1);
                 int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
                 StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
-                log.info("res2的内容是===" + res2);
+                log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
 
                 //将公共类的instanceIdList清空
                 if (Constant.flagMap.get(taskId) != null && !Constant.flagMap.get(taskId).isEmpty()){

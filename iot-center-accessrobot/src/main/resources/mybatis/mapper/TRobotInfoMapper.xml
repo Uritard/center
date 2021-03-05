@@ -636,6 +636,7 @@
         from t_cruise_task_result_detail a,t_cruise_result b
         where 1 = 1
         and a.task_result_id = b.task_result_id
+        and a.cruise_status = '252'
         <if test="taskId != null and taskId != ''">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
     </select>
     <select id="selectRepairTCDRList" resultType="com.yjh.accessrobot.module.command.entity.TCruiseDataResult">
@@ -668,6 +669,7 @@
         where 1 = 1
         and b.task_result_id = d.task_result_id
         and d.cruise_result_id = a.cruise_result_id
+        and a.result_num = '设备检修中'
         <if test="taskId != null and taskId != ''">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
     </select>
 </mapper>

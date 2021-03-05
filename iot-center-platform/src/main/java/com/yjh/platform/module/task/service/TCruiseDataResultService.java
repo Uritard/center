@@ -195,8 +195,6 @@ public class TCruiseDataResultService {
     }
     @Transactional(rollbackFor = Exception.class)
     public int updateCruiseAnalyze(List<String> cruiseResultIdList){
-        List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-        log.info("deviceMeteIdList==="+deviceMeteIdList);
         log.info("cruiseResultIdList==="+cruiseResultIdList);
         for (String cruiseResultId: cruiseResultIdList){
             TStdDeviceMeteUpdate tStdDeviceMeteUpdateTemp = tCruiseDataResultDao.selectCruiseAnalyze(cruiseResultId);
@@ -213,15 +211,17 @@ public class TCruiseDataResultService {
                 tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
             }
             log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-                if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId()) ){
-                    //更新
-                    int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                    log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值: "+updateRes);
-                }else {
-                    //插入
-                    int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                    log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值: "+insertRes);
-                }
+            List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
+            log.info("deviceMeteIdList==="+deviceMeteIdList);
+            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId()) ){
+                //更新
+                int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值: "+updateRes);
+            }else {
+                //插入
+                int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值: "+insertRes);
+            }
         }
         return 1;
     }

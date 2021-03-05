@@ -222,7 +222,7 @@
         a.union_id,
         a.rule_name,
         a.is_finish,
-        a.create_time,
+        a.triggering_time as create_time,
         a.param_values,
         a.plan_name,
         a.rule_content

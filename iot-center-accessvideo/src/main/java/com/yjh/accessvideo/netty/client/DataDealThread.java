@@ -414,7 +414,7 @@ public class DataDealThread implements Runnable {
                                                     log.info("该测点告警推送配置的告警等级是===" + alarmLevel);
                                                     log.info("产生的该条告警等级是===" + warnLevel);
                                                     log.info("一层判断" + (alarmNote != null && "1".equals(alarmNote)));
-                                                    log.info("二层判断" + (warnLevel == alarmLevel || warnLevel > alarmLevel));
+                                                    log.info("二层判断" + (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel));
 
                                                     if (alarmNote != null && "1".equals(alarmNote)) {
                                                         if (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel) {
