@@ -70,6 +70,7 @@ public class TStdDeviceController {
     public Result addALL(@RequestBody TStdDeviceDetail tStdDeviceDetail) {
         Result result = new Result();
         try {
+            log.info("getDeviceName: "+tStdDeviceDetail.getDeviceName());
             result.setData(tStdDeviceService.addALL(tStdDeviceDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
