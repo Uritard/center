@@ -105,6 +105,14 @@ public class RobotService {
         Item.add(map);
 
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
+
+        String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+        if (robotStatus.equals("离线")){
+            log.info("该机器人处于离线状态,没有成功将模型文件同步指令下发到机器人......");
+            scmap.put("code", 3);
+            scmap.put("result", "机器人不在线");
+            return scmap;
+        }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
@@ -181,11 +189,6 @@ public class RobotService {
         log.info("发送会话序列号<start>" + sendSessionId + "<end>");
         byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);//生成发送的报文
 
-        /*StringBuilder Str = new StringBuilder();
-        for (byte byteitem : requestProtocol) {
-            Str.append(String.format("%02x ", byteitem));
-        }
-        log.info("发送给机器人的指令是<start>" + Str + "<end>");*/
         return requestProtocol;
     }
 
@@ -399,6 +402,7 @@ public class RobotService {
         ItemList.add(itemMap);
 
         List<String> robotCodeList = tRobotInfoDao.selectOnline();
+        log.info("在线的robotCodeList: "+robotCodeList);
 
         for (String robotCode : robotCodeList){
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
