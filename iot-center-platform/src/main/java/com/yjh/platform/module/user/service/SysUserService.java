@@ -106,22 +106,13 @@ public class SysUserService {
             }
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
-            if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserLogin.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
-
-                SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
-                Map verMap = new LinkedHashMap<>();
-                verMap.put("userName", userName);
-                verMap.put("password", password);
-                String verfiCode=Demo.summary(verMap.toString());
-                if (!sysUserBackUp.getVerfiCode().equals(verfiCode)) {
+            SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
+            if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
+                if (!Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)) {
                     SysUser sysUsers=new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
                     sysUsers.setUserId(sysUserLogin.getUserId());
                     sysUserDao.update(sysUsers);
-                    mapResult.put("errorCount", "密码被篡改，请重新登陆！");
-                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                    mapResult.put("info", ResultCodeEnum.CODE10102.getName());
-                    return mapResult;
                 }
                 String userAvoid = Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
                 if (!replayAvoid.equals(userAvoid)) {
@@ -373,10 +364,16 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int unlockUserAccount(Map<String, String> map) {
+    public int unlockUserAccount(Map<String, String> map) throws IOException {
         SysUser sysUserLocked = new SysUser();
         sysUserLocked.setState(1);
-        sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
+        Map<String, String> maps = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+        String isDecode = maps.get("content");
+        if ("true".equals(isDecode)) {
+            sysUserLocked.setUserId(Long.valueOf(Demo.decrypt(map.get("lockedUserId"))));
+        } else {
+            sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
+        }
         Date date = new Date();
         sysUserLocked.setUpdateTime(date);
         return this.sysUserDao.update(sysUserLocked);
