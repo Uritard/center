@@ -70,13 +70,13 @@ public class SysLogService {
             String state = item.getState();
             if(state != null && !"".equals(state)){
                 if("1".equals(state)){
-                    state = "正常";
+                    state = "成功";
                 }
                 if("2".equals(state)){
-                    state = "错误";
+                    state = "失败";
                 }
                 if("3".equals(state)){
-                    state = "异常";
+                    state = "失败";
                 }
                 item.setState(state);
             }
