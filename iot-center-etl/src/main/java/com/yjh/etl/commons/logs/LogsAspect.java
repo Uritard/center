@@ -34,7 +34,7 @@ import java.util.Arrays;
 public class LogsAspect {
     private static final Logger log = LoggerFactory.getLogger(IPUtil.class);
 
-    private static final String LOG_URL = "http://iot-center-logs/sysLogs/v1/add";
+    private static final String LOG_URL = "http://iot-center-share/sysLogs/v1/add";
     @Autowired
     private LogsConfig logsConfig;
 

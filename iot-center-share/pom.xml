@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>iot-center-logs</artifactId>
+    <artifactId>iot-center-share</artifactId>
 
     <dependencies>
         <dependency>
