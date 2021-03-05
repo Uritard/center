@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.module.user.dao.SysUserDao;
+import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.service.TSysParamService;
 import com.yjh.platform.module.user.entity.TSysParam;
 
@@ -23,6 +25,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author tt
@@ -35,6 +39,8 @@ public class TSysParamController {
 
     @Autowired
     private final TSysParamService tSysParamService;
+    @Autowired
+    private SysUserDao sysUserDao;
 
     private Logger log = LoggerFactory.getLogger(TSysParamController.class);
 
@@ -204,11 +210,18 @@ public class TSysParamController {
     @ApiOperation(value = "查询系统参数")
     @RequestMapping(value = "/updateByCode", method = RequestMethod.GET)
     @Logs(title = "查询系统参数",content = "根据用户传递的参数分页查询系统参数",logType = 1)
-    public Result updateByCode(@RequestParam(value = "paramCode") String paramCode,
+    public Result updateByCode(HttpServletRequest request,
+                                @RequestParam(value = "paramCode") String paramCode,
                                @RequestParam(value = "content") String content) {
         Result result = new Result();
         try {
-            result.setData(tSysParamService.updateByCode(paramCode,content));
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+            if(sysUser.getRoleId() != null  && sysUser.getRoleId() == 1234){
+                result.setData(tSysParamService.updateByCode(paramCode,content));
+            }else {
+             result.setCode(10008,"用户权限不足");
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("系统参数分页查询失败描述：", e);
