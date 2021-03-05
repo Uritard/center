@@ -72,7 +72,7 @@ public class zuulFilter extends ZuulFilter {
                     }
                     String token = Demo.summary(sb.toString());
                     if (!token.equals(absCode)) {
-                        log.error("参数篡改userId" + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
+                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
                         ctx.setSendZuulResponse(false);
                         ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                         return false;

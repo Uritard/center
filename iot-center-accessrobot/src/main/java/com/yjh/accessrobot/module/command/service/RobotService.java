@@ -808,21 +808,27 @@ public class RobotService {
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
         Map map = new HashMap();
         String keys = Constant.map.get(String.valueOf(userId));
-        if (StringUtils.isEmpty(key) && keys == null&&StringUtils.isEmpty(password) ) {
+        if (StringUtils.isEmpty(key) && keys == null && StringUtils.isEmpty(password)) {
             String random = String.valueOf((int) (Math.random() * 1000000000 + 1));
             Constant.map.put(String.valueOf(userId), random);
             map.put("code", 1);
             map.put("result", random);
             return map;
-        } else if(StringUtils.isEmpty(key)&&StringUtils.isEmpty(password)&&keys!=null) {
+        } else if (StringUtils.isEmpty(key) && StringUtils.isEmpty(password) && keys != null) {
             map.put("code", 1);
             map.put("result", keys);
             return map;
-        }else if (keys == null&&StringUtils.isNoneBlank(key)&&StringUtils.isNoneBlank(password)) {
+        } else if (StringUtils.isEmpty(key) && StringUtils.isNoneBlank(password) && keys == null) {
+            map.put("code", 2);
+            map.put("result", "请输入密钥");
+            return map;
+        } else if (keys == null && StringUtils.isNoneBlank(key) && StringUtils.isNoneBlank(password)) {
             map.put("code", 2);
             map.put("result", "密钥已过期");
             return map;
         } else if (!key.equals(keys)) {
+            log.info("key==========================================="+key);
+            log.info("keys==========================================="+keys);
             map.put("code", 2);
             map.put("result", "密钥不正确,请重新输入");
             return map;
