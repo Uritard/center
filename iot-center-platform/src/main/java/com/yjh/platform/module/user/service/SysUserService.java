@@ -81,8 +81,6 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) throws IOException {
       //  Date date = new Date();
-        sysUser.setUserName(null);
-        sysUser.setPassword(null);
        // sysUser.setUpdateTime(date);
         return this.sysUserDao.update(sysUser);
     }

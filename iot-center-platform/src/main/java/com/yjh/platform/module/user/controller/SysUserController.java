@@ -103,12 +103,6 @@ public class SysUserController {
     public Result update(@RequestBody SysUser sysUser) {
         Result result = new Result();
         try {
-            Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-            String isDecode =map.get("content");
-            if("true".equals(isDecode)) {
-                sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
-                sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
-            }
             result.setData(sysUserService.update(sysUser));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
