@@ -47,6 +47,8 @@ public interface TCruiseResultDao {
                                                 @Param(value = "list") List<Long> list);
 
     int manualReview(CruiseManualReview cruiseManualReview);
+    Long selectDeviceMeteId(@Param(value = "cruiseDataId")Long cruiseDataId);
+    int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
     AfterManualReviewInfo selectJudgeCondition(@Param(value = "cruiseDataId")Long cruiseDataId);
     TStdDevicemete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
 

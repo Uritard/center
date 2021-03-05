@@ -86,6 +86,7 @@ public interface TCruiseDataResultDao {
 
 
     List<Long> selectAllDeviceMeteId();
+    List<TStdDeviceMeteUpdate> selectDeviceMeteList(List<String> list);
     TStdDeviceMeteUpdate selectCruiseAnalyze(@Param(value = "cruiseResultId") String cruiseResultId);
     int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
     int insertDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);

@@ -728,12 +728,6 @@ public class RobotService {
             Constant.flagMap.put(taskId, instancedList);
         }
 
-        /*List<TCruiseTaskResultDetail> repairTCTRDList = selectRepairTCTRDList(taskId);
-        tCTRDList.removeAll(repairTCTRDList);
-        List<TCruiseDataResult> repairTCDRList = selectRepairTCDRList(taskId);
-        tCDRList.removeAll(repairTCDRList);
-        log.info("处理后的tCTRDList大小是==="+tCTRDList.size()+",处理后的tCDRList的大小是: "+tCDRList.size());*/
-
         int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);
         int res2 = batchInsertCruiseDataResult(tCDRList);
         otherServer(cruiseResultIdList);

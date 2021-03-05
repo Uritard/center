@@ -612,6 +612,27 @@
         ORDER BY e.cruise_time ASC
     </select>
 
+    <select id="selectDeviceMeteList" resultType="com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate">
+        SELECT
+            a.instance_id,
+            b.device_mete_id,
+            MAX(a.cruise_time )as update_time,
+            d.picpath,
+            d.cruise_result,
+            d.identify_result,
+            a.cruise_status
+        FROM
+            t_cruise_task_result_detail a,t_cruise_point_instance b,t_cruise_data_result d
+        WHERE
+        a.instance_id = b.instance_id
+        and a.cruise_result_id = d.cruise_result_id
+        <if test="list != null and list.size() > 0">and a.cruise_result_id IN
+            <foreach collection="list" item="cruiseResultId" separator="," open="(" close=")" index="index">
+                #{cruiseResultId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        GROUP BY  device_mete_id
+    </select>
     <select id="selectCruiseAnalyze" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate">
         SELECT
             a.instance_id,

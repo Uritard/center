@@ -89,6 +89,13 @@ public class TCruiseResultService{
         //manualReview
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
+        //更新测点信息
+        Long deviceMeteId = tCruiseResultDao.selectDeviceMeteId(cruiseManualReview.getCruiseDataId());
+        TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
+                .setDeviceMeteId(deviceMeteId)
+                .setIdentifyResult(cruiseManualReview.getIdentifyResult());
+        tCruiseResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
+
         //查询该巡检点审核后的相关信息
         AfterManualReviewInfo afterManualReviewInfo = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
         //查询该巡检点对应测点配置的告警阈值相关信息
