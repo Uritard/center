@@ -156,7 +156,7 @@ public class SysUserService {
                             return mapResult;
                         } else {
                             if (yxTime>sysUserLogin.getInvalidTime()) {
-                                mapResult.put("mmgh", "当前密码长时间未更换，需更换");
+                                mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
                             mapResult.put("roleMenuList", sysRoleMenuList);
@@ -188,7 +188,7 @@ public class SysUserService {
                     }
                     if (sysUserLogin.getState() == 1) {
                         if (yxTime>sysUserLogin.getInvalidTime()) {
-                            mapResult.put("mmgh", "当前密码长时间未更换，需更换");
+                            mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
                         mapResult.put("roleMenuList", sysRoleMenuList);
