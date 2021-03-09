@@ -108,13 +108,7 @@ public class SysUserService {
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
             SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
             if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
-                String passwords="";
-               try {
-                    passwords=Demo.decryptDB(sysUserLogin.getPassword());
-               }catch (Exception e){
-                   e.printStackTrace();
-               }
-                if (!passwords.equals(password)) {
+                if (!sysUserLogin.getPassword().equals(password)) {
                     SysUser sysUsers=new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
                     sysUsers.setUserId(sysUserLogin.getUserId());
@@ -218,9 +212,7 @@ public class SysUserService {
                         redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
                     }
                 } else {
-                    mapResult.put("code", ResultCodeEnum.CODE10107.getCode());
-                    mapResult.put("info", ResultCodeEnum.CODE10107.getName());
-                    return mapResult;
+                    throw new RuntimeException("用户已登陆");
                 }
             } else {
                 //登陆错误判断用户是否存在
