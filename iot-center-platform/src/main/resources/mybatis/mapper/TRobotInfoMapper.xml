@@ -487,9 +487,10 @@
     </select>
     <select id="selectHaveIns" resultType="java.lang.Long">
         SELECT
-            a.instance_id
+          IFNULL(a.instance_id,b.inspection_id)
         FROM
-            t_cruise_point_instance a
-		WHERE a.cruise_id in (SELECT inspection_id from t_robot_inspection where robot_id = #{robotId, jdbcType=BIGINT} )
+        t_robot_inspection b
+        LEFT JOIN  t_cruise_point_instance a on a.cruise_id = b.inspection_id
+        where b.robot_id = #{robotId, jdbcType=BIGINT}
     </select>
 </mapper>

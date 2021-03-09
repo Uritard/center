@@ -213,7 +213,7 @@ public class TCameraInfoService {
         Long cameraId = tCameraInfoDao.selectCameraIdByPmsId(pmsId);
 
         Map<String,String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String filePathAndName = resMap.get("content") +  "/PMS/VoicePMS.xml";
+        String filePathAndName = resMap.get("content") +  "/PMS/CameraPMS.xml";
 //        String filePathAndName = "D:/testform/PMS/CameraPMS.xml";
         log.info("路径是==="+filePathAndName);
 

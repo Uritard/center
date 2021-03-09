@@ -9,6 +9,7 @@ import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.common.websocket.WebSocketServer;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
@@ -108,7 +109,7 @@ public class RobotService {
 
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
         if (robotStatus.equals("离线")){
-            log.info("该机器人处于离线状态,没有成功将模型文件同步指令下发到机器人......");
+            log.info("该机器人处于离线状态,没有成功将控制指令下发到机器人......");
             scmap.put("code", 3);
             scmap.put("result", "机器人不在线");
             return scmap;
@@ -149,7 +150,6 @@ public class RobotService {
             return false;
         }
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
-
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
@@ -202,6 +202,12 @@ public class RobotService {
 
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("修改结果==="+res);
+        //机器人状态改变给前端推送webSocket
+        /*Map<String,Object> jasonMap=new HashMap<>();
+        jasonMap.put("type","robotStatus");
+        jasonMap.put("status",tRobotInfo.getRobotStatus());
+        String json= JSON.toJSONString(jasonMap);
+        WebSocketServer.sendMsg(json);*/
         return res;
     }
     @Transactional(rollbackFor = Exception.class)
