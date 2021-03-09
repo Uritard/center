@@ -178,7 +178,8 @@ public class TCameraRecorderService {
                         tCameraRecorder.setRecordIp(map.get("recordIp").toString());
                     }
                     if (map.containsKey("protocol")) {
-                        tCameraRecorder.setProtocol(map.get("protocol").toString());
+                        String protocol = tRobotInfoDao.selectDictCode("protocol_type",map.get("protocol").toString());
+                        tCameraRecorder.setProtocol(protocol);
                     }
                     if (map.containsKey("httpPort")) {
                         tCameraRecorder.setHttpPort(Integer.valueOf(map.get("httpPort").toString()));

@@ -65,8 +65,8 @@ public class ReportManageService {
 //        String fileName = sdf.format(new Date())+"-"+reportType+".xlsx";
 //        String finalFileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
         //生成随机的文件名称
-        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
-//        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
+//        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
+        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
 
 //        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
 /*        String finalFileName = null;

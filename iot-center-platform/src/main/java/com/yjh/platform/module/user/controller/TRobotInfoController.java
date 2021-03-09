@@ -92,7 +92,7 @@ public class TRobotInfoController {
         try {
             int re = tRobotInfoService.deleteByPrimaryId(robotId);
             if(re == -1){
-                result.setCode(209,"此机器人下存在巡视点");
+                result.setCode(209,"此机器人下存在测点或巡视点");
             }else {
                 result.setData(re);
             }
@@ -279,7 +279,7 @@ public class TRobotInfoController {
         try {
             int re = tRobotInfoService.batchDelete(robotIds);
             if(re == -1){
-                result.setCode(209,"此机器人下存在巡视点");
+                result.setCode(209,"此机器人下存在测点或巡视点");
             }else {
                 result.setData(re);
             }

@@ -1,9 +1,11 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -59,7 +61,7 @@ public class TRobotInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long robotId) {
-        {//机器人有巡视点
+        {//机器人有测点或巡视点
             List<Long> list = tRobotInfoDao.selectHaveIns(robotId);
             if(list != null && list.size()>0){
                 return -1;
@@ -104,6 +106,12 @@ public class TRobotInfoService{
             TRobotInfo tRobotInfoTemp = new TRobotInfo()
                     .setRobotStatus(result.getData().toString())
                     .setRobotId(tRobotInfoPri.getRobotId());
+            //机器人状态改变给前端推送webSocket
+            /*Map<String,Object> jasonMap=new HashMap<>();
+            jasonMap.put("type","robotStatus");
+            jasonMap.put("status",tRobotInfoTemp.getRobotStatus());
+            String json= JSON.toJSONString(jasonMap);
+            WebSocketServer.sendMsg(json);*/
             tRobotInfoDao.update(tRobotInfoTemp);
         }
 
