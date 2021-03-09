@@ -14,7 +14,7 @@ public class Constant {
     //VQD诊断图片存储路径
     public static final String VQD_IMAGES_STORE_URL="192.168.33.241:81";
     //accessVideo视频播放
-    public static final String START_CAMERA_URL = "http://192.168.9.40:18715/camera/v1/startRealPlay?cameraId={cameraId}";
+    public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
 
     public static Result otherServer(Long cameraId, String url) throws Exception{
         Result re = new Result();

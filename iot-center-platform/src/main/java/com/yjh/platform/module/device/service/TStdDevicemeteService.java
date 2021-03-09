@@ -94,12 +94,13 @@ public class TStdDevicemeteService{
     public int deleteByPrimaryId(Long deviceMeteId) {
         //删除测点配置的算法
         tAlgorithmConfBakDao.deleteByPrimaryId(deviceMeteId);
-//        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
-//        Long deviceId=tStdDeviceMete.getDeviceId();
-//        String customId=tStdDeviceMete.getCustomId();
+        TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
+        Long deviceId=tStdDeviceMete.getDeviceId();
+        String customId=tStdDeviceMete.getCustomId();
+
         this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);//删除当前标准测点
 
-//        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
+        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
 //
 //            if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
 //                TStdDevice tStdDevice=tStdDeviceDao.selectByPrimaryId(deviceId);
@@ -108,10 +109,10 @@ public class TStdDevicemeteService{
 //                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
 //                tStdDeviceDao.add(tStdDevice);
 //            }else {                                               //若存在则删除与当前测点关联的设备信息
-//                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
 //            }
 //
-//        }
+        }
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         //tCruisePointInstance.setDeviceMeteId(deviceMeteId);
         List<Long> haveList = tStdDevicemeteDao.selectHave(deviceMeteId);
@@ -174,7 +175,7 @@ public class TStdDevicemeteService{
                     tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());  //删除之前部位的设备
                 }
             }
-            
+
         }
         return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }

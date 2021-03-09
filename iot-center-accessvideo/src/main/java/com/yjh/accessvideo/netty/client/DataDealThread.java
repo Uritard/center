@@ -503,6 +503,8 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("defectTime", simpleDateFormat.format(new Date()));
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
+                                        //缺陷插库  To be continue。。。
+
                                         // webSocket通知显示缺陷信息(单条推送)
                                         Map<String, Object> jasonMaps = new HashMap<>();
                                         jasonMaps.put("type", "newAlarm");
@@ -554,6 +556,9 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                                             defectMap.put("defectTime", defectTime);
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
+
+                                            //缺陷插库 To be continue。。。
+
 
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                             String alarmNote = tStdDevicemete.getAlarmNote();

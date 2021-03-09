@@ -11,6 +11,7 @@ import com.yjh.accessvqd.module.diagnose.entity.DiagnoseResultDetail;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,5 +291,24 @@ public class ChanResultController {
         return result;
     }
 
+
+    @ApiOperation(value = "诊断测试----")
+    @RequestMapping(value = "/diagnoseTest",method = RequestMethod.GET)
+    public  Result diagnoseTest(@RequestParam(value = "param")String param){
+        Result result =new Result();
+
+        try {
+            ChanResult chan=chanResultService.selectByPrimaryId(Long.valueOf(param));
+            Integer c=null;
+            c.toString();
+            result.setData(chanResultService.checkItems(chan).getResultContent());
+        }catch (Exception e){
+            log.error("测试失败："+e);
+            log.info("Reasons----------"+e.getStackTrace()[0]);
+        }
+
+
+        return  result;
+    }
 
 }

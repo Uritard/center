@@ -526,12 +526,13 @@ public class AnalyseDataOperateService {
 
     /**
      * -----缺陷识别结果解析（标签数据转化文字描述）------
-     * @param resultValue 缺陷算法识别结果
+     * @param resultValueOrigin 缺陷算法识别结果(逗号分隔)
      * @return
      */
     //@Logs(title = "缺陷识别结果解析", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public String resolveDefectResult(String resultValue) {
+    public String resolveDefectResult(String resultValueOrigin) {
+        String resultValue=resultValueOrigin.replaceAll(","," ");
         log.info("----缺陷识别结果解析---resultValue:" + resultValue);
         String defectValue = "";
         String value = resultValue;

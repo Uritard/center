@@ -198,6 +198,12 @@ public class HelloController {
         Long beginTime=System.currentTimeMillis();
 
 
+
+        String finalValue = testString.replaceAll("[0-9]", "");
+        String[] str2 = finalValue.split("\\s+");
+        for(String str:str2){
+            log.info("result"+str);
+        }
 //        Long endTime=System.currentTimeMillis();
 //        List<Integer> results=new ArrayList<>();
 
@@ -349,7 +355,7 @@ public class HelloController {
 
         return result;
     }
-    
+
 
     @ApiOperation("发任务")
     @PostMapping("/task")

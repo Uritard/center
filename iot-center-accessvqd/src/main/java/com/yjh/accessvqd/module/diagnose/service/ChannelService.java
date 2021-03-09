@@ -124,6 +124,7 @@ public class ChannelService {
         try {
             String channels=HttpClientUtils.getInstance().getUrl(channelURl+"/"+channelId,null);
             channel=ChannelsXML.unPackingXMl(channels);
+            log.info("channel-------*****---------"+channel);
         }catch (Exception e){
             log.error("查询失败"+e);
         }

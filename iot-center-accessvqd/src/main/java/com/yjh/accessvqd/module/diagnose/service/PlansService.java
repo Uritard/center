@@ -159,6 +159,29 @@ public class PlansService {
         } catch (Exception e) {
             log.error("计划查询失败" + e);
         }
+
+
+        //按任务开始时间 降序排列
+        Collections.sort(finalResults, new Comparator<Plans>() {
+            @Override
+            public int compare(Plans o1, Plans o2) {
+                if (Objects.isNull(o1.getStartTime()) || Objects.isNull(o2.getStartTime())) {
+                    int flag = 1;
+                    return flag;
+                } else {
+                    int flag = o1.getStartTime().compareTo(o2.getStartTime());
+                    if (flag == -1) {
+                        flag = 1;
+                    } else if (flag == 1) {
+                        flag = -1;
+                    }
+                    return flag;
+                }
+
+            }
+        });
+
+
         return finalResults;
     }
 

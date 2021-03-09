@@ -120,8 +120,9 @@ public class TCameraInfoService {
     public int update(TCameraInfo tCameraInfo) {
         TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
         try {
+            log.info("channelId----------:"+tCameraInfo.getMonitorId());
             Result result=Constant.otherServerGet(tCameraInfo.getMonitorId(),Constant.DIAGNOSE_CHANNEL_GET);
-            log.info("result:"+result.getData());
+            log.info("result------------:"+result.getMessage());
             Channel channel=(Channel)result.getData();
 
             channel.setIp(recorder.getRecordIp());
@@ -135,10 +136,10 @@ public class TCameraInfoService {
         }catch (Exception e){
             log.error("监测点修改失败："+e);
             return 0;
+        }finally {
+            return this.tCameraInfoDao.update(tCameraInfo);
         }
 
-
-        return this.tCameraInfoDao.update(tCameraInfo);
     }
 
     @Transactional(rollbackFor = Exception.class)

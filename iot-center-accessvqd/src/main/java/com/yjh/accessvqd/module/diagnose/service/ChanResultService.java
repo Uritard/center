@@ -90,6 +90,7 @@ public class ChanResultService {
     @Logs(title = "主键查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public ChanResult selectByPrimaryId(Long diagnoseResultId) {
+        log.info("URL--------------------:"+VQD_IMAGES_STORE_URL);
         return this.chanResultDao.selectByPrimaryId(diagnoseResultId);
     }
 

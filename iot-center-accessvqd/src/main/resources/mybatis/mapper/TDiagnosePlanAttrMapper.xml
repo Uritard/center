@@ -44,7 +44,6 @@
         from t_diagnose_plan_attr a
         where 1 = 1
             and a.diagnose_plan_id = #{diagnosePlanId, jdbcType=VARCHAR}
-        limit 1
     </select>
 
     <select id="select" parameterType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr" resultType="com.yjh.accessvqd.module.diagnose.entity.TDiagnosePlanAttr">
