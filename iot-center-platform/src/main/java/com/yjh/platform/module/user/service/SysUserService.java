@@ -156,7 +156,7 @@ public class SysUserService {
                             return mapResult;
                         } else {
                             if (yxTime>sysUserLogin.getInvalidTime()) {
-                                mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
+                                mapResult.put("mmgh", "当前密码长时间未更换，需更换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
                             mapResult.put("roleMenuList", sysRoleMenuList);
@@ -188,7 +188,7 @@ public class SysUserService {
                     }
                     if (sysUserLogin.getState() == 1) {
                         if (yxTime>sysUserLogin.getInvalidTime()) {
-                            mapResult.put("mmgh", "当前密码长时间未跟换，需跟换");
+                            mapResult.put("mmgh", "当前密码长时间未更换，需更换");
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
                         mapResult.put("roleMenuList", sysRoleMenuList);
@@ -216,7 +216,7 @@ public class SysUserService {
                 }
             } else {
                 //登陆错误判断用户是否存在
-                List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userMap.get("userName"));
+                List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userName);
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "5");
                 params.set("ip", request.getRemoteHost());
