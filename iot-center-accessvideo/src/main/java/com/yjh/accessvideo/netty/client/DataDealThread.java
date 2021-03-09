@@ -382,7 +382,8 @@ public class DataDealThread implements Runnable {
                                                         xmlItem.put("unit", (null == info.get("unit") ? "" : info.get("unit")));
                                                         xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
                                                         xmlItem.put("time", simpleDateFormat.format(new Date()));
-                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId"));
+                                                        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(cruiseResult.get("cruiseTime")));
                                                         xmlItem.put("content", tWarnInfo.getWarnContent());
 
 
@@ -393,7 +394,7 @@ public class DataDealThread implements Runnable {
                                                         Map<String, List<XMLBaseModel>> map = new HashMap<>();
                                                         map.put("list", list);
                                                         log.info("告警上报：-" + map);
-                                                        Constant.otherServer(map, Constant.TCP_URL);
+                                                        //Constant.otherServer(map, Constant.TCP_URL);//江苏要求
                                                     }
 
                                                     // webSocket通知前端刷新告警统计数量
@@ -649,7 +650,8 @@ public class DataDealThread implements Runnable {
                             xmlItem.put("file_type", "2");
                             xmlItem.put("file_path", cruiseResult.get("picpath"));
                             xmlItem.put("rectangle", "");
-                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId"));
+                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(cruiseResult.get("cruiseTime")));
                             xmlItem.put("data_type", "0x01");
                             String valid = "";
                             if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
@@ -666,7 +668,7 @@ public class DataDealThread implements Runnable {
                             Map<String, List<XMLBaseModel>> map = new HashMap<>();
                             map.put("list", list);
                             log.info("结果信息上报：-" + map);
-                            Constant.otherServer(map, Constant.TCP_URL);
+                            //Constant.otherServer(map, Constant.TCP_URL);//江苏要求
                         }
 
                         log.info("Border_______---------______________________________________________________________________________________________");

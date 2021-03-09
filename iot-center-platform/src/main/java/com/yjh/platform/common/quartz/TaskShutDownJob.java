@@ -222,7 +222,8 @@ public class TaskShutDownJob extends QuartzJobBean {
                             xmlItem.put("file_type","2");
                             xmlItem.put("file_path","");
                             xmlItem.put("rectangle","");
-                            xmlItem.put("task_patrolled_id",taskId);
+                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                            xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
                             xmlItem.put("data_type","0x01");
                             xmlItem.put("valid","0");
 
@@ -233,7 +234,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
                             log.info("信息上报：-"+cruiseResult);
-                            Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                         }
 
                     } else {
@@ -298,7 +299,8 @@ public class TaskShutDownJob extends QuartzJobBean {
                             xmlItem.put("file_type","2");
                             xmlItem.put("file_path","");
                             xmlItem.put("rectangle","");
-                            xmlItem.put("task_patrolled_id",taskId);
+                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                            xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
                             xmlItem.put("data_type","0x01");
                             xmlItem.put("valid","0");
 
@@ -309,7 +311,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
                             log.info("信息上报：-"+cruiseResult);
-                            Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                         }
                     }
                 }

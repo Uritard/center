@@ -938,11 +938,13 @@ public class TCruiseTaskService {
 
     private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state) {
         //任务状态上报站端
+
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> item = new HashMap<>();
         xmlBaseModel.setType("41");
-        item.put("task_patrolled_id",tCruiseTask.getTaskId());
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+        item.put("task_patrolled_id",tCruiseTask.getTaskId()+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
         item.put("task_name",tCruiseTask.getTaskName());
         item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
@@ -981,7 +983,7 @@ public class TCruiseTaskService {
         Result re = null;
         try {
             log.info("信息上报：-" + map);
-            re = Constant.otherServer(map, Constant.TCP_URL);
+            re = Constant.otherServer(map, Constant.TCP_URL);//江苏要求
         } catch (Exception e) {
             log.info("上报出错" + e.getMessage());
         }

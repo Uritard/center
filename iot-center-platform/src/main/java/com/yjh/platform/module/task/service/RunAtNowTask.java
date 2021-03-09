@@ -318,6 +318,7 @@ public class RunAtNowTask implements Runnable{
             log.info("开始巡检"+new Date());
 
             List<String> cruiseResultIdList = new ArrayList<>();
+            int countForInstance = 0;
             for (TCruisePointInstanceNameDetail item : instancesList) {
                 TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                 tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId()+item.getInstanceId().toString());
@@ -428,33 +429,45 @@ public class RunAtNowTask implements Runnable{
                         log.info(map.toString());
                         Map<String,String> mapForCameraState = redisTemplate.opsForHash().entries("camera_info:"+tCameraPreset.getCameraId());
                         Integer cameraState = Integer.valueOf(mapForCameraState.get("state"));
+                        boolean waitFlag = true;
                         if(cameraState == 1){//摄像头在任务中
+                            int waitCount = 0;
                             while (cameraState == 1){
                                 Thread.sleep(waitTime+1000);
                                 log.info("任务："+tCruiseTask.getTaskName()+"在"+simpleDateFormat.format(new Date())+"时已经等待了"+(waitTime+1000)/1000+"秒");
                                 Map<String,String> mapForCameraStateForGet = redisTemplate.opsForHash().entries("camera_info:"+tCameraPreset.getCameraId());
                                 cameraState = Integer.valueOf(mapForCameraStateForGet.get("state"));
+                                waitCount = waitCount +1;
+                                if(waitCount == 30){
+                                    log.info("任务："+tCruiseTask.getTaskName()+"已经等待了330秒,仍未等待到"+tCameraPreset.getPresetName()+"预置位,摄像机Id"+tCameraPreset.getCameraId()+"退出等待");
+                                    waitFlag = false;
+                                    break;
+                                }
                             }
                         }
-                        mapForCameraState.put("state","1");
-                        redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
-                        move(map);
-                        Thread.sleep(waitTime);//等待摄像头转到预置位
-                        //2.抓图
-                        HashMap<String, Object> map2 = new HashMap<>();
-                        map2.put("cameraId", tCameraPreset.getCameraId());
-                        Result re = picture(map2);
-                        if(re == null){
-                            isOk = "";
-                        }else{
-                            JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
-                            //todo 对于相机的返回错误分析  任务异常终止/超期
-                            urlPath = (String) jsonForRe.get("urlPath");
-                            absPath = (String) jsonForRe.get("absPath");
-                            isOk = re.getMessage();
+                        if(waitFlag){
+                            mapForCameraState.put("state","1");
+                            redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
+                            move(map);
+                            Thread.sleep(waitTime);//等待摄像头转到预置位
+                            //2.抓图
+                            HashMap<String, Object> map2 = new HashMap<>();
+                            map2.put("cameraId", tCameraPreset.getCameraId());
+                            Result re = picture(map2);
+                            if(re == null){
+                                isOk = "";
+                            }else{
+                                JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
+                                //todo 对于相机的返回错误分析  任务异常终止/超期
+                                urlPath = (String) jsonForRe.get("urlPath");
+                                absPath = (String) jsonForRe.get("absPath");
+                                isOk = re.getMessage();
+                            }
+                            mapForCameraState.put("state","0");
+                            redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
+                        }else {
+                            isOk ="";
                         }
-                        mapForCameraState.put("state","0");
-                        redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
                     }
                     if( !"success".equals(isOk)){
                         //抓图失败 任务失败
@@ -518,7 +531,8 @@ public class RunAtNowTask implements Runnable{
                             xmlItem.put("file_type","2");
                             xmlItem.put("file_path",urlPath);
                             xmlItem.put("rectangle","");
-                            xmlItem.put("task_patrolled_id",taskId);
+                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                            xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
                             xmlItem.put("data_type","0x01");
                             xmlItem.put("valid","0");
 
@@ -529,7 +543,7 @@ public class RunAtNowTask implements Runnable{
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
                             log.info("信息上报：-"+cruiseResult);
-                            Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                         }
 
 
@@ -684,7 +698,8 @@ public class RunAtNowTask implements Runnable{
                                 xmlItem.put("file_type","2");
                                 xmlItem.put("file_path",urlPath);
                                 xmlItem.put("rectangle","");
-                                xmlItem.put("task_patrolled_id",taskId);
+                                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                                xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
                                 xmlItem.put("data_type","0x01");
                                 xmlItem.put("valid","1");
 
@@ -695,12 +710,32 @@ public class RunAtNowTask implements Runnable{
                                 Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                                 cruiseResult.put("list",list);
                                 log.info("信息上报：-"+cruiseResult);
-                                Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                                Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                             }
 
                         }
 
 
+                    }
+                    {
+                        //专为检测的  4张图片一轮
+                        Map<String,String> maoForFour= redisTemplate.opsForHash().entries("");
+                        Boolean flagForFour = false;
+                        if(maoForFour != null  && maoForFour.size()>0){
+                            flagForFour = Boolean.valueOf(maoForFour.get("content"));
+                        }
+                        if(flagForFour){
+                            countForInstance = countForInstance +1;
+                            if(countForInstance == 4){
+                                Map<String,String> maoForSleep= redisTemplate.opsForHash().entries("");
+                                Long sleepTime = 30000L;
+                                if(maoForSleep != null  && maoForSleep.size()>0){
+                                    sleepTime = Long.valueOf(maoForSleep.get("content"));
+                                }
+                                Thread.sleep(sleepTime);
+                            }
+                            countForInstance = 0;
+                        }
                     }
                 }
                 if (231 == item.getCruiseType()) {//todo 在线监控
@@ -843,7 +878,8 @@ public class RunAtNowTask implements Runnable{
         List<Map<String,Object>> items= new ArrayList<>();
         Map<String,Object> item = new HashMap<>();
         xmlBaseModel.setType("41");
-        item.put("task_patrolled_id",tCruiseTask.getTaskId());
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+        item.put("task_patrolled_id",tCruiseTask.getTaskId()+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
         item.put("task_name",tCruiseTask.getTaskName());
         item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
@@ -879,7 +915,7 @@ public class RunAtNowTask implements Runnable{
         Result re = null;
         try{
             log.info("信息上报：-"+map);
-            re = Constant.otherServer(map,Constant.TCP_URL);
+            re = Constant.otherServer(map,Constant.TCP_URL);//江苏要求
         }catch (Exception e){
             log.info("上报出错"+e.getMessage());
         }

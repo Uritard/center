@@ -566,7 +566,7 @@ select *from (
             LEFT JOIN t_dict_business b ON a.c_type = b.dict_code
             LEFT JOIN t_cruise_task c ON a.task_id = c.task_id
         WHERE
-            a.c_state = 239
+            a.c_state = 239 or a.c_state = 241
             order by c.start_time desc limit 3
     </select>
 

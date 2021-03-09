@@ -18,6 +18,7 @@ import io.netty.channel.*;
 
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.ReferenceCountUtil;
+import io.swagger.models.Xml;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -253,16 +254,22 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                             Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
                         }
                     }
-                    //将数据放入redis 做个保存
-                    redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
-                    //心跳线程发心跳
-                    HeartBeatThead heartBeatThead = new HeartBeatThead(this, true);
-                    //天气线程发天气
-                    WeatherThread weatherThread = new WeatherThread(this,redisTemplate,true,sendToUpSystemServices);
+//                    //将数据放入redis 做个保存
+//                    redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
+//                    //心跳线程发心跳
+//                    HeartBeatThead heartBeatThead = new HeartBeatThead(this, true);
+//                    //天气线程发天气
+//                    WeatherThread weatherThread = new WeatherThread(this,redisTemplate,true,sendToUpSystemServices);
+//                    //运行数据
+//
+//                    TaskExecutePool.getInstance().execute(heartBeatThead);
+//                    TaskExecutePool.getInstance().execute(weatherThread);//江苏要求
 
-                    TaskExecutePool.getInstance().execute(heartBeatThead);
-                    TaskExecutePool.getInstance().execute(weatherThread);
-
+                    Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
+                    List<XMLBaseModel> list = new ArrayList<>();
+                    list.add(xmlBaseModel);
+                    robotMap.put("list",list);
+                    Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
                 } else {
                     return;
                 }
@@ -297,7 +304,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             robotMap.put("list",list);
-            Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);
+            Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
             }else if("success".equals(re.getData().toString())){
@@ -314,7 +321,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             map.put("list",list);
-            re = Constant.otherServer(map,Constant.TASK_STATE_URL);
+            //re = Constant.otherServer(map,Constant.TASK_STATE_URL);//江苏要求
+            re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
             List<Map<String,Object>> items = new ArrayList<>();
             Map<String,Object> item = new HashMap<>();
             item.put("task_patrolled_id",xmlBaseModel.getCode());
@@ -394,11 +402,16 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     }
                     tCruiseTaskAdd.setStartTime(simpleDateFormat.parse(item.get("fixed_start_time").toString()));
 
-                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
-                    List<TCruiseTaskAdd> taskList = new ArrayList<>();
-                    taskList.add(tCruiseTaskAdd);
+//                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
+//                    List<TCruiseTaskAdd> taskList = new ArrayList<>();
+//                    taskList.add(tCruiseTaskAdd);
+//                    map.put("list",taskList);
+                    //Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);//江苏要求
+                    Map<String,List<XMLBaseModel>> map = new HashMap<>();
+                    List<XMLBaseModel> taskList = new ArrayList<>();
+                    taskList.add(xmlBaseModel);
                     map.put("list",taskList);
-                    Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
+                    Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
                     if(re == null){
                         sendToUpSystemServices.sendResponse("251","3","500",null);
                     }else if("200".equals(re.getCode())){
@@ -430,16 +443,22 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     tCruiseTaskAdd.setIfRun(173);
                     tCruiseTaskAdd.setStartTime(new Date());
 
-                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
-                    List<TCruiseTaskAdd> listTask = new ArrayList<>();
-                    listTask.add(tCruiseTaskAdd);
-                    map.put("list",listTask);
-                    Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
+//                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
+//                    List<TCruiseTaskAdd> listTask = new ArrayList<>();
+//                    listTask.add(tCruiseTaskAdd);
+//                    map.put("list",listTask);
+                    //Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);//江苏要求
+                    Map<String,List<XMLBaseModel>> map = new HashMap<>();
+                    List<XMLBaseModel> taskList = new ArrayList<>();
+                    taskList.add(xmlBaseModel);
+                    map.put("list",taskList);
+                    Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
                     List<Map<String,Object>> xmlItems = new ArrayList<>();
                     Map<String,Object> xmlItem = new HashMap<>();
+                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
                     if(re == null){
                         xmlItem.put("error_code","3");
-                        xmlItem.put("task_patrolled_id",taskId);
+                        xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","100",xmlItems);
                     }else if("200".equals(re.getCode())){
@@ -449,7 +468,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
                     }else {
                         xmlItem.put("error_code","1");
-                        xmlItem.put("task_patrolled_id",taskId);
+                        xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","500",xmlItems);
                     }
@@ -479,8 +498,12 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                 mapForDevice.put("task_file_path",path+"/"+"task_file.xml");
                 list.add(mapForTask);
 
-                sendToUpSystemServices.sendResponse("251","3","200",list);
-
+                //sendToUpSystemServices.sendResponse("251","3","200",list);//江苏要求
+                Map<String,List<XMLBaseModel>> map = new HashMap<>();
+                List<XMLBaseModel> taskList = new ArrayList<>();
+                taskList.add(xmlBaseModel);
+                map.put("list",taskList);
+                Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
             }
         }
 
@@ -490,7 +513,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             robotMap.put("list",list);
-            Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);
+            //Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);//江苏要求
+            Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
             log.info("--响应检修--"+re);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);

@@ -52,7 +52,7 @@ public class Constant {
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
         //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        //re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
         return re;
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";

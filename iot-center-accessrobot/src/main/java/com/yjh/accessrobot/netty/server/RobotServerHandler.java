@@ -368,7 +368,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         robotStatusMap.put("unit",res.get("unit").toString());
                         robotStatusList.add(robotStatusMap);
 
-                        robotService.upToCruise(xmlBaseModel);
+                        robotService.upToCruise(xmlBaseModel);//国网要求
                     });
                     log.info("机器人状态数据是："+robotStatusList);
                     //放缓存
@@ -397,7 +397,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         robotOperationMap.put("unit",res.get("unit").toString());
                         robotOperationList.add(robotOperationMap);
 
-                        robotService.upToCruise(xmlBaseModel);
                     });
                     //放缓存
                     for (int i = 0; i < robotOperationList.size(); i++) {
@@ -407,6 +406,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] operationProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, operationXmlString);
                     send(ctx, operationProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
+                    robotService.upToCruise(xmlBaseModel);//国网要求
 
                     break;
                 //机器人坐标(接收并发送响应)
@@ -432,7 +432,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] coordinateProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, coordinateXmlString);
                     send(ctx, coordinateProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
-
+                    robotService.upToCruise(xmlBaseModel);//国网要求
                     break;
                 //机器人巡视路线(接收并发送响应)
                 case "4":
@@ -489,6 +489,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, roadProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
+                    robotService.upToCruise(xmlBaseModel);//国网要求
                     break;
                 //机器人异常告警数据(接收并发送响应)
                 case "5":
@@ -510,8 +511,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("巡视主机给机器人响应了");
 
 
-                    xmlBaseModel.setType("62");
-                    robotService.upToCruise(xmlBaseModel);
+                    //xmlBaseModel.setType("62");
+                    robotService.upToCruise(xmlBaseModel);//国网要求
 
                     break;
                 //微气象数据(接收并发送响应)
@@ -539,6 +540,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
+                    robotService.upToCruise(xmlBaseModel);//国网要求
                     break;
                 //任务状态数据(接收并发送响应)
                 case "41":
@@ -566,6 +568,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
+                    robotService.upToCruise(xmlBaseModel);//国网要求
                     break;
                 //巡视结果
                 case "61":
@@ -647,14 +650,18 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     xmlBaseModel.getItems().get(0).put("material_id",mapForGet.get("realCode"));
                     xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
                     xmlBaseModel.getItems().get(0).put("patroldevice_code",instanceId);
+                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
                     xmlBaseModel.getItems().get(0).remove("robot_code");
                     List<XMLBaseModel> list = new ArrayList<>();
                     list.add(xmlBaseModel);
                     Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                     cruiseResult.put("list",list);
                     log.info("信息上报：-"+cruiseResult);
-                    Constant.otherServer(cruiseResult,Constant.TCP_URL);
+                    //Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                 }
+
+                robotService.upToCruise(xmlBaseModel);//国网要求
                     break;
                 default:
                     break;
