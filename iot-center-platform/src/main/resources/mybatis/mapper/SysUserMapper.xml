@@ -281,11 +281,10 @@
         <result property="lastLogin" column="last_login"/>
     </resultMap>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysUser" resultMap="userInfoPageMap">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysUserSelect" resultMap="userInfoPageMap">
         select
         a.user_id,
         a.user_name,
-        a.PASSWORD,
         a.true_name,
         a.user_type,
         a.sex,
