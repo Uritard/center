@@ -242,6 +242,8 @@ public class TCruiseTaskService {
                 log.info("del task single...");
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             } else {
+                //判断当前周期任务是否已执行 --by tt 2021.3.10
+                if (Objects.isNull(tCruiseTask.getDateType())) { taskId = tCruiseTask.getTaskCode(); }
                 //删除整个周期任务
                 for (Iterator<ConcurrentHashMap<String, Object>> it = Constant.taskMap.iterator(); it.hasNext(); ) {
                     ConcurrentHashMap<String, Object> mapItem = it.next();
