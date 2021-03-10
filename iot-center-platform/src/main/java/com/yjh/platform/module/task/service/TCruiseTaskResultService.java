@@ -203,7 +203,7 @@ public class TCruiseTaskResultService {
 
                 Map<String, String> videoInfo = new HashMap<>();
                 log.info("redis-cameraId-------:"+resultMap.get("cameraId"));
-                if (Objects.nonNull(resultMap.get("cameraId"))  || !(resultMap.get("cameraId").toString().equals(""))) {
+                if (Objects.nonNull(resultMap.get("cameraId")) && !(resultMap.get("cameraId").toString().equals(""))) {
                     if (redisTemplate.opsForHash().entries("cruiseVideo:" + taskId + (cruiseInspectResult.getInstanceId()).toString()).size() == 0) {
                         HashMap<String, Long> camera = new HashMap<>();
                         camera.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
