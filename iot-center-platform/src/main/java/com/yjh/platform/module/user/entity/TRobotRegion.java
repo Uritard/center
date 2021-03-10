@@ -56,7 +56,7 @@ public class TRobotRegion implements Serializable {
     @ApiModelProperty(value = "0:非当前变电站 1：当前变电站")
     private Integer state;
 
-    @Past
+
     private Date createTime;
 
     @Length(max = 128,message = "stationName长度必须小于等于128")

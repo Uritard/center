@@ -67,7 +67,7 @@ public class TCfgTelesignal implements Serializable {
 
     private Integer lastValue;
 
-    @Past
+
     @ApiModelProperty(value = "当前值更新时间")
     @TableField(value = "last_time",updateStrategy = FieldStrategy.IGNORED)
     private Date lastTime;

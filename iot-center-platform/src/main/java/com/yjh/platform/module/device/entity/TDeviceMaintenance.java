@@ -53,13 +53,13 @@ public class TDeviceMaintenance implements Serializable {
     @ApiModelProperty(value = "是否使用，0-不使用，1-使用")
     private Integer isValid;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "开始检修时间")
     private Date maintenanceStart;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "结束检修时间")

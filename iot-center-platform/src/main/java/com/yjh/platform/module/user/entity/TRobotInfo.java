@@ -30,34 +30,34 @@ public class TRobotInfo implements Serializable {
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "机器人id")
-    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_id", updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
 
     @Length(max = 32, message = "robotCode长度必须小于等于32")
     @ApiModelProperty(value = "机器人编号")
-    @TableField(value = "robot_code",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_code", updateStrategy = FieldStrategy.IGNORED)
     private String robotCode;
 
     @Length(max = 64, message = "robotName长度必须小于等于64")
     @ApiModelProperty(value = "机器人名字")
-     @TableField(value = "robot_name",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_name", updateStrategy = FieldStrategy.IGNORED)
     private String robotName;
 
     @Length(max = 6, message = "robotStatus长度必须小于等于6")
     @ApiModelProperty(value = "机器人状态 ")
-     @TableField(value = "robot_status",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_status", updateStrategy = FieldStrategy.IGNORED)
     private String robotStatus;
 
     @Max(value = 999999)
     @ApiModelProperty(value = "机器人型号")
     private Integer robotType;
 
-//    @Length(max = 255, message = "robotTypeName长度必须小于等于255")
+    //    @Length(max = 255, message = "robotTypeName长度必须小于等于255")
     private String robotTypeName;
 
     @Length(max = 32, message = "robotIp长度必须小于等于32")
     @ApiModelProperty(value = "机器人IP")
-     @TableField(value = "robot_ip",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_ip", updateStrategy = FieldStrategy.IGNORED)
     private String robotIp;
 
     @Max(value = 99999999)
@@ -66,93 +66,93 @@ public class TRobotInfo implements Serializable {
 
     @Length(max = 32, message = "lightIp长度必须小于等于32")
     @ApiModelProperty(value = "可见光IP")
-    @TableField(value = "light_ip",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "light_ip", updateStrategy = FieldStrategy.IGNORED)
     private String lightIp;
 
     @Length(max = 8, message = "lightPort长度必须小于等于8")
     @ApiModelProperty(value = "可见光端口")
-     @TableField(value = "light_port",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "light_port", updateStrategy = FieldStrategy.IGNORED)
     private String lightPort;
 
     @Length(max = 32, message = "lightUsername长度必须小于等于32")
     @ApiModelProperty(value = "可见光用户名")
-    @TableField(value = "identity_manager",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "identity_manager", updateStrategy = FieldStrategy.IGNORED)
     private String identityManager;
 
     @Length(max = 15, message = "lightPassword长度必须小于等于15")
     @ApiModelProperty(value = "可见光密码")
-    @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "identity_code", updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
 
     @Length(max = 32, message = "lnferadIp长度必须小于等于32")
     @ApiModelProperty(value = "红外IP")
-    @TableField(value = "lnferad_IP",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "lnferad_IP", updateStrategy = FieldStrategy.IGNORED)
     private String lnferadIp;
 
     @Max(value = 99999999)
     @ApiModelProperty(value = "红外端口")
-    @TableField(value = "lnferad_IP",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "lnferad_IP", updateStrategy = FieldStrategy.IGNORED)
     private Integer inferadPort;
 
     @Length(max = 32, message = "inferadUsername长度必须小于等于32")
-    @TableField(value = "Inferad_username",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "Inferad_username", updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "红外用户名")
     private String inferadUsername;
 
     @Length(max = 8, message = "inferadPassword长度必须小于等于8")
-    @TableField(value = "Inferad_password",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "Inferad_password", updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "红外密码")
     private String inferadPassword;
 
     @Length(max = 255, message = "photePath长度必须小于等于255")
     @ApiModelProperty(value = "照片路径")
-    @TableField(value = "phote_path",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "phote_path", updateStrategy = FieldStrategy.IGNORED)
     private String photePath;
 
     @Length(max = 64, message = "createBy长度必须小于等于64")
     @ApiModelProperty(value = "创建人")
-    @TableField(value = "create_by",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "create_by", updateStrategy = FieldStrategy.IGNORED)
     private String createBy;
 
-    @Past
+
     @ApiModelProperty(value = "修改日期", example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createDate;
 
     @Length(max = 64, message = "updateBy长度必须小于等于64")
     @ApiModelProperty(value = "修改日期")
-    @TableField(value = "update_by",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "update_by", updateStrategy = FieldStrategy.IGNORED)
     private String updateBy;
 
-    @Past
+
     @ApiModelProperty(value = "修改日期", example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-        private Date updateDate;
+    private Date updateDate;
 
     @Length(max = 28, message = "robotFactory长度必须小于等于28")
     @ApiModelProperty(value = "机器人厂家 ")
-    @TableField(value = "robotFactory",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robotFactory", updateStrategy = FieldStrategy.IGNORED)
     private String robotFactory;
 
-//    @Length(max = 100, message = "robotFactoryName长度必须小于等于100")
+    //    @Length(max = 100, message = "robotFactoryName长度必须小于等于100")
     private String robotFactoryName;
 
     @Length(max = 10, message = "isUse长度必须小于等于10")
     @ApiModelProperty(value = "使用状态 ")
-    @TableField(value = "is_use",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "is_use", updateStrategy = FieldStrategy.IGNORED)
     private String isUse;
 
-//    @Length(max = 64, message = "robotCode长度必须小于等于32")
+    //    @Length(max = 64, message = "robotCode长度必须小于等于32")
     private String isUseName;
 
-    @Past
+
     @ApiModelProperty(value = "投运时间", example = "2020-08-01")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date commissionDate;
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "区域ID")
-    @TableField(value = "upRegionId",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "upRegionId", updateStrategy = FieldStrategy.IGNORED)
     private Long upRegionId;
 
     private List<Long> upRegionIds;
@@ -161,35 +161,35 @@ public class TRobotInfo implements Serializable {
 
     @Length(max = 32, message = "robotPosition长度必须小于等于32")
     @ApiModelProperty(value = "机器人类型")
-    @TableField(value = "robot_position",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_position", updateStrategy = FieldStrategy.IGNORED)
     private String robotPosition;
 
     private String robotPositionName;
 
     @Length(max = 255, message = "remarks长度必须小于等于255")
-    @TableField(value = "remarks",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "remarks", updateStrategy = FieldStrategy.IGNORED)
     private String remarks;
 
 
     @ApiModelProperty(value = "设备来源")
-    @TableField(value = "robot_source",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "robot_source", updateStrategy = FieldStrategy.IGNORED)
     private String robotSource;
     @ApiModelProperty(value = "安装位置")
-     @TableField(value = "address",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "address", updateStrategy = FieldStrategy.IGNORED)
     private String address;
     @ApiModelProperty(value = "使用单位")
-    @TableField(value = "building_user",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "building_user", updateStrategy = FieldStrategy.IGNORED)
     private String buildingUser;
     @ApiModelProperty(value = "出场编号")
-    @TableField(value = "appearance_number",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "appearance_number", updateStrategy = FieldStrategy.IGNORED)
     private String appearanceNumber;
     @ApiModelProperty(value = "缺陷记录")
-    @TableField(value = "defect_record",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "defect_record", updateStrategy = FieldStrategy.IGNORED)
     private String defectRecord;
     @ApiModelProperty(value = "大修记录")
-    @TableField(value = "repair_record",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "repair_record", updateStrategy = FieldStrategy.IGNORED)
     private String repairRecord;
     @ApiModelProperty(value = "退出再重放记录")
-    @TableField(value = "exit_putInto_record",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "exit_putInto_record", updateStrategy = FieldStrategy.IGNORED)
     private String exitPutIntoRecord;
 }

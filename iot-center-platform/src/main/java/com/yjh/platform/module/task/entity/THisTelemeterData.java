@@ -43,7 +43,7 @@ public class THisTelemeterData implements Serializable {
     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "数值时间")
     private Date recordTime;

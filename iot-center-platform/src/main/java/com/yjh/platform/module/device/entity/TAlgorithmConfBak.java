@@ -62,11 +62,11 @@ public class TAlgorithmConfBak implements Serializable {
     @ApiModelProperty(value = "0不应用，1应用到日常巡视，2..待定")
     private Integer applyModule;
 
-    @Past
+
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @Past
+
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
 
