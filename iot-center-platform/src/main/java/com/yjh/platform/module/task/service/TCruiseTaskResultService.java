@@ -232,8 +232,9 @@ public class TCruiseTaskResultService {
                     HashMap<String, Long> robot = new HashMap<>();
                     robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
                     Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-
-                    videoInfo.putAll((Map<String, String>) result.getData());
+                    log.info("robot-VideoINfo:"+result);
+                    List<Map<String, String>> robotVideoInfo=(List<Map<String, String>>)result.getData();
+                    videoInfo.putAll(robotVideoInfo.get(0));
                     videoInfo.put("cameraId", null);
                     cruiseInspectResult.setVideoInfo(videoInfo);
                 } else {
