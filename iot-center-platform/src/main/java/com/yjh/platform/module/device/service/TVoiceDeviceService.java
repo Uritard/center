@@ -167,48 +167,68 @@ public class TVoiceDeviceService{
                     areaInfoTem.setLabel(areaInfoMap.getLabel());
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
-                    List<VoiceDevice> dateList = new ArrayList<>();
+                    List<VoiceDevice> channelList = new ArrayList<>();
                     if("device".equals(areaInfoTem.getInfoType())){
                         //todo 记得加上日期这一层级日期
                         boolean flag = false;
                         //File file = new File("D:/code/qhTest"+"/"+areaInfoTem.getId());
-                        File file = new File(absPath+"/"+areaInfoTem.getId());
-                        File[] tempList = file.listFiles();
-                        if(tempList != null && tempList.length>0){
-                            for (int i = 0; i < tempList.length; i++) {
-                                if (tempList[i].isDirectory()) {//时间日期文件夹
-                                    VoiceDevice date = new VoiceDevice();
-                                    date.setUpId(areaInfoTem.getId());
-                                    date.setUpName(areaInfoTem.getLabel());
-                                    date.setLabel(tempList[i].getName());
-                                    date.setId(areaInfoTem.getId());
+                        File channelFile = new File(absPath+"/"+areaInfoTem.getId());
+                        File[] channelFileList = channelFile.listFiles();
+                        if(channelFileList != null && channelFileList.length>0){
+                            for (int i = 0; i < channelFileList.length; i++) {
+                                if (channelFileList[i].isDirectory()) {//通道日期文件夹
+                                    VoiceDevice channel = new VoiceDevice();
+                                    channel.setUpId(areaInfoTem.getId());
+                                    channel.setUpName(areaInfoTem.getLabel());
+                                    channel.setLabel(channelFileList[i].getName());
+                                    channel.setId(channelFileList[i].getName());
                                     //voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
-                                    date.setInfoType("date");
+                                    channel.setInfoType("channel");
                                     //查询此文件夹下的所有文件
-                                    List<VoiceDevice> fileList = new ArrayList<>();
-                                    File fileForFile = new File(absPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
-                                    File[] voiceFileList = fileForFile.listFiles();
-                                    if(voiceFileList != null && voiceFileList.length>0) {
-                                        for (int j = 0; j < voiceFileList.length; j++) {
-                                            if (voiceFileList[j].isFile()) {//音频文件
-                                                VoiceDevice voiceDevice = new VoiceDevice();
-                                                voiceDevice.setUpId(date.getId());
-                                                voiceDevice.setUpName(date.getLabel());
-                                                voiceDevice.setLabel(voiceFileList[i].getName());
-                                                voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName()+"/"+voiceFileList[i].getName());
-                                                voiceDevice.setInfoType("file");
-                                                fileList.add(voiceDevice);
+                                    List<VoiceDevice> dateList = new ArrayList<>();
+                                    File fileForDate = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
+                                    File[] voiceDateList = fileForDate.listFiles();
+                                    if(voiceDateList != null && voiceDateList.length>0) {
+                                        for (int j = 0; j < voiceDateList.length; j++) {
+                                            if (voiceDateList[j].isFile()) {//日期文件
+                                                VoiceDevice date = new VoiceDevice();
+                                                date.setUpId(channel.getId());
+                                                date.setUpName(channel.getLabel());
+                                                date.setLabel(voiceDateList[j].getName());
+                                                date.setId(voiceDateList[j].getName());
+                                                date.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName());
+                                                date.setInfoType("date");
+                                                //查询此文件夹下的所有文件
+                                                List<VoiceDevice> fileList = new ArrayList<>();
+                                                File fileForFile = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
+                                                File[] voiceFileList = fileForFile.listFiles();
+                                                if(voiceFileList != null && voiceFileList.length>0) {
+                                                    for (int k = 0; k < voiceFileList.length; k++) {
+                                                        if (voiceFileList[k].isFile()) {//文件文件
+                                                            VoiceDevice voiceFile = new VoiceDevice();
+                                                            voiceFile.setUpId(date.getId());
+                                                            voiceFile.setUpName(date.getLabel());
+                                                            voiceFile.setLabel(voiceFileList[k].getName());
+                                                            voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName()+"/"+voiceFileList[k].getName());
+                                                            voiceFile.setInfoType("file");
+                                                            fileList.add(voiceFile);
+                                                        }
+                                                    }
+
+                                                }
+                                                date.setChildren(fileList);
+                                                dateList.add(date);
                                             }
                                         }
                                     }
-                                    date.setChildren(fileList);
-                                    dateList.add(date);
+                                    channel.setChildren(dateList);
+                                    channelList.add(channel);
                                 }
                             }
                         }
 
                     }
-                    areaInfoTem.setChildren(dateList);
+                    areaInfoTem.setChildren(channelList);
                     childrenList.add(areaInfoTem);
                 }
             }

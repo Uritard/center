@@ -141,7 +141,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTask.setDateType(null);
                     tCruiseTask.setStartTime(new Date());
                     tCruiseTask.setCreateTime(new Date());
-                    tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
                     tCruiseTaskDao.insert(tCruiseTask);
                     for (TCruiseTaskAttr item:attrList) {
                         item.setTaskId(newTaskId);
