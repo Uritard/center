@@ -657,7 +657,7 @@
         <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
         <if test="updateTime != null">a.update_time = #{updateTime},</if>
         <if test="cruiseResult != null ">a.cruise_result = #{cruiseResult},</if>
-        <if test="identifyResult != null ">a.identify_result = #{identifyResult},</if>
+        a.identify_result = #{identifyResult},
         <if test="picPath != null">a.pic_path = #{picPath},</if>
     </set>
         where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}

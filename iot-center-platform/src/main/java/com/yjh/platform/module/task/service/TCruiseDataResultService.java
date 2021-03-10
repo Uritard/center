@@ -213,6 +213,7 @@ public class TCruiseDataResultService {
             if (Objects.nonNull(res.getPicPath())){
                 tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
             }
+            log.info("此时的tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
             if (deviceMeteIdList.contains(res.getDeviceMeteId()) ){
                 //更新
                 int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);

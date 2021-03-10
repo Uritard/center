@@ -196,8 +196,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         ReferenceCountUtil.release(byteBuf);
     }
     /*
-    *拆包工具
-    * */
+     *拆包工具
+     * */
     private void handlingMethod(byte[] bytes,String parameter)throws Exception {
         String xmlTemp = null;
 
@@ -219,6 +219,49 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             handlingMethod(bytes, othersPacket);
         } else {
             Packet = parameter;
+        }
+    }
+    /*
+     * 拆包工具2
+     * */
+    public void openPackage (String socketMessageHex,int headNum) throws Exception{
+        String onePacketString = null;
+        String residueString = null;
+        if(socketMessageHex.startsWith("eb90") && headNum >= 2) {
+            //有至少一个完整的包
+            int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度-1
+
+            if(socketMessageHex.length()-limitNum == 1){
+                byte[] onePacket = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
+                StringBuilder Str2 = new StringBuilder();
+                for (byte byteItem : onePacket) {
+                    Str2.append(String.format("%02x ", byteItem));
+                }
+                log.info("一个完整的包,准备解析的字节数组="+Str2);
+
+                String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
+                onePacketString = PlatformPacketUtil.toStringHex(body1);
+                log.info("准备解析的xml=="+onePacketString);
+                Packet = "";
+                stringToXml(onePacket,onePacketString);
+                return;
+            }else{
+                log.info("大于一个完整的包==="+socketMessageHex);
+                onePacketString = socketMessageHex.substring(0,limitNum+1);
+//                log.info("一个完整的包==="+onePacketString);
+                residueString = socketMessageHex.replace(onePacketString,"");//除去一个完整包剩余的内容
+                openPackage(onePacketString,appearNumber(onePacketString,"eb90"));
+//                log.info("residueString===="+residueString);
+
+                byte[] residuePacket = PlatformPacketUtil.HexString2Bytes(residueString);
+                StringBuilder Str2 = new StringBuilder();
+                for (byte byteItem : residuePacket) {
+                    Str2.append(String.format("%02x ", byteItem));
+                }
+                log.info("除去一个完整包剩余的字节数组="+Str2);
+                Packet = residueString;
+                openPackage(residueString,appearNumber(residueString,"eb90"));
+            }
         }
     }
     private void stringToXml(byte[] bytes,String xmlContext)throws Exception{
@@ -287,7 +330,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             .setTime(sdf.format(new Date()))
                             .setItems(itemsList);
                     String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
-                    log.info("发送的注册指令xml是==="+registerXmlString);
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, registerXmlString);
                     sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
 
@@ -320,11 +362,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
                     if (xmlBaseModel.getItems().get(0).size() == 1) {
-                        log.info("机器人收到任务控制指令了,这是机器人的响应");
                         //Deal with task control
                         String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
-                        log.info("巡视任务执行Id是："+taskId);
-
+                        log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==="+taskId);
                     }else if (xmlBaseModel.getItems().get(0).size() == 2){
                         log.info("机器人收到模型指令了,这是机器人的响应");
                         //Deal with synchronous model
@@ -699,7 +739,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return xmlBaseModelEmpty;
     }
     /*
-    *通过文件路径解析XML
+    * 通过文件路径解析XML
     * */
     public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
         SAXReader reader = new SAXReader();
@@ -780,65 +820,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * */
     public void sendHeartBeat (byte[] protocolBytes,String robotCode) {
         send(ctx,protocolBytes,robotCode);
-    }
-    /*
-     * 拆包
-     * */
-    public void openPackage (String socketMessageHex,int headNum) throws Exception{
-        String onePacketString = null;
-        String residueString = null;
-        if(socketMessageHex.startsWith("eb90") && headNum >= 2) {
-            //有至少一个完整的包
-            int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度
-
-            if(socketMessageHex.length()-limitNum == 1){
-                byte[] onePacket = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
-                StringBuilder Str2 = new StringBuilder();
-                for (byte byteItem : onePacket) {
-                    Str2.append(String.format("%02x ", byteItem));
-                }
-                log.info("一个完整的包,准备解析的字节数组="+Str2);
-
-                String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
-                onePacketString = PlatformPacketUtil.toStringHex(body1);
-                log.info("准备解析的xml=="+onePacketString);
-                Packet = "";
-                stringToXml(onePacket,onePacketString);
-                return;
-            }else{
-                log.info("大于一个完整的包==="+socketMessageHex);
-                onePacketString = socketMessageHex.substring(0,limitNum+1);
-                log.info("一个完整的包==="+onePacketString);
-                residueString = socketMessageHex.replace(onePacketString,"");//除去一个完整包剩余的内容
-                openPackage(onePacketString,appearNumber(onePacketString,"eb90"));
-                log.info("residueString===="+residueString);
-
-                byte[] residuePacket = PlatformPacketUtil.HexString2Bytes(residueString);
-                StringBuilder Str2 = new StringBuilder();
-                for (byte byteItem : residuePacket) {
-                    Str2.append(String.format("%02x ", byteItem));
-                }
-                log.info("除去一个完整包剩余的字节数组="+Str2);
-                Packet = residueString;
-                openPackage(residueString,appearNumber(residueString,"eb90"));
-            }
-        }
-//        else {
-//
-//            if (socketMessageHex.startsWith("eb90")){
-//                String now = Constant.Packet + socketMessageHex;
-//                log.info("这是前半包，加上之后现在的包："+ now);
-//                Constant.Packet = now;
-//            if (appearNumber(now,"eb90") >= 2){
-//                openPackage(now,appearNumber(now,"eb90"));
-//            }
-            /*}else {
-                String now = socketMessageHex + Constant.Packet;
-                log.info("这是后半包，加上之后现在的包："+ now);
-                Constant.Packet = now;
-//                openPackage(now,appearNumber(now,"eb90"));
-            }*/
-//        }
     }
     /*
      * 获取指定字符串出现的次数
@@ -932,7 +913,5 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             isThreadStart = false;
             log.error("clientDisconnect: " + e.getMessage());
         }
-
-
     }
 }

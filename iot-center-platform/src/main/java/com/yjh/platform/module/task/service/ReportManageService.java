@@ -35,8 +35,6 @@ public class ReportManageService {
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
-    private TStdDevicemeteDao tStdDevicemeteDao;
-    @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -63,21 +61,19 @@ public class ReportManageService {
         recordData.setTCDRDList(tCDRDList);
 
 //        String fileName = sdf.format(new Date())+"-"+reportType+".xlsx";
-//        String finalFileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
-        //生成随机的文件名称
-//        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
-        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
-
-//        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
-/*        String finalFileName = null;
+        /*String finalFileName = reportName+"_"+reportType+"_"+sdf.format(new Date())+".xlsx";
+          String finalFileName = null;
         try {
             finalFileName = new String(fileName.getBytes(),"UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }*/
 
+//        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+//        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
 //        String finalFileName = toUTF8(fileName);
 
+        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
 
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
@@ -207,19 +203,20 @@ public class ReportManageService {
         //3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         recordData.setTCDRDList(tCDRDList);
+
         /*String taskName = recordData.getTaskVO().getTaskName();
         String cruiseDate = sdf.format(recordData.getTaskVO().getCruiseDate());
-        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称*/
-        String reportName =  taskId + ".xlsx";//报表名称
-
-//        String filePathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
-
+        String reportName =  taskName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
         String finalFileName = null;
         try {
             finalFileName = new String(reportName.getBytes(StandardCharsets.UTF_8),"UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
+        }*/
+
+//        String filePathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+//        String reportName = "Task-"+sdf.format(new Date())+".xlsx";
+        String reportName =  taskId + ".xlsx";//报表名称
 
         //从缓存中获取系统参数
         Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
@@ -231,14 +228,14 @@ public class ReportManageService {
         if (!temporaryFile.exists() && !temporaryFile.isDirectory())
         {
             temporaryFile.mkdir();
-            newReportPath = reportPath+"/"+finalFileName;
+            newReportPath = reportPath+"/"+reportName;
             log.info("不存在，创建的文件绝对路径是==="+newReportPath);
             File file = new File(reportPath);
             ContentData contentData = ReportDataRepo.getData(recordData);
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
-            newReportPath = reportPath+"/"+finalFileName;
+            newReportPath = reportPath+"/"+reportName;
             log.info("存在，该文件绝对路径是==="+newReportPath);
             File file = new File(newReportPath);
             ContentData contentData = ReportDataRepo.getData(recordData);
@@ -247,7 +244,7 @@ public class ReportManageService {
         }
         //从缓存中获取系统参数
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-        String fileRelativePath = map.get("content") + "/" + finalFileName;
+        String fileRelativePath = map.get("content") + "/" + reportName;
         log.info("该文件相对路径是==="+fileRelativePath);
         return fileRelativePath;
     }
