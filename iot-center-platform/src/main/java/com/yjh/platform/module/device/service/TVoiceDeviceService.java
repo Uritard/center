@@ -190,7 +190,7 @@ public class TVoiceDeviceService{
                                     File[] voiceDateList = fileForDate.listFiles();
                                     if(voiceDateList != null && voiceDateList.length>0) {
                                         for (int j = 0; j < voiceDateList.length; j++) {
-                                            if (voiceDateList[j].isFile()) {//日期文件
+                                            if (voiceDateList[j].isDirectory()) {//日期文件夹
                                                 VoiceDevice date = new VoiceDevice();
                                                 date.setUpId(channel.getId());
                                                 date.setUpName(channel.getLabel());
