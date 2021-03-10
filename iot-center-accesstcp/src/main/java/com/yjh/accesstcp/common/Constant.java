@@ -6,6 +6,7 @@ import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelHandlerContext;
 import org.apache.poi.ss.formula.functions.T;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,5 +97,4 @@ public class Constant {
 
     //任务下发
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemIssuedTask";
-
 }
