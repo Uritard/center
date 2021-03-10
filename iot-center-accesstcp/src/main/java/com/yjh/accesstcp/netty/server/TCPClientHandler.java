@@ -140,42 +140,129 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     }
 
+    public static int appearNumber(String srcText, String findText) {
+        int count = 0;
+        Pattern p = Pattern.compile(findText);
+        Matcher m = p.matcher(srcText);
+        while (m.find()) {
+            count++;
+        }
+        return count;
+    }
+    public void openPackage (String socketMessageHex,int headNum) throws Exception{
+        String onePacketString = null;
+        String residueString = null;
+        if(socketMessageHex.startsWith("eb90") && headNum >= 2) {
+            //有至少一个完整的包
+            int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度-1
+
+            if(socketMessageHex.length()-limitNum == 1){
+                byte[] onePacket = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
+                StringBuilder Str2 = new StringBuilder();
+                for (byte byteItem : onePacket) {
+                    Str2.append(String.format("%02x ", byteItem));
+                }
+                log.info("一个完整的包,准备解析的字节数组="+Str2);
+
+                String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
+                onePacketString = PlatformPacketUtil.toStringHex(body1);
+                log.info("准备解析的xml=="+onePacketString);
+                Packet = "";
+                stringToXml(onePacket,onePacketString);
+                return;
+            }else{
+                log.info("大于一个完整的包==="+socketMessageHex);
+                onePacketString = socketMessageHex.substring(0,limitNum+1);
+//                log.info("一个完整的包==="+onePacketString);
+                residueString = socketMessageHex.replace(onePacketString,"");//除去一个完整包剩余的内容
+                openPackage(onePacketString,appearNumber(onePacketString,"eb90"));
+//                log.info("residueString===="+residueString);
+
+                byte[] residuePacket = PlatformPacketUtil.HexString2Bytes(residueString);
+                StringBuilder Str2 = new StringBuilder();
+                for (byte byteItem : residuePacket) {
+                    Str2.append(String.format("%02x ", byteItem));
+                }
+                log.info("除去一个完整包剩余的字节数组="+Str2);
+                Packet = residueString;
+                openPackage(residueString,appearNumber(residueString,"eb90"));
+            }
+        }
+    }
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws InterruptedException {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
-        try {
-            //处理接收到的数据
-//            DataDealThread dataDealThread=new DataDealThread(bytes,this,redisTemplate, sendToUpSystemServices);
-//            TaskExecutePool.getInstance().execute(dataDealThread);
-            StringBuilder dataByte = new StringBuilder();
-            byte[] data = bytes;
-            for (byte byteitem : data) {
-                dataByte.append(String.format("%02x ", byteitem));
-            }
-            log.info("我在处理数据-字节"+dataByte);
+        //log.info("OnlineSize: " + maps.size());
 
-            String dataString = new String(data, "UTF-8");
-            log.info("我在处理数据-字符串"+dataString);
-            //处理毡包问题
-            String zzbds ="^.*<?xml.*";
-            Pattern pattern1 = Pattern.compile(zzbds);
-            Matcher matcher1 = pattern1.matcher(Packet);
-            if (!matcher1.find()){
-                Packet = "";
-            }
-            log.info("--Packet--"+Packet);
-            String temporaryBody = Packet + dataString ;//临时
-            String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
-            String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
-            handlingMethod(data,finalBody);
-
-        } catch (Exception e) {
-            log.info("解析出错"+e);
+        StringBuilder Str = new StringBuilder();
+        for (byte byteItem : bytes) {
+            Str.append(String.format("%02x ", byteItem));
         }
+        log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
+        Packet = Packet + Str.toString().replace(" ","").toLowerCase();
+        log.info("socketMessageHex:"+Packet);
+        /*PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
+        TaskExecutePool.getInstance().execute(packetDealThread);*/
+        int headNum = appearNumber(Packet,"eb90");
+        openPackage(Packet,headNum);
+
+//        lookByte(bytes);//看指令
+        /*String body = new String(bytes, StandardCharsets.UTF_8);
+        log.info("机器人发来的内容="+body);
+
+        log.info("还没处理的Packet="+Packet);
+        String zzbds ="^.*<?xml.*";
+        Pattern pattern1 = Pattern.compile(zzbds);
+        Matcher matcher1 = pattern1.matcher(Packet);
+        if (!matcher1.find()){
+            Packet = "";
+        }
+        log.info("处理过的Packet="+Packet);
+        String temporaryBody = Packet + body ;//临时
+        log.info("准备解析的xml是==="+temporaryBody);
+        String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
+        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
+
+        handlingMethod(bytes,finalBody);*/
         ReferenceCountUtil.release(byteBuf);
+
+//        ByteBuf byteBuf = (ByteBuf) msg;
+//        byte[] bytes = new byte[byteBuf.readableBytes()];
+//        byteBuf.readBytes(bytes);
+//        try {
+//            //处理接收到的数据
+////            DataDealThread dataDealThread=new DataDealThread(bytes,this,redisTemplate, sendToUpSystemServices);
+////            TaskExecutePool.getInstance().execute(dataDealThread);
+//            StringBuilder dataByte = new StringBuilder();
+//            byte[] data = bytes;
+//            for (byte byteitem : data) {
+//                dataByte.append(String.format("%02x ", byteitem));
+//            }
+//            log.info("我在处理数据-字节"+dataByte);
+//
+//            String dataString = new String(data, "UTF-8");
+//            log.info("我在处理数据-字符串"+dataString);
+//            //处理毡包问题
+//            String zzbds ="^.*<?xml.*";
+//            Pattern pattern1 = Pattern.compile(zzbds);
+//            Matcher matcher1 = pattern1.matcher(Packet);
+//            if (!matcher1.find()){
+//                Packet = "";
+//            }
+//            log.info("--Packet--"+Packet);
+//            String temporaryBody = Packet + dataString ;//临时
+//            String temporaryBody2 = temporaryBody.replace("\"UTF-8\"","\'UTF-8\'");//临时
+//            String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
+//            handlingMethod(data,finalBody);
+//
+//        } catch (Exception e) {
+//            log.info("解析出错"+e);
+//        }
+//
+//        ReferenceCountUtil.release(byteBuf);
     }
 
     //拆包 解决毡包
