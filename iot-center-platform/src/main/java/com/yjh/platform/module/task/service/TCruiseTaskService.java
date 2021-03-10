@@ -244,6 +244,7 @@ public class TCruiseTaskService {
             } else {
                 //判断当前周期任务是否已执行 --by tt 2021.3.10
                 if (Objects.isNull(tCruiseTask.getDateType())) { taskId = tCruiseTask.getTaskCode(); }
+                log.info("del taskId..."+taskId);
                 //删除整个周期任务
                 for (Iterator<ConcurrentHashMap<String, Object>> it = Constant.taskMap.iterator(); it.hasNext(); ) {
                     ConcurrentHashMap<String, Object> mapItem = it.next();
