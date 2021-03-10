@@ -71,12 +71,20 @@ public class RecordVoiceFileThread implements Runnable {
                 }
                 if (sdk_.NET_TRADIO_Init() == 0) {
                     log.info("SDK初始化成功");
-                } else { log.info("SDK初始化失败"); }
+                } else {
+                    log.info("SDK初始化失败");
+                    isThreadStart = false;
+                    return;
+                }
 
                 LongBuffer hd = LongBuffer.allocate(1);
                 if(sdk_.NET_TRADIO_CreateDevice(hd) == 0){
                     log.info("创建设备成功");
-                }else{ log.info("创建设备失败"); }
+                }else{
+                    log.info("创建设备失败");
+                    isThreadStart = false;
+                    return;
+                }
 
                 long hdForData = hd.get();
                 sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
@@ -113,7 +121,11 @@ public class RecordVoiceFileThread implements Runnable {
                 }, 0);
 
                 NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
-                if (sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev) == 0) { log.info("注册成功"); }else { log.info("注册失败"); }
+                if (sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev) == 0) { log.info("注册成功"); }else {
+                    log.info("注册失败");
+                    isThreadStart = false;
+                    return;
+                }
                 try { Thread.sleep(6000); } catch (InterruptedException e) { e.getMessage(); }
                 if (sdk_.NET_TRADIO_Logout(0) != 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
                 sdk_.NET_TRADIO_Clear();
