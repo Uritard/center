@@ -89,7 +89,7 @@ public class zuulFilter extends ZuulFilter {
                     if (appKeymap.size() == 0) {
                         log.error("用户未登陆===================================================================================");
                         ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                        ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                         return false;
                     } else {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + token, "expireTime")));
@@ -107,7 +107,7 @@ public class zuulFilter extends ZuulFilter {
                 } else {
                     log.error("无token========================================================================================");
                     ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                    ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                     return false;
                 }
 
