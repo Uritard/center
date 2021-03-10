@@ -13,8 +13,8 @@
         <result column="robot_port" jdbcType="INTEGER" property="robotPort" />
         <result column="light_ip" jdbcType="VARCHAR" property="lightIp" />
         <result column="light_port" jdbcType="VARCHAR" property="lightPort" />
-        <result column="light_username" jdbcType="VARCHAR" property="lightUsername" />
-        <result column="light_password" jdbcType="VARCHAR" property="lightPassword" />
+        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager" />
+        <result column="identity_code" jdbcType="VARCHAR" property="identityCode" />
         <result column="lnferad_IP" jdbcType="VARCHAR" property="lnferadIp" />
         <result column="Inferad_Port" jdbcType="INTEGER" property="inferadPort" />
         <result column="Inferad_username" jdbcType="VARCHAR" property="inferadUsername" />
@@ -385,6 +385,12 @@
         SELECT a.robot_status FROM t_robot_info a
         WHERE 1 = 1
         <if test="robotCode != null and robotCode !=''">and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectInstanceForTaskGoOn" parameterType="java.lang.String" resultType="java.lang.Long">
+        select b.instance_id
+        from t_cruise_result a,t_cruise_task_result_detail b
+        where a.task_result_id = b.task_result_id
+        AND a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
     <!--根据instanceId查询inspectionCode-->
     <select id="selectInspectionCode" parameterType="java.lang.Long" resultType="java.lang.String">

@@ -610,7 +610,11 @@ public class RobotService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
+    public void insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
+
+        /*if ( == 240){
+            return;
+        }*/
 
         //统计巡视主机下发给机器人的巡检点大小
         Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
@@ -621,17 +625,26 @@ public class RobotService {
         for (String i : instanceIdArray) {
             instanceIdList.add(i);
         }
-        log.info("instanceIdList的大小====" + instanceIdList.size());
+        log.info("发给机器人的巡检点的个数====" + instanceIdList.size());
 
-        List<Long> instanceIDList = Constant.flagMap.get(taskId);//做过的点
-        log.info("做过的点instanceIDList====" + instanceIDList);
-
+        List<Long> instanceIDList = Constant.flagMap.get(taskId);//已经做过的点
+        log.info("已经做过的巡视点====" + instanceIDList);
+        //删除已经做过的点
         if (instanceIDList != null && !instanceIDList.isEmpty()) {
             for (Long instanceId : instanceIDList) {
                 instanceIdList.remove(instanceId.toString());
             }
         }
-        log.info("准备遍历的点是===" + instanceIdList);
+
+        List<Long> isFinishedInstanceList = tRobotInfoDao.selectInstanceForTaskGoOn(taskId);//已经入库的点
+        log.info("已经入库的巡视点==="+isFinishedInstanceList);
+        //删除已经入库的点
+        if (isFinishedInstanceList != null && !isFinishedInstanceList.isEmpty()) {
+            for (Long instanceIdInTable : isFinishedInstanceList) {
+                instanceIdList.remove(instanceIdInTable);
+            }
+        }
+
         List<TCruiseDataResult> tCDRList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
@@ -649,9 +662,10 @@ public class RobotService {
         Integer abnormal = abnormalCheckPoint;
         Integer normal = normalCheckPoint;
 
+        log.info("准备遍历的点是===" + instanceIdList);
         for (String instanceId : instanceIdList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
-            log.info("cruiseResult 是 ===" + redisInfoMap.get("cruiseResult"));
+            log.info("cruiseResult是 ===" + redisInfoMap.get("cruiseResult"));
             //缓存中该巡检点有结果
             if (!redisInfoMap.get("resultNum").equals("设备检修中")) {
                 if (redisInfoMap.get("cruiseResult").equals("246") || redisInfoMap.get("cruiseResult").equals("247")) {
@@ -695,11 +709,6 @@ public class RobotService {
                     } else {
                         tCruiseDataResult.setRemark(null);
                     }
-                /*if (!"--".equals(redisInfoMap.get("resultNum"))) {
-                    tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
-                } else {
-                    tCruiseDataResult.setResultNum(null);
-                }*/
                     tCDRList.add(tCruiseDataResult);
 
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
@@ -761,7 +770,6 @@ public class RobotService {
         int res = updateTCruiseResult(tCruiseResult);
         log.info("更新TCR的条数====" + res);
 
-        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)
