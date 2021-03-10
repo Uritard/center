@@ -615,7 +615,7 @@ public class TCruiseTaskService {
             quartzTaskForAre.setStartTime(new Date());
             JobManager jobManager = new JobManager();
             jobManager.taskShutDown(quartzTaskForAre, tCruiseTask.getTaskId());
-            log.info("任务终止创建成功");
+            log.info("任务终止创建成功=="+taskId);
         } catch (Exception e) {
             log.info("任务终止创建失败" + e);
         }

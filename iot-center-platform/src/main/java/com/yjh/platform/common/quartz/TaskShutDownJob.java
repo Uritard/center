@@ -85,10 +85,18 @@ public class TaskShutDownJob extends QuartzJobBean {
 
     public void executeInternal(JobExecutionContext context) {
         try {
-
+            Thread.sleep(16000);
 
             String taskId = context.getMergedJobDataMap().getString("taskId");
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
+            TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+            log.info("tCruiseResult:----"+tCruiseResult);
+            if(tCruiseResult != null && !(tCruiseResult.getCState() == 240)){
+                return;
+            }
+
+//            String taskId = context.getMergedJobDataMap().getString("taskId");
+//            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
             //给算法暂停
             Analysis analysis = new Analysis();
             analysis.setTaskId(tCruiseTask.getTaskId());
@@ -116,8 +124,8 @@ public class TaskShutDownJob extends QuartzJobBean {
 
             log.info("任务终止开始操作");
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
-            log.info("tCruiseResult:----" + tCruiseResult);
+            //TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+            //log.info("tCruiseResult:----" + tCruiseResult);
 
             //获取任务下的所有的点
             List<Long> instanceIdList = tCruiseTaskAttrDao.selectInstanceId(taskId);
