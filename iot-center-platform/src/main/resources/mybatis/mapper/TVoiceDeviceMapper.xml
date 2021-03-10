@@ -174,7 +174,7 @@
     <select id="selectVoiceInfo" resultType="com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail">
         SELECT
             a.*,
-            b.dbValue
+            b.db_value
         FROM
             t_voice_device a
         left join t_voice_config b on a.config_id = b.config_id
