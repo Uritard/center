@@ -43,7 +43,7 @@ public class SysRole implements Serializable {
     @TableField(value = "role_name",updateStrategy = FieldStrategy.IGNORED)
     private String roleName;
 
-    @Past
+
     @ApiModelProperty(value = "创建时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

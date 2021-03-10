@@ -74,7 +74,7 @@ public class TCruiseResult implements Serializable {
     @TableField(value = "check_user",updateStrategy = FieldStrategy.IGNORED)
     private String checkUser;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "审核时间")
@@ -85,13 +85,13 @@ public class TCruiseResult implements Serializable {
     @TableField(value = "weatherTableField",updateStrategy = FieldStrategy.IGNORED)
     private String weather;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "巡检时间")
     private Date createTime;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "执行时间")

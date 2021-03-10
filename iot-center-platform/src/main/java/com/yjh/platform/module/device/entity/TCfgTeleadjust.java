@@ -79,7 +79,7 @@ public class TCfgTeleadjust implements Serializable {
     @TableField(value = "last_value",updateStrategy = FieldStrategy.IGNORED)
     private Float lastValue;
 
-    @Past
+
     @ApiModelProperty(value = "更新时间")
     @TableField(value = "last_time",updateStrategy = FieldStrategy.IGNORED)
     private Date lastTime;

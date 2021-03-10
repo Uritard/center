@@ -43,7 +43,7 @@ public class TCfgDataCurrent implements Serializable {
     @TableField(value = "cunstom_id", updateStrategy = FieldStrategy.IGNORED)
     private String cunstomId;
 
-    @Past
+
     @ApiModelProperty(value = "数值时间")
     private Date recordTime;
 

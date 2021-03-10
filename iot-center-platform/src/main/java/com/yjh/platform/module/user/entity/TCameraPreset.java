@@ -52,7 +52,7 @@ public class TCameraPreset implements Serializable {
     @TableField(value = "creator_user",updateStrategy = FieldStrategy.IGNORED)
     private String creatorUser ;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date creatorTime ;

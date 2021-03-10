@@ -36,7 +36,7 @@ public class TReportInfo implements Serializable {
     @ApiModelProperty(value = "报表类型")
     private String reportType;
 
-    @Past
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "生成日期")
     private Date generateDate;
