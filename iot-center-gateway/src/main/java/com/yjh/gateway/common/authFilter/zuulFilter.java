@@ -93,10 +93,12 @@ public class zuulFilter extends ZuulFilter {
                         return false;
                     } else {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + token, "expireTime")));
-                        if (System.currentTimeMillis() - expireTime > 1800000) {
+                        int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime" , "content")));
+                        if (System.currentTimeMillis() - expireTime > 60000*logoutTime) {
                             log.error("token已失效===========================================================================");
+                            redisTemplate.delete("appKey:"+token);
                             ctx.setSendZuulResponse(false);
-                            ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                            ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;
                         } else {
                             redisTemplate.opsForHash().put("appKey:" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
