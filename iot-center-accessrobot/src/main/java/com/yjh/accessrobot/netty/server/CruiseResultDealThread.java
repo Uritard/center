@@ -229,15 +229,10 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("tCTRDList的内容是===" + tCTRDList+",大小size是: "+tCTRDList.size());
                 log.info("tCDRList的内容是===" + tCDRList+",大小size是: "+tCDRList.size());
 
-                /*List<TCruiseTaskResultDetail> repairTCTRDList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCTRDList(taskId);
-                tCTRDList.removeAll(repairTCTRDList);
-                List<TCruiseDataResult> repairTCDRList = StaticContextAccessor.getBean(RobotService.class).selectRepairTCDRList(taskId);
-                tCDRList.removeAll(repairTCDRList);
-                log.info("处理后的tCTRDList大小是==="+tCTRDList.size()+",处理后的tCDRList的大小是: "+tCDRList.size());*/
-
                 int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
                 int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
                 StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
+                log.info("准备传其他服务的cruiseResultIdList==="+cruiseResultIdList);
                 log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
 
                 //将公共类的instanceIdList清空
