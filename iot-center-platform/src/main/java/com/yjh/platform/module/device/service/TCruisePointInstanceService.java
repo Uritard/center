@@ -333,7 +333,7 @@ public class TCruisePointInstanceService{
                         //新增配置号的巡检点
                         result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
                         tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
-                        tCruisePointAttrDao.add(tCruisePointAttr);
+                        //tCruisePointAttrDao.add(tCruisePointAttr);
                     }
                 }else {
                     TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
@@ -370,7 +370,7 @@ public class TCruisePointInstanceService{
                     //新增配置号的巡检点
                     result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
                     tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
-                    tCruisePointAttrDao.add(tCruisePointAttr);
+                    //tCruisePointAttrDao.add(tCruisePointAttr);
                 }
 
             }
@@ -379,7 +379,7 @@ public class TCruisePointInstanceService{
         if(cruiseIdList != null && cruiseIdList.size()>0){
             List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
             tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
-            tCruisePointAttrDao.deleteByInstanceId(instanceIdList);
+            //tCruisePointAttrDao.deleteByInstanceId(instanceIdList);
             tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
             //tCruiseTaskAttrDao.deleteByInstanceId(instanceIdList);
             tCruiseTypeDao.deleteForInstanceId(instanceIdList);

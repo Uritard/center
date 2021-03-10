@@ -82,8 +82,8 @@ public class RecordVoiceFileThread implements Runnable {
                 sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
                     @Override
                     public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
-                        log.info("收到数据：charPtr1=" + data + "，int1=" + len + "，int2=" + channel + "，int3=" + db
-                                + "，long1=" + dev + "，sample_rate=" + sample_rate);
+                        //log.info("收到数据：charPtr1=" + data + "，int1=" + len + "，int2=" + channel + "，int3=" + db
+                                //+ "，long1=" + dev + "，sample_rate=" + sample_rate);
 
                         byte[] bytesArrayTem = new byte[len];
                         StringBuilder StrArrayTem = new StringBuilder();
