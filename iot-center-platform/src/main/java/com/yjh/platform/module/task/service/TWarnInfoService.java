@@ -393,6 +393,8 @@ public class TWarnInfoService{
             tWarnInfoDetail.setAlarmSourceName(alarmSourceName);
             tWarnInfoDetail.setDefectModel(Integer.valueOf(defectMap.get("defectType")));
             tWarnInfoDetail.setDefectModelName(defectModelName);
+            tWarnInfoDetail.setCustomName(nameMap.get("custom_name"));
+
         }
         return tWarnInfoDetail;
     }

@@ -168,16 +168,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
-//       String socketMessageHex = Packet+Str.toString().replace(" ","").toLowerCase();
-        Packet = Packet+Str.toString().replace(" ","").toLowerCase();
-
+        Packet = Packet + Str.toString().replace(" ","").toLowerCase();
         log.info("socketMessageHex:"+Packet);
         /*PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
         TaskExecutePool.getInstance().execute(packetDealThread);*/
         int headNum = appearNumber(Packet,"eb90");
         openPackage(Packet,headNum);
-//        lookByte(bytes);//看指令
 
+//        lookByte(bytes);//看指令
         /*String body = new String(bytes, StandardCharsets.UTF_8);
         log.info("机器人发来的内容="+body);
 
@@ -310,10 +308,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     heartNum = 0;
                     /*String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
-                    send(ctx, heartProtocol,xmlBaseModel.getSendCode());*/
+                    send(ctx, heartProtocol,xmlBaseModel.getSendCode());
                     //若心跳能够正常收发，将机器人置为在线状态
-//                    Constant.flag = 1;
-                    /*log.info("flag2的值==="+flag2);
+                    Constant.flag = 1;
+                    log.info("flag2的值==="+flag2);
                     if (flag2 == 0){
                         robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
                         flag2 = 1;
@@ -334,10 +332,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
                         XMLBaseModel deviceModel = getXmlMessage(filePathMap.get(redisValue) + "/" +deviceFile);
                         List<Map<String,Object>> deviceMap = deviceModel.getItems();
-                        log.info("deviceMap是："+deviceMap);
+//                        log.info("deviceMap是："+deviceMap);
                         XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" +robotFile);
                         List<Map<String,Object>> robotMap = robotModel.getItems();
-                        log.info("robotMap是："+robotMap);
+//                        log.info("robotMap是："+robotMap);
                         robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
                     }else if (xmlBaseModel.getItems().get(0).size() == 0){
                         log.info("机器人收到检修区域指令了,这是机器人的响应");
@@ -368,7 +366,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         robotStatusMap.put("time",res.get("time").toString());
                         robotStatusMap.put("type",res.get("type").toString());
                         robotStatusMap.put("value",res.get("value").toString());
-                        robotStatusMap.put("valueUnit",res.get("value_unit").toString());   
+                        robotStatusMap.put("valueUnit",res.get("value_unit").toString());
                         robotStatusMap.put("unit",res.get("unit").toString());
                         robotStatusList.add(robotStatusMap);
 
