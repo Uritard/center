@@ -215,11 +215,10 @@ public class TVoiceDeviceController {
     @ApiOperation(value = "音频分析")
     @RequestMapping(value = "/voiceAnalyse", method = RequestMethod.GET)
 //    @Logs(title = "音频分析",content = "音频频谱分析",logType = 5)
-    public Result voiceAnalyse(@RequestParam(value = "voicePath") String voicePath,
-                               @RequestParam(value = "voiceDeviceId") Long voiceDeviceId) {
+    public Result voiceAnalyse(@RequestParam(value = "voicePath") String voicePath) {
         Result result = new Result();
         try {
-            result.setData(tVoiceDeviceService.voiceAnalyse(voicePath, voiceDeviceId));
+            result.setData(tVoiceDeviceService.voiceAnalyse(voicePath));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

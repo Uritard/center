@@ -390,7 +390,7 @@ public class DataDealThread implements Runnable {
                                                         xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
                                                         xmlItem.put("time", simpleDateFormat.format(new Date()));
                                                         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(cruiseResult.get("cruiseTime")));
+                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime").toString())));
                                                         xmlItem.put("content", tWarnInfo.getWarnContent());
 
 
@@ -694,7 +694,7 @@ public class DataDealThread implements Runnable {
                             xmlItem.put("file_path", cruiseResult.get("picpath"));
                             xmlItem.put("rectangle", "");
                             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(cruiseResult.get("cruiseTime")));
+                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime").toString())));
                             xmlItem.put("data_type", "0x01");
                             String valid = "";
                             if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {

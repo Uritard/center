@@ -150,8 +150,8 @@ public class TVoiceDeviceService{
         }
         String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
         String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
-        //String realPath = "D:/code/qhTest";
-        //String absPath  = "D:/code/qhTest";
+//        String realPath = "D:/code/qhTest";
+//        String absPath  = "D:/code/qhTest";
         diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }
@@ -240,13 +240,26 @@ public class TVoiceDeviceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,String>> voiceAnalyse(String voicePath,Long voiceDeviceId) throws Exception{
+    public List<Map<String,String>> voiceAnalyse(String voicePath) throws Exception{
 //        if(Constant.voiceAnalyseResult.get(voiceDeviceId+":"+voicePath) != null){
 //            //此文件已经分析过了
 //        }
         //String path = "D:/code/qhTest";
-        String path = tSysParamDao.selectByParamType("absVoicePath").getContent();
-        MultimediaObject multimediaObject = new MultimediaObject(new File(path+"/"+voiceDeviceId+"/"+voicePath));
+        Long voiceDeviceId = null;
+        String absPath = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
+//        String realPath = "D:/code/qhTest";
+//        String absPath  = "D:/code/qhTest";
+        String[] getId = voicePath.replaceAll(realPath,"").split("/");
+        if(getId != null && getId.length>2){
+            if("".equals(getId[0])){
+                voiceDeviceId = Long.valueOf(getId[2]);
+            }else {
+                voiceDeviceId = Long.valueOf(getId[1]);
+            }
+        }
+        voicePath = voicePath.replaceAll(realPath,absPath);
+        MultimediaObject multimediaObject = new MultimediaObject(new File(voicePath));
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
         VoiceDeviceInfoDetail voiceDeviceInfoDetail = tVoiceDeviceDao.selectVoiceInfo(voiceDeviceId);
@@ -254,7 +267,10 @@ public class TVoiceDeviceService{
 //        Thread thread = new Thread(voiceAnalyseThread);
 //        thread.setDaemon(true);
 //        thread.start();
-        return voiceAnalyse(path+"/"+voiceDeviceId+"/"+voicePath,playTime.intValue(),voiceDeviceInfoDetail);
+        if(voiceDeviceId == null){
+            return null;
+        }
+        return voiceAnalyse(voicePath,playTime.intValue(),voiceDeviceInfoDetail);
     }
 
     private List<Map<String,String>> voiceAnalyse(String voicePath,Integer second,VoiceDeviceInfoDetail voiceDeviceInfoDetail){
