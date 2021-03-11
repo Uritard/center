@@ -57,7 +57,7 @@ public class TStdDevicemeteController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增标准设备测点",content = "根据用户传递的参数新增标准设备测点",logType = 2)
-    public Result add(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request)  {
+    public Result add(@Validated @RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request)  {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -43,7 +44,7 @@ public class TSequentialConfController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增顺控配置信息",content = "根据用户传递的参数新增顺控配置信息",logType = 2)
-    public Result add(@RequestBody TSequentialConf tSequentialConf) {
+    public Result add(@Validated @RequestBody TSequentialConf tSequentialConf) {
         Result result = new Result();
         try {
             int i = tSequentialConfService.add(tSequentialConf);

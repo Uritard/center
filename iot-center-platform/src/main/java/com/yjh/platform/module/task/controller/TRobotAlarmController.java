@@ -46,7 +46,7 @@ public class TRobotAlarmController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增机器人本体告警表",content = "根据用户传递的参数新增机器人本体告警数据",logType = 2)
-    public Result insert(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
+    public Result insert(@Validated @RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

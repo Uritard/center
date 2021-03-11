@@ -42,7 +42,7 @@ public class TCfgTelesignalController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增遥信数据",content = "根据用户传递的参数插入遥信数据",logType = 2)
-    public Result add(@RequestBody TCfgTelesignal tCfgTelesignal) {
+    public Result add(@Validated @RequestBody TCfgTelesignal tCfgTelesignal) {
         Result result = new Result();
         try {
             result.setData(tCfgTelesignalService.insert(tCfgTelesignal));

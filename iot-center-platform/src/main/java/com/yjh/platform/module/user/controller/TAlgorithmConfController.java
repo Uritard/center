@@ -43,7 +43,7 @@ public class TAlgorithmConfController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增算法配置数据",content = "根据用户传递的参数新增算法配置数据",logType = 2)
-    public Result add( @RequestBody TAlgorithmConf tAlgorithmConf) {
+    public Result add(@Validated @RequestBody TAlgorithmConf tAlgorithmConf) {
 
         Result result = new Result();
         try {

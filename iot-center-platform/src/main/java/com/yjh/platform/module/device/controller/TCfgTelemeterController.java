@@ -42,7 +42,7 @@ public class TCfgTelemeterController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增遥测数据",content = "根据用户传递的参数插入遥测数据",logType = 2)
-    public Result add(@RequestBody TCfgTelemeter tCfgTelemeter) {
+    public Result add(@Validated @RequestBody TCfgTelemeter tCfgTelemeter) {
         Result result = new Result();
         try {
             result.setData(tCfgTelemeterService.insert(tCfgTelemeter));

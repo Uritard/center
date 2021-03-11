@@ -45,7 +45,7 @@ public class TCameraScreenController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增分屏配置信息",content = "根据用户传递的参数新增分屏配置信息",logType = 2)
-    public Result add( @RequestBody TCameraScreen tCameraScreen) {
+    public Result add(@Validated @RequestBody TCameraScreen tCameraScreen) {
 
         Result result = new Result();
         try {

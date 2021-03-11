@@ -42,7 +42,7 @@ public class TCfgTeleadjustController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增遥调数据",content = "根据用户传递的参数新增遥调数据",logType = 2)
-    public Result add(@RequestBody TCfgTeleadjust tCfgTeleadjust) {
+    public Result add(@Validated @RequestBody TCfgTeleadjust tCfgTeleadjust) {
         Result result = new Result();
         try {
             result.setData(tCfgTeleadjustService.insert(tCfgTeleadjust));

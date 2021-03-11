@@ -43,7 +43,7 @@ public class TCruisePlanAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检预案属性数据",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2)
-    public Result insert(@RequestBody TCruisePlanAttr tCruisePlanAttr) {
+    public Result insert(@Validated @RequestBody TCruisePlanAttr tCruisePlanAttr) {
         Result result = new Result();
         try {
             result.setData(tCruisePlanAttrService.insert(tCruisePlanAttr));

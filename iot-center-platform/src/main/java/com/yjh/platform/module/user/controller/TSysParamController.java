@@ -51,7 +51,7 @@ public class TSysParamController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统参数",content = "根据用户传递的参数新增系统参数",logType = 2)
-    public Result insert( @RequestBody TSysParam tSysParam) {
+    public Result insert( @Validated @RequestBody TSysParam tSysParam) {
 
         Result result = new Result();
         try {

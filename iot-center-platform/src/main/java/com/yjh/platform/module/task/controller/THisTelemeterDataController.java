@@ -46,7 +46,7 @@ public class THisTelemeterDataController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增遥测历史数据",content = "根据用户传递的参数新增遥测历史数据",logType = 2)
-    public Result insert( @RequestBody THisTelemeterData tHisTelemeterData) {
+    public Result insert( @Validated @RequestBody THisTelemeterData tHisTelemeterData) {
         Result result = new Result();
         try {
             result.setData(tHisTelemeterDataService.insert(tHisTelemeterData));

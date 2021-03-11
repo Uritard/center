@@ -42,7 +42,7 @@ public class TCruisePointAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检点数据",content = "根据用户传递的参数插入巡检点数据",logType = 2)
-    public Result add(@RequestBody TCruisePointAttr tCruisePointAttr) {
+    public Result add(@Validated @RequestBody TCruisePointAttr tCruisePointAttr) {
         Result result = new Result();
         try {
             result.setData(tCruisePointAttrService.add(tCruisePointAttr));

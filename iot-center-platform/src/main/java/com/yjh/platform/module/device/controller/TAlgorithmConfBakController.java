@@ -42,7 +42,7 @@ public class TAlgorithmConfBakController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增算法配置信息",content = "根据用户传递的参数新增算法配置信息",logType = 2)
-    public Result add(@RequestBody TAlgorithmConfBak tAlgorithmConfBak) {
+    public Result add(@Validated @RequestBody TAlgorithmConfBak tAlgorithmConfBak) {
         Result result = new Result();
         try {
             result.setData(tAlgorithmConfBakService.add(tAlgorithmConfBak));

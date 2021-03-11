@@ -44,7 +44,7 @@ public class TAlgorithmInfoController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增算法信息",content = "根据用户传递的参数新增算法信息",logType = 2)
-    public Result insert( @RequestBody TAlgorithmInfo tAlgorithmInfo) {
+    public Result insert( @Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
 
         Result result = new Result();
         try {

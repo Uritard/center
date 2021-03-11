@@ -43,7 +43,7 @@ public class TCfgMeteController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统测点数据",content = "根据用户传递的参数新增系统测点数据",logType = 2)
-    public Result add(@RequestBody TCfgMete tCfgMete) {
+    public Result add(@Validated @RequestBody TCfgMete tCfgMete) {
         Result result = new Result();
         try {
             result.setData(tCfgMeteService.insert(tCfgMete));
