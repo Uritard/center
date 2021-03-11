@@ -6,6 +6,8 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.common.utils.Decode;
+import com.yjh.gateway.common.utils.GPSFormatUtils;
+import com.yjh.gateway.common.utils.IpUtil;
 import com.yjh.gateway.common.utils.MultisMap;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
@@ -61,6 +63,13 @@ public class zuulFilter extends ZuulFilter {
             HttpServletRequest request = ctx.getRequest();
             HttpServletResponse response = ctx.getResponse();
             response.setHeader("Server", "unKnow");
+            String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
+            if(!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/')+1,origin.lastIndexOf(':')))){
+                log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
+                ctx.setSendZuulResponse(false);
+                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                return false;
+            }
             String url = request.getRequestURI();
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
