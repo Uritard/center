@@ -152,6 +152,13 @@ public class DataDealThread implements Runnable {
                                 if (recognitionMode.equals("0")) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-2");
                                 }
+                                //表计识别图片放入缓存
+                                String analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
+                                redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
+
+                                // TODO: 2021/3/10 JsonObject中存在 firDocPath 则放入缓存中
+                                log.info("FIR-Doc-----:"+jsonObjectResult.get("firDocPath").toString());
+
                                 if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
                                     Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", "缺少标定文件");
                                     cruiseResultMap.put("resultNum", doubleHandelMap.get("resultNum"));
@@ -435,6 +442,7 @@ public class DataDealThread implements Runnable {
                                                 }
                                             } catch (Exception e) {
                                                 log.error("告警入库失败" + e);
+                                                log.error("Exception--Detail:"+e.getStackTrace()[0]);
                                             }
 
                                         } else {
@@ -463,6 +471,7 @@ public class DataDealThread implements Runnable {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-1");
                                 }
 
+                                List<TDefectInfo> defectInfos=new ArrayList<>();//缺陷信息List
                                 String originResult = jsonObjectResult.get("resultValue").toString();
                                 String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
                                 log.info("解析的缺陷数据：" + resultValue);
@@ -486,6 +495,7 @@ public class DataDealThread implements Runnable {
                                     String[] resultArr = resultValue.split("\\s+");
                                     if (resultArr.length == 1) {
                                         log.info("--------____--------单一缺陷");
+                                        TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
                                         Map<String, String> defectMap = new HashMap<>();
                                         String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
                                         String defectRedisName = "defectInfo:" + redisFlag;
@@ -505,6 +515,19 @@ public class DataDealThread implements Runnable {
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
                                         //缺陷插库  To be continue。。。
+                                        tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
+                                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
+                                        tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
+                                        tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
+                                        tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
+                                        tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
+                                        tDefectInfo.setCunstomId(defectMap.get("customId").toString());
+                                        tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
+                                        tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
+                                        tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
+                                        tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
+                                        defectInfos.add(tDefectInfo);
+
 
                                         // webSocket通知显示缺陷信息(单条推送)
                                         Map<String, Object> jasonMaps = new HashMap<>();
@@ -536,6 +559,7 @@ public class DataDealThread implements Runnable {
 
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
+                                        TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
                                         String defectTime = simpleDateFormat.format(new Date());
                                         String defectNames = "";
                                         for (int i = 0; i < resultArr.length; i++) {
@@ -543,7 +567,7 @@ public class DataDealThread implements Runnable {
                                             Map<String, String> defectMap = new HashMap<>();
                                             String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             String defectRedisName = "defectInfo:" + redisFlag;
-                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
+//                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                             defectMap.put("defectContent", resultArr[i]);
@@ -559,6 +583,18 @@ public class DataDealThread implements Runnable {
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
                                             //缺陷插库 To be continue。。。
+                                            tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
+                                            tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
+                                            tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
+                                            tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
+                                            tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
+                                            tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
+                                            tDefectInfo.setCunstomId(defectMap.get("customId").toString());
+                                            tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
+                                            tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
+                                            tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
+                                            tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
+                                            defectInfos.add(tDefectInfo);
 
 
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
@@ -595,6 +631,12 @@ public class DataDealThread implements Runnable {
 
                                     }
 
+                                    //  缺陷批量实时入库
+                                    if (defectInfos.size() > 0) {
+                                        analyseDataOperateService.batchInsertDefectInfo(defectInfos);
+                                    }
+                                    log.info("--------缺陷入库完成-----");
+
                                 } else {  //未产生缺陷
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
@@ -609,6 +651,7 @@ public class DataDealThread implements Runnable {
                         }
                     } catch (Exception e) {
                         log.error("告警/缺陷处理失败：" + e);
+                        log.error("Exception-Detail:-------"+e.getStackTrace()[0]);
                     }
 
 
@@ -785,24 +828,24 @@ public class DataDealThread implements Runnable {
                     }
 
 
-                    Set<String> defectKey = redisScan("defectInfo:" + TASKID);
-                    for (String key : defectKey) {
-                        Map<String, Object> defectMap = redisTemplate.opsForHash().entries(key);
-                        log.info("TDI开始");
-                        TDefectInfo tDefectInfo = new TDefectInfo();
-                        tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
-                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
-                        tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
-                        tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
-                        tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
-                        tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
-                        tDefectInfo.setCunstomId(defectMap.get("customId").toString());
-                        tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
-                        tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
-                        tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
-                        tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
-                        defectList.add(tDefectInfo);
-                    }
+//                    Set<String> defectKey = redisScan("defectInfo:" + TASKID);
+//                    for (String key : defectKey) {
+//                        Map<String, Object> defectMap = redisTemplate.opsForHash().entries(key);
+//                        log.info("TDI开始");
+//                        TDefectInfo tDefectInfo = new TDefectInfo();
+//                        tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
+//                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
+//                        tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
+//                        tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
+//                        tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
+//                        tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
+//                        tDefectInfo.setCunstomId(defectMap.get("customId").toString());
+//                        tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
+//                        tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
+//                        tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
+//                        tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
+//                        defectList.add(tDefectInfo);
+//                    }
 
                     //批量插入两表
 
@@ -822,9 +865,9 @@ public class DataDealThread implements Runnable {
 //                        redisTemplate.delete(key);
 //                    }
 //                }
-                    if (defectList.size() > 0) {
-                        analyseDataOperateService.batchInsertDefectInfo(defectList);
-                    }
+//                    if (defectList.size() > 0) {
+//                        analyseDataOperateService.batchInsertDefectInfo(defectList);
+//                    }
                     log.info("两表结束插入");
                     cruiseKeys.clear();
                 } catch (Exception e) {

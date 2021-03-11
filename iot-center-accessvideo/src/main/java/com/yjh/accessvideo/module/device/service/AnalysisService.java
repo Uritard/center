@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -70,8 +71,10 @@ public class AnalysisService {
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                pictureDataObject.put("csvPath",firHandelMap.get("csvPath"));
-                pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
+                if(Objects.nonNull(firHandelMap) && firHandelMap.size()!=0){
+                    pictureDataObject.put("csvPath",firHandelMap.get("csvPath"));
+                    pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
+                }
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                 msgDataObject.put("data", pictureInfoObject);
             }
