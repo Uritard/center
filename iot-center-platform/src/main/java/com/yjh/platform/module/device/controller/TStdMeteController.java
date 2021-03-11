@@ -50,7 +50,7 @@ public class TStdMeteController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统测点",content = "根据用户传递的参数新增系统测点",logType = 2)
-    public Result add(@RequestBody TStdMete tStdMete, HttpServletRequest request) {
+    public Result add(@Validated @RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

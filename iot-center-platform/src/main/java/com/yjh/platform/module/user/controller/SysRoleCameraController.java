@@ -45,7 +45,7 @@ public class SysRoleCameraController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增角色和摄像机关联数据",content = "根据用户传递的参数新增角色和摄像机关联数据",logType = 2)
-    public Result insert(@RequestBody SysRoleCamera sysRoleCamera) {
+    public Result insert(@Validated @RequestBody SysRoleCamera sysRoleCamera) {
 
         Result result = new Result();
         try {

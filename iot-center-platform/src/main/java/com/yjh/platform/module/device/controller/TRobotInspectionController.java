@@ -52,7 +52,7 @@ public class TRobotInspectionController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "插入机器人巡检点信息",content = "根据用户传递的参数新增机器人巡检点信息",logType = 2)
-    public Result add(@RequestBody TRobotInspection tRobotInspection) {
+    public Result add(@Validated @RequestBody TRobotInspection tRobotInspection) {
         Result result = new Result();
         try {
             result.setData(tRobotInspectionService.insert(tRobotInspection));

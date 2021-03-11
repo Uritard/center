@@ -56,7 +56,7 @@ public class TCameraPresetController {
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
     @Logs(title = "新增新增预置位信息",content = "根据用户传递的参数新增预置位信息",logType = 2)
-    public Result insert( @RequestBody TCameraPreset tCameraPreset) {
+    public Result insert( @Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
             int resultNum = 0;

@@ -48,7 +48,7 @@ public class TStdMetemodelDetailController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统测点模版详细数据",content = "根据用户传递的参数新增系统测点模版详细数据",logType = 2)
-    public Result add(@RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
+    public Result add(@Validated @RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));

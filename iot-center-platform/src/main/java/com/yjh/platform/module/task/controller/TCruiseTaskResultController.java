@@ -47,7 +47,7 @@ public class TCruiseTaskResultController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增任务点状态数据",content = "根据用户传递的参数新增任务点状态数据",logType = 2)
-    public Result insert(@RequestBody TCruiseTaskResult tCruiseTaskResult) {
+    public Result insert(@Validated @RequestBody TCruiseTaskResult tCruiseTaskResult) {
         Result result = new Result();
         try {
             result.setData(tCruiseTaskResultService.insert(tCruiseTaskResult));

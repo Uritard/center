@@ -42,7 +42,7 @@ public class TUnionTaskAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增联合巡视预案属性数据",content = "根据用户传递的参数新增联合巡视预案属性数据",logType = 2)
-    public Result insert(@RequestBody TUnionTaskAttr tUnionTaskAttr) {
+    public Result insert(@Validated @RequestBody TUnionTaskAttr tUnionTaskAttr) {
         Result result = new Result();
         try {
             result.setData(tUnionTaskAttrService.insert(tUnionTaskAttr));

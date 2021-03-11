@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody TRobotInspection tRobotInspection) {
+    public Result insert(@Validated  @RequestBody TRobotInspection tRobotInspection) {
         Result result = new Result();
         try {
             result.setData(tRobotInspectionService.insert(tRobotInspection));

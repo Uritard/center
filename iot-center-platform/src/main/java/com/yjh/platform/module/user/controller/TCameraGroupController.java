@@ -45,7 +45,7 @@ public class TCameraGroupController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增相机分组信息",content = "根据用户传递的参数新增相机分组信息",logType = 2)
-    public Result add( @RequestBody TCameraGroup tCameraGroup) {
+    public Result add( @Validated @RequestBody TCameraGroup tCameraGroup) {
 
         Result result = new Result();
         try {

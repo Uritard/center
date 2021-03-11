@@ -51,7 +51,7 @@ public class TCruiseResultController {
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
     @Logs(title = "新增巡检任务结果数据",content = "根据用户传递的参数新增巡检任务结果数据",logType = 2)
-    public Result insert(@RequestBody TCruiseResult tCruiseResult) {
+    public Result insert(@Validated @RequestBody TCruiseResult tCruiseResult) {
         Result result = new Result();
         try {
             result.setData(tCruiseResultService.insert(tCruiseResult));

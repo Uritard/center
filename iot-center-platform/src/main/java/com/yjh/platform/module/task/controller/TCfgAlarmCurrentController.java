@@ -42,7 +42,7 @@ public class TCfgAlarmCurrentController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增活动告警数据",content = "根据用户传递的参数新增活动告警数据",logType = 2)
-    public Result insert(@RequestBody TCfgAlarmCurrent tCfgAlarmCurrent) {
+    public Result insert(@Validated @RequestBody TCfgAlarmCurrent tCfgAlarmCurrent) {
         Result result = new Result();
         try {
             result.setData(tCfgAlarmCurrentService.insert(tCfgAlarmCurrent));

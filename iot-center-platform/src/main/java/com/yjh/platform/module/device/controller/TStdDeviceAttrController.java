@@ -42,7 +42,7 @@ public class TStdDeviceAttrController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增标准化设备参数",content = "根据用户传递的参数新增标准化设备参数",logType = 2)
-    public Result add(@RequestBody TStdDeviceAttr tStdDeviceAttr) {
+    public Result add(@Validated @RequestBody TStdDeviceAttr tStdDeviceAttr) {
         Result result = new Result();
         try {
             result.setData(tStdDeviceAttrService.insert(tStdDeviceAttr));

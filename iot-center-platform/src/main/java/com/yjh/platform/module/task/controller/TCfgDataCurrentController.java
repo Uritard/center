@@ -45,7 +45,7 @@ public class TCfgDataCurrentController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增实时数据",content = "根据用户传递的参数新增实时数据",logType = 2)
-    public Result insert(@RequestBody TCfgDataCurrent tCfgDataCurrent) {
+    public Result insert(@Validated @RequestBody TCfgDataCurrent tCfgDataCurrent) {
         Result result = new Result();
         try {
             result.setData(tCfgDataCurrentService.insert(tCfgDataCurrent));

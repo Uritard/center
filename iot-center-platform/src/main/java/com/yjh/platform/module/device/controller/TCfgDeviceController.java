@@ -43,7 +43,7 @@ public class TCfgDeviceController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增设备数据",content = "根据用户传递的参数新增设备数据",logType = 2)
-    public Result add(@RequestBody TCfgDevice tCfgDevice) {
+    public Result add(@Validated @RequestBody TCfgDevice tCfgDevice) {
         Result result = new Result();
         try {
             result.setData(tCfgDeviceService.insert(tCfgDevice));

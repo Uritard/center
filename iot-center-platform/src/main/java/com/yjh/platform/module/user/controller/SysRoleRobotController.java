@@ -43,7 +43,7 @@ public class SysRoleRobotController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增角色和机器人关联数据",content = "根据用户传递的参数新增角色和机器人关联数据",logType = 2)
-    public Result insert(@RequestBody SysRoleRobot sysRoleRobot) {
+    public Result insert(@Validated @RequestBody SysRoleRobot sysRoleRobot) {
 
         Result result = new Result();
         try {

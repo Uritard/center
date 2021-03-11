@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +45,7 @@ public class TVoiceDeviceController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增声纹设备数据", content = "根据用户传递的参数新增声纹设备数据", logType = 2)
-    public Result add(@RequestBody VoiceDeviceAllInfoDetail tVoiceDevice) {
+    public Result add(@Validated @RequestBody VoiceDeviceAllInfoDetail tVoiceDevice) {
         Result result = new Result();
         try {
             //tVoiceDevice.getfValue();

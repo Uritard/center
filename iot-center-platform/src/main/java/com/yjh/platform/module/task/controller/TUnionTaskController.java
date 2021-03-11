@@ -47,7 +47,7 @@ public class TUnionTaskController {
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增巡检任务数据",content = "根据用户传递的参数新增巡检任务数据",logType = 2)
-    public Result insert(@RequestBody TUnionTask tUnionTask) {
+    public Result insert(@Validated @RequestBody TUnionTask tUnionTask) {
         Result result = new Result();
         try {
             result.setData(tUnionTaskService.insert(tUnionTask));
