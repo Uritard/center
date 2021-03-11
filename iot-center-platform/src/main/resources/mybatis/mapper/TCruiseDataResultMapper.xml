@@ -593,12 +593,12 @@
         n.dict_note as meter_type_name,
         a.device_mete_id
         FROM
-        t_std_devicemete a
-        LEFT JOIN t_cruise_point_instance b ON a.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        LEFT JOIN t_cruise_task_result_detail e ON b.instance_id = e.instance_id
+        t_cruise_result g
+        LEFT JOIN t_cruise_task_result_detail e ON e.task_result_id = g.task_result_id
         LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
-        LEFT JOIN t_cruise_result g ON e.task_result_id = g.task_result_id
+        LEFT JOIN t_cruise_point_instance b ON b.instance_id = e.instance_id
+        LEFT JOIN t_std_devicemete a ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
         LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
         LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"

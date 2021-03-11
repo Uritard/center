@@ -103,7 +103,7 @@ public class TCruiseResult implements Serializable {
     private String taskCode;
 
     @Length(max = 256,message = "remark长度必须小于等于256")
-    @ApiModelProperty(value = "备用字段3")
+    @ApiModelProperty(value = "巡视点是否全部审核完成，1-是0-否")
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 

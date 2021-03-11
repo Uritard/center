@@ -53,7 +53,7 @@ public class AlarmResultDealThread implements Runnable{
                 log.info("插告警表的结果="+res);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 }

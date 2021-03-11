@@ -6,6 +6,8 @@ import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.common.websocket.WebSocketServer;
+import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import org.springframework.data.redis.core.RedisCallback;
@@ -28,6 +30,11 @@ public class CruiseResultDealThread implements Runnable{
     private static final String DATE_TIME_FORMAT_TPL = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT_TPL);
 
+    //算法接口
+    private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
+    //缺陷接口
+    private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+
     private RedisTemplate redisTemplate;
 
     private Map<String,String> cruiseResultMap;
@@ -40,7 +47,7 @@ public class CruiseResultDealThread implements Runnable{
     @Override
     public void run(){
         try {
-            log.info("Process CruiseResult Starting.....cruiseResultMap==="+cruiseResultMap);
+            log.info("Process CruiseResult Starting >>>>>>> cruiseResultMap==="+cruiseResultMap);
 
             List<TCruiseDataResult> tCDRList = new ArrayList<>();
             List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
@@ -97,9 +104,9 @@ public class CruiseResultDealThread implements Runnable{
                         tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                     }
                     if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
-                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
+                        tCruiseTaskResultMap.put("picPathAnl",cruiseResultMap.get("relativePath"));
                     }
-                    tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
+                    tCruiseTaskResultMap.put("origPicAnl",cruiseResultMap.get("absolutePath"));
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("isWarn","0");
@@ -161,6 +168,72 @@ public class CruiseResultDealThread implements Runnable{
                     }
                 }
                 log.info("准备遍历的点是==="+instanceIdList);
+
+                //String的巡视点转Long,下面需要
+                List<Long> instanceIdList2 = new ArrayList<>();
+                for (String res : instanceIdList){
+                    instanceIdList2.add(Long.valueOf(res));
+                }
+
+                /*
+                * 将机器人巡检图片发给算法在分析
+                * */
+                /*List<TCruisePointInstanceDetail> instancesList = StaticContextAccessor.getBean(RobotService.class).selectForTask(instanceIdList2);//巡检点信息
+                for (TCruisePointInstanceDetail item : instancesList){
+                    if(item.getAnalyseType() != null || "on".equals(item.getIsAi())) {//配置了算法
+
+                        List<TAlgorithmInfo> tAlgorithmInfoList = StaticContextAccessor.getBean(RobotService.class).selectByDeviceMeteId(item.getDeviceMeteId());
+                        TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMete(item.getDeviceMeteId());
+                        String recognitionMode = "0";
+                        if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
+                            recognitionMode = "1";
+                        }
+                        if("on".equals(tStdDevicemete.getIsAi())){
+                            if("1".equals(recognitionMode)){
+                                recognitionMode = "0";
+                            }else {
+                                recognitionMode = "2";
+                            }
+                        }
+//                        tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
+
+                        for (TAlgorithmInfo tAlgorithmInfo : tAlgorithmInfoList) {
+                            Analysis analysis = new Analysis();
+                            analysis.setTaskId(taskId);
+                            analysis.setInstanceId(item.getInstanceId());
+                            analysis.setPicPath(redisInfoMap.get("picpath");
+                            analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                            analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
+                            analysis.setIsAi(tAlgorithmInfo.getIsAi());
+                            List<Analysis> analysisList = new ArrayList<>();
+                            analysisList.add(analysis);
+                            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                            analysisMap.put("list",analysisList);
+                            log.info("算法信息：    "+analysisMap);
+                            if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
+                                analysis(analysisMap);
+                            }else {
+                                defect(analysisMap);
+                            }
+                        }
+
+                        if("on".equals(tStdDevicemete.getIsAi())){
+                            Analysis analysis = new Analysis();
+                            analysis.setTaskId(taskId);
+                            analysis.setInstanceId(item.getInstanceId());
+                            analysis.setPicPath(redisInfoMap.get("picpath");
+                            analysis.setAnalyseType("398");
+                            analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
+                            analysis.setIsAi(0);
+                            List<Analysis> analysisList = new ArrayList<>();
+                            analysisList.add(analysis);
+                            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                            analysisMap.put("list",analysisList);
+                            log.info("算法信息：    "+analysisMap);
+                            defect(analysisMap);
+                        }
+                    }
+                }*/
 
                 for (String instanceId : instanceIdList) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
@@ -287,6 +360,29 @@ public class CruiseResultDealThread implements Runnable{
                     log.info("tCruiseResult的内容是==="+tCruiseResult);
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
                 }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    //表记分析
+    private void analysis(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ALGORITHM_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+    //缺陷分析
+    private void defect(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(DEFECT_URL, analysisMap, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

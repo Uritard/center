@@ -37,4 +37,5 @@ public interface ReportManageDao {
     String selectReportEnvId(@Param(value = "reportId") String reportId);
     List<TReportInfo> reportSelect(HashMap<String,Object> map);
     int reportDelete(@Param(value = "reportId") String reportId);
+    String selectReviewTaskFlag(@Param(value = "taskId")String taskId);
 }

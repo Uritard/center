@@ -69,7 +69,7 @@ public class TCruiseResultExpand  {
     @ApiModelProperty(value = "任务编码")
     private String taskCode;
 
-    @ApiModelProperty(value = "备用字段3")
+    @ApiModelProperty(value = "巡视点是否全部审核完成，1-是0-否")
     private String remark;
     @ApiModelProperty(value = "任务名称")
     private String taskName;

@@ -550,8 +550,20 @@
             ORDER BY dict_code;
     </select>
 
-    <select id="selectByIdentifyResult" parameterType="java.lang.Integer" resultType="java.lang.String">
-        select dict_note from t_dict_business where dict_code = #{identifyResult,jdbcType=INTEGER}
+    <select id="selectCruiseDataResult" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        SELECT
+                d.cruise_data_id,
+                d.cruise_result,
+                d.result_num
+        FROM
+            t_cruise_result a,
+            t_cruise_task_result_detail b,
+            t_cruise_data_result d
+        WHERE 1 = 1
+        <if test="taskId != null ">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
+        and a.task_result_id = b.task_result_id
+        and b.cruise_result_id = d.cruise_result_id
+        and ISNULL(d.check_user)
     </select>
     <select id="selectByIdentifyState" parameterType="java.lang.Integer" resultType="java.lang.String">
         select dict_note from t_dict_business where dict_code = #{identifyState,jdbcType=INTEGER}
@@ -576,9 +588,10 @@
     <update id="updateCheck">
         update t_cruise_result a <set>
         <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
-        a.check_date = #{checkDate, jdbcType=TIMESTAMP}
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="remark != null">a.remark = #{remark},</if>
     </set>
-        where a.task_result_id = #{taskResultId, jdbcType=VARCHAR}
+        where a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>
 
     <update id="updateWarnInfo">

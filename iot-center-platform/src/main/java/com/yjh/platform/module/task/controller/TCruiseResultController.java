@@ -149,14 +149,37 @@ public class TCruiseResultController {
     public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
                                    @RequestParam(value = "cState", required = false) Integer cState,
                                    @RequestParam(value = "cType", required = false) Integer cType,
+                                   @RequestParam(value = "regionId",required = false) Long regionId,
+                                   @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                   @RequestParam(value = "startDate",required = false) String startDate,
+                                   @RequestParam(value = "endDate",required = false) String endDate,
+                                   @RequestParam(value = "meteType", required = false) Integer meteType,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
 
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if (Objects.isNull(startDate) || "".equals(startDate)){
+                startDate = null;
+            }
+            if (Objects.isNull(endDate) || "".equals(endDate)){
+                endDate = null;
+            }
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType);
+            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -274,8 +297,6 @@ public class TCruiseResultController {
     public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
 
         String userId = request.getHeader("userId");
-        log.info("userId是："+userId);
-
         Result result = new Result();
         try {
             result.setData(tCruiseResultService.manualReview(cruiseManualReview,userId));
@@ -313,6 +334,20 @@ public class TCruiseResultController {
             log.error("失败描述",e);
         }
 
+        return result;
+    }
+    @ApiOperation(value = "一键审核--任务下的所有巡视点")
+    @GetMapping(value = "/manualReviewTask")
+    @Logs(title = "审核任务",content = "一键审核",logType = 1)
+    public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
+        String userId = request.getHeader("userId");
+        Result result=new Result();
+        try{
+            result.setData(tCruiseResultService.manualReviewTask(taskResultId,userId));
+        }catch(Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("审核任务失败描述",e);
+        }
         return result;
     }
 }

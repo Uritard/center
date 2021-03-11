@@ -20,6 +20,7 @@ import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -611,11 +612,6 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public void insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
-
-        /*if ( == 240){
-            return;
-        }*/
-
         //统计巡视主机下发给机器人的巡检点大小
         Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
         String instanceList = redisInfoMap2.get("instanceIdList");
@@ -1125,5 +1121,17 @@ public class RobotService {
     public List<TCruiseDataResult> selectRepairTCDRList(String taskId){
         return this.tRobotInfoDao.selectRepairTCDRList(taskId);
     }
+    public List<TCruisePointInstanceDetail> selectForTask (List<Long> list){
+        return this.tRobotInfoDao.selectForTask(list);
+    }
+
+    public List<TAlgorithmInfo> selectByDeviceMeteId(Long deviceMeteId){
+        return this.tRobotInfoDao.selectByDeviceMeteId(deviceMeteId);
+    }
+    public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
+        return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
+    }
+
+
 }
 
