@@ -358,6 +358,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         String isOk = "";
                         String urlPath = "";
                         String absPath = "";
+                        TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
                         if(tCameraPreset != null){
                             //1.转到预置位
                             HashMap<String, Object> map = new HashMap<>();
@@ -509,7 +510,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 //log.info("tCruiseDataResultMap" +tCruiseDataResultMap);
 
                                 List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.selectByDeviceMeteId(item.getDeviceMeteId());
-                                TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
                                 Integer recognitionMode = 0;
                                 if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
                                     recognitionMode = 1;
@@ -664,7 +664,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         }
                         {
                             //专为检测的  4张图片一轮
-                            Map<String,String> maoForFour= redisTemplate.opsForHash().entries("");
+                            Map<String,String> maoForFour= redisTemplate.opsForHash().entries("t_sys_param:isCheckByFour");
                             Boolean flagForFour = false;
                             if(maoForFour != null  && maoForFour.size()>0){
                                 flagForFour = Boolean.valueOf(maoForFour.get("content"));
@@ -672,14 +672,33 @@ public class CruiseTaskJob extends QuartzJobBean {
                             if(flagForFour){
                                 countForInstance = countForInstance +1;
                                 if(countForInstance == 4){
-                                    Map<String,String> maoForSleep= redisTemplate.opsForHash().entries("");
+                                    Map<String,String> maoForSleep= redisTemplate.opsForHash().entries("t_sys_param:checkWaitTimeByFour");
                                     Long sleepTime = 30000L;
                                     if(maoForSleep != null  && maoForSleep.size()>0){
-                                        sleepTime = Long.valueOf(maoForSleep.get("content"));
+                                        sleepTime = Long.valueOf(maoForSleep.get("content"))*1000L;
                                     }
+                                    log.info("4个点以巡检完，等待"+sleepTime/1000+"秒钟");
                                     Thread.sleep(sleepTime);
+                                    countForInstance = 0;
                                 }
-                                countForInstance = 0;
+                            }
+                        }
+
+                        {
+                            //专为检测的  1张图片一轮
+                            Map<String,String> maoForOne= redisTemplate.opsForHash().entries("t_sys_param:isCheckByOne");
+                            Boolean flagForOne = false;
+                            if(maoForOne != null  && maoForOne.size()>0){
+                                flagForOne = Boolean.valueOf(maoForOne.get("content"));
+                            }
+                            if(flagForOne){
+                                Map<String,String> maoForSleep= redisTemplate.opsForHash().entries("t_sys_param:checkWaitTimeByOne");
+                                Long sleepTime = 10000L;
+                                if(maoForSleep != null  && maoForSleep.size()>0){
+                                    sleepTime = Long.valueOf(maoForSleep.get("content"))*1000L;
+                                }
+                                log.info("1个点以巡检完，等待"+sleepTime/1000+"秒钟");
+                                Thread.sleep(sleepTime);
                             }
                         }
                     }

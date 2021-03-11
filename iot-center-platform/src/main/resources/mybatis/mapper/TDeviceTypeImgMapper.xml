@@ -119,7 +119,7 @@
         SELECT
             a.dict_code as deviceType,
             a.dict_note as deviceTypeName,
-            b.pic_real_path
+            b.pic_real_path as picRealPath
         from t_dict_business a
         left join t_device_type_img b on a.dict_code = b.type_id
         WHERE a.col_name = "device_type"

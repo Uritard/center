@@ -176,7 +176,7 @@ public class TVoiceDeviceService{
                         File[] channelFileList = channelFile.listFiles();
                         if(channelFileList != null && channelFileList.length>0){
                             for (int i = 0; i < channelFileList.length; i++) {
-                                if (channelFileList[i].isDirectory()) {//通道日期文件夹
+                                if (channelFileList[i].isDirectory()) {//通道文件夹
                                     VoiceDevice channel = new VoiceDevice();
                                     channel.setUpId(areaInfoTem.getId());
                                     channel.setUpName(areaInfoTem.getLabel());
@@ -200,16 +200,18 @@ public class TVoiceDeviceService{
                                                 date.setInfoType("date");
                                                 //查询此文件夹下的所有文件
                                                 List<VoiceDevice> fileList = new ArrayList<>();
-                                                File fileForFile = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName());
-                                                File[] voiceFileList = fileForFile.listFiles();
-                                                if(voiceFileList != null && voiceFileList.length>0) {
-                                                    for (int k = 0; k < voiceFileList.length; k++) {
-                                                        if (voiceFileList[k].isFile()) {//文件文件
+                                                String path = absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName();
+//                                                File fileForFile = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName());
+//                                                File[] voiceFileList = fileForFile.listFiles();
+                                                List<File> voiceFileList = getFileSort(path);
+                                                if(voiceFileList != null && voiceFileList.size()>0) {
+                                                    for (int k = 0; k < voiceFileList.size(); k++) {
+                                                        if (voiceFileList.get(k).isFile() && voiceFileList.get(k).getName().contains(".wav")) {//音频文件
                                                             VoiceDevice voiceFile = new VoiceDevice();
                                                             voiceFile.setUpId(date.getId());
                                                             voiceFile.setUpName(date.getLabel());
-                                                            voiceFile.setLabel(voiceFileList[k].getName());
-                                                            voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName()+"/"+voiceFileList[k].getName());
+                                                            voiceFile.setLabel(voiceFileList.get(k).getName());
+                                                            voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName()+"/"+voiceFileList.get(k).getName());
                                                             voiceFile.setInfoType("file");
                                                             fileList.add(voiceFile);
                                                         }
@@ -237,6 +239,46 @@ public class TVoiceDeviceService{
                 diGui(childrenList, listTree,realPath,absPath);
             }
         }
+    }
+
+    private List<File> getFileSort(String path) {
+
+        List<File> list = getFiles(path, new ArrayList<File>());
+
+        if (list != null && list.size() > 0) {
+
+            Collections.sort(list, new Comparator<File>() {
+                public int compare(File file, File newFile) {
+                    if (file.lastModified() < newFile.lastModified()) {
+                        return 1;
+                    } else if (file.lastModified() == newFile.lastModified()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+
+                }
+            });
+
+        }
+
+        return list;
+    }
+
+    private  List<File> getFiles(String realpath, List<File> files) {
+
+        File realFile = new File(realpath);
+        if (realFile.isDirectory()) {
+            File[] subfiles = realFile.listFiles();
+            for (File file : subfiles) {
+                if (file.isDirectory()) {
+                    getFiles(file.getAbsolutePath(), files);
+                } else {
+                    files.add(file);
+                }
+            }
+        }
+        return files;
     }
 
     @Transactional(rollbackFor = Exception.class)
