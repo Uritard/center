@@ -501,6 +501,7 @@ public class DataDealThread implements Runnable {
                                         String defectRedisName = "defectInfo:" + redisFlag;
                                         // TODO: 2021/2/19 判别并获取对应缺陷的缺陷算法等级
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
+                                        log.info("defectMap:"+defectMap);
                                         defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                         defectMap.put("defectContent", resultValue);
                                         defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
@@ -559,15 +560,17 @@ public class DataDealThread implements Runnable {
 
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
-                                        TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
                                         String defectTime = simpleDateFormat.format(new Date());
                                         String defectNames = "";
                                         for (int i = 0; i < resultArr.length; i++) {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
+                                            TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
                                             String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             String defectRedisName = "defectInfo:" + redisFlag;
 //                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
+
+                                            log.info("redisFlag:"+redisFlag);
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                             defectMap.put("defectContent", resultArr[i]);
@@ -576,13 +579,16 @@ public class DataDealThread implements Runnable {
                                             TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
                                             defectMap.put("customId", tStdDevicemete.getCustomId());
                                             defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
-                                            defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未处理"));
+                                            defectMap.put("confMode", "276");//确认状态--未核查
                                             defectMap.put("imagePath", cruiseResult.get("picpath").toString());
                                             defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                                             defectMap.put("defectTime", defectTime);
+
+                                            log.info("defectMap:"+defectMap);
+
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
-                                            //缺陷插库 To be continue。。。
+                                            //缺陷插库
                                             tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
                                             tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
                                             tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
@@ -672,7 +678,7 @@ public class DataDealThread implements Runnable {
 
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
 
-                        {
+                        try{
                             //巡视点结果上报站端
                             XMLBaseModel xmlBaseModel = new XMLBaseModel();
                             List<Map<String, Object>> xmlItems = new ArrayList<>();
@@ -694,7 +700,7 @@ public class DataDealThread implements Runnable {
                             xmlItem.put("file_path", cruiseResult.get("picpath"));
                             xmlItem.put("rectangle", "");
                             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime").toString())));
+//                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(cruiseResult.get("cruiseTime")));
                             xmlItem.put("data_type", "0x01");
                             String valid = "";
                             if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
@@ -712,6 +718,9 @@ public class DataDealThread implements Runnable {
                             map.put("list", list);
                             log.info("结果信息上报：-" + map);
                             //Constant.otherServer(map, Constant.TCP_URL);//江苏要求
+                        }catch (Exception e){
+                            log.error("结果上报失败"+e);
+                            log.error("异常原因："+e.getStackTrace()[0]);
                         }
 
                         log.info("Border_______---------______________________________________________________________________________________________");

@@ -23,7 +23,7 @@ import java.util.List;
 public class TStdDeviceMeteDetail extends TStdDeviceMete{
 
 
-    
+
     //private String meteKindName;
 
     private String unitName;
@@ -46,7 +46,8 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     @Max(value=999999999)
     private Integer analyseType;
     private String analyseTypeName;
-    private String isAi;
+    private String isAi;//是否配置缺陷算法
+    private String isJudge;//是否配置判别算法
 
 }
 

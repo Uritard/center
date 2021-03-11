@@ -4,6 +4,7 @@ package com.yjh.platform.module.task.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -29,4 +30,8 @@ public class RealTimeWarn {
     private Date cruiseTime;
     @ApiModelProperty(value = "巡视点ID")
     private Long instanceId;
+
+    @ApiModelProperty(value = "告警内容")
+    private String alarmContent;
+
 }

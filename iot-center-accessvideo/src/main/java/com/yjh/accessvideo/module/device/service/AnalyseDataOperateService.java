@@ -155,6 +155,8 @@ public class AnalyseDataOperateService {
     @Transactional(rollbackFor = Exception.class)
     public String selectAlgorithmDefectInfo(String defectType){
         Integer defectLevel=analyseDataOperateDao.selectAlgorithmDefectInfo(Integer.valueOf(defectType));
+        log.info("defectType:+======"+defectType);
+        log.info("defectLevel:======"+defectLevel);
         return defectLevel.toString();
     }
 
@@ -577,7 +579,7 @@ public class AnalyseDataOperateService {
                     defectValue = defectValue + "呼吸器-硅胶筒破损" + " ";
                     break;
                 case "ywzt_yfyc":
-                    defectValue = defectValue + "油位状态-油位异常" + " ";
+                    defectValue = defectValue + "油位状态-油封异常" + " ";
                     break;
                 case "bj_bpmh":
                     defectValue = defectValue + "表计-表盘模糊" + " ";
@@ -626,6 +628,9 @@ public class AnalyseDataOperateService {
                     break;
                 case "kgg_ybh":
                     defectValue=defectValue+"压板合"+ " ";
+                    break;
+                case "bjdsyc":
+                    defectValue=defectValue+"表计读数异常"+" ";
                     break;
                 default:
                     return "null";
