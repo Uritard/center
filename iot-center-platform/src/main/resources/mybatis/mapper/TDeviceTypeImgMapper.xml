@@ -114,4 +114,14 @@
     <delete id="deleteAll">
         delete from t_device_type_img
     </delete>
+
+    <select id="selectDeviceTypeAndImg" resultType="java.util.Map">
+        SELECT
+            a.dict_code as deviceType,
+            a.dict_note as deviceTypeName,
+            b.pic_realpath
+        from t_dict_business a
+        left join t_device_type_img b on a.dict_code = b.type_id
+        WHERE a.col_name = "device_type"
+    </select>
 </mapper>

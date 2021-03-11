@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.platform.module.device.entity.TDeviceTypeImg;
 import org.apache.ibatis.annotations.Param;
@@ -29,4 +30,5 @@ public interface TDeviceTypeImgDao {
     int batchAdd(List<TDeviceTypeImg> list);
     int batchDelete(List<String> list);
     int deleteAll();
+    List<Map<String,String>>selectDeviceTypeAndImg();
 }

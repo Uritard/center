@@ -291,25 +291,21 @@ public class TRobotInspectionService{
 
     //机器人树
     @Transactional(rollbackFor = Exception.class)
-    public List<RobotNode> robotTree(){
-        List<RobotNode> reList = new ArrayList<>();
-        RobotNode node = new RobotNode();
+    public List<Robot> robotTree(){
+        List<Robot> reList = new ArrayList<>();
+        Robot node = new Robot();
         node.setId(1L);
         node.setLabel("机器人树");
         node.setInfoType("tree");
-        List<RobotNode> child = new ArrayList<>();
         List<Robot> robotList = this.selectRobotInfo();
         for(Robot robot:robotList){
-            RobotNode robotNode = new RobotNode();
-            robotNode.setUpId(node.getId());
-            robotNode.setUpName(node.getLabel());
-            robotNode.setId(robot.getRobotId());
-            robotNode.setLabel(robot.getRobotName());
-            robotNode.setCode(robot.getRobotCode());
-            robotNode.setInfoType("robot");
-            child.add(robotNode);
+            robot.setId(robot.getRobotId());
+            robot.setLabel(robot.getRobotName());
+            robot.setUpId(1L);
+            robot.setUpName("机器人树");
+            robot.setInfoType("robot");
         }
-        node.setChildren(child);
+        node.setChildren(robotList);
         reList.add(node);
         return reList;
     }

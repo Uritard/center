@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Map;
 
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
@@ -111,6 +112,11 @@ public class TDeviceTypeImgService{
             return this.batchAdd(inList);
         }
         return -1;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,String>>selectDeviceTypeAndImg(){
+        return this.tDeviceTypeImgDao.selectDeviceTypeAndImg();
     }
 
 }

@@ -179,4 +179,17 @@ public class TDeviceTypeImgController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询设备类型和图片")
+    @RequestMapping(value = "/selectDeviceTypeAndImg", method = RequestMethod.GET)
+    public Result selectDeviceTypeAndImg() {
+        Result result = new Result();
+        try {
+            result.setData(tDeviceTypeImgService.selectDeviceTypeAndImg());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("将图片同步到数据库中：" + e);
+        }
+        return result;
+    }
 }

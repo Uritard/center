@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -44,5 +45,23 @@ public class Robot implements Serializable {
     private String robotPositionName;
 
     private String photePath;
+
+    @ApiModelProperty(value = "ID")
+    private Long Id;
+
+    @ApiModelProperty(value = "名称")
+    private String label;
+
+    @ApiModelProperty(value = "上级区域ID")
+    private Long upId;
+
+    @ApiModelProperty(value = "上级区域名称")
+    private String upName;
+
+    @ApiModelProperty(value = "消息类型")
+    private String infoType;
+
+    @ApiModelProperty(value = "子类")
+    private List<Robot> children;
 
 }
