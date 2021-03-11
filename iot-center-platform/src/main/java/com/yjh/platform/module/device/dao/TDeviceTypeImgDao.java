@@ -19,12 +19,12 @@ public interface TDeviceTypeImgDao {
     int update(TDeviceTypeImg tDeviceTypeImg);
     TDeviceTypeImg selectByPrimaryId(@Param(value = "typeId") String typeId);
     List<TDeviceTypeImg> select(@Param(value = "typeId") String typeId,
-                                @Param(value = "picAbspath") String picAbspath,
-                                @Param(value = "picRealpath") String picRealpath,
+                                @Param(value = "picAbsPath") String picAbsPath,
+                                @Param(value = "picRealPath") String picRealPath,
                                 @Param(value = "remake") String remake);
     List<TDeviceTypeImg> selectByPage(@Param(value = "typeId") String typeId,
-                                    @Param(value = "picAbspath") String picAbspath,
-                                    @Param(value = "picRealpath") String picRealpath,
+                                    @Param(value = "picAbsPath") String picAbsPath,
+                                    @Param(value = "picRealPath") String picRealPath,
                                     @Param(value = "remake") String remake);
 
     int batchAdd(List<TDeviceTypeImg> list);

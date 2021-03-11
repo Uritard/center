@@ -392,6 +392,7 @@
         g.dict_note as voltageLevelName,
         d.model_name as modelName,
         h.dict_note as deviceTypeName,
+        l.pic_real_path,
         k.region_name as upRegionName
         from t_std_device a
         left join t_std_device_attr b on a.device_id = b.device_id
@@ -401,6 +402,7 @@
         left join t_std_metemodel d on d.model_id=a.model_id
         left join t_dict_business h on h.dict_code = a.device_type
         left join t_std_region k on a.up_region_id = k.region_id
+        left join t_device_type_img l on a.device_type = l.type_id
         where 1=1
         <if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
         and a.up_region_id in

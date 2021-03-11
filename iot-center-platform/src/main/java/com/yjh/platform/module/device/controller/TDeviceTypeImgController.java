@@ -101,12 +101,12 @@ public class TDeviceTypeImgController {
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     public Result select(@RequestParam(value = "typeId", required = false) String typeId,
-                            @RequestParam(value = "picAbspath", required = false) String picAbspath,
-                            @RequestParam(value = "picRealpath", required = false) String picRealpath,
+                            @RequestParam(value = "picAbsPath", required = false) String picAbsPath,
+                            @RequestParam(value = "picRealPath", required = false) String picRealPath,
                             @RequestParam(value = "remake", required = false) String remake) {
         Result result = new Result();
         try {
-            List<TDeviceTypeImg> list = tDeviceTypeImgService.select(typeId, picAbspath, picRealpath, remake);
+            List<TDeviceTypeImg> list = tDeviceTypeImgService.select(typeId, picAbsPath, picRealPath, remake);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -118,8 +118,8 @@ public class TDeviceTypeImgController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "typeId", required = false) String typeId,
-                                @RequestParam(value = "picAbspath", required = false) String picAbspath,
-                                @RequestParam(value = "picRealpath", required = false) String picRealpath,
+                                @RequestParam(value = "picAbsPath", required = false) String picAbsPath,
+                                @RequestParam(value = "picRealPath", required = false) String picRealPath,
                                 @RequestParam(value = "remake", required = false) String remake,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
@@ -127,7 +127,7 @@ public class TDeviceTypeImgController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize);
-            List<TDeviceTypeImg> list = tDeviceTypeImgService.selectByPage(typeId, picAbspath, picRealpath, remake);
+            List<TDeviceTypeImg> list = tDeviceTypeImgService.selectByPage(typeId, picAbsPath, picRealPath, remake);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

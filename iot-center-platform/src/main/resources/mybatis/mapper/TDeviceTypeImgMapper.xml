@@ -5,27 +5,27 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         <id column="type_id" jdbcType="VARCHAR" property="typeId" />
-        <result column="pic_abspath" jdbcType="VARCHAR" property="picAbspath" />
-        <result column="pic_realpath" jdbcType="VARCHAR" property="picRealpath" />
+        <result column="pic_abs_path" jdbcType="VARCHAR" property="picAbsPath" />
+        <result column="pic_real_path" jdbcType="VARCHAR" property="picRealPath" />
         <result column="remake" jdbcType="VARCHAR" property="remake" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        type_id, pic_abspath, pic_realpath, remake
+        type_id, pic_abs_path, pic_real_path, remake
     </sql>
 
 
     <insert id="add" useGeneratedKeys="true" keyProperty="typeId" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         insert into t_device_type_img(
             type_id,
-            pic_abspath,
-            pic_realpath,
+            pic_abs_path,
+            pic_real_path,
             remake
         )values(
                 #{typeId, jdbcType=VARCHAR},
-                #{picAbspath, jdbcType=VARCHAR},
-                #{picRealpath, jdbcType=VARCHAR},
+                #{picAbsPath, jdbcType=VARCHAR},
+                #{picRealPath, jdbcType=VARCHAR},
                 #{remake, jdbcType=VARCHAR}
         )
     </insert>
@@ -38,8 +38,8 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         update t_device_type_img a <set>
         <if test="typeId != null and typeId != ''">a.type_id = #{typeId, jdbcType=VARCHAR},</if>
-        <if test="picAbspath != null and picAbspath != ''">a.pic_abspath = #{picAbspath, jdbcType=VARCHAR},</if>
-        <if test="picRealpath != null and picRealpath != ''">a.pic_realpath = #{picRealpath, jdbcType=VARCHAR},</if>
+        <if test="picAbsPath != null and picAbsPath != ''">a.pic_abs_path = #{picAbsPath, jdbcType=VARCHAR},</if>
+        <if test="picRealPath != null and picRealPath != ''">a.pic_real_path = #{picRealPath, jdbcType=VARCHAR},</if>
         <if test="remake != null and remake != ''">a.remake = #{remake, jdbcType=VARCHAR},</if>
     </set>
             where a.type_id = #{typeId, jdbcType=VARCHAR}
@@ -48,8 +48,8 @@
     <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         select
         a.type_id,
-        a.pic_abspath,
-        a.pic_realpath,
+        a.pic_absp_ath,
+        a.pic_real_path,
         a.remake
         from t_device_type_img a
         where 1 = 1
@@ -60,43 +60,43 @@
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg" resultType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         select
         a.type_id,
-        a.pic_abspath,
-        a.pic_realpath,
+        a.pic_abs_path,
+        a.pic_real_path,
         a.remake
         from t_device_type_img a
         where 1 = 1
         <if test="typeId != null and typeId != ''"> and a.type_id = #{typeId, jdbcType=VARCHAR}</if>
-        <if test="picAbspath != null and picAbspath != ''"> and a.pic_abspath = #{picAbspath, jdbcType=VARCHAR}</if>
-        <if test="picRealpath != null and picRealpath != ''"> and a.pic_realpath = #{picRealpath, jdbcType=VARCHAR}</if>
+        <if test="picAbsPath != null and picAbsPath != ''"> and a.pic_abs_path = #{picAbsPath, jdbcType=VARCHAR}</if>
+        <if test="picRealPath != null and picRealPath != ''"> and a.pic_real_path = #{picRealPath, jdbcType=VARCHAR}</if>
         <if test="remake != null and remake != ''"> and a.remake = #{remake, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg" resultType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         select
         a.type_id,
-        a.pic_abspath,
-        a.pic_realpath,
+        a.pic_abs_path,
+        a.pic_real_path,
         a.remake
         from t_device_type_img a
         where 1 = 1
         <if test="typeId != null and typeId != ''"> and a.type_id = #{typeId, jdbcType=VARCHAR}</if>
-        <if test="picAbspath != null and picAbspath != ''"> and a.pic_abspath = #{picAbspath, jdbcType=VARCHAR}</if>
-        <if test="picRealpath != null and picRealpath != ''"> and a.pic_realpath = #{picRealpath, jdbcType=VARCHAR}</if>
+        <if test="picAbsPath != null and picAbsPath != ''"> and a.pic_abs_path = #{picAbsPath, jdbcType=VARCHAR}</if>
+        <if test="picRealPath != null and picRealPath != ''"> and a.pic_real_path = #{picRealPath, jdbcType=VARCHAR}</if>
         <if test="remake != null and remake != ''"> and a.remake = #{remake, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchAdd">
         insert into t_device_type_img(
             type_id,
-            pic_abspath,
-            pic_realpath,
+            pic_abs_path,
+            pic_real_path,
             remake
         )values
         <foreach collection="list" item="TDeviceTypeImg" separator=",">
             (
                 #{TDeviceTypeImg.typeId, jdbcType=VARCHAR},
-                #{TDeviceTypeImg.picAbspath, jdbcType=VARCHAR},
-                #{TDeviceTypeImg.picRealpath, jdbcType=VARCHAR},
+                #{TDeviceTypeImg.picAbsPath, jdbcType=VARCHAR},
+                #{TDeviceTypeImg.picRealPath, jdbcType=VARCHAR},
                 #{TDeviceTypeImg.remake, jdbcType=VARCHAR}
             )
         </foreach>
@@ -119,7 +119,7 @@
         SELECT
             a.dict_code as deviceType,
             a.dict_note as deviceTypeName,
-            b.pic_realpath
+            b.pic_real_path
         from t_dict_business a
         left join t_device_type_img b on a.dict_code = b.type_id
         WHERE a.col_name = "device_type"

@@ -45,7 +45,7 @@ public class RecordVoiceFileThread implements Runnable {
         dateTime = System.currentTimeMillis();
         dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
         channelNumList = channelNum.split(",");
-        voiceName = voiceDeviceId +"T"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(dateTime))+"T"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(dateTimeAfter))+"T";
+        voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HH:mm:ss").format(new Date(dateTime))+"-"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTimeAfter))+"_";
     }
 
     @Override
@@ -67,7 +67,7 @@ public class RecordVoiceFileThread implements Runnable {
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
-                    voiceName = voiceDeviceId +"T"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(dateTime))+"T"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(dateTimeAfter))+"T";
+                    voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTime))+"-"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTimeAfter))+"_";
                 }
                 if (sdk_.NET_TRADIO_Init() == 0) {
                     log.info("SDK初始化成功");

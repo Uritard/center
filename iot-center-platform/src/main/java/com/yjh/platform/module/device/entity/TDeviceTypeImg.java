@@ -24,10 +24,10 @@ public class TDeviceTypeImg implements Serializable {
     private String typeId;
 
     @ApiModelProperty(value = "图片绝对路径")
-    private String picAbspath;
+    private String picAbsPath;
 
     @ApiModelProperty(value = "图片相对路径")
-    private String picRealpath;
+    private String picRealPath;
 
     @ApiModelProperty(value = "描述")
     private String remake;

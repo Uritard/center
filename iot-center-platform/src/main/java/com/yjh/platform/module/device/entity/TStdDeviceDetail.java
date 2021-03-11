@@ -148,6 +148,8 @@ public class TStdDeviceDetail {
     @ApiModelProperty(value = "安装地址")
     private String address;
 
+    private String picRealPath;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

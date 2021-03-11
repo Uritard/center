@@ -59,15 +59,15 @@ public class TDeviceTypeImgService{
 
     //@Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TDeviceTypeImg> select(String typeId, String picAbspath, String picRealpath, String remake) {
-        List<TDeviceTypeImg> tDeviceTypeImgList = tDeviceTypeImgDao.select(typeId, picAbspath, picRealpath, remake);
+    public List<TDeviceTypeImg> select(String typeId, String picAbsPath, String picRealPath, String remake) {
+        List<TDeviceTypeImg> tDeviceTypeImgList = tDeviceTypeImgDao.select(typeId, picAbsPath, picRealPath, remake);
         return tDeviceTypeImgList;
     }
 
     //@Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TDeviceTypeImg> selectByPage(String typeId, String picAbspath, String picRealpath, String remake) {
-        List<TDeviceTypeImg> tDeviceTypeImgList = tDeviceTypeImgDao.selectByPage(typeId, picAbspath, picRealpath, remake);
+    public List<TDeviceTypeImg> selectByPage(String typeId, String picAbsPath, String picRealPath, String remake) {
+        List<TDeviceTypeImg> tDeviceTypeImgList = tDeviceTypeImgDao.selectByPage(typeId, picAbsPath, picRealPath, remake);
         return tDeviceTypeImgList;
     }
 
@@ -103,8 +103,8 @@ public class TDeviceTypeImgService{
             if(picList == null || picList.length <1){
                 continue;
             }
-            tDeviceTypeImg.setPicAbspath(absPath+"/"+tDictBusiness.getDictCode()+"/"+picList[0].getName());
-            tDeviceTypeImg.setPicRealpath(realPath+"/"+tDictBusiness.getDictCode()+"/"+picList[0].getName());
+            tDeviceTypeImg.setPicAbsPath(absPath+"/"+tDictBusiness.getDictCode()+"/"+picList[0].getName());
+            tDeviceTypeImg.setPicRealPath(realPath+"/"+tDictBusiness.getDictCode()+"/"+picList[0].getName());
             inList.add(tDeviceTypeImg);
         }
         if(inList != null && inList.size()>0){

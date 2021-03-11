@@ -32,7 +32,7 @@ public class TSysParam implements Serializable {
     @TableId(value = "param_id", type = IdType.AUTO)
     private Integer paramId;
 
-    @Length(max = 11,message = "paramCode长度必须小于等于11")
+    @Length(max = 20,message = "paramCode长度必须小于等于20")
     @ApiModelProperty(value = "参数编码")
     @TableField(value = "param_code",updateStrategy = FieldStrategy.IGNORED)
     private String paramCode;
