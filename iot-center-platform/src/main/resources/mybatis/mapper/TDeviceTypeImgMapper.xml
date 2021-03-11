@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TDeviceTypeImgDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TDeviceTypeImg">
+        <id column="type_id" jdbcType="VARCHAR" property="typeId" />
+        <result column="pic_abspath" jdbcType="VARCHAR" property="picAbspath" />
+        <result column="pic_realpath" jdbcType="VARCHAR" property="picRealpath" />
+        <result column="remake" jdbcType="VARCHAR" property="remake" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        type_id, pic_abspath, pic_realpath, remake
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="typeId" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
+        insert into t_device_type_img(
+            type_id,
+            pic_abspath,
+            pic_realpath,
+            remake
+        )values(
+                #{typeId, jdbcType=VARCHAR},
+                #{picAbspath, jdbcType=VARCHAR},
+                #{picRealpath, jdbcType=VARCHAR},
+                #{remake, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from t_device_type_img
+                where type_id = #{typeId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
+        update t_device_type_img a <set>
+        <if test="typeId != null and typeId != ''">a.type_id = #{typeId, jdbcType=VARCHAR},</if>
+        <if test="picAbspath != null and picAbspath != ''">a.pic_abspath = #{picAbspath, jdbcType=VARCHAR},</if>
+        <if test="picRealpath != null and picRealpath != ''">a.pic_realpath = #{picRealpath, jdbcType=VARCHAR},</if>
+        <if test="remake != null and remake != ''">a.remake = #{remake, jdbcType=VARCHAR},</if>
+    </set>
+            where a.type_id = #{typeId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
+        select
+        a.type_id,
+        a.pic_abspath,
+        a.pic_realpath,
+        a.remake
+        from t_device_type_img a
+        where 1 = 1
+            and a.type_id = #{typeId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg" resultType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
+        select
+        a.type_id,
+        a.pic_abspath,
+        a.pic_realpath,
+        a.remake
+        from t_device_type_img a
+        where 1 = 1
+        <if test="typeId != null and typeId != ''"> and a.type_id = #{typeId, jdbcType=VARCHAR}</if>
+        <if test="picAbspath != null and picAbspath != ''"> and a.pic_abspath = #{picAbspath, jdbcType=VARCHAR}</if>
+        <if test="picRealpath != null and picRealpath != ''"> and a.pic_realpath = #{picRealpath, jdbcType=VARCHAR}</if>
+        <if test="remake != null and remake != ''"> and a.remake = #{remake, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg" resultType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
+        select
+        a.type_id,
+        a.pic_abspath,
+        a.pic_realpath,
+        a.remake
+        from t_device_type_img a
+        where 1 = 1
+        <if test="typeId != null and typeId != ''"> and a.type_id = #{typeId, jdbcType=VARCHAR}</if>
+        <if test="picAbspath != null and picAbspath != ''"> and a.pic_abspath = #{picAbspath, jdbcType=VARCHAR}</if>
+        <if test="picRealpath != null and picRealpath != ''"> and a.pic_realpath = #{picRealpath, jdbcType=VARCHAR}</if>
+        <if test="remake != null and remake != ''"> and a.remake = #{remake, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_device_type_img(
+            type_id,
+            pic_abspath,
+            pic_realpath,
+            remake
+        )values
+        <foreach collection="list" item="TDeviceTypeImg" separator=",">
+            (
+                #{TDeviceTypeImg.typeId, jdbcType=VARCHAR},
+                #{TDeviceTypeImg.picAbspath, jdbcType=VARCHAR},
+                #{TDeviceTypeImg.picRealpath, jdbcType=VARCHAR},
+                #{TDeviceTypeImg.remake, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_device_type_img
+        where type_id in (
+            <foreach collection="list" item="typeId" separator=",">
+                #{typeId, jdbcType=VARCHAR}
+            </foreach>
+            )
+    </delete>
+
+    <delete id="deleteAll">
+        delete from t_device_type_img
+    </delete>
+</mapper>

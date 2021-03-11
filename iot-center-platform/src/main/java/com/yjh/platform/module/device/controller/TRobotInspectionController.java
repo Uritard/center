@@ -200,6 +200,7 @@ public class TRobotInspectionController {
             }
             resultMap.put("taskName",map.get("taskName"));
             resultMap.put("startTime",map.get("startTime"));
+            resultMap.put("taskState",map.get("taskState"));
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -236,4 +237,17 @@ public class TRobotInspectionController {
         return result;
     }
 
+    @ApiOperation(value = "查询机器人树")
+    @RequestMapping(value = "/robotTree", method = RequestMethod.GET)
+    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1)
+    public Result robotTree() {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.robotTree());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询机器人状态信息失败描述：", e);
+        }
+        return result;
+    }
 }

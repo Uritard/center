@@ -128,11 +128,20 @@ public class TCfgUnionRuleService{
         List<AreaInfo> listItem2 = this.tCfgUnionRuleDao.selectForTCfgMete(2);
         AreaInfo areaInfoItem2 = new AreaInfo();
         areaInfoItem2.setId(2L);
-        areaInfoItem2.setUpId(-1L);
+        areaInfoItem2.setUpId(-2L);
         areaInfoItem2.setLabel("遥测");
         areaInfoItem2.setChildren(listItem2);
         areaInfoItem2.setInfoType("meteKind");
         list.add(areaInfoItem2);
+        //遥控
+        List<AreaInfo> listItem3 = this.tCfgUnionRuleDao.selectForTCfgMete(3);
+        AreaInfo areaInfoItem3 = new AreaInfo();
+        areaInfoItem3.setId(3L);
+        areaInfoItem3.setUpId(-3L);
+        areaInfoItem3.setLabel("遥控");
+        areaInfoItem3.setChildren(listItem3);
+        areaInfoItem3.setInfoType("meteKind");
+        list.add(areaInfoItem3);
 
         return list;
     }

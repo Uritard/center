@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.controller.TRobotInspectionController;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.entity.Robot;
-import com.yjh.platform.module.device.entity.RobotTaskMessage;
-import com.yjh.platform.module.device.entity.TCruisePointAttr;
-import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.entity.TCruiseResult;
@@ -225,6 +222,14 @@ public class TRobotInspectionService{
             reMap.put("taskProgress",0);
             reMap.put("taskName","");
             reMap.put("startTime","");
+            reMap.put("taskState","");
+
+            Map<String,Object> jasonMap=new HashMap<>();
+            jasonMap.put("type","noTask");
+            //jasonMap.put("taskId",tCruiseTask.getTaskId());
+            String json= JSON.toJSONString(jasonMap);
+            WebSocketServer.sendMsg(json);
+            log.info("发送给前端的消息-停止调接口：   "+json);
             return reMap;
         }
         String taskId = (String)mapForRobotInstance.get("taskId");
@@ -247,18 +252,66 @@ public class TRobotInspectionService{
             reMap.put("taskProgress",0);
             reMap.put("taskName","");
             reMap.put("startTime","");
+            reMap.put("taskState","");
         }else{
             if(tc.getCState() == 239 || tc.getCState() == 241){
                 reMap.put("taskProgress",re);
                 reMap.put("taskName",tc.getTaskName());
                 reMap.put("startTime",mapForRobotInstance.get("startTime"));
+                String state = mapForRobotInstance.get("taskState").toString();
+                //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
+                if("1".equals(state)){
+                    state = "已执行";
+                }
+                if("2".equals(state)){
+                    state = "正在执行";
+                }
+                if("3".equals(state)){
+                    state = "暂停";
+                }
+                if("4".equals(state)){
+                    state = "终止";
+                }
+                if("5".equals(state)){
+                    state = "未执行";
+                }
+                if("6".equals(state)){
+                    state = "超期";
+                }
+                reMap.put("taskState",state);
             }else {
                 reMap.put("taskProgress",0);
                 reMap.put("taskName","");
                 reMap.put("startTime","");
+                reMap.put("taskState","");
             }
         }
         return reMap;
+    }
+
+    //机器人树
+    @Transactional(rollbackFor = Exception.class)
+    public List<RobotNode> robotTree(){
+        List<RobotNode> reList = new ArrayList<>();
+        RobotNode node = new RobotNode();
+        node.setId(1L);
+        node.setLabel("机器人树");
+        node.setInfoType("tree");
+        List<RobotNode> child = new ArrayList<>();
+        List<Robot> robotList = this.selectRobotInfo();
+        for(Robot robot:robotList){
+            RobotNode robotNode = new RobotNode();
+            robotNode.setUpId(node.getId());
+            robotNode.setUpName(node.getLabel());
+            robotNode.setId(robot.getRobotId());
+            robotNode.setLabel(robot.getRobotName());
+            robotNode.setCode(robot.getRobotCode());
+            robotNode.setInfoType("robot");
+            child.add(robotNode);
+        }
+        node.setChildren(child);
+        reList.add(node);
+        return reList;
     }
 
 }

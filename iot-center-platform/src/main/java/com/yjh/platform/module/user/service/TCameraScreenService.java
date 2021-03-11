@@ -168,6 +168,15 @@ public class TCameraScreenService{
                                 continue;
                             }
                         }
+                        if(flag != null && flag == 0){
+                            if("0".equals(map.get(areaInfoMap.getId().toString()))){
+                                //不在线
+                                childrenList.add(areaInfoTem);
+                                continue;
+                            }else {
+                                continue;
+                            }
+                        }
                     }
                     childrenList.add(areaInfoTem);
                 }
