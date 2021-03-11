@@ -202,7 +202,7 @@ public class TCfgDataCurrentService {
         cLogger.info("meteId--"+meteMap);
         //联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
-        
+
            cLogger.info("开始");
             List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
             for (TCfgUnionRule rule : unionrules) {
@@ -274,6 +274,14 @@ public class TCfgDataCurrentService {
 
                 } else {
                     cLogger.info("表达式错误");
+                    try {
+                        int delay = rule.getRuleDelay();
+                        Thread.sleep(delay * 1000);
+                        cLogger.info(rule.getRuleName());
+                        plans.add(rule.getPlanId());
+                    } catch (Exception e) {
+                        e.getMessage();
+                    }
                 }
 
             }

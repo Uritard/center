@@ -191,7 +191,14 @@ public class TCruiseDataResultService {
                                                  String endTime,
                                                  String meteType,
                                                  Integer meterType) {
-        return tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
+
+       List<BrokenLineInfo> brokenLineInfos= tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
+       for(BrokenLineInfo point:brokenLineInfos){
+           if(point.getResultNum().matches("^[a-zA-Z_\\u4e00-\\u9fa5]+$")){
+               point.setResultNum("0");
+           }
+       }
+       return brokenLineInfos;
     }
     @Transactional(rollbackFor = Exception.class)
     public int updateCruiseAnalyze(List<String> cruiseResultIdList){

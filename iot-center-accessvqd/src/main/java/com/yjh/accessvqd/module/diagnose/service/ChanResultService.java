@@ -132,6 +132,7 @@ public class ChanResultService {
         log.info("details:---------" + details);
         log.info("result：" + details);
         //无任务时返回[]结果信息
+        try {
         if(Objects.isNull(diagnosePlanId) || diagnosePlanId.equals("")){
            return details;
         }else {
@@ -140,7 +141,9 @@ public class ChanResultService {
                 detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
                 checkItemsOperate(detail);
                 //获取视频地址
-                Result result = Constant.otherServer(detail.getCameraId(), Constant.START_CAMERA_URL);
+                HashMap map=new HashMap();
+                map.put("cameraId",detail.getCameraId());
+                Result result = Constant.otherServer(map, Constant.START_CAMERA_URL);
                 Map<String, String> videoInfo = (Map<String, String>) result.getData();
                 detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
                 detail.setFlvUrl(videoInfo.get("flvUrl"));
@@ -153,6 +156,10 @@ public class ChanResultService {
                         break;
                 }
             }
+        }
+        }catch (Exception e){
+            log.error("诊断结果查询失败:"+e);
+            log.error("ExceptionDetail-----:"+e.getStackTrace()[0]);
         }
         return details;
     }
