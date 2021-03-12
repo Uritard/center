@@ -8,7 +8,10 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -74,6 +77,15 @@ public class PlatformApplication  implements CommandLineRunner {
             }
         }
     }
+    @Bean
+    public Connector connector(){
+        Connector connector=new Connector("org.apache.coyote.http11.Http11NioProtocol");
+        connector.setScheme("http");
+        connector.setPort(18751);
+        connector.setSecure(false);
+        connector.setRedirectPort(18711);
+        return  connector;
+    }
 
     @Bean
     public static ConfigureRedisAction configureRedisAction() {
@@ -81,14 +93,26 @@ public class PlatformApplication  implements CommandLineRunner {
     }
 
     @Bean
-    public ConfigurableServletWebServerFactory webServerFactory() {
-        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+    public ConfigurableServletWebServerFactory webServerFactory(Connector connector) {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory(){
+            @Override
+            protected void postProcessContext(Context context) {
+                SecurityConstraint securityConstraint=new SecurityConstraint();
+                securityConstraint.setUserConstraint("CONFIDENTIAL");
+                SecurityCollection collection=new SecurityCollection();
+                collection.addPattern("/*");
+                securityConstraint.addCollection(collection);
+                super.postProcessContext(context);
+            }
+        };
+        factory.addAdditionalTomcatConnectors(connector);
         factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
             @Override
             public void customize(Connector connector) {
                 connector.setProperty("relaxedQueryChars", "|{}[]");
             }
         });
+
         return factory;
     }
 
