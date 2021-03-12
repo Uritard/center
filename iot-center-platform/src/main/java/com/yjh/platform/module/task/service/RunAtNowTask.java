@@ -222,6 +222,7 @@ public class RunAtNowTask implements Runnable{
                 tCruiseResult.setTaskWait(taskCount);
                 tCruiseResult.setCreateTime(date);
                 tCruiseResult.setExecuteTime(simpleDateFormat.parse(simpleDateFormat.format(new Date())));
+                tCruiseResult.setRemark("0");
                 tCruiseResultDao.insert(tCruiseResult);//插入一条任务结果
             }
 
@@ -614,7 +615,11 @@ public class RunAtNowTask implements Runnable{
                                 analysis.setTaskId(tCruiseTask.getTaskId());
                                 analysis.setInstanceId(item.getInstanceId());
                                 analysis.setPicPath(absPath);
-                                analysis.setAnalyseType("398");
+                                if("on".equals(tStdDevicemete.getIsJudge())){
+                                    analysis.setAnalyseType("11");
+                                }else {
+                                    analysis.setAnalyseType("398");
+                                }
                                 analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
                                 analysis.setIsAi(0);
                                 List<Analysis> analysisList = new ArrayList<>();

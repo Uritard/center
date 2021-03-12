@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import rx.internal.operators.OnSubscribeGroupJoin;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -180,40 +181,41 @@ public class HomePageController {
     }
 
     @ApiOperation(value = "用来接受微气象服务数据的接口")
-    @RequestMapping(value = "/getWeatherInfoForService", method = RequestMethod.GET)
-    public Result getWeatherInfoForService(@RequestParam String map)  {
+    @RequestMapping(value = "/getWeatherInfoForService", method = RequestMethod.POST)
+    public Result getWeatherInfoForService(@RequestBody Map<String, Object> map)  {
         Result result = new Result();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             log.info("天气信息"+map);
-            Map mapa = JSON.parseObject(map);
-            Integer temp1 = Integer.valueOf(mapa.get("windDirection").toString());
-            String windDirection="";
-            if(temp1 == 0 || temp1 ==360){
-                windDirection = "北";
-            }
-            if(temp1 == 90){
-                windDirection = "东";
-            }
-            if(temp1 == 180){
-                windDirection = "南";
-            }
-            if(temp1 == 270){
-                windDirection = "西";
-            }
-            if(temp1 > 0 && temp1 < 90){
-                windDirection = "东北";
-            }
-            if(temp1 > 90 && temp1 < 1800){
-                windDirection = "东南";
-            }
-            if(temp1 > 180 && temp1 < 270){
-                windDirection = "西南";
-            }
-            if(temp1 > 270 && temp1 < 360){
-                windDirection = "西北";
-            }
-            mapa.put("windDirection",windDirection);
+            //Map mapa = JSON.parseObject(map);
+            Map mapa = map;
+//            Integer temp1 = Integer.valueOf(mapa.get("windDirection").toString());
+//            String windDirection="";
+//            if(temp1 == 0 || temp1 ==360){
+//                windDirection = "北";
+//            }
+//            if(temp1 == 90){
+//                windDirection = "东";
+//            }
+//            if(temp1 == 180){
+//                windDirection = "南";
+//            }
+//            if(temp1 == 270){
+//                windDirection = "西";
+//            }
+//            if(temp1 > 0 && temp1 < 90){
+//                windDirection = "东北";
+//            }
+//            if(temp1 > 90 && temp1 < 1800){
+//                windDirection = "东南";
+//            }
+//            if(temp1 > 180 && temp1 < 270){
+//                windDirection = "西南";
+//            }
+//            if(temp1 > 270 && temp1 < 360){
+//                windDirection = "西北";
+//            }
+//            mapa.put("windDirection",windDirection);
             mapa.put("getTime",simpleDateFormat.format(new Date()));
             redisTemplate.opsForHash().putAll("weatherInfoForLastValue",mapa);
             Constant.weatherInfo = mapa;

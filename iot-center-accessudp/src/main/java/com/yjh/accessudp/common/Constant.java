@@ -66,4 +66,6 @@ public class Constant {
     public static Map<Integer,List<String>>  data = new HashMap<>();
 
     public static List<String> listAllByte = new ArrayList<>();
+
+    public static String encoding="UTF-8";
 }

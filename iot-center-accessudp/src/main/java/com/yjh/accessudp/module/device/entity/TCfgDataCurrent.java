@@ -54,5 +54,7 @@ public class TCfgDataCurrent implements Serializable {
     @TableField(value = "last_mete_value",updateStrategy = FieldStrategy.IGNORED)
     private String lastMeteValue;
 
+    private String meteComment;
+
 
 }

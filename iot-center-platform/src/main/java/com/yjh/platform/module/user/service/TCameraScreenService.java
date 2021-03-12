@@ -135,9 +135,9 @@ public class TCameraScreenService{
             }
             map.putAll((Map<String,String>)re.getData());
         }
-        for(Map<String,String> item:listForState){
-            map.putAll(item);
-        }
+//        for(Map<String,String> item:listForState){
+//            map.putAll(item);
+//        }
         diGui(areaInfoCountryList, listTree,map,flag);
         return areaInfoCountryList;
     }
@@ -160,7 +160,7 @@ public class TCameraScreenService{
                             areaInfoTem.setState(0);
                         }
                         if(flag != null && flag == 1){
-                            if("1".equals(map.get(areaInfoMap.getId().toString()))){
+                            if(1 == areaInfoTem.getState()){
                                 //在线
                                 childrenList.add(areaInfoTem);
                                 continue;
@@ -169,7 +169,7 @@ public class TCameraScreenService{
                             }
                         }
                         if(flag != null && flag == 0){
-                            if("0".equals(map.get(areaInfoMap.getId().toString()))){
+                            if(0 == areaInfoTem.getState()){
                                 //不在线
                                 childrenList.add(areaInfoTem);
                                 continue;

@@ -505,6 +505,7 @@
         <if test="meteKind != null">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
         <if test="regionId != null ">a.region_id = #{regionId},</if>
         <if test="meteValue != null">a.mete_value = #{meteValue},</if>
+        <if test="meteComment != null">a.mete_comment = #{meteComment},</if>
         <if test="lastMeteValue != null ">a.last_mete_value = #{lastMeteValue},</if>
     </set>
         where a.mete_id = #{meteId, jdbcType=BIGINT}
@@ -518,6 +519,7 @@
             record_time,
             mete_kind,
             region_id,
+            mete_comment,
             mete_value,
             last_mete_value
         )values(
@@ -528,6 +530,7 @@
                 #{meteKind, jdbcType=INTEGER},
                 #{regionId, jdbcType=VARCHAR},
                 #{meteValue, jdbcType=VARCHAR},
+                #{meteComment, jdbcType=VARCHAR},
                 #{lastMeteValue, jdbcType=VARCHAR}
         )
     </insert>

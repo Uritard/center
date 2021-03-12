@@ -143,6 +143,16 @@ public class TCfgUnionRuleService{
         areaInfoItem3.setInfoType("meteKind");
         list.add(areaInfoItem3);
 
+        //遥调
+        List<AreaInfo> listItem4 = this.tCfgUnionRuleDao.selectForTCfgMete(4);
+        AreaInfo areaInfoItem4 = new AreaInfo();
+        areaInfoItem4.setId(4L);
+        areaInfoItem4.setUpId(-4L);
+        areaInfoItem4.setLabel("遥调");
+        areaInfoItem4.setChildren(listItem4);
+        areaInfoItem4.setInfoType("meteKind");
+        list.add(areaInfoItem4);
+
         return list;
     }
 

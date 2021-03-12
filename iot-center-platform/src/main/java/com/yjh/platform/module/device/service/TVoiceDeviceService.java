@@ -148,10 +148,10 @@ public class TVoiceDeviceService{
                 areaInfoCountryList.add(areaInfoCountry);
             }
         }
-        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
-        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
-//        String realPath = "D:/code/qhTest";
-//        String absPath  = "D:/code/qhTest";
+//        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
+//        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        String realPath = "D:/code/qhTest";
+        String absPath  = "D:/code/qhTest";
         diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }

@@ -157,7 +157,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         String[] udp = Str.toString().split(" ");
         if("55".equals(udp[4])){
             //获取meteid
-            Integer meteId = Integer.valueOf(new BigInteger(udp[7],16).toString())*100+Integer.valueOf(new BigInteger(udp[8],16).toString());
+            Integer meteId = Integer.valueOf(new BigInteger(udp[8]+udp[7],16).toString());
             log.info("meteId:   "+meteId);
             //获取meteKind
             Integer meteKind = Integer.valueOf(new BigInteger(udp[9],16).toString());
@@ -182,9 +182,12 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //            log.info("描述数字:"+commitValue);
             //获取时间
             String shijianchuo = arrayToString(udp,weizhi+1+commitLength,7,false);
-            long day= Long.valueOf(shijianchuo,16);
+//            getCP56time2a
+//            String timea="20"+Integer.valueOf(new BigInteger(udp[weizhi+1+commitLength+7],16).toString())+"-"+Integer.valueOf(new BigInteger(udp[weizhi+1+commitLength+6],16).toString())
+//                    +"-"+Integer.valueOf(new BigInteger(udp[weizhi+1+commitLength+7],16).toString());
+//            long day= Long.valueOf(shijianchuo,16);
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//这个是你要转成后的时间的格式
-            String time = sdf.format(new Date(day));
+            String time = getCP56time2a(shijianchuo);
             log.info("time:  "+time);
 
             TCfgDataCurrent tCfgDataCurrent = tCfgMeteService.selectByPrimaryIdTCfgDataCurrent(meteId.toString());
@@ -194,12 +197,14 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 tCfgDataCurrent.setDeviceId(Long.valueOf(tCfgMeteService.selectByMeteId(meteId.toString())));
                 tCfgDataCurrent.setMeteKind(meteKind);
                 tCfgDataCurrent.setRecordTime(sdf.parse(time));
+                tCfgDataCurrent.setMeteComment(value);
                 tCfgDataCurrent.setMeteValue(commit);
                 tCfgMeteService.insertTCfgDataCurrent(tCfgDataCurrent);
             }else {
                 //库里已经有数据了
                 tCfgDataCurrent.setLastMeteValue(tCfgDataCurrent.getMeteValue());
                 tCfgDataCurrent.setRecordTime(sdf.parse(time));
+                tCfgDataCurrent.setMeteComment(value);
                 tCfgDataCurrent.setMeteValue(commit);
                 tCfgMeteService.updateTCfgDataCurrent(tCfgDataCurrent);
             }
@@ -227,11 +232,15 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 log.info("帧序号：  "+xuHao);
                 //其实传输位置 9-12
                 Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
-                List<String> listByte = new ArrayList<>();
+                //List<String> listByte = new ArrayList<>();
                 for(int i =0;i<valueLength;i++){
-                    listByte.add(udp[14+i]);
+                    //listByte.add(udp[14+i]);
+                    Constant.listAllByte.add(udp[14+i]);
                 }
-                Constant.data.put(xuHao,listByte);
+                String weiZhi= arrayToString(udp,9,4,true);
+                //String neiRong= arrayToString(udp,14,valueLength,true);
+                log.info("位置："+weiZhi);
+                //Constant.data.put(xuHao,listByte);
             }
             if(doesHas == 0){
                 Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
@@ -241,18 +250,21 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 List<String> listByte = new ArrayList<>();
                 for(int i =0;i<valueLength;i++){
                     listByte.add(udp[14+i]);
+                    Constant.listAllByte.add(udp[14+i]);
                 }
                 Constant.data.put(xuHao,listByte);
 
-                List<String> listForSortByte =new ArrayList<>();
-                for(int i=0;i<Constant.data.size();i++ ){
-                    Constant.data.get(i);
-                    for (String item:Constant.data.get(i)) {
-                        listForSortByte.add(item);
-                    }
-
-                }
-                String data = arrayToString(listForSortByte);
+//                List<String> listForSortByte =new ArrayList<>();
+//                for(int i=0;i<Constant.data.size();i++ ){
+//                    Constant.data.get(i);
+//                    for (String item:Constant.data.get(i)) {
+//                        listForSortByte.add(item);
+//                    }
+//
+//                }
+                String data = arrayToString(Constant.listAllByte);
+                data = toStringHex(data);
+                log.info("文件内容： "+data);
                 String regex ="\\#.*?(是|不是)";
                 Matcher matcher = Pattern.compile(regex).matcher(data);
                 List<SYAllInfo> list = new LinkedList<>();
@@ -289,6 +301,34 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     }
 
+    private  String getCP56time2a(String str) {
+     return "20" + Integer.parseInt(str.substring(12, 14), 16) + "-" + Integer.parseInt(str.substring(10, 12), 16)
+       + "-" + Integer.parseInt(str.substring(8, 10), 16) + " " + Integer.parseInt(str.substring(6, 8), 16)
+             + ":" + Integer.parseInt(str.substring(4, 6), 16) + ":"
+             + Integer.parseInt(str.substring(2, 4) + "" + str.substring(0, 2), 16) / 1000;
+    }
+
+
+    public static String toStringHex(String s) {
+        byte[] baKeyword = new byte[s.length() / 2];
+        for (int i = 0; i < baKeyword.length; i++) {
+            try {
+                baKeyword[i] = (byte) (0xff & Integer.parseInt(
+                        s.substring(i * 2, i * 2 + 2), 16));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            s = new String(baKeyword, Constant.encoding);// UTF-16le:Not
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return s;
+    }
+
+
     public String getUrl(String url, String json) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         String result = "";
@@ -324,8 +364,10 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //        if(flag){
 //            return hexStr2Str(str);
 //        }
-        return hexStr2Str(str);
+        return str;
+        //return hexToString(str);
     }
+
     public String arrayToString(String[] udp,int start,int length,boolean flag)throws UnsupportedEncodingException{
         StringBuilder stringBuilder = new StringBuilder();
         for(int i = 0; i < length;i++){
@@ -333,29 +375,10 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         }
         String str =  stringBuilder.toString();
         if(flag){
-            return hexStr2Str(str);
+            return toStringHex(str);
         }
         return str;
     }
-
-    //16进制字符串串转为汉字
-    public static String hexStr2Str(String hexStr) throws UnsupportedEncodingException {
-        String str = "0123456789abcdef"; //16进制能用到的所有字符 0-15
-        char[] hexs = hexStr.toCharArray();//toCharArray() 方法将字符串转换为字符数组。
-        int length = (hexStr.length() / 2);//1个byte数值 -> 两个16进制字符
-        byte[] bytes = new byte[length];
-        int n;
-        for (int i = 0; i < bytes.length; i++) {
-            int position = i * 2;//两个16进制字符 -> 1个byte数值
-            n = str.indexOf(hexs[position]) * 16;
-            n += str.indexOf(hexs[position + 1]);
-            // 保持二进制补码的一致性 因为byte类型字符是8bit的  而int为32bit 会自动补齐高位1  所以与上0xFF之后可以保持高位一致性
-            //当byte要转化为int的时候，高的24位必然会补1，这样，其二进制补码其实已经不一致了，&0xff可以将高的24位置为0，低8位保持原样，这样做的目的就是为了保证二进制数据的一致性。
-            bytes[i] = (byte) (n & 0xff);
-        }
-        return new String(bytes,"UTF-8");
-    }
-
 
 
     private void handleDate(String msgData) {
