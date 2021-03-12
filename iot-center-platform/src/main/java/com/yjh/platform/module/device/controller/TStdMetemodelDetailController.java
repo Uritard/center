@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -39,6 +41,9 @@ public class TStdMetemodelDetailController {
     @Autowired
     private final TStdMetemodelDetailService tStdMetemodelDetailService;
 
+    @Resource
+    private RedisTemplate redisTemplate;
+
     private Logger log = LoggerFactory.getLogger(TStdMetemodelDetailController.class);
 
     public TStdMetemodelDetailController(TStdMetemodelDetailService tStdMetemodelDetailService) {
@@ -52,7 +57,8 @@ public class TStdMetemodelDetailController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 if (tStdMeteModelDetail.getLowLimit1() != null || tStdMeteModelDetail.getLowLimit2() != null || tStdMeteModelDetail.getLowLimit3() != null || tStdMeteModelDetail.getLowLimit4() != null
                         || tStdMeteModelDetail.getHighLimit1() != null || tStdMeteModelDetail.getHighLimit2() != null || tStdMeteModelDetail.getHighLimit3() != null || tStdMeteModelDetail.getHighLimit4() != null
                         || tStdMeteModelDetail.getAlarmState() != null) {
@@ -94,7 +100,8 @@ public class TStdMetemodelDetailController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 List<TStdMeteModelDetail> tStdMete = tStdMetemodelDetailService.selectByPrimaryId(tStdMeteModelDetail.getModelId());
                 TStdMeteModelDetail list = tStdMete.get(0);
                 if (tStdMeteModelDetail.getLowLimit1() != list.getLowLimit1() || tStdMeteModelDetail.getLowLimit2() != list.getLowLimit2() || tStdMeteModelDetail.getLowLimit3() != list.getLowLimit3() || tStdMeteModelDetail.getLowLimit4() != list.getLowLimit4()
@@ -198,7 +205,8 @@ public class TStdMetemodelDetailController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 for (TStdMeteModelDetail e : list) {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null

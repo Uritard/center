@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import io.swagger.models.auth.In;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -47,6 +50,8 @@ public class TStdDevicemeteController {
 
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TStdDevicemeteController.class);
 
@@ -61,7 +66,8 @@ public class TStdDevicemeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 if (tStdDeviceMeteDetail.getLowLimit1() != null || tStdDeviceMeteDetail.getLowLimit2() != null || tStdDeviceMeteDetail.getLowLimit3() != null || tStdDeviceMeteDetail.getLowLimit4() != null
                         || tStdDeviceMeteDetail.getHighLimit1() != null || tStdDeviceMeteDetail.getHighLimit2() != null || tStdDeviceMeteDetail.getHighLimit3() != null || tStdDeviceMeteDetail.getHighLimit4() != null
                         || tStdDeviceMeteDetail.getAlarmState() != null) {
@@ -102,7 +108,8 @@ public class TStdDevicemeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 TStdDeviceMete tStdDeviceMete = tStdDevicemeteService.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
                 if (tStdDeviceMeteDetail.getLowLimit1() != tStdDeviceMete.getLowLimit1() || tStdDeviceMeteDetail.getLowLimit2() != tStdDeviceMete.getLowLimit2() || tStdDeviceMeteDetail.getLowLimit3() != tStdDeviceMete.getLowLimit3() || tStdDeviceMeteDetail.getLowLimit4() != tStdDeviceMete.getLowLimit4()
                         || tStdDeviceMeteDetail.getHighLimit1() != tStdDeviceMete.getHighLimit1() || tStdDeviceMeteDetail.getHighLimit2() != tStdDeviceMete.getHighLimit2()  || tStdDeviceMeteDetail.getHighLimit3() != tStdDeviceMete.getHighLimit3()  || tStdDeviceMeteDetail.getHighLimit4() != tStdDeviceMete.getHighLimit4()
@@ -212,7 +219,8 @@ public class TStdDevicemeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 for (TStdDeviceMete e : list) {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
@@ -251,7 +259,8 @@ public class TStdDevicemeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 for (TStdDeviceMete e : list) {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null

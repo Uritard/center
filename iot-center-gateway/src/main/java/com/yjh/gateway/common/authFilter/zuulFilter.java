@@ -63,13 +63,6 @@ public class zuulFilter extends ZuulFilter {
             HttpServletRequest request = ctx.getRequest();
             HttpServletResponse response = ctx.getResponse();
             response.setHeader("Server", "unKnow");
-            String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
-            if(!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/')+1,origin.lastIndexOf(':')))){
-                log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
-                ctx.setSendZuulResponse(false);
-                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                return false;
-            }
             String url = request.getRequestURI();
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
@@ -126,6 +119,13 @@ public class zuulFilter extends ZuulFilter {
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (request instanceof HttpServletRequest) {
                 if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
+                    String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
+                    if(!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/')+1,origin.lastIndexOf(':')))){
+                        log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        return false;
+                    }
                     String contentType = request.getContentType();
                     if (contentType != null && contentType.contains("multipart/form-data")) {
                         String filePath = "";

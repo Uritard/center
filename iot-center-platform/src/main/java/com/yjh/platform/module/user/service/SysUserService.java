@@ -75,13 +75,16 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long userId) {
+        redisTemplate.delete("userInfo:"+userId);
         return this.sysUserDao.deleteByPrimaryId(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) throws IOException {
-      //  Date date = new Date();
-       // sysUser.setUpdateTime(date);
+        Long roleId=sysUser.getRoleId();
+        if(roleId!=null){
+            redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
+        }
         return this.sysUserDao.update(sysUser);
     }
 
@@ -430,6 +433,7 @@ public class SysUserService {
             Map map = new HashMap();
             map.put("userId",item.getUserId());
             map.put("userName",item.getUserName());
+            map.put("roleId",item.getRoleId());
             String str = "userInfo:"+item.getUserId();
             redisTemplate.opsForHash().putAll(str, Object2Map.toStringMap(map));
         }
