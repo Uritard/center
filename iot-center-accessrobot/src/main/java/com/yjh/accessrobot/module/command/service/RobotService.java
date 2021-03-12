@@ -700,11 +700,6 @@ public class RobotService {
                     } else {
                         tCruiseDataResult.setCruiseAbnormal(null);
                     }
-                    if (!"null".equals(redisInfoMap.get("remark"))) {
-                        tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
-                    } else {
-                        tCruiseDataResult.setRemark(null);
-                    }
                     tCDRList.add(tCruiseDataResult);
 
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
@@ -1121,17 +1116,14 @@ public class RobotService {
     public List<TCruiseDataResult> selectRepairTCDRList(String taskId){
         return this.tRobotInfoDao.selectRepairTCDRList(taskId);
     }
-    public List<TCruisePointInstanceDetail> selectForTask (List<Long> list){
-        return this.tRobotInfoDao.selectForTask(list);
+    public TCruisePointInstanceDetail selectForTask (Long instanceId){
+        return this.tRobotInfoDao.selectForTask(instanceId);
     }
-
     public List<TAlgorithmInfo> selectByDeviceMeteId(Long deviceMeteId){
         return this.tRobotInfoDao.selectByDeviceMeteId(deviceMeteId);
     }
     public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
         return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
     }
-
-
 }
 

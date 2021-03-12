@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.server;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -22,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -559,7 +561,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //微气象数据(接收并发送响应)
                 case "21":
-                    log.info("巡视主机收到微气象数据了");
+                    /*log.info("巡视主机收到微气象数据了");
                     //Deal with robot micro climate data
                     List<Map<String,String>> weatherList = new ArrayList<>();
                     xmlBaseModel.getItems().forEach(res-> {
@@ -577,6 +579,56 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     for (int i = 0; i < weatherList.size(); i++) {
                         redisTemplate.opsForHash().putAll("RobotWeather:"+xmlBaseModel.getSendCode()+":"+ weatherList.get(i).get("type"), weatherList.get(i));
                     }
+                    String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                    byte[] weatherProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, weatherXmlString);
+                    send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
+                    log.info("巡视主机给机器人响应了");
+
+                    robotService.upToCruise(xmlBaseModel);//国网要求
+                    break;*/
+                    log.info("巡视主机收到微气象数据了");
+                    //Deal with robot micro climate data
+                    List<Map<String,String>> weatherList = new ArrayList<>();
+                    Map<String,Object> info = new HashMap<>();
+                    DecimalFormat decimalFormat = new DecimalFormat("#0.0");
+                    xmlBaseModel.getItems().forEach(res-> {
+                        Map<String, String> weatherMap = new HashMap<>();
+                        weatherMap.put("robotName", res.get("robot_name").toString());
+                        weatherMap.put("robotCode", xmlBaseModel.getSendCode());
+                        weatherMap.put("time", res.get("time").toString());
+                        weatherMap.put("type", res.get("type").toString());
+                        weatherMap.put("value", res.get("value").toString());
+                        weatherMap.put("valueUnit", res.get("value_unit").toString());
+                        weatherMap.put("unit", res.get("unit").toString());
+                        weatherList.add(weatherMap);
+                        //1=温度 2=湿度 3=风速 4=大气压  5=降雨量
+                        if("1".equals(weatherMap.get("type"))){
+                            info.put("temperature",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                            info.put("temperatureUnit","℃");
+                        }
+                        if("2".equals(weatherMap.get("type"))){
+                            info.put("humidity",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                            info.put("humidityUnit","%");
+                        }
+                        if("3".equals(weatherMap.get("type"))){
+                            info.put("windSpeed",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                            info.put("windSpeedUnit","m/s");
+                        }
+                        if("4".equals(weatherMap.get("type"))){
+                            info.put("airPressure",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                            info.put("airPressureUnit","Pa");
+                        }
+                        if("5".equals(weatherMap.get("type"))){
+                            info.put("precipitation",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                            info.put("precipitationUnit","mm");
+                        }
+                    });
+                    //放缓存
+                    for (int i = 0; i < weatherList.size(); i++) {
+                        redisTemplate.opsForHash().putAll("RobotWeather:"+xmlBaseModel.getSendCode()+":"+ weatherList.get(i).get("type"), weatherList.get(i));
+                    }
+//                    JSONObject jsonObj=new JSONObject(info);
+                    Constant.weatherServer(info,Constant.WEATHER_URL);
                     String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] weatherProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, weatherXmlString);
                     send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
@@ -673,6 +725,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
                     cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
+//待完善             cruiseResultMap.put("originRobotPic",xmlBaseModel.getItems().get(0).get("origin_file_path").toString());//机器人巡视原图
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
                     //Start CruiseResultDealThread

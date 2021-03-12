@@ -85,6 +85,7 @@ public class CruiseResultDealThread implements Runnable{
                         &&cruiseResultMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
                     String instanceId = redisInfoMap.get("instanceId");
                     String cruiseTime = redisInfoMap.get("cruiseTime");
+                    String inspectionCode = redisInfoMap.get("inspectionCode");
 
                     str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + ":" + instanceId;//redis缓存名称
 
@@ -95,7 +96,7 @@ public class CruiseResultDealThread implements Runnable{
                     tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("cruiseStatus","252");
                     if (!"".equals(cruiseResultMap.get("value"))){
-                        tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("valueUnit"));
+                        tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("value"));//只有值
                         tCruiseTaskResultMap.put("cruiseResult","246");
                         tCruiseTaskResultMap.put("cruiseAbnormal","null");
                     }else {
@@ -103,15 +104,87 @@ public class CruiseResultDealThread implements Runnable{
                         tCruiseTaskResultMap.put("cruiseResult","247");
                         tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                     }
+                    //待完善
+                    /*if ( cruiseResultMap.get("fileType").equals("1")){
+                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("originRobotPic"));//红外图
+                        tCruiseTaskResultMap.put("resultPic",cruiseResultMap.get("relativePath"));//fir
+                    }else if (cruiseResultMap.get("fileType").equals("2")) {
+                        tCruiseTaskResultMap.put("picpath", cruiseResultMap.get("relativePath"));
+                    }*/
                     if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
-                        tCruiseTaskResultMap.put("picPathAnl",cruiseResultMap.get("relativePath"));
+                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
                     }
-                    tCruiseTaskResultMap.put("origPicAnl",cruiseResultMap.get("absolutePath"));
+                    tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
                     tCruiseTaskResultMap.put("evaluationState","257");
                     tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("isWarn","0");
-                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
+                    /*
+                     * 将机器人巡检图片发给算法再分析
+                     * */
+                    /*{
+                        TCruisePointInstanceDetail details = StaticContextAccessor.getBean(RobotService.class).selectForTask(Long.valueOf(instanceId));//巡检点信息
+
+                        Map<String,Object> picModelPathMap  = redisTemplate.opsForHash().entries("t_sys_param:robotPicModelPath");
+                        String picModelPath = picModelPathMap.get("content").toString();
+
+                        if(details.getAnalyseType() != null || "on".equals(details.getIsAi())) {//配置了算法
+                            List<TAlgorithmInfo> tAlgorithmInfoList = StaticContextAccessor.getBean(RobotService.class).selectByDeviceMeteId(details.getDeviceMeteId());
+                            TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMete(details.getDeviceMeteId());
+
+                            String recognitionMode = "0";
+                            if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
+                                recognitionMode = "1";
+                            }
+                            if("on".equals(tStdDevicemete.getIsAi())){
+                                if("1".equals(recognitionMode)){
+                                    recognitionMode = "0";
+                                }else {
+                                    recognitionMode = "2";
+                                }
+                            }
+                            tCruiseTaskResultMap.put("recognitionMode",recognitionMode);
+                            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
+
+                            for (TAlgorithmInfo tAlgorithmInfo : tAlgorithmInfoList) {
+                                Analysis analysis = new Analysis();
+                                analysis.setTaskId(taskId);
+                                analysis.setInstanceId(details.getInstanceId());
+                                analysis.setPicPath(cruiseResultMap.get("originRobotPic"));
+                                analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                                analysis.setPicModelPath(picModelPath + "/" + inspectionCode);
+                                analysis.setIsAi(tAlgorithmInfo.getIsAi());
+                                List<Analysis> analysisList = new ArrayList<>();
+                                analysisList.add(analysis);
+                                Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                                analysisMap.put("list",analysisList);
+                                log.info("算法信息：    "+analysisMap);
+                                if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
+                                    analysis(analysisMap);
+                                }else {
+                                    defect(analysisMap);
+                                }
+                            }
+
+                            if("on".equals(tStdDevicemete.getIsAi())){
+                                Analysis analysis = new Analysis();
+                                analysis.setTaskId(taskId);
+                                analysis.setInstanceId(details.getInstanceId());
+                                analysis.setPicPath(cruiseResultMap.get("originRobotPic"));
+                                analysis.setAnalyseType("398");
+                                analysis.setPicModelPath(picModelPath + "/" + inspectionCode);
+                                analysis.setIsAi(0);
+                                List<Analysis> analysisList = new ArrayList<>();
+                                analysisList.add(analysis);
+                                Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                                analysisMap.put("list",analysisList);
+                                log.info("算法信息：    "+analysisMap);
+                                defect(analysisMap);
+                            }
+                        }
+                    }*/
+
+                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
                     //做完一个点给前端推一次webSocket
                     Map<String, Object> jasonMap = new HashMap<>();
                     jasonMap.put("type", "finishedOneInstance");
@@ -169,72 +242,6 @@ public class CruiseResultDealThread implements Runnable{
                 }
                 log.info("准备遍历的点是==="+instanceIdList);
 
-                //String的巡视点转Long,下面需要
-                List<Long> instanceIdList2 = new ArrayList<>();
-                for (String res : instanceIdList){
-                    instanceIdList2.add(Long.valueOf(res));
-                }
-
-                /*
-                * 将机器人巡检图片发给算法在分析
-                * */
-                /*List<TCruisePointInstanceDetail> instancesList = StaticContextAccessor.getBean(RobotService.class).selectForTask(instanceIdList2);//巡检点信息
-                for (TCruisePointInstanceDetail item : instancesList){
-                    if(item.getAnalyseType() != null || "on".equals(item.getIsAi())) {//配置了算法
-
-                        List<TAlgorithmInfo> tAlgorithmInfoList = StaticContextAccessor.getBean(RobotService.class).selectByDeviceMeteId(item.getDeviceMeteId());
-                        TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMete(item.getDeviceMeteId());
-                        String recognitionMode = "0";
-                        if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
-                            recognitionMode = "1";
-                        }
-                        if("on".equals(tStdDevicemete.getIsAi())){
-                            if("1".equals(recognitionMode)){
-                                recognitionMode = "0";
-                            }else {
-                                recognitionMode = "2";
-                            }
-                        }
-//                        tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
-
-                        for (TAlgorithmInfo tAlgorithmInfo : tAlgorithmInfoList) {
-                            Analysis analysis = new Analysis();
-                            analysis.setTaskId(taskId);
-                            analysis.setInstanceId(item.getInstanceId());
-                            analysis.setPicPath(redisInfoMap.get("picpath");
-                            analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
-                            analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
-                            analysis.setIsAi(tAlgorithmInfo.getIsAi());
-                            List<Analysis> analysisList = new ArrayList<>();
-                            analysisList.add(analysis);
-                            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-                            analysisMap.put("list",analysisList);
-                            log.info("算法信息：    "+analysisMap);
-                            if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
-                                analysis(analysisMap);
-                            }else {
-                                defect(analysisMap);
-                            }
-                        }
-
-                        if("on".equals(tStdDevicemete.getIsAi())){
-                            Analysis analysis = new Analysis();
-                            analysis.setTaskId(taskId);
-                            analysis.setInstanceId(item.getInstanceId());
-                            analysis.setPicPath(redisInfoMap.get("picpath");
-                            analysis.setAnalyseType("398");
-                            analysis.setPicModelPath(picModelPath+"/"+item.getCruiseId());
-                            analysis.setIsAi(0);
-                            List<Analysis> analysisList = new ArrayList<>();
-                            analysisList.add(analysis);
-                            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
-                            analysisMap.put("list",analysisList);
-                            log.info("算法信息：    "+analysisMap);
-                            defect(analysisMap);
-                        }
-                    }
-                }*/
-
                 for (String instanceId : instanceIdList) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
                     //缓存中该巡检点有结果
@@ -262,9 +269,9 @@ public class CruiseResultDealThread implements Runnable{
                                     .setResultNum(redisInfoMap.get("resultNum"))
                                     .setModifyNum(redisInfoMap.get("modifyNum"))
                                     .setPicpath(redisInfoMap.get("picpath"))
-                                    .setPicPathAnl(redisInfoMap.get("picPathAnl"))
+//待完善                             .setPicPathAnl(redisInfoMap.get("picPathAnl"))
                                     .setOrigpic(redisInfoMap.get("origpic"))
-                                    .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+//待完善                             .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                                     .setEvaluationState(257)
                                     .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
                                     .setIsWarn(0)
