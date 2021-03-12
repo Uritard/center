@@ -40,7 +40,7 @@
         a.task_wait as cruise_data_state2,
         f.task_abnormal,
         a.execute_time,
-        a.check_user,
+        n.user_name as check_user,
         a.check_date,
         a.modify_state,
         a.task_wait,a.create_time,
@@ -274,10 +274,29 @@
         LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
         LEFT JOIN t_cruise_task_result f ON a.task_result_id = f.task_result_id
         LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
+        LEFT JOIN t_std_device j on g.device_id = j.device_id
+        LEFT JOIN t_cruise_point_instance m on m.instance_id = g.instance_id
+        LEFT JOIN t_std_devicemete k on k.device_mete_id = m.device_mete_id
+        LEFT JOIN sys_user n on n.user_id  = a.check_user
         where 1 = 1
         <if test="taskName != null and taskName != ''">and a.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
+
         <if test="cType != null and cType != -1">and a.c_type = #{cType, jdbcType=INTEGER}</if>
+
         <if test="cState != null and cState != -1">and a.c_state = #{cState, jdbcType=INTEGER}</if>
+
+        <if test="startDate != null and endDate != null"> and a.execute_time BETWEEN #{startDate, jdbcType=TIMESTAMP} AND #{endDate, jdbcType=TIMESTAMP}</if>
+
+        <if test="list != null and list.size() > 0">and g.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+
+        <if test="deviceType != -1"> and j.device_type = #{deviceType, jdbcType=INTEGER}</if>
+
+        <if test="meteType != -1 ">and k.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+
         and a.c_state != 239 and a.c_state != 241 and e.col_name='task_state'
         GROUP BY task_result_id
         order by a.execute_time desc
