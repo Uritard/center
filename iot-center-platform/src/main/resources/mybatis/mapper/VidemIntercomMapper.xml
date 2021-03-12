@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.VideoIntercomDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.VideoIntercom">
+        <id column="video_intercom_id" jdbcType="BIGINT" property="videoIntercomId" />
+        <result column="camera_name" jdbcType="VARCHAR" property="cameraName" />
+        <result column="camera_ip" jdbcType="VARCHAR" property="cameraIp"/>
+        <result column="owner" jdbcType="VARCHAR" property="owner"/>
+        <result column="owner_code" jdbcType="VARCHAR" property="ownerCode"/>
+        <result column="channel_num" jdbcType="INTEGER" property="channelNum" />
+        <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+         <result column="region_name" jdbcType="VARCHAR" property="regionName" />
+        <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
+        <result column="vendor" jdbcType="VARCHAR" property="vendor" />
+        <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
+        <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="desc" jdbcType="VARCHAR" property="desc" />
+        <result column="camera_model" jdbcType="VARCHAR" property="cameraModel" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+         video_intercom_id, camera_name,camera_ip,owner, owner_code, channel_num, camera_type, up_region_id,
+         vendor_id, protocol_type,port, address, camera_model,remark,region_name
+    </sql>
+
+    <sql id="tongTong">
+        a.video_intercom_id,
+        a.camera_name,
+        a.camera_ip,
+        a.owner,
+        a.owner_code,
+        a.channel_num,
+        a.camera_type,
+        a.up_region_id,
+        a.region_name,
+        a.vendor_id ,
+        a.protocol_type ,
+        a.port,
+        a.address,
+        a.camera_model,
+        a.remark,
+        e.dict_note as cameraModel,
+        b.dict_note as vendor,
+        d.dict_note as recorder_type_Name,
+        f.region_name as regionName
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="video_intercom_id" parameterType="com.yjh.platform.module.user.entity.VideoIntercom">
+     insert  into t_video_intercom(
+     camera_name,
+     camera_ip,
+     owner,
+     owner_code,
+     channel_num,
+     camera_type,
+     up_region_id,
+     vendor_id,
+     protocol_type,
+     port,
+     address,
+     camera_model,
+     remark,
+     vendor,
+     region_name
+     )values(
+      #{cameraName, jdbcType=VARCHAR},
+      #{cameraIp, jdbcType=VARCHAR},
+      #{owner, jdbcType=VARCHAR},
+      #{ownerCode, jdbcType=VARCHAR},
+      #{channelNum, jdbcType=INTEGER},
+      #{cameraType, jdbcType=VARCHAR},
+      #{upRegionId, jdbcType=BIGINT},
+      #{vendorId, jdbcType=INTEGER},
+      #{protocolType, jdbcType=INTEGER},
+      #{port, jdbcType=INTEGER},
+      #{address, jdbcType=VARCHAR},
+      #{cameraType, jdbcType=VARCHAR},
+      #{remark, jdbcType=VARCHAR},
+      #{vendor, jdbcType=VARCHAR},
+      #{regionName, jdbcType=VARCHAR}
+     )
+
+
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from  t_video_intercom
+                where video_intercom_id = #{videoIntercomId, jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteVideoIntercom">
+        DELETE
+        FROM
+        t_video_intercom
+        WHERE
+        video_intercom_id IN
+        <foreach collection="list" item="videoIntercomId" open="(" separator="," close=")">
+            #{videoIntercomId, jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.VideoIntercom">
+        update t_video_intercom  a <set>
+        <if test="videoIntercomId != null">a.video_intercom_id = #{videoIntercomId},</if>
+        <if test="cameraName != null">a.camera_name = #{cameraName},</if>
+        <if test="cameraIp != null">a.camera_ip = #{cameraIp},</if>
+        <if test="owner != null">a.owner = #{owner},</if>
+        <if test="ownerCode != null">a.owner_code = #{ownerCode},</if>
+        <if test="channelNum != null">a.channel_num = #{channelNum},</if>
+        <if test="cameraType != null">a.camera_type = #{cameraType},</if>
+        <if test="upRegionId != null">a.up_region_id = #{upRegionId},</if>
+        <if test="vendorId != null">a.vendor_id = #{vendorId},</if>
+        <if test="protocolType != null">a.protocol_type = #{protocolType},</if>
+        <if test="port != null">a.port = #{port},</if>
+        <if test="address != null">a.address = #{address},</if>
+        <if test="cameraModel != null">a.camera_model = #{cameraModel},</if>
+        <if test="remark != null">a.remark = #{remark},</if>
+        <if test="vendor != null">a.vendor = #{vendor},</if>
+        <if test="regionName != null">a.region_name = #{regionName},</if>
+    </set>
+        where a.video_intercom_id = #{videoIntercomId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.VideoIntercom">
+        select <include refid="Base_Column_List"></include>
+        from t_video_intercom a
+        where 1 = 1
+        and a.video_intercom_id = #{videoIntercomId}
+    </select>
+
+    <select id="selectByRegionId" parameterType="com.yjh.platform.module.device.entity.TStdRegion" resultType="com.yjh.platform.module.user.entity.VideoIntercom">
+        select
+                a.video_intercom_id,
+                a.camera_name,
+                a.camera_ip,
+                a.owner,
+                a.owner_code,
+                a.channel_num,
+                a.camera_type,
+                a.up_region_id,
+                a.region_name,
+                a.vendor_id ,
+                a.protocol_type ,
+                a.port,
+                a.address,
+                a.camera_model,
+                a.remark,
+                b.dict_note as vendor,
+                c.region_name as regionName
+        from t_video_intercom a,t_dict_business b,t_std_region c
+        where 1 = 1
+        and a.up_region_id = #{regionId, jdbcType=BIGINT}
+        and b.dict_code=a.vendor_id and c.region_id = a.up_region_id
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.VideoIntercom" resultType="com.yjh.platform.module.user.entity.VideoIntercom">
+        select<include refid="tongTong"></include>
+        from   t_video_intercom  a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code and d.col_name = 'camera_type'
+        LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
+        LEFT JOIN t_std_region f on a.up_region_id = f.region_id
+        where 1 = 1
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
+        <if test="regionIdList != null and regionIdList.size() > 0 ">
+            and a.up_region_id in
+            <foreach collection="regionIdList" item="upRegionIds"  separator="," open="(" close=")"  >
+                #{upRegionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        order by a.video_intercom_id
+    </select>
+
+</mapper>

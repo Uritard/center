@@ -550,6 +550,7 @@ public interface HCNetSDK extends Library {
     public static final int COMM_IPCCFG = 0x4001;//9000设备IPC接入配置改变报警信息主动上传
     public static final int COMM_ALARM_PDC = 0x1103; //客流量统计报警上传
     public static final int COMM_UPLOAD_PLATE_RESULT = 0x2800;//交通抓拍结果(车辆、车牌识别及抓拍图片)上传
+    public static final int COMM_UPLOAD_VIDEO_INTERCOM_EVENT = 0x1132;  //可视对讲事件记录上传
     /*************操作异常类型(消息方式, 回调方式(保留))****************/
     public static final int EXCEPTION_EXCHANGE = 0x8000;//用户交互时异常
     public static final int EXCEPTION_AUDIOEXCHANGE = 0x8001;//语音对讲异常
@@ -937,9 +938,7 @@ public interface HCNetSDK extends Library {
         public int dwMinute;		//分
         public int dwSecond;		//秒
 
-        public String toString() {
-            return "NET_DVR_TIME.dwYear: " + dwYear + "\n" + "NET_DVR_TIME.dwMonth: \n" + dwMonth + "\n" + "NET_DVR_TIME.dwDay: \n" + dwDay + "\n" + "NET_DVR_TIME.dwHour: \n" + dwHour + "\n" + "NET_DVR_TIME.dwMinute: \n" + dwMinute + "\n" + "NET_DVR_TIME.dwSecond: \n" + dwSecond;
-        }
+
 
         //用于列表中显示
         public String toStringTime()
@@ -1008,9 +1007,7 @@ public interface HCNetSDK extends Library {
         public byte[] sIpV4 = new byte[16];
         public byte[] byRes = new byte[128];
 
-        public String toString() {
-            return "NET_DVR_IPADDR.sIpV4: " + new String(sIpV4) + "\n" + "NET_DVR_IPADDR.byRes: " + new String(byRes) + "\n";
-        }
+
     }
 
 
@@ -1041,6 +1038,43 @@ public interface HCNetSDK extends Library {
         public byte[] sPPPoEUser = new byte[32];
         public byte[] sPPPoEPassword = new byte[16];
         public NET_DVR_IPADDR struPPPoEIP = new NET_DVR_IPADDR();
+    }
+    //布防参数
+    public static class NET_DVR_SETUPALARM_PARAM extends Structure
+    {
+        public int dwSize;
+        public byte  byLevel; //布防优先级，0-一等级（高），1-二等级（中），2-三等级（低）
+        public byte  byAlarmInfoType; //上传报警信息类型（抓拍机支持），0-老报警信息（NET_DVR_PLATE_RESULT），1-新报警信息(NET_ITS_PLATE_RESULT)2012-9-28
+        public byte  byRetAlarmTypeV40; //0--返回NET_DVR_ALARMINFO_V30或NET_DVR_ALARMINFO, 1--设备支持NET_DVR_ALARMINFO_V40则返回NET_DVR_ALARMINFO_V40，不支持则返回NET_DVR_ALARMINFO_V30或NET_DVR_ALARMINFO
+        public byte  byRetDevInfoVersion; //CVR上传报警信息回调结构体版本号 0-COMM_ALARM_DEVICE， 1-COMM_ALARM_DEVICE_V40
+        public byte  byRetVQDAlarmType; //VQD报警上传类型，0-上传报报警NET_DVR_VQD_DIAGNOSE_INFO，1-上传报警NET_DVR_VQD_ALARM
+        //1-表示人脸侦测报警扩展(INTER_FACE_DETECTION),0-表示原先支持结构(INTER_FACESNAP_RESULT)
+        public byte  byFaceAlarmDetection;
+        //Bit0- 表示二级布防是否上传图片: 0-上传，1-不上传
+        //Bit1- 表示开启数据上传确认机制；0-不开启，1-开启
+        //Bit6- 表示雷达检测报警(eventType:radarDetection)是否开启实时上传；0-不开启，1-开启（用于web插件实时显示雷达目标轨迹）
+        public byte  bySupport;
+        //断网续传类型
+        //bit0-车牌检测（IPC） （0-不续传，1-续传）
+        //bit1-客流统计（IPC）  （0-不续传，1-续传）
+        //bit2-热度图统计（IPC） （0-不续传，1-续传）
+        //bit3-人脸抓拍（IPC） （0-不续传，1-续传）
+        //bit4-人脸对比（IPC） （0-不续传，1-续传）
+        //bit5-JSON报警透传（IPC） （0-不续传，1-续传）
+        //bit6-热度图按人员停留时间统计数据上传事件（0-不续传，1-续传）
+        //bit7-热度图按人数统计数据上传事件的确认机制（0-不续传，1-续传）
+        public byte  byBrokenNetHttp;
+        public short  wTaskNo;    //任务处理号 和 (上传数据NET_DVR_VEHICLE_RECOG_RESULT中的字段dwTaskNo对应 同时 下发任务结构 NET_DVR_VEHICLE_RECOG_COND中的字段dwTaskNo对应)
+        public byte  byDeployType;    //布防类型：0-客户端布防，1-实时布防
+        public byte  bySubScription;	//订阅，按位表示，未开启订阅不上报  //占位
+        //Bit7-移动侦测人车分类是否传图；0-不传图(V30上报)，1-传图(V40上报)
+        public byte[]  byRes1 = new byte[2];
+        public byte  byAlarmTypeURL;//bit0-表示人脸抓拍报警上传（INTER_FACESNAP_RESULT）；0-表示二进制传输，1-表示URL传输（设备支持的情况下，设备支持能力根据具体报警能力集判断,同时设备需要支持URL的相关服务，当前是”云存储“）
+        //bit1-表示EVENT_JSON中图片数据长传类型；0-表示二进制传输，1-表示URL传输（设备支持的情况下，设备支持能力根据具体报警能力集判断）
+        //bit2 - 人脸比对(报警类型为COMM_SNAP_MATCH_ALARM)中图片数据上传类型：0 - 二进制传输，1 - URL传输
+        //bit3 - 行为分析(报警类型为COMM_ALARM_RULE)中图片数据上传类型：0 - 二进制传输，1 - URL传输，本字段设备是否支持，对应软硬件能力集中<isSupportBehaviorUploadByCloudStorageURL>节点是否返回且为true
+        public byte  byCustomCtrl;//Bit0- 表示支持副驾驶人脸子图上传: 0-不上传,1-上传
+        public byte[]  byRes4 = new byte[128];
     }
 
     public static class NET_DVR_NETCFG_V30 extends Structure {
@@ -1637,6 +1671,60 @@ public interface HCNetSDK extends Library {
         public struAlarmHardDisk strualarmHardDisk = new struAlarmHardDisk();
         public struAlarmChannel sstrualarmChannel = new struAlarmChannel();
         public struRecordingHost strurecordingHost = new struRecordingHost();
+    }
+    public int ACS_CARD_NO_LEN = 32;  //门禁卡号长度
+    public static final int LOCK_NAME_LEN = 32;  //锁名称
+    public static final int NET_SDK_EMPLOYEE_NO_LEN = 32;  //工号长度
+    public static final int MAX_DEV_NUMBER_LEN = 32;   //设备编号最大长度
+    //可视对讲事件记录
+    public static class NET_DVR_VIDEO_INTERCOM_EVENT extends Structure{
+        public int dwSize; //结构体大小
+        public NET_DVR_TIME_EX struTime = new NET_DVR_TIME_EX(); //时间
+        public byte[] byDevNumber = new byte[MAX_DEV_NUMBER_LEN]; //设备编号
+        public byte byEventType; //事件信息类型，1-开锁记录，2-公告信息阅读回执，3-认证记录，4-车牌信息上传，5非法卡刷卡事件，6-门口机发卡记录(需要启动门口机发卡功能，刷卡时才会上传该事件)
+        public byte byPicTransType;        //图片数据传输方式: 0-二进制；1-url
+        public byte[] byRes1 = new byte[2]; //保留
+        public NET_DVR_VIDEO_INTERCOM_EVENT_INFO_UINON uEventInfo = new NET_DVR_VIDEO_INTERCOM_EVENT_INFO_UINON(); //事件信息，具体内容参考byEventType取值
+        public int dwIOTChannelNo;    //IOT通道号
+        public byte[] byRes2 = new byte[252]; //保留
+    }
+    //可视对讲事件记录信息联合体
+    public static class NET_DVR_VIDEO_INTERCOM_EVENT_INFO_UINON extends Union{
+        public byte[] byLen = new byte[256]; //联合体大小
+        public NET_DVR_UNLOCK_RECORD_INFO struUnlockRecord = new NET_DVR_UNLOCK_RECORD_INFO(); //开锁记录
+        public NET_DVR_AUTH_INFO struAuthInfo = new NET_DVR_AUTH_INFO(); //认证记录（设备未实现）
+        public NET_DVR_SEND_CARD_INFO struSendCardInfo = new NET_DVR_SEND_CARD_INFO(); //门口机发卡,对应设备处于发卡状态，刷卡时上传该事件
+    }
+    //开锁记录
+    public static class NET_DVR_UNLOCK_RECORD_INFO extends Structure{
+        public byte byUnlockType; //开锁方式，参考UNLOCK_TYPE_ENUM
+        public byte[] byRes1 = new byte[3]; //保留
+        public byte[] byControlSrc = new byte[NAME_LEN]; //操作发起源信息，刷卡开锁时为卡号，蓝牙开锁时为萤石的APP账号，二维码开锁时为访客的手机号，其余情况下为设备编号
+        public int dwPicDataLen; //图片数据长度
+        public Pointer pImage; //图片指针
+        public int dwCardUserID; //持卡人ID
+        public short nFloorNumber;//刷卡开锁时有效，为楼层号
+        public short wRoomNumber; //操作发起源附加信息，刷卡开锁时有效，为房间号，
+        public short wLockID; //（对于门口机，0-表示本机控制器上接的锁、1-表示外接控制器上接的锁）
+        public byte[] byRes2 = new byte[2];
+        public byte[] byLockName = new byte[LOCK_NAME_LEN]; //刷卡开锁时有效，锁名称，对应门参数配置中门名称
+        public byte[] byEmployeeNo = new byte[NET_SDK_EMPLOYEE_NO_LEN]; //工号（人员ID）
+        public byte   byMask; //是否带口罩：0-保留，1-未知，2-未戴口罩，3-戴口罩
+        public byte[] byRes = new byte[135]; //保留
+    }
+    //认证记录（设备未实现）
+    public static class NET_DVR_AUTH_INFO extends Structure{
+        public byte byAuthResult; //认证结果：0-无效，1-认证成功，2-认证失败
+        public byte byAuthType; //认证方式：0-无效，1-指纹，2-人脸
+        public byte[]  byRes1 = new byte[2]; //保留
+        public byte[] byCardNo = new byte[ACS_CARD_NO_LEN/*32*/]; //卡号
+        public int dwPicDataLen; //图片数据长度（当认证方式byAuthType为人脸时有效）
+        public Pointer pImage; //图片指针（当认证方式byAuthType为人脸时有效）
+        public byte[] byRes = new byte[212];  //保留
+    }
+    public static class NET_DVR_SEND_CARD_INFO extends Structure{
+        public byte[] byCardNo = new byte[ACS_CARD_NO_LEN/*32*/]; //卡号
+        public byte[] byRes = new byte[224];  //保留
     }
 
     public static class NET_DVR_ALRAM_FIXED_HEADER extends Structure {
@@ -4204,6 +4292,9 @@ EMAIL参数结构
     public static interface FLoginResultCallBack extends Callback {
         public int invoke(NativeLong lUserID, int dwResult, Pointer lpDeviceinfo, Pointer pUser);
     }
+    public static interface FMSGCallBack_V31 extends StdCallLibrary.StdCallCallback  {
+        public boolean invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
+    }
 
     boolean  NET_DVR_Init();
     boolean  NET_DVR_SetSDKInitCfg(int enumType, Pointer lpInBuff);
@@ -4351,6 +4442,7 @@ EMAIL参数结构
     NativeLong NET_DVR_SetupAlarmChan(NativeLong lUserID);
     boolean  NET_DVR_CloseAlarmChan(NativeLong lAlarmHandle);
     NativeLong NET_DVR_SetupAlarmChan_V30(NativeLong lUserID);
+    int  NET_DVR_SetupAlarmChan_V41(int lUserID, NET_DVR_SETUPALARM_PARAM lpSetupParam);
     boolean  NET_DVR_CloseAlarmChan_V30(NativeLong lAlarmHandle);
     //语音对讲
     NativeLong NET_DVR_StartVoiceCom(NativeLong lUserID, FVoiceDataCallBack fVoiceDataCallBack, int dwUser);
@@ -4437,6 +4529,7 @@ EMAIL参数结构
         public void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
     }
     NativeLong NET_DVR_StartRemoteConfig (NativeLong lUserID, int dwCommand, Pointer lpInBuffer, int dwInBufferLen, FRemoteConfigCallback cbStateCallback, Pointer pUserData);
+    boolean NET_DVR_StopRemoteConfig(int lHandle);
 
 
     //2006-02-16
@@ -4559,6 +4652,7 @@ EMAIL参数结构
     //获取温度
     boolean NET_DVR_CaptureJPEGPicture_WithAppendData(NativeLong lUserID, int lChannel, NET_DVR_JPEGPICTURE_WITH_APPENDDATA lpJpegWithAppend);
     boolean NET_DVR_STDXMLConfig(int lUserID, NET_DVR_XML_CONFIG_INPUT lpInputParam, NET_DVR_XML_CONFIG_OUTPUT lpOutputParam);
+    boolean  NET_DVR_SetDVRMessageCallBack_V31(FMSGCallBack_V31 fMessageCallBack, Pointer pUser);
 
 }
 

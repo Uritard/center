@@ -31,6 +31,9 @@ public class CameraConController {
     @Autowired
     private CameraConService cameraConService;
 
+   /* @Autowired
+    private DoorMachineService doorMachineService;*/
+
     @Value("${nginx.picture.reflact}")
     private String capturePath;//图片路径
 
@@ -495,4 +498,51 @@ public class CameraConController {
 
         return result;
     }
+    @ApiOperation(value = "开启可视对讲")
+    @RequestMapping(value = "/startVoiceTalk", method = RequestMethod.GET)
+    public Result startVoiceTalk( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
+    {
+        Result result = new Result();
+        int re=cameraConService.startVoiceTalk(videoIntercomId);
+        if (re>0)
+        {
+            result.setData("开启对讲");
+        }else
+            {
+                result.setData("无法开启对讲");
+            }
+
+        return result;
+    }
+    @ApiOperation(value = "关闭可视对讲")
+    @RequestMapping(value = "/stopVideoCallSession", method = RequestMethod.GET)
+    public Result stopVideoCallSession()
+    {
+        Result result = new Result();
+        try {
+            cameraConService.stopVideoCallSession();
+            result.setData("关闭对讲");
+
+        }catch (Exception e){
+            result.setData("系统异常");
+        }
+        return result;
+    }
+
+
+    /*@ApiOperation(value = "门口机布防")
+    @RequestMapping(value = "/doorMa", method = RequestMethod.GET)
+    public Result doorMa(@RequestParam(value = "presetId",required = false) Long presetId,
+                             @RequestParam(value = "cameraId",required = false) Long cameraId) {
+        Result result = new Result();
+
+        try {
+            doorMachineService.SetupAlarmChan();
+            result.setData("布防成功");
+        }catch (Exception e)
+        {
+            result.setData("布防失败");
+        }
+        return result;
+    }*/
 }
