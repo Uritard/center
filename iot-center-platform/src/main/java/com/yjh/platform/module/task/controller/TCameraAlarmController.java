@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Date;
 
 import io.swagger.annotations.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -39,6 +41,9 @@ public class TCameraAlarmController {
     @Autowired
     private final TCameraAlarmService tCameraAlarmService;
 
+    @Resource
+    private RedisTemplate redisTemplate;
+
     private Logger log = LoggerFactory.getLogger(TCameraAlarmController.class);
 
     public TCameraAlarmController(TCameraAlarmService tCameraAlarmService) {
@@ -52,7 +57,8 @@ public class TCameraAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 if (tCameraAlarm.getAlarmState() != null) {
                     throw new JurisdictionException();
                 }
@@ -91,7 +97,8 @@ public class TCameraAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 TCameraAlarm list = tCameraAlarmService.selectByPrimaryId(tCameraAlarm.getCameraAlarmId());
                 if (list.getAlarmState() != tCameraAlarm.getAlarmState()) {
                     throw new JurisdictionException();
@@ -180,7 +187,8 @@ public class TCameraAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 for (TCameraAlarm e : list) {
                     if (e.getAlarmState() != null) {
                         throw new JurisdictionException();

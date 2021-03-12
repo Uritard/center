@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.yjh.platform.module.task.service.TRobotAlarmService;
 import io.swagger.annotations.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -37,6 +39,9 @@ public class TRobotAlarmController {
     @Autowired
     private final TRobotAlarmService tRobotAlarmService;
 
+    @Resource
+    private RedisTemplate redisTemplate;
+
     private Logger log = LoggerFactory.getLogger(TRobotAlarmController.class);
 
     public TRobotAlarmController(TRobotAlarmService tRobotAlarmService) {
@@ -50,7 +55,8 @@ public class TRobotAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 if (tRobotAlarm.getAlarmState()!=null) {
                     throw new JurisdictionException();
                 }
@@ -89,7 +95,8 @@ public class TRobotAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 TRobotAlarm list = tRobotAlarmService.selectByPrimaryId(tRobotAlarm.getRobotAlarmId());
                 if (list.getAlarmState()!=tRobotAlarm.getAlarmState()) {
                     throw new JurisdictionException();
@@ -179,7 +186,8 @@ public class TRobotAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 for (TRobotAlarm e : list) {
                     if (e.getAlarmState()!=null) {
                         throw new JurisdictionException();

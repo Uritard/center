@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -40,6 +42,8 @@ public class TStdMeteController {
 
     @Autowired
     private final TStdMeteService tStdMeteService;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TStdMeteController.class);
 
@@ -54,7 +58,8 @@ public class TStdMeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 if (tStdMete.getLowLimit1() != null || tStdMete.getLowLimit2() != null || tStdMete.getLowLimit3() != null || tStdMete.getLowLimit4() != null
                         || tStdMete.getHighLimit1() != null || tStdMete.getHighLimit2() != null || tStdMete.getHighLimit3() != null || tStdMete.getHighLimit4() != null
                        ) {
@@ -95,7 +100,8 @@ public class TStdMeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 TStdMete list = tStdMeteService.selectByPrimaryId(tStdMete.getStdMeteId());
                 if (tStdMete.getLowLimit1() != list.getLowLimit1() || tStdMete.getLowLimit2() != list.getLowLimit2() || tStdMete.getLowLimit3() != list.getLowLimit3() || tStdMete.getLowLimit4() != list.getLowLimit4()
                         || tStdMete.getHighLimit1() != list.getHighLimit1() || tStdMete.getHighLimit2() != list.getHighLimit2()  || tStdMete.getHighLimit3() != list.getHighLimit3()  || tStdMete.getHighLimit4() != list.getHighLimit4()
@@ -205,7 +211,8 @@ public class TStdMeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            if (userId.intValue() != 10001) {
+            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (roleId.intValue() != 1234) {
                 for (TStdMete e : list) {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
