@@ -4,7 +4,6 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Report.ReportDataRepo;
 import com.yjh.platform.common.utils.Report.ReportHelper;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
@@ -214,9 +213,9 @@ public class ReportManageService {
             e.printStackTrace();
         }*/
 
-//        String filePathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
-//        String reportName = "Task-"+sdf.format(new Date())+".xlsx";
-        String reportName =  taskId + ".xlsx";//报表名称
+//        String reportPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
+//        String reportName = "Task-"+ "_" +sdf.format(new Date())+".xlsx";
+        String reportName =  taskId +".xlsx";//巡视报告名称
 
         //从缓存中获取系统参数
         Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
@@ -243,16 +242,19 @@ public class ReportManageService {
                     contentData.getElements(), file);
         }
         //从缓存中获取系统参数
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-        String fileRelativePath = map.get("content") + "/" + reportName;
-        log.info("该文件相对路径是==="+fileRelativePath);
-        return fileRelativePath;
+//        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+//        String fileRelativePath = map.get("content") + "/" + reportName;
+//        log.info("该文件相对路径是==="+fileRelativePath);
+        return newReportPath;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public String downLoadCruiseReport(String taskId){
-        String reportName = taskId + ".xlsx";//报表名称
-        //从缓存中获取系统参数
+        String flag = reportManageDao.selectReviewTaskFlag(taskId);
+        if ("0".equals(flag)) {
+            return "0";
+        }
+        String reportName = taskId + ".xlsx";
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String fileRelativePath = map.get("content") + "/" + reportName;
         log.info("该文件相对路径是==="+fileRelativePath);

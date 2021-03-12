@@ -55,7 +55,9 @@ public class RobotController {
                                     @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
+//            Long userId = Long.valueOf(request.getHeader("userId"));
+            Long userId = 10001l;
+
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
             if("true".equals(isDecode)) {

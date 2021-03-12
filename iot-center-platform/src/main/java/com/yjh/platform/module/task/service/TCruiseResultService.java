@@ -68,8 +68,12 @@ public class TCruiseResultService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cType, Integer cState) {
-        return tCruiseResultDao.selectTaskByPage(taskName,cState,cType);
+    public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cState, Integer cType,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList,Integer meteType) {
+        List<TCruiseResultExpand> list =new ArrayList<>();
+        if (deviceIdList != null && !deviceIdList.isEmpty()){
+            list = tCruiseResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType);
+        }
+        return list;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultDetail>  selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList) {
@@ -101,53 +105,54 @@ public class TCruiseResultService{
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(afterManualReviewInfo.getInstanceId());
         log.info("tStdDeviceMete==="+tStdDevicemete);
+        //该巡视点还在,能找到对应测点信息
+        if (Objects.nonNull(tStdDevicemete)){
+            Map<String,Object> params = new HashMap<>();
+            params.put("value",afterManualReviewInfo.getPersonCheck());
+            params.put("stdDeviceMeteName",tStdDevicemete.getMeteName());
+            params.put("meteKind",tStdDevicemete.getMeteKind());
+            params.put("alarmState",tStdDevicemete.getAlarmState());
+            params.put("stateZero",tStdDevicemete.getStateZero());
+            params.put("stateOne",tStdDevicemete.getStateOne());
+            params.put("alarmLevel",tStdDevicemete.getAlarmLevel());
+            params.put("highLimit1",tStdDevicemete.getHighLimit1());
+            params.put("lowLimit1",tStdDevicemete.getLowLimit1());
+            params.put("highLimit2",tStdDevicemete.getHighLimit2());
+            params.put("lowLimit2",tStdDevicemete.getLowLimit2());
+            params.put("highLimit3",tStdDevicemete.getHighLimit3());
+            params.put("lowLimit3",tStdDevicemete.getLowLimit3());
+            params.put("highLimit4",tStdDevicemete.getHighLimit4());
+            params.put("lowLimit4",tStdDevicemete.getLowLimit4());
+            log.info("params的值是==="+params);
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("value",afterManualReviewInfo.getPersonCheck());
-        params.put("stdDeviceMeteName",tStdDevicemete.getMeteName());
-        params.put("meteKind",tStdDevicemete.getMeteKind());
-        params.put("alarmState",tStdDevicemete.getAlarmState());
-        params.put("stateZero",tStdDevicemete.getStateZero());
-        params.put("stateOne",tStdDevicemete.getStateOne());
-        params.put("alarmLevel",tStdDevicemete.getAlarmLevel());
-        params.put("highLimit1",tStdDevicemete.getHighLimit1());
-        params.put("lowLimit1",tStdDevicemete.getLowLimit1());
-        params.put("highLimit2",tStdDevicemete.getHighLimit2());
-        params.put("lowLimit2",tStdDevicemete.getLowLimit2());
-        params.put("highLimit3",tStdDevicemete.getHighLimit3());
-        params.put("lowLimit3",tStdDevicemete.getLowLimit3());
-        params.put("highLimit4",tStdDevicemete.getHighLimit4());
-        params.put("lowLimit4",tStdDevicemete.getLowLimit4());
-        log.info("params的值是==="+params);
+            Result result = sendPostRequest(Constant.WARN_JUDGE,params);
+            Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+            log.info("object转map的东西==="+map);
+            Boolean isWarN = (Boolean)map.get("isWarn");
+            String outRange = null;
+            if (Objects.nonNull(map.get("outRange"))){
+                outRange = map.get("outRange").toString();
+            }
 
-        Result result = sendPostRequest(Constant.WARN_JUDGE,params);
-        Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
-        log.info("object转map的东西==="+map);
-        Boolean isWarN = (Boolean)map.get("isWarn");
-        String outRange = null;
-        if (Objects.nonNull(map.get("outRange"))){
-            outRange = map.get("outRange").toString();
-        }
-
-        //组装告警基本信息
-        TWarnInfo warnInfo = new TWarnInfo();
-        warnInfo.setWarnTime(date);
+            //组装告警基本信息
+            TWarnInfo warnInfo = new TWarnInfo();
+            warnInfo.setWarnTime(date);
 //        warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
-        warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
-        warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-        warnInfo.setInstanceId(afterManualReviewInfo.getInstanceId());
-        warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-        warnInfo.setConfMode(275);//已核查
-        warnInfo.setDealType(286);//属实
-        warnInfo.setDealInfo("程序正常，告警属实");
-        warnInfo.setDefectModel(405);//其他
-        warnInfo.setAlarmSource(282);//主辅设备
-        warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
-        warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
-        warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
-        log.info("warnInfo=="+warnInfo);
+            warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+            warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+            warnInfo.setInstanceId(afterManualReviewInfo.getInstanceId());
+            warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+            warnInfo.setConfMode(275);//已核查
+            warnInfo.setDealType(286);//属实
+            warnInfo.setDealInfo("程序正常，告警属实");
+            warnInfo.setDefectModel(405);//其他
+            warnInfo.setAlarmSource(282);//主辅设备
+            warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
+            warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
+            warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
+            log.info("warnInfo=="+warnInfo);
 
-        //判断该点是否已在告警表
+            //判断该点是否已在告警表
             if (afterManualReviewInfo.getIsWarn() == 1) {
                 Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(),afterManualReviewInfo.getInstanceId());
                 //存在
@@ -181,7 +186,9 @@ public class TCruiseResultService{
                     tCruiseResultDao.updateIsWarn(cruiseManualReview.getCruiseDataId());
                 }
             }
-        //获取审核后该任务下的巡检点信息
+        }
+
+        //获取审核后该任务下的巡检点审核信息
         List<CruiseManualReview> cruiseManualReviewList = tCruiseResultDao.selectManualDetail(cruiseManualReview.getTaskResultId());
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
         HashSet<String> haS1 = new HashSet<>();
@@ -208,8 +215,7 @@ public class TCruiseResultService{
         }
         int result2 = 0;
         if (list.size() == cruiseManualReviewList.size()){
-            result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate);
-
+            result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate,"1");
             //自动生成巡视报告
             String taskID = cruiseManualReview.getTaskId();
             String reportFilePath = reportManageService.cruiseReportGenerate(taskID);
@@ -330,6 +336,34 @@ public class TCruiseResultService{
         }
 
         return novelTaskList ;
+    }
+    public int manualReviewTask(String taskId,String userId){
+        Date date = new Date();
+        //审核任务
+        int result = tCruiseResultDao.updateCheck(taskId,userId,date,"1");
+        //审核未被审核的巡视点
+        List<TCruiseDataResult> list = tCruiseResultDao.selectCruiseDataResult(taskId);
+        log.info("未被审核的点=="+list);
+        for (TCruiseDataResult res : list){
+            CruiseManualReview cruiseManualReview = new CruiseManualReview()
+                    .setCruiseDataId(res.getCruiseDataId())
+                    .setCheckUser(userId)
+                    .setCheckDate(date)
+                    .setPersonCheck(res.getResultNum());
+            if (res.getCruiseResult() == 246){//正常,实际:正常,算法:正确
+                cruiseManualReview.setIdentifyResult(261);
+                cruiseManualReview.setIdentifyState(258);
+            } else {//异常,实际:数据异常,算法:错误
+                cruiseManualReview.setIdentifyResult(264);
+                cruiseManualReview.setIdentifyState(259);
+            }
+            log.info("准备更改的的东西是==="+cruiseManualReview);
+            tCruiseResultDao.manualReview(cruiseManualReview);
+        }
+        //自动生成巡视报告
+        String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
+        log.info("自动生成巡视报告的路径是=="+reportFilePath);
+        return result + list.size();
     }
 }
 

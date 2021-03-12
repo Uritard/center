@@ -70,4 +70,8 @@ public interface TRobotInfoDao {
 
     List<TCruiseTaskResultDetail> selectRepairTCTRDList(@Param(value = "taskId")String taskId);
     List<TCruiseDataResult> selectRepairTCDRList(@Param(value = "taskId")String taskId);
+    List<TCruisePointInstanceDetail> selectForTask(@Param(value = "list")List<Long> list);
+    List<TAlgorithmInfo> selectByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    TStdDeviceMete selectDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
+
 }

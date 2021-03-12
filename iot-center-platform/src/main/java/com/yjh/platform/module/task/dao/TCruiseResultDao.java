@@ -36,8 +36,13 @@ public interface TCruiseResultDao {
                                @Param(value = "taskCode") String taskCode,
                                @Param(value = "remark") String remark);
     List<TCruiseResultExpand> selectTaskByPage(@Param(value = "taskName") String taskName,
+                                               @Param(value = "cState") Integer cState,
                                                @Param(value = "cType") Integer cType,
-                                               @Param(value = "cState") Integer cState);
+                                               @Param(value = "deviceType") Integer deviceType,
+                                               @Param(value = "startDate") String startDate,
+                                               @Param(value = "endDate") String endDate,
+                                               @Param(value = "list") List<Long> list,
+                                               @Param(value = "meteType") Integer meteType);
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "cruiseResult") Integer cruiseResult,
@@ -87,15 +92,16 @@ public interface TCruiseResultDao {
     //查询巡视监控统计点(listIndex:0-任务下测点 1-任务下摄像头个数 2-任务下机器人点位 3-任务下巡视点个数)
     List<Long> cruiseInspectCount(@Param(value = "taskId")String taskId);
 
-    String selectByIdentifyResult(@Param(value = "identifyResult")Integer identifyResult);
+    List<TCruiseDataResult> selectCruiseDataResult(@Param(value = "taskId")String taskId);
     String selectByIdentifyState(@Param(value = "identifyState")Integer identifyState);
 
     String selectUserName(@Param(value = "userID")Integer  userID);
 
     List<CruiseManualReview> selectManualDetail(@Param(value = "taskResultId")String taskResultId);
-    int updateCheck(@Param(value = "taskResultId")String taskResultId,
+    int updateCheck(@Param(value = "taskId")String taskId,
                     @Param(value = "checkUserName")String checkUserName,
-                    @Param(value = "checkDate")Date checkDate);
+                    @Param(value = "checkDate")Date checkDate,
+                    @Param(value = "remark")String remark);
 
     TCruiseResult selectForTaskId(@Param(value = "taskId") String taskId);
 
