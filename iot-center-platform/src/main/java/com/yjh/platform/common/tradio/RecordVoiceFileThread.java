@@ -45,7 +45,7 @@ public class RecordVoiceFileThread implements Runnable {
         dateTime = System.currentTimeMillis();
         dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
         channelNumList = channelNum.split(",");
-        voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HH:mm:ss").format(new Date(dateTime))+"-"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTimeAfter))+"_";
+        voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTime))+"-"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTimeAfter))+"_";
     }
 
     @Override
