@@ -204,7 +204,7 @@ public class TCruiseResultService{
             sb.append(checkUser + ",");
         }
         String checkUserName = sb.toString().substring(0,sb.toString().length()-1);
-        String taskResultId = cruiseManualReview.getTaskResultId();
+        String taskId = cruiseManualReview.getTaskId();
         Date taskCheckDate =findLastDate(cruiseManualReviewList);
         //更新任务审核人以及审核时间
         List<String> list = new ArrayList<>();
@@ -215,7 +215,7 @@ public class TCruiseResultService{
         }
         int result2 = 0;
         if (list.size() == cruiseManualReviewList.size()){
-            result2 = tCruiseResultDao.updateCheck(taskResultId,checkUserName,taskCheckDate,"1");
+            result2 = tCruiseResultDao.updateCheck(taskId,checkUserName,taskCheckDate,"1");
             //自动生成巡视报告
             String taskID = cruiseManualReview.getTaskId();
             String reportFilePath = reportManageService.cruiseReportGenerate(taskID);
