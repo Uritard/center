@@ -40,7 +40,7 @@
         a.task_wait as cruise_data_state2,
         f.task_abnormal,
         a.execute_time,
-        n.user_name as check_user,
+        a.check_user,
         a.check_date,
         a.modify_state,
         a.task_wait,a.create_time,
@@ -277,7 +277,6 @@
         LEFT JOIN t_std_device j on g.device_id = j.device_id
         LEFT JOIN t_cruise_point_instance m on m.instance_id = g.instance_id
         LEFT JOIN t_std_devicemete k on k.device_mete_id = m.device_mete_id
-        LEFT JOIN sys_user n on n.user_id  = a.check_user
         where 1 = 1
         <if test="taskName != null and taskName != ''">and a.task_name like concat('%',#{taskName, jdbcType=VARCHAR},'%') </if>
 

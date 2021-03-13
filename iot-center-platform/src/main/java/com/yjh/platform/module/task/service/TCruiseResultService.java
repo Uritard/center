@@ -339,15 +339,16 @@ public class TCruiseResultService{
     }
     public int manualReviewTask(String taskId,String userId){
         Date date = new Date();
+        String userName = tCruiseResultDao.selectUserName(Integer.valueOf(userId));
         //审核任务
-        int result = tCruiseResultDao.updateCheck(taskId,userId,date,"1");
+        int result = tCruiseResultDao.updateCheck(taskId,userName,date,"1");
         //审核未被审核的巡视点
         List<TCruiseDataResult> list = tCruiseResultDao.selectCruiseDataResult(taskId);
         log.info("未被审核的点=="+list);
         for (TCruiseDataResult res : list){
             CruiseManualReview cruiseManualReview = new CruiseManualReview()
                     .setCruiseDataId(res.getCruiseDataId())
-                    .setCheckUser(userId)
+                    .setCheckUser(userName)
                     .setCheckDate(date)
                     .setPersonCheck(res.getResultNum());
             if (res.getCruiseResult() == 246){//正常,实际:正常,算法:正确
