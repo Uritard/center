@@ -204,61 +204,34 @@ public class TCruiseDataResultService {
     public int updateCruiseAnalyze(List<String> cruiseResultIdList){
         log.info("cruiseResultIdList==="+cruiseResultIdList);
         List<TStdDeviceMeteUpdate> list = tCruiseDataResultDao.selectDeviceMeteList(cruiseResultIdList);
-
-        for (TStdDeviceMeteUpdate res : list){
-            List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-            log.info("deviceMeteIdList==="+deviceMeteIdList);
-            TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
-                    .setDeviceMeteId(res.getDeviceMeteId())
-                    .setIdentifyResult(res.getIdentifyResult());
-            if (Objects.nonNull(res.getUpdateTime())){
-                tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
-            }
-            if (Objects.nonNull(res.getCruiseResult())){
-                tStdDeviceMeteUpdate.setCruiseResult(res.getCruiseResult());
-            }
-            if (Objects.nonNull(res.getPicPath())){
-                tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
-            }
-            log.info("此时的tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-            if (deviceMeteIdList.contains(res.getDeviceMeteId()) ){
-                //更新
-                int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info(res.getDeviceMeteId()+"存在,更新值: "+updateRes);
-            }else {
-                //插入
-                int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info(res.getDeviceMeteId()+"不存在,插入值: "+insertRes);
+        if (list != null && !list.isEmpty()){
+            for (TStdDeviceMeteUpdate res : list){
+                List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
+                log.info("deviceMeteIdList==="+deviceMeteIdList);
+                TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
+                        .setDeviceMeteId(res.getDeviceMeteId())
+                        .setIdentifyResult(res.getIdentifyResult());
+                if (Objects.nonNull(res.getUpdateTime())){
+                    tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
+                }
+                if (Objects.nonNull(res.getCruiseResult())){
+                    tStdDeviceMeteUpdate.setCruiseResult(res.getCruiseResult());
+                }
+                if (Objects.nonNull(res.getPicPath())){
+                    tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
+                }
+                log.info("此时的tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
+                if (deviceMeteIdList.contains(res.getDeviceMeteId()) ){
+                    //更新
+                    int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                    log.info(res.getDeviceMeteId()+"存在,更新值: "+updateRes);
+                }else {
+                    //插入
+                    int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                    log.info(res.getDeviceMeteId()+"不存在,插入值: "+insertRes);
+                }
             }
         }
-
-        /*for (String cruiseResultId: cruiseResultIdList){
-            TStdDeviceMeteUpdate tStdDeviceMeteUpdateTemp = tCruiseDataResultDao.selectCruiseAnalyze(cruiseResultId);
-            TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
-                    .setDeviceMeteId(tStdDeviceMeteUpdateTemp.getDeviceMeteId())
-                    .setIdentifyResult(tStdDeviceMeteUpdateTemp.getIdentifyResult());
-            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getUpdateTime())){
-                tStdDeviceMeteUpdate.setUpdateTime(tStdDeviceMeteUpdateTemp.getUpdateTime());
-            }
-            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getCruiseResult())){
-                tStdDeviceMeteUpdate.setCruiseResult(tStdDeviceMeteUpdateTemp.getCruiseResult());
-            }
-            if (Objects.nonNull(tStdDeviceMeteUpdateTemp.getPicPath())){
-                tStdDeviceMeteUpdate.setPicPath(tStdDeviceMeteUpdateTemp.getPicPath());
-            }
-            log.info("tStdDeviceMeteUpdate==="+tStdDeviceMeteUpdate);
-            List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-            log.info("deviceMeteIdList==="+deviceMeteIdList);
-            if (deviceMeteIdList.contains(tStdDeviceMeteUpdateTemp.getDeviceMeteId()) ){
-                //更新
-                int updateRes = tCruiseDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"存在,更新值: "+updateRes);
-            }else {
-                //插入
-                int insertRes = tCruiseDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                log.info(tStdDeviceMeteUpdateTemp.getDeviceMeteId()+"不存在,插入值: "+insertRes);
-            }
-        }*/
         return 1;
     }
 

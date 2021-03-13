@@ -87,7 +87,7 @@ public class CruiseResultDealThread implements Runnable{
                     String cruiseTime = redisInfoMap.get("cruiseTime");
                     String inspectionCode = redisInfoMap.get("inspectionCode");
 
-                    str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + ":" + instanceId;//redis缓存名称
+                    str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + ":" + instanceId;
 
                     tCruiseTaskResultMap.put("cruiseTime",cruiseResultMap.get("time"));
                     tCruiseTaskResultMap.put("cruiseTaskTime",cruiseTime);
