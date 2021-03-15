@@ -49,6 +49,7 @@ public class CameraConService {
     @Autowired
     private CameraConDao cameraConDao;
 
+
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
     @Value("${nvr.rtmp.video}")
@@ -873,8 +874,10 @@ public class CameraConService {
 //
 //        return judge;
 //    }
-@Autowired
-private TCameraInfoDao TCameraInfoDao;
+
+//    @Autowired
+//    private TCameraInfoDao TCameraInfoDao;
+
     /**
      *下载nvr文件
      * @param cameraId 摄像头id
