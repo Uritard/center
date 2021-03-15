@@ -615,8 +615,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             info.put("windSpeedUnit","m/s");
                         }
                         if("4".equals(weatherMap.get("type"))){
-                            info.put("airPressure",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                            info.put("airPressureUnit","Pa");
+                            info.put("airPressure",decimalFormat.format(Double.valueOf(weatherMap.get("value"))/10).toString());
+                            info.put("airPressureUnit","kPa");
                         }
                         if("5".equals(weatherMap.get("type"))){
                             info.put("precipitation",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
