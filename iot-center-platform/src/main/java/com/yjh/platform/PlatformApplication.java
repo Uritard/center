@@ -65,7 +65,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();
-        tDeviceTypeImgService.findPic();
+        tDeviceTypeImgService.findPic();//本地启动把此行注掉
         //Start RecordVoiceFileThread
         List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
         if (voiceDeviceAllInfoList.size()>0) {
