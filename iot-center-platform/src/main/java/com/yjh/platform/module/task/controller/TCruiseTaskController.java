@@ -7,6 +7,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
@@ -425,4 +426,22 @@ public class TCruiseTaskController {
         }
         return  result;
     }
+
+    @ApiOperation(value = "同步到websocket")
+    @RequestMapping(value = "/syncWebsocket", method = RequestMethod.POST)
+    public Result syncWebsocketInfo(@RequestParam String json) {
+        Result result = new Result();
+        try {
+            WebSocketServer.sendMsg(json);
+            result.setData("同步到websocket");
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("同步到websocket异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("同步到websocket错误:", e);
+        }
+        return result;
+    }
+
 }
