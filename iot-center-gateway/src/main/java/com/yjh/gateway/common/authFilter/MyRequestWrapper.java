@@ -47,7 +47,7 @@ public class MyRequestWrapper extends HttpServletRequestWrapper {
     }
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
+        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes("UTF-8"));
         ServletInputStream servletInputStream = new ServletInputStream() {
             @Override
             public boolean isFinished() {
