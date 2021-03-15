@@ -622,6 +622,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         // 发送json字符串
         String registerMsg = "{\n\"msgType\": \"3\", \n\"msgData\": {\n\"desNode\": \"serverSocket\", \n\"srcNode\": \"clientSocket001\",\n\"registerKey\": \"yijiahe\"\n}\n}\n";
         sendString(ctx, registerMsg);
+//        String fakeData="";
+//        sendString(ctx,fakeData);
         // TODO: 2020/10/22
         //  String registerMsg = "发送假数据";
         //        sendString(ctx, registerMsg);

@@ -1,6 +1,7 @@
 package com.yjh.accessvideo.module.device.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.module.control.service.CameraConService;
@@ -14,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 /**
 * @author tt
@@ -60,9 +58,14 @@ public class AnalysisService {
         for (Analysis analysis: analysisList) {
             log.info("表计IsAI："+analysis.getIsAi());
             if (analysis.getIsAi()==1) {
-                Map<String,Long>cameraInfo=analyseDataOperateDao.selectTaskCruiseCameraInfo(analysis.getTaskId(),analysis.getInstanceId());
-                Map<String,String> firHandelMap=cameraConService.givePicFir(cameraInfo.get("cameraId"),cameraInfo.get("presetId"));
-                log.info("cameraInfo-----"+cameraInfo);
+//                Map<String,Long>cameraInfo=analyseDataOperateDao.selectTaskCruiseCameraInfo(analysis.getTaskId(),analysis.getInstanceId());
+//                Map<String,String> firHandelMap=cameraConService.givePicFir(cameraInfo.get("cameraId"),cameraInfo.get("presetId"));
+                Map<String,String> firHandelMap=new HashMap<>();
+                if(analysis.getAnalyseType().equals("9")) {
+                    firHandelMap.put("csvPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.csv");
+                    firHandelMap.put("dataPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.data");
+                }
+//                log.info("cameraInfo-----"+cameraInfo);
                 log.info("firData-------"+firHandelMap);
                 JSONObject pictureInfoObject = new JSONObject();
                 JSONObject pictureDataObject = new JSONObject();
@@ -106,22 +109,34 @@ public class AnalysisService {
         log.info("进入算法方法----------");
         try{
             int i=1;
+            JSONObject pictureInfoObject = new JSONObject();
             for (Analysis analysis: analysisList) {
+
+                if(analysis.getAnalyseType().equals("11")){
+                    JSONObject normalPictureDataObject=new JSONObject();
+                    normalPictureDataObject.put("analyseType", analysis.getAnalyseType());
+                    normalPictureDataObject.put("modelPath", analysis.getPicModelPath());
+                    normalPictureDataObject.put("taskId", analysis.getTaskId());
+                    normalPictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                    normalPictureDataObject.put("imagePath",analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId()));
+                    pictureInfoObject.put("pictureInfo"+i,normalPictureDataObject);
+                    i++;
+                }
+
                 log.info("缺陷IsAI："+analysis.getIsAi());
-                if (analysis.getIsAi()==0) {
+                if (analysis.getIsAi()==0 || analysis.getAnalyseType().equals("11")) {
                     JSONObject pictureDataObject = new JSONObject();
-                    JSONObject pictureInfoObject = new JSONObject();
                     pictureDataObject.put("analyseType", analysis.getAnalyseType());
                     pictureDataObject.put("imagePath", analysis.getPicPath());
                     pictureDataObject.put("modelPath", analysis.getPicModelPath());
                     pictureDataObject.put("taskId", analysis.getTaskId());
                     pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                     pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                    msgDataObject.put("data", pictureInfoObject);
                     log.info("DATA内容:"+pictureInfoObject);
                 }
                 i++;
             }
+            msgDataObject.put("data", pictureInfoObject);
             analysisObject.put("msgData", msgDataObject);
             log.info("msgData",msgDataObject);
             log.info("analysisObject-----"+analysisObject);

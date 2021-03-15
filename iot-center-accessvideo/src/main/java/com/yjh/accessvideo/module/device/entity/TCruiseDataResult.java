@@ -86,5 +86,8 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "是否产生告警 --0：否  1：是")
     private Integer isWarn;
 
+    @ApiModelProperty(value = "红外FIR文件存储路径")
+    private String resultPic;
+
 
 }

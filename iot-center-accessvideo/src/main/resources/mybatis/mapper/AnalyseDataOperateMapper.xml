@@ -109,6 +109,7 @@
         <result column="check_user" jdbcType="VARCHAR" property="checkUser" />
         <result column="check_date" jdbcType="TIMESTAMP" property="checkDate" />
         <result column="is_warn" jdbcType="INTEGER" property="isWarn"/>
+        <result column="result_pic" jdbcType="VARCHAR" property="resultPic"/>
     </resultMap>
 
     <resultMap id="stdDeviceMete" type="com.yjh.accessvideo.module.device.entity.TStdDevicemete">
@@ -593,7 +594,8 @@
         remark,
         check_user,
         check_date,
-        is_warn
+        is_warn,
+        result_pic
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
@@ -617,7 +619,8 @@
             #{TCruiseDataResult.remark, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
-            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER},
+            #{TCruiseDataResult.resultPic,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -909,4 +912,15 @@
         a.task_id = #{taskId,jdbcType=VARCHAR}
     AND b.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectPresetImgByCruise" parameterType="java.lang.Long" resultType="java.lang.String">
+                SELECT
+            b.preset_img
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN t_camera_preset b ON a.cruise_id = b.preset_id
+        WHERE
+            a.instance_id = #{instanceId,jdbcType=BIGINT}
+    </select>
+
 </mapper>
