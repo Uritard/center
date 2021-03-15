@@ -46,8 +46,8 @@ public class RecordVoiceFileThread implements Runnable {
         this.dateTime = System.currentTimeMillis();
         this.dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
         this.channelNumList = channelNum.split(",");
-        this.voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTime))+"-"
-                +new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTimeAfter))+"_";
+        this.voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
+                +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
     }
 
     @Override
@@ -119,8 +119,8 @@ public class RecordVoiceFileThread implements Runnable {
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
-                    voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTime))+"-"
-                            +new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(dateTimeAfter))+"_";
+                    voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
+                            +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
                 }
 
 //                try {
