@@ -76,6 +76,7 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long userId) {
         redisTemplate.delete("userInfo:"+userId);
+        this.SysUserBackUpDao.deleteByPrimaryId(userId);
         return this.sysUserDao.deleteByPrimaryId(userId);
     }
 

@@ -85,6 +85,9 @@ public class SysUserController {
     public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
+            if(userId==10001){
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此用户为系统管理员,无法删除");
+            }
             result.setData(sysUserService.deleteByPrimaryId(userId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());

@@ -23,4 +23,6 @@ public interface SysUserBackUpDao {
 
         SysUserBackUp selectByVerfiCode(@Param(value = "userId") Long userId);
 
+        int deleteByPrimaryId(@Param(value = "userId") Long userId);
+
 }

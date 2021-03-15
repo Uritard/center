@@ -134,4 +134,10 @@
         from sys_info_backup a
          WHERE user_id = #{userId, jdbcType=BIGINT}
     </select>
+
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from sys_info_backup
+                where user_id = #{userId, jdbcType=BIGINT}
+    </delete>
 </mapper>
