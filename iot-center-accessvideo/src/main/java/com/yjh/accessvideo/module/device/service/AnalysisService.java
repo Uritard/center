@@ -58,14 +58,14 @@ public class AnalysisService {
         for (Analysis analysis: analysisList) {
             log.info("表计IsAI："+analysis.getIsAi());
             if (analysis.getIsAi()==1) {
-//                Map<String,Long>cameraInfo=analyseDataOperateDao.selectTaskCruiseCameraInfo(analysis.getTaskId(),analysis.getInstanceId());
-//                Map<String,String> firHandelMap=cameraConService.givePicFir(cameraInfo.get("cameraId"),cameraInfo.get("presetId"));
-                Map<String,String> firHandelMap=new HashMap<>();
-                if(analysis.getAnalyseType().equals("9")) {
-                    firHandelMap.put("csvPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.csv");
-                    firHandelMap.put("dataPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.data");
-                }
-//                log.info("cameraInfo-----"+cameraInfo);
+                Map<String,Long>cameraInfo=analyseDataOperateDao.selectTaskCruiseCameraInfo(analysis.getTaskId(),analysis.getInstanceId());
+                Map<String,String> firHandelMap=cameraConService.givePicFir(cameraInfo.get("cameraId"),cameraInfo.get("presetId"));
+//                Map<String,String> firHandelMap=new HashMap<>();
+//                if(analysis.getAnalyseType().equals("9")) {
+//                    firHandelMap.put("csvPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.csv");
+//                    firHandelMap.put("dataPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.data");
+//                }
+                log.info("cameraInfo-----"+cameraInfo);
                 log.info("firData-------"+firHandelMap);
                 JSONObject pictureInfoObject = new JSONObject();
                 JSONObject pictureDataObject = new JSONObject();

@@ -155,8 +155,7 @@ public class DataDealThread implements Runnable {
                                 String analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
                                 redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
 
-                                // TODO: 2021/3/10 JsonObject中存在 firDocPath 则放入缓存中
-                                log.info("FIR-Doc-----:"+jsonObjectResult.get("firDocPath").toString());
+
 
                                 if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
                                     Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", "缺少标定文件");
@@ -178,10 +177,12 @@ public class DataDealThread implements Runnable {
 
                                         String alarmValue = jsonObjectResult.get("resultValue").toString();
                                         //判断是否为红外识别且获取FIR文件
+                                        //  JsonObject中存在 firDocPath 则放入缓存中
                                         if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
                                             if(!(jsonObjectResult.get("firDocPath").toString().equals(""))){
                                                 String firDocPath=jsonObjectResult.get("firDocPath").toString();
                                                 cruiseResultMap.put("firDocPath",firDocPath);
+                                                log.info("FIR-Doc-----:"+jsonObjectResult.get("firDocPath").toString());
                                             }
                                         }
 
