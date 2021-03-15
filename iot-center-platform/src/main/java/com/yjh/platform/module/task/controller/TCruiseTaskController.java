@@ -429,7 +429,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "同步到websocket")
     @RequestMapping(value = "/syncWebsocket", method = RequestMethod.POST)
-    public Result syncWebsocketInfo(@RequestParam String json) {
+    public Result syncWebsocketInfo(@RequestParam(value = "json") String json) {
         Result result = new Result();
         try {
             WebSocketServer.sendMsg(json);
