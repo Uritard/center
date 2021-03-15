@@ -90,16 +90,15 @@ public class DataDealThread implements Runnable {
                     log.info("数据****：" + jsonObjectResult);//打印resultInfo
 
                     //处理判别结果
-                    if (jsonObjectResult.get("analyseType").toString().equals("11")) {
-                        //获取分析结果图片地址
-                        String taskId = jsonObjectResult.get("taskId").toString();
-                        Long instanceId = Long.valueOf(jsonObjectResult.get("instanceId").toString());
-                        String resultImage = jsonObjectResult.get("analyseResultImg").toString();
-                        if (instanceId != 0) {
+                    //获取分析结果图片地址
+                    String taskId = jsonObjectResult.get("taskId").toString();
+                    Long instanceId = Long.valueOf(jsonObjectResult.get("instanceId").toString());
+                    String resultImage = jsonObjectResult.get("analyseResultImg").toString();
+                    String analyseType=jsonObjectResult.get("analyseType").toString();
+                    if (analyseType.equals("11")) {
+                        if (resultImage.equals("")) {
                             // TODO: 2021/2/6 联调时修改完善
-                            //插入TCTR
-                            //插入TCTRD
-                            //插入TCDR
+                            continue;
                         }
                     }
 
@@ -176,7 +175,15 @@ public class DataDealThread implements Runnable {
                                 } else {
                                     if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]")) {
 
+
                                         String alarmValue = jsonObjectResult.get("resultValue").toString();
+                                        //判断是否为红外识别且获取FIR文件
+                                        if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
+                                            if(!(jsonObjectResult.get("firDocPath").toString().equals(""))){
+                                                String firDocPath=jsonObjectResult.get("firDocPath").toString();
+                                                cruiseResultMap.put("firDocPath",firDocPath);
+                                            }
+                                        }
 
                                         log.info("开始告警预处理");
                                         TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
@@ -467,9 +474,27 @@ public class DataDealThread implements Runnable {
 
                                 break;
                             case 13669:
+
                                 if (recognitionMode.equals("0")) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-1");
                                 }
+
+                                //判别结果处理逻辑
+                                if(analyseType.equals("11")){
+
+                                    String analyseResultImg=resultImage.replaceAll(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content").toString(),redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content").toString());
+
+                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
+//                                    tNormal++;
+                                    Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
+                                    cruiseResultMap.put("resultNum", "判别成功");
+                                    cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                    cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+                                    cruiseResultMap.put("picpath",analyseResultImg);
+                                    break;
+                                }
+
 
                                 List<TDefectInfo> defectInfos=new ArrayList<>();//缺陷信息List
                                 String originResult = jsonObjectResult.get("resultValue").toString();
@@ -477,6 +502,7 @@ public class DataDealThread implements Runnable {
                                 log.info("解析的缺陷数据：" + resultValue);
                                 String analyseResultImg = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content").toString());
                                 redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultImg);
+
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
                                 if (resultValue != "null") {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
@@ -831,6 +857,11 @@ public class DataDealThread implements Runnable {
                         tCruiseDataResult.setCreatetime(new Date());
                         tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
                         tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
+                        if(Objects.nonNull(cruiseWorkedMap.get("firDocPath"))){
+                            tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath").toString());
+                        }else {
+                            tCruiseDataResult.setResultPic("");
+                        }
                         log.info("TCDR内容：" + tCruiseDataResult);
                         dataList.add(tCruiseDataResult);
 

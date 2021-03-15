@@ -194,7 +194,7 @@ public class TCruiseDataResultService {
 
        List<BrokenLineInfo> brokenLineInfos= tCruiseDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType);
        for(BrokenLineInfo point:brokenLineInfos){
-           if(point.getResultNum().matches("^[a-zA-Z_\\u4e00-\\u9fa5]+$")){
+           if(point.getResultNum().matches("^[a-zA-Z_\\u4e00-\\u9fa5_\\--]+$")){
                point.setResultNum("0");
            }
        }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.InetAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -143,7 +144,9 @@ public class ChanResultService {
                 //获取视频地址
                 HashMap map=new HashMap();
                 map.put("cameraId",detail.getCameraId());
-                Result result = Constant.otherServer(map, Constant.START_CAMERA_URL);
+                String str=Constant.START_CAMERA_URL.replaceAll("iot-center-accessvideo", InetAddress.getLocalHost().getHostAddress()+":"+"18715");
+                log.info("url"+str);
+                Result result = Constant.otherServer(map, str);
                 Map<String, String> videoInfo = (Map<String, String>) result.getData();
                 detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
                 detail.setFlvUrl(videoInfo.get("flvUrl"));

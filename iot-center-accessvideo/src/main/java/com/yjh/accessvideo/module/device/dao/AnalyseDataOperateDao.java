@@ -64,5 +64,7 @@ public interface AnalyseDataOperateDao {
     //根据任务ID与巡视点ID查询相机ID与预置位ID
     Map<String,Long> selectTaskCruiseCameraInfo(@Param(value = "taskId")String taskId,
                                                 @Param(value = "instanceId")Long instanceId);
-}
 
+    //根据巡视点ID查询预置位图片
+    String selectPresetImgByCruise(@Param(value = "instanceId")Long instanceId);
+}
