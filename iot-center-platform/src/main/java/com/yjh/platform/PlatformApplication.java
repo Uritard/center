@@ -2,7 +2,9 @@ package com.yjh.platform;
 
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.tradio.RecordVoiceFileThread;
+import com.yjh.platform.module.device.entity.TDeviceTypeImg;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
+import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.service.SysUserService;
@@ -47,6 +49,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TVoiceDeviceService tVoiceDeviceService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TDeviceTypeImgService tDeviceTypeImgService;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -61,6 +65,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();
+        tDeviceTypeImgService.findPic();
         //Start RecordVoiceFileThread
         List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
         if (voiceDeviceAllInfoList.size()>0) {
