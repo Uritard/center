@@ -58,6 +58,8 @@ public class zuulFilter extends ZuulFilter {
         String isDecode = map.get("content");
         Map<String, String> uKeymap = redisTemplate.opsForHash().entries("t_sys_param:isUkey");
         String isUkey = uKeymap.get("content");
+        Map<String, String> ipmap = redisTemplate.opsForHash().entries("t_sys_param:isIp");
+        String isIp = ipmap.get("content");
         if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
@@ -119,12 +121,14 @@ public class zuulFilter extends ZuulFilter {
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (request instanceof HttpServletRequest) {
                 if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
-                    String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
-                    if(!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/')+1,origin.lastIndexOf(':')))){
-                        log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
-                        ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                        return false;
+                    if("true".equals(isIp)) {
+                        String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
+                        if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':')))) {
+                            log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
+                            ctx.setSendZuulResponse(false);
+                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                            return false;
+                        }
                     }
                     String contentType = request.getContentType();
                     if (contentType != null && contentType.contains("multipart/form-data")) {
