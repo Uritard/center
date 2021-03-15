@@ -5,6 +5,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 
@@ -25,6 +26,8 @@ public class TCameraScreenService{
     private TCameraScreenDao tCameraScreenDao;
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraScreen tCameraScreen) {
@@ -177,6 +180,52 @@ public class TCameraScreenService{
                                 continue;
                             }
                         }
+                    }
+                    if("robot".equals(areaInfoMap.getInfoType())){
+                        //机器人
+                        TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(areaInfoMap.getId());
+                        List<AreaInfoDetail> robotCameraList = new ArrayList<>();
+                        //可见光
+                        AreaInfoDetail lightCamera = new AreaInfoDetail();
+                        lightCamera.setId(1L);
+                        lightCamera.setLabel("机器人可见光");
+                        lightCamera.setInfoType("robotCamera");
+                        lightCamera.setUpId(areaInfoMap.getId());
+                        lightCamera.setUpName(tRobotInfo.getRobotCode());
+                        if("在线".equals(tRobotInfo.getRobotStatus())){
+                            lightCamera.setState(1);
+                        }else {
+                            lightCamera.setState(0);
+                        }
+
+                        if(flag != null){
+                            if(flag == lightCamera.getState() && (flag == 1 || flag == 0)){
+                                robotCameraList.add(lightCamera);
+                            }else {
+                                robotCameraList.add(lightCamera);
+                            }
+                        }
+                        //红外
+                        AreaInfoDetail redCamera = new AreaInfoDetail();
+                        redCamera.setId(2L);
+                        redCamera.setLabel("机器人红外");
+                        redCamera.setInfoType("robotCamera");
+                        redCamera.setUpId(areaInfoMap.getId());
+                        redCamera.setUpName(tRobotInfo.getRobotCode());
+                        if("在线".equals(tRobotInfo.getRobotStatus())){
+                            redCamera.setState(1);
+                        }else {
+                            redCamera.setState(0);
+                        }
+
+                        if(flag != null){
+                            if(flag == redCamera.getState()&& (flag == 1 || flag == 0)){
+                                robotCameraList.add(redCamera);
+                            }else {
+                                robotCameraList.add(redCamera);
+                            }
+                        }
+                        areaInfoTem.setChildren(robotCameraList);
                     }
                     childrenList.add(areaInfoTem);
                 }

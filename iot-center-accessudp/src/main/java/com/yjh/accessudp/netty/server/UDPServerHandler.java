@@ -232,15 +232,15 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 log.info("帧序号：  "+xuHao);
                 //其实传输位置 9-12
                 Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
-                //List<String> listByte = new ArrayList<>();
+                List<String> listByte = new ArrayList<>();
                 for(int i =0;i<valueLength;i++){
-                    //listByte.add(udp[14+i]);
+                    listByte.add(udp[14+i]);
                     Constant.listAllByte.add(udp[14+i]);
                 }
                 String weiZhi= arrayToString(udp,9,4,true);
                 //String neiRong= arrayToString(udp,14,valueLength,true);
                 log.info("位置："+weiZhi);
-                //Constant.data.put(xuHao,listByte);
+                Constant.data.put(xuHao,listByte);
             }
             if(doesHas == 0){
                 Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
@@ -254,17 +254,24 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 }
                 Constant.data.put(xuHao,listByte);
 
-//                List<String> listForSortByte =new ArrayList<>();
-//                for(int i=0;i<Constant.data.size();i++ ){
-//                    Constant.data.get(i);
-//                    for (String item:Constant.data.get(i)) {
-//                        listForSortByte.add(item);
-//                    }
-//
-//                }
-                String data = arrayToString(Constant.listAllByte);
-                data = toStringHex(data);
-                log.info("文件内容： "+data);
+                List<String> listForSortByte =new ArrayList<>();
+                for(int i=0;i<Constant.data.size();i++ ){
+                    Constant.data.get(i);
+                    for (String item:Constant.data.get(i)) {
+                        listForSortByte.add(item);
+                    }
+
+                }
+                String data="";
+                if(Constant.sort){
+                    data = arrayToString(listForSortByte);
+                    data = toStringHex(data);
+                    log.info("文件内容map： "+data);
+                }else {
+                    data = arrayToString(Constant.listAllByte);
+                    data = toStringHex(data);
+                    log.info("文件内容： "+data);
+                }
                 String regex ="\\#.*?(是|不是)";
                 Matcher matcher = Pattern.compile(regex).matcher(data);
                 List<SYAllInfo> list = new LinkedList<>();

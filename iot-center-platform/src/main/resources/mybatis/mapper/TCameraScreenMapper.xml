@@ -115,6 +115,10 @@
             FROM t_std_region a
             LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
         UNION ALL (
+        SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType
+        FROM  t_robot_info e
+        LEFT JOIN t_std_region b ON e.up_region_id = b.region_id)
+        UNION ALL (
             SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
                 FROM t_camera_info d
                 LEFT JOIN t_std_region b ON d.up_region_id = b.region_id

@@ -46,6 +46,8 @@ public class AccessUdpApplication implements CommandLineRunner {
     private String SEQUENCE_URL;
     @Value("${spring.encoding.style}")
     private String encoding;
+    @Value("${spring.union.file.sort}")
+    private String sort;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -67,6 +69,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         String url = getLocalIp();
         //loadDeviceInfo();
         Constant.encoding = encoding;
+        Constant.sort = Boolean.valueOf(sort);
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
         nettyServer.start(address, redisTemplate,tCfgMeteService,UNION_URL, SEQUENCE_URL);

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotCameraPresetDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        <id column="preset_id" jdbcType="BIGINT" property="presetId" />
+        <result column="preset_num" jdbcType="INTEGER" property="presetNum" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
+        <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
+        <result column="creator_time" jdbcType="TIMESTAMP" property="creatorTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        preset_id,preset_num, robot_id, robot_code, preset_name, creator_time, remark
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        insert into t_robot_camera_preset(
+            preset_id,
+            preset_num,
+            robot_id,
+            robot_code,
+            preset_name,
+            creator_time,
+            remark
+        )values(
+                #{presetId, jdbcType=BIGINT},
+                #{presetNum, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
+                #{robotCode, jdbcType=VARCHAR},
+                #{presetName, jdbcType=VARCHAR},
+                #{creatorTime, jdbcType=TIMESTAMP},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_robot_camera_preset
+                where preset_id = #{presetId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        update t_robot_camera_preset a <set>
+        <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        <if test="presetNum != null and presetNum != ''">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="robotCode != null and robotCode != ''">a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
+        <if test="presetName != null and presetName != ''">a.preset_name = #{presetName, jdbcType=VARCHAR},</if>
+        <if test="creatorTime != null and creatorTime != ''">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+            where a.preset_id = #{presetId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        select
+        a.preset_id,
+        preset_num,
+        a.robot_id,
+        a.robot_code,
+        a.preset_name,
+        a.creator_time,
+        a.remark
+        from t_robot_camera_preset a
+        where 1 = 1
+            and a.preset_id = #{presetId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset" resultType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        select
+        a.preset_id,
+        preset_num,
+        a.robot_id,
+        a.robot_code,
+        a.preset_name,
+        a.creator_time,
+        a.remark
+        from t_robot_camera_preset a
+        where 1 = 1
+        <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
+        <if test="presetNum != null and presetNum != ''"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+        <if test="presetName != null and presetName != ''"> and a.preset_name = #{presetName, jdbcType=VARCHAR}</if>
+        <if test="creatorTime != null and creatorTime != ''"> and a.creator_time = #{creatorTime, jdbcType=TIMESTAMP}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset" resultType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        select
+        a.preset_id,
+        a.preset_num,
+        a.robot_id,
+        b.robot_name,
+        a.robot_code,
+        a.preset_name,
+        a.creator_time,
+        a.remark
+        from t_robot_camera_preset a
+        left join t_robot_info b on a.robot_id = b.robot_id
+        where 1 = 1
+        <if test="presetNum != null and presetNum != ''"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="presetName != null and presetName != ''"> and a.preset_name like concat("%",#{presetName, jdbcType=VARCHAR},"%") </if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_robot_camera_preset(
+            preset_id,
+            preset_num,
+            robot_id,
+            robot_code,
+            preset_name,
+            creator_time,
+            remark
+        )values
+        <foreach collection="list" item="TRobotCameraPreset" separator=",">
+            (
+                #{TRobotCameraPreset.presetId, jdbcType=BIGINT},
+                #{TRobotCameraPreset.presetNum, jdbcType=INTEGER},
+                #{TRobotCameraPreset.robotId, jdbcType=BIGINT},
+                #{TRobotCameraPreset.robotCode, jdbcType=VARCHAR},
+                #{TRobotCameraPreset.presetName, jdbcType=VARCHAR},
+                #{TRobotCameraPreset.creatorTime, jdbcType=TIMESTAMP},
+                #{TRobotCameraPreset.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_robot_camera_preset
+        where preset_id in (
+            <foreach collection="list" item="presetId" separator=",">
+                #{presetId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+    <select id="selectByPresetNum" parameterType="java.lang.Integer" resultType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
+        select
+        a.preset_id,
+        a.preset_num,
+        a.robot_id,
+        a.robot_code,
+        a.preset_name,
+        a.creator_time,
+        a.remark
+        from t_robot_camera_preset a
+        where 1 = 1
+            and a.preset_num = #{presetId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+</mapper>
