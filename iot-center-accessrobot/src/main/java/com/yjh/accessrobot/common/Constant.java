@@ -84,7 +84,7 @@ public class Constant {
         CloseableHttpClient client = HttpClients.createDefault();
         String result = "";
         try {
-            URI uri = new URIBuilder(url).setParameter("meteId", json).build();
+            URI uri = new URIBuilder(url).setParameter("json", json).build();
             HttpPost httpGet = new HttpPost(uri);
             httpGet.addHeader("Content-type", "application/json;charset=utf-8");
             httpGet.setHeader("Accept", "application/json");
