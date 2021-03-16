@@ -28,9 +28,10 @@ public class TAlgorithmInfo implements Serializable {
 
 
     @Max(value = 999999999999999999l)
-    @Length(max = 64, message = "algorithmName长度必须小于等于64")
     @TableField(value = "algorithm_id", updateStrategy = FieldStrategy.IGNORED)
     private Long algorithmId;
+
+    @Length(max = 64, message = "algorithmName长度必须小于等于64")
     @TableField(value = "algorithm_name", updateStrategy = FieldStrategy.IGNORED)
     private String algorithmName;
 
