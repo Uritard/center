@@ -175,7 +175,7 @@
     </select>
 
     <select id="selectAreaTree" resultType="com.yjh.platform.module.device.entity.AreaInfoRegionCode">
-        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, a.region_code AS regionCode
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, a.region_code AS regionCode, "region" AS infoType
         FROM t_std_region a
         LEFT JOIN t_std_region b ON a.up_region_id = b.region_id;
     </select>
