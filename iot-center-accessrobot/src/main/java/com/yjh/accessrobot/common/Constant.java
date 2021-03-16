@@ -8,8 +8,18 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import io.netty.channel.ChannelHandlerContext;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +73,26 @@ public class Constant {
     public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze";
 
     public static final String WEATHER_URL="http://iot-center-platform/homePage/v1/getWeatherInfoForService";
-    public static Result weatherServer(Map<String,Object> map, String url) throws Exception{
+    public static Result weatherServer(Map<String,Object> map, String url){
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
         //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
+    public static String getUrl(String url, String json) {
+        CloseableHttpClient client = HttpClients.createDefault();
+        String result = "";
+        try {
+            URI uri = new URIBuilder(url).setParameter("meteId", json).build();
+            HttpPost httpGet = new HttpPost(uri);
+            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+            httpGet.setHeader("Accept", "application/json");
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {e.getMessage();}
+        return result;
+    }
+
 }

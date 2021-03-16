@@ -55,8 +55,8 @@ public class RobotController {
                                     @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
-//            Long userId = 10001l;
+//            Long userId = Long.valueOf(request.getHeader("userId"));
+            Long userId = 10001l;
 
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
@@ -185,10 +185,10 @@ public class RobotController {
     /*用完就删*/
     @ApiOperation(value = "方法测试")
     @PostMapping(value = "/methodTest")
-    public Result methodTest(@RequestParam(value = "instanceId",required = false) Long instanceId){
+    public Result methodTest(@RequestParam(value = "taskId",required = false) String taskId){
         Result result = new Result();
         try {
-//            result.setData(robotService.methodTest(instanceId));
+            result.setData(robotService.methodTest(taskId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

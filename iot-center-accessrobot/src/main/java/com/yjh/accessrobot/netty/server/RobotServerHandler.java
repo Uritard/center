@@ -294,6 +294,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
          Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
          Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
          Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
+        Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+
 
         if ("251".equals(xmlBaseModel.getType())){
             switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
@@ -304,7 +306,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     List<Map<String, Object>> itemsList = new ArrayList<>();
                     Map<String, Object> items = new HashMap<>();
                     String code = "";
-                    Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
                     if (allRobotCodeMap.containsValue(xmlBaseModel.getSendCode())){
                         code = "200";//success
                         log.info("缓存有,可以注册");
@@ -350,16 +351,21 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 case "2512":
                     log.info("巡视主机收到心跳指令了");
                     heartNum = 0;
-                    /*String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
-                    send(ctx, heartProtocol,xmlBaseModel.getSendCode());
-                    //若心跳能够正常收发，将机器人置为在线状态
-                    Constant.flag = 1;
-                    log.info("flag2的值==="+flag2);
-                    if (flag2 == 0){
-                        robotService.updateRobotInfo(xmlBaseModel.getSendCode(),"在线");
-                        flag2 = 1;
-                    }*/
+                    String robotCode = xmlBaseModel.getSendCode();
+                    if (allRobotCodeMap.containsValue(robotCode)){
+                        log.info("缓存有,发送心跳响应");
+                        heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
+                    }else {
+                        List<String> robotCodeList = robotService.selectAllRobotCode();
+                        if (robotCodeList.contains(robotCode)){
+                            log.info("缓存无,表中有,发送心跳相应");
+                            heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
+                        }else {
+                            log.info("缓存无,表中无,断开连接");
+                            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+                            heartBeatFailAfter(robotCode,robotStatusMap);
+                        }
+                    }
                     break;
                 //模型同步指令and任务控制指令(接收响应)
                 case "2514":
@@ -808,7 +814,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         if (heartNum > 3){
             heartBeatFailAfter(robotCode,robotStatusMap);
         }
-        Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+        /*Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
 
         if (allRobotCodeMap.containsValue(robotCode)){
             log.info("缓存有,发送心跳响应");
@@ -822,7 +828,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("缓存无,表中无,断开连接");
                 heartBeatFailAfter(robotCode,robotStatusMap);
             }
-        }
+        }*/
     }
     /*
      * 成功收到心跳指令,sendHeartResponse && updateRobotStatus
