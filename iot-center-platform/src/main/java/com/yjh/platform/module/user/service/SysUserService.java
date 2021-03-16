@@ -110,6 +110,24 @@ public class SysUserService {
             }
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
+            if(Objects.equals(null, sysUserLogin)){
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "5");
+                params.set("ip", request.getRemoteHost());
+                params.set("title", "登录");
+                params.set("state", 1);
+                params.set("userId", "");
+                params.set("userName", userName);
+                params.set("requestOrigin", request.getRequestURL());
+                params.set("requestPath", request.getRequestURI());
+                params.set("requestMethod", request.getMethod());
+                params.set("content", "用户名或密码错误登录失败");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
+                mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                return mapResult;
+            }
             SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
             if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
                 if (!sysUserLogin.getPassword().equals(password)) {
