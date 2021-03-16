@@ -653,34 +653,38 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public void insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
         //统计巡视主机下发给机器人的巡检点大小
-        Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
-        String instanceList = redisInfoMap2.get("instanceIdList");
-        instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
-        String[] instanceIdArray = instanceList.split(", ");
-        List<String> instanceIdList = new ArrayList<>();
+        Map<String, String> redisInstanceIdMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
+        String redisInstanceIdList = redisInstanceIdMap.get("instanceIdList");
+        redisInstanceIdList = redisInstanceIdList.replaceAll("\\[", "").replaceAll("]", "");
+        String[] instanceIdArray = redisInstanceIdList.split(", ");
+        List<String> allInstanceIdList = new ArrayList<>();
         for (String i : instanceIdArray) {
-            instanceIdList.add(i);
+            allInstanceIdList.add(i);
         }
-        log.info("发给机器人的巡检点的个数====" + instanceIdList.size());
+        log.info("发给机器人的巡检点的个数====" + allInstanceIdList.size());
 
         List<Long> instanceIDList = Constant.flagMap.get(taskId);//已经做过的点
         log.info("已经做过的巡视点====" + instanceIDList);
+
         //删除已经做过的点
         if (instanceIDList != null && !instanceIDList.isEmpty()) {
             for (Long instanceId : instanceIDList) {
-                instanceIdList.remove(instanceId.toString());
+                allInstanceIdList.remove(instanceId.toString());
             }
         }
-        log.info("删除已经做过的巡视点==="+instanceIdList);
+        log.info("删除已经做过的巡视点后==="+allInstanceIdList);
+
         List<Long> isFinishedInstanceList = tRobotInfoDao.selectInstanceForTaskGoOn(taskId);//已经入库的点
         log.info("已经入库的巡视点==="+isFinishedInstanceList);
+
         //删除已经入库的点
         if (isFinishedInstanceList != null && !isFinishedInstanceList.isEmpty()) {
             for (Long instanceIdInTable : isFinishedInstanceList) {
-                instanceIdList.remove(instanceIdInTable);
+                allInstanceIdList.remove(instanceIdInTable);
             }
         }
-        log.info("删除已经入库的巡视点==="+instanceIdList);
+        log.info("删除已经入库的巡视点后==="+allInstanceIdList);
+
         List<TCruiseDataResult> tCDRList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
@@ -698,8 +702,8 @@ public class RobotService {
         Integer abnormal = abnormalCheckPoint;
         Integer normal = normalCheckPoint;
 
-        log.info("准备遍历的点是===" + instanceIdList);
-        for (String instanceId : instanceIdList) {
+        log.info("准备遍历的点是===" + allInstanceIdList);
+        for (String instanceId : allInstanceIdList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
             log.info("cruiseResult是 ===" + redisInfoMap.get("cruiseResult"));
             //缓存中该巡检点有结果
@@ -773,10 +777,17 @@ public class RobotService {
             log.info("不用放");
             Constant.flagMap.put(taskId, instancedList);
         }
-
-        int res1 = batchInsertCruiseTaskResultDetail(tCTRDList);
-        int res2 = batchInsertCruiseDataResult(tCDRList);
-        otherServer(cruiseResultIdList);
+        
+        int res1 = 0;
+        int res2 = 0;
+        if (tCTRDList != null && !tCTRDList.isEmpty())
+        {
+            res1 = batchInsertCruiseTaskResultDetail(tCTRDList);
+        }
+        if (tCDRList != null && !tCDRList.isEmpty()){
+            res2 = batchInsertCruiseDataResult(tCDRList);
+            otherServer(cruiseResultIdList);
+        }
         log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
 
         Integer cState = null;
@@ -786,7 +797,7 @@ public class RobotService {
             cState = 242;
             //将公共类的instanceIdList清空
             for (Long instancedId : Constant.flagMap.get(taskId)) {
-                instanceIdList.remove(instancedId.toString());
+                allInstanceIdList.remove(instancedId.toString());
             }
         }
 
