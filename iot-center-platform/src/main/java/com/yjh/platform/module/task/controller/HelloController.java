@@ -202,6 +202,7 @@ public class HelloController {
 
         Map<String,List<Analysis>> analysisInfo=new HashMap<>();
         List<Analysis> analysisList=new ArrayList<>();
+        //缺陷算法发送测试
 //        List<String> picpath=new ArrayList<>();
 //        picpath.add("/home/yjh_iot_center/iot-picture/presets/21000000104/21000000104.jpg");
 //        picpath.add("/home/yjh_iot_center/iot-picture/presets/21000000105/21000000105.jpg");
@@ -227,7 +228,7 @@ public class HelloController {
 //        }
 //
 
-
+//表计算法发送测试
 //        Analysis analysis=new Analysis();
 //        analysis.setTaskId("110001");
 //        analysis.setInstanceId(Long.valueOf("910009"));
@@ -248,11 +249,7 @@ public class HelloController {
 //            log.error(e.getMessage(), e);
 //        }
 
-       try {
-           result.setData(InetAddress.getLocalHost().getHostAddress());
-       }catch (Exception e){
-           log.error("失败"+e);
-       }
+
 
 //        String finalValue = testString.replaceAll("[0-9]", "");
 //        String[] str2 = finalValue.split("\\s+");

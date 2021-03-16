@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.accessvideo.common.Constant;
-import com.yjh.accessvideo.common.websocket.WebSocketServer;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;

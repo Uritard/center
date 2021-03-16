@@ -1,15 +1,27 @@
 package com.yjh.accessvideo.netty.client;
 
+import com.alibaba.druid.util.HttpClientUtils;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.accessvideo.common.Constant;
-import com.yjh.accessvideo.common.websocket.WebSocketServer;
+import com.yjh.accessvideo.common.logs.SpringBeanUtils;
+import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
+import com.yjh.accessvideo.commons.result.Result;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.SneakyThrows;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -17,6 +29,11 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -32,6 +49,7 @@ public class DataDealThread implements Runnable {
     private ChannelHandlerContext ctx;
     private String TASKID;
     private String INSTANCEID;
+    private String syncWebsocketUrl;
 
 
     public DataDealThread(String body, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, ChannelHandlerContext ctx) {
@@ -39,7 +57,24 @@ public class DataDealThread implements Runnable {
         this.redisTemplate = redisTemplate;
         this.body = body;
         this.ctx = ctx;
+        this.syncWebsocketUrl=redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content").toString();
     }
+
+
+
+    //请求webSocket发送方法
+    public String postUrl(String url, String json) throws IOException, URISyntaxException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
+    }
+
 
     //读批量redis
     public Set<String> redisScan(String key) {
@@ -151,9 +186,14 @@ public class DataDealThread implements Runnable {
                                 if (recognitionMode.equals("0")) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-2");
                                 }
-                                //表计识别图片放入缓存
+                                //表计识别图片放入缓存(已考虑双算法)
                                 String analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
-                                redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
+                                if(recognitionMode.equals("-1") || recognitionMode.equals("-2")){
+                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName,"picpath",redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName,"picpath").toString()+","+analyseResultPic);
+                                }else {
+                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
+                                }
+
 
 
 
@@ -420,7 +460,7 @@ public class DataDealThread implements Runnable {
                                                     jasonMaps.put("alarmContent", warningMsg.get("warnContent"));
                                                     String jsons = JSON.toJSONString(jasonMaps);
                                                     log.info("告警生成-前端推送：" + jsons);
-                                                    WebSocketServer.sendMsg(jsons);
+                                                    postUrl(syncWebsocketUrl,jsons);
 
                                                     //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                                     String alarmNote = tStdDevicemeteM.getAlarmNote();
@@ -441,7 +481,7 @@ public class DataDealThread implements Runnable {
                                                             jasonMaps2.put("defectModel", tWarnInfo.getDefectModel());
                                                             String json = JSON.toJSONString(jasonMaps2);
                                                             log.info("发送给前端的消息：" + json);
-                                                            WebSocketServer.sendMsg(json);
+                                                            postUrl(syncWebsocketUrl,json);
                                                         }
                                                     }
 //
@@ -501,8 +541,13 @@ public class DataDealThread implements Runnable {
                                 String originResult = jsonObjectResult.get("resultValue").toString();
                                 String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
                                 log.info("解析的缺陷数据：" + resultValue);
+                                //获取算法标定结果图片并放入缓存（已考虑双算法情况）
                                 String analyseResultImg = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content").toString());
-                                redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultImg);
+                                if(recognitionMode.equals("-1") || recognitionMode.equals("-2")){
+                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName,"picpath",redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName,"picpath").toString()+","+analyseResultImg);
+                                }else {
+                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultImg);
+                                }
 
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
                                 if (resultValue != "null") {
@@ -565,7 +610,7 @@ public class DataDealThread implements Runnable {
                                         jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName() + "--" + resultValue);
                                         String jsons = JSON.toJSONString(jasonMaps);
                                         log.info("缺陷生成-前端推送：" + jsons);
-                                        WebSocketServer.sendMsg(jsons);
+                                        postUrl(syncWebsocketUrl,jsons);
 
                                         //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                         String alarmNote = tStdDevicemete.getAlarmNote();
@@ -581,7 +626,7 @@ public class DataDealThread implements Runnable {
                                                 jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                 String json = JSON.toJSONString(jasonMaps2);
                                                 log.info("发送给前端的消息：" + json);
-                                                WebSocketServer.sendMsg(json);
+                                                postUrl(syncWebsocketUrl,json);
                                             }
                                         }
 
@@ -644,7 +689,7 @@ public class DataDealThread implements Runnable {
                                                     jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                     String json = JSON.toJSONString(jasonMaps2);
                                                     log.info("发送给前端的消息：" + json);
-                                                    WebSocketServer.sendMsg(json);
+                                                    postUrl(syncWebsocketUrl,json);
                                                 }
                                             }
 
@@ -660,7 +705,7 @@ public class DataDealThread implements Runnable {
                                         jasonMaps.put("alarmContent", tStdDevicemeteM.getMeteName() + "--" + defectNames);
                                         String jsons = JSON.toJSONString(jasonMaps);
                                         log.info("缺陷生成-前端推送：" + jsons);
-                                        WebSocketServer.sendMsg(jsons);
+                                        postUrl(syncWebsocketUrl,jsons);
 
                                     }
 
@@ -769,7 +814,7 @@ public class DataDealThread implements Runnable {
                         jasonMap.put("taskId", cruiseResult.get("taskId").toString());
                         String json = JSON.toJSONString(jasonMap);
                         log.info("发送给前端的消息：" + json);
-                        WebSocketServer.sendMsg(json);
+                        postUrl(syncWebsocketUrl,json);
 
                         //修改缓存中任务算法巡视点List
                         redisTemplate.opsForList().remove("analysisList:" + cruiseResult.get("taskId").toString(), 0, cruiseResult.get("instanceId").toString());
@@ -964,7 +1009,7 @@ public class DataDealThread implements Runnable {
                         jasonMap.put("taskId", cruiseResult.get("taskId").toString());
                         String json = JSON.toJSONString(jasonMap);
                         log.info("发送给前端的消息：" + json);
-                        WebSocketServer.sendMsg(json);
+                        postUrl(syncWebsocketUrl,json);
 
 
                         //任务执行完成 删除当前任务的缓存
