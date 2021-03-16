@@ -3,13 +3,11 @@ package com.yjh.accessrobot.module.command.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.common.websocket.WebSocketServer;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
@@ -20,24 +18,18 @@ import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author tt
@@ -50,6 +42,8 @@ public class RobotService {
 
     private static final String DATE_TIME_FORMAT_TPL = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT_TPL);
+    String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -183,9 +177,9 @@ public class RobotService {
         log.info("sendId是<start>" + sendId + "<end>");
         if (sendId != null) {
             sendSessionId = sendSessionId + 1L;//请求报文每次累加1
-            Constant.sendSessionId = sendSessionId;//刷新sendSessionId
+            Constant.sendSessionId = sendSessionId;
         } else {
-            Constant.sendSessionId = 0L;//刷新sendSessionId
+            Constant.sendSessionId = 0L;
         }
         log.info("发送会话序列号<start>" + sendSessionId + "<end>");
         byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);//生成发送的报文
@@ -199,16 +193,16 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setRobotStatus(robotStatus);
-        log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus());
-
         int res = tRobotInfoDao.update(tRobotInfo);
-        log.info("修改结果==="+res);
+        log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus()+",修改结果==="+res);
         //机器人状态改变给前端推送webSocket
-        /*Map<String,Object> jasonMap=new HashMap<>();
+        /*Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
+        String webSocketUrl = webSocketUrlMap.get("content");
+        Map<String,Object> jasonMap=new HashMap<>();
         jasonMap.put("type","robotStatus");
         jasonMap.put("status",tRobotInfo.getRobotStatus());
         String json= JSON.toJSONString(jasonMap);
-        WebSocketServer.sendMsg(json);*/
+        Constant.getUrl(json,webSocketUrl);*/
         return res;
     }
     @Transactional(rollbackFor = Exception.class)
@@ -390,7 +384,54 @@ public class RobotService {
         Constant.robotResultMap.put("Type",xmlBaseModel.getType());
         Constant.robotResultMap.put("Code",xmlBaseModel.getCode());
         log.info("组成的robotResultMap是==="+Constant.robotResultMap);
-        return Constant.robotResultMap;
+        if (xmlBaseModel.getItems().get(0).isEmpty()){
+            return Constant.robotResultMap;
+        }
+        Map<String,String> res = new HashMap<>();
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        /*
+        将ftp服务器上的文件复制到开发环境
+        * */
+        String temporaryPath = filePathMap.get("content");//文件在ftp服务器上的绝对路径
+        //开发环境图片绝对路径文件目录
+        String developAbsoluteUrl = absoluteImgMap.get("content") + "/CameraLib/"+ todayTime  + "/";
+        //开发环境图片相对路径文件目录
+        String developRelativeUrl = relativeImgMap.get("content")+ "/CameraLib/"+ todayTime  + "/";
+
+        if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_image_path"))){
+            developAbsoluteUrl = developAbsoluteUrl + "CCD";
+            developRelativeUrl = developRelativeUrl + "CCD";
+        }
+        if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_fir_path"))){
+            developAbsoluteUrl = developAbsoluteUrl + "FIR";
+            developRelativeUrl = developRelativeUrl + "FIR";
+        }
+        if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_video_path"))){
+            developAbsoluteUrl = developAbsoluteUrl + "Video";
+            developRelativeUrl = developRelativeUrl + "Video";
+        }
+
+        log.info("developAbsoluteUrl是: "+developAbsoluteUrl+"------developRelativeUrl是: "+developRelativeUrl);
+
+        File f=new File(developAbsoluteUrl);
+        if (!f.exists()){
+            f.setWritable(true, false);
+            f.mkdirs();
+        }
+
+        try {
+            String url = "cp " + temporaryPath + " "+developAbsoluteUrl;
+            log.info("url是==="+url);
+            Runtime.getRuntime().exec(url);
+        }catch (Exception e){
+            e.getMessage();
+        }
+        res.put("developAbsoluteUrl",developAbsoluteUrl);
+        res.put("developRelativeUrl",developRelativeUrl);
+
+        return res;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1124,6 +1165,17 @@ public class RobotService {
     }
     public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
         return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
+    }
+    public int methodTest(String taskId){
+        Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
+        String webSocketUrl = webSocketUrlMap.get("content");
+        Map<String, Object> jasonMap = new HashMap<>();
+        jasonMap.put("type", "finishedOneInstance");
+        jasonMap.put("taskId", taskId);
+        String json = JSON.toJSONString(jasonMap);
+        log.info("发送给前端的消息：" + json);
+        Constant.getUrl(json,webSocketUrl);
+        return 1;
     }
 }
 

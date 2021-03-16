@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.common.websocket.WebSocketServer;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.module.command.entity.*;
@@ -186,12 +185,14 @@ public class CruiseResultDealThread implements Runnable{
 
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
                     //做完一个点给前端推一次webSocket
+                    Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
+                    String webSocketUrl = webSocketUrlMap.get("content");
                     Map<String, Object> jasonMap = new HashMap<>();
                     jasonMap.put("type", "finishedOneInstance");
                     jasonMap.put("taskId", taskId);
                     String json = JSON.toJSONString(jasonMap);
                     log.info("发送给前端的消息：" + json);
-                    WebSocketServer.sendMsg(json);
+                    Constant.getUrl(json,webSocketUrl);
                 }
             }
 
@@ -350,12 +351,14 @@ public class CruiseResultDealThread implements Runnable{
                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 
                     // webSocket通知前端调用巡视监控的接口（任务完成）
+                    Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
+                    String webSocketUrl = webSocketUrlMap.get("content");
                     Map<String, Object> jasonMap = new HashMap<>();
                     jasonMap.put("type", "lastOneInstance");
                     jasonMap.put("taskId",taskId);
                     String json = JSON.toJSONString(jasonMap);
                     log.info("发送给前端的消息：" + json);
-                    WebSocketServer.sendMsg(json);
+                    Constant.getUrl(json,webSocketUrl);
 
                 }else{
                     log.info("机器人巡检点不是最后一个点");
