@@ -203,8 +203,9 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public int updateCruiseAnalyze(List<String> cruiseResultIdList){
         log.info("cruiseResultIdList==="+cruiseResultIdList);
-        List<TStdDeviceMeteUpdate> list = tCruiseDataResultDao.selectDeviceMeteList(cruiseResultIdList);
-        if (list != null && !list.isEmpty()){
+        if (cruiseResultIdList != null && !cruiseResultIdList.isEmpty()) {
+            List<TStdDeviceMeteUpdate> list = tCruiseDataResultDao.selectDeviceMeteList(cruiseResultIdList);
+
             for (TStdDeviceMeteUpdate res : list){
                 List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
                 log.info("deviceMeteIdList==="+deviceMeteIdList);

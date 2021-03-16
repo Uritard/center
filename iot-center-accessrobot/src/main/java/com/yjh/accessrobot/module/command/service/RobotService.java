@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -672,7 +671,7 @@ public class RobotService {
                 instanceIdList.remove(instanceId.toString());
             }
         }
-
+        log.info("删除已经做过的巡视点==="+instanceIdList);
         List<Long> isFinishedInstanceList = tRobotInfoDao.selectInstanceForTaskGoOn(taskId);//已经入库的点
         log.info("已经入库的巡视点==="+isFinishedInstanceList);
         //删除已经入库的点
@@ -681,7 +680,7 @@ public class RobotService {
                 instanceIdList.remove(instanceIdInTable);
             }
         }
-
+        log.info("删除已经入库的巡视点==="+instanceIdList);
         List<TCruiseDataResult> tCDRList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
