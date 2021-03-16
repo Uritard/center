@@ -204,7 +204,17 @@
             a.task_name,
             a.plan_id,
             a.area_id,
-            d.remark AS task_status,
+            (
+        CASE
+				WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=239 THEN -1
+        WHEN d.c_state=240 THEN 1
+        WHEN d.c_state=241 THEN -1
+        WHEN d.c_state=242 THEN 0
+        WHEN d.c_state=243 THEN 0
+        WHEN d.c_state=244 THEN 0
+        END
+        ) AS task_status,
             d.c_state AS task_state,
         e.dict_note AS taskStateName,
             b.dict_note AS plan_type_name,
@@ -228,7 +238,17 @@
                 a.task_name,
                 a.plan_id,
                 a.area_id,
-                d.remark AS task_status,
+                (
+        CASE
+				WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=239 THEN -1
+        WHEN d.c_state=240 THEN 1
+        WHEN d.c_state=241 THEN -1
+        WHEN d.c_state=242 THEN 0
+        WHEN d.c_state=243 THEN 0
+        WHEN d.c_state=244 THEN 0
+        END
+        ) AS task_status,
                 d.c_state AS task_state,
         e.dict_note AS taskStateName,
                 b.dict_note AS plan_type_name,
@@ -253,7 +273,17 @@
                 a.task_name,
                 a.plan_id,
                 a.area_id,
-                d.remark AS task_status,
+                (
+        CASE
+				WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=239 THEN -1
+        WHEN d.c_state=240 THEN 1
+        WHEN d.c_state=241 THEN -1
+        WHEN d.c_state=242 THEN 0
+        WHEN d.c_state=243 THEN 0
+        WHEN d.c_state=244 THEN 0
+        END
+        ) AS task_status,
                 d.c_state AS task_state,
         e.dict_note AS taskStateName,
                 b.dict_note AS plan_type_name,
@@ -290,7 +320,17 @@ select *from (
         a.task_name,
         a.plan_id,
         a.area_id,
-        d.c_state AS task_status,
+        (
+        CASE
+        WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=239 THEN -1
+        WHEN d.c_state=240 THEN 1
+        WHEN d.c_state=241 THEN -1
+        WHEN d.c_state=242 THEN 0
+        WHEN d.c_state=243 THEN 0
+        WHEN d.c_state=244 THEN 0
+        END
+        ) AS task_status,
         d.c_state AS task_state,
         e.dict_note AS taskStateName,
         b.dict_note AS plan_type_name,
@@ -316,7 +356,17 @@ select *from (
         a.task_name,
         a.plan_id,
         a.area_id,
-        d.c_state AS task_status,
+        (
+        CASE
+        WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=239 THEN -1
+        WHEN d.c_state=240 THEN 1
+        WHEN d.c_state=241 THEN -1
+        WHEN d.c_state=242 THEN 0
+        WHEN d.c_state=243 THEN 0
+        WHEN d.c_state=244 THEN 0
+        END
+        ) AS task_status,
         d.c_state AS task_state,
         e.dict_note AS taskStateName,
         b.dict_note AS plan_type_name,
@@ -343,7 +393,17 @@ select *from (
         a.task_name,
         a.plan_id,
         a.area_id,
-        d.c_state AS task_status,
+        (
+        CASE
+        WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=239 THEN -1
+        WHEN d.c_state=240 THEN 1
+        WHEN d.c_state=241 THEN -1
+        WHEN d.c_state=242 THEN 0
+        WHEN d.c_state=243 THEN 0
+        WHEN d.c_state=244 THEN 0
+        END
+        ) AS task_status,
         d.c_state AS task_state,
         e.dict_note AS taskStateName,
         b.dict_note AS plan_type_name,

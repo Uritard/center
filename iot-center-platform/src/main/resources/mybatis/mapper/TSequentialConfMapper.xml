@@ -59,6 +59,7 @@
         c.device_name as cgfDeviceName,
         a.cfg_mete_id,
         d.mete_name as cfgMeteName,
+        a.camera_id,
         a.preset_id,
         b.preset_name,
         a.identify_result

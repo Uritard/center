@@ -152,7 +152,7 @@
         a.remark
         from t_robot_camera_preset a
         where 1 = 1
-            and a.preset_num = #{presetId, jdbcType=BIGINT}
+            and a.preset_num = #{presetNum, jdbcType=INTEGER}
         limit 1
     </select>
 
