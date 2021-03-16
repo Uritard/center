@@ -472,7 +472,7 @@ public class DataDealThread implements Runnable {
                                                     log.info("一层判断" + (alarmNote != null && "1".equals(alarmNote)));
                                                     log.info("二层判断" + (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel));
 
-                                                    if (alarmNote != null && "1".equals(alarmNote)) {
+                                                    if (Objects.nonNull(alarmNote) && "1".equals(alarmNote)) {
                                                         if (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel) {
                                                             //webSocket通知前端调用查询告警弹框的接口
                                                             Map<String, Object> jasonMaps2 = new HashMap<>();
