@@ -91,9 +91,6 @@ public class TaskShutDownJob extends QuartzJobBean {
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
             TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
             log.info("tCruiseResult:----"+tCruiseResult);
-            if(tCruiseResult != null && !(tCruiseResult.getCState() == 240)){
-                return;
-            }
 
 //            String taskId = context.getMergedJobDataMap().getString("taskId");
 //            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务

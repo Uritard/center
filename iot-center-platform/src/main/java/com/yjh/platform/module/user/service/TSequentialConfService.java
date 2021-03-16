@@ -64,9 +64,6 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TSequentialConf tSequentialConf) {
         TSequentialConf old = tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId());
-        log.info("old.getCameraId():"+old.getCameraId());
-        log.info("tSequentialConf.getCameraId():"+tSequentialConf.getCameraId());
-        log.info("判断:"+(old.getCameraId() != tSequentialConf.getCameraId()));
         if(!old.getCameraId().equals(tSequentialConf.getCameraId())){
             List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
             if(cameraIdList != null && cameraIdList.size() >0 && cameraIdList.contains(tSequentialConf.getCameraId())){
