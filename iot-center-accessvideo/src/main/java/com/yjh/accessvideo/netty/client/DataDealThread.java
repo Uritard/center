@@ -124,18 +124,6 @@ public class DataDealThread implements Runnable {
                     JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
                     log.info("数据****：" + jsonObjectResult);//打印resultInfo
 
-                    //处理判别结果
-                    //获取分析结果图片地址
-                    String taskId = jsonObjectResult.get("taskId").toString();
-                    Long instanceId = Long.valueOf(jsonObjectResult.get("instanceId").toString());
-                    String resultImage = jsonObjectResult.get("analyseResultImg").toString();
-                    String analyseType=jsonObjectResult.get("analyseType").toString();
-                    if (analyseType.equals("11")) {
-                        if (resultImage.equals("")) {
-                            // TODO: 2021/2/6 联调时修改完善
-                            continue;
-                        }
-                    }
 
 
                     //初始化TASKID和INSTANCEID
@@ -160,6 +148,7 @@ public class DataDealThread implements Runnable {
                     String alarm_level = "";
 
 
+
                     log.info("数据初始化");
 
                     //redis数据键名由taskId+instanceId命名
@@ -178,6 +167,24 @@ public class DataDealThread implements Runnable {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
+                    //处理判别结果
+                    //获取分析结果图片地址
+                    String taskId = jsonObjectResult.get("taskId").toString();
+                    Long instanceId = Long.valueOf(jsonObjectResult.get("instanceId").toString());
+                    String resultImage=cruiseResult.get("picpath").toString();
+                    if(Objects.nonNull(jsonObjectResult.get("analyseResultImg"))) {
+                        resultImage = jsonObjectResult.get("analyseResultImg").toString();
+                    }
+                    String analyseType = jsonObjectResult.get("analyseType").toString();
+                    if (analyseType.equals("11")) {
+                        if (resultImage.equals("")) {
+                            // TODO: 2021/2/6 联调时修改完善
+                            continue;
+                        }
+                    }
+
+
+
                     log.info("端口号：" + remotePort);
 
                     try {
@@ -187,11 +194,14 @@ public class DataDealThread implements Runnable {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-2");
                                 }
                                 //表计识别图片放入缓存(已考虑双算法)
-                                String analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
-                                if(recognitionMode.equals("-1") || recognitionMode.equals("-2")){
-                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName,"picpath",redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName,"picpath").toString()+","+analyseResultPic);
-                                }else {
-                                    redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
+                                if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && jsonObjectResult.get("analyseResultImg").toString().equals("") ){
+                                    String analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
+                                    if(recognitionMode.equals("-1") || recognitionMode.equals("-2")) {
+                                        log.info("双算法-第二算法图片生成-M");
+                                        redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath").toString() + "," + analyseResultPic);
+                                    }else {
+                                        redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
+                                    }
                                 }
 
 
@@ -323,6 +333,12 @@ public class DataDealThread implements Runnable {
                                                         warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "数据异常");
                                                         warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                         log.info("数字结果告警判断结果：" + warnRuleMeter);
+
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "异常告警", alarmValue);
+                                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+
                                                         switch (warnRuleMeter) {
                                                             case 1:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
@@ -371,10 +387,6 @@ public class DataDealThread implements Runnable {
                                                         cruiseResultMap.put("isWarn", "1");
                                                         log.info("告警Map:" + warnMap);
 
-                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "异常告警", alarmValue);
-                                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
-                                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
-                                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                                        tAbnormal++;
                                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
@@ -544,6 +556,7 @@ public class DataDealThread implements Runnable {
                                 //获取算法标定结果图片并放入缓存（已考虑双算法情况）
                                 String analyseResultImg = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content").toString());
                                 if(recognitionMode.equals("-1") || recognitionMode.equals("-2")){
+                                    log.info("双算法-第二算法图片生成-D");
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName,"picpath",redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName,"picpath").toString()+","+analyseResultImg);
                                 }else {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultImg);
