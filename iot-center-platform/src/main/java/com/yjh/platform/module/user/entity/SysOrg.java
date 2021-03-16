@@ -68,8 +68,9 @@ public class SysOrg implements Serializable {
 
     @Max(value=999999999)
     @ApiModelProperty(value = "层级")
-    @Length(max = 255,message = "orgPath长度必须小于等于255")
     private Integer orgLevel;
+
+    @Length(max = 255,message = "orgPath长度必须小于等于255")
     @TableField(value = "org_path",updateStrategy = FieldStrategy.IGNORED)
     private String orgPath;
 
