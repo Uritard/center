@@ -9,6 +9,7 @@ import com.yjh.platform.module.user.entity.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.Max;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +51,8 @@ public class Constant {
 
     public static final String DIAGNOSE_CHANNEL_GET="http://iot-center-accessvqd/channelOperate/v1/getChannel?channelId={channelId}";
 
+    public static final String DIAGNOSE_CHANNEL_DELETE="http://iot-center-accessvqd/channelOperate/v1/deleteChannel?channelId={channelId}";
+
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
@@ -83,6 +86,11 @@ public class Constant {
         //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url,Result.class,channelId);
         return re;
+    }
+
+    //跨服删除
+    public static void crossServerDelete(String url, Map map){
+        StaticContextAccessor.getBean(ServiceRestTemplate.class).delete(url,map);
     }
 
     public static Map<String,Object> sequentialState = new HashMap<>();

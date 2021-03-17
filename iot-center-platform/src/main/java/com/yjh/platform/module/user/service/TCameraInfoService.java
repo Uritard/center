@@ -98,6 +98,11 @@ public class TCameraInfoService {
                 return -1;
             }
         }
+        Map<String,String> channelMap=new HashMap<>();
+        channelMap.put("channelId", tCameraInfoDao.selectMonitorId(cameraId));
+        if(Objects.nonNull(channelMap.get("channelId"))) {
+            Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
+        }
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
         return this.intoRedis();
     }
@@ -110,11 +115,20 @@ public class TCameraInfoService {
             if(haveList != null && haveList.size()>0){
                 return -1;
             }
+
+            Map<String,String> channelMap=new HashMap<>();
+            channelMap.put("channelId", tCameraInfoDao.selectMonitorId(Long.valueOf(item)));
+            if(Objects.nonNull(channelMap.get("channelId"))) {
+                Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
+            }
+
         }
         int i = this.tCameraInfoDao.deleteSelectedCamera(list);
         this.intoRedis();
         return i;
     }
+
+
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraInfo tCameraInfo) {
@@ -123,8 +137,30 @@ public class TCameraInfoService {
             log.info("channelId----------:"+tCameraInfo.getMonitorId());
             Result result=Constant.otherServerGet(tCameraInfo.getMonitorId(),Constant.DIAGNOSE_CHANNEL_GET);
             log.info("result------------:"+result.getMessage());
-            Channel channel=(Channel)result.getData();
-
+            Map<String,String> channels=(Map<String,String>)result.getData();
+            log.info("channels-----"+channels);
+            Channel channel=new Channel();
+            channel.setId(channels.get("id"));
+            channel.setCheckFlag(channels.get("checkFlag"));
+            channel.setSignalPoint(channels.get("signalPoint"));
+            channel.setBlurPoint(channels.get("blurPoint"));
+            channel.setContrastPoint(channels.get("contrastPoint"));
+            channel.setBrightPoint(channels.get("brightPoint"));
+            channel.setDarkPoint(channels.get("darkPoint"));
+            channel.setChromaPoint(channels.get("chromaPoint"));
+            channel.setMonoPoint(channels.get("monoPoint"));
+            channel.setNoisePoint(channels.get("noisePoint"));
+            channel.setStreakPoint(channels.get("streakPoint"));
+            channel.setFreezePoint(channels.get("freezePoint"));
+            channel.setShakePoint(channels.get("shakePoint"));
+            channel.setFlashPoint(channels.get("flashPoint"));
+            channel.setScenePoint(channels.get("scenePoint"));
+            channel.setCoverPoint(channels.get("coverPoint"));
+            channel.setPtzPoint(channels.get("ptzPoint"));
+            channel.setStreamType(channels.get("streamType"));
+            channel.setProtocol(channels.get("protocol"));
+            channel.setDevType(channels.get("devType"));
+            channel.setDevBrand(channels.get("devBrand"));
             channel.setIp(recorder.getRecordIp());
             channel.setPort(recorder.getHttpPort().toString());
             channel.setUserName(recorder.getIdentityManager());
@@ -132,7 +168,8 @@ public class TCameraInfoService {
             Integer realChannelNum=tCameraInfo.getChannelNum()+32;
             channel.setChanIndex(realChannelNum.toString());
 
-            Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+            Result result1=Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+            log.info("re========:"+result1.getData());
         }catch (Exception e){
             log.error("监测点修改失败："+e);
             return 0;

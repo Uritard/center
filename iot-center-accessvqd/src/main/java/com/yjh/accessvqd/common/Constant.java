@@ -19,6 +19,8 @@ public class Constant {
     // TODO: 2021/3/12 是否可配
     public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
 
+    public static final String START_PLAY_BACK="http://iot-center-accessvideo/camera/v1/startPlayBack?cameraId={cameraId}&startTime={startTime}&stopTime={stopTime}";
+
     public static Result otherServer(HashMap map, String url) throws Exception{
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
