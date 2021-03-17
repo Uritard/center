@@ -85,7 +85,7 @@ public class TaskShutDownJob extends QuartzJobBean {
 
     public void executeInternal(JobExecutionContext context) {
         try {
-            Thread.sleep(16000);
+            //Thread.sleep(16000);
 
             String taskId = context.getMergedJobDataMap().getString("taskId");
             TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务

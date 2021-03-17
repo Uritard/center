@@ -24,7 +24,7 @@ public interface TRobotCameraPresetDao {
                                 @Param(value = "robotCode") String robotCode,
                                 @Param(value = "presetName") String presetName,
                                 @Param(value = "creatorTime") Date creatorTime,
-                                @Param(value = "remark") String remark);
+                                @Param(value = "cameraType") Integer cameraType);
     List<TRobotCameraPreset> selectByPage(@Param(value = "presetNum") Integer presetNum,
                                     @Param(value = "presetName") String presetName);
 

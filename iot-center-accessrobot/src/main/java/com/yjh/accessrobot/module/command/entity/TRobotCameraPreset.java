@@ -44,8 +44,10 @@ public class TRobotCameraPreset implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date creatorTime;
 
-    @ApiModelProperty(value = "备注")
-    private String remark;
+    @ApiModelProperty(value = "机器人摄像机类型")
+    private Integer cameraType;
+
+    private String cameraName;
 
     private Integer presetNum;
 

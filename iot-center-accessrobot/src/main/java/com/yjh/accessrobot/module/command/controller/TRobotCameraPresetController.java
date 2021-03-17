@@ -115,10 +115,10 @@ public class TRobotCameraPresetController {
                             @RequestParam(value = "robotCode", required = false) String robotCode,
                             @RequestParam(value = "presetName", required = false) String presetName,
                             @RequestParam(value = "creatorTime", required = false) Date creatorTime,
-                            @RequestParam(value = "remark", required = false) String remark) {
+                            @RequestParam(value = "cameraType", required = false) Integer cameraType) {
         Result result = new Result();
         try {
-            List<TRobotCameraPreset> list = tRobotCameraPresetService.select(presetId,presetNum, robotId, robotCode, presetName, creatorTime, remark);
+            List<TRobotCameraPreset> list = tRobotCameraPresetService.select(presetId,presetNum, robotId, robotCode, presetName, creatorTime, cameraType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
