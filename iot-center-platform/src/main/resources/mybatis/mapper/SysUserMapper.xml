@@ -111,7 +111,7 @@
         <if test="trueName != null ">a.true_name = #{trueName},</if>
         <if test="userType != null">a.user_type = #{userType, jdbcType=INTEGER},</if>
         <if test="sex != null">a.sex = #{sex, jdbcType=INTEGER},</if>
-        <if test="eMail != null">a.e_mail = #{eMail},</if>
+        <if test="eMail != null">a.e_mail = #{eMail, jdbcType=VARCHAR},</if>
         <if test="workNo != null">a.work_no = #{workNo},</if>
         <if test="faceId != null">a.face_id = #{faceId},</if>
         <if test="fingerId != null ">a.finger_id = #{fingerId},</if>

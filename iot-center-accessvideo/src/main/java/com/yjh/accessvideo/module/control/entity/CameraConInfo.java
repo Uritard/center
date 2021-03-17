@@ -1,6 +1,5 @@
 package com.yjh.accessvideo.module.control.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -8,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author YC
@@ -43,13 +41,28 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "服务器地址")
     private String recordIp;
 
-    @ApiModelProperty(value = "用户名")
+    @ApiModelProperty(value = "NVR用户名")
     private String identityManager;
 
-    @ApiModelProperty(value = "密码")
+    @ApiModelProperty(value = "NVR密码")
     private String identityCode;
 
     @ApiModelProperty(value = "控制端口")
     private Integer rtspPort;
+
+    @ApiModelProperty(value = "相机用户名")
+    private String cameraManager;
+
+    @ApiModelProperty(value = "相机密码")
+    private String cameraCode;
+
+    @ApiModelProperty(value = "相机IP")
+    private String cameraIp;
+
+    @ApiModelProperty(value = "相机通道号")
+    private Integer cameraChannelNum;
+
+    @ApiModelProperty(value = "相机控制端口")
+    private Integer port;
 
 }
