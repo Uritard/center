@@ -45,7 +45,7 @@ public class TStdDeviceMete implements Serializable {
     @Length(max = 50, message = "customId长度必须小于等于50")
     private String customId;
 
-    @Max(value = 999999999)
+    @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
     private Integer meteKind;
@@ -53,7 +53,7 @@ public class TStdDeviceMete implements Serializable {
     @Length(max = 50, message = "meteKindName长度必须小于等于50")
     private String meteKindName;
 
-    @Max(value = 99)
+    @Max(value = 99999999)
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
 
@@ -62,11 +62,11 @@ public class TStdDeviceMete implements Serializable {
     @TableField(value = "mete_name",updateStrategy = FieldStrategy.IGNORED)
     private String meteName;
 
-    @Max(value = 99)
+    @Max(value = 9999)
     @ApiModelProperty(value = "外观类型")
     private Integer appearanceType;
 
-    @Max(value = 99999999)
+    @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
 
