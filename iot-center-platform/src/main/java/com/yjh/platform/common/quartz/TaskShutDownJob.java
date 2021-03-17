@@ -350,7 +350,13 @@ public class TaskShutDownJob extends QuartzJobBean {
             tCruiseTaskResult.setCruiseTaskTime(format.parse(mapForGet.get("taskStart")));
             tCruiseTaskResult.setTaskStatus(242);
             tCruiseTaskResult.setCruiseResult(247);
-            tCruiseTaskResultDao.insert(tCruiseTaskResult);
+            TCruiseTaskResult tCruiseTaskResultForIsIn = tCruiseTaskResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
+            if(tCruiseTaskResultForIsIn != null){
+                tCruiseTaskResultDao.update(tCruiseTaskResult);
+            }else {
+                tCruiseTaskResultDao.insert(tCruiseTaskResult);
+            }
+
 
 
             Map<String,Object> jasonMapOnFinished=new HashMap<>();
