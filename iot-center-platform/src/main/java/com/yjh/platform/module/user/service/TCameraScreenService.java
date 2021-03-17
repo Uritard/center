@@ -207,7 +207,7 @@ public class TCameraScreenService{
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName,Integer flag) {
         List<AreaInfoDetail> listTree = new ArrayList<>();
-        listTree = tCameraScreenDao.selectCameraTreeDevice(cameraName);
+        listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName);
         List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
         for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
             AreaInfoDetail areaInfoMap = it.next();

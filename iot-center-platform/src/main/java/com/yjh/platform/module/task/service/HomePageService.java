@@ -8,6 +8,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.service.SystemInfoService;
+import com.yjh.platform.module.task.controller.HomePageController;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.entity.*;
@@ -22,6 +23,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,9 @@ import java.util.*;
  */
 @Service
 public class HomePageService {
+
+
+    private Logger log = LoggerFactory.getLogger(HomePageService.class);
 
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
@@ -92,6 +98,7 @@ public class HomePageService {
     public List<TaskOnExecuteInfo> taskOnExecute()throws ParseException {
         //查出正在执行的任务
         List<TaskOnExecuteInfo> listTask=tCruiseTaskDao.selectTaskOnExecute();
+        log.info("任务list: "+listTask);
         for (TaskOnExecuteInfo item: listTask) {
             CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(item.getTaskId());
             item.setAlarmCount(cruiseResultCounter.getAlarmCount());
