@@ -188,7 +188,7 @@ public class RobotController {
     public Result methodTest(@RequestParam(value = "taskId",required = false) String taskId){
         Result result = new Result();
         try {
-            result.setData(robotService.methodTest(taskId));
+            result.setData(robotService.methodTest1(taskId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

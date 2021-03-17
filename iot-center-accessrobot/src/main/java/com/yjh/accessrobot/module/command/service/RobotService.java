@@ -680,7 +680,7 @@ public class RobotService {
         //删除已经入库的点
         if (isFinishedInstanceList != null && !isFinishedInstanceList.isEmpty()) {
             for (Long instanceIdInTable : isFinishedInstanceList) {
-                allInstanceIdList.remove(instanceIdInTable);
+                allInstanceIdList.remove(instanceIdInTable.toString());
             }
         }
         log.info("删除已经入库的巡视点后==="+allInstanceIdList);
@@ -1176,7 +1176,7 @@ public class RobotService {
     public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
         return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
     }
-    public int methodTest(String taskId){
+    public int methodTest1(String taskId){
         Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
         String webSocketUrl = webSocketUrlMap.get("content");
         Map<String, Object> jasonMap = new HashMap<>();
