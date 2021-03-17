@@ -54,8 +54,8 @@ public class TRobotCameraPresetService{
 
     //@Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotCameraPreset> select(Long presetId,Integer presetNum, Long robotId, String robotCode, String presetName, Date creatorTime, String remark) {
-        List<TRobotCameraPreset> tRobotCameraPresetList = tRobotCameraPresetDao.select(presetId, presetNum, robotId, robotCode, presetName, creatorTime, remark);
+    public List<TRobotCameraPreset> select(Long presetId,Integer presetNum, Long robotId, String robotCode, String presetName, Date creatorTime, Integer cameraType) {
+        List<TRobotCameraPreset> tRobotCameraPresetList = tRobotCameraPresetDao.select(presetId, presetNum, robotId, robotCode, presetName, creatorTime, cameraType);
         return tRobotCameraPresetList;
     }
 

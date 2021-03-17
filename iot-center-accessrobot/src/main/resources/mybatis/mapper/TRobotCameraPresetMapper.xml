@@ -10,7 +10,7 @@
         <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
         <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
         <result column="creator_time" jdbcType="TIMESTAMP" property="creatorTime" />
-        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -27,7 +27,7 @@
             robot_code,
             preset_name,
             creator_time,
-            remark
+            camera_type
         )values(
                 #{presetId, jdbcType=BIGINT},
                 #{presetNum, jdbcType=INTEGER},
@@ -35,7 +35,7 @@
                 #{robotCode, jdbcType=VARCHAR},
                 #{presetName, jdbcType=VARCHAR},
                 #{creatorTime, jdbcType=TIMESTAMP},
-                #{remark, jdbcType=VARCHAR}
+                #{cameraType, jdbcType=INTEGER}
         )
     </insert>
 
@@ -47,12 +47,12 @@
     <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
         update t_robot_camera_preset a <set>
         <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
-        <if test="presetNum != null and presetNum != ''">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
+        <if test="presetNum != null">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
         <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="robotCode != null and robotCode != ''">a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
         <if test="presetName != null and presetName != ''">a.preset_name = #{presetName, jdbcType=VARCHAR},</if>
         <if test="creatorTime != null and creatorTime != ''">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}
     </update>
@@ -65,7 +65,7 @@
         a.robot_code,
         a.preset_name,
         a.creator_time,
-        a.remark
+        a.camera_type
         from t_robot_camera_preset a
         where 1 = 1
             and a.preset_id = #{presetId, jdbcType=BIGINT}
@@ -80,16 +80,16 @@
         a.robot_code,
         a.preset_name,
         a.creator_time,
-        a.remark
+        a.camera_type
         from t_robot_camera_preset a
         where 1 = 1
         <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
-        <if test="presetNum != null and presetNum != ''"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="presetNum != null"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
         <if test="presetName != null and presetName != ''"> and a.preset_name = #{presetName, jdbcType=VARCHAR}</if>
         <if test="creatorTime != null and creatorTime != ''"> and a.creator_time = #{creatorTime, jdbcType=TIMESTAMP}</if>
-        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset" resultType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
@@ -101,7 +101,10 @@
         a.robot_code,
         a.preset_name,
         a.creator_time,
-        a.remark
+        (CASE
+        WHEN a.camera_type = 1 THEN "机器人可见光"
+        WHEN a.camera_type = 2 THEN "机器人红外"
+        END)as cameraName
         from t_robot_camera_preset a
         left join t_robot_info b on a.robot_id = b.robot_id
         where 1 = 1
@@ -117,7 +120,7 @@
             robot_code,
             preset_name,
             creator_time,
-            remark
+        camera_type
         )values
         <foreach collection="list" item="TRobotCameraPreset" separator=",">
             (
@@ -127,7 +130,7 @@
                 #{TRobotCameraPreset.robotCode, jdbcType=VARCHAR},
                 #{TRobotCameraPreset.presetName, jdbcType=VARCHAR},
                 #{TRobotCameraPreset.creatorTime, jdbcType=TIMESTAMP},
-                #{TRobotCameraPreset.remark, jdbcType=VARCHAR}
+                #{TRobotCameraPreset.cameraType, jdbcType=INTEGER}
             )
         </foreach>
     </insert>
@@ -149,7 +152,7 @@
         a.robot_code,
         a.preset_name,
         a.creator_time,
-        a.remark
+        a.camera_type
         from t_robot_camera_preset a
         where 1 = 1
             and a.preset_num = #{presetNum, jdbcType=INTEGER}

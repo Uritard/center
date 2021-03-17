@@ -254,7 +254,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     robotTask(robotTaskInfoMap);
                 }
 
-                log.info("开始巡检"+new Date());
+                log.info("开始巡检"+new Date()+"--"+tCruiseTask.getTaskId());
 
                 List<String> cruiseResultIdList = new ArrayList<>();
                 int countForInstance = 0;

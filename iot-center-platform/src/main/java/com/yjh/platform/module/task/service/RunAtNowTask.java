@@ -267,7 +267,7 @@ public class RunAtNowTask implements Runnable{
                 quartzTaskForAre.setStartTime(sd.parse(s));
                 JobManager jobManager =new JobManager();
                 jobManager.checkTaskIsOver(quartzTaskForAre, tCruiseTask.getTaskId());
-                log.info("检查任务超期任务创建成功");
+                log.info("检查任务超期任务创建成功"+tCruiseTask.getTaskId());
             } catch (Exception e) {
                 log.info("检查任务超期任务创建失败"+e); }
 
@@ -282,7 +282,7 @@ public class RunAtNowTask implements Runnable{
             }
             log.info("robotCruiseList   :" +robotCruiseList);
             List<Long> robotTaskInstanceList = new ArrayList<>();
-            if(robotCruiseList.size() != 0  && !isGoOn){
+            if(robotCruiseList.size() > 0  && !isGoOn){
                 List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 log.info("robotCode   :" +robotCode);
@@ -307,16 +307,18 @@ public class RunAtNowTask implements Runnable{
             }
 
             if(isGoOn){
-                List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
-                for (String item: robotCode){
-                    robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
-                    for(Long itemLong:robotTaskInstanceList){
-                        instancesList.remove(itemLong);
+                if(robotCruiseList.size() > 0) {
+                    List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+                    for (String item : robotCode) {
+                        robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList, item);
+                        for (Long itemLong : robotTaskInstanceList) {
+                            instancesList.remove(itemLong);
+                        }
                     }
                 }
             }
 
-            log.info("开始巡检"+new Date());
+            log.info("开始巡检"+new Date()+"--"+tCruiseTask.getTaskId());
 
             List<String> cruiseResultIdList = new ArrayList<>();
             int countForInstance = 0;
