@@ -21,21 +21,26 @@ public class VoiceDeviceAllInfo {
 
     private static final long serialVersionUID = 1L;
 
+    @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "声纹监控设备Id（默认为Ip地址）")
     private Long voiceDeviceId;
 
+    @Length(max = 255, message = "voiceDeviceName长度必须小于等于255")
     @ApiModelProperty(value = "声纹监控设备名称（）")
     private String voiceDeviceName;
 
+    @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "变压器下面换流变的设备Id")
     private Long stdDeviceId;
 
+    @Length(max = 64, message = "deviceType长度必须小于等于64")
     @ApiModelProperty(value = "被监测的设备类型")
     private String deviceType;
 
-    @Length(max = 32, message = "configId长度必须小于等于32")
+    @Max(value = 999999999999999999l)
     private Long configId;
 
+    @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "上级区域id")
     private Long upRegionId;
 

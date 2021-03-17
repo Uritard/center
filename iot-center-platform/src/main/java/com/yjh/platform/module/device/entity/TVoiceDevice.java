@@ -23,7 +23,7 @@ public class TVoiceDevice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Length(max = 64, message = "voiceDeviceId长度必须小于等于64")
+    @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "声纹监控设备Id（默认为Ip地址）")
     private Long voiceDeviceId;
 
