@@ -618,7 +618,7 @@
             SELECT
             a.instance_id,
             b.device_mete_id,
-            a.cruise_time,
+            a.cruise_time as update_time,
             d.picpath,
             d.cruise_result,
             d.identify_result

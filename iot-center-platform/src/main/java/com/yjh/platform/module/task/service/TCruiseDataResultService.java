@@ -205,10 +205,10 @@ public class TCruiseDataResultService {
         log.info("cruiseResultIdList==="+cruiseResultIdList);
         if (cruiseResultIdList != null && !cruiseResultIdList.isEmpty()) {
             List<TStdDeviceMeteUpdate> list = tCruiseDataResultDao.selectDeviceMeteList(cruiseResultIdList);
+            log.info("list==="+list);
 
             for (TStdDeviceMeteUpdate res : list){
                 List<Long> deviceMeteIdList = tCruiseDataResultDao.selectAllDeviceMeteId();
-                log.info("deviceMeteIdList==="+deviceMeteIdList);
                 TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
                         .setDeviceMeteId(res.getDeviceMeteId())
                         .setIdentifyResult(res.getIdentifyResult());
