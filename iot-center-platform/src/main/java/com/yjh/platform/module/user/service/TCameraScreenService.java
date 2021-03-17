@@ -181,6 +181,100 @@ public class TCameraScreenService{
                             }
                         }
                     }
+                    childrenList.add(areaInfoTem);
+                }
+            }
+            if (childrenList.size()>0 ) {
+                areaInfo.setChildren(childrenList);
+                diGui(childrenList, listTree,map,flag);
+            }
+        }
+    }
+    private static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+            }
+        } catch (Exception e) {
+
+        }
+        return re;
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName,Integer flag) {
+        List<AreaInfoDetail> listTree = new ArrayList<>();
+        listTree = tCameraScreenDao.selectCameraTreeDevice(cameraName);
+        List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
+        for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
+            AreaInfoDetail areaInfoMap = it.next();
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+                AreaInfoDetail areaInfoCountry = new AreaInfoDetail();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountryList.add(areaInfoCountry);
+            }
+        }
+        Map<String,String> map = new HashMap<>();
+        //获取相机的状态
+        List<Map<String,String>> listForState = new ArrayList<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
+            map.putAll((Map<String,String>)re.getData());
+        }
+//        for(Map<String,String> item:listForState){
+//            map.putAll(item);
+//        }
+        diGuiWithRobot(areaInfoCountryList, listTree,map,flag);
+        return areaInfoCountryList;
+    }
+    private void diGuiWithRobot(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,String> map,Integer flag) {
+        for(AreaInfoDetail areaInfo : areaInfoList){
+            List<AreaInfoDetail> childrenList = new ArrayList<>();
+            for(Iterator<AreaInfoDetail> it = listTree.iterator();it.hasNext();){
+                AreaInfoDetail areaInfoMap = it.next();
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                    AreaInfoDetail areaInfoTem = new AreaInfoDetail();
+                    areaInfoTem.setId(areaInfoMap.getId());
+                    areaInfoTem.setUpId(areaInfoMap.getUpId());
+                    areaInfoTem.setLabel(areaInfoMap.getLabel());
+                    areaInfoTem.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    if("camera".equals(areaInfoMap.getInfoType())){
+                        if(map.get(areaInfoMap.getId().toString()) != null){
+                            areaInfoTem.setState(Integer.valueOf(map.get(areaInfoMap.getId().toString())));
+                        }else {
+                            areaInfoTem.setState(0);
+                        }
+                        if(flag != null && flag == 1){
+                            if(1 == areaInfoTem.getState()){
+                                //在线
+                                childrenList.add(areaInfoTem);
+                                continue;
+                            }else {
+                                continue;
+                            }
+                        }
+                        if(flag != null && flag == 0){
+                            if(0 == areaInfoTem.getState()){
+                                //不在线
+                                childrenList.add(areaInfoTem);
+                                continue;
+                            }else {
+                                continue;
+                            }
+                        }
+                    }
                     if("robot".equals(areaInfoMap.getInfoType())){
                         //机器人
                         TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(areaInfoMap.getId());
@@ -232,24 +326,10 @@ public class TCameraScreenService{
             }
             if (childrenList.size()>0 ) {
                 areaInfo.setChildren(childrenList);
-                diGui(childrenList, listTree,map,flag);
+                diGuiWithRobot(childrenList, listTree,map,flag);
             }
         }
     }
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
-
-        }
-        return re;
-    }
-
-
 
 }
 

@@ -187,7 +187,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //                    +"-"+Integer.valueOf(new BigInteger(udp[weizhi+1+commitLength+7],16).toString());
 //            long day= Long.valueOf(shijianchuo,16);
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//这个是你要转成后的时间的格式
-            String time = getCP56time2a(shijianchuo);
+            String time = TimeScale(shijianchuo);
+            //String time2 =TimeScale(shijianchuo);
             log.info("time:  "+time);
 
             TCfgDataCurrent tCfgDataCurrent = tCfgMeteService.selectByPrimaryIdTCfgDataCurrent(meteId.toString());
@@ -313,6 +314,27 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
        + "-" + Integer.parseInt(str.substring(8, 10), 16) + " " + Integer.parseInt(str.substring(6, 8), 16)
              + ":" + Integer.parseInt(str.substring(4, 6), 16) + ":"
              + Integer.parseInt(str.substring(2, 4) + "" + str.substring(0, 2), 16) / 1000;
+    }
+
+    private  String TimeScale(String str) {
+        StringBuilder result = new StringBuilder();
+
+        int year = Integer.parseInt(str.substring(12, 14), 16) & 0x7F;
+        int month = Integer.parseInt(str.substring(10, 12), 16) & 0x0F;
+        int day = Integer.parseInt(str.substring(8, 10), 16) & 0x1F;
+        int week = (Integer.parseInt(str.substring(8, 10), 16) & 0xE0) / 32;
+        int hour = Integer.parseInt(str.substring(6, 8), 16) & 0x1F;
+        int minute = Integer.parseInt(str.substring(4, 6), 16) & 0x3F;
+        int second = (Integer.parseInt(str.substring(2, 4), 16) << 8) + Integer.parseInt(str.substring(0, 2), 16);
+
+        result.append("20");
+        result.append(year).append("-");
+        result.append(String.format("%02d", month)).append("-");
+        result.append(String.format("%02d", day)).append(" ");
+        result.append(hour).append(":").append(minute).append(":");
+        result.append(second / 1000 );
+
+        return result.toString();
     }
 
 
