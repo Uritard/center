@@ -14,6 +14,14 @@ import com.yjh.logs.module.log.entity.SysLogDetail;
 import com.yjh.logs.module.log.service.SysLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +31,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -48,6 +60,20 @@ public class SysLogController {
 
     public SysLogController(SysLogService sysOperateLogService) {
         this.sysLogService = sysOperateLogService;
+    }
+
+
+    //请求webSocket发送方法
+    public String postUrl(String url, String json) throws IOException, URISyntaxException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
     }
 
     @ApiOperation(value = "插入")
@@ -194,7 +220,8 @@ public class SysLogController {
                 String json = JSON.toJSONString(errMessage);
                 new Thread(() -> {
                     try {
-                        Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
+                        postUrl(Constant.WEB_SCOKET, json);
+                        // Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
                     } catch (Exception e) {
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
                         log.error("发送失败：" + e);

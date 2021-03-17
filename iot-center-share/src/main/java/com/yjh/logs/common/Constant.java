@@ -52,6 +52,6 @@ public class Constant {
 
     public static final String TYPE_104 = "104";
 
-    public static final String WEB_SCOKET = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket?json={json}";
+    public static final String WEB_SCOKET = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket";
 
 }
