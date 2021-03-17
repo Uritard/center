@@ -186,6 +186,7 @@ public class TCameraScreenController {
         Result result = new Result();
         try {
             result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
+            //result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

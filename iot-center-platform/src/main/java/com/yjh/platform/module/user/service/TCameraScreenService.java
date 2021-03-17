@@ -287,8 +287,10 @@ public class TCameraScreenService{
                         lightCamera.setUpId(areaInfoMap.getId());
                         lightCamera.setUpName(tRobotInfo.getRobotCode());
                         if("在线".equals(tRobotInfo.getRobotStatus())){
+                            areaInfoTem.setState(1);
                             lightCamera.setState(1);
                         }else {
+                            areaInfoTem.setState(0);
                             lightCamera.setState(0);
                         }
 
@@ -307,8 +309,10 @@ public class TCameraScreenService{
                         redCamera.setUpId(areaInfoMap.getId());
                         redCamera.setUpName(tRobotInfo.getRobotCode());
                         if("在线".equals(tRobotInfo.getRobotStatus())){
+                            areaInfoTem.setState(1);
                             redCamera.setState(1);
                         }else {
+                            areaInfoTem.setState(0);
                             redCamera.setState(0);
                         }
 
@@ -320,6 +324,17 @@ public class TCameraScreenService{
                             }
                         }
                         areaInfoTem.setChildren(robotCameraList);
+                        if(flag != null){
+                            if((flag == 1 || flag == 0)){
+                                if(flag == areaInfoTem.getState()){
+                                    childrenList.add(areaInfoTem);
+                                }
+                                continue;
+                            }else {
+                                childrenList.add(areaInfoTem);
+                                continue;
+                            }
+                        }
                     }
                     childrenList.add(areaInfoTem);
                 }
