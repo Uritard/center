@@ -64,7 +64,8 @@ public class SysLogController {
 
 
     //请求webSocket发送方法
-    public String postUrl(String url, String json) throws IOException, URISyntaxException {
+    public String postUrl(String json) throws IOException, URISyntaxException {
+        String url = redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content").toString();
         CloseableHttpClient client = HttpClients.createDefault();
         URI uri = new URIBuilder(url).setParameter("json", json).build();
         HttpPost httpPost = new HttpPost(uri);
@@ -220,7 +221,7 @@ public class SysLogController {
                 String json = JSON.toJSONString(errMessage);
                 new Thread(() -> {
                     try {
-                        postUrl(Constant.WEB_SCOKET, json);
+                        postUrl(json);
                         // Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
                     } catch (Exception e) {
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
