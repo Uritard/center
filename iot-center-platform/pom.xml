@@ -30,10 +30,10 @@
             <scope>provided</scope>
         </dependency>
         <!-- spring cloud eureka 注册中心客户端 暂时不需要-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.cloud</groupId>-->
-            <!--<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <!-- spring cloud zuul 网关 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
