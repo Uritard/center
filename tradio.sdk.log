@@ -1,0 +1,9 @@
+2021-03-17 10:06:34 INFO  tradio sdk version: 1.0.8 (Dec  7 2020 13:19:59)
+2021-03-17 10:06:34 INFO  tradio sdk version: 1.0.8 (Dec  7 2020 13:19:59)
+2021-03-17 10:06:34 TRACE [NET_TRADIO_Login:000000000105B730]: 192.168.33.214, 80
+2021-03-17 10:06:34 TRACE [NET_TRADIO_Login:000000002A8A7D30]: 125.156.20.22, 20
+2021-03-17 10:06:34 TRACE [NET_TRADIO_Login:00000000010AD1C0]: 192.168.20.2, 80
+2021-03-17 10:06:36 ERROR [DoGetDeviceInfo:000000002A8A7D30]: receive 0, failed to parse response message
+2021-03-17 10:06:36 ERROR [DoGetDeviceInfo:00000000010AD1C0]: receive 0, failed to parse response message
+2021-03-17 10:06:36 ERROR [DoGetDeviceInfo:000000000105B730]: receive 0, failed to parse response message
+tDeviceInfo:000000000105B730]: receive 0, failed to parse response message

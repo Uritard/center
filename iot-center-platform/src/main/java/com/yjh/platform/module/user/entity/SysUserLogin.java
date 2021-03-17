@@ -17,7 +17,6 @@ import java.util.Date;
  * @author tt
  * @since 2020-07-23
  */
-@Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "SysUser对象", description = "系统用户表")
@@ -33,6 +32,218 @@ public class SysUserLogin implements Serializable {
     @ApiModelProperty(value = "用户名")
     private String userName;
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getTrueName() {
+        return trueName;
+    }
+
+    public void setTrueName(String trueName) {
+        this.trueName = trueName;
+    }
+
+    public Integer getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Integer userType) {
+        this.userType = userType;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public String geteMail() {
+        return eMail;
+    }
+
+    public void seteMail(String eMail) {
+        this.eMail = eMail;
+    }
+
+    public String getWorkNo() {
+        return workNo;
+    }
+
+    public void setWorkNo(String workNo) {
+        this.workNo = workNo;
+    }
+
+    public String getFaceId() {
+        return faceId;
+    }
+
+    public void setFaceId(String faceId) {
+        this.faceId = faceId;
+    }
+
+    public String getFingerId() {
+        return fingerId;
+    }
+
+    public void setFingerId(String fingerId) {
+        this.fingerId = fingerId;
+    }
+
+    public String getVoiceId() {
+        return voiceId;
+    }
+
+    public void setVoiceId(String voiceId) {
+        this.voiceId = voiceId;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+    public String getUserTitle() {
+        return userTitle;
+    }
+
+    public void setUserTitle(String userTitle) {
+        this.userTitle = userTitle;
+    }
+
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public String getAppkey() {
+        return appkey;
+    }
+
+    public void setAppkey(String appkey) {
+        this.appkey = appkey;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public Long getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(Long orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public Integer getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(Integer userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public Integer getInvalidTime() {
+        return invalidTime;
+    }
+
+    public void setInvalidTime(Integer invalidTime) {
+        this.invalidTime = invalidTime;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public Date getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(Date lockTime) {
+        this.lockTime = lockTime;
+    }
+
     @ApiModelProperty(value = "密码")
     private String password;
 
@@ -45,7 +256,7 @@ public class SysUserLogin implements Serializable {
     @ApiModelProperty(value = "性别0女，1 男，2未知")
     private Integer sex;
 
-    @ApiModelProperty(value = "email")
+    @ApiModelProperty(value = "eMail")
     private String eMail;
 
 
