@@ -129,7 +129,7 @@ public class ChanResultService {
     public List<DiagnoseResultDetail> selectDiagnoseResultByPage(String pointId, Date startTime, Date endTime, String diagnosePlanId, String status) throws Exception {
 
         List<DiagnoseResultDetail> details=new ArrayList<>();
-
+        Calendar calendar=Calendar.getInstance();
         log.info("details:---------" + details);
         log.info("result：" + details);
         //无任务时返回[]结果信息
@@ -141,15 +141,21 @@ public class ChanResultService {
             for (DiagnoseResultDetail detail : details) {
                 detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
                 checkItemsOperate(detail);
-                //获取视频地址
+                //获取回放视频地址
                 HashMap map=new HashMap();
+                calendar.setTime(detail.getCheckTime());
+                calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE)-1);
                 map.put("cameraId",detail.getCameraId());
-                String str=Constant.START_CAMERA_URL.replaceAll("iot-center-accessvideo", InetAddress.getLocalHost().getHostAddress()+":"+"18715");
+                map.put("startTime",calendar.getTime());
+                calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE)+3);
+                map.put("stopTime",calendar.getTime());
+                log.info("视频诊断视频Map----"+map);
+                String str=Constant.START_PLAY_BACK.replaceAll("iot-center-accessvideo", InetAddress.getLocalHost().getHostAddress()+":"+"18715");
                 log.info("url"+str);
                 Result result = Constant.otherServer(map, str);
-                Map<String, String> videoInfo = (Map<String, String>) result.getData();
-                detail.setRtmpUrl(videoInfo.get("rtmpUrl"));
-                detail.setFlvUrl(videoInfo.get("flvUrl"));
+                Map<String, Object> videoInfo = (Map<String, Object>) result.getData();
+                detail.setRtmpUrl(videoInfo.get("rtmpUrl").toString());
+                detail.setFlvUrl(videoInfo.get("flvUrl").toString());
                 switch (detail.getDevType()) {
                     case "0":
                         detail.setDevType("枪机");

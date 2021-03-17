@@ -324,7 +324,7 @@
         select camera_id
         from t_camera_info
     </select>
-    
+
     <select id="selectHavePreset" resultType="java.lang.Long">
         SELECT
             a.preset_id
@@ -337,5 +337,14 @@
     </select>
     <select id="selectPmsIdById" resultType="java.lang.String">
         SELECT a.pms_id FROM t_camera_info a where a.camera_id = #{cameraId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectMonitorId" parameterType="java.lang.Long" resultType="java.lang.String">
+                SELECT
+            monitor_id
+        FROM
+            t_camera_info
+        WHERE
+            camera_id = #{cameraId,jdbcType=BIGINT}
     </select>
 </mapper>

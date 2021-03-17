@@ -72,4 +72,6 @@ public interface TCameraInfoDao {
     List<Long>selectHavePreset(@Param(value = "cameraId") Long cameraId);
     List<String> selectAllPMSId();
     String selectPmsIdById(@Param(value = "cameraId") Long cameraId);
+    //相机ID查询视频诊断监测点ID
+    String selectMonitorId(@Param(value = "cameraId")Long cameraId);
 }
