@@ -555,7 +555,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                         defect(analysisMap);
                                     }
                                 }
-                                if("on".equals(tStdDevicemete.getIsAi())){
+                                if("on".equals(tStdDevicemete.getIsAi()) || "on".equals(tStdDevicemete.getIsJudge())){
                                     Analysis analysis = new Analysis();
                                     analysis.setTaskId(tCruiseTask.getTaskId());
                                     analysis.setInstanceId(item.getInstanceId());

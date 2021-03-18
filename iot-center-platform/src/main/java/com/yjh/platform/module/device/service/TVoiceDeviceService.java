@@ -305,6 +305,7 @@ public class TVoiceDeviceService{
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
         VoiceDeviceInfoDetail voiceDeviceInfoDetail = tVoiceDeviceDao.selectVoiceInfo(voiceDeviceId);
+        log.info("voiceDeviceInfoDetail: "+voiceDeviceInfoDetail);
 //        VoiceAnalyseThread voiceAnalyseThread = new VoiceAnalyseThread(voicePath,playTime.intValue(),voiceDeviceInfoDetail);
 //        Thread thread = new Thread(voiceAnalyseThread);
 //        thread.setDaemon(true);
