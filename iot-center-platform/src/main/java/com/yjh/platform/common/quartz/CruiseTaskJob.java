@@ -162,6 +162,16 @@ public class CruiseTaskJob extends QuartzJobBean {
                 Integer taskCount = instanceIdList.size();
                 List<TCruisePointInstanceNameDetail> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
                 //开始任务
+
+                Map<String,String> mapForAbnormal = new HashMap<>();
+                mapForAbnormal.put("all",taskCount.toString());
+                mapForAbnormal.put("abnormal","0");
+                mapForAbnormal.put("normal","0");
+                mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
+                mapForAbnormal.put("overDay",tasksAreTime.toString());
+                String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
+                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+
                 TCruiseResult tCruiseResult = new TCruiseResult();
                 tCruiseResult.setTaskResultId(uuid);
                 tCruiseResult.setTaskId(tCruiseTask.getTaskId());
@@ -184,14 +194,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                 tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
                 //tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
-                Map<String,String> mapForAbnormal = new HashMap<>();
-                mapForAbnormal.put("all",taskCount.toString());
-                mapForAbnormal.put("abnormal","0");
-                mapForAbnormal.put("normal","0");
-                mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
-                mapForAbnormal.put("overDay",tasksAreTime.toString());
-                String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
-                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
 
                 Integer taskAbnormal = 0;//异常数量
                 Integer taskNormal = 0;//正常

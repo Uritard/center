@@ -487,7 +487,7 @@
             ) c ON c.alarm_level = b.dict_code
         WHERE
             b.col_name = 'alarm_level'
-            order by alarmLevel 
+            order by alarmLevel
     </select>
 
     <select id="selectThereWarn" resultType="com.yjh.platform.module.task.entity.WarnInfoForHomePage">
