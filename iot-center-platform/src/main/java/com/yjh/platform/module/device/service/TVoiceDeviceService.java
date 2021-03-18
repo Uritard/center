@@ -210,6 +210,7 @@ public class TVoiceDeviceService{
                                                             VoiceDevice voiceFile = new VoiceDevice();
                                                             voiceFile.setUpId(date.getId());
                                                             voiceFile.setUpName(date.getLabel());
+                                                            voiceFile.setId(voiceFileList.get(k).getName());
                                                             voiceFile.setLabel(voiceFileList.get(k).getName());
                                                             voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName()+"/"+voiceFileList.get(k).getName());
                                                             voiceFile.setInfoType("file");
