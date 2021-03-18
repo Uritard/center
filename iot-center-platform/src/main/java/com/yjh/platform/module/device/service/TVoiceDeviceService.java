@@ -47,9 +47,9 @@ public class TVoiceDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int add(VoiceDeviceAllInfoDetail tVoiceDevice) {
-        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
-        if(tStdDevice != null){
-            tVoiceDevice.setDeviceType(tStdDevice.getDeviceType().toString());
+        List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
+        if(tStdDevice.size()!=0){
+            tVoiceDevice.setDeviceType(tStdDevice.get(0).getDeviceType().toString());
             //tVoiceDevice.setStationId(tStdDevice.getS)
         }else {
             return -1;
@@ -67,9 +67,9 @@ public class TVoiceDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(VoiceDeviceAllInfoDetail tVoiceDevice) {
-        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
-        if(tStdDevice != null){
-            tVoiceDevice.setDeviceType(tStdDevice.getDeviceType().toString());
+        List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
+        if(tStdDevice.size() != 0){
+            tVoiceDevice.setDeviceType(tStdDevice.get(0).getDeviceType().toString());
             //tVoiceDevice.setStationId(tStdDevice.getS)
         }else {
             return -1;

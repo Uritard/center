@@ -157,11 +157,11 @@ public class TCruiseTaskResultService {
         List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskId(taskId);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
-            TStdDevice tStdDevice = stdDeviceDao.selectByPrimaryId(cruiseInspectResult.getDeviceId());
-            if (tStdDevice.equals(null)) {
+            List<TStdDevice> tStdDevice = stdDeviceDao.selectByPrimaryId(cruiseInspectResult.getDeviceId());
+            if (tStdDevice.size()==0) {
                 cruiseInspectResult.setDeviceName("");
             } else {
-                cruiseInspectResult.setDeviceName(tStdDevice.getDeviceName());
+                cruiseInspectResult.setDeviceName(tStdDevice.get(0).getDeviceName());
             }
             cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(cruiseInspectResult.getInstanceId()));
             cruiseInspectResult.setCruiseResultName("--");
