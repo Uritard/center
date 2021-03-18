@@ -1484,15 +1484,14 @@ public class CameraConService {
             log.info("password"+password);
             String cameraIp = videoIntercom.get("cameraIp").toString();
             log.info("cameraIp"+cameraIp);
-            int cameraPort = 2554;
+            String cameraPort = videoIntercom.get("port").toString();
             int iChanNum = 1;
            int livePath=123;
             log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+" "+livePath);
-            String transUrl = "";
-                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,videoDefinition, livePath);
+            String transUrl  = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,videoDefinition, livePath);
             Runtime.getRuntime().exec(transUrl);
             log.info("transUrl: "+transUrl);
-            String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
+            String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
             returnMap.put("flvUrl", flvUrl);
             log.info("returnMap: "+returnMap);
         } catch (Exception e) {e.getMessage();}
