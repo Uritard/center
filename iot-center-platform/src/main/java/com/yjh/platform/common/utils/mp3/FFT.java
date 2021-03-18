@@ -88,5 +88,53 @@ public class FFT {
 				realIO[i - 1] = tmpr * tmpr + tmpi * tmpi;
 		}
 	}
- 
+
+
+	public void calculates(float[] realIO) {
+		int i, j, k, ir, exchanges = 1, idx = FFT_N_LOG - 1;
+		float cosv, sinv, tmpr, tmpi;
+		for (i = 0; i != FFT_N; i++) {
+			real[i] = realIO[bitReverse[i]];
+			imag[i] = 0;
+		}
+
+		for (i = FFT_N_LOG; i != 0; i--) {
+			for (j = 0; j != exchanges; j++) {
+				cosv = costable[j << idx];
+				sinv = sintable[j << idx];
+				for (k = j; k < FFT_N; k += exchanges << 1) {
+					ir = k + exchanges;
+					tmpr = cosv * real[ir] - sinv * imag[ir];
+					tmpi = cosv * imag[ir] + sinv * real[ir];
+					real[ir] = real[k] - tmpr;
+					imag[ir] = imag[k] - tmpi;
+					real[k] += tmpr;
+					imag[k] += tmpi;
+				}
+			}
+			exchanges <<= 1;
+			idx--;
+		}
+
+		j = FFT_N >> 1;
+		/*
+		 * 输出模的平方(的FFT_N倍):
+		 * for(i = 1; i <= j; i++)
+		 * 	realIO[i-1] = real[i] * real[i] +  imag[i] * imag[i];
+		 *
+		 * 如果FFT只用于频谱显示,可以"淘汰"幅值较小的而减少浮点乘法运算. MINY的值
+		 * 和Spectrum.Y0,Spectrum.logY0对应.
+		 */
+		sinv = MINY;
+		cosv = -MINY;
+		for (i = j; i != 0; i--) {
+			tmpr = real[i];
+			tmpi = imag[i];
+//			if (tmpr > cosv && tmpr < sinv && tmpi > cosv && tmpi < sinv)
+//				realIO[i - 1] = 0;
+//			else
+				realIO[i - 1] = tmpr * tmpr + tmpi * tmpi;
+		}
+	}
+
 }

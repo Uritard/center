@@ -89,14 +89,14 @@ public class zuulFilter extends ZuulFilter {
                 }
                 String token = request.getHeader("token") != null ? request.getHeader("token") : "";
                 if (StringUtils.isNoneBlank(token)) {
-                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + token);
+                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:"+userId+":"+ token);
                     if (appKeymap.size() == 0) {
                         log.error("用户未登陆===================================================================================");
                         ctx.setSendZuulResponse(false);
                         ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                         return false;
                     } else {
-                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + token, "expireTime")));
+                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:"+userId+":"+ token, "expireTime")));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime" , "content")));
                         if (System.currentTimeMillis() - expireTime > 60000*logoutTime) {
                             log.error("token已失效===========================================================================");
@@ -105,7 +105,7 @@ public class zuulFilter extends ZuulFilter {
                             ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;
                         } else {
-                            redisTemplate.opsForHash().put("appKey:" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            redisTemplate.opsForHash().put("appKey:"+userId+":"+ token, "expireTime", String.valueOf(System.currentTimeMillis()));
                         }
                     }
                 } else {

@@ -167,6 +167,60 @@ public class VoiceAnalyseUtil {
 
     }
 
+
+
+    private void drawHistograms(float[] amp) {
+        spectrumGraphics.clearRect(0, 0, width, height);
+
+        long t = System.currentTimeMillis();
+        int speed = (int)(t - lastTimeMillis) / 30;	//峰值下落速度
+        lastTimeMillis = t;
+
+        List<Integer> list = new ArrayList<>();
+        int i = 0, x = 0, y = 0, xi, peaki, w = deltax - 1;
+        float maxAmp;
+        for (; i != band; i++, x += deltax) {
+            maxAmp = 0; xi = xplot[i]; y = xplot[i + 1];
+            for (; xi < y; xi++) {
+                    maxAmp = amp[xi];
+            }
+            y = (maxAmp > Y0) ? (int) ((Math.log10(maxAmp) - logY0) * 20) : 0;
+            max.add(y);
+            list.add(y);
+            // 使幅值匀速度下落
+            lastY[i] -= speed << 2;
+            if(y < lastY[i]) {
+                y = lastY[i];
+                if(y < 0) y = 0;
+            }
+            lastY[i] = y;
+
+            if(y >= lastPeak[i]) {
+                lastPeak[i] = y;
+            } else {
+                // 使峰值匀速度下落
+                peaki = lastPeak[i] - speed;
+                if(peaki < 0)
+                    peaki = 0;
+                lastPeak[i] = peaki;
+                peaki = height - peaki;
+                spectrumGraphics.drawLine(x, peaki, x + w - 1, peaki);
+            }
+
+            // 画当前频段的直方图
+            y = height - y;
+            spectrumGraphics.drawImage(barImage, x, y, x+w, height, 0, y, w, height, null);
+        }
+
+        int listMax = list.stream().mapToInt(Integer::valueOf).sum();
+        DBList.add(listMax);
+
+    }
+
+
+
+
+
     public void paintComponent(Graphics g) {
         g.drawImage(spectrumImage, 0, 0, null);
     }
@@ -239,6 +293,61 @@ public class VoiceAnalyseUtil {
         return filePath + fileName +".png";
     }
 
+
+
+
+    public List<Integer> analyticalDecibelsPl() {
+        isAlive = true;
+        int lastIndex = file.lastIndexOf("/") > 0 ? file.lastIndexOf("/"):file.lastIndexOf("\\");
+        this.filePath = file.substring(0,lastIndex+1);
+        this.fileName = file.substring(lastIndex + 1,file.length());
+        band = 128;		//64段
+        width = 691;	//频谱窗口 383x124
+        height = 300;
+        lastTimeMillis = System.currentTimeMillis();
+        xplot = new int[maxColums + 1];
+        lastPeak = new int[maxColums];
+        lastY = new int[maxColums];
+        spectrumImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        spectrumGraphics = spectrumImage.getGraphics();
+        //setPreferredSize(new Dimension(width, height));
+        setPlot();
+        barImage = new BufferedImage(deltax - 1, height, BufferedImage.TYPE_3BYTE_BGR);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        WaveOutMp3 wi = new WaveOutMp3(file);
+        wi.open();
+        wi.start();
+
+        FFT fft = new FFT();
+        byte[] b = new byte[FFT.FFT_N << 1];
+        float[] realIO = new float[FFT.FFT_N];
+        int i, j,nByteRead = 0;
+        try {
+            long start = System.currentTimeMillis();
+            Date kaishi = new Date();
+            count = 0;
+            DBList = new ArrayList<>();
+            while (nByteRead!=-1) {
+                // 从混音器录制数据并转换为short类型的PCM
+                nByteRead = wi.read(b, FFT.FFT_N << 1);
+                for (i = j = 0; i != FFT.FFT_N; i++, j += 2)
+                    realIO[i] = (b[j + 1] << 8) | (b[j] & 0xff); //signed short
+                // 时域PCM数据变换到频域
+                fft.calculates(realIO);
+                // 绘制
+                drawHistograms(realIO);
+            }
+            int max = getMaxVoice();
+            this.max.stream().filter(a -> max != a).distinct().forEach(str -> {
+                File file = new File(filePath + str + ".png");
+                if (file.exists()) file.delete();
+            });
+            wi.close();
+        } catch (Exception e) {
+            // e.printStackTrace();
+        }
+        return DBList;
+    }
     public void stop() {
         isAlive = false;
     }

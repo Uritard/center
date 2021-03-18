@@ -36,4 +36,5 @@ public interface TVoiceDeviceDao {
     int addConf(VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail);
     int updateConf(VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail);
     int deleteConf(@Param(value = "configId") Long configId);
+    VoiceDeviceInfoDetail selectFrequencyInfo(@Param(value = "voiceDeviceId") Long voiceDeviceId);
 }

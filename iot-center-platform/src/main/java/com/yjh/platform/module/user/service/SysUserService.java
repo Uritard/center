@@ -199,7 +199,7 @@ public class SysUserService {
                             mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                             mapAppKey.put("appKey", appKey);
                             mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                            redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
+                            redisTemplate.opsForHash().putAll("appKey:"+userId+":"+ appKey, mapAppKey);
                         }
 
                     }
@@ -231,7 +231,7 @@ public class SysUserService {
                         mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                         mapAppKey.put("appKey", appKey);
                         mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        redisTemplate.opsForHash().putAll("appKey:" + appKey, mapAppKey);
+                        redisTemplate.opsForHash().putAll("appKey:"+userId+":"+ appKey, mapAppKey);
                     }
                 } else {
                     throw new RuntimeException("用户已登陆");

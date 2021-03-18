@@ -15,4 +15,6 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "TVoiceDevice对象扩展", description = "声纹设备表扩展")
 public class VoiceDeviceInfoDetail extends TVoiceDevice{
     private String dbValue;
+
+    private String fValue;
 }

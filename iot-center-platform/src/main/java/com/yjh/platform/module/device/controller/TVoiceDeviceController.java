@@ -256,4 +256,17 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "频率分析")
+    @RequestMapping(value = "/frequencyAnalyse", method = RequestMethod.GET)
+    public Result frequencyAnalyse(@RequestParam(value = "frequencyPath") String frequencyPath) {
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.frequencyAnalyse(frequencyPath));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }
