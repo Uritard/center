@@ -422,8 +422,8 @@ public class TCruisePointInstanceService{
 //                    tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
 //                }
                 if(cruiseType == 232){//声纹
-                    TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(id);
-                    tCruisePointInstance.setCruiseName(tStdDevice.getDeviceName());
+                    List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(id);
+                    tCruisePointInstance.setCruiseName(tStdDevice.get(0).getDeviceName());
                 }
                 //231 在线监控 232 声纹
                 result =  tCruisePointInstanceDao.insert(tCruisePointInstance);

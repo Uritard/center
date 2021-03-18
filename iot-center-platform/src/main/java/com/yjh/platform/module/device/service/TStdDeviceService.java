@@ -284,7 +284,7 @@ public class TStdDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public TStdDevice selectByPrimaryId(Long deviceId) {
-        return this.tStdDeviceDao.selectByPrimaryId(deviceId);
+        return this.tStdDeviceDao.selectByPrimaryId(deviceId).get(0);
     }
 
 
