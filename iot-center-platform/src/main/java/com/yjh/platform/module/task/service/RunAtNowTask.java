@@ -207,6 +207,17 @@ public class RunAtNowTask implements Runnable{
             }
 
             //开始任务
+
+            String strForCountAbnormal = "countForAbnormal:"+taskId;
+            Map<String,String> mapForAbnormal = new HashMap<>();
+            if( !redisTemplate.hasKey(strForCountAbnormal)){//判断任务是否做过 没做->初始化  做了->后续工作直接从redis获取
+                mapForAbnormal.put("all",taskCount.toString());
+                mapForAbnormal.put("abnormal","0");
+                mapForAbnormal.put("normal","0");
+                mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
+                mapForAbnormal.put("overDay",tasksAreTime.toString());
+                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+            }
             TCruiseResult tCruiseResult = new TCruiseResult();
             tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
             if(tCruiseResult == null){//判断任务是否存在
@@ -232,16 +243,6 @@ public class RunAtNowTask implements Runnable{
             tCruiseTaskResult.setTaskId(taskId);
             //tCruiseTaskResult.setTaskStatus(239);
             tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
-            String strForCountAbnormal = "countForAbnormal:"+taskId;
-            Map<String,String> mapForAbnormal = new HashMap<>();
-            if( !redisTemplate.hasKey(strForCountAbnormal)){//判断任务是否做过 没做->初始化  做了->后续工作直接从redis获取
-                mapForAbnormal.put("all",taskCount.toString());
-                mapForAbnormal.put("abnormal","0");
-                mapForAbnormal.put("normal","0");
-                mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
-                mapForAbnormal.put("overDay",tasksAreTime.toString());
-                redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
-            }
             Integer taskAbnormal = 0;//异常数量
             Integer taskNormal = 0;//正常
             List<String> analysisInstanceList = new ArrayList<>();
