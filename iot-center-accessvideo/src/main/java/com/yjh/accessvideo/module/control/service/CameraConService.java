@@ -145,7 +145,7 @@ public class CameraConService {
             log.info("transUrl: "+transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-            String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
+            String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
             returnMap.put("rtmpUrl", rtmpUrl);
             returnMap.put("flvUrl", flvUrl);
             Constant.mapsForCamera.put(String.valueOf(cameraId), rtmpUrl);
