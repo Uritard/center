@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
@@ -99,6 +100,7 @@ public class SysUserService {
             Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             Map<String,String> lockTimes= redisTemplate.opsForHash().entries("t_sys_param:lockTime");
             Map<String,String> loginNum= redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
+            String isLogin =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
             String isDecode =enmap.get("content");
             if("true".equals(isDecode)) {
                  userName =Demo.decrypt(userMap.get("userName"));
@@ -130,6 +132,16 @@ public class SysUserService {
             }
             SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
             if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
+                if("true".equals(isLogin)){
+                    Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:"+sysUserLogin.getUserId(), "expireTime")));
+                    if(expireTime!=null){
+                        int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
+                        if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
+                            throw new BusinessException(500, "用户已登陆");
+                        }
+                    }
+
+                }
                 if (!sysUserLogin.getPassword().equals(password)) {
                     SysUser sysUsers=new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
@@ -200,6 +212,11 @@ public class SysUserService {
                             mapAppKey.put("appKey", appKey);
                             mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
                             redisTemplate.opsForHash().putAll("appKey:"+userId+":"+ appKey, mapAppKey);
+                            if("true".equals(isLogin)){
+                                Map<String, Object> mapUser = new HashMap<>();
+                                mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                                redisTemplate.opsForHash().putAll("user:"+userId, mapUser);
+                            }
                         }
 
                     }
@@ -232,9 +249,14 @@ public class SysUserService {
                         mapAppKey.put("appKey", appKey);
                         mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
                         redisTemplate.opsForHash().putAll("appKey:"+userId+":"+ appKey, mapAppKey);
+                        if("true".equals(isLogin)){
+                            Map<String, Object> mapUser = new HashMap<>();
+                            mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                            redisTemplate.opsForHash().putAll("user:"+userId, mapUser);
+                        }
                     }
                 } else {
-                    throw new RuntimeException("用户已登陆");
+                    throw new BusinessException(500, "用户已登陆");
                 }
             } else {
                 //登陆错误判断用户是否存在
@@ -379,7 +401,8 @@ public class SysUserService {
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
         sysUserParams.setUserId(userIdLong);
-        redisTemplate.delete("appKey:"+token);
+        redisTemplate.delete("appKey:" + userId + ":" + token);
+        redisTemplate.delete("user:"+userId);
         return this.sysUserDao.update(sysUserParams);
     }
 
