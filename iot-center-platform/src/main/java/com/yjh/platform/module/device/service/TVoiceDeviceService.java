@@ -389,6 +389,105 @@ public class TVoiceDeviceService{
         return big;
     }
 
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,String>> frequencyAnalyse(String frequencyPath) throws Exception{
+        Long voiceDeviceId = null;
+        String absPath = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
+        String[] getId = frequencyPath.replaceAll(realPath,"").split("/");
+        if(getId != null && getId.length>2){
+            if("".equals(getId[0])){
+                voiceDeviceId = Long.valueOf(getId[2]);
+            }else {
+                voiceDeviceId = Long.valueOf(getId[1]);
+            }
+        }
+        frequencyPath = frequencyPath.replaceAll(realPath,absPath);
+        MultimediaObject multimediaObject = new MultimediaObject(new File(frequencyPath));
+        MultimediaInfo info = multimediaObject.getInfo();
+        Long playTime = info.getDuration();
+        VoiceDeviceInfoDetail voiceDeviceInfoDetail = tVoiceDeviceDao.selectFrequencyInfo(voiceDeviceId);
+        if(voiceDeviceId == null){
+            return null;
+        }
+        return voiceAnalyses(frequencyPath,playTime.intValue(),voiceDeviceInfoDetail);
+    }
+
+    private List<Map<String,String>> voiceAnalyses(String voicePath,Integer second,VoiceDeviceInfoDetail voiceDeviceInfoDetail){
+        log.info("文件："+voicePath);
+        List<Map<String,String>> reList = new ArrayList<>();
+        VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
+        List<Integer> DBList = voiceAnalyseUtil.analyticalDecibelsPl();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss.SSS");
+        log.info("频率数组："+DBList);
+        //每一段的毫秒数；
+        float hm = second/DBList.size();
+        log.info("每一段的毫秒数："+hm);
+        DBList.add(0);//补一个0 方便操作
+        Integer warnDb = Integer.valueOf(voiceDeviceInfoDetail.getFValue());
+        List<Integer> timeList = new ArrayList<>();
+        if(DBList.size()>0 && DBList.get(0)>warnDb){
+            log.info("开始时间："+0);
+            timeList.add(0);
+        }
+        for(int i = 1; i < DBList.size()-1;i++){
+            try{
+                if(DBList.get(i-1)<warnDb && DBList.get(i) >= warnDb){
+                    //记录开始时间
+                    //log.info("开始时间："+simpleDateFormat.format(i*hm- TimeZone.getDefault().getRawOffset()));
+                    timeList.add(i);
+                }
+                if(DBList.get(i-1)>=warnDb && DBList.get(i) < warnDb){
+                    //记录结束时间
+                    //log.info("结束时间："+simpleDateFormat.format(i*hm- TimeZone.getDefault().getRawOffset()));
+                    timeList.add(i);
+                }
+            }catch (Exception e){
+                log.info("时间转化错误："+e);
+            }
+        }
+        if(timeList.size()%2 == 1){
+            //只有开始没有结束
+            timeList.add(DBList.size()-1);
+            log.info("结束时间："+simpleDateFormat.format((DBList.size()-1)*hm- TimeZone.getDefault().getRawOffset()));
+        }
+        DecimalFormat df1 = new DecimalFormat("#####0.000");
+        try{
+            for(int j = 0;j < timeList.size();j=j+2){
+                Map<String,String> map = new HashMap<>();
+                map.put("startTime",simpleDateFormat.format(timeList.get(j)*hm- TimeZone.getDefault().getRawOffset()));
+                map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
+                if(timeList.get(j+1) == (DBList.size()-1)){
+                    //整个文件满足
+                    map.put("endTime",simpleDateFormat.format(second- TimeZone.getDefault().getRawOffset()));
+                    map.put("time",String.valueOf(second/1000F));
+                } else {
+                    map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
+                    map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
+                }
+
+                map.put("result",findBig(DBList,timeList.get(j),timeList.get(j+1)).toString());
+                reList.add(map);
+            }
+        }catch (Exception e){
+            log.info("时间转化错误："+e);
+        }
+        log.info("返回结果："+reList);
+        return  reList;
+    }
+
+
+
+
+
+
+
+
+
+
+
     //查询音频设备的所有信息
     @Transactional(rollbackFor = Exception.class)
     public List<VoiceDeviceAllInfo> selectVoiceDeviceInfo(){
