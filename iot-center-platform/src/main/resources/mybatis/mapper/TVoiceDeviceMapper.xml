@@ -171,7 +171,6 @@
             a.voice_device_id AS id,
             a.voice_device_name AS label,
             a.up_region_id AS upId,
-            a.state AS state,
             b.region_name as upName,
             "device" AS infoType
         FROM
