@@ -515,17 +515,40 @@ public class CameraConController {
         return result;
     }
     @ApiOperation(value = "关闭可视对讲")
-    @RequestMapping(value = "/stopVideoCallSession", method = RequestMethod.GET)
-    public Result stopVideoCallSession()
+    @RequestMapping(value = "/stopVoiceTalk", method = RequestMethod.GET)
+    public Result stopVoiceTalk()
     {
         Result result = new Result();
         try {
-            cameraConService.stopVideoCallSession();
+            cameraConService.stopVoiceTalk();
             result.setData("关闭对讲");
 
         }catch (Exception e){
             result.setData("系统异常");
         }
+        return result;
+    }
+
+    @ApiOperation(value = "可视对讲播放")
+    @RequestMapping(value = "/startVideoRealPlay", method = RequestMethod.GET)
+    public Result startVideoRealPlay( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
+    {
+        Result result = new Result();
+       try {
+           Map<String, Object> map=cameraConService.startVideoRealPlay(videoIntercomId);
+           if (map.size()>0)
+           {
+               result.setData(map);
+           }else
+               {
+                   result.setData("地址不存在");
+               }
+       }catch (Exception e)
+       {
+           result.setData("系统异常");
+           log.info(e.getMessage());
+       }
+
         return result;
     }
 

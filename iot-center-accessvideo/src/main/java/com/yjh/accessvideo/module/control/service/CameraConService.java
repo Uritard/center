@@ -872,10 +872,6 @@ public class CameraConService {
 //
 //        return judge;
 //    }
-
-//    @Autowired
-//    private TCameraInfoDao TCameraInfoDao;
-
     /**
      *下载nvr文件
      * @param cameraId 摄像头id
@@ -1155,28 +1151,7 @@ public class CameraConService {
 
         List<String> list=new ArrayList<String>();
        try {
-
-           /*if (lUserIDLong.longValue()<0)
-           {
-               hCNetSDK.NET_DVR_Init();
-               TCameraInfo tCameraInfo =TCameraInfoDao.selectCamera(cameraId);
-               tCameraInfo.setChannelNum(tCameraInfo.getChannelNum()+32);
-               m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-               System.arraycopy(tCameraInfo.getCameraIp().getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, tCameraInfo.getCameraIp().length());
-               m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-               System.arraycopy(tCameraInfo.getUrl().getBytes(), 0, m_strLoginInfo.sUserName, 0, tCameraInfo.getUrl().length());
-               m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-               System.arraycopy(tCameraInfo.getUnit().getBytes(), 0, m_strLoginInfo.sPassword, 0, tCameraInfo.getUnit().length());
-               m_strLoginInfo.wPort =tCameraInfo.getPort().shortValue() ;
-               m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
-               m_strLoginInfo.write();
-               log.info("登录账号:"+tCameraInfo.getUrl().getBytes()+"ip地址"+tCameraInfo.getCameraIp()+"登录密码"+tCameraInfo.getUnit()+"端口号"+tCameraInfo.getChannelNum());
-               int i=hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-               log.info("NET_DVR_Login_V40:返回值"+i);
-               lUserIDLong = new NativeLong(i);
-               log.info("lUserIDLong:返回值"+lUserIDLong);
-           }*/
-         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+           CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
            log.info("通道号："+cameraConInfo.getChannelNum());
            log.info("getRecordId:"+cameraConInfo.getRecordId());
@@ -1264,27 +1239,7 @@ public class CameraConService {
 
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
-          /*  if (lUserIDLong.longValue()<0)
-            {
-                hCNetSDK.NET_DVR_Init();
-                TCameraInfo tCameraInfo =TCameraInfoDao.selectCamera(cameraId);
-                tCameraInfo.setChannelNum(tCameraInfo.getChannelNum()+32);
-                m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-                System.arraycopy(tCameraInfo.getCameraIp().getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, tCameraInfo.getCameraIp().length());
-                m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-                System.arraycopy(tCameraInfo.getUrl().getBytes(), 0, m_strLoginInfo.sUserName, 0, tCameraInfo.getUrl().length());
-                m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-                System.arraycopy(tCameraInfo.getUnit().getBytes(), 0, m_strLoginInfo.sPassword, 0, tCameraInfo.getUnit().length());
-                m_strLoginInfo.wPort =tCameraInfo.getPort().shortValue() ;
-                m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
-                m_strLoginInfo.write();
-                log.info("登录账号:"+tCameraInfo.getUrl().getBytes()+"ip地址"+tCameraInfo.getCameraIp()+"登录密码"+tCameraInfo.getUnit()+"端口号"+tCameraInfo.getChannelNum());
-                int i=hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-                log.info("NET_DVR_Login_V40:返回值"+i);
-                lUserIDLong = new NativeLong(i);
-                log.info("lUserIDLong:返回值"+lUserIDLong);
-            }*/
-           cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
             log.info("通道号："+cameraConInfo.getChannelNum());
             log.info("getRecordId:"+cameraConInfo.getRecordId());
             lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
@@ -1417,40 +1372,49 @@ public class CameraConService {
     {
 
         int re=1;
+        log.info("开启可视对讲");
         try {
+            log.info("开启可视对讲videoIntercomId："+videoIntercomId);
           String url= SERVICE_URL+"?videoIntercomId="+videoIntercomId;
-            String services =HttpClientUtils.getInstance().getUrl(SERVICE_URL, null);
+            String services =HttpClientUtils.getInstance().getUrl(url, null);
+            log.info("services："+services);
             JSONObject jsonObject =JSONObject.parseObject(services);
-            Map<String,String> videoIntercom= (Map<String,String>) jsonObject.get("data");
-
-          //VideoIntercom  videoIntercom=  VideoIntercomDao.selectByPrimaryId(videoIntercomId);
+            Map<String,Object> videoIntercom= (Map<String,Object>) jsonObject.get("data");
+            String userName = videoIntercom.get("owner").toString();
+            log.info("userName"+userName);
+            String password = videoIntercom.get("ownerCode").toString();
+            log.info("password"+password);
+            String cameraIp = videoIntercom.get("cameraIp").toString();
+            log.info("cameraIp"+cameraIp);
+            String port = videoIntercom.get("port").toString();
+            log.info("port:>>>"+port);
             if (! hCNetSDK.NET_DVR_Init())
             {
                 log.info("语音对讲初始化失败");
             }
+            log.info("语音对讲开始登录。。。。。");
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-            System.arraycopy(videoIntercom.get("cameraIp").getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, videoIntercom.get("cameraIp").length());
+            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
             m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-            System.arraycopy(videoIntercom.get("owner").getBytes(), 0, m_strLoginInfo.sUserName, 0, videoIntercom.get("owner").length());
+            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
             m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-            System.arraycopy(videoIntercom.get("ownerCode").getBytes(), 0, m_strLoginInfo.sPassword, 0, videoIntercom.get("ownerCode").length());
-            m_strLoginInfo.wPort =Short.decode(videoIntercom.get("port")) ;
+            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+            m_strLoginInfo.wPort = Short.parseShort(port);
             m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
             m_strLoginInfo.write();
-            log.info("登录账号:"+videoIntercom.get("owner")+"ip地址"+videoIntercom.get("cameraIp")+"登录密码"+videoIntercom.get("ownerCode")+"端口号"+videoIntercom.get("port"));
-               int i=hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-               log.info("NET_DVR_Login_V40:返回值"+i);
-               lUserIDLong = new NativeLong(i);
+            log.info("登录账号:"+userName+"ip地址"+cameraIp+"登录密码"+password+"端口号"+port);
+            lUserID=hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            log.info("NET_DVR_Login_V40:返回值"+lUserID);
             log.info("lUserIDLong:返回值"+lUserIDLong);
             if (mVoiceTalkHandle.longValue() < 0 )
             {
-                mVoiceTalkHandle = hCNetSDK.NET_DVR_StartVoiceCom_V30(lUserIDLong, 1, false, null,  null);
+             int   mVoiceTalkHandle = hCNetSDK.NET_DVR_StartVoiceCom_V30(lUserID, 1, false, null,  null);
                 log.info("mVoiceTalkHandle:返回值"+mVoiceTalkHandle);
-                if (mVoiceTalkHandle.longValue() == -1)
+                if (mVoiceTalkHandle == -1)
                 {
                     re=0;
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
-                    log.info("NET_DVR_StartVoiceCom_V30 failed"+iErr);
+                    log.info("NET_DVR_StartVoiceCom_V30 failed  --->"+iErr);
                 }
                 else
                 {
@@ -1466,8 +1430,10 @@ public class CameraConService {
         }catch (Exception e) {
             re=0;
             int iErr = hCNetSDK.NET_DVR_GetLastError();
+            e.printStackTrace();
             log.info("NET_DVR_StartVoiceCom_V30 failed"+iErr);
-            log.info("NET_DVR_StartVoiceCom_V30 ....."+e.getMessage());
+            log.info("NET_DVR_StartVoiceCom_V30 .....");
+
         }
         return re;
     }
@@ -1476,13 +1442,15 @@ public class CameraConService {
      * 语音对讲结束
      */
 
-    public void stopVideoCallSession()
+    public void stopVoiceTalk()
     {
         try {
             if(mVoiceTalkHandle.longValue() >= 0) {
-                boolean res=  hCNetSDK.NET_DVR_StopRemoteConfig(mVoiceTalkHandle.intValue());
+               // boolean res=  hCNetSDK.NET_DVR_StopRemoteConfig(mVoiceTalkHandle.intValue());
+                boolean res= hCNetSDK.NET_DVR_StopVoiceCom(mVoiceTalkHandle);
                 if (res)
                 {
+                    mVoiceTalkHandle = new NativeLong(-1);
                     log.info("NET_DVR_StopRemoteConfig SUCC ");
                 }else
                     {
@@ -1497,6 +1465,38 @@ public class CameraConService {
         {
             log.info("NET_DVR_StopRemoteConfig failed "+e.getMessage());
         }
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> startVideoRealPlay(Long videoIntercomId) {
+        Map<String, Object> returnMap = new HashMap<>();
+        try {
+            String url= SERVICE_URL+"?videoIntercomId="+videoIntercomId;
+            String services =HttpClientUtils.getInstance().getUrl(url, null);
+            log.info("services"+services);
+            JSONObject jsonObject =JSONObject.parseObject(services);
+            log.info("jsonObject"+jsonObject.toJSONString());
+            Map<String,Object> videoIntercom= (Map<String,Object>) jsonObject.get("data");
+            String userName = videoIntercom.get("owner").toString();
+            log.info("userName"+userName);
+            String password = videoIntercom.get("ownerCode").toString();
+            log.info("password"+password);
+            String cameraIp = videoIntercom.get("cameraIp").toString();
+            log.info("cameraIp"+cameraIp);
+            int cameraPort = 2554;
+            int iChanNum = 1;
+           int livePath=123;
+            log.info(userName+" "+password+" "+cameraIp+" "+cameraPort+" "+iChanNum+" "+" "+livePath);
+            String transUrl = "";
+                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,videoDefinition, livePath);
+            Runtime.getRuntime().exec(transUrl);
+            log.info("transUrl: "+transUrl);
+            String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
+            returnMap.put("flvUrl", flvUrl);
+            log.info("returnMap: "+returnMap);
+        } catch (Exception e) {e.getMessage();}
+        return returnMap;
     }
 
 
