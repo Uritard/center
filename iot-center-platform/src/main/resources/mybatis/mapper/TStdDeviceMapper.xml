@@ -158,7 +158,7 @@
         from t_std_device a
         where 1 = 1
             and a.device_id = #{deviceId, jdbcType=BIGINT}
-            GROUP BY a.device_id
+
 
     </select>
 
