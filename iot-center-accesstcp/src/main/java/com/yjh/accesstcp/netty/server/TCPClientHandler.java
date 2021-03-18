@@ -457,7 +457,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         StringBuilder stringBuilder = new StringBuilder("0 0");
                         String interval_type = item.get("interval_type").toString();
                         if("1".equals(interval_type)){
-                            String interval_number = item.get("interval_number").toString();
+                            String interval_number = item.get(" ").toString();
                             stringBuilder.append(" 0/"+interval_number+" ?");
                             String cycle_month = item.get("cycle_month").toString();
                             if("".equals(cycle_month) || null == cycle_month){

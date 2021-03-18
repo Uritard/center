@@ -33,4 +33,5 @@ public interface TRobotRegionDao {
     int batchInsert(List<TRobotRegion> list);
     List<String> selectAllRobotRegion();
     int batchDelete(List<String> list);
+    String selectDeviceName(@Param(value = "inspectionCode") String inspectionCode);
 }

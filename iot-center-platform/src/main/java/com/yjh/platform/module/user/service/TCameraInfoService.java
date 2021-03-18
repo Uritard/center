@@ -196,13 +196,13 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String pmsId,String aliasName, String recordId,
-                                          Long upRegionId, Integer channelNum, Integer smsId, Integer rmsId,String monitorId,
+                                          Long upRegionId, Integer channelNum, Integer cameraNum,Integer smsId, Integer rmsId,String monitorId,
                                           Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
-                                          String url, Integer port, Integer cameraType, Integer isControl, String latitude,
+                                          String url, Integer port,Integer infreadPort,String cameraManager,String cameraCode, Integer cameraType, Integer isControl, String latitude,
                                           String longitude, String address,String unit) {
         return tCameraInfoDao.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
-                recordId, upRegionId, channelNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType, cameraIp, url,
-                port, cameraType,isControl,latitude, longitude, address, unit);
+                recordId, upRegionId, channelNum,cameraNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType, cameraIp, url,
+                port, infreadPort,cameraManager,cameraCode,cameraType,isControl,latitude, longitude, address, unit);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -293,6 +293,9 @@ public class TCameraInfoService {
                     if (map.containsKey("channelNum")) {
                         tCameraInfo.setChannelNum(Integer.valueOf(map.get("channelNum").toString()));
                     }
+                    if (map.containsKey("cameraNum")) {
+                        tCameraInfo.setCameraNum(Integer.valueOf(map.get("cameraNum").toString()));
+                    }
                     if (map.containsKey("smsId")) {
                         tCameraInfo.setSmsId(Integer.valueOf(map.get("smsId").toString()));
                     }
@@ -320,6 +323,15 @@ public class TCameraInfoService {
                     }
                     if (map.containsKey("port")) {
                         tCameraInfo.setPort(Integer.valueOf(map.get("port").toString()));
+                    }
+                    if (map.containsKey("infreadPort")) {
+                        tCameraInfo.setInfreadPort(Integer.valueOf(map.get("infreadPort").toString()));
+                    }
+                    if (map.containsKey("cameraManager")) {
+                        tCameraInfo.setCameraManager(map.get("cameraManager").toString());
+                    }
+                    if (map.containsKey("cameraCode")) {
+                        tCameraInfo.setCameraCode(map.get("cameraCode").toString());
                     }
                     if (map.containsKey("cameraType")) {
                         Integer cameraType = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_type",map.get("cameraType").toString()));

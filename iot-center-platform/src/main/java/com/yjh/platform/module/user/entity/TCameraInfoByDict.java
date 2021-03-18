@@ -95,4 +95,12 @@ public class TCameraInfoByDict implements Serializable {
     private String pmsId;
     @ApiModelProperty(value = "检测点ID")
     private String monitorId;
+    @ApiModelProperty(value = "相机本身通道")
+    private Integer cameraNum;
+    @ApiModelProperty(value = "红外测温端口")
+    private Integer infreadPort;
+    @ApiModelProperty(value = "相机用户名")
+    private String cameraManager;
+    @ApiModelProperty(value = "相机密码")
+    private String cameraCode;
 }

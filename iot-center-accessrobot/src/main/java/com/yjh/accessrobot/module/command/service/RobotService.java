@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -535,7 +536,7 @@ public class RobotService {
                 //放数据到缓存
                 for (int i = 0; i < redisInfoList.size(); i++) {
                     redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                            + ":" + redisInfoList.get(i).get("taskId") + i, redisInfoList.get(i));
+                            + ":" + redisInfoList.get(i).get("taskId") + ":" +redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
                 }
 
                 String deviceIdList = str.toString();
@@ -550,21 +551,21 @@ public class RobotService {
                 map.put("device_level", rTII.getDeviceLevel());
                 map.put("device_list", deviceIdList);
                 map.put("fixed_start_time", sdf.format(new Date()));
-//                map.put("cycle_month", "周期（月）");
-//                map.put("cycle_week", "周期（周）");
-//                map.put("cycle_execute_time", "周期（执行时间） ");
-//                map.put("cycle_start_time", "周期开始时间 ");
-//                map.put("cycle_end_time", "周期开始时间 ");
-//                map.put("interval_number", "间隔（数量）");
-//                map.put("interval_type", "间隔（类型） ");
-//                map.put("interval_execute_time", "间隔（执行时间）");
-//                map.put("interval_start_time", "间隔开始时间");
-//                map.put("interval_end_time", "间隔结束时间 ");
-//                map.put("invalid_start_time", "不可用开始时间 ");
-//                map.put("invalid_end_time", "不可用结束时间");
-//                map.put("isenable", "是否可用");
-//                map.put("creator", "编制人");
-//                map.put("create_time", "编制时间");
+                map.put("cycle_month", "");//周期（月）
+                map.put("cycle_week", "");//周期（周）
+                map.put("cycle_execute_time", "");//周期（执行时间）
+                map.put("cycle_start_time", "");//周期开始时间
+                map.put("cycle_end_time", "");//周期开始时间
+                map.put("interval_number", "");//间隔（数量）
+                map.put("interval_type", "");//间隔（类型）
+                map.put("interval_execute_time", "");//间隔（执行时间）
+                map.put("interval_start_time", "");//间隔开始时间
+                map.put("interval_end_time", "");//间隔结束时间
+                map.put("invalid_start_time", "");//不可用开始时间
+                map.put("invalid_end_time", "");//不可用结束时间
+                map.put("isenable", "");//是否可用
+                map.put("creator", "");//编制人
+                map.put("create_time", "");//编制时间
                 mapList.add(map);
                 log.info("任务下发的item是：" + mapList);
                 String sendCode = tRobotInfoDao.selectContent("PlatformServer");
@@ -1186,6 +1187,150 @@ public class RobotService {
         log.info("发送给前端的消息：" + json);
         Constant.getUrl(json,webSocketUrl);
         return 1;
+    }
+    public int robotTaskIntoDB(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
+        int tcpiRes = 0;
+        int tctaRes = 0;
+        int tcrRes = 0;
+        List<TCruiseTask> tCruiseTaskList = new ArrayList<>();
+        for (Map<String, Object> taskModelMap : taskModelMapList) {
+            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
+            /*
+            * 构建t_cruise_task
+            * */
+            TCruiseTask tCruiseTask = new TCruiseTask();
+            tCruiseTask.setTaskId(newTaskId);
+            tCruiseTask.setTaskCode(taskModelMap.get("task_code").toString());
+            tCruiseTask.setTaskName(taskModelMap.get("task_name").toString());
+            Integer cType = null;
+            if (Objects.nonNull(taskModelMap.get("type")) && !"".equals(taskModelMap.get("type").toString())){
+                String type = taskModelMap.get("type").toString();
+                switch (type){
+                    case "1":
+                        cType = 214;break;//例行
+                    case "2":
+                        cType = 216;break;//特殊
+                    case "3":
+                        cType = 217;break;//专项
+                    case "4":
+                        cType = 218;break;//自定义
+                    default:break;
+                }
+            }
+            tCruiseTask.setType(cType);
+            //贼几把难搞
+            /*tCruiseTask.setDateType();
+            if (Objects.nonNull(taskModelMap.get("fixed_start_time")) || "".equals(taskModelMap.get("fixed_start_time").toString())){
+                tCruiseTask.setIfRun();
+
+            }else {
+                tCruiseTask.setIfRun();
+            }*/
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
+            tCruiseTask.setRobotId(robotId);
+            tCruiseTask.setTaskType(271);//机器人本体任务
+            if (!"".equals(taskModelMap.get("priority").toString())){
+                tCruiseTask.setTaskLevel(Integer.valueOf(taskModelMap.get("priority").toString()));
+            }
+            try {
+                tCruiseTask.setStartTime(sdf.parse(taskModelMap.get("fixed_start_time").toString()));
+            }catch (ParseException e){
+                e.getMessage();
+            }
+            tCruiseTask.setCreateTime(new Date());
+            tCruiseTaskList.add(tCruiseTask);
+            log.info("tCruiseTaskList==="+tCruiseTaskList);
+
+            /*
+            * 该任务下包含的点位
+            * */
+            String inspectionIdString = taskModelMap.get("device_list").toString();
+            String inspectionIds[] = inspectionIdString.split(",");
+            List<String> inspectionIdList = new ArrayList<>();
+            for(String inspectionId : inspectionIds){
+                inspectionIdList.add(inspectionId);
+            }
+            log.info("机器人对应点list==="+inspectionIdList);
+
+            /*
+             * 构建t_cruise_point_instance
+             * */
+            List<TCruisePointInstance> tCruisePointInstanceList = new ArrayList<>();
+            for (String inspectionCode : inspectionIdList){
+                TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
+                TStdRegion tStdRegion = tRobotInfoDao.selectTSRegionForStation();
+                tCruisePointInstance.setStationId(tStdRegion.getStationId());
+                tCruisePointInstance.setStationName(tStdRegion.getStationName());
+                tCruisePointInstance.setCruiseType(228);//机器人
+                tCruisePointInstance.setCruiseId(Long.valueOf(inspectionCode));
+                String inspectionName = tRobotInspectionDao.selectInspectionName(inspectionCode);
+                tCruisePointInstance.setCruiseName(inspectionName);
+                tCruisePointInstance.setIfSy(1);
+                tCruisePointInstanceList.add(tCruisePointInstance);
+
+            }
+            log.info("tCruisePointInstanceList==="+tCruisePointInstanceList);
+            tcpiRes = tRobotInfoDao.batchInsertInstance(tCruisePointInstanceList);
+
+            /*
+             * 构建t_cruise_task_attr
+             * */
+            List<Map<String, String>> redisInfoList = new ArrayList<>();
+            List<Long> instanceIdList = new ArrayList<>();
+            List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
+            for (TCruisePointInstance tCruisePointInstance : tCruisePointInstanceList){
+                TCruiseTaskAttr tCruiseTaskAttr = new TCruiseTaskAttr()
+                        .setTaskId(newTaskId)
+                        .setInstanceId(tCruisePointInstance.getInstanceId());
+                tCruiseTaskAttrList.add(tCruiseTaskAttr);
+                instanceIdList.add(tCruisePointInstance.getInstanceId());
+
+                Map<String, String> redisInfoMap = new HashMap<>();
+                redisInfoMap.put("robotCode", xmlBaseModel.getSendCode());
+                redisInfoMap.put("instanceId", tCruisePointInstance.getInstanceId() + "");
+                redisInfoMap.put("inspectionCode", tCruisePointInstance.getCruiseId() + "");
+                redisInfoMap.put("taskId", newTaskId);
+                redisInfoMap.put("inspectionName", tCruisePointInstance.getCruiseName());
+                String deviceName = tRobotRegionDao.selectDeviceName(tCruisePointInstance.getCruiseId() + "");
+                redisInfoMap.put("deviceName",deviceName);
+                redisInfoList.add(redisInfoMap);
+                log.info("redisInfoList是===" + redisInfoList);
+                //放数据到缓存
+                for (int i = 0; i < redisInfoList.size(); i++) {
+                    redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
+                            + ":" + redisInfoList.get(i).get("taskId") + ":" +redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
+                }
+
+            }
+            log.info("tCruiseTaskAttrList==="+tCruiseTaskAttrList);
+            tctaRes = tRobotInfoDao.batchInsertTaskAttr(tCruiseTaskAttrList);
+
+            //将instanceIdList放缓存，以备后续使用
+            log.info("instanceIdList是===" + instanceIdList);
+            Map<String, Object> instanceListMap = new HashMap<>();
+            instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
+            instanceListMap.put("taskId", newTaskId);
+            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode(), instanceListMap);
+
+            /*
+             * 构建t_cruise_result
+             * */
+            TCruiseResult tCruiseResult = new TCruiseResult()
+                    .setTaskResultId(String.valueOf(UUID.randomUUID()).replace("-", ""))
+                    .setTaskId(newTaskId)
+                    .setTaskName(taskModelMap.get("task_name").toString())
+                    .setCType(cType)
+                    .setCState(238)//任务未开始
+                    .setTaskCode(taskModelMap.get("task_code").toString())
+                    .setRemark("0");
+            log.info("tCruiseResult==="+tCruiseResult);
+            tcrRes = tRobotInfoDao.insertTCruiseResult(tCruiseResult);
+        }
+
+        int tctRes = tRobotInfoDao.batchInsertTask(tCruiseTaskList);
+        log.info("入库结果: "+"tcpiRes==="+tcpiRes+",tctaRes==="+tctaRes+",tctRes==="+tctRes+",tcrRes==="+tcrRes);
+
+        return  tcpiRes + tctaRes + tctRes + tcrRes;
     }
 }
 

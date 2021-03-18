@@ -10,6 +10,7 @@
         <result column="record_id" jdbcType="BIGINT" property="recordId" />
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
         <result column="channel_num" jdbcType="INTEGER" property="channelNum" />
+        <result column="camera_num" jdbcType="INTEGER" property="cameraNum" />
         <result column="sms_id" jdbcType="INTEGER" property="smsId" />
         <result column="rms_id" jdbcType="INTEGER" property="rmsId" />
         <result column="vendor_id" jdbcType="INTEGER" property="vendorId" />
@@ -18,6 +19,9 @@
         <result column="camera_ip" jdbcType="VARCHAR" property="cameraIp"/>
         <result column="url" jdbcType="VARCHAR" property="url" />
         <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="infread_port" jdbcType="INTEGER" property="infreadPort" />
+        <result column="camera_manager" jdbcType="VARCHAR" property="cameraManager" />
+        <result column="camera_code" jdbcType="VARCHAR" property="cameraCode" />
         <result column="camera_type" jdbcType="INTEGER" property="cameraType" />
         <result column="is_control" jdbcType="INTEGER" property="isControl" />
         <result column="latitude" jdbcType="VARCHAR" property="latitude" />
@@ -27,8 +31,8 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-         camera_name, camera_model,pms_id,alias_name, record_id, up_region_id, channel_num, sms_id,
-         rms_id, monitor_id,vendor_id, stream_type, protocol_type, camera_ip,url, port, camera_type,
+         camera_name, camera_model,pms_id,alias_name, record_id, up_region_id, channel_num, camera_num,sms_id,
+         rms_id, monitor_id,vendor_id, stream_type, protocol_type, camera_ip,url, port,infread_port,camera_manager,camera_code ,camera_type,
          is_control,latitude,longitude,address,unit
     </sql>
 
@@ -37,7 +41,7 @@
         a.camera_id,
         a.camera_model,
         a.pms_id,
-        e.dict_note as camera_model_name,
+        d.dict_note as camera_model_name,
         a.camera_name,
         a.alias_name,
         a.record_id,
@@ -47,6 +51,7 @@
         a.camera_type,
         d.dict_note as camera_type_name,
         a.channel_num,
+        a.camera_num,
         a.sms_id,
         a.rms_id,
         a.stream_type,
@@ -54,6 +59,9 @@
         a.camera_ip,
         a.url,
         a.port,
+        a.infread_port,
+        a.camera_manager,
+        a.camera_code ,
         a.is_control,
         a.latitude,
         a.longitude,
@@ -73,6 +81,7 @@
                 #{recordId, jdbcType=VARCHAR},
                 #{upRegionId, jdbcType=BIGINT},
                 #{channelNum, jdbcType=INTEGER},
+                #{cameraNum, jdbcType=INTEGER},
                 #{smsId, jdbcType=INTEGER},
                 #{rmsId, jdbcType=INTEGER},
                 #{monitorId,jdbcType=VARCHAR},
@@ -82,6 +91,9 @@
                 #{cameraIp,jdbcType=VARCHAR},
                 #{url, jdbcType=VARCHAR},
                 #{port, jdbcType=INTEGER},
+                #{infreadPort, jdbcType=INTEGER},
+                #{cameraManager, jdbcType=VARCHAR},
+                #{cameraCode, jdbcType=VARCHAR},
                 #{cameraType, jdbcType=INTEGER},
                 #{isControl, jdbcType=INTEGER},
                 #{latitude, jdbcType=VARCHAR},
@@ -128,6 +140,7 @@
         <if test="recordId != null ">a.record_id = #{recordId},</if>
         <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
         <if test="channelNum != null">a.channel_num = #{channelNum, jdbcType=INTEGER},</if>
+        <if test="cameraNum != null">a.camera_num = #{cameraNum, jdbcType=INTEGER},</if>
         <if test="smsId != null">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
         <if test="rmsId != null">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
         <if test="monitorId != null ">a.monitor_id = #{monitorId, jdbcType=VARCHAR},</if>
@@ -137,6 +150,9 @@
         <if test="cameraIp != null ">a.camera_ip = #{cameraIp},</if>
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
+        <if test="infreadPort != null">a.infread_port = #{infreadPort, jdbcType=INTEGER},</if>
+        <if test="cameraManager != null">a.camera_manager = #{cameraManager, jdbcType=VARCHAR},</if>
+        <if test="cameraCode != null">a.camera_code = #{cameraCode, jdbcType=VARCHAR},</if>
         <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
         <if test="isControl != null">a.is_control = #{isControl, jdbcType=INTEGER},</if>
         <if test="address != null ">a.address = #{address},</if>
@@ -181,6 +197,7 @@
         a.record_id,
         a.up_region_id,
         a.channel_num,
+        a.camera_num,
         a.sms_id,
         a.rms_id,
         a.vendor_id,
@@ -189,6 +206,9 @@
         a.camera_ip,
         a.url,
         a.port,
+        a.infread_port,
+        a.camera_manager,
+        a.camera_code ,
         a.camera_type,
         a.is_control,
         a.latitude,
@@ -205,6 +225,7 @@
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="channelNum != null "> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
+        <if test="cameraNum != null "> and a.camera_num = #{cameraNum, jdbcType=INTEGER}</if>
         <if test="smsId != null "> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
         <if test="rmsId != null "> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
         <if test="monitorId != null and monitorId != ''"> and a.monitor_id = #{monitorId, jdbcType=VARCHAR}</if>
@@ -216,6 +237,9 @@
         <if test="cameraIp != null and cameraIp != ''"> and a.camera_ip like concat('%',#{cameraIp, jdbcType=VARCHAR},'%')</if>
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
         <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
+        <if test="infreadPort != null "> and a.infread_port = #{infreadPort, jdbcType=INTEGER}</if>
+        <if test="cameraManager != null">and a.camera_manager = #{cameraManager, jdbcType=VARCHAR},</if>
+        <if test="cameraCode != null">and a.camera_code = #{cameraCode, jdbcType=VARCHAR},</if>
         <if test="cameraType != null "> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
         <if test="isControl != null "> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
         <if test="address != null">and a.address = #{address, jdbcType=VARCHAR},</if>

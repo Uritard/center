@@ -182,5 +182,15 @@
             #{regionId, jdbcType=VARCHAR}
         </foreach>
     </delete>
+    <select id="selectDeviceName" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            d.region_name
+        FROM
+        t_robot_inspection a,t_robot_region b,t_robot_region d
+        WHERE 1 = 1
+        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
+        and a.component_id = b.region_id
+        and b.up_region_id = d.region_id
+    </select>
 
 </mapper>
