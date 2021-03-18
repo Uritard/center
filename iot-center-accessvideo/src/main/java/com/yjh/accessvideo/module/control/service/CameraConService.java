@@ -125,7 +125,7 @@ public class CameraConService {
             String password = cameraConInfo.getCameraCode();
             String cameraIp = cameraConInfo.getCameraIp();
             int cameraPort = cameraConInfo.getPort();
-            int iChanNum = cameraConInfo.getChannelNum();
+            int iChanNum = cameraConInfo.getCameraNum();
             int cameraType = cameraConInfo.getCameraType();
             int livePath;
             if (Constant.maps.get("livePath") != null) {
@@ -214,7 +214,7 @@ public class CameraConService {
                     String password = cameraConInfo.getCameraCode();
                     String cameraIp = cameraConInfo.getCameraIp();
                     int cameraPort = cameraConInfo.getPort();
-                    int iChanNum = cameraConInfo.getChannelNum();
+                    int iChanNum = cameraConInfo.getCameraNum();
                     int cameraType = cameraConInfo.getCameraType();
                     int livePath;
                     if (Objects.nonNull(Constant.maps.get("livePath"))) {

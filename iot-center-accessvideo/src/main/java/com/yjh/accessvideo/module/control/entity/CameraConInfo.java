@@ -59,8 +59,8 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "相机IP")
     private String cameraIp;
 
-    @ApiModelProperty(value = "相机通道号")
-    private Integer cameraChannelNum;
+    @ApiModelProperty(value = "相机本身通道号")
+    private Integer cameraNum;
 
     @ApiModelProperty(value = "相机控制端口")
     private Integer port;

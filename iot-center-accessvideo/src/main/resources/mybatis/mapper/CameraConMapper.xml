@@ -35,7 +35,8 @@
         a.camera_ip,
         a.port,
         a.camera_manager,
-        a.camera_code
+        a.camera_code,
+        a.camera_num
         FROM t_camera_info a
         LEFT JOIN t_camera_preset b ON a.camera_id = b.camera_id
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
@@ -54,7 +55,12 @@
         c.record_ip,
         c.identity_manager,
         c.identity_code,
-        c.rtsp_port
+        c.rtsp_port,
+        a.camera_ip,
+        a.port,
+        a.camera_manager,
+        a.camera_code,
+        a.camera_num
         FROM t_camera_info a
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
         WHERE 1 = 1 and a.camera_id IN
