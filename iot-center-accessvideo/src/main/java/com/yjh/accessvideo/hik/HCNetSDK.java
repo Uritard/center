@@ -4446,7 +4446,7 @@ EMAIL参数结构
     boolean  NET_DVR_CloseAlarmChan_V30(NativeLong lAlarmHandle);
     //语音对讲
     NativeLong NET_DVR_StartVoiceCom(NativeLong lUserID, FVoiceDataCallBack fVoiceDataCallBack, int dwUser);
-    NativeLong NET_DVR_StartVoiceCom_V30(NativeLong lUserID, int dwVoiceChan, boolean bNeedCBNoEncData, FVoiceDataCallBack_V30 fVoiceDataCallBack, Pointer pUser);
+    int NET_DVR_StartVoiceCom_V30(int lUserID, int dwVoiceChan, boolean bNeedCBNoEncData, FVoiceDataCallBack_V30 fVoiceDataCallBack, Pointer pUser);
     boolean  NET_DVR_SetVoiceComClientVolume(NativeLong lVoiceComHandle, short wVolume);
     boolean  NET_DVR_StopVoiceCom(NativeLong lVoiceComHandle);
     //语音转发
