@@ -5,15 +5,14 @@ import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.module.command.service.TRobotCameraPresetService;
 import com.yjh.accessrobot.module.command.entity.TRobotCameraPreset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
+
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,6 +165,8 @@ public class TRobotCameraPresetController {
     public Result batchDelete(@RequestParam(value = "presetIds") String presetIds) {
     Result result = new Result();
     try {
+//        List<String> list1= Arrays.asList(presetIds.split(","));
+//        for ()
         result.setData(tRobotCameraPresetService.batchDelete(presetIds));
     } catch (BusinessException e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

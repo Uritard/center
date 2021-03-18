@@ -612,7 +612,7 @@ public class RunAtNowTask implements Runnable{
                                     defect(analysisMap);
                                 }
                             }
-                            if("on".equals(tStdDevicemete.getIsAi())){
+                            if("on".equals(tStdDevicemete.getIsAi()) || "on".equals(tStdDevicemete.getIsJudge())){
                                 Analysis analysis = new Analysis();
                                 analysis.setTaskId(tCruiseTask.getTaskId());
                                 analysis.setInstanceId(item.getInstanceId());
@@ -739,6 +739,12 @@ public class RunAtNowTask implements Runnable{
                                 if(maoForSleep != null  && maoForSleep.size()>0){
                                     sleepTime = Long.valueOf(maoForSleep.get("content"))*1000L;
                                 }
+                                Map<String,Object> jasonForPic=new HashMap<>();
+                                jasonForPic.put("type","picChange");
+                                jasonForPic.put("msg","该换图片了");
+                                String picChange=JSON.toJSONString(jasonForPic);
+                                log.info("发送给前端的消息：   "+picChange);
+                                WebSocketServer.sendMsg(picChange);
                                 log.info("4个点以巡检完，等待"+sleepTime/1000+"秒钟");
                                 Thread.sleep(sleepTime);
                                 countForInstance = 0;
@@ -759,6 +765,12 @@ public class RunAtNowTask implements Runnable{
                             if(maoForSleep != null  && maoForSleep.size()>0){
                                 sleepTime = Long.valueOf(maoForSleep.get("content"))*1000L;
                             }
+                            Map<String,Object> jasonForPic=new HashMap<>();
+                            jasonForPic.put("type","picChange");
+                            jasonForPic.put("msg","该换图片了");
+                            String picChange=JSON.toJSONString(jasonForPic);
+                            log.info("发送给前端的消息：   "+picChange);
+                            WebSocketServer.sendMsg(picChange);
                             log.info("1个点以巡检完，等待"+sleepTime/1000+"秒钟");
                             Thread.sleep(sleepTime);
                         }
