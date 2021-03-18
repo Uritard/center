@@ -82,5 +82,7 @@ public class VoiceDeviceAllInfo {
 
     private String channelNum;
 
+    private String  state;
+
 
 }

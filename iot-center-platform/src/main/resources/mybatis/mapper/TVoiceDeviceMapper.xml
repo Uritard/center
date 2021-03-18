@@ -8,13 +8,14 @@
         <result column="voice_device_name" jdbcType="VARCHAR" property="voiceDeviceName" />
         <result column="std_device_id" jdbcType="BIGINT" property="stdDeviceId" />
         <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
+        <result column="state" jdbcType="VARCHAR" property="state" />
         <result column="config_id" jdbcType="BIGINT" property="configId" />
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        voice_device_id, voice_device_name, std_device_id, device_type, config_id
+        voice_device_id, voice_device_name, std_device_id, device_type, config_id,state
     </sql>
 
 
@@ -24,6 +25,7 @@
             voice_device_name,
             std_device_id,
             device_type,
+            state,
             config_id,
             up_region_id
         )values(
@@ -31,6 +33,7 @@
                 #{voiceDeviceName, jdbcType=VARCHAR},
                 #{stdDeviceId, jdbcType=BIGINT},
                 #{deviceType, jdbcType=VARCHAR},
+                #{state, jdbcType=VARCHAR},
                 #{configId, jdbcType=BIGINT},
                 #{upRegionId, jdbcType=BIGINT}
         )
@@ -47,6 +50,7 @@
         <if test="voiceDeviceName != null">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
         <if test="stdDeviceId != null">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
         <if test="deviceType != null">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
+        <if test="state != null">a.state = #{state, jdbcType=VARCHAR},</if>
         <if test="configId != null">a.config_id = #{configId, jdbcType=BIGINT},</if>
         <if test="upRegionId != null">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
     </set>
@@ -76,6 +80,7 @@
         a.voice_device_name,
         a.std_device_id,
         a.device_type,
+        a.state,
         a.config_id,
         a.up_region_id
         from t_voice_device a
@@ -94,6 +99,7 @@
         a.voice_device_name,
         a.std_device_id,
         a.device_type,
+        a.state,
         a.config_id,
         a.up_region_id,
         e.ftp_url,
@@ -129,6 +135,7 @@
             voice_device_id,
             voice_device_name,
             std_device_id,
+        state,
             device_type,
             config_id,
         up_region_id
@@ -139,6 +146,7 @@
                 #{TVoiceDevice.voiceDeviceName, jdbcType=VARCHAR},
                 #{TVoiceDevice.stdDeviceId, jdbcType=BIGINT},
                 #{TVoiceDevice.deviceType, jdbcType=VARCHAR},
+                #{TVoiceDevice.state, jdbcType=VARCHAR},
                 #{TVoiceDevice.configId, jdbcType=BIGINT},
             #{TVoiceDevice.upRegionId, jdbcType=BIGINT},
             )
@@ -163,6 +171,7 @@
             a.voice_device_id AS id,
             a.voice_device_name AS label,
             a.up_region_id AS upId,
+            a.state AS state,
             b.region_name as upName,
             "device" AS infoType
         FROM

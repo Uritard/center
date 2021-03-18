@@ -89,6 +89,17 @@ public class VoiceDeviceAllInfoDetail{
 
     private String pmsId;
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    private String state;
+
+
     public String getPmsId() {
         return pmsId;
     }
