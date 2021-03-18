@@ -121,10 +121,10 @@ public class CameraConService {
                 return cameraFlowMap;
             }
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
-            String userName = cameraConInfo.getIdentityManager();
-            String password = cameraConInfo.getIdentityCode();
-            String cameraIp = cameraConInfo.getRecordIp();
-            int cameraPort = cameraConInfo.getRtspPort();
+            String userName = cameraConInfo.getCameraManager();
+            String password = cameraConInfo.getCameraCode();
+            String cameraIp = cameraConInfo.getCameraIp();
+            int cameraPort = cameraConInfo.getPort();
             int iChanNum = cameraConInfo.getChannelNum();
             int cameraType = cameraConInfo.getCameraType();
             int livePath;
