@@ -240,7 +240,14 @@
             )
         </foreach>
     </insert>
-
+    <select id="selectInspectionName" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            a.inspection_name
+        FROM
+            t_robot_inspection a
+        WHERE 1 = 1
+        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
+    </select>
 
 
 </mapper>

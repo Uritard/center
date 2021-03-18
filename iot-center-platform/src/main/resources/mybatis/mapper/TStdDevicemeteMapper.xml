@@ -697,7 +697,7 @@
         LEFT JOIN t_dict_business k on k.dict_code = h.cruise_result and k.col_name = 'cruise_result'
         where 1 = 1
         <if test="deviceType != -1">and g.device_type = #{deviceType,jdbcType = INTEGER} </if>
-        <if test="meterType != -1">and b.meter_type = #{meterType,jdbcType = INTEGER} </if>
+        <if test="meterType != -1">and f.meter_type = #{meterType,jdbcType = INTEGER} </if>
         <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
 
         <if test="list!= null and list.size() > 0">and b.device_id IN
@@ -733,7 +733,7 @@
         LEFT JOIN t_dict_business k on k.dict_code = h.cruise_result and k.col_name = 'cruise_result'
         where 1 = 1
         <if test="deviceType != -1">and g.device_type = #{deviceType,jdbcType = INTEGER} </if>
-        <if test="meterType != -1">and b.meter_type = #{meterType,jdbcType = INTEGER} </if>
+        <if test="meterType != -1">and f.meter_type = #{meterType,jdbcType = INTEGER} </if>
         <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
 
         <if test="list!= null and list.size() > 0">and b.device_id IN

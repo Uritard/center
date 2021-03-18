@@ -219,6 +219,7 @@ public class TCameraInfoController {
                          @RequestParam(value = "recordId", required = false) String recordId,
                          @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                          @RequestParam(value = "channelNum", required = false) Integer channelNum,
+                         @RequestParam(value = "cameraNum", required = false) Integer cameraNum,
                          @RequestParam(value = "smsId", required = false) Integer smsId,
                          @RequestParam(value = "rmsId", required = false) Integer rmsId,
                          @RequestParam(value = "monitorId", required = false) String monitorId,
@@ -228,6 +229,9 @@ public class TCameraInfoController {
                          @RequestParam(value = "cameraIp", required = false) String cameraIp,
                          @RequestParam(value = "url", required = false) String url,
                          @RequestParam(value = "port", required = false) Integer port,
+                         @RequestParam(value = "infreadPort", required = false) Integer infreadPort,
+                         @RequestParam(value = "cameraManager", required = false) String cameraManager,
+                         @RequestParam(value = "cameraCode", required = false) String cameraCode,
                          @RequestParam(value = "cameraType", required = false) Integer cameraType,
                          @RequestParam(value = "latitude", required = false) String latitude,
                          @RequestParam(value = "longitude", required = false) String longitude,
@@ -237,8 +241,8 @@ public class TCameraInfoController {
         Result result = new Result();
         try {
             List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
-                    recordId, upRegionId, channelNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType,
-                    cameraIp,url, port, cameraType, isControl,latitude,longitude,address,unit);
+                    recordId, upRegionId, channelNum, cameraNum,smsId, rmsId, monitorId,vendorId, streamType, protocolType,
+                    cameraIp,url, port, infreadPort,cameraManager,cameraCode,cameraType, isControl,latitude,longitude,address,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

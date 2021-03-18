@@ -26,7 +26,7 @@ public class PlatformXMLUtil {
             Element rootElt = doc.getRootElement(); // 获取根节点
             List<Element> list = rootElt.elements();// 获取根节点下所有节点
 
-            if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model")) {
+            if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model") || rootElt.getName().equals("Task_Model")) {
                 for (Element element : list) {
                     if (element.getName().equals("Item")) {
                         Map<String, Object> map = new HashMap<String, Object>();

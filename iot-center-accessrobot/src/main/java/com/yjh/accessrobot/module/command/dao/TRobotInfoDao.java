@@ -73,5 +73,10 @@ public interface TRobotInfoDao {
     TCruisePointInstanceDetail selectForTask(@Param(value = "instanceId")Long instanceId);
     List<TAlgorithmInfo> selectByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
     TStdDeviceMete selectDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
+    TStdRegion selectTSRegionForStation();
+    int batchInsertInstance(List<TCruisePointInstance> list);
+    int batchInsertTaskAttr(List<TCruiseTaskAttr> list);
+    int insertTCruiseResult(TCruiseResult tCruiseResult);
+    int batchInsertTask(List<TCruiseTask> list);
 
 }

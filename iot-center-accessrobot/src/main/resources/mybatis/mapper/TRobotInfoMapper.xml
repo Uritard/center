@@ -703,4 +703,162 @@
         from t_std_devicemete
         where device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
+    <select id="selectTSRegionForStation" resultType="com.yjh.accessrobot.module.command.entity.TStdRegion">
+        select
+        *
+        from
+        t_std_region a
+        where
+        a.up_region_id = -1
+    </select>
+    <insert id="batchInsertInstance">
+        insert into t_cruise_point_instance(
+        instance_id,
+        device_mete_id,
+        station_id,
+        station_name,
+        device_id,
+        custom_id,
+        data_format,
+        identify_type,
+        identify_son_type,
+        cruise_type,
+        cruise_id,
+        cruise_name,
+        cruise_content,
+        position_type,
+        unit,
+        if_sy,
+        sy_type,
+        if_videotape,
+        videotape_time,
+        text_desc,
+        sort
+        )values
+        <foreach collection="list" item="TCruisePointInstance" separator=",">
+            (
+            #{TCruisePointInstance.instanceId, jdbcType=BIGINT},
+            #{TCruisePointInstance.deviceMeteId, jdbcType=BIGINT},
+            #{TCruisePointInstance.stationId, jdbcType=VARCHAR},
+            #{TCruisePointInstance.stationName, jdbcType=VARCHAR},
+            #{TCruisePointInstance.deviceId, jdbcType=BIGINT},
+            #{TCruisePointInstance.customId, jdbcType=VARCHAR},
+            #{TCruisePointInstance.dataFormat, jdbcType=VARCHAR},
+            #{TCruisePointInstance.identifyType, jdbcType=INTEGER},
+            #{TCruisePointInstance.identifySonType, jdbcType=INTEGER},
+            #{TCruisePointInstance.cruiseType, jdbcType=INTEGER},
+            #{TCruisePointInstance.cruiseId, jdbcType=BIGINT},
+            #{TCruisePointInstance.cruiseName, jdbcType=VARCHAR},
+            #{TCruisePointInstance.cruiseContent, jdbcType=VARCHAR},
+            #{TCruisePointInstance.positionType, jdbcType=VARCHAR},
+            #{TCruisePointInstance.unit, jdbcType=VARCHAR},
+            #{TCruisePointInstance.ifSy, jdbcType=INTEGER},
+            #{TCruisePointInstance.syType, jdbcType=INTEGER},
+            #{TCruisePointInstance.ifVideotape, jdbcType=INTEGER},
+            #{TCruisePointInstance.videotapeTime, jdbcType=VARCHAR},
+            #{TCruisePointInstance.textDesc, jdbcType=VARCHAR},
+            #{TCruisePointInstance.sort, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <insert id="batchInsertTaskAttr">
+        insert into t_cruise_task_attr(
+            task_id,
+            instance_id,
+            device_mete_id,
+            device_id,
+            custom_id,
+            point_task_id,
+            if_robot,
+            if_video,
+            if_inferad,
+            if_artificial
+        )values
+        <foreach collection="list" item="TCruiseTaskAttr" separator=",">
+            (
+            #{TCruiseTaskAttr.taskId, jdbcType=VARCHAR},
+            #{TCruiseTaskAttr.instanceId, jdbcType=BIGINT},
+            #{TCruiseTaskAttr.deviceMeteId, jdbcType=BIGINT},
+            #{TCruiseTaskAttr.deviceId, jdbcType=BIGINT},
+            #{TCruiseTaskAttr.customId, jdbcType=VARCHAR},
+            #{TCruiseTaskAttr.pointTaskId, jdbcType=VARCHAR},
+            #{TCruiseTaskAttr.ifRobot, jdbcType=INTEGER},
+            #{TCruiseTaskAttr.ifVideo, jdbcType=INTEGER},
+            #{TCruiseTaskAttr.ifInferad, jdbcType=INTEGER},
+            #{TCruiseTaskAttr.ifArtificial, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertTCruiseResult" parameterType="com.yjh.accessrobot.module.command.entity.TCruiseResult">
+        insert into t_cruise_result(
+            task_result_id,
+            task_id,
+            task_name,
+            area_id,
+            c_type,
+            c_state,
+            modify_state,
+            task_count,
+            task_wait,
+            check_user,
+            check_date,
+            weather,
+            create_time,
+            execute_time,
+            task_code,
+            remark
+        )values(
+                #{taskResultId, jdbcType=VARCHAR},
+                #{taskId, jdbcType=VARCHAR},
+                #{taskName, jdbcType=VARCHAR},
+                #{areaId, jdbcType=VARCHAR},
+                #{cType, jdbcType=INTEGER},
+                #{cState, jdbcType=INTEGER},
+                #{modifyState, jdbcType=INTEGER},
+                #{taskCount, jdbcType=INTEGER},
+                #{taskWait, jdbcType=INTEGER},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{weather, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{executeTime, jdbcType=TIMESTAMP},
+                #{taskCode, jdbcType=VARCHAR},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="batchInsertTask">
+        insert into t_cruise_task(
+            task_id,
+            task_code,
+            task_name,
+            plan_id,
+            area_id,
+            type,
+            if_run,
+            robot_id,
+            date_type,
+            task_type,
+            task_level,
+            start_time,
+            create_time
+        )values
+        <foreach collection="list" item="TCruiseTask" separator=",">
+            (
+            #{TCruiseTask.taskId, jdbcType=VARCHAR},
+            #{TCruiseTask.taskCode, jdbcType=VARCHAR},
+            #{TCruiseTask.taskName, jdbcType=VARCHAR},
+            #{TCruiseTask.planId, jdbcType=BIGINT},
+            #{TCruiseTask.areaId, jdbcType=VARCHAR},
+            #{TCruiseTask.type, jdbcType=INTEGER},
+            #{TCruiseTask.ifRun, jdbcType=INTEGER},
+            #{TCruiseTask.robotId, jdbcType=BIGINT},
+            #{TCruiseTask.dateType, jdbcType=VARCHAR},
+            #{TCruiseTask.taskType, jdbcType=INTEGER},
+            #{TCruiseTask.taskLevel, jdbcType=INTEGER},
+            #{TCruiseTask.startTime, jdbcType=TIMESTAMP},
+            #{TCruiseTask.createTime, jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
 </mapper>

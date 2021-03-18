@@ -633,7 +633,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     for (int i = 0; i < weatherList.size(); i++) {
                         redisTemplate.opsForHash().putAll("RobotWeather:"+xmlBaseModel.getSendCode()+":"+ weatherList.get(i).get("type"), weatherList.get(i));
                     }
-//                    JSONObject jsonObj=new JSONObject(info);
                     Constant.weatherServer(info,Constant.WEATHER_URL);
                     String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] weatherProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, weatherXmlString);
@@ -686,6 +685,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
                     cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
                     cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
+
+                    /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+                    String filePath = null;
+                    if ("1".equals(fileType)){//红外,拿原图的路径
+                        filePath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
+                    }else if ("2".equals(fileType)){//可见光,拿结果的路径
+                        filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                    }*/
                     String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String splitArray[] = filePath.split("/");
                     String fileName = splitArray[splitArray.length - 1];
@@ -733,6 +740,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
 //待完善             cruiseResultMap.put("originRobotPic",xmlBaseModel.getItems().get(0).get("origin_file_path").toString());//机器人巡视原图
 
+
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
                     //Start CruiseResultDealThread
                     CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
@@ -763,6 +771,15 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 }
 
                 robotService.upToCruise(xmlBaseModel);//国网要求
+                    break;
+                case "71":
+                    log.info("巡视主机收到机器人站端的任务了");
+                    //Deal with robot task data
+                    String taskFile = xmlBaseModel.getItems().get(0).get("task_file_path").toString();
+                    XMLBaseModel taskModel = getXmlMessage(filePathMap.get(redisValue) + "/" +taskFile);
+                    List<Map<String,Object>> taskModelMapList = taskModel.getItems();
+                    log.info("taskModelItemsMap是："+taskModelMapList);
+                    robotService.robotTaskIntoDB(taskModelMapList,xmlBaseModel);
                     break;
                 default:
                     break;
