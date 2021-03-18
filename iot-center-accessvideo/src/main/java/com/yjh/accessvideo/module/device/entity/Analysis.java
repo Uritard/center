@@ -36,11 +36,11 @@ public class Analysis implements Serializable {
     @ApiModelProperty(value = "模版图片路径")
     private String picModelPath;
 
-//    @ApiModelProperty(value = "CSV文件路径")
-//    private String csvPath;
-//
-//    @ApiModelProperty(value = "红外图谱辅助Data文件路径")
-//    private String dataPath;
+    @ApiModelProperty(value = "CSV文件路径")
+    private String csvPath;
+
+    @ApiModelProperty(value = "红外图谱辅助Data文件路径")
+    private String dataPath;
 
     @ApiModelProperty(value = "是否AI算法 0是1否")
     private int isAi;

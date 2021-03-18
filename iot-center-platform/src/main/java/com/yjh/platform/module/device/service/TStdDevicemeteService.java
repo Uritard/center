@@ -263,15 +263,15 @@ public class TStdDevicemeteService{
                 tCruiseTypeDao.deleteForInstanceId(haveList);
             }
 
+            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));
+            log.info("deviceMete---------------------"+tStdDeviceMete);
+            Long deviceId=tStdDeviceMete.getDeviceId();
+            String customId=tStdDeviceMete.getCustomId();
 //            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));//根据devicemeteId查测点
 //            Long deviceId=tStdDeviceMete.getDeviceId();
 //            String customId=tStdDeviceMete.getCustomId();
             deleteCount=tStdDevicemeteDao.deleteByPrimaryId(Long.valueOf(item))+deleteCount;
 
-
-            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));
-            Long deviceId=tStdDeviceMete.getDeviceId();
-            String customId=tStdDeviceMete.getCustomId();
             if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
 //
                 if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备

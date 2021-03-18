@@ -12,6 +12,7 @@ import org.apache.xml.serializer.utils.MsgKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,9 @@ public class AnalysisService {
 
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private CameraConService cameraConService;
@@ -58,14 +62,12 @@ public class AnalysisService {
         for (Analysis analysis: analysisList) {
             log.info("表计IsAI："+analysis.getIsAi());
             if (analysis.getIsAi()==1) {
-                Map<String,Long>cameraInfo=analyseDataOperateDao.selectTaskCruiseCameraInfo(analysis.getTaskId(),analysis.getInstanceId());
-                Map<String,String> firHandelMap=cameraConService.givePicFir(cameraInfo.get("cameraId"),cameraInfo.get("presetId"));
-//                Map<String,String> firHandelMap=new HashMap<>();
-//                if(analysis.getAnalyseType().equals("9")) {
-//                    firHandelMap.put("csvPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.csv");
-//                    firHandelMap.put("dataPath", "/home/yjh_iot_center/iot-picture/infrared/20210303042709568.data");
-//                }
-                log.info("cameraInfo-----"+cameraInfo);
+                Map<String,String> firHandelMap=new HashMap<>();
+                if(analysis.getAnalyseType().equals("9")) {
+                    firHandelMap.put("picPath",analysis.getPicPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content").toString()));
+                    firHandelMap.put("csvPath", analysis.getCsvPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
+                    firHandelMap.put("dataPath", analysis.getDataPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
+                }
                 log.info("firData-------"+firHandelMap);
                 JSONObject pictureInfoObject = new JSONObject();
                 JSONObject pictureDataObject = new JSONObject();
@@ -74,9 +76,10 @@ public class AnalysisService {
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                if(Objects.nonNull(firHandelMap) && firHandelMap.size()!=0){
+                if(firHandelMap.size()!=0){
                     pictureDataObject.put("csvPath",firHandelMap.get("csvPath"));
                     pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
+                    pictureDataObject.put("imagePath",firHandelMap.get("picPath"));
                 }
                 pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                 msgDataObject.put("data", pictureInfoObject);
