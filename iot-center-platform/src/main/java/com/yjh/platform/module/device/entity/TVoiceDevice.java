@@ -46,6 +46,8 @@ public class TVoiceDevice implements Serializable {
     @ApiModelProperty(value = "上级区域id")
     private Long upRegionId;
 
+    private String state;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
