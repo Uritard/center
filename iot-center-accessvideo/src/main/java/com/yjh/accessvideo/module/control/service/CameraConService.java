@@ -210,10 +210,10 @@ public class CameraConService {
                     returnMapList.add(cameraFlowMap);
                 } else {
                     CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
-                    String userName = cameraConInfo.getIdentityManager();
-                    String password = cameraConInfo.getIdentityCode();
-                    String cameraIp = cameraConInfo.getRecordIp();
-                    int cameraPort = cameraConInfo.getRtspPort();
+                    String userName = cameraConInfo.getCameraManager();
+                    String password = cameraConInfo.getCameraCode();
+                    String cameraIp = cameraConInfo.getCameraIp();
+                    int cameraPort = cameraConInfo.getPort();
                     int iChanNum = cameraConInfo.getChannelNum();
                     int cameraType = cameraConInfo.getCameraType();
                     int livePath;
@@ -234,7 +234,7 @@ public class CameraConService {
                     log.info("transUrl: "+transUrl);
                     String[] rtmpUrls = transUrl.split("rtmp");
                     String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-                    String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
+                    String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
                     Map<String, Object> returnMap = new HashMap<>();
                     returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
                     returnMap.put("rtmpUrl", rtmpUrl);
@@ -277,7 +277,7 @@ public class CameraConService {
         log.info("transUrlLight: "+transUrlLight);
         String[] rtmpUrls = transUrlLight.split("rtmp");
         String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-        String flvUrl = "http://"+hostIp+":8000/live/"+livePath+".flv";
+        String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
         Map<String, Object> returnLightMap = new HashMap<>();
         returnLightMap.put("light", String.valueOf(robotId));
         returnLightMap.put("rtmpUrl", rtmpUrl);
@@ -296,7 +296,7 @@ public class CameraConService {
         log.info("transUrlinferad: "+transUrlinferad);
         String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
         String rtmpUrlInferad = "rtmp"+rtmpUrlsInferad[rtmpUrlsInferad.length-1];
-        String flvUrlInferad = "http://"+hostIp+":8000/live/"+livePath+".flv";
+        String flvUrlInferad = "http://"+hostIp+":10080/live/"+livePath+".flv";
         Map<String, Object> returnInferadMap = new HashMap<>();
         returnInferadMap.put("inferad", String.valueOf(robotId));
         returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
@@ -392,7 +392,7 @@ public class CameraConService {
             Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-            String flvUrl = "http://"+hostIp+":8000/history/"+historyPath+".flv";
+            String flvUrl = "http://"+hostIp+":10080/history/"+historyPath+".flv";
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
             returnMap.put("flvUrl", flvUrl);
