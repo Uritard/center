@@ -269,6 +269,9 @@ public class TWarnInfoService{
                         .setDealPersonId(userId)
                         .setConfMode(275);
                 jieGuo = tWarnInfoDao.update(tWarnInfo);
+                if (jieGuo == 1) {
+                    sendWebSocket(warnId);
+                }
             }else {
                 TDefectInfo tDefectInfo = new TDefectInfo()
                         .setDefectId(warnId)
@@ -278,9 +281,21 @@ public class TWarnInfoService{
                         .setDealTime(date)
                         .setConfMode(275);
                 jieGuo = tDefectInfoDao.update(tDefectInfo);
+                if (jieGuo == 1) {
+                    sendWebSocket(warnId);
+                }
             }
         }
         return jieGuo;
+    }
+    public void sendWebSocket(Long warnId){
+        //给前端推webSocket
+        Map<String,Object> jasonMap=new HashMap<>();
+        jasonMap.put("type","finishedOneAlarm");
+        jasonMap.put("alarmId",warnId);
+        String json= JSON.toJSONString(jasonMap);
+        System.out.println(("发送给前端的消息==="+json));
+        WebSocketServer.sendMsg(json);
     }
     @Transactional(rollbackFor = Exception.class)
     public int alarmProcess(TWarnInfo tWarnInfoTemp,String userId) {

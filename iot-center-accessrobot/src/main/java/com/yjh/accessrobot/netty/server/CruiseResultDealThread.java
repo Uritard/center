@@ -79,6 +79,11 @@ public class CruiseResultDealThread implements Runnable{
                         tCruiseTaskResultMap.put("instanceName",redisInfoMap.get("inspectionName"));
                         tCruiseTaskResultMap.put("deviceName",redisInfoMap.get("deviceName"));
                         tCruiseTaskResultMap.put("cruiseTime",cruiseResultMap.get("time"));
+                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
+                        tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
+                        if (cruiseResultMap.get("fileType").equals("1")){
+                            tCruiseTaskResultMap.put("resultPic",cruiseResultMap.get("resultPic"));
+                        }
                         if (!"".equals(cruiseResultMap.get("value"))){
                             tCruiseTaskResultMap.put("resultNum",cruiseResultMap.get("value"));//只有值
                             tCruiseTaskResultMap.put("cruiseResult","246");
@@ -88,7 +93,6 @@ public class CruiseResultDealThread implements Runnable{
                             tCruiseTaskResultMap.put("cruiseResult","247");
                             tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                         }
-                        tCruiseTaskResultMap.put("endTime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("evaluationState","257");
                         tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("isWarn","0");
@@ -168,12 +172,10 @@ public class CruiseResultDealThread implements Runnable{
                             tCruiseTaskResultMap.put("cruiseResult","247");
                             tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                         }
-                        //待完善
-                        /*if ( cruiseResultMap.get("fileType").equals("1")){
-                            tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("originRobotPic"));//红外图
-                            tCruiseTaskResultMap.put("resultPic",cruiseResultMap.get("relativePath"));//fir
-                        }else if (cruiseResultMap.get("fileType").equals("2")) {
-                            tCruiseTaskResultMap.put("picpath", cruiseResultMap.get("relativePath"));
+                        /*tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
+                        tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
+                        if (cruiseResultMap.get("fileType").equals("1")){
+                            tCruiseTaskResultMap.put("resultPic",cruiseResultMap.get("resultPic"));
                         }*/
                         if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
                             tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
