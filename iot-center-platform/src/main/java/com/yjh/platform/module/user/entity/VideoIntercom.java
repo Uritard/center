@@ -75,6 +75,9 @@ public class VideoIntercom implements Serializable {
     @ApiModelProperty(value = "相机端口")
     @TableField(value = "port",updateStrategy = FieldStrategy.IGNORED)
     private Integer port;
+    @ApiModelProperty(value = "相机端口")
+    @TableField(value = "rtspPort",updateStrategy = FieldStrategy.IGNORED)
+    private Integer rtspPort;
 
     @Length(max = 32,message = "address长度必须小于等于128")
     @ApiModelProperty(value = "安装地址")
@@ -87,6 +90,9 @@ public class VideoIntercom implements Serializable {
     @ApiModelProperty(value = "描述")
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
+
+    @ApiModelProperty(value = "在线状态 0 在在线  1 离线")
+    private Integer state ;
 
 
 }
