@@ -184,7 +184,7 @@ public class SysUserService {
                         Calendar calendarOne = Calendar.getInstance();
                         calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
-                        if (lockTime < Integer.valueOf(lockTimes.get("content"))) { //如果锁定时间小于1200S
+                        if (lockTime < Integer.valueOf(lockTimes.get("content"))*60) { //如果锁定时间小于1200S
                             mapResult.put("errorCount", "账户已被锁定！");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
@@ -292,7 +292,7 @@ public class SysUserService {
                 if (num == null) { //第一次访问错误
                     redisTemplate.opsForValue().set(key, 1);
                     num = 1;
-                } else if (num >= Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
+                } else if (num+1 >= Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
                     if (!userId.equals("10001")) { //admin用户不可锁定
                         SysUser user=new SysUser();
                         user.setState(2);
