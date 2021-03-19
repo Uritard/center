@@ -121,7 +121,7 @@
         <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=INTEGER},</if>
         <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
         <if test="lockTime != null">a.lock_time = #{lockTime, jdbcType=TIMESTAMP},</if>
-        <if test="verfiCode != null and verfiCode != ''">a.verfi_code = #{verfiCode, jdbcType=VARCHAR},</if>
+        <if test="verfiCode != null">a.verfi_code = #{verfiCode, jdbcType=VARCHAR},</if>
     </set>
         where a.user_id = #{userId, jdbcType=BIGINT}
     </update>

@@ -47,9 +47,9 @@
         update sys_role_menu a <set>
         <if test="rpId != null">a.rp_id = #{rpId},</if>
         <if test="menuCode != null">a.menu_code = #{menuCode},</if>
-        <if test="sort != null">a.sort = #{sort},</if>
+        a.sort = #{sort},
         <if test="elementCode != null">a.element_code = #{elementCode},</if>
-        <if test="roleId != null ">a.role_id = #{roleId},</if>
+        a.role_id = #{roleId},
     </set>
             where a.rp_id = #{rpId, jdbcType=BIGINT}
     </update>

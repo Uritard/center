@@ -32,7 +32,7 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleRobot">
         update sys_role_robot a <set>
         <if test="roleId != null">a.role_id = #{roleId},</if>
-        <if test="robotId != null ">a.robot_id = #{robotId},</if>
+        a.robot_id = #{robotId},
     </set>
             where a.role_id = #{roleId, jdbcType=BIGINT}
     </update>

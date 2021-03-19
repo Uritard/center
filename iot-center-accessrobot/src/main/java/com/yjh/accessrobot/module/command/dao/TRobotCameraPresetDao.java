@@ -26,7 +26,8 @@ public interface TRobotCameraPresetDao {
                                 @Param(value = "creatorTime") Date creatorTime,
                                 @Param(value = "cameraType") Integer cameraType);
     List<TRobotCameraPreset> selectByPage(@Param(value = "presetNum") Integer presetNum,
-                                    @Param(value = "presetName") String presetName);
+                                    @Param(value = "presetName") String presetName,
+                                    @Param(value = "robotId") Long robotId);
 
     int batchAdd(List<TRobotCameraPreset> list);
     int batchDelete(List<String> list);

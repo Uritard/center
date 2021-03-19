@@ -67,7 +67,7 @@
         <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
         <if test="upRegionIds != null ">a.up_region_ids = #{upRegionIds},</if>
-        <if test="regionCode != null ">a.region_code = #{regionCode, jdbcType=INTEGER},</if>
+        a.region_code = #{regionCode, jdbcType=INTEGER},
         <if test="stationId != null ">a.station_id = #{stationId},</if>
         <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>

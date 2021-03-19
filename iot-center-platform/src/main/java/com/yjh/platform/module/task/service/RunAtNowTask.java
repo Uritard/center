@@ -472,15 +472,19 @@ public class RunAtNowTask implements Runnable{
                         if(waitFlag){
                             mapForCameraState.put("state","1");
                             redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
-                            move(map);
-                            Thread.sleep(waitTime);//等待摄像头转到预置位
-                            //2.抓图
+                            Result re = null;
                             HashMap<String, Object> map2 = new HashMap<>();
                             map2.put("cameraId", tCameraPreset.getCameraId());
-                            Result re = picture(map2);
                             if(item.getCruiseType().equals(230)){//红外专属拍照方法
-                                re = redPicture(map2);
+                                re = redPicture(map);
+                            }else {
+                                move(map);
+                                Thread.sleep(waitTime);//等待摄像头转到预置位
+                                //2.抓图
+                                 re = picture(map2);
                             }
+                            mapForCameraState.put("state","0");
+                            redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
                             if(re == null){
                                 isOk = "";
                             }else{
@@ -493,8 +497,7 @@ public class RunAtNowTask implements Runnable{
                                 dataPath = (String) jsonForRe.get("dataPath");
                                 isOk = re.getMessage();
                             }
-                            mapForCameraState.put("state","0");
-                            redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
+
                         }else {
                             isOk ="";
                         }

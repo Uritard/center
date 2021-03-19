@@ -130,13 +130,14 @@ public class TRobotCameraPresetController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     public Result selectByPage(@RequestParam(value = "presetNum", required = false) Integer presetNum,
                                 @RequestParam(value = "presetName", required = false) String presetName,
+                                @RequestParam(value = "cameraId", required = false) Long cameraId,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TRobotCameraPreset> list = tRobotCameraPresetService.selectByPage(presetNum,presetName);
+            List<TRobotCameraPreset> list = tRobotCameraPresetService.selectByPage(presetNum,presetName, cameraId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -195,4 +196,17 @@ public class TRobotCameraPresetController {
         return result;
     }
 
+
+    @ApiOperation(value = "机器人预置位树")
+    @RequestMapping(value = "/robotPresetTree", method = RequestMethod.GET)
+    public Result robotPresetTree(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(this.tRobotCameraPresetService.robotPresetTree(robotId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

@@ -47,12 +47,12 @@
     <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotCameraPreset">
         update t_robot_camera_preset a <set>
         <if test="presetId != null and presetId != ''">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
-        <if test="presetNum != null">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        a.preset_num = #{presetNum, jdbcType=INTEGER},
+        a.robot_id = #{robotId, jdbcType=BIGINT},
         <if test="robotCode != null and robotCode != ''">a.robot_code = #{robotCode, jdbcType=VARCHAR},</if>
         <if test="presetName != null and presetName != ''">a.preset_name = #{presetName, jdbcType=VARCHAR},</if>
         <if test="creatorTime != null and creatorTime != ''">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
-        <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
+        a.camera_type = #{cameraType, jdbcType=INTEGER},
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}
     </update>
@@ -108,8 +108,9 @@
         from t_robot_camera_preset a
         left join t_robot_info b on a.robot_id = b.robot_id
         where 1 = 1
-        <if test="presetNum != null and presetNum != ''"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
+        <if test="presetNum != null"> and a.preset_num = #{presetNum, jdbcType=INTEGER}</if>
         <if test="presetName != null and presetName != ''"> and a.preset_name like concat("%",#{presetName, jdbcType=VARCHAR},"%") </if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
 
     <insert id="batchAdd">

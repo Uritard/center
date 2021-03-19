@@ -86,6 +86,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     //机器人任务接口
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
+    //红外拍照
+    private static final String RED_MOVE_URL = "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}";
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
@@ -361,6 +363,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                         String isOk = "";
                         String urlPath = "";
                         String absPath = "";
+                        String picPath = "";
+                        String csvPath = "";
+                        String dataPath = "";
                         TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
                         if(tCameraPreset != null){
                             //1.转到预置位
@@ -393,12 +398,19 @@ public class CruiseTaskJob extends QuartzJobBean {
                             if(waitFlag){
                                 mapForCameraState.put("state","1");
                                 redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
-                                move(map);
-                                Thread.sleep(waitTime);//等待摄像头转到预置位
-                                //2.抓图
+                                Result re = null;
                                 HashMap<String, Object> map2 = new HashMap<>();
                                 map2.put("cameraId", tCameraPreset.getCameraId());
-                                Result re = picture(map2);
+                                if(item.getCruiseType().equals(230)){//红外专属拍照方法
+                                    re = redPicture(map);
+                                }else {
+                                    move(map);
+                                    Thread.sleep(waitTime);//等待摄像头转到预置位
+                                    //2.抓图
+                                    re = picture(map2);
+                                }
+                                mapForCameraState.put("state","0");
+                                redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
                                 if(re == null){
                                     isOk = "";
                                 }else{
@@ -406,12 +418,14 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     //todo 对于相机的返回错误分析  任务异常终止/超期
                                     urlPath = (String) jsonForRe.get("urlPath");
                                     absPath = (String) jsonForRe.get("absPath");
+                                    picPath = (String) jsonForRe.get("picPath");
+                                    csvPath = (String) jsonForRe.get("csvPath");
+                                    dataPath = (String) jsonForRe.get("dataPath");
                                     isOk = re.getMessage();
                                 }
-                                mapForCameraState.put("state","0");
-                                redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
+
                             }else {
-                               isOk ="";
+                                isOk ="";
                             }
                         }
                         if( !"success".equals(isOk)){
@@ -552,6 +566,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     analysisMap.put("list",analysisList);
                                     log.info("算法信息：    "+analysisMap);
                                     if(tAlgorithmInfo.getIsAi() == 1){//0-缺陷 1-表记
+                                        if(item.getCruiseType().equals(230)){//红外专属
+                                            analysis.setPicPath(picPath);
+                                            analysis.setCsvPath(csvPath);
+                                            analysis.setDataPath(dataPath);
+                                            log.info("算法信息(红外)：    "+analysisMap);
+                                        }
                                         analysis(analysisMap);
                                     }else {
                                         defect(analysisMap);
@@ -904,6 +924,20 @@ public class CruiseTaskJob extends QuartzJobBean {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    //红外相机抓图
+    private  Result redPicture(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class,map);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return re;
     }
 
     private Result sendTaskStateToUp(TCruiseTask tCruiseTask,Integer state){

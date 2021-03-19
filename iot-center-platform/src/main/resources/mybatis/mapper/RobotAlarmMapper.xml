@@ -72,17 +72,17 @@
         update robot_alarm a <set>
         <if test="robotAlarmId != null ">a.robot_alarm_id = #{robotAlarmId},</if>
         <if test="stationId != null">a.station_id = #{stationId},</if>
-        <if test="alarmType != null">a.al arm_type = #{alarmType, jdbcType=INTEGER},</if>
-        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        a.al arm_type = #{alarmType, jdbcType=INTEGER},
+        a.alarm_level = #{alarmLevel, jdbcType=INTEGER},
         <if test="alarmInfo != null">a.alarm_info = #{alarmInfo},</if>
         a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
-        <if test="dealType != null">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        a.deal_type = #{dealType, jdbcType=INTEGER},
         <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
         <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
         <if test="dealPersonName != null ">a.deal_person_name = #{dealPersonName},</if>
         <if test="positionStationNum != null ">a.position_station_num = #{positionStationNum},</if>
         <if test="positionOffset != null ">a.position_offset = #{positionOffset},</if>
-        <if test="alarmState != null">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        a.alarm_state = #{alarmState, jdbcType=INTEGER},
         a.end_time = CURRENT_TIMESTAMP(),
     </set>
             where a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}

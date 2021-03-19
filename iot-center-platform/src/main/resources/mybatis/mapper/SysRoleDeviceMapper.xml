@@ -35,7 +35,7 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleDevice">
         update sys_role_device a <set>
         <if test="roleId != null ">a.role_id = #{roleId},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        a.device_id = #{deviceId},
         <if test="isChecked != null ">a.is_checked = #{isChecked},</if>
     </set>
             where a.role_id = #{roleId, jdbcType=BIGINT}

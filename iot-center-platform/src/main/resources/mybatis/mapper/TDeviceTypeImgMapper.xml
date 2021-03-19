@@ -37,10 +37,10 @@
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TDeviceTypeImg">
         update t_device_type_img a <set>
-        <if test="typeId != null and typeId != ''">a.type_id = #{typeId, jdbcType=VARCHAR},</if>
-        <if test="picAbsPath != null and picAbsPath != ''">a.pic_abs_path = #{picAbsPath, jdbcType=VARCHAR},</if>
-        <if test="picRealPath != null and picRealPath != ''">a.pic_real_path = #{picRealPath, jdbcType=VARCHAR},</if>
-        <if test="remake != null and remake != ''">a.remake = #{remake, jdbcType=VARCHAR},</if>
+        <if test="typeId != null">a.type_id = #{typeId, jdbcType=VARCHAR},</if>
+        <if test="picAbsPath != null">a.pic_abs_path = #{picAbsPath, jdbcType=VARCHAR},</if>
+        <if test="picRealPath != null">a.pic_real_path = #{picRealPath, jdbcType=VARCHAR},</if>
+        <if test="remake != null">a.remake = #{remake, jdbcType=VARCHAR},</if>
     </set>
             where a.type_id = #{typeId, jdbcType=VARCHAR}
     </update>

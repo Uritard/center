@@ -1,9 +1,12 @@
 package com.yjh.accessrobot.module.command.service;
 
+import com.yjh.accessrobot.module.command.entity.AreaInfoDetail;
 import com.yjh.accessrobot.module.command.entity.TRobotCameraPreset;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yjh.accessrobot.module.command.dao.TRobotCameraPresetDao;
 import com.yjh.accessrobot.module.command.service.TRobotCameraPresetService;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 import java.util.Arrays;
@@ -61,8 +64,8 @@ public class TRobotCameraPresetService{
 
     //@Logs(title = "分页查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotCameraPreset> selectByPage(Integer presetNum, String presetName) {
-        List<TRobotCameraPreset> tRobotCameraPresetList = tRobotCameraPresetDao.selectByPage( presetNum,presetName);
+    public List<TRobotCameraPreset> selectByPage(Integer presetNum, String presetName,Long robotId) {
+        List<TRobotCameraPreset> tRobotCameraPresetList = tRobotCameraPresetDao.selectByPage( presetNum,presetName,robotId);
         return tRobotCameraPresetList;
     }
 
@@ -79,7 +82,28 @@ public class TRobotCameraPresetService{
     return this.tRobotCameraPresetDao.batchDelete(list1);
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfoDetail> robotPresetTree(Long robotId){
+        List<AreaInfoDetail> re =new ArrayList<>();
+        AreaInfoDetail tree = new AreaInfoDetail();
+        tree.setId(1L);
+        tree.setLabel("机器人预置位树");
+        tree.setInfoType("tree");
+        List<AreaInfoDetail> child = new ArrayList<>();
+        List<TRobotCameraPreset> list = selectByPage(null,null,robotId);
+        for(TRobotCameraPreset item:list){
+            AreaInfoDetail pre = new AreaInfoDetail();
+            pre.setId(Long.valueOf(item.getPresetNum()));
+            pre.setLabel(item.getPresetName());
+            pre.setUpId(1L);
+            pre.setUpName("机器人预置位树");
+            pre.setInfoType("preset");
+            child.add(pre);
+        }
+        tree.setChildren(child);
+        re.add(tree);
+        return re;
+    }
 
 }
 
