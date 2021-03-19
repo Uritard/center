@@ -17,6 +17,7 @@
         <result column="vendor" jdbcType="VARCHAR" property="vendor" />
         <result column="protocol_type" jdbcType="INTEGER" property="protocolType" />
         <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort" />
         <result column="address" jdbcType="VARCHAR" property="address" />
         <result column="desc" jdbcType="VARCHAR" property="desc" />
         <result column="camera_model" jdbcType="VARCHAR" property="cameraModel" />
@@ -26,7 +27,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
          video_intercom_id, camera_name,camera_ip,owner, owner_code, channel_num, camera_type, up_region_id,
-         vendor_id, protocol_type,port, address, camera_model,remark,region_name
+         vendor_id, protocol_type,port, address, camera_model,remark,region_name,rtsp_port
     </sql>
 
     <sql id="tongTong">
@@ -42,6 +43,7 @@
         a.vendor_id ,
         a.protocol_type ,
         a.port,
+        a.rtsp_port,
         a.address,
         a.camera_model,
         a.remark,
@@ -63,6 +65,7 @@
      vendor_id,
      protocol_type,
      port,
+     rtsp_port,
      address,
      camera_model,
      remark,
@@ -79,6 +82,7 @@
       #{vendorId, jdbcType=INTEGER},
       #{protocolType, jdbcType=INTEGER},
       #{port, jdbcType=INTEGER},
+      #{rtspPort, jdbcType=INTEGER},
       #{address, jdbcType=VARCHAR},
       #{cameraType, jdbcType=VARCHAR},
       #{remark, jdbcType=VARCHAR},
@@ -118,6 +122,7 @@
         <if test="vendorId != null">a.vendor_id = #{vendorId},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType},</if>
         <if test="port != null">a.port = #{port},</if>
+        <if test="rtspPort != null">a.rtsp_port = #{rtspPort},</if>
         <if test="address != null">a.address = #{address},</if>
         <if test="cameraModel != null">a.camera_model = #{cameraModel},</if>
         <if test="remark != null">a.remark = #{remark},</if>
@@ -148,6 +153,7 @@
                 a.vendor_id ,
                 a.protocol_type ,
                 a.port,
+                a.rtsp_port,
                 a.address,
                 a.camera_model,
                 a.remark,
