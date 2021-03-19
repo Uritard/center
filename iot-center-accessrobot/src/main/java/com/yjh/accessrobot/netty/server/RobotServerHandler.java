@@ -685,14 +685,52 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
                     cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
                     cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
-
+//改版
                     /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
-                    String filePath = null;
-                    if ("1".equals(fileType)){//红外,拿原图的路径
-                        filePath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
-                    }else if ("2".equals(fileType)){//可见光,拿结果的路径
-                        filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                    String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                    String sArray[] = ftpFilePath.split("/");
+                    String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
+                    String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
+                    String ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//原图:红外bmp,可见光为标定
+                    String sArray2[] = ftpOriginPath.split("/");
+                    String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
+                    String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
+                    log.info("temporaryFilePath==="+temporaryFilePath+",temporaryOriginPath==="+temporaryOriginPath);
+
+                    String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                    String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                    String developFirAbsoluteUrl = null;
+                    String developFirRelativeUrl = null;
+                    String developOriginAbsoluteUrl = null;
+                    String developOriginRelativeUrl = null;
+                    if ("1".equals(fileType)){//红外
+                        developAbsoluteUrl = developAbsoluteUrl + "Infrared";
+                        developRelativeUrl = developRelativeUrl + "Infrared";
+                        developFirAbsoluteUrl = developAbsoluteUrl + "FIR";
+                        developFirRelativeUrl = developRelativeUrl + "FIR";
+                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl);//拷贝原图
+                        copyFileToDevelop(temporaryFilePath,developFirAbsoluteUrl);//拷贝巡视结果图
+                        cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpOriginName);
+                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpOriginName);
+                        cruiseResultMap.put("resultPic",developFirRelativeUrl + "/" +ftpFileName);
+                    }else if ("2".equals(fileType)){//可见光
+                        developAbsoluteUrl = developAbsoluteUrl + "CCD";
+                        developRelativeUrl = developRelativeUrl + "CCD";
+                        developOriginAbsoluteUrl = developAbsoluteUrl + "BigImg";
+                        developOriginRelativeUrl = developRelativeUrl + "BigImg";
+                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl);//拷贝巡视结果图
+                        copyFileToDevelop(temporaryOriginPath,developOriginAbsoluteUrl);//拷贝原图
+                        cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpFileName);
+                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpFileName);
+                        cruiseResultMap.put("originRobotPic",developOriginAbsoluteUrl+"/"+ftpOriginName);
+                    }else if ("3".equals(fileType)){//音频
+                        developAbsoluteUrl = developAbsoluteUrl + "Audio";
+                        developRelativeUrl = developRelativeUrl + "Audio";
+                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl);//拷贝巡视结果图
+                        cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpFileName);
+                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpFileName);
                     }*/
+//改版
                     String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String splitArray[] = filePath.split("/");
                     String fileName = splitArray[splitArray.length - 1];
@@ -707,13 +745,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //开发环境图片相对路径文件目录
                     String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
 
-                    if (xmlBaseModel.getItems().get(0).get("file_type").toString().equals("1")){//红外图谱文件
+                    if (xmlBaseModel.getItems().get(0).get("file_type").toString().equals("1")){//红外图谱和红外图片
                         developAbsoluteUrl = developAbsoluteUrl + "FIR";
                         developRelativeUrl = developRelativeUrl + "FIR";
-                    }else if(xmlBaseModel.getItems().get(0).get("file_type").toString().equals("2")){//可见光照片文件
+                    }else if(xmlBaseModel.getItems().get(0).get("file_type").toString().equals("2")){//可见光照片
                         developAbsoluteUrl = developAbsoluteUrl + "CCD";
                         developRelativeUrl = developRelativeUrl + "CCD";
-                    }else if(xmlBaseModel.getItems().get(0).get("file_type").toString().equals("3")){//音频文件
+                    }else if(xmlBaseModel.getItems().get(0).get("file_type").toString().equals("3")){//音频
                         developAbsoluteUrl = developAbsoluteUrl + "Audio";
                         developRelativeUrl = developRelativeUrl + "Audio";
                     }
@@ -738,8 +776,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
                     cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
-//待完善             cruiseResultMap.put("originRobotPic",xmlBaseModel.getItems().get(0).get("origin_file_path").toString());//机器人巡视原图
-
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
                     //Start CruiseResultDealThread
@@ -784,6 +820,23 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 default:
                     break;
             }
+        }
+    }
+    /*
+    将ftp服务器上的文件复制到开发环境
+    * */
+    void copyFileToDevelop(String source,String aim){
+        File ff=new File(aim);
+        if (!ff.exists()){
+            ff.setWritable(true, false);
+            ff.mkdirs();
+        }
+        try {
+            String url = "cp " + source + " "+aim;
+            log.info("url是==="+url);
+            Runtime.getRuntime().exec(url);
+        }catch (Exception e){
+            e.getMessage();
         }
     }
     /*

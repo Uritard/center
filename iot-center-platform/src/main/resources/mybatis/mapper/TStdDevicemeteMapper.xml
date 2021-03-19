@@ -698,7 +698,7 @@
         where 1 = 1
         <if test="deviceType != -1">and g.device_type = #{deviceType,jdbcType = INTEGER} </if>
         <if test="meterType != -1">and f.meter_type = #{meterType,jdbcType = INTEGER} </if>
-        <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
+        <if test="meteType != null and meteType != -1">and f.mete_type = #{meteType,jdbcType = INTEGER} </if>
 
         <if test="list!= null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
@@ -734,7 +734,7 @@
         where 1 = 1
         <if test="deviceType != -1">and g.device_type = #{deviceType,jdbcType = INTEGER} </if>
         <if test="meterType != -1">and f.meter_type = #{meterType,jdbcType = INTEGER} </if>
-        <if test="meteType != null and meteType != -1">and b.mete_type = #{meteType,jdbcType = INTEGER} </if>
+        <if test="meteType != null and meteType != -1">and f.mete_type = #{meteType,jdbcType = INTEGER} </if>
 
         <if test="list!= null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
