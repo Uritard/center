@@ -39,4 +39,8 @@ public class Analysis implements Serializable {
     @ApiModelProperty(value = "是否AI算法 0是1否")
     private int isAi;
 
+    private String csvPath;
+
+    private String dataPath;
+
 }
