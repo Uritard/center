@@ -89,23 +89,30 @@ public class zuulFilter extends ZuulFilter {
                 }
                 String token = request.getHeader("token") != null ? request.getHeader("token") : "";
                 if (StringUtils.isNoneBlank(token)) {
-                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:"+userId+":"+ token);
+                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
+                    String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
                     if (appKeymap.size() == 0) {
                         log.error("用户未登陆===================================================================================");
                         ctx.setSendZuulResponse(false);
                         ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                         return false;
                     } else {
-                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:"+userId+":"+ token, "expireTime")));
-                        int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime" , "content")));
-                        if (System.currentTimeMillis() - expireTime > 60000*logoutTime) {
+                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
+                        int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
+                        if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
                             log.error("token已失效===========================================================================");
-                            redisTemplate.delete("appKey:"+token);
+                            redisTemplate.delete("appKey:" + userId + ":" + token);
+                            if ("true".equals(isLogin)) {
+                                redisTemplate.delete("user:" + userId);
+                            }
                             ctx.setSendZuulResponse(false);
                             ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;
                         } else {
-                            redisTemplate.opsForHash().put("appKey:"+userId+":"+ token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            if ("true".equals(isLogin)) {
+                                redisTemplate.opsForHash().put("user:" + userId, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            }
                         }
                     }
                 } else {
@@ -121,7 +128,7 @@ public class zuulFilter extends ZuulFilter {
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (request instanceof HttpServletRequest) {
                 if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
-                    if("true".equals(isIp)) {
+                    if ("true".equals(isIp)) {
                         String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
                         if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':')))) {
                             log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
