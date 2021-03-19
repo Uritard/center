@@ -133,8 +133,9 @@ public class SysUserService {
             SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
             if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
                 if("true".equals(isLogin)){
-                    Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:"+sysUserLogin.getUserId(), "expireTime")));
-                    if(expireTime!=null){
+                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:"+sysUserLogin.getUserId());
+                    if(appKeymap.size()!=0){
+                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:"+sysUserLogin.getUserId(), "expireTime")));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
                             throw new BusinessException(500, "用户已登陆");
