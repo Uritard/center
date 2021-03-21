@@ -281,7 +281,7 @@
         <result property="lastLogin" column="last_login"/>
     </resultMap>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysUserSelect" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.SysUser" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
         select
         a.user_id,
         a.user_name,
@@ -446,7 +446,7 @@
 
 
     <update id="batchUpdate" parameterType="com.yjh.platform.module.user.entity.SysUser">
-        update sys_user a set a.status=1
+        update sys_user a set a.state=1
         WHERE
         a.user_id in
         <foreach collection="list" item="userId" separator="," open="(" close=")">
