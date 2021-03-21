@@ -227,6 +227,22 @@ public class SysUserSelect implements Serializable {
         this.pageSize = pageSize;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
     @Max(value = 999999999999999999l)
 
     @ApiModelProperty(value = "用户id")
