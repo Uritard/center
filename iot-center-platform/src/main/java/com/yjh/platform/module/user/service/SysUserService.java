@@ -355,7 +355,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysUser> selectByPage(SysUser sysUser) {
+    public List<SysUserSelect> selectByPage(SysUserSelect sysUser) {
         if (sysUser.getUserStatus() != null && sysUser.getUserStatus() == -1) {
             sysUser.setUserStatus(null);
         }

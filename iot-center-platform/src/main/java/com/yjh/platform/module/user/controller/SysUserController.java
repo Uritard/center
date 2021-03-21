@@ -227,7 +227,7 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询系统用户数据", content = "根据用户传递的参数分页查询系统用户信息", logType = 1)
-    public Result selectByPage(@RequestBody SysUser sysUser
+    public Result selectByPage(@RequestBody SysUserSelect sysUser
     ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -241,12 +241,11 @@ public class SysUserController {
             String isDecode = map.get("content");
             if ("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
-                sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
-            List<SysUser> list = sysUserService.selectByPage(sysUser);
-            List<SysUser> userList = new ArrayList<>();
+            List<SysUserSelect> list = sysUserService.selectByPage(sysUser);
+            List<SysUserSelect> userList = new ArrayList<>();
             List<Long> userId=new ArrayList<>();
-            for (SysUser user : list) {
+            for (SysUserSelect user : list) {
                 if(user.getState()==2){
                     String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
