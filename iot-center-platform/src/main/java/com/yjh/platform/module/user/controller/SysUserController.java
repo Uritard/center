@@ -3,14 +3,19 @@ package com.yjh.platform.module.user.controller;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
+import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.service.SysUserService;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import io.swagger.annotations.*;
@@ -46,11 +51,12 @@ public class SysUserController {
     private UserManager userManager;
     @Autowired
     private SysRoleMenuDao sysRoleMenuDao;
-
-
-    private Logger log = LoggerFactory.getLogger(SysUserController.class);
+    @Autowired
+    private SysUserDao sysUserDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    private Logger log = LoggerFactory.getLogger(SysUserController.class);
+
 
     public SysUserController(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
@@ -85,7 +91,7 @@ public class SysUserController {
     public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
-            if(userId==10001){
+            if (userId == 10001) {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此用户为系统管理员,无法删除");
             }
             result.setData(sysUserService.deleteByPrimaryId(userId));
@@ -225,26 +231,45 @@ public class SysUserController {
     ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
+        Map<String,String> lockTimes= redisTemplate.opsForHash().entries("t_sys_param:lockTime");
+        Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         try {
             Page page = PageHelper.startPage(sysUser.getPageNum() != null ? sysUser.getPageNum() : 1, sysUser.getPageSize() != null ? sysUser.getPageSize() : 0, true, null, true);
             if (sysUser.getState() == -1) {
                 sysUser.setState(null);
             }
-            Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = map.get("content");
             if ("true".equals(isDecode)) {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
-                List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
-                resultMap.put("count", page.getTotal());
-                resultMap.put("list", list);
-                result.setData(resultMap);
-            } else {
-                List<Map<String, String>> list = sysUserService.selectByPage(sysUser);
-                resultMap.put("count", page.getTotal());
-                resultMap.put("list", list);
-                result.setData(resultMap);
             }
+            List<SysUser> list = sysUserService.selectByPage(sysUser);
+            List<SysUser> userList = new ArrayList<>();
+            List<Long> userId=new ArrayList<>();
+            for (SysUser user : list) {
+                if(user.getState()==2){
+                    String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = sdf.parse(timeStr1);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    //锁定时间
+                    Calendar calendarOne = Calendar.getInstance();
+                    calendarOne.setTime(user.getLockTime());
+                    Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
+                    if (lockTime > Integer.valueOf(lockTimes.get("content")) * 60) {
+                        user.setState(1);
+                        userId.add(user.getUserId());
+                    }
+                }
+                userList.add(user);
+            }
+            if(userId.size()>0){
+                sysUserDao.batchUpdate(userId);
+            }
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", userList);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -372,18 +397,18 @@ public class SysUserController {
     public Result unlockUserAccount(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
-            Long userId =Long.valueOf(httpServletRequest.getHeader("userId"));
+            Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             Map<String, String> maps = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = maps.get("content");
             String password = null;
-            String locked=null;
+            String locked = null;
             if ("true".equals(isDecode)) {
                 password = Demo.decrypt(map.get("password"));
                 locked = Demo.decrypt(map.get("lockedUserId"));
             } else {
                 password = map.get("password");
-                locked =map.get("lockedUserId");
+                locked = map.get("lockedUserId");
             }
             if (sysUserCurrent.getRoleId() == 1234 && password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
                 result.setData(this.sysUserService.unlockUserAccount(map));
@@ -391,7 +416,7 @@ public class SysUserController {
                 mapCache.put("userId", locked);
                 mapCache.put("expireTime", String.valueOf(System.currentTimeMillis()));
                 mapCache.put("errorInputTimes", "0");
-                String key = Constant.account_lock_times.replace("userAccountID",locked);
+                String key = Constant.account_lock_times.replace("userAccountID", locked);
                 redisTemplate.opsForHash().putAll(key, mapCache);
             } else if (!password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
                 Map<String, Object> mapResult = new HashMap<>();

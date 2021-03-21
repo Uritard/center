@@ -57,11 +57,13 @@ public interface SysUserDao {
                          @Param(value = "updateTime") Date updateTime,
                          @Param(value = "invalidTime") Integer invalidTime,
                          @Param(value = "lastLogin") Date lastLogin);
-    List<Map<String, String>> selectByPage(SysUser sysUser);
+    List<SysUser> selectByPage(SysUser sysUser);
 
     SysOrg selectRelationOrg(@Param(value = "userId") Long userId);
     List<String> selectRelationMenu(@Param(value = "userId") Long userId);
     List<Map<String, String>> selectRelationAuthor(@Param(value = "userId") Long userId);
 
     SysUserLogin selectByUserNameAndL(@Param(value = "userName") String userName);
+
+    int batchUpdate(@Param(value = "list") List<Long> list);
 }

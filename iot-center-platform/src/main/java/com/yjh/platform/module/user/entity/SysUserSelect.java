@@ -326,6 +326,10 @@ public class SysUserSelect implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lockTime;
 
+    private String roleName;
+
+    private String orgName;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
