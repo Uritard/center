@@ -57,7 +57,7 @@ public interface SysUserDao {
                          @Param(value = "updateTime") Date updateTime,
                          @Param(value = "invalidTime") Integer invalidTime,
                          @Param(value = "lastLogin") Date lastLogin);
-    List<SysUserSelect> selectByPage(SysUserSelect sysUser);
+    List<SysUserSelect> selectByPage(SysUser sysUser);
 
     SysOrg selectRelationOrg(@Param(value = "userId") Long userId);
     List<String> selectRelationMenu(@Param(value = "userId") Long userId);
