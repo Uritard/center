@@ -187,12 +187,12 @@ public class TRobotInspectionController {
             Map<String,Object> map = tRobotInspectionService.selectRobotTaskProgress(robotId);
             if(list != null){
                 if("100".equals(map.get("taskProgress")) ){
-                    Map<String,Object> jasonMap=new HashMap<>();
+                    Map<String,String> jasonMap=new HashMap<>();
                     jasonMap.put("type","noTask");
                     //jasonMap.put("taskId",tCruiseTask.getTaskId());
                     String json= JSON.toJSONString(jasonMap);
                     log.info("发送给前端的消息-停止调接口：   "+json);
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
                 }
                 resultMap.put("taskProgress",map.get("taskProgress"));
             }else {

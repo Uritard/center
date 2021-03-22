@@ -194,12 +194,12 @@ public class RunAtNowTask implements Runnable{
             } catch (Exception e) { e.getMessage(); }
 
             //Thread.sleep(10000);
-            Map<String,Object> jasonMap=new HashMap<>();
+            Map<String,String> jasonMap=new HashMap<>();
             jasonMap.put("type","newTask");
             jasonMap.put("taskId",taskId);
             String json=JSON.toJSONString(jasonMap);
             log.info("发送给前端的消息：   "+json);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
             log.info(taskDate+"需要执行的任务");
 
             TCruiseDataResultService tCruiseDataResultService  = StaticContextAccessor.getBean(TCruiseDataResultService.class);
@@ -535,12 +535,12 @@ public class RunAtNowTask implements Runnable{
 
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                         // webSocket通知前端调用巡视监控的接口
-                        Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                        Map<String,String> jasonMapOnFinished=new HashMap<>();
                         jasonMapOnFinished.put("type","finishedOneInstance");
                         jasonMapOnFinished.put("taskId",taskId);
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                         log.info("发送给前端的消息："+jsonMessage);
-                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                         {
                             //巡视点结果上报站端
@@ -668,12 +668,12 @@ public class RunAtNowTask implements Runnable{
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             // webSocket通知前端调用巡视监控的接口
-                            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                            Map<String,String> jasonMapOnFinished=new HashMap<>();
                             jasonMapOnFinished.put("type","finishedOneInstance");
                             jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
                         }else {
                             taskNormal = taskNormal+1;
                             tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
@@ -711,12 +711,12 @@ public class RunAtNowTask implements Runnable{
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
 
                             // webSocket通知前端调用巡视监控的接口
-                            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                            Map<String,String> jasonMapOnFinished=new HashMap<>();
                             jasonMapOnFinished.put("type","finishedOneInstance");
                             jasonMapOnFinished.put("taskId",taskId);
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                             {
                                 //巡视点结果上报站端
@@ -773,12 +773,12 @@ public class RunAtNowTask implements Runnable{
                                 if(maoForSleep != null  && maoForSleep.size()>0){
                                     sleepTime = Long.valueOf(maoForSleep.get("content"))*1000L;
                                 }
-                                Map<String,Object> jasonForPic=new HashMap<>();
+                                Map<String,String> jasonForPic=new HashMap<>();
                                 jasonForPic.put("type","picChange");
                                 jasonForPic.put("msg","该换图片了");
                                 String picChange=JSON.toJSONString(jasonForPic);
                                 log.info("发送给前端的消息：   "+picChange);
-                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,picChange);
+                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonForPic);
                                 log.info("4个点以巡检完，等待"+sleepTime/1000+"秒钟");
                                 Thread.sleep(sleepTime);
                                 countForInstance = 0;
@@ -799,12 +799,12 @@ public class RunAtNowTask implements Runnable{
                             if(maoForSleep != null  && maoForSleep.size()>0){
                                 sleepTime = Long.valueOf(maoForSleep.get("content"))*1000L;
                             }
-                            Map<String,Object> jasonForPic=new HashMap<>();
+                            Map<String,String> jasonForPic=new HashMap<>();
                             jasonForPic.put("type","picChange");
                             jasonForPic.put("msg","该换图片了");
                             String picChange=JSON.toJSONString(jasonForPic);
                             log.info("发送给前端的消息：   "+picChange);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,picChange);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonForPic);
                             log.info("1个点以巡检完，等待"+sleepTime/1000+"秒钟");
                             Thread.sleep(sleepTime);
                         }
@@ -820,12 +820,12 @@ public class RunAtNowTask implements Runnable{
                 Long taskEndTime = new Date().getTime();
                 if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
                     if(tCruiseResultIsPause.getCState() == 242){
-                        Map<String,Object> jsonMap=new HashMap<>();
+                        Map<String,String> jsonMap=new HashMap<>();
                         jsonMap.put("type","newTask");
                         jsonMap.put("taskId","");
                         String jsonForShut=JSON.toJSONString(jsonMap);
                         log.info("任务终止的消息：   "+jsonForShut);
-                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForShut);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
                     }
                     Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                     Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
@@ -895,12 +895,12 @@ public class RunAtNowTask implements Runnable{
                 }
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
-                Map<String, Object> jsonForLastMap = new HashMap<>();
+                Map<String, String> jsonForLastMap = new HashMap<>();
                 jsonForLastMap.put("type", "lastOneInstance");
                 jsonForLastMap.put("taskId", taskId);
                 String jsonForLast = JSON.toJSONString(jsonForLastMap);
                 log.info("发送给前端的消息：" + jsonForLast);
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForLast);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForLastMap);
 
                 Thread.sleep(15000);
                 tCruiseResult.setCState(240);

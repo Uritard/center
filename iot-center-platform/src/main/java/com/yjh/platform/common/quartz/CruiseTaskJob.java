@@ -139,6 +139,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
                     tCruiseTask.setTaskId(newTaskId);
                     tCruiseTask.setTaskCode(taskId);
+                    tCruiseTask.setTaskName(tCruiseTask.getTaskName()+"-"+simpleDateFormat.format(new Date()));
                     tCruiseTask.setDateType(null);
                     tCruiseTask.setStartTime(new Date());
                     tCruiseTask.setCreateTime(new Date());
@@ -149,12 +150,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTaskAttrDao.batchInsert(attrList);
                 }
                 taskId = tCruiseTask.getTaskId();
-                Map<String,Object> jasonMap=new HashMap<>();
+                Map<String,String> jasonMap=new HashMap<>();
                 jasonMap.put("type","newTask");
                 jasonMap.put("taskId",tCruiseTask.getTaskId());
                 String json=JSON.toJSONString(jasonMap);
                 log.info("发送给前端的消息：   "+json);
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
                 log.info(taskDate+"需要执行的任务");
                 //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
                 String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
@@ -462,12 +463,12 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             // webSocket通知前端调用巡视监控的接口
-                            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                            Map<String,String> jasonMapOnFinished=new HashMap<>();
                             jasonMapOnFinished.put("type","finishedOneInstance");
                             jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                             {
                                 //巡视点结果上报站端
@@ -598,12 +599,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
                                 // webSocket通知前端调用巡视监控的接口
-                                Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                                Map<String,String> jasonMapOnFinished=new HashMap<>();
                                 jasonMapOnFinished.put("type","finishedOneInstance");
                                 jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                                 String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                                 log.info("发送给前端的消息："+jsonMessage);
-                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
                             }else {
                                 taskNormal = taskNormal+1;
                                 tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
@@ -641,12 +642,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
 
                                 // webSocket通知前端调用巡视监控的接口
-                                Map<String,Object> jasonMapOnFinished=new HashMap<>();
+                                Map<String,String> jasonMapOnFinished=new HashMap<>();
                                 jasonMapOnFinished.put("type","finishedOneInstance");
                                 jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                                 String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                                 log.info("发送给前端的消息："+jsonMessage);
-                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                                 {
                                     //巡视点结果上报站端
@@ -740,12 +741,12 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                     if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
                         if(tCruiseResultIsPause.getCState() == 242){
-                            Map<String,Object> jsonMap=new HashMap<>();
+                            Map<String,String> jsonMap=new HashMap<>();
                             jsonMap.put("type","newTask");
                             jsonMap.put("taskId","");
                             String jsonForShut=JSON.toJSONString(jsonMap);
                             log.info("任务终止的消息：   "+jsonForShut);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForShut);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
                         }
                         Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                         Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
@@ -764,12 +765,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                             }
                             tCruiseTaskResultDao.insert(tCruiseTaskResult);
 
-                            Map<String, Object> jsonForLastMap = new HashMap<>();
+                            Map<String, String> jsonForLastMap = new HashMap<>();
                             jsonForLastMap.put("type", "lastOneInstance");
                             jsonForLastMap.put("taskId", taskId);
                             String jsonForLast = JSON.toJSONString(jsonForLastMap);
                             log.info("发送给前端的消息：" + jsonForLast);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForLast);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForLastMap);
 
                             Thread.sleep(15000);
                             tCruiseResult.setCState(240);

@@ -358,12 +358,12 @@ public class TaskShutDownJob extends QuartzJobBean {
 
 
 
-            Map<String,Object> jasonMapOnFinished=new HashMap<>();
+            Map<String,String> jasonMapOnFinished=new HashMap<>();
             jasonMapOnFinished.put("type","newTask");
             jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
             String jsonMessage= JSON.toJSONString(jasonMapOnFinished);
             log.info("发送给前端的消息："+jsonMessage);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
         } catch (Exception e) {
             log.error("任务终止异常: " + e);

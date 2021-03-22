@@ -272,13 +272,13 @@ public class TCruiseResultService{
     }
     public void sendWebSocket(Long warnId){
         //给前端推webSocket
-        Map<String,Object> jasonMap=new HashMap<>();
+        Map<String,String> jasonMap=new HashMap<>();
         jasonMap.put("type","finishedOneAlarm");
-        jasonMap.put("alarmId",warnId);
+        jasonMap.put("alarmId", warnId.toString());
         String json= JSON.toJSONString(jasonMap);
         System.out.println(("发送给前端的消息==="+json));
         try{
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
         }catch (Exception e){
             System.out.println("发送websocket出错");
         }

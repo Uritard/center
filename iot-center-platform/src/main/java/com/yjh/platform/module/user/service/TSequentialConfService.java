@@ -148,17 +148,17 @@ public class TSequentialConfService{
     public String sequential(String meteId) throws Exception{
         {
             Map<String,Object> map = this.sequentialInfo(meteId).get(0);
-            Map<String, Object> jasonMaps2 = new HashMap<>();
+            Map<String, String> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "newSequential");
             jasonMaps2.put("cfgDeviceId", meteId);
-            jasonMaps2.put("sort", ((Double)map.get("sort")).intValue());
+            jasonMaps2.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
             Constant.sequentialState.put("state",((Double)map.get("sort")).intValue());
             Constant.sequentialState.put("cfgDeviceId",meteId);
-            jasonMaps2.put("state", map.get("state"));
+            jasonMaps2.put("state", map.get("state").toString());
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
             }catch (Exception e){
                 System.out.println("发送websocket出错");
             }
@@ -214,16 +214,16 @@ public class TSequentialConfService{
                 Constant.otherServer(mapForSend,Constant.UDP_SEND);
             }catch (Exception e){log.info("生成顺控确认文件失败"+e.getMessage());}
 
-            Map<String, Object> jasonMapsResult = new HashMap<>();
+            Map<String, String> jasonMapsResult = new HashMap<>();
             jasonMapsResult.put("type", "newSequentialResult");
             jasonMapsResult.put("cfgDeviceId", meteId);
-            jasonMapsResult.put("sort", ((Double)map.get("sort")).intValue());
-            jasonMapsResult.put("state", map.get("state"));
-            jasonMapsResult.put("identifyResult", map.get("state"));
+            jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
+            jasonMapsResult.put("state", map.get("state").toString());
+            jasonMapsResult.put("identifyResult", map.get("state").toString());
             String jsonResult = JSON.toJSONString(jasonMapsResult);
             log.info("发送给前端的消息：" + jsonResult);
             try{
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonResult);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
             }catch (Exception e){
                 System.out.println("发送websocket出错");
             }

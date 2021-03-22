@@ -307,7 +307,7 @@ public class TCfgDataCurrentService {
             tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0),unionForGetTime.getRecordTime());
             // TODO: 2020/12/12 待优化WB
             // webSocket通知前端产生联动信息
-            Map<String, Object> jasonMap = new HashMap<>();
+            Map<String, String> jasonMap = new HashMap<>();
             jasonMap.put("type", "newLinkage");
             log.info("cfgDevice:"+currents.get(0).getDeviceId().toString());
             jasonMap.put("deviceName", tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName());
@@ -315,18 +315,18 @@ public class TCfgDataCurrentService {
             jasonMap.put("warnContent",  tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName()+"触发联动");
             String jsonT = JSON.toJSONString(jasonMap);
             log.info("发送给前端的消息：" + jsonT);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonT);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
 
             TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(unionRule.get(0).getRuleId());
             //根据该规则id是否设置了联动监控推送，若是，则将满足该条规则id产生的联动相关信息推送给前端；不是，不推
             if ("1".equals(tCfgUnionRule.getRuleType())){
                 //webSocket通知前端调联动弹框的接口
-                Map<String, Object> jasonMaps2 = new HashMap<>();
+                Map<String, String> jasonMaps2 = new HashMap<>();
                 jasonMaps2.put("type", "linkagePopUp");
                 jasonMaps2.put("unionId", taskId);
                 String json = JSON.toJSONString(jasonMaps2);
                 log.info("发送给前端的消息：" + json);
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
             }
         }
 

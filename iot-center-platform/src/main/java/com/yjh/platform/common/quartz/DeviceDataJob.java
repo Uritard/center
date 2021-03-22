@@ -28,12 +28,12 @@ public class DeviceDataJob extends QuartzJobBean {
     public void executeInternal(JobExecutionContext context) {
         try {
            log.info("正在进行定时任务");
-            Map<String,Object> jasonMap2=new HashMap<>();
+            Map<String,String> jasonMap2=new HashMap<>();
             jasonMap2.put("type","newTask");
-            jasonMap2.put("taskId",6666);
+            jasonMap2.put("taskId","6666");
             String json2=JSON.toJSONString(jasonMap2);
             log.info("发送给前端的消息：   "+json2);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json2);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap2);
            log.info("完成定时任务执行");
         } catch (Exception e) {
             log.error("定时任务异常" + e);

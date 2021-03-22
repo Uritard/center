@@ -1,9 +1,11 @@
 package com.yjh.platform.common;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.entity.Channel;
 import org.apache.http.HttpEntity;
@@ -15,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.validation.constraints.Max;
 import java.io.IOException;
@@ -25,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class Constant {
     public static final String account_lock_times = "account_lock_times:userAccountID";
@@ -109,8 +113,18 @@ public class Constant {
 
     public static String WEBSOCKET_URL="";
 
-    public static String websocketSendMsg(String url, String json) throws IOException {
-        //WebSocketServer.sendMsg(json);
+    public static RedisTemplate redisTemplate;
+
+    public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
+        //将websocket信息写入redis
+        String json= JSON.toJSONString(map);
+        WebSocketServer.sendMsg(json);
+       // String.valueOf(map);
+        if("logError".equals(map.get("type")) || "newTask".equals(map.get("type")) || "newLinkage".equals(map.get("type"))
+                || "newAlarm".equals(map.get("type"))  || "alarmPopUp".equals(map.get("type"))  || "linkagePopUp".equals(map.get("type"))){
+            redisTemplate.opsForValue().set(map.get("type"),String.valueOf(map),5, TimeUnit.MINUTES);
+        }
+
 //        CloseableHttpClient client = HttpClients.createDefault();
 //        String result = "";
 //        try {

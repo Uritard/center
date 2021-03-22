@@ -242,12 +242,12 @@ public class TWarnInfoService{
         //处理告警完成之后
         if (jieGuo == 1) {
             //给前端推webSocket
-            Map<String, Object> jasonMap = new HashMap<>();
+            Map<String, String> jasonMap = new HashMap<>();
             jasonMap.put("type", "finishedOneAlarm");
-            jasonMap.put("alarmId", warnId);
+            jasonMap.put("alarmId", warnId.toString());
             String json = JSON.toJSONString(jasonMap);
             log.info(("发送给前端的消息===" + json));
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
         }
         return jieGuo;
     }
@@ -290,13 +290,13 @@ public class TWarnInfoService{
     }
     public void sendWebSocket(Long warnId){
         //给前端推webSocket
-        Map<String,Object> jasonMap=new HashMap<>();
+        Map<String,String> jasonMap=new HashMap<>();
         jasonMap.put("type","finishedOneAlarm");
-        jasonMap.put("alarmId",warnId);
+        jasonMap.put("alarmId",warnId.toString());
         String json= JSON.toJSONString(jasonMap);
         System.out.println(("发送给前端的消息==="+json));
         try{
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
         }catch (Exception e){
             System.out.println("发送websocket出错");
         }
@@ -321,13 +321,13 @@ public class TWarnInfoService{
             //处理告警完成之后
             if(jieGuo == 1) {
             //给前端推webSocket
-                Map<String,Object> jasonMap=new HashMap<>();
+                Map<String,String> jasonMap=new HashMap<>();
                 jasonMap.put("type","finishedOneAlarm");
-                jasonMap.put("alarmId",warnId);
+                jasonMap.put("alarmId",warnId.toString());
                 String json= JSON.toJSONString(jasonMap);
                 log.info(("发送给前端的消息==="+json));
                 try{
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
                 }catch (Exception e){
                     System.out.println("发送websocket出错");
                 }
@@ -345,13 +345,13 @@ public class TWarnInfoService{
             //处理告警完成之后
             if(jieGuo == 1) {
                 //给前端推webSocket
-                Map<String,Object> jasonMap=new HashMap<>();
+                Map<String,String> jasonMap=new HashMap<>();
                 jasonMap.put("type","finishedOneAlarm");
-                jasonMap.put("alarmId",warnId);
+                jasonMap.put("alarmId",warnId.toString());
                 String json= JSON.toJSONString(jasonMap);
                 log.info(("发送给前端的消息==="+json));
                 try{
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
                 }catch (Exception e){
                     System.out.println("发送websocket出错");
                 }
@@ -368,13 +368,13 @@ public class TWarnInfoService{
             //处理告警完成之后
             if(jieGuo == 1) {
                 //给前端推webSocket
-                Map<String,Object> jasonMap=new HashMap<>();
+                Map<String,String> jasonMap=new HashMap<>();
                 jasonMap.put("type","finishedOneAlarm");
-                jasonMap.put("alarmId",warnId);
+                jasonMap.put("alarmId",warnId.toString());
                 String json= JSON.toJSONString(jasonMap);
                 log.info(("发送给前端的消息==="+json));
                 try{
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
                 }catch (Exception e){
                     System.out.println("发送websocket出错");
                 }

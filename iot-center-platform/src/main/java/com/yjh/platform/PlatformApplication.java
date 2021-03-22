@@ -71,6 +71,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();
         Constant.WEBSOCKET_URL = url;
+        Constant.redisTemplate = redisTemplate;
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         //Start RecordVoiceFileThread
         List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();

@@ -82,12 +82,12 @@ public class HelloController {
     @RequestMapping(value = "/testAnything", method = RequestMethod.GET)
     public Result QrDecode() {
         Result result = new Result();
-        Map<String,Object> jasonMap=new HashMap<>();
+        Map<String,String> jasonMap=new HashMap<>();
         jasonMap.put("type","noTask");
         //jasonMap.put("taskId",tCruiseTask.getTaskId());
         String json= JSON.toJSONString(jasonMap);
         try{
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
         }catch (Exception e){
             System.out.println("发送websocket出错");
         }
@@ -147,7 +147,7 @@ public class HelloController {
             log.info("发送给前端的消息：" + json);
             try{
                 String url = Constant.WEBSOCKET_URL;
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,map);
             }catch (Exception e){
                 System.out.println("发送websocket出错");
             }
@@ -235,13 +235,13 @@ public class HelloController {
     public Result linkWebSocket(@RequestParam String taskId) {
         Result result = new Result();
         try {
-            Map<String, Object> jasonMaps2 = new HashMap<>();
+            Map<String, String> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "linkagePopUp");
             jasonMaps2.put("unionId", taskId);
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
             }catch (Exception e){
                 System.out.println("发送websocket出错");
             }
