@@ -48,6 +48,9 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Value("${netty.server.url}")
     private String serverUrl;//算法服务端IP
 
+    @Value("${system.webSocket.url}")
+    private String syncWebsocketUrl;//WS调用接口地址
+
     private int lUserID;//用户句柄
     //设备登录信息
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
@@ -72,7 +75,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         register();
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService);
+        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,syncWebsocketUrl);
     }
 
     private void register() {

@@ -17,6 +17,8 @@ import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -58,7 +61,7 @@ public class TCfgDataCurrentService {
     private TCruiseTaskController tCruiseTaskController;
 
     @Autowired
-    private TStdDeviceService tStdDeviceService;
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private TCfgDeviceService tCfgDeviceService;
@@ -306,6 +309,11 @@ public class TCfgDataCurrentService {
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));
             tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0),unionForGetTime.getRecordTime());
             // TODO: 2020/12/12 待优化WB
+
+            Map<String,String> currentUnionInfo=new HashMap<>();
+            currentUnionInfo.put("unionId",taskId);
+            currentUnionInfo.put("isPop","false");
+
             // webSocket通知前端产生联动信息
             Map<String, String> jasonMap = new HashMap<>();
             jasonMap.put("type", "newLinkage");
@@ -321,6 +329,7 @@ public class TCfgDataCurrentService {
             //根据该规则id是否设置了联动监控推送，若是，则将满足该条规则id产生的联动相关信息推送给前端；不是，不推
             if ("1".equals(tCfgUnionRule.getRuleType())){
                 //webSocket通知前端调联动弹框的接口
+                currentUnionInfo.put("isPop","true");
                 Map<String, String> jasonMaps2 = new HashMap<>();
                 jasonMaps2.put("type", "linkagePopUp");
                 jasonMaps2.put("unionId", taskId);
@@ -328,6 +337,8 @@ public class TCfgDataCurrentService {
                 log.info("发送给前端的消息：" + json);
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
             }
+
+            redisTemplate.opsForValue().set("currentUnion",currentUnionInfo,3, TimeUnit.MINUTES);
         }
 
         cLogger.info("联动任务：----"+tCruiseTasks);

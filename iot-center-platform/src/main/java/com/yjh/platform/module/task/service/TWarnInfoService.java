@@ -429,6 +429,18 @@ public class TWarnInfoService{
         }
         return tWarnInfoDetail;
     }
+
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,String> selectCurrentWarn(){
+        return (Map<String, String>)redisTemplate.opsForValue().get("currentWarn");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,String> selectUnionWarn(){
+        return (Map<String,String>)redisTemplate.opsForValue().get("currentUnion");
+    }
     //读批量redis
     public Set<String> redisScan(String key) {
         return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {

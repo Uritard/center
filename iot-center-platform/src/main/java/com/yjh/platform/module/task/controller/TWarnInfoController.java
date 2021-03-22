@@ -445,4 +445,34 @@ public class TWarnInfoController {
         return result;
     }
 
+    @ApiOperation(value = "查询当前三分钟以内最新告警")
+    @GetMapping(value = "/SelectCurrentWarn")
+    @Logs(title = "查询最新告警",content = "三分中内最新告警ID",logType = 5)
+    public Result SelectCurrentWarn(){
+        Result result=new Result();
+        try{
+            result.setData(tWarnInfoService.selectCurrentWarn());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询告警数据失败：", e);
+        }
+        return result;
+    }
+
+
+
+    @ApiOperation(value = "查询当前三分钟以内最新联动信息")
+    @GetMapping(value = "/SelectCurrentUnion")
+    @Logs(title = "查询最新联动",content = "三分中内最新联动任务ID",logType = 5)
+    public Result SelectCurrentUnion(){
+        Result result=new Result();
+        try{
+            result.setData(tWarnInfoService.selectUnionWarn());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询告警数据失败：", e);
+        }
+        return result;
+    }
+
 }

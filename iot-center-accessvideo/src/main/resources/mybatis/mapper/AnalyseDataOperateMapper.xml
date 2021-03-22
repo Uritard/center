@@ -923,4 +923,13 @@
             a.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
 
+    <select id="selectCurrentWarn" resultType="java.lang.Long">
+                SELECT
+            warn_id
+        FROM
+            t_warn_info
+        GROUP BY
+            warn_time DESC
+    </select>
+
 </mapper>

@@ -67,4 +67,6 @@ public interface AnalyseDataOperateDao {
 
     //根据巡视点ID查询预置位图片
     String selectPresetImgByCruise(@Param(value = "instanceId")Long instanceId);
+    //查看当前最新的一条告警信息
+    Long selectCurrentWarn();
 }

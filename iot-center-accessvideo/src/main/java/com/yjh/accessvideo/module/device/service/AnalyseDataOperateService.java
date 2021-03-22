@@ -642,6 +642,10 @@ public class AnalyseDataOperateService {
                 case "bjdsyc":
                     defectValue=defectValue+"表计读数异常"+" ";
                     break;
+                case "normal":
+                    defectValue="有差异";
+                case "abnormal":
+                    defectValue="无差异";
                 default:
                     return "null";
             }
@@ -653,6 +657,11 @@ public class AnalyseDataOperateService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectWarnInfo(Long deviceMeteId){
         return analyseDataOperateDao.selectWarnInfo(deviceMeteId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Long selectCurrentWarn(){
+        return analyseDataOperateDao.selectCurrentWarn();
     }
 }
 

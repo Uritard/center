@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 //import static com.yjh.accessvideo.common.Constant.INSTANCEID;
 //import static com.yjh.accessvideo.common.Constant.TASKID;
@@ -50,15 +51,15 @@ public class DataDealThread implements Runnable {
     private ChannelHandlerContext ctx;
     private String TASKID;
     private String INSTANCEID;
-    @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;
 
 
-    public DataDealThread(String body, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, ChannelHandlerContext ctx) {
+    public DataDealThread(String body, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, ChannelHandlerContext ctx,String syncWebsocketUrl) {
         this.analyseDataOperateService = analyseDataOperateService;
         this.redisTemplate = redisTemplate;
         this.body = body;
         this.ctx = ctx;
+        this.syncWebsocketUrl=syncWebsocketUrl;
     }
 
 
@@ -431,6 +432,11 @@ public class DataDealThread implements Runnable {
                                                     log.info("------------------------------------------------------------");
                                                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
+                                                    // TODO: 2021/3/22 最新告警信息获取
+                                                    Map<String,String> currentWarnInfo=new HashMap<>();
+                                                    currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentWarn().toString());
+                                                    currentWarnInfo.put("isPop","false");
+
                                                     {
                                                         //告警上报站端
                                                         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -490,6 +496,7 @@ public class DataDealThread implements Runnable {
                                                     if (one) {
                                                         if (two) {
                                                             //webSocket通知前端调用查询告警弹框的接口
+                                                            currentWarnInfo.put("isPop","true");
                                                             Map<String, Object> jasonMaps2 = new HashMap<>();
                                                             jasonMaps2.put("type", "alarmPopUp");
                                                             jasonMaps2.put("warnId", tWarnInfo.getWarnId());
@@ -499,6 +506,8 @@ public class DataDealThread implements Runnable {
                                                             postUrl(syncWebsocketUrl,json);
                                                         }
                                                     }
+
+                                                    redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3,TimeUnit.MINUTES);
 //
 //                                                    //删除告警redis
 //                                                    redisTemplate.delete(warnName);
@@ -539,15 +548,30 @@ public class DataDealThread implements Runnable {
                                 if(analyseType.equals("11")){
 
                                     String analyseResultImg=resultImage.replaceAll(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content").toString(),redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content").toString());
+                                    String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
 
-                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
-                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
+                                    if(jsonObjectResult.get("resultValue").toString().contains("normal")){
+                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
 //                                    tNormal++;
-                                    Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
-                                    cruiseResultMap.put("resultNum", "判别成功");
-                                    cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
-                                    cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
-                                    cruiseResultMap.put("picpath",analyseResultImg);
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
+                                        cruiseResultMap.put("resultNum", resultValue);
+                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+                                        cruiseResultMap.put("picpath",analyseResultImg);
+                                    }else {
+
+                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
+//                                    tNormal++;
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "--", "--");
+                                        cruiseResultMap.put("resultNum", resultValue);
+                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+                                        cruiseResultMap.put("picpath",analyseResultImg);
+                                    }
+
+
                                     break;
                                 }
 
@@ -708,6 +732,7 @@ public class DataDealThread implements Runnable {
                                                     postUrl(syncWebsocketUrl,json);
                                                 }
                                             }
+
 
                                             defectNames = defectNames + resultArr[i] + " ";
 

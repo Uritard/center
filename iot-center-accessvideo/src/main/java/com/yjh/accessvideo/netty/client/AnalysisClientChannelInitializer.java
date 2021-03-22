@@ -13,9 +13,11 @@ public class AnalysisClientChannelInitializer extends ChannelInitializer<SocketC
 
     private RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
-    public AnalysisClientChannelInitializer(RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService) {
+    private String syncWebsocketUrl;
+    public AnalysisClientChannelInitializer(RedisTemplate redisTemplate,AnalyseDataOperateService analyseDataOperateService,String syncWebsocketUrl) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateService=analyseDataOperateService;
+        this.syncWebsocketUrl=syncWebsocketUrl;
     }
 
     @Override
@@ -23,6 +25,6 @@ public class AnalysisClientChannelInitializer extends ChannelInitializer<SocketC
         ChannelPipeline p = socketChannel.pipeline();
         //p.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
         //p.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        p.addLast(new AnalysisClientHandler(redisTemplate,analyseDataOperateService));
+        p.addLast(new AnalysisClientHandler(redisTemplate,analyseDataOperateService,syncWebsocketUrl));
     }
 }
