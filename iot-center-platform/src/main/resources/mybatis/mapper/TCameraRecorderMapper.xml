@@ -141,16 +141,16 @@
         <if test="aliasName != null">a.alias_name = #{aliasName},</if>
         <if test="recordIp != null">a.record_ip = #{recordIp},</if>
         <if test="protocol != null ">a.protocol = #{protocol},</if>
-        <if test="httpPort != null ">a.http_port = #{httpPort, jdbcType=INTEGER},</if>
-        <if test="transPort != null ">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
+        a.http_port = #{httpPort, jdbcType=INTEGER},
+        a.trans_port = #{transPort, jdbcType=INTEGER},
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
         <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
-        <if test="maxChannel != null ">a.max_channel = #{maxChannel, jdbcType=INTEGER},</if>
-        <if test="hddSize != null ">a.hdd_size = #{hddSize, jdbcType=INTEGER},</if>
-        <if test="bufferDay != null ">a.buffer_day = #{bufferDay, jdbcType=INTEGER},</if>
-        <if test="timeLong != null ">a.time_long = #{timeLong, jdbcType=INTEGER},</if>
+        a.max_channel = #{maxChannel, jdbcType=INTEGER},
+        a.hdd_size = #{hddSize, jdbcType=INTEGER},
+        a.buffer_day = #{bufferDay, jdbcType=INTEGER},
+        a.time_long = #{timeLong, jdbcType=INTEGER},
         <if test="unit != null ">a.unit = #{unit},</if>
     </set>
             where a.record_id = #{recordId, jdbcType=BIGINT}

@@ -45,8 +45,8 @@
         update t_device_maintenance a <set>
         <if test="maintenanceId != null ">a.maintenance_id = #{maintenanceId},</if>
         <if test="maintenanceName != null ">a.maintenance_name = #{maintenanceNam},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
-        <if test="isValid != null ">a.is_valid = #{isValid, jdbcType=INTEGER},</if>
+        a.device_id = #{deviceId},
+        a.is_valid = #{isValid, jdbcType=INTEGER},
         <if test="maintenanceStart != null ">a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP},</if>
         <if test="maintenanceStop != null ">a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP},</if>
     </set>

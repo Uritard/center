@@ -56,11 +56,11 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TAlgorithmConf">
         update t_algorithm_conf a <set>
         <if test="presetId != null ">a.preset_id = #{presetId},</if>
-        <if test="algorithmId != null ">a.algorithm_id = #{algorithmId},</if>
+        a.algorithm_id = #{algorithmId},
         <if test="configName != null ">a.config_name = #{configName},</if>
-        <if test="status != null">a.status = #{status, jdbcType=INTEGER},</if>
+        a.status = #{status, jdbcType=INTEGER},
         <if test="ifDel != null">a.if_del = #{ifDel, jdbcType=INTEGER},</if>
-        <if test="ifShow != null">a.if_show = #{ifShow, jdbcType=INTEGER},</if>
+        a.if_show = #{ifShow, jdbcType=INTEGER},
         <if test="picUrl != null ">a.pic_url = #{picUrl},</if>
         <if test="applyModule != null ">a.apply_module = #{applyModule},</if>
         a.update_time = CURRENT_TIMESTAMP(),

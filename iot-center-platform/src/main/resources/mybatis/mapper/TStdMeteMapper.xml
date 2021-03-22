@@ -117,34 +117,34 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdMete">
         update t_std_mete a <set>
         <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId},</if>
-        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+        a.device_type = #{deviceType, jdbcType=INTEGER},
         <if test="meteType != null">a.mete_type = #{meteType},</if>
-        <if test="meteKind != null ">a.mete_kind = #{meteKind},</if>
+        a.mete_kind = #{meteKind},
         <if test="meteName != null ">a.mete_name = #{meteName},</if>
         <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
         <if test="alarmExplain != null">a.alarm_explain = #{alarmExplain},</if>
         <if test="alarmType != null ">a.alarm_type = #{alarmType},</if>
-        <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
+        a.analyse_type = #{analyseType, jdbcType=INTEGER},
         <if test="unit != null">a.unit = #{unit},</if>
-        <if test="upEffect != null ">a.up_effect = #{upEffect},</if>
-        <if test="downEffect != null ">a.down_effect = #{downEffect},</if>
-        <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
-        <if test="alarmLimit != null ">a.alarm_limit = #{alarmLimit, jdbcType=INTEGER},</if>
-        <if test="highLimit1 != null ">a.high_limit1 = #{highLimit1},</if>
-        <if test="lowLimit1 != null ">a.low_limit1 = #{lowLimit1},</if>
-        <if test="highLimit2 != null ">a.high_limit2 = #{highLimit2},</if>
-        <if test="lowLimit2 != null">a.low_limit2 = #{lowLimit2},</if>
-        <if test="highLimit3 != null">a.high_limit3 = #{highLimit3},</if>
-        <if test="lowLimit3 != null ">a.low_limit3 = #{lowLimit3},</if>
-        <if test="highLimit4 != null ">a.high_limit4 = #{highLimit4},</if>
-        <if test="lowLimit4 != null ">a.low_limit4 = #{lowLimit4},</if>
-        <if test="stateZero !=null ">a.state_zero =#{stateZero},</if>
-        <if test="stateOne !=null">a.state_one =#{stateOne},</if>
-        <if test="alarmDelay != null ">a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},</if>
-        <if test="alarmCnt != null ">a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},</if>
-        <if test="thresholdAbs != null ">a.threshold_abs = #{thresholdAbs},</if>
-        <if test="thresholdPer != null ">a.threshold_per = #{thresholdPer},</if>
-        <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
+        a.up_effect = #{upEffect},
+        a.down_effect = #{downEffect},
+        a.alarm_level = #{alarmLevel, jdbcType=INTEGER},
+        a.alarm_limit = #{alarmLimit, jdbcType=INTEGER},
+        a.high_limit1 = #{highLimit1},
+        a.low_limit1 = #{lowLimit1},
+        a.high_limit2 = #{highLimit2},
+        a.low_limit2 = #{lowLimit2},
+        a.high_limit3 = #{highLimit3},
+        a.low_limit3 = #{lowLimit3},
+        a.high_limit4 = #{highLimit4},
+        a.low_limit4 = #{lowLimit4},
+        a.state_zero =#{stateZero},
+        a.state_one =#{stateOne},
+       a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},
+        a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},
+        a.threshold_abs = #{thresholdAbs},
+        a.threshold_per = #{thresholdPer},
+        a.modulus = #{modulus, jdbcType=INTEGER},
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}

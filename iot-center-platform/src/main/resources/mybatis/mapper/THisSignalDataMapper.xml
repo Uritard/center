@@ -46,10 +46,10 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.THisSignalData">
         update t_his_signal_data a <set>
         <if test="Id != null">a.id = #{Id},</if>
-        <if test="meteId != null">a.mete_id = #{meteId},</if>
-        <if test="deviceId != null">a.device_id = #{deviceId},</if>
+        a.mete_id = #{meteId},
+        a.device_id = #{deviceId},
         a.record_time = #{recordTime, jdbcType=TIMESTAMP},
-        <if test="meteKind != null">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        a.mete_kind = #{meteKind, jdbcType=INTEGER},
         <if test="meteValue != null ">a.mete_value = #{meteValue},</if>
         <if test="lastMeteValue != null">a.last_mete_value = #{lastMeteValue},</if>
     </set>

@@ -89,21 +89,21 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCfgAlarmHistory">
         update t_cfg_alarm_history a <set>
         <if test="alarmNo != nul">a.alarm_no = #{alarmNo},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
-        <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
-        <if test="meteId != null">a.mete_id = #{meteId},</if>
+        a.device_id = #{deviceId},
+        a.cunstom_id = #{cunstomId},
+        a.mete_id = #{meteId},
         a.alarm_time = #{alarmTime, jdbcType=TIMESTAMP},
-        <if test="alarmLevel != null">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        a.alarm_level = #{alarmLevel, jdbcType=INTEGER},
         <if test="alarmValue != null">a.alarm_value = #{alarmValue},</if>
         <if test="alarmDesc != null ">a.alarm_desc = #{alarmDesc},</if>
         a.clear_time = #{clearTime, jdbcType=TIMESTAMP},
         <if test="clearValue != null">a.clear_value = #{clearValue},</if>
-        <if test="confirmState != null">a.confirm_state = #{confirmState, jdbcType=INTEGER},</if>
+        a.confirm_state = #{confirmState, jdbcType=INTEGER},
         <if test="confirmPeople != null ">a.confirm_people = #{confirmPeople},</if>
         a.confirm_time = #{confirmTime, jdbcType=TIMESTAMP},
         <if test="confirmRemark != null ">a.confirm_remark = #{confirmRemark},</if>
-        <if test="defect != null">a.defect = #{defect, jdbcType=INTEGER},</if>
-        <if test="defectLevel != null">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        a.defect = #{defect, jdbcType=INTEGER},
+        a.defect_level = #{defectLevel, jdbcType=INTEGER},
         <if test="forceClearReason != null">a.force_clear_reason = #{forceClearReason},</if>
         <if test="meteCode != null ">a.mete_code = #{meteCode},</if>
         <if test="isClear != null">a.is_clear = #{isClear},</if>

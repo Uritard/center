@@ -78,16 +78,16 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
         update t_camera_preset a <set>
         <if test="presetId != null">a.preset_id = #{presetId},</if>
-        <if test="cameraId != null ">a.camera_id = #{cameraId,},</if>
-        <if test="presetNum != null ">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
+        a.camera_id = #{cameraId,},
+        a.preset_num = #{presetNum, jdbcType=INTEGER},
         <if test="presetName != null ">a.preset_name = #{presetName},</if>
         <if test="creatorUser != null  ">a.creator_user = #{creatorUser},</if>
         <if test="creatorTime != null ">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
-        <if test="isUse != null ">a.is_use = #{isUse, jdbcType=INTEGER},</if>
+        a.is_use = #{isUse, jdbcType=INTEGER},
         <if test="presetImg != null">a.preset_img = #{presetImg},</if>
-        <if test="inspectionPostion != null ">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
-        <if test="collectStatus != null ">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
-        <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
+        a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},
+        a.collect_status = #{collectStatus, jdbcType=INTEGER},
+        a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},
         <if test="remark != null ">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}

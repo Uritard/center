@@ -135,15 +135,15 @@
         <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="robotStatus != null ">a.robot_status = #{robotStatus},</if>
-        <if test="robotType != null ">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
+        a.robot_type = #{robotType, jdbcType=INTEGER},
         <if test="robotIp != null ">a.robot_ip = #{robotIp},</if>
-        <if test="robotPort != null ">a.robot_port = #{robotPort, jdbcType=INTEGER},</if>
+        a.robot_port = #{robotPort, jdbcType=INTEGER},
         <if test="lightIp != null ">a.light_ip = #{lightIp},</if>
         <if test="lightPort != null ">a.light_port = #{lightPort},</if>
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
         <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
         <if test="lnferadIp != null ">a.lnferad_IP = #{lnferadIp},</if>
-        <if test="inferadPort != null">a.Inferad_Port = #{inferadPort, jdbcType=INTEGER},</if>
+        a.Inferad_Port = #{inferadPort, jdbcType=INTEGER},
         <if test="inferadUsername != null">a.Inferad_username = #{inferadUsername},</if>
         <if test="inferadPassword != null ">a.Inferad_password = #{inferadPassword},</if>
         <if test="photePath != null ">a.phote_path = #{photePath},</if>

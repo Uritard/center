@@ -77,16 +77,16 @@
         <if test="alarmName != null">a.alarm_name = #{alarmName},</if>
         <if test="cameraId != null ">a.camera_id = #{cameraId},</if>
         <if test="stationId != null ">a.station_id = #{stationId},</if>
-        <if test="alarmType != null ">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
-        <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
+        a.alarm_type = #{alarmType, jdbcType=INTEGER},
+        a.alarm_level = #{alarmLevel, jdbcType=INTEGER},
         <if test="alarmInfo != null ">a.alarm_info = #{alarmInfo},</if>
         <if test="alarmTime != null and">a.alarm_time = #{alarmTime},</if>
-        <if test="isAlarm != null ">a.is_alarm = #{isAlarm, jdbcType=INTEGER},</if>
-        <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        a.is_alarm = #{isAlarm, jdbcType=INTEGER},
+        a.deal_type = #{dealType, jdbcType=INTEGER},
         <if test="dealInfo != null  ">a.deal_info = #{dealInfo},</if>
         <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
-        <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
-        <if test="alarmState != null ">a.alarm_state = #{alarmState, jdbcType=INTEGER},</if>
+        a.deal_time = #{dealTime, jdbcType=TIMESTAMP},
+        a.alarm_state = #{alarmState, jdbcType=INTEGER},
         <if test="createTime != null">a.create_time = #{createTime},</if>
         <if test="endTime != null ">a.end_time = #{endTime},</if>
     </set>

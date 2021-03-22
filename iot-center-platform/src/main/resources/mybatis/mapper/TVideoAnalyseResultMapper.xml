@@ -57,10 +57,10 @@
         <if test="analyseConfId != null ">a.analyse_conf_id = #{analyseConfId},</if>
         <if test="algorithmResult != null ">a.algorithm_result = #{algorithmResult},</if>
         <if test="algorithmPicture != null ">a.algorithm_picture = #{algorithmPicture},</if>
-        <if test="algorithmStatus != null ">a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},</if>
+        a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},
         <if test="resultRate != null ">a.result_rate = #{resultRate},</if>
         <if test="resultDescribe != null ">a.result_describe = #{resultDescribe},</if>
-        <if test="reserver != null ">a.reserver = #{reserver, jdbcType=INTEGER},</if>
+        a.reserver = #{reserver, jdbcType=INTEGER},
     </set>
             where a.algorithm_result_id = #{algorithmResultId, jdbcType=BIGINT}
     </update>

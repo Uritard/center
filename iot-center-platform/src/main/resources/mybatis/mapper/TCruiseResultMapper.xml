@@ -189,11 +189,11 @@
         <if test="taskId != null">a.task_id = #{taskId},</if>
         <if test="taskName != null">a.task_name = #{taskName},</if>
         <if test="areaId != null">a.area_id = #{areaId},</if>
-        <if test="cType != null">a.c_type = #{cType, jdbcType=INTEGER},</if>
-        <if test="cState != null">a.c_state = #{cState, jdbcType=INTEGER},</if>
-        <if test="modifyState != null">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
-        <if test="taskCount != null">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
-        <if test="taskWait != null">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        a.c_type = #{cType, jdbcType=INTEGER},
+        a.c_state = #{cState, jdbcType=INTEGER},
+        a.modify_state = #{modifyState, jdbcType=INTEGER},
+        a.task_count = #{taskCount, jdbcType=INTEGER},
+        a.task_wait = #{taskWait, jdbcType=INTEGER},
         <if test="checkUser != null ">a.check_user = #{checkUser},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP},
         <if test="weather != null">a.weather = #{weather},</if>

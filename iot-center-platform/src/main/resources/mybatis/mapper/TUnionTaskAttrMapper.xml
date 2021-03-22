@@ -47,12 +47,12 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TUnionTaskAttr">
         update t_union_task_attr a <set>
         <if test="unionId != null ">a.union_id = #{unionId},</if>
-        <if test="instanceId != null">a.instance_id = #{instanceId},</if>
-        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        a.instance_id = #{instanceId},
+        a.device_mete_id = #{deviceMeteId},
         <if test="deviceCustomId != null ">a.device_custom_id = #{deviceCustomId},</if>
-        <if test="ifRobot != null ">a.if_robot = #{ifRobot},</if>
-        <if test="ifVideo != null ">a.if_video = #{ifVideo},</if>
-        <if test="ifInferad != null ">a.if_inferad = #{ifInferad},</if>
+        a.if_robot = #{ifRobot},
+        a.if_video = #{ifVideo},
+        a.if_inferad = #{ifInferad},
     </set>
             where a.union_id = #{unionId, jdbcType=VARCHAR}
     </update>

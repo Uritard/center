@@ -53,7 +53,7 @@
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
         <if test="cunstomId != null">a.cunstom_id = #{cunstomId},</if>
         a.record_time = #{recordTime, jdbcType=TIMESTAMP},
-        <if test="meteKind != null">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        a.mete_kind = #{meteKind, jdbcType=INTEGER},
         <if test="regionId != null">a.region_id = #{regionId},</if>
         <if test="meteValue != null ">a.mete_value = #{meteValue},</if>
         <if test="lastMeteValue != null">a.last_mete_value = #{lastMeteValue},</if>
