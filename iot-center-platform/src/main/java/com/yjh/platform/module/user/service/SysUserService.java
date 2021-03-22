@@ -143,7 +143,7 @@ public class SysUserService {
                     }
 
                 }
-                if (!sysUserLogin.getPassword().equals(password)) {
+                if (!sysUserLogin.getPassword().equals(sysUserBackUp.getPassword())) {
                     SysUser sysUsers=new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
                     sysUsers.setUserId(sysUserLogin.getUserId());
