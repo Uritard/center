@@ -122,15 +122,7 @@ public class IsWarnAfterCruiseThread implements Runnable{
         }
     }
     public Result sendPostRequest(String url, Map<String,Object> params) {
-        Result response = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                response = serviceRestTemplate.getForObject(url, Result.class,params);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+        Result response = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class,params);
         return response;
     }
     //Redis数据库批量查询Key值游标

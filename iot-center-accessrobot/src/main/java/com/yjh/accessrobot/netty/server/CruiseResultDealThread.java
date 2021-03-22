@@ -259,8 +259,8 @@ public class CruiseResultDealThread implements Runnable{
                         jasonMap.put("type", "finishedOneInstance");
                         jasonMap.put("taskId", taskId);
                         String json = JSON.toJSONString(jasonMap);
-                        log.info("发送给前端的消息：" + json);
-                        Constant.getUrl(json,webSocketUrl);
+                        StaticContextAccessor.getBean(RobotService.class).sendWebSocket(json);
+
                     }
                 }
 
@@ -422,8 +422,7 @@ public class CruiseResultDealThread implements Runnable{
                         jasonMap.put("type", "lastOneInstance");
                         jasonMap.put("taskId",taskId);
                         String json = JSON.toJSONString(jasonMap);
-                        log.info("发送给前端的消息：" + json);
-                        Constant.getUrl(json,webSocketUrl);
+                        StaticContextAccessor.getBean(RobotService.class).sendWebSocket(json);
 
                     }else{
                         log.info("机器人巡检点不是最后一个点");

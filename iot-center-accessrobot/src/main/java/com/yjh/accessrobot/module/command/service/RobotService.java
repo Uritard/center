@@ -1341,5 +1341,10 @@ public class RobotService {
     public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
         return tRobotInfoDao.selectDeviceMeteInfo(instanceId);
     }
+    public int sendWebSocket(String json){
+        log.info("发送给前端的消息：" + json);
+        Constant.getUrl(json,webSocketUrl);
+        return 1;
+    }
 }
 
