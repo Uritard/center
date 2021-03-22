@@ -14,6 +14,7 @@ import com.yjh.logs.module.log.entity.SysLogDetail;
 import com.yjh.logs.module.log.service.SysLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -39,6 +40,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -65,7 +67,7 @@ public class SysLogController {
 
     //请求webSocket发送方法
     public String postUrl(String json) throws IOException, URISyntaxException {
-        String url = redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content").toString();
+        String url = redisTemplate.opsForHash().get("t_sys_param:webSocketUrl", "content").toString();
         CloseableHttpClient client = HttpClients.createDefault();
         URI uri = new URIBuilder(url).setParameter("json", json).build();
         HttpPost httpPost = new HttpPost(uri);
@@ -222,6 +224,8 @@ public class SysLogController {
                 new Thread(() -> {
                     try {
                         postUrl(json);
+                        String err = "错误日志";
+                        redisTemplate.opsForValue().set("errorLog", err, 5, TimeUnit.MINUTES);
                         // Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
                     } catch (Exception e) {
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -379,6 +383,20 @@ public class SysLogController {
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("日志统计失败：" + e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "是否返回错误日志")
+    @RequestMapping(value = "/errLog", method = RequestMethod.GET)
+    public Result errLog() {
+        Result result = new Result();
+        String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
+        if (StringUtils.isNotBlank(errorLog)) {
+            result.setMessage(ResultCodeEnum.CODE0.getCode(), ResultCodeEnum.CODE0.getName());
+        } else {
+            result.setMessage(ResultCodeEnum.CODE1.getCode(), ResultCodeEnum.CODE1.getName());
         }
         return result;
     }

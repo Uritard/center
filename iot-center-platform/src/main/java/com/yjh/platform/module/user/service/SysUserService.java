@@ -76,15 +76,15 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long userId) {
-        redisTemplate.delete("userInfo:"+userId);
+        redisTemplate.delete("userInfo:" + userId);
         this.SysUserBackUpDao.deleteByPrimaryId(userId);
         return this.sysUserDao.deleteByPrimaryId(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) throws IOException {
-        Long roleId=sysUser.getRoleId();
-        if(roleId!=null){
+        Long roleId = sysUser.getRoleId();
+        if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
         }
         return this.sysUserDao.update(sysUser);
@@ -95,24 +95,24 @@ public class SysUserService {
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
         Map<String, Object> mapResult = new HashMap<>();
         if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
-            String userName=null;
-            String password=null;
-            Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-            Map<String,String> lockTimes= redisTemplate.opsForHash().entries("t_sys_param:lockTime");
-            Map<String,String> loginNum= redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
-            String isLogin =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
-            String isDecode =enmap.get("content");
-            if("true".equals(isDecode)) {
-                 userName =Demo.decrypt(userMap.get("userName"));
-                 password =Demo.decrypt(userMap.get("password"));
+            String userName = null;
+            String password = null;
+            Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            Map<String, String> lockTimes = redisTemplate.opsForHash().entries("t_sys_param:lockTime");
+            Map<String, String> loginNum = redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
+            String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
+            String isDecode = enmap.get("content");
+            if ("true".equals(isDecode)) {
+                userName = Demo.decrypt(userMap.get("userName"));
+                password = Demo.decrypt(userMap.get("password"));
                 // String verfiCode = userMap.get("verfiCode");
-            }else{
-                 userName =userMap.get("userName");
-                 password =userMap.get("password");
+            } else {
+                userName = userMap.get("userName");
+                password = userMap.get("password");
             }
             String replayAvoid = userMap.get("replayAvoid");
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
-            if(Objects.equals(null, sysUserLogin)){
+            if (Objects.equals(null, sysUserLogin)) {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "5");
                 params.set("ip", request.getRemoteHost());
@@ -131,11 +131,11 @@ public class SysUserService {
                 return mapResult;
             }
             SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
-            if (!Objects.equals(null, sysUserLogin)&&Demo.decryptDB(sysUserBackUp.getPassword()).equals(password)&&userName.equals(sysUserLogin.getUserName())) {
-                if("true".equals(isLogin)){
-                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:"+sysUserLogin.getUserId());
-                    if(appKeymap.size()!=0){
-                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:"+sysUserLogin.getUserId(), "expireTime")));
+            if (!Objects.equals(null, sysUserLogin) && Demo.decryptDB(sysUserBackUp.getPassword()).equals(password) && userName.equals(sysUserLogin.getUserName())) {
+                if ("true".equals(isLogin)) {
+                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:" + sysUserLogin.getUserId());
+                    if (appKeymap.size() != 0) {
+                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:" + sysUserLogin.getUserId(), "expireTime")));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
                             throw new BusinessException(500, "用户已登陆");
@@ -144,7 +144,7 @@ public class SysUserService {
 
                 }
                 if (!sysUserLogin.getPassword().equals(sysUserBackUp.getPassword())) {
-                    SysUser sysUsers=new SysUser();
+                    SysUser sysUsers = new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
                     sysUsers.setUserId(sysUserLogin.getUserId());
                     sysUserDao.update(sysUsers);
@@ -184,13 +184,13 @@ public class SysUserService {
                         Calendar calendarOne = Calendar.getInstance();
                         calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
-                        if (lockTime < Integer.valueOf(lockTimes.get("content"))*60) { //如果锁定时间小于1200S
+                        if (lockTime < Integer.valueOf(lockTimes.get("content")) * 60) { //如果锁定时间小于1200S
                             mapResult.put("errorCount", "账户已被锁定！");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
                             return mapResult;
                         } else {
-                            if (yxTime>=sysUserLogin.getInvalidTime()) {
+                            if (yxTime >= sysUserLogin.getInvalidTime()) {
                                 mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -212,11 +212,11 @@ public class SysUserService {
                             mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                             mapAppKey.put("appKey", appKey);
                             mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                            redisTemplate.opsForHash().putAll("appKey:"+userId+":"+ appKey, mapAppKey);
-                            if("true".equals(isLogin)){
+                            redisTemplate.opsForHash().putAll("appKey:" + userId + ":" + appKey, mapAppKey);
+                            if ("true".equals(isLogin)) {
                                 Map<String, Object> mapUser = new HashMap<>();
                                 mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                                redisTemplate.opsForHash().putAll("user:"+userId, mapUser);
+                                redisTemplate.opsForHash().putAll("user:" + userId, mapUser);
                             }
                         }
 
@@ -227,7 +227,7 @@ public class SysUserService {
                         return mapResult;
                     }
                     if (sysUserLogin.getState() == 1) {
-                        if (yxTime>=sysUserLogin.getInvalidTime()) {
+                        if (yxTime >= sysUserLogin.getInvalidTime()) {
                             mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -249,11 +249,11 @@ public class SysUserService {
                         mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                         mapAppKey.put("appKey", appKey);
                         mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        redisTemplate.opsForHash().putAll("appKey:"+userId+":"+ appKey, mapAppKey);
-                        if("true".equals(isLogin)){
+                        redisTemplate.opsForHash().putAll("appKey:" + userId + ":" + appKey, mapAppKey);
+                        if ("true".equals(isLogin)) {
                             Map<String, Object> mapUser = new HashMap<>();
                             mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                            redisTemplate.opsForHash().putAll("user:"+userId, mapUser);
+                            redisTemplate.opsForHash().putAll("user:" + userId, mapUser);
                         }
                     }
                 } else {
@@ -292,9 +292,9 @@ public class SysUserService {
                 if (num == null) { //第一次访问错误
                     redisTemplate.opsForValue().set(key, 1);
                     num = 1;
-                } else if (num+1 >= Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
+                } else if (num + 1 >= Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
                     if (!userId.equals("10001")) { //admin用户不可锁定
-                        SysUser user=new SysUser();
+                        SysUser user = new SysUser();
                         user.setState(2);
                         Date date = new Date();
                         user.setLockTime(date);
@@ -303,6 +303,10 @@ public class SysUserService {
                     }
                     redisTemplate.opsForValue().increment(key, 1);
                     num = num + 1;
+                    mapResult.put("errorCount", "账户已被锁定！");
+                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                    return mapResult;
                 } else {
                     redisTemplate.opsForValue().increment(key, 1);
                     num = num + 1;
@@ -321,6 +325,7 @@ public class SysUserService {
 
         return mapResult;
     }
+
     @Transactional(rollbackFor = Exception.class)
     public SysUserSelect selectByPrimaryIds(Long userId) {
         return this.sysUserDao.selectByPrimaryIds(userId);
@@ -397,13 +402,13 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int userLogout(String userId,String token) {
+    public int userLogout(String userId, String token) {
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
         sysUserParams.setUserId(userIdLong);
         redisTemplate.delete("appKey:" + userId + ":" + token);
-        redisTemplate.delete("user:"+userId);
+        redisTemplate.delete("user:" + userId);
         return this.sysUserDao.update(sysUserParams);
     }
 
@@ -428,12 +433,12 @@ public class SysUserService {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
-        Map<String,String> enmap= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-        String isDecode =enmap.get("content");
-        if("true".equals(isDecode)) {
+        Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+        String isDecode = enmap.get("content");
+        if ("true".equals(isDecode)) {
             linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
-            sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPassword")) ));
-        }else{
+            sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPassword"))));
+        } else {
             linkedHashMap.put("password", map.get("newPassword"));
             sysUser.setPassword(Demo.encryption(map.get("newPassword")));
         }
@@ -470,14 +475,14 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int insertIntoRedis(){
+    public int insertIntoRedis() {
         List<SysUser> list = this.sysUserDao.selectUser();
-        for (SysUser item:list) {
+        for (SysUser item : list) {
             Map map = new HashMap();
-            map.put("userId",item.getUserId());
-            map.put("userName",item.getUserName());
-            map.put("roleId",item.getRoleId());
-            String str = "userInfo:"+item.getUserId();
+            map.put("userId", item.getUserId());
+            map.put("userName", item.getUserName());
+            map.put("roleId", item.getRoleId());
+            String str = "userInfo:" + item.getUserId();
             redisTemplate.opsForHash().putAll(str, Object2Map.toStringMap(map));
         }
         return 1;
