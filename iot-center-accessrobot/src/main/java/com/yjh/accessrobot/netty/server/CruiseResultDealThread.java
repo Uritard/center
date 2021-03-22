@@ -9,6 +9,7 @@ import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -37,6 +38,8 @@ public class CruiseResultDealThread implements Runnable{
     private RedisTemplate redisTemplate;
 
     private Map<String,String> cruiseResultMap;
+    @Value("${other.webSocketUrl}")
+    private String webSocketUrl;
 
     public CruiseResultDealThread(Map<String,String> cruiseResultMap,RedisTemplate redisTemplate){
         this.cruiseResultMap = cruiseResultMap;
@@ -252,8 +255,6 @@ public class CruiseResultDealThread implements Runnable{
 
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
                         //做完一个点给前端推一次webSocket
-                        Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
-                        String webSocketUrl = webSocketUrlMap.get("content");
                         Map<String, Object> jasonMap = new HashMap<>();
                         jasonMap.put("type", "finishedOneInstance");
                         jasonMap.put("taskId", taskId);
@@ -417,8 +418,6 @@ public class CruiseResultDealThread implements Runnable{
                         StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 
                         // webSocket通知前端调用巡视监控的接口（任务完成）
-                        Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
-                        String webSocketUrl = webSocketUrlMap.get("content");
                         Map<String, Object> jasonMap = new HashMap<>();
                         jasonMap.put("type", "lastOneInstance");
                         jasonMap.put("taskId",taskId);

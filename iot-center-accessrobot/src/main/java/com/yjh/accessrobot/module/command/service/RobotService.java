@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,8 @@ public class RobotService {
     private TRobotRegionDao tRobotRegionDao;
     @Resource
     private SysUserDao sysUserDao;
+    @Value("${other.webSocketUrl}")
+    private String webSocketUrl;
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) throws Exception{
@@ -1178,8 +1181,6 @@ public class RobotService {
         return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
     }
     public int methodTest1(String taskId){
-        Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
-        String webSocketUrl = webSocketUrlMap.get("content");
         Map<String, Object> jasonMap = new HashMap<>();
         jasonMap.put("type", "finishedOneInstance");
         jasonMap.put("taskId", taskId);
