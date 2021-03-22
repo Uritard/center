@@ -87,8 +87,11 @@ public class CameraConService {
 
     @Value("${nvr.capture.savePath}")
     private String savePath;//下载视频地址
-    @Value("${service.video.Path}")
 
+    @Value("${video.https.enable}")
+    private Integer videoHttps;//是否支持https
+
+    @Value("${service.video.Path}")
     private String SERVICE_URL;//获取可视台账用户
 
 
@@ -146,9 +149,14 @@ public class CameraConService {
             log.info("transUrl: "+transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-            String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
             returnMap.put("rtmpUrl", rtmpUrl);
-            returnMap.put("flvUrl", flvUrl);
+            if (videoHttps==1) {
+                String flvsUrl = "https://"+hostIp+":8088/live/"+livePath+".flv";
+                returnMap.put("flvsUrl", flvsUrl);
+            } else {
+                String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
+                returnMap.put("flvUrl", flvUrl);
+            }
             Constant.mapsForCamera.put(String.valueOf(cameraId), rtmpUrl);
             redisTemplate.opsForHash().putAll("cameraRealFlow:"+cameraId, returnMap);
             log.info("mapsForCamera: "+Constant.mapsForCamera);
@@ -235,11 +243,17 @@ public class CameraConService {
                     log.info("transUrl: "+transUrl);
                     String[] rtmpUrls = transUrl.split("rtmp");
                     String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-                    String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
+
                     Map<String, Object> returnMap = new HashMap<>();
                     returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
                     returnMap.put("rtmpUrl", rtmpUrl);
-                    returnMap.put("flvUrl", flvUrl);
+                    if (videoHttps==1) {
+                        String flvsUrl = "https://"+hostIp+":8088/live/"+livePath+".flv";
+                        returnMap.put("flvsUrl", flvsUrl);
+                    } else {
+                        String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
+                        returnMap.put("flvUrl", flvUrl);
+                    }
                     returnMapList.add(returnMap);
                     Constant.mapsForCamera.put(String.valueOf(cameraConInfo.getCameraId()), rtmpUrl);
                     redisTemplate.opsForHash().putAll("cameraRealFlow:"+cameraId, returnMap);
@@ -278,11 +292,17 @@ public class CameraConService {
         log.info("transUrlLight: "+transUrlLight);
         String[] rtmpUrls = transUrlLight.split("rtmp");
         String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-        String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
+
         Map<String, Object> returnLightMap = new HashMap<>();
         returnLightMap.put("light", String.valueOf(robotId));
         returnLightMap.put("rtmpUrl", rtmpUrl);
-        returnLightMap.put("flvUrl", flvUrl);
+        if (videoHttps==1) {
+            String flvsUrl = "https://"+hostIp+":8088/live/"+livePath+".flv";
+            returnLightMap.put("flvsUrl", flvsUrl);
+        } else {
+            String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
+            returnLightMap.put("flvUrl", flvUrl);
+        }
         Constant.mapsForRobot.put(String.valueOf(robotId)+":light", rtmpUrl);
         log.info("mapsForRobot: "+Constant.mapsForRobot);
 
@@ -297,11 +317,17 @@ public class CameraConService {
         log.info("transUrlinferad: "+transUrlinferad);
         String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
         String rtmpUrlInferad = "rtmp"+rtmpUrlsInferad[rtmpUrlsInferad.length-1];
-        String flvUrlInferad = "http://"+hostIp+":10080/live/"+livePath+".flv";
+
         Map<String, Object> returnInferadMap = new HashMap<>();
         returnInferadMap.put("inferad", String.valueOf(robotId));
         returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
-        returnInferadMap.put("flvUrlInferad", flvUrlInferad);
+        if (videoHttps==1) {
+            String flvsUrlInferad = "https://"+hostIp+":8088/live/"+livePath+".flv";
+            returnInferadMap.put("flvsUrlInferad", flvsUrlInferad);
+        } else {
+            String flvUrlInferad = "http://"+hostIp+":10080/live/"+livePath+".flv";
+            returnInferadMap.put("flvUrlInferad", flvUrlInferad);
+        }
         Constant.mapsForRobot.put(String.valueOf(robotId)+":inferad", rtmpUrlInferad);
         log.info("mapsForRobot: "+Constant.mapsForRobot);
 
@@ -393,10 +419,16 @@ public class CameraConService {
             Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp"+rtmpUrls[rtmpUrls.length-1];
-            String flvUrl = "http://"+hostIp+":10080/history/"+historyPath+".flv";
+
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
-            returnMap.put("flvUrl", flvUrl);
+            if (videoHttps==1) {
+                String flvsUrl = "https://"+hostIp+":8088/live/"+historyPath+".flv";
+                returnMap.put("flvsUrl", flvsUrl);
+            } else {
+                String flvUrl = "http://"+hostIp+":10080/history/"+historyPath+".flv";
+                returnMap.put("flvUrl", flvUrl);
+            }
             Constant.mapsForCamera.put(String.valueOf(cameraId), rtmpUrl);
             log.info("mapsForCamera: "+Constant.mapsForCamera);
             log.info("returnMap: "+returnMap);
