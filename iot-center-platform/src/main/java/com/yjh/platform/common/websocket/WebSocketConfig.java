@@ -1,4 +1,4 @@
-package com.yjh.gateway.common.websocket;
+package com.yjh.platform.common.websocket;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

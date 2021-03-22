@@ -1,4 +1,4 @@
-package com.yjh.gateway.common.websocket;
+package com.yjh.platform.common.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
