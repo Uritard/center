@@ -789,6 +789,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
                     cResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
                     cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
+                    cResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
                     IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate);
                     TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
 
@@ -923,6 +924,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             robotService.updateRobotInfo(robotCode,"在线");
             robotStatusMap.put("value","0");//正常
             redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
+            flag2 = 0;
         }
     }
     /*
