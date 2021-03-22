@@ -427,21 +427,4 @@ public class TCruiseTaskController {
         return  result;
     }
 
-    @ApiOperation(value = "同步到websocket")
-    @RequestMapping(value = "/syncWebsocket", method = RequestMethod.POST)
-    public Result syncWebsocketInfo(@RequestParam(value = "json") String json) {
-        Result result = new Result();
-        try {
-            WebSocketServer.sendMsg(json);
-            result.setData("同步到websocket");
-        } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("同步到websocket异常:", e);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("同步到websocket错误:", e);
-        }
-        return result;
-    }
-
 }

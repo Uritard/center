@@ -1,4 +1,4 @@
-package com.yjh.platform.common.websocket;
+package com.yjh.gateway.common.websocket;
 
 import lombok.Builder;
 import lombok.Data;
