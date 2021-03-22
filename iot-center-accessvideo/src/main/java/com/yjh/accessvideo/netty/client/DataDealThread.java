@@ -22,6 +22,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -49,6 +50,7 @@ public class DataDealThread implements Runnable {
     private ChannelHandlerContext ctx;
     private String TASKID;
     private String INSTANCEID;
+    @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;
 
 
@@ -57,13 +59,13 @@ public class DataDealThread implements Runnable {
         this.redisTemplate = redisTemplate;
         this.body = body;
         this.ctx = ctx;
-        this.syncWebsocketUrl=redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content").toString();
     }
 
 
 
     //请求webSocket发送方法
     public String postUrl(String url, String json) throws IOException, URISyntaxException {
+        log.info("webSocketUrl"+url);
         CloseableHttpClient client = HttpClients.createDefault();
         URI uri = new URIBuilder(url).setParameter("json", json).build();
         HttpPost httpPost = new HttpPost(uri);

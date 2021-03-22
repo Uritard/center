@@ -491,6 +491,7 @@ public class CameraConController {
         if (map.size()>0)
         {
             result.setData(map);
+            result.setMessage("success");
         }else
             {
                 result.setData("获取文件失败");

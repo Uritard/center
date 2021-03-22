@@ -222,8 +222,17 @@ public class TCruiseTaskResultService {
                     } else {
                         Map<String, Object> cruiseVideoInfo = redisTemplate.opsForHash().entries("cruiseVideo:" + taskId + (cruiseInspectResult.getInstanceId()).toString());
                         videoInfo.put("cameraId", cruiseVideoInfo.get("cameraId").toString());
-                        videoInfo.put("flvUrl", cruiseVideoInfo.get("flvUrl").toString());
-                        videoInfo.put("rtmpUrl", cruiseVideoInfo.get("rtmpUrl").toString());
+                        if(Objects.nonNull(cruiseVideoInfo.get("flvUrl"))){
+                            videoInfo.put("flvUrl", cruiseVideoInfo.get("flvUrl").toString());
+                        }else {
+                            videoInfo.put("flvUrl",null);
+                        }
+                       if(Objects.nonNull(cruiseVideoInfo.get("rtmpUrl"))){
+                           videoInfo.put("rtmpUrl", cruiseVideoInfo.get("rtmpUrl").toString());
+                       }else {
+                           videoInfo.put("rtmpUrl",null);
+                       }
+
 
                     }
                     cruiseInspectResult.setVideoInfo(videoInfo);

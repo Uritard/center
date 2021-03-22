@@ -74,6 +74,7 @@ public class AnalysisService {
                 pictureDataObject.put("analyseType", analysis.getAnalyseType());
                 pictureDataObject.put("imagePath", analysis.getPicPath());
                 pictureDataObject.put("modelPath", analysis.getPicModelPath());
+                pictureDataObject.put("meterResultImg",redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content").toString());//表计算法图片存储路径
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                 if(firHandelMap.size()!=0){
@@ -133,8 +134,8 @@ public class AnalysisService {
                     pictureDataObject.put("imagePath", analysis.getPicPath());
                     pictureDataObject.put("modelPath", analysis.getPicModelPath());
                     pictureDataObject.put("taskId", analysis.getTaskId());
-                    pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                     pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                    pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
                     log.info("DATA内容:"+pictureInfoObject);
                 }
                 i++;
