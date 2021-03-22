@@ -922,7 +922,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         send(ctx, heartProtocol,robotCode);
         flag2 ++;
         log.info("成功收到心跳flag2的值==="+flag2);
-        if (flag2 > 3){
+        if (flag2 > 4){
             robotService.updateRobotInfo(robotCode,"在线");
             robotStatusMap.put("value","0");//正常
             redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
